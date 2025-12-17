@@ -1,0 +1,2038 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prestige Goal Motion - Alquiler de Coches de Lujo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        :root {
+            --black: #0a0a0a;
+            --gold: #d4af37;
+            --silver: #c0c0c0;
+            --darkgray: #1a1a1a;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--black);
+            color: white;
+            line-height: 1.6;
+        }
+        header {
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        header.scrolled { background: rgba(10, 10, 10, 0.95); }
+        .logo {
+            height: 50px;
+            width: auto;
+        }
+        .logo img {
+            height: 100%;
+            width: auto;
+            object-fit: contain;
+        }
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2.5rem;
+        }
+        nav a {
+            color: var(--silver);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        nav a:hover { color: var(--gold); }
+
+        /* Hero */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.8)),
+                        url('https://images.unsplash.com/photo-1617654112368-307921291f42?q=80&w=1313&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') center/cover no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 5%;
+            position: relative;
+        }
+        .hero-title-img {
+            max-width: 800px;
+            width: 100%;
+            height: auto;
+            margin-bottom: 2rem;
+            z-index: 10;
+            filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.6));
+        }
+        .hero h1 {
+            font-size: 4.5rem;
+            margin-bottom: 1rem;
+            color: var(--gold);
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+            display: none; /* Ocultamos el texto h1 si usamos la imagen */
+        }
+        .hero p {
+            font-size: 1.6rem;
+            max-width: 700px;
+            margin-bottom: 2.5rem;
+            color: var(--silver);
+        }
+        .btn {
+            background: var(--gold);
+            color: var(--black);
+            padding: 1rem 2.5rem;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 50px;
+            transition: all 0.3s;
+            font-size: 1.2rem;
+            display: inline-block;
+        }
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Sección de presentación */
+        .presentation {
+            background: var(--black);
+            padding: 6rem 5%;
+            text-align: center;
+        }
+        .presentation h2 {
+            font-size: 3rem;
+            color: var(--gold);
+            margin-bottom: 2rem;
+            letter-spacing: 3px;
+        }
+        .presentation .subtitle {
+            font-size: 1.4rem;
+            color: var(--silver);
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .presentation .description {
+            font-size: 1.1rem;
+            color: var(--silver);
+            line-height: 1.8;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Secciones */
+        section {
+            padding: 8rem 5%;
+        }
+        h2 {
+            text-align: center;
+            font-size: 3.5rem;
+            margin-bottom: 4rem;
+            color: var(--gold);
+        }
+
+        /* Flota */
+        .fleet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .car-card {
+            background: var(--darkgray);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.4s;
+            border: 1px solid #333;
+        }
+        .car-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 20px 40px rgba(212, 175, 55, 0.2);
+        }
+        .car-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+        .car-info {
+            padding: 2rem;
+            text-align: center;
+        }
+        .car-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        .price {
+            font-size: 1.5rem;
+            color: var(--gold);
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+        .btn-reservar {
+            background: var(--gold);
+            color: var(--black);
+            padding: 0.8rem 2rem;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 50px;
+            transition: all 0.3s;
+            font-size: 1rem;
+            display: inline-block;
+            margin-top: 1rem;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-reservar:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Modal de Reserva */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(5px);
+            overflow-y: auto;
+        }
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .modal-content {
+            background: var(--darkgray);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 900px;
+            width: 100%;
+            position: relative;
+            border: 2px solid var(--gold);
+            box-shadow: 0 20px 60px rgba(212, 175, 55, 0.3);
+        }
+        .close-modal {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            color: var(--silver);
+            cursor: pointer;
+            transition: color 0.3s;
+            background: none;
+            border: none;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .close-modal:hover {
+            color: var(--gold);
+        }
+        .reservation-form {
+            display: grid;
+            gap: 2rem;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .form-group label {
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .form-group input,
+        .form-group select {
+            padding: 1rem;
+            background: #222;
+            color: white;
+            border: 1px solid #444;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Stripe Elements */
+        .stripe-payment-container {
+            background: #222;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        #card-element {
+            padding: 1rem;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 10px;
+            color: white;
+        }
+        #card-element:focus {
+            border-color: var(--gold);
+        }
+        .StripeElement {
+            color: white;
+        }
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        @media (min-width: 768px) {
+            .payment-methods {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .apple-pay-btn {
+                grid-column: span 1;
+            }
+        }
+        .payment-method-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1.5rem 1rem;
+            background: #222;
+            border: 2px solid #444;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        .payment-method-btn:hover {
+            border-color: var(--gold);
+            background: #2a2a2a;
+            transform: translateY(-2px);
+        }
+        .payment-method-btn.active {
+            border-color: var(--gold);
+            background: rgba(212, 175, 55, 0.1);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+        .payment-method-btn i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .payment-method-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .payment-method-btn.disabled:hover {
+            transform: none;
+            border-color: #444;
+            background: #222;
+        }
+        .apple-pay-btn {
+            background: #000 !important;
+            border: 2px solid #fff !important;
+            position: relative;
+        }
+        .apple-pay-btn:hover {
+            background: #1a1a1a !important;
+            border-color: var(--gold) !important;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.2) !important;
+        }
+        .apple-pay-btn.active {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border-color: var(--gold) !important;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.5) !important;
+        }
+        .payment-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #444;
+        }
+        .customer-data-summary {
+            background: #222;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        .customer-data-summary h3 {
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+        .customer-data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #444;
+        }
+        .customer-data-row:last-child {
+            border-bottom: none;
+        }
+        .customer-data-label {
+            color: var(--silver);
+        }
+        .customer-data-value {
+            color: white;
+            font-weight: 500;
+        }
+        .error-message {
+            color: #ff4444;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        .success-message {
+            color: #44ff44;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Calendario */
+        .calendar-container {
+            background: #222;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            color: var(--gold);
+        }
+        .calendar-nav {
+            background: var(--gold);
+            color: var(--black);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        .calendar-day.header {
+            color: var(--gold);
+            font-weight: bold;
+            cursor: default;
+        }
+        .calendar-day.available {
+            background: #2a2a2a;
+            color: white;
+        }
+        .calendar-day.available:hover {
+            background: var(--gold);
+            color: var(--black);
+        }
+        .calendar-day.unavailable {
+            background: #1a1a1a;
+            color: #666;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        .calendar-day.selected {
+            background: var(--gold);
+            color: var(--black);
+            font-weight: bold;
+        }
+        .calendar-day.today {
+            border: 2px solid var(--gold);
+        }
+        .calendar-day.past {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .reservation-summary {
+            background: #222;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid #444;
+        }
+        .summary-row:last-child {
+            border-bottom: none;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--gold);
+        }
+        .total-price {
+            font-size: 2rem;
+            color: var(--gold);
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+
+        /* Reserva */
+        #reserva {
+            background: var(--darkgray);
+            text-align: center;
+        }
+
+        /* Contacto */
+        #contacto {
+            background: var(--black);
+        }
+        .contact-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+        @media (max-width: 968px) {
+            .contact-container {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+        }
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: var(--darkgray);
+            border-radius: 15px;
+            border: 1px solid #333;
+            transition: all 0.3s;
+        }
+        .contact-item:hover {
+            border-color: var(--gold);
+            transform: translateX(10px);
+        }
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gold);
+            color: var(--black);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        .contact-details h3 {
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+        .contact-details p {
+            color: var(--silver);
+            margin: 0.3rem 0;
+        }
+        .contact-details a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .contact-details a:hover {
+            color: var(--silver);
+            text-decoration: underline;
+        }
+        .contact-form-container {
+            background: var(--darkgray);
+            padding: 3rem;
+            border-radius: 20px;
+            border: 1px solid #333;
+        }
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .contact-form textarea {
+            padding: 1rem;
+            background: #222;
+            color: white;
+            border: 1px solid #444;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Segoe UI', sans-serif;
+            resize: vertical;
+            min-height: 150px;
+        }
+        .contact-form textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+        .contact-form button {
+            background: var(--gold);
+            color: var(--black);
+            padding: 1.2rem 2.5rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        .contact-form button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+        }
+        .social-links-contact {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .social-links-contact a {
+            width: 45px;
+            height: 45px;
+            background: var(--darkgray);
+            border: 2px solid #444;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--silver);
+            font-size: 1.3rem;
+            transition: all 0.3s;
+        }
+        .social-links-contact a:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+            transform: translateY(-5px);
+        }
+        form {
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+        }
+        input, button {
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+        }
+        input {
+            background: #222;
+            color: white;
+            flex: 1;
+            min-width: 200px;
+        }
+        button {
+            background: var(--gold);
+            color: var(--black);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Banner del Footer */
+        .footer-banner {
+            width: 100%;
+            background: var(--black);
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+        .footer-banner img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+        }
+        .footer-banner::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.5));
+            pointer-events: none;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--black);
+            text-align: center;
+            padding: 3rem 5%;
+            border-top: 1px solid #333;
+        }
+        footer a {
+            color: var(--silver);
+            margin: 0 1rem;
+            font-size: 1.5rem;
+            transition: color 0.3s;
+        }
+        footer a:hover { color: var(--gold); }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 3rem; }
+            .hero-title-img {
+                max-width: 90%;
+                margin-bottom: 1.5rem;
+            }
+            .logo {
+                height: 40px;
+            }
+            nav ul { gap: 1.2rem; }
+            nav { display: none; } /* Puedes añadir menú hamburguesa después */
+            .footer-banner img {
+                min-height: 200px;
+                object-fit: cover;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <img src="https://static.wixstatic.com/media/a11208_3c3efc0ce03a49b5b22d8e9fc1451ee2~mv2.png/v1/crop/x_0,y_68,w_765,h_443/fill/w_342,h_198,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/LOGO%20FINAL%20PGM.png" alt="Prestige Goal Motion">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#inicio">Inicio</a></li>
+                <li><a href="#flota">Flota</a></li>
+                <li><a href="#reserva">Reservas</a></li>
+                <li><a href="#contacto">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero -->
+    <section id="inicio" class="hero">
+        <img src="https://static.wixstatic.com/media/a11208_3c3efc0ce03a49b5b22d8e9fc1451ee2~mv2.png/v1/crop/x_0,y_303,w_765,h_163/fill/w_1068,h_228,al_c,lg_1,q_85,enc_avif,quality_auto/a11208_3c3efc0ce03a49b5b22d8e9fc1451ee2~mv2.png" alt="Prestige Goal Motion" class="hero-title-img">
+        <h1>CONDUCE EL LUJO</h1>
+        <p>Alquiler de superdeportivos y vehículos de alta gama en españa y dubai. Conduce hoy el superdeportivo de tus sueños.</p>
+        <a href="#reserva" class="btn">RESERVAR AHORA</a>
+    </section>
+
+    <!-- Presentación -->
+    <section class="presentation">
+        <h2>ONE GOAL, ONE VISION</h2>
+        <p class="subtitle">Explora nuestra amplia gama de coches de lujo y conduce hoy el auto de tus sueños.</p>
+        <p class="description">En Prestige Goal Motion, redefinimos la experiencia de alquiler de coches de lujo, combinando elegancia, exclusividad y excelencia en cada detalle. Nos especializamos en ofrecer vehículos de alta gama que no solo transportan, sino que elevan cada trayecto a un nivel extraordinario.</p>
+    </section>
+
+    <!-- Flota -->
+    <section id="flota">
+        <h2>Nuestra Flota Exclusiva</h2>
+        <div class="fleet-grid">
+            <div class="car-card">
+                <img src="https://a.ccdn.es/nuevos/400/mercedes/glecoupe/2020/5od-4.jpg" alt="Mercedes GLE 53 AMG">
+                <div class="car-info">
+                    <h3>Mercedes GLE 53 AMG</h3>
+                    <div class="price">Desde 450 € / día</div>
+                    <button class="btn-reservar" onclick="openReservationModal('Mercedes GLE 53 AMG', 450)">RESERVAR AHORA</button>
+                </div>
+            </div>
+            <div class="car-card">
+                <img src="https://static.wixstatic.com/media/a11208_cdff107bcc264bd99ce840ca61df422c~mv2.webp/v1/fill/w_1024,h_768,al_c,q_85,enc_auto/a11208_cdff107bcc264bd99ce840ca61df422c~mv2.webp" alt="Mercedes GLE Coupe 400 D">
+                <div class="car-info">
+                    <h3>Mercedes GLE Coupe 400 D</h3>
+                    <div class="price">Desde 400 € / día</div>
+                    <button class="btn-reservar" onclick="openReservationModal('Mercedes GLE Coupe 400 D', 400)">RESERVAR AHORA</button>
+                </div>
+            </div>
+            <div class="car-card">
+                <img src="https://images.unsplash.com/photo-1543854589-fdd815f176e0?q=80&w=1904&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Lamborghini Huracán">
+                <div class="car-info">
+                    <h3>Lamborghini Huracán</h3>
+                    <div class="price">Desde 950 € / día</div>
+                    <button class="btn-reservar" onclick="openReservationModal('Lamborghini Huracán', 950)">RESERVAR AHORA</button>
+                </div>
+            </div>
+            <div class="car-card">
+                <img src="https://www.km77.com/images/medium/4/6/3/5/mercedes-amg-gle-63-s-coupe-2023-lateral-frontal.364635.jpg" alt="Mercedes GLE 400D">
+                <div class="car-info">
+                    <h3>Mercedes GLE 400D</h3>
+                    <div class="price">Desde 400 € / día</div>
+                    <button class="btn-reservar" onclick="openReservationModal('Mercedes GLE 400D', 400)">RESERVAR AHORA</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reserva -->
+    <section id="reserva">
+        <h2>Reserva tu Experiencia</h2>
+        <p style="color: var(--silver); margin-bottom: 2rem;">Selecciona un vehículo de nuestra flota y completa tu reserva</p>
+    </section>
+
+    <!-- Contacto -->
+    <section id="contacto">
+        <h2>Contacta con Nosotros</h2>
+        <div class="contact-container">
+            <!-- Información de Contacto -->
+            <div class="contact-info">
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="contact-details">
+                        <h3>Oficina Principal</h3>
+                        <p>Calle Cicón, 27</p>
+                        <p>España</p>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div class="contact-details">
+                        <h3>Teléfono</h3>
+                        <p><a href="tel:+34680162813">+34 680 162 813</a></p>
+                        <p style="color: var(--silver); font-size: 0.9rem;">Disponible 24 horas</p>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <div class="contact-details">
+                        <h3>WhatsApp</h3>
+                        <p><a href="https://wa.me/34680162813" target="_blank">+34 680 162 813</a></p>
+                        <p style="color: var(--silver); font-size: 0.9rem;">Disponible 24/7</p>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="contact-details">
+                        <h3>Email</h3>
+                        <p><a href="mailto:prestigegoalmotion@gmail.com">prestigegoalmotion@gmail.com</a></p>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="contact-details">
+                        <h3>Horario de Atención</h3>
+                        <p>24 horas</p>
+                        <p>Lunes a Lunes</p>
+                        <p style="color: var(--gold); font-weight: 600;">Siempre disponibles</p>
+                    </div>
+                </div>
+
+                <div class="social-links-contact">
+                    <a href="https://wa.me/34680162813" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    <a href="https://www.instagram.com/prestigegoalmotion" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+
+            <!-- Formulario de Contacto -->
+            <div class="contact-form-container">
+                <h3 style="color: var(--gold); margin-bottom: 1.5rem;">Envíanos un Mensaje</h3>
+                <form class="contact-form" id="contactForm" onsubmit="handleContactSubmit(event)">
+                    <div class="form-group">
+                        <label>Nombre completo *</label>
+                        <input type="text" id="contactName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" id="contactEmail" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="tel" id="contactPhone">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Asunto *</label>
+                        <select id="contactSubject" required>
+                            <option value="">Selecciona un asunto</option>
+                            <option value="reserva">Consulta sobre Reserva</option>
+                            <option value="flota">Información sobre Flota</option>
+                            <option value="precio">Consulta de Precios</option>
+                            <option value="evento">Eventos Corporativos</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Mensaje *</label>
+                        <textarea id="contactMessage" required placeholder="Escribe tu mensaje aquí..."></textarea>
+                    </div>
+                    
+                    <button type="submit">ENVIAR MENSAJE</button>
+                    <div id="contactFormStatus" style="text-align: center; margin-top: 1rem;"></div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal de Reserva -->
+    <div id="reservationModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeReservationModal()">&times;</button>
+            <h2 style="color: var(--gold); margin-bottom: 2rem; text-align: center;">Reservar: <span id="selectedCarName"></span></h2>
+            
+            <div class="reservation-form">
+                <h3 style="color: var(--gold); margin-bottom: 1rem;">Datos del Cliente</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nombre completo *</label>
+                        <input type="text" id="customerName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>DNI / NIE *</label>
+                        <input type="text" id="customerDNI" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" id="customerEmail" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Teléfono / WhatsApp *</label>
+                        <input type="tel" id="customerPhone" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Dirección completa *</label>
+                    <input type="text" id="customerAddress" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Ciudad *</label>
+                        <input type="text" id="customerCity" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Código Postal *</label>
+                        <input type="text" id="customerPostalCode" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>País *</label>
+                    <select id="customerCountry" required>
+                        <option value="">Selecciona un país</option>
+                        <option value="ES">España</option>
+                        <option value="FR">Francia</option>
+                        <option value="IT">Italia</option>
+                        <option value="DE">Alemania</option>
+                        <option value="GB">Reino Unido</option>
+                        <option value="US">Estados Unidos</option>
+                        <option value="AE">Emiratos Árabes Unidos</option>
+                        <option value="OT">Otro</option>
+                    </select>
+                </div>
+
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <button class="calendar-nav" onclick="changeMonth(-1)">‹ Anterior</button>
+                        <h3 id="currentMonth" style="margin: 0;"></h3>
+                        <button class="calendar-nav" onclick="changeMonth(1)">Siguiente ›</button>
+                    </div>
+                    <div id="calendarGrid" class="calendar-grid"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Fecha de inicio</label>
+                    <input type="date" id="startDate" required onchange="calculateTotal()">
+                </div>
+                
+                <div class="form-group">
+                    <label>Fecha de fin</label>
+                    <input type="date" id="endDate" required onchange="calculateTotal()">
+                </div>
+
+                <!-- Resumen de Datos del Cliente -->
+                <div class="customer-data-summary" id="customerDataSummary" style="display: none;">
+                    <h3>Resumen de tus Datos</h3>
+                    <div class="customer-data-row">
+                        <span class="customer-data-label">Nombre:</span>
+                        <span class="customer-data-value" id="summaryCustomerName">-</span>
+                    </div>
+                    <div class="customer-data-row">
+                        <span class="customer-data-label">Email:</span>
+                        <span class="customer-data-value" id="summaryCustomerEmail">-</span>
+                    </div>
+                    <div class="customer-data-row">
+                        <span class="customer-data-label">Teléfono:</span>
+                        <span class="customer-data-value" id="summaryCustomerPhone">-</span>
+                    </div>
+                    <div class="customer-data-row">
+                        <span class="customer-data-label">Dirección:</span>
+                        <span class="customer-data-value" id="summaryCustomerAddress">-</span>
+                    </div>
+                </div>
+
+                <!-- Métodos de Pago -->
+                <div class="payment-section">
+                    <h3 style="color: var(--gold); margin-bottom: 1.5rem;">Método de Pago</h3>
+                    
+                    <div class="payment-methods">
+                        <!-- Apple Pay - Destacado -->
+                        <button type="button" class="payment-method-btn apple-pay-btn" id="applePayBtn" onclick="selectPaymentMethod('applepay')" style="background: #000; border-color: #fff;">
+                            <i class="fab fa-apple-pay" style="font-size: 2.5rem;"></i>
+                            <span style="font-weight: 600;">Apple Pay</span>
+                            <span style="font-size: 0.75rem; color: var(--silver); margin-top: 0.25rem;">Pago rápido y seguro</span>
+                        </button>
+                        
+                        <!-- Google Pay -->
+                        <button type="button" class="payment-method-btn" id="googlePayBtn" onclick="selectPaymentMethod('googlepay')">
+                            <i class="fab fa-google-pay"></i>
+                            <span>Google Pay</span>
+                        </button>
+                        
+                        <!-- Link de Stripe -->
+                        <button type="button" class="payment-method-btn" id="linkBtn" onclick="selectPaymentMethod('link')">
+                            <i class="fas fa-link"></i>
+                            <span>Link de Stripe</span>
+                        </button>
+                        
+                        <!-- Tarjeta de Crédito/Débito -->
+                        <button type="button" class="payment-method-btn" id="cardBtn" onclick="selectPaymentMethod('card')">
+                            <i class="fas fa-credit-card"></i>
+                            <span>Tarjeta</span>
+                        </button>
+                        
+                        <!-- PayPal -->
+                        <button type="button" class="payment-method-btn" id="paypalBtn" onclick="selectPaymentMethod('paypal')">
+                            <i class="fab fa-paypal"></i>
+                            <span>PayPal</span>
+                        </button>
+                        
+                        <!-- Bizum -->
+                        <button type="button" class="payment-method-btn" id="bizumBtn" onclick="selectPaymentMethod('bizum')">
+                            <i class="fas fa-mobile-alt"></i>
+                            <span>Bizum</span>
+                        </button>
+                        
+                        <!-- Transferencia Bancaria -->
+                        <button type="button" class="payment-method-btn" id="bankTransferBtn" onclick="selectPaymentMethod('banktransfer')">
+                            <i class="fas fa-university"></i>
+                            <span>Transferencia</span>
+                        </button>
+                    </div>
+
+                    <!-- Formulario de Tarjeta (Stripe Elements) -->
+                    <div id="cardPaymentForm" style="display: none;" class="stripe-payment-container">
+                        <label style="color: var(--gold); font-weight: 600; margin-bottom: 1rem; display: block;">Datos de la Tarjeta</label>
+                        <div id="card-element">
+                            <!-- Stripe Elements creará el formulario aquí -->
+                        </div>
+                        <div id="card-errors" role="alert" class="error-message"></div>
+                    </div>
+
+                    <!-- Formulario de Link de Stripe -->
+                    <div id="linkPaymentForm" style="display: none;" class="stripe-payment-container">
+                        <label style="color: var(--gold); font-weight: 600; margin-bottom: 1rem; display: block;">Pagar con Link de Stripe</label>
+                        <div id="link-authentication-element">
+                            <!-- Stripe Link se inicializará aquí -->
+                        </div>
+                        <p style="color: var(--silver); font-size: 0.9rem; margin-top: 1rem;">
+                            Link de Stripe te permite pagar rápidamente con tus datos guardados de forma segura.
+                        </p>
+                    </div>
+
+                    <!-- Información para métodos alternativos -->
+                    <div id="alternativePaymentInfo" style="display: none;" class="stripe-payment-container">
+                        <p style="color: var(--silver); text-align: center; padding: 1rem;">
+                            <i class="fas fa-info-circle" style="color: var(--gold); margin-right: 0.5rem;"></i>
+                            <span id="alternativePaymentText">Selecciona un método de pago para continuar</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="reservation-summary">
+                    <div class="summary-row">
+                        <span>Vehículo:</span>
+                        <span id="summaryCar"></span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Precio por día:</span>
+                        <span id="summaryPricePerDay"></span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Días:</span>
+                        <span id="summaryDays">0</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Total:</span>
+                        <span id="summaryTotal">0 €</span>
+                    </div>
+                </div>
+
+                <div class="total-price" id="totalPriceDisplay">Total: 0 €</div>
+
+                <button type="button" class="btn-reservar" id="payButton" style="width: 100%; padding: 1.2rem; font-size: 1.2rem; display: none;" onclick="processPayment()">
+                    COMPLETAR PAGO
+                </button>
+                <div id="paymentStatus" class="error-message" style="text-align: center; margin-top: 1rem;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Banner del Footer -->
+    <div class="footer-banner">
+        <img src="https://static.wixstatic.com/media/a11208_f3188ecefc0f41deb44d04802127d9c4f000.jpg/v1/fill/w_1080,h_359,al_c,q_85,usm_0.33_1.00_0.00,enc_avif,quality_auto/a11208_f3188ecefc0f41deb44d04802127d9c4f000.jpg" alt="Prestige Goal Motion Banner">
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Prestige Goal Motion. Todos los derechos reservados.</p>
+        <div>
+            <a href="https://wa.me/34680162813" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+            <a href="https://www.instagram.com/prestigegoalmotion" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+        </div>
+    </footer>
+
+    <script>
+        // Efecto header al hacer scroll
+        window.addEventListener('scroll', () => {
+            document.querySelector('header').classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        // Variables globales
+        let currentSelectedCar = '';
+        let currentPricePerDay = 0;
+        let currentDate = new Date();
+        let selectedStartDate = null;
+        let selectedEndDate = null;
+        let selectedPaymentMethod = '';
+        let cardElement = null;
+        let elements = null;
+        
+        // Disponibilidad de vehículos (simulado - en producción vendría de una API)
+        const availability = {
+            'Mercedes GLE 53 AMG': [],
+            'Mercedes GLE Coupe 400 D': [],
+            'Lamborghini Huracán': [],
+            'Mercedes GLE 400D': []
+        };
+
+        // Inicializar Stripe (reemplaza con tu clave pública de Stripe)
+        const stripe = Stripe('pk_test_51...'); // Reemplaza con tu clave pública de Stripe
+        
+        // Inicializar Stripe Elements cuando se abre el modal
+        function initializeStripeElements() {
+            if (!elements) {
+                elements = stripe.elements();
+            }
+            
+            // Crear elemento de tarjeta
+            if (!cardElement) {
+                const style = {
+                    base: {
+                        color: '#ffffff',
+                        fontFamily: '"Segoe UI", sans-serif',
+                        fontSmoothing: 'antialiased',
+                        fontSize: '16px',
+                        '::placeholder': {
+                            color: '#aab7c4'
+                        }
+                    },
+                    invalid: {
+                        color: '#fa755a',
+                        iconColor: '#fa755a'
+                    }
+                };
+                
+                cardElement = elements.create('card', { style: style });
+                cardElement.mount('#card-element');
+                
+                // Manejar errores de tarjeta
+                cardElement.on('change', function(event) {
+                    const displayError = document.getElementById('card-errors');
+                    if (event.error) {
+                        displayError.textContent = event.error.message;
+                    } else {
+                        displayError.textContent = '';
+                    }
+                });
+            }
+        }
+        
+        // Verificar disponibilidad de métodos de pago
+        async function checkPaymentMethodsAvailability() {
+            try {
+                const paymentRequest = stripe.paymentRequest({
+                    country: 'ES',
+                    currency: 'eur',
+                    total: {
+                        label: 'Reserva',
+                        amount: 0,
+                    },
+                    requestPayerName: true,
+                    requestPayerEmail: true,
+                    requestPayerPhone: true,
+                });
+                
+                const canMakePayment = await paymentRequest.canMakePayment();
+                
+                // Apple Pay - Siempre visible
+                const applePayBtn = document.getElementById('applePayBtn');
+                applePayBtn.style.display = 'flex';
+                if (canMakePayment && canMakePayment.applePay) {
+                    applePayBtn.classList.remove('disabled');
+                    applePayBtn.title = 'Apple Pay disponible';
+                } else {
+                    // Mantener visible pero indicar que puede no estar disponible en este dispositivo
+                    applePayBtn.classList.remove('disabled');
+                    applePayBtn.title = 'Apple Pay - Disponible en dispositivos Apple compatibles';
+                }
+                
+                // Google Pay
+                const googlePayBtn = document.getElementById('googlePayBtn');
+                if (canMakePayment && canMakePayment.googlePay) {
+                    googlePayBtn.style.display = 'flex';
+                    googlePayBtn.classList.remove('disabled');
+                } else {
+                    googlePayBtn.style.display = 'none';
+                }
+                
+                // Link de Stripe (siempre disponible si está habilitado en tu cuenta)
+                const linkBtn = document.getElementById('linkBtn');
+                linkBtn.style.display = 'flex';
+                
+            } catch (error) {
+                console.error('Error checking payment methods:', error);
+            }
+        }
+        
+        // Seleccionar método de pago
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            
+            // Actualizar botones
+            document.querySelectorAll('.payment-method-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Ocultar todos los formularios
+            document.getElementById('cardPaymentForm').style.display = 'none';
+            document.getElementById('linkPaymentForm').style.display = 'none';
+            document.getElementById('alternativePaymentInfo').style.display = 'none';
+            
+            if (method === 'card') {
+                document.getElementById('cardBtn').classList.add('active');
+                document.getElementById('cardPaymentForm').style.display = 'block';
+                initializeStripeElements();
+            } else if (method === 'applepay' || method === 'googlepay') {
+                if (method === 'applepay') {
+                    document.getElementById('applePayBtn').classList.add('active');
+                } else {
+                    document.getElementById('googlePayBtn').classList.add('active');
+                }
+            } else if (method === 'link') {
+                document.getElementById('linkBtn').classList.add('active');
+                document.getElementById('linkPaymentForm').style.display = 'block';
+                initializeStripeLink();
+            } else if (method === 'paypal') {
+                document.getElementById('paypalBtn').classList.add('active');
+                document.getElementById('alternativePaymentInfo').style.display = 'block';
+                document.getElementById('alternativePaymentText').textContent = 
+                    'Serás redirigido a PayPal para completar el pago de forma segura.';
+            } else if (method === 'bizum') {
+                document.getElementById('bizumBtn').classList.add('active');
+                document.getElementById('alternativePaymentInfo').style.display = 'block';
+                document.getElementById('alternativePaymentText').textContent = 
+                    'Recibirás un SMS con el enlace para completar el pago con Bizum.';
+            } else if (method === 'banktransfer') {
+                document.getElementById('bankTransferBtn').classList.add('active');
+                document.getElementById('alternativePaymentInfo').style.display = 'block';
+                document.getElementById('alternativePaymentText').textContent = 
+                    'Recibirás los datos bancarios por email. La reserva se confirmará al recibir el pago.';
+            }
+            
+            // Mostrar botón de pago si hay datos válidos
+            validateAndShowPayButton();
+        }
+        
+        // Inicializar Stripe Link
+        function initializeStripeLink() {
+            if (!elements) {
+                elements = stripe.elements();
+            }
+            
+            // Crear elemento de Link si no existe
+            if (!document.getElementById('link-authentication-element').hasChildNodes()) {
+                const linkAuthenticationElement = elements.create('linkAuthentication');
+                linkAuthenticationElement.mount('#link-authentication-element');
+            }
+        }
+        
+        // Validar formulario y mostrar botón de pago
+        function validateAndShowPayButton() {
+            const name = document.getElementById('customerName').value;
+            const email = document.getElementById('customerEmail').value;
+            const phone = document.getElementById('customerPhone').value;
+            const dni = document.getElementById('customerDNI').value;
+            const address = document.getElementById('customerAddress').value;
+            const city = document.getElementById('customerCity').value;
+            const postalCode = document.getElementById('customerPostalCode').value;
+            const country = document.getElementById('customerCountry').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            const isValid = name && email && phone && dni && address && city && postalCode && country && startDate && endDate && selectedPaymentMethod;
+            
+            if (isValid) {
+                document.getElementById('payButton').style.display = 'block';
+                updateCustomerSummary();
+            } else {
+                document.getElementById('payButton').style.display = 'none';
+            }
+        }
+        
+        // Actualizar resumen de datos del cliente
+        function updateCustomerSummary() {
+            const name = document.getElementById('customerName').value;
+            const email = document.getElementById('customerEmail').value;
+            const phone = document.getElementById('customerPhone').value;
+            const address = document.getElementById('customerAddress').value;
+            
+            if (name && email && phone && address) {
+                document.getElementById('customerDataSummary').style.display = 'block';
+                document.getElementById('summaryCustomerName').textContent = name;
+                document.getElementById('summaryCustomerEmail').textContent = email;
+                document.getElementById('summaryCustomerPhone').textContent = phone;
+                document.getElementById('summaryCustomerAddress').textContent = address;
+            }
+        }
+
+        // Abrir modal de reserva
+        function openReservationModal(carName, pricePerDay) {
+            currentSelectedCar = carName;
+            currentPricePerDay = pricePerDay;
+            document.getElementById('selectedCarName').textContent = carName;
+            document.getElementById('summaryCar').textContent = carName;
+            document.getElementById('summaryPricePerDay').textContent = pricePerDay + ' €';
+            
+            const modal = document.getElementById('reservationModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            generateCalendar();
+            resetForm();
+            checkPaymentMethodsAvailability();
+            
+            // Añadir listeners a los campos del formulario
+            const formFields = ['customerName', 'customerEmail', 'customerPhone', 'customerDNI', 
+                              'customerAddress', 'customerCity', 'customerPostalCode', 'customerCountry',
+                              'startDate', 'endDate'];
+            formFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('input', validateAndShowPayButton);
+                    field.addEventListener('change', validateAndShowPayButton);
+                }
+            });
+        }
+
+        // Cerrar modal
+        function closeReservationModal() {
+            const modal = document.getElementById('reservationModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            resetForm();
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('reservationModal');
+            if (event.target === modal) {
+                closeReservationModal();
+            }
+        }
+
+        // Generar calendario
+        function generateCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDayOfWeek = firstDay.getDay();
+
+            const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                              'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            document.getElementById('currentMonth').textContent = `${monthNames[month]} ${year}`;
+
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+
+            // Días de la semana
+            const weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+            weekDays.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day header';
+                dayElement.textContent = day;
+                grid.appendChild(dayElement);
+            });
+
+            // Espacios vacíos al inicio
+            for (let i = 0; i < startingDayOfWeek; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day';
+                grid.appendChild(emptyDay);
+            }
+
+            // Días del mes
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const dateStr = formatDate(date);
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
+
+                // Verificar si es una fecha pasada
+                if (date < today) {
+                    dayElement.classList.add('past', 'unavailable');
+                } else {
+                    // Verificar disponibilidad (simulado)
+                    const isAvailable = checkAvailability(dateStr);
+                    if (isAvailable) {
+                        dayElement.classList.add('available');
+                        dayElement.onclick = () => selectDate(date);
+                    } else {
+                        dayElement.classList.add('unavailable');
+                    }
+                }
+
+                // Marcar hoy
+                if (dateStr === formatDate(today)) {
+                    dayElement.classList.add('today');
+                }
+
+                // Marcar fechas seleccionadas
+                if (selectedStartDate && formatDate(selectedStartDate) === dateStr) {
+                    dayElement.classList.add('selected');
+                }
+                if (selectedEndDate && formatDate(selectedEndDate) === dateStr) {
+                    dayElement.classList.add('selected');
+                }
+
+                grid.appendChild(dayElement);
+            }
+        }
+
+        // Verificar disponibilidad
+        function checkAvailability(dateStr) {
+            // Simulación - en producción verificarías contra una base de datos
+            const unavailableDates = availability[currentSelectedCar] || [];
+            return !unavailableDates.includes(dateStr);
+        }
+
+        // Seleccionar fecha
+        function selectDate(date) {
+            if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
+                selectedStartDate = date;
+                selectedEndDate = null;
+                document.getElementById('startDate').value = formatDateInput(date);
+            } else if (date > selectedStartDate) {
+                selectedEndDate = date;
+                document.getElementById('endDate').value = formatDateInput(date);
+            } else {
+                selectedStartDate = date;
+                selectedEndDate = null;
+                document.getElementById('startDate').value = formatDateInput(date);
+                document.getElementById('endDate').value = '';
+            }
+            generateCalendar();
+            calculateTotal();
+        }
+
+        // Cambiar mes
+        function changeMonth(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            generateCalendar();
+        }
+
+        // Formatear fecha para input
+        function formatDateInput(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Formatear fecha para comparación
+        function formatDate(date) {
+            return formatDateInput(date);
+        }
+
+        // Calcular total
+        function calculateTotal() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (startDate && endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                const diffTime = Math.abs(end - start);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+                if (diffDays > 0) {
+                    const total = diffDays * currentPricePerDay;
+                    document.getElementById('summaryDays').textContent = diffDays;
+                    document.getElementById('summaryTotal').textContent = total + ' €';
+                    document.getElementById('totalPriceDisplay').textContent = 'Total: ' + total + ' €';
+                }
+            } else {
+                document.getElementById('summaryDays').textContent = '0';
+                document.getElementById('summaryTotal').textContent = '0 €';
+                document.getElementById('totalPriceDisplay').textContent = 'Total: 0 €';
+            }
+        }
+
+        // Resetear formulario
+        function resetForm() {
+            document.getElementById('customerName').value = '';
+            document.getElementById('customerEmail').value = '';
+            document.getElementById('customerPhone').value = '';
+            document.getElementById('customerDNI').value = '';
+            document.getElementById('customerAddress').value = '';
+            document.getElementById('customerCity').value = '';
+            document.getElementById('customerPostalCode').value = '';
+            document.getElementById('customerCountry').value = '';
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            selectedStartDate = null;
+            selectedEndDate = null;
+            selectedPaymentMethod = '';
+            currentDate = new Date();
+            calculateTotal();
+            
+            // Resetear métodos de pago
+            document.querySelectorAll('.payment-method-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('cardPaymentForm').style.display = 'none';
+            document.getElementById('linkPaymentForm').style.display = 'none';
+            document.getElementById('alternativePaymentInfo').style.display = 'none';
+            document.getElementById('payButton').style.display = 'none';
+            document.getElementById('customerDataSummary').style.display = 'none';
+            document.getElementById('paymentStatus').textContent = '';
+            document.getElementById('paymentStatus').style.display = 'none';
+            
+            // Resetear Stripe Elements si existe
+            if (cardElement) {
+                cardElement.clear();
+            }
+        }
+
+        // Procesar pago con Stripe
+        async function processPayment() {
+            const name = document.getElementById('customerName').value;
+            const email = document.getElementById('customerEmail').value;
+            const phone = document.getElementById('customerPhone').value;
+            const dni = document.getElementById('customerDNI').value;
+            const address = document.getElementById('customerAddress').value;
+            const city = document.getElementById('customerCity').value;
+            const postalCode = document.getElementById('customerPostalCode').value;
+            const country = document.getElementById('customerCountry').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            // Validación completa
+            if (!name || !email || !phone || !dni || !address || !city || !postalCode || !country || !startDate || !endDate) {
+                showPaymentStatus('Por favor, completa todos los campos', 'error');
+                return;
+            }
+
+            if (!selectedPaymentMethod) {
+                showPaymentStatus('Por favor, selecciona un método de pago', 'error');
+                return;
+            }
+
+            if (new Date(endDate) <= new Date(startDate)) {
+                showPaymentStatus('La fecha de fin debe ser posterior a la fecha de inicio', 'error');
+                return;
+            }
+
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const diffTime = Math.abs(end - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            const total = diffDays * currentPricePerDay;
+            const totalCents = Math.round(total * 100); // Stripe usa centavos
+
+            // Deshabilitar botón durante el procesamiento
+            const payButton = document.getElementById('payButton');
+            payButton.disabled = true;
+            payButton.textContent = 'PROCESANDO...';
+            showPaymentStatus('', '');
+
+            try {
+                const customerData = { name, email, phone, dni, address, city, postalCode, country };
+                
+                if (selectedPaymentMethod === 'applepay' || selectedPaymentMethod === 'googlepay') {
+                    // Procesar con Apple Pay o Google Pay
+                    await processWalletPayment(selectedPaymentMethod, totalCents, diffDays, customerData);
+                } else if (selectedPaymentMethod === 'card') {
+                    // Procesar con tarjeta usando Stripe Elements
+                    await processCardPayment(totalCents, diffDays, customerData);
+                } else if (selectedPaymentMethod === 'link') {
+                    // Procesar con Link de Stripe
+                    await processLinkPayment(totalCents, diffDays, customerData);
+                } else if (selectedPaymentMethod === 'paypal') {
+                    // Procesar con PayPal
+                    await processPayPalPayment(totalCents, diffDays, customerData);
+                } else if (selectedPaymentMethod === 'bizum') {
+                    // Procesar con Bizum
+                    await processBizumPayment(totalCents, diffDays, customerData);
+                } else if (selectedPaymentMethod === 'banktransfer') {
+                    // Procesar con transferencia bancaria
+                    await processBankTransferPayment(totalCents, diffDays, customerData);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showPaymentStatus('Hubo un error al procesar el pago: ' + error.message, 'error');
+                payButton.disabled = false;
+                payButton.textContent = 'COMPLETAR PAGO';
+            }
+        }
+
+        // Procesar pago con Apple Pay o Google Pay
+        async function processWalletPayment(method, totalCents, days, customerData) {
+            try {
+                const paymentRequest = stripe.paymentRequest({
+                    country: 'ES',
+                    currency: 'eur',
+                    total: {
+                        label: `Reserva ${currentSelectedCar} (${days} días)`,
+                        amount: totalCents,
+                    },
+                    requestPayerName: true,
+                    requestPayerEmail: true,
+                    requestPayerPhone: true,
+                });
+
+                const canMakePayment = await paymentRequest.canMakePayment();
+                const methodName = method === 'applepay' ? 'Apple Pay' : 'Google Pay';
+                const isAvailable = method === 'applepay' ? canMakePayment?.applePay : canMakePayment?.googlePay;
+                
+                if (!canMakePayment || !isAvailable) {
+                    const deviceMessage = method === 'applepay' 
+                        ? 'Apple Pay solo está disponible en dispositivos Apple (iPhone, iPad, Mac) con Safari o navegadores compatibles.'
+                        : 'Google Pay solo está disponible en dispositivos compatibles.';
+                    throw new Error(`${methodName} no está disponible en este dispositivo. ${deviceMessage} Por favor, selecciona otro método de pago como tarjeta.`);
+                }
+
+                paymentRequest.on('paymentmethod', async (ev) => {
+                    // Aquí crearías el PaymentIntent en tu backend
+                    // Por ahora, simulamos la confirmación
+                    try {
+                        // En producción, llamarías a tu backend:
+                        /*
+                        const response = await fetch('/api/create-payment-intent', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                amount: totalCents,
+                                currency: 'eur',
+                                paymentMethod: ev.paymentMethod.id,
+                                customerData: customerData,
+                                reservationData: {
+                                    car: currentSelectedCar,
+                                    pricePerDay: currentPricePerDay,
+                                    days: days,
+                                    startDate: document.getElementById('startDate').value,
+                                    endDate: document.getElementById('endDate').value
+                                }
+                            })
+                        });
+                        const { clientSecret } = await response.json();
+                        const { error: confirmError } = await stripe.confirmCardPayment(clientSecret);
+                        */
+
+                        // Simulación
+                        ev.complete('success');
+                        const methodName = method === 'applepay' ? 'Apple Pay' : 'Google Pay';
+                        showPaymentStatus(`¡Pago procesado exitosamente con ${methodName}!`, 'success');
+                        setTimeout(() => {
+                            closeReservationModal();
+                            alert(`Reserva confirmada:\n\nVehículo: ${currentSelectedCar}\nDías: ${days}\nTotal: ${totalCents/100} €\n\nRecibirás un email de confirmación.`);
+                        }, 1500);
+                    } catch (error) {
+                        ev.complete('fail');
+                        throw error;
+                    }
+                });
+
+                paymentRequest.show();
+            } catch (error) {
+                const methodName = method === 'applepay' ? 'Apple Pay' : 'Google Pay';
+                throw new Error(`Error al procesar ${methodName}: ` + error.message);
+            }
+        }
+
+        // Procesar pago con tarjeta
+        async function processCardPayment(totalCents, days, customerData) {
+            if (!cardElement) {
+                throw new Error('El formulario de tarjeta no está inicializado');
+            }
+
+            // Crear PaymentMethod con la tarjeta
+            const { paymentMethod, error: pmError } = await stripe.createPaymentMethod({
+                type: 'card',
+                card: cardElement,
+                billing_details: {
+                    name: customerData.name,
+                    email: customerData.email,
+                    phone: customerData.phone,
+                    address: {
+                        line1: customerData.address,
+                        city: customerData.city,
+                        postal_code: customerData.postalCode,
+                        country: customerData.country,
+                    },
+                },
+            });
+
+            if (pmError) {
+                throw new Error(pmError.message);
+            }
+
+            // En producción, aquí crearías el PaymentIntent en tu backend
+            try {
+                // Ejemplo de llamada al backend:
+                /*
+                const response = await fetch('/api/create-payment-intent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: totalCents,
+                        currency: 'eur',
+                        paymentMethodId: paymentMethod.id,
+                        customerData: customerData,
+                        reservationData: {
+                            car: currentSelectedCar,
+                            pricePerDay: currentPricePerDay,
+                            days: days,
+                            startDate: document.getElementById('startDate').value,
+                            endDate: document.getElementById('endDate').value
+                        }
+                    })
+                });
+                const { clientSecret } = await response.json();
+                const { error: confirmError } = await stripe.confirmCardPayment(clientSecret);
+                if (confirmError) {
+                    throw confirmError;
+                }
+                */
+
+                // Simulación para demostración
+                showPaymentStatus('¡Pago procesado exitosamente!', 'success');
+                setTimeout(() => {
+                    closeReservationModal();
+                    alert(`Reserva confirmada:\n\nVehículo: ${currentSelectedCar}\nDías: ${days}\nTotal: ${totalCents/100} €\n\nRecibirás un email de confirmación.`);
+                }, 1500);
+            } catch (error) {
+                throw new Error('Error al confirmar el pago: ' + error.message);
+            }
+        }
+
+        // Procesar pago con Link de Stripe
+        async function processLinkPayment(totalCents, days, customerData) {
+            try {
+                // Crear PaymentMethod con Link
+                const { paymentMethod, error: pmError } = await stripe.createPaymentMethod({
+                    type: 'card',
+                    // Link manejará la autenticación
+                });
+
+                if (pmError) {
+                    throw new Error(pmError.message);
+                }
+
+                // En producción, crearías el PaymentIntent en tu backend
+                showPaymentStatus('¡Pago procesado exitosamente con Link!', 'success');
+                setTimeout(() => {
+                    closeReservationModal();
+                    alert(`Reserva confirmada:\n\nVehículo: ${currentSelectedCar}\nDías: ${days}\nTotal: ${totalCents/100} €\n\nRecibirás un email de confirmación.`);
+                }, 1500);
+            } catch (error) {
+                throw new Error('Error al procesar Link: ' + error.message);
+            }
+        }
+
+        // Procesar pago con PayPal
+        async function processPayPalPayment(totalCents, days, customerData) {
+            try {
+                // En producción, redirigirías a PayPal o usarías su API
+                // Por ahora, simulamos el proceso
+                showPaymentStatus('Redirigiendo a PayPal...', 'success');
+                
+                // Simulación - en producción harías:
+                /*
+                const response = await fetch('/api/create-paypal-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: totalCents / 100,
+                        currency: 'EUR',
+                        customerData: customerData,
+                        reservationData: {
+                            car: currentSelectedCar,
+                            days: days,
+                            startDate: document.getElementById('startDate').value,
+                            endDate: document.getElementById('endDate').value
+                        }
+                    })
+                });
+                const { approvalUrl } = await response.json();
+                window.location.href = approvalUrl;
+                */
+                
+                setTimeout(() => {
+                    showPaymentStatus('¡Pago procesado exitosamente con PayPal!', 'success');
+                    setTimeout(() => {
+                        closeReservationModal();
+                        alert(`Reserva confirmada:\n\nVehículo: ${currentSelectedCar}\nDías: ${days}\nTotal: ${totalCents/100} €\n\nRecibirás un email de confirmación.`);
+                    }, 1500);
+                }, 2000);
+            } catch (error) {
+                throw new Error('Error al procesar PayPal: ' + error.message);
+            }
+        }
+
+        // Procesar pago con Bizum
+        async function processBizumPayment(totalCents, days, customerData) {
+            try {
+                // En producción, enviarías SMS con enlace de Bizum
+                showPaymentStatus('Enviando SMS con enlace de Bizum...', 'success');
+                
+                // Simulación - en producción harías:
+                /*
+                const response = await fetch('/api/create-bizum-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: totalCents / 100,
+                        phone: customerData.phone,
+                        customerData: customerData,
+                        reservationData: {
+                            car: currentSelectedCar,
+                            days: days,
+                            startDate: document.getElementById('startDate').value,
+                            endDate: document.getElementById('endDate').value
+                        }
+                    })
+                });
+                */
+                
+                setTimeout(() => {
+                    showPaymentStatus('¡SMS enviado! Completa el pago con Bizum para confirmar tu reserva.', 'success');
+                    setTimeout(() => {
+                        closeReservationModal();
+                        alert(`Reserva pendiente de pago:\n\nVehículo: ${currentSelectedCar}\nDías: ${days}\nTotal: ${totalCents/100} €\n\nRecibirás un SMS con el enlace para completar el pago con Bizum.`);
+                    }, 2000);
+                }, 2000);
+            } catch (error) {
+                throw new Error('Error al procesar Bizum: ' + error.message);
+            }
+        }
+
+        // Procesar pago con transferencia bancaria
+        async function processBankTransferPayment(totalCents, days, customerData) {
+            try {
+                // En producción, enviarías los datos bancarios por email
+                showPaymentStatus('Preparando datos bancarios...', 'success');
+                
+                // Simulación - en producción harías:
+                /*
+                const response = await fetch('/api/create-bank-transfer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: totalCents / 100,
+                        customerData: customerData,
+                        reservationData: {
+                            car: currentSelectedCar,
+                            days: days,
+                            startDate: document.getElementById('startDate').value,
+                            endDate: document.getElementById('endDate').value
+                        }
+                    })
+                });
+                */
+                
+                setTimeout(() => {
+                    closeReservationModal();
+                    alert(`Reserva pendiente de pago:\n\nVehículo: ${currentSelectedCar}\nDías: ${days}\nTotal: ${totalCents/100} €\n\nRecibirás un email con los datos bancarios para realizar la transferencia. La reserva se confirmará al recibir el pago.`);
+                }, 1500);
+            } catch (error) {
+                throw new Error('Error al procesar transferencia bancaria: ' + error.message);
+            }
+        }
+
+        // Mostrar estado del pago
+        function showPaymentStatus(message, type) {
+            const statusDiv = document.getElementById('paymentStatus');
+            statusDiv.textContent = message;
+            statusDiv.className = type === 'error' ? 'error-message' : type === 'success' ? 'success-message' : '';
+            statusDiv.style.display = message ? 'block' : 'none';
+        }
+
+        // Actualizar calendario cuando cambian las fechas manualmente
+        document.getElementById('startDate').addEventListener('change', function() {
+            const date = new Date(this.value);
+            if (!isNaN(date.getTime())) {
+                selectedStartDate = date;
+                generateCalendar();
+            }
+        });
+
+        document.getElementById('endDate').addEventListener('change', function() {
+            const date = new Date(this.value);
+            if (!isNaN(date.getTime())) {
+                selectedEndDate = date;
+                generateCalendar();
+            }
+        });
+
+        // Manejar envío del formulario de contacto
+        function handleContactSubmit(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('contactName').value;
+            const email = document.getElementById('contactEmail').value;
+            const phone = document.getElementById('contactPhone').value;
+            const subject = document.getElementById('contactSubject').value;
+            const message = document.getElementById('contactMessage').value;
+            const statusDiv = document.getElementById('contactFormStatus');
+            
+            // Validación
+            if (!name || !email || !subject || !message) {
+                statusDiv.innerHTML = '<p class="error-message">Por favor, completa todos los campos obligatorios.</p>';
+                return;
+            }
+            
+            // Deshabilitar botón durante el envío
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'ENVIANDO...';
+            statusDiv.innerHTML = '<p style="color: var(--silver);">Enviando mensaje...</p>';
+            
+            // Simulación de envío (en producción, aquí harías una llamada a tu backend)
+            setTimeout(() => {
+                // En producción, harías algo como:
+                /*
+                fetch('/api/contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        email: email,
+                        phone: phone,
+                        subject: subject,
+                        message: message
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    statusDiv.innerHTML = '<p class="success-message">¡Mensaje enviado exitosamente! Te responderemos pronto.</p>';
+                    event.target.reset();
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'ENVIAR MENSAJE';
+                })
+                .catch(error => {
+                    statusDiv.innerHTML = '<p class="error-message">Hubo un error al enviar el mensaje. Por favor, intenta de nuevo.</p>';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'ENVIAR MENSAJE';
+                });
+                */
+                
+                // Simulación para demostración
+                statusDiv.innerHTML = '<p class="success-message">¡Mensaje enviado exitosamente! Te responderemos pronto.</p>';
+                event.target.reset();
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'ENVIAR MENSAJE';
+                
+                // Limpiar mensaje después de 5 segundos
+                setTimeout(() => {
+                    statusDiv.innerHTML = '';
+                }, 5000);
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
+
