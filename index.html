@@ -1193,11 +1193,27 @@
             ? STRIPE_CONFIG.publishableKey 
             : 'pk_test_51...'; // ⚠️ REEMPLAZA CON TU CLAVE PÚBLICA DE STRIPE
         
-        if (stripePublishableKey === 'pk_test_51...') {
-            console.warn('⚠️ ADVERTENCIA: Usa tu clave pública de Stripe en config.js');
+        // Validar clave de Stripe
+        let stripe = null;
+        if (!stripePublishableKey || stripePublishableKey === 'pk_test_51...' || stripePublishableKey.includes('...')) {
+            console.error('❌ ERROR: Stripe publishableKey not configured correctly');
+            console.error('   Please configure your Stripe public key in config.js');
+            console.error('   Get your key at: https://dashboard.stripe.com/apikeys');
+            console.error('   See: CONFIGURAR-STRIPE.md for more information');
+            
+            // Mostrar alerta visual si se intenta hacer un pago
+            window.showStripeConfigError = function() {
+                alert('⚠️ Stripe Payment Gateway Not Configured\n\nPlease configure your Stripe keys in config.js\n\nSee: CONFIGURAR-STRIPE.md for instructions');
+            };
+        } else {
+            try {
+                stripe = Stripe(stripePublishableKey);
+                console.log('✅ Stripe initialized successfully');
+            } catch (error) {
+                console.error('❌ Error initializing Stripe:', error);
+                alert('Error initializing Stripe. Please check your configuration.');
+            }
         }
-        
-        const stripe = Stripe(stripePublishableKey);
         
         // Configuración del backend
         const BACKEND_URL = (typeof STRIPE_CONFIG !== 'undefined' && STRIPE_CONFIG.backendUrl) 
@@ -1222,6 +1238,15 @@
         
         // Inicializar Stripe Elements cuando se abre el modal
         function initializeStripeElements() {
+            if (!stripe) {
+                if (typeof window.showStripeConfigError === 'function') {
+                    window.showStripeConfigError();
+                } else {
+                    alert('⚠️ Stripe Payment Gateway Not Configured\n\nPlease configure your Stripe keys in config.js\n\nSee: CONFIGURAR-STRIPE.md for instructions');
+                }
+                return;
+            }
+            
             if (!elements) {
                 elements = stripe.elements();
             }
@@ -1633,6 +1658,16 @@
 
         // Procesar pago con Stripe
         async function processPayment() {
+            // Verificar que Stripe esté configurado
+            if (!stripe) {
+                if (typeof window.showStripeConfigError === 'function') {
+                    window.showStripeConfigError();
+                } else {
+                    alert('⚠️ Stripe Payment Gateway Not Configured\n\nPlease configure your Stripe keys in config.js\n\nSee: CONFIGURAR-STRIPE.md for instructions');
+                }
+                return;
+            }
+            
             const name = document.getElementById('customerName').value;
             const email = document.getElementById('customerEmail').value;
             const phone = document.getElementById('customerPhone').value;
@@ -1705,6 +1740,13 @@
 
         // Procesar pago con Apple Pay o Google Pay
         async function processWalletPayment(method, totalCents, days, customerData) {
+            if (!stripe) {
+                if (typeof window.showStripeConfigError === 'function') {
+                    window.showStripeConfigError();
+                }
+                throw new Error('Stripe is not configured');
+            }
+            
             try {
                 const paymentRequest = stripe.paymentRequest({
                     country: 'ES',
@@ -1802,6 +1844,13 @@
 
         // Procesar pago con tarjeta
         async function processCardPayment(totalCents, days, customerData) {
+            if (!stripe) {
+                if (typeof window.showStripeConfigError === 'function') {
+                    window.showStripeConfigError();
+                }
+                throw new Error('Stripe is not configured');
+            }
+            
             if (!cardElement) {
                 throw new Error('Card form is not initialized');
             }
@@ -1888,6 +1937,13 @@
 
         // Procesar pago con Link de Stripe
         async function processLinkPayment(totalCents, days, customerData) {
+            if (!stripe) {
+                if (typeof window.showStripeConfigError === 'function') {
+                    window.showStripeConfigError();
+                }
+                throw new Error('Stripe is not configured');
+            }
+            
             try {
                 // Obtener el email del cliente para Link
                 const email = customerData.email;

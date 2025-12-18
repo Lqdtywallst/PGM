@@ -5,7 +5,8 @@
   "main": "backend-example.js",
   "scripts": {
     "start": "node backend-example.js",
-    "dev": "node backend-example.js"
+    "dev": "node backend-example.js",
+    "verify": "node verificar-stripe.js"
   },
   "keywords": [
     "stripe",

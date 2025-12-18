@@ -3,6 +3,16 @@
 
 require('dotenv').config();
 const express = require('express');
+
+// Verificar que STRIPE_SECRET_KEY esté configurada
+if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('tu_clave')) {
+    console.error('\n❌ ERROR: STRIPE_SECRET_KEY no está configurada en .env');
+    console.error('   Por favor, configura tu clave secreta de Stripe en el archivo .env');
+    console.error('   Obtén tu clave en: https://dashboard.stripe.com/apikeys');
+    console.error('   Ver: CONFIGURAR-STRIPE.md para más información\n');
+    process.exit(1);
+}
+
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const cors = require('cors');
 const nodemailer = require('nodemailer');
