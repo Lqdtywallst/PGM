@@ -792,9 +792,9 @@
             }
         nav ul { gap: 1.2rem; }
         
-        /* Botón de menú hamburguesa para móvil - Oculto en desktop */
+        /* Botón de menú hamburguesa para móvil - Oculto por defecto */
         .menu-toggle {
-            display: none;
+            display: none !important;
             background: none;
             border: none;
             color: var(--gold);
@@ -817,16 +817,12 @@
         }
         
         /* Menú móvil - Oculto en desktop, visible solo en móvil */
-        @media (min-width: 769px) {
-            .menu-toggle {
-                display: none !important;
-            }
-            nav {
-                display: flex !important;
-            }
-        }
-        
         @media (max-width: 768px) {
+            /* Mostrar botón hamburguesa solo en móvil */
+            .menu-toggle {
+                display: block !important;
+            }
+            
             /* Ocultar menú normal en móvil */
             nav { 
                 display: none !important;
@@ -863,9 +859,12 @@
                 background: rgba(212, 175, 55, 0.1);
                 padding-left: 2.5rem;
             }
-            /* Mostrar botón hamburguesa solo en móvil */
-            .menu-toggle {
-                display: block !important;
+        }
+        
+        /* Asegurar que en desktop el menú normal esté visible */
+        @media (min-width: 769px) {
+            nav {
+                display: flex !important;
             }
         }
             .footer-banner img {
