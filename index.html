@@ -790,8 +790,73 @@
             .logo {
                 height: 40px;
             }
-            nav ul { gap: 1.2rem; }
-            nav { display: none; } /* Puedes añadir menú hamburguesa después */
+        nav ul { gap: 1.2rem; }
+        
+        /* Botón de menú hamburguesa para móvil */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--gold);
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: color 0.3s;
+        }
+        .menu-toggle:hover {
+            color: var(--silver);
+        }
+        .menu-toggle .fa-times {
+            display: none;
+        }
+        .menu-toggle.active .fa-bars {
+            display: none;
+        }
+        .menu-toggle.active .fa-times {
+            display: inline-block;
+        }
+        
+        /* Menú móvil */
+        @media (max-width: 768px) {
+            nav { 
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: rgba(10, 10, 10, 0.98);
+                backdrop-filter: blur(10px);
+                border-top: 2px solid var(--gold);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+            }
+            nav.active {
+                display: block;
+            }
+            nav ul {
+                flex-direction: column;
+                gap: 0;
+                padding: 1rem 0;
+            }
+            nav li {
+                width: 100%;
+                border-bottom: 1px solid #333;
+            }
+            nav a {
+                display: block;
+                padding: 1.2rem 2rem;
+                width: 100%;
+                text-align: left;
+                transition: all 0.3s;
+            }
+            nav a:hover {
+                background: rgba(212, 175, 55, 0.1);
+                padding-left: 2.5rem;
+            }
+            .menu-toggle {
+                display: block;
+            }
+        }
             .footer-banner img {
                 min-height: 200px;
                 object-fit: cover;
@@ -806,12 +871,16 @@
         <div class="logo">
             <img src="https://static.wixstatic.com/media/a11208_3c3efc0ce03a49b5b22d8e9fc1451ee2~mv2.png/v1/crop/x_0,y_68,w_765,h_443/fill/w_342,h_198,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/LOGO%20FINAL%20PGM.png" alt="Prestige Goal Motion">
         </div>
-        <nav>
+        <button class="menu-toggle" id="menuToggle" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+            <i class="fas fa-bars"></i>
+            <i class="fas fa-times"></i>
+        </button>
+        <nav id="mobileNav">
             <ul>
-                <li><a href="#inicio">Home</a></li>
-                <li><a href="#flota">Fleet</a></li>
-                <li><a href="#reserva">Reservations</a></li>
-                <li><a href="#contacto">Contact</a></li>
+                <li><a href="#inicio" onclick="closeMobileMenu()">Home</a></li>
+                <li><a href="#flota" onclick="closeMobileMenu()">Fleet</a></li>
+                <li><a href="#reserva" onclick="closeMobileMenu()">Reservations</a></li>
+                <li><a href="#contacto" onclick="closeMobileMenu()">Contact</a></li>
             </ul>
         </nav>
     </header>
@@ -1240,6 +1309,43 @@
         // Efecto header al hacer scroll
         window.addEventListener('scroll', () => {
             document.querySelector('header').classList.toggle('scrolled', window.scrollY > 50);
+        });
+        
+        // Función para abrir/cerrar el menú móvil
+        function toggleMobileMenu() {
+            const nav = document.getElementById('mobileNav');
+            const toggle = document.getElementById('menuToggle');
+            nav.classList.toggle('active');
+            toggle.classList.toggle('active');
+        }
+        
+        // Función para cerrar el menú móvil
+        function closeMobileMenu() {
+            const nav = document.getElementById('mobileNav');
+            const toggle = document.getElementById('menuToggle');
+            nav.classList.remove('active');
+            toggle.classList.remove('active');
+        }
+        
+        // Cerrar menú al hacer clic fuera
+        document.addEventListener('click', (e) => {
+            const nav = document.getElementById('mobileNav');
+            const toggle = document.getElementById('menuToggle');
+            const header = document.querySelector('header');
+            
+            if (nav && nav.classList.contains('active') && 
+                !nav.contains(e.target) && 
+                !toggle.contains(e.target) &&
+                !header.contains(e.target)) {
+                closeMobileMenu();
+            }
+        });
+        
+        // Cerrar menú al redimensionar la ventana (si se hace más grande)
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                closeMobileMenu();
+            }
         });
 
         // Variables globales
