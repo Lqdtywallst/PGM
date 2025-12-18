@@ -1642,6 +1642,7 @@
         // Seleccionar método de pago
         function selectPaymentMethod(method) {
             selectedPaymentMethod = method;
+            userHasAttemptedValidation = true; // Marcar que el usuario está intentando completar
             
             // Actualizar botones
             document.querySelectorAll('.payment-method-btn').forEach(btn => {
@@ -1701,8 +1702,11 @@
             }
         }
         
+        // Variable para controlar si el usuario ha intentado completar el formulario
+        let userHasAttemptedValidation = false;
+        
         // Validar formulario y mostrar botón de pago
-        function validateAndShowPayButton() {
+        function validateAndShowPayButton(showMessage = false) {
             const name = document.getElementById('customerName').value;
             const email = document.getElementById('customerEmail').value;
             const phone = document.getElementById('customerPhone').value;
@@ -1719,7 +1723,7 @@
             if (!name) missingFields.push('Name');
             if (!email) missingFields.push('Email');
             if (!phone) missingFields.push('Phone');
-            if (!dni) missingFields.push('DNI');
+            if (!dni) missingFields.push('ID/Passport');
             if (!address) missingFields.push('Address');
             if (!city) missingFields.push('City');
             if (!postalCode) missingFields.push('Postal Code');
@@ -1730,24 +1734,30 @@
             
             const isValid = name && email && phone && dni && address && city && postalCode && country && startDate && endDate && selectedPaymentMethod;
             
+            const validationMsg = document.getElementById('validationMessage');
+            
             if (isValid) {
                 document.getElementById('payButton').style.display = 'block';
                 document.getElementById('payButton').disabled = false;
                 updateCustomerSummary();
-                // Ocultar mensaje de validación si existe
-                const validationMsg = document.getElementById('validationMessage');
+                // Ocultar mensaje de validación
                 if (validationMsg) {
                     validationMsg.style.display = 'none';
                 }
+                userHasAttemptedValidation = false;
             } else {
                 document.getElementById('payButton').style.display = 'none';
-                // Mostrar mensaje de ayuda
-                const validationMsg = document.getElementById('validationMessage');
+                // Solo mostrar mensaje si el usuario ha intentado completar o si se solicita explícitamente
                 if (validationMsg) {
-                    validationMsg.style.display = 'block';
-                    if (missingFields.length > 0) {
-                        validationMsg.innerHTML = '<strong style="color: var(--gold);">⚠️ Complete all fields to continue:</strong><br>' + missingFields.join(', ');
+                    if (showMessage || userHasAttemptedValidation) {
+                        if (missingFields.length > 0) {
+                            validationMsg.style.display = 'block';
+                            validationMsg.innerHTML = '<strong style="color: var(--gold);">📝 Please complete the following fields:</strong><br><span style="color: var(--silver);">' + missingFields.join(', ') + '</span>';
+                        } else {
+                            validationMsg.style.display = 'none';
+                        }
                     } else {
+                        // Ocultar mensaje si el usuario aún no ha intentado completar
                         validationMsg.style.display = 'none';
                     }
                 }
@@ -1785,6 +1795,15 @@
             generateCalendar();
             resetForm();
             
+            // Resetear el flag de validación
+            userHasAttemptedValidation = false;
+            
+            // Ocultar mensaje de validación al abrir
+            const validationMsg = document.getElementById('validationMessage');
+            if (validationMsg) {
+                validationMsg.style.display = 'none';
+            }
+            
             // Mostrar todos los métodos de pago inmediatamente
             const allPaymentButtons = document.querySelectorAll('.payment-method-btn');
             allPaymentButtons.forEach(btn => {
@@ -1801,8 +1820,8 @@
             formFields.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
                 if (field) {
-                    field.addEventListener('input', validateAndShowPayButton);
-                    field.addEventListener('change', validateAndShowPayButton);
+                    field.addEventListener('input', () => validateAndShowPayButton(false));
+                    field.addEventListener('change', () => validateAndShowPayButton(false));
                 }
             });
         }
@@ -2004,6 +2023,9 @@
 
         // Procesar pago con Stripe
         async function processPayment() {
+            // Marcar que el usuario está intentando completar el pago
+            userHasAttemptedValidation = true;
+            
             // Verificar que Stripe esté configurado
             if (!stripe) {
                 if (typeof window.showStripeConfigError === 'function') {
@@ -2025,13 +2047,20 @@
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
 
-            // Validación completa
+            // Validación completa - mostrar mensaje de validación si faltan campos
             if (!name || !email || !phone || !dni || !address || !city || !postalCode || !country || !startDate || !endDate) {
-                showPaymentStatus('Please complete all fields', 'error');
+                validateAndShowPayButton(true); // Mostrar mensaje de validación
+                showPaymentStatus('Please complete all required fields above', 'error');
+                // Hacer scroll al mensaje de validación
+                const validationMsg = document.getElementById('validationMessage');
+                if (validationMsg) {
+                    validationMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
                 return;
             }
 
             if (!selectedPaymentMethod) {
+                validateAndShowPayButton(true); // Mostrar mensaje de validación
                 showPaymentStatus('Please select a payment method', 'error');
                 return;
             }
