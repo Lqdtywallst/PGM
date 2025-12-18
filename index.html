@@ -1334,6 +1334,9 @@
 
                 <div class="total-price" id="totalPriceDisplay">Total: 0 €</div>
 
+                <!-- Mensaje de validación -->
+                <div id="validationMessage" style="display: none; color: var(--silver); font-size: 0.9rem; margin-top: 1rem; padding: 1rem; background: rgba(212, 175, 55, 0.1); border-radius: 10px; border-left: 3px solid var(--gold);"></div>
+
                 <button type="button" class="btn-reservar" id="payButton" style="width: 100%; padding: 1.2rem; font-size: 1.2rem; display: none;" onclick="processPayment()">
                     COMPLETE PAYMENT
                 </button>
@@ -1688,13 +1691,43 @@
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
             
+            // Validar campos requeridos
+            const missingFields = [];
+            if (!name) missingFields.push('Name');
+            if (!email) missingFields.push('Email');
+            if (!phone) missingFields.push('Phone');
+            if (!dni) missingFields.push('DNI');
+            if (!address) missingFields.push('Address');
+            if (!city) missingFields.push('City');
+            if (!postalCode) missingFields.push('Postal Code');
+            if (!country) missingFields.push('Country');
+            if (!startDate) missingFields.push('Start Date');
+            if (!endDate) missingFields.push('End Date');
+            if (!selectedPaymentMethod) missingFields.push('Payment Method');
+            
             const isValid = name && email && phone && dni && address && city && postalCode && country && startDate && endDate && selectedPaymentMethod;
             
             if (isValid) {
                 document.getElementById('payButton').style.display = 'block';
+                document.getElementById('payButton').disabled = false;
                 updateCustomerSummary();
+                // Ocultar mensaje de validación si existe
+                const validationMsg = document.getElementById('validationMessage');
+                if (validationMsg) {
+                    validationMsg.style.display = 'none';
+                }
             } else {
                 document.getElementById('payButton').style.display = 'none';
+                // Mostrar mensaje de ayuda
+                const validationMsg = document.getElementById('validationMessage');
+                if (validationMsg) {
+                    validationMsg.style.display = 'block';
+                    if (missingFields.length > 0) {
+                        validationMsg.innerHTML = '<strong style="color: var(--gold);">⚠️ Complete all fields to continue:</strong><br>' + missingFields.join(', ');
+                    } else {
+                        validationMsg.style.display = 'none';
+                    }
+                }
             }
         }
         
