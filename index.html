@@ -1346,6 +1346,58 @@
             document.querySelector('header').classList.toggle('scrolled', window.scrollY > 50);
         });
         
+        // Eliminar completamente el botón del menú móvil en desktop
+        function hideMobileMenuButton() {
+            const menuToggle = document.getElementById('menuToggle');
+            if (menuToggle && window.innerWidth > 768) {
+                menuToggle.style.display = 'none';
+                menuToggle.style.visibility = 'hidden';
+                menuToggle.style.opacity = '0';
+                menuToggle.style.width = '0';
+                menuToggle.style.height = '0';
+                menuToggle.style.position = 'absolute';
+                menuToggle.style.overflow = 'hidden';
+                menuToggle.style.pointerEvents = 'none';
+                // Intentar remover del DOM si es posible
+                if (menuToggle.parentNode) {
+                    menuToggle.remove();
+                }
+            }
+        }
+        
+        // Ejecutar al cargar y al redimensionar
+        window.addEventListener('load', hideMobileMenuButton);
+        window.addEventListener('resize', () => {
+            const menuToggle = document.getElementById('menuToggle');
+            if (window.innerWidth > 768) {
+                if (menuToggle) {
+                    menuToggle.style.display = 'none';
+                    menuToggle.style.visibility = 'hidden';
+                    menuToggle.style.opacity = '0';
+                    menuToggle.style.pointerEvents = 'none';
+                }
+            } else {
+                // Restaurar en móvil si fue removido
+                const header = document.querySelector('header');
+                if (header && !document.getElementById('menuToggle')) {
+                    const newToggle = document.createElement('button');
+                    newToggle.id = 'menuToggle';
+                    newToggle.className = 'menu-toggle';
+                    newToggle.setAttribute('onclick', 'toggleMobileMenu()');
+                    newToggle.setAttribute('aria-label', 'Toggle menu');
+                    newToggle.innerHTML = '<i class="fas fa-bars"></i><i class="fas fa-times"></i>';
+                    header.appendChild(newToggle);
+                }
+            }
+        });
+        
+        // Ejecutar inmediatamente
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', hideMobileMenuButton);
+        } else {
+            hideMobileMenuButton();
+        }
+        
         // Función para abrir/cerrar el menú móvil
         function toggleMobileMenu() {
             const nav = document.getElementById('mobileNav');
