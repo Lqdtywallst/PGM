@@ -1861,22 +1861,99 @@
         // Procesar pago con Link de Stripe
         async function processLinkPayment(totalCents, days, customerData) {
             try {
-                // Crear PaymentMethod con Link
-                const { paymentMethod, error: pmError } = await stripe.createPaymentMethod({
-                    type: 'card',
-                    // Link manejará la autenticación
-                });
-
-                if (pmError) {
-                    throw new Error(pmError.message);
+                // Obtener el email del cliente para Link
+                const email = customerData.email;
+                
+                if (!email) {
+                    throw new Error('El email es requerido para usar Stripe Link');
                 }
 
-                // En producción, crearías el PaymentIntent en tu backend
-                showPaymentStatus('¡Pago procesado exitosamente con Link!', 'success');
-                setTimeout(() => {
-                    closeReservationModal();
-                    alert(`Reserva confirmada:\n\nVehículo: ${currentSelectedCar}\nDías: ${days}\nTotal: ${totalCents/100} €\n\nRecibirás un email de confirmación.`);
-                }, 1500);
+                // Crear PaymentIntent en el backend primero (sin paymentMethodId para Link)
+                const response = await fetch(`${BACKEND_URL}/api/create-payment-intent`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        amount: totalCents,
+                        currency: 'eur',
+                        customerData: customerData,
+                        reservationData: {
+                            car: currentSelectedCar,
+                            pricePerDay: currentPricePerDay,
+                            days: days,
+                            startDate: document.getElementById('startDate').value,
+                            endDate: document.getElementById('endDate').value
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Error al crear el PaymentIntent');
+                }
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                // Con Stripe Link, el usuario completa el pago a través del elemento de autenticación
+                // Usamos confirmPayment con el clientSecret
+                // Link manejará automáticamente la autenticación y el método de pago
+                const { error: confirmError, paymentIntent } = await stripe.confirmPayment({
+                    elements: elements,
+                    clientSecret: data.clientSecret,
+                    confirmParams: {
+                        return_url: window.location.href,
+                        payment_method_data: {
+                            billing_details: {
+                                name: customerData.name,
+                                email: customerData.email,
+                                phone: customerData.phone,
+                                address: {
+                                    line1: customerData.address,
+                                    city: customerData.city,
+                                    postal_code: customerData.postalCode,
+                                    country: customerData.country,
+                                },
+                            },
+                        },
+                    },
+                });
+
+                if (confirmError) {
+                    // Manejar diferentes tipos de errores
+                    if (confirmError.type === 'card_error' || confirmError.type === 'validation_error') {
+                        throw new Error(confirmError.message);
+                    }
+                    // Si requiere acción adicional (3D Secure), se maneja automáticamente
+                    if (confirmError.type === 'requires_action') {
+                        // El usuario será redirigido para completar la autenticación
+                        return;
+                    }
+                    throw confirmError;
+                }
+
+                // Verificar el estado del pago
+                if (paymentIntent) {
+                    if (paymentIntent.status === 'succeeded') {
+                        showPaymentStatus('¡Pago procesado exitosamente con Link!', 'success');
+                        setTimeout(() => {
+                            closeReservationModal();
+                            alert(`Reserva confirmada:\n\nVehículo: ${currentSelectedCar}\nDías: ${days}\nTotal: ${totalCents/100} €\n\nRecibirás un email de confirmación.`);
+                        }, 1500);
+                    } else if (paymentIntent.status === 'requires_action') {
+                        // Requiere autenticación adicional (3D Secure)
+                        // Stripe manejará esto automáticamente
+                        showPaymentStatus('Completa la autenticación en la ventana emergente...', '');
+                    } else {
+                        throw new Error('El pago no se completó correctamente. Estado: ' + paymentIntent.status);
+                    }
+                } else {
+                    throw new Error('No se recibió información del pago');
+                }
             } catch (error) {
                 throw new Error('Error al procesar Link: ' + error.message);
             }
