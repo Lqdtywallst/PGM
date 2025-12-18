@@ -1804,8 +1804,20 @@
             document.getElementById('summaryPricePerDay').textContent = pricePerDay + ' €';
             
             const modal = document.getElementById('reservationModal');
+            const modalContent = modal.querySelector('.modal-content');
+            
+            // Asegurar que el modal y su contenido sean visibles
+            modal.style.display = 'flex';
+            modal.style.visibility = 'visible';
+            modal.style.opacity = '1';
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
+            
+            if (modalContent) {
+                modalContent.style.display = 'block';
+                modalContent.style.visibility = 'visible';
+                modalContent.style.opacity = '1';
+            }
             
             generateCalendar();
             resetForm();
@@ -1817,64 +1829,97 @@
             const validationMsg = document.getElementById('validationMessage');
             if (validationMsg) {
                 validationMsg.style.display = 'none';
+                validationMsg.style.visibility = 'hidden';
             }
             
-            // Asegurar que todos los campos del formulario sean visibles
-            const reservationForm = document.querySelector('.reservation-form');
-            if (reservationForm) {
-                reservationForm.style.display = 'grid';
-                reservationForm.style.visibility = 'visible';
-                reservationForm.style.opacity = '1';
-            }
-            
-            // Asegurar que todos los grupos de formulario sean visibles
-            const formGroups = document.querySelectorAll('.form-group');
-            formGroups.forEach(group => {
-                group.style.display = 'flex';
-                group.style.visibility = 'visible';
-                group.style.opacity = '1';
-            });
-            
-            // Asegurar que todos los inputs y selects sean visibles
-            const formInputs = document.querySelectorAll('.form-group input, .form-group select');
-            formInputs.forEach(input => {
-                input.style.display = 'block';
-                input.style.visibility = 'visible';
-                input.style.opacity = '1';
-            });
-            
-            // Asegurar que todos los labels sean visibles
-            const formLabels = document.querySelectorAll('.form-group label');
-            formLabels.forEach(label => {
-                label.style.display = 'block';
-                label.style.visibility = 'visible';
-                label.style.opacity = '1';
-            });
-            
-            // Mostrar todos los métodos de pago inmediatamente
-            const allPaymentButtons = document.querySelectorAll('.payment-method-btn');
-            allPaymentButtons.forEach(btn => {
-                btn.style.display = 'flex';
-            });
-            
-            // Verificar disponibilidad (pero mostrar todos de todas formas)
-            checkPaymentMethodsAvailability();
-            
-            // Añadir listeners a los campos del formulario
-            const formFields = ['customerName', 'customerEmail', 'customerPhone', 'customerDNI', 
-                              'customerAddress', 'customerCity', 'customerPostalCode', 'customerCountry',
-                              'startDate', 'endDate'];
-            formFields.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (field) {
-                    // Asegurar visibilidad
-                    field.style.display = 'block';
-                    field.style.visibility = 'visible';
-                    field.style.opacity = '1';
-                    field.addEventListener('input', () => validateAndShowPayButton(false));
-                    field.addEventListener('change', () => validateAndShowPayButton(false));
+            // Usar setTimeout para asegurar que el DOM esté completamente renderizado
+            setTimeout(() => {
+                // Asegurar que todos los campos del formulario sean visibles
+                const reservationForm = document.querySelector('.reservation-form');
+                if (reservationForm) {
+                    reservationForm.style.display = 'grid';
+                    reservationForm.style.visibility = 'visible';
+                    reservationForm.style.opacity = '1';
+                    reservationForm.style.height = 'auto';
+                    reservationForm.style.minHeight = 'auto';
                 }
-            });
+                
+                // Asegurar que todos los grupos de formulario sean visibles
+                const formGroups = document.querySelectorAll('.form-group');
+                formGroups.forEach(group => {
+                    group.style.display = 'flex';
+                    group.style.visibility = 'visible';
+                    group.style.opacity = '1';
+                    group.style.height = 'auto';
+                });
+                
+                // Asegurar que todos los form-row sean visibles
+                const formRows = document.querySelectorAll('.form-row');
+                formRows.forEach(row => {
+                    row.style.display = 'grid';
+                    row.style.visibility = 'visible';
+                    row.style.opacity = '1';
+                });
+                
+                // Asegurar que todos los inputs y selects sean visibles
+                const formInputs = document.querySelectorAll('.form-group input, .form-group select, .form-group textarea');
+                formInputs.forEach(input => {
+                    input.style.display = 'block';
+                    input.style.visibility = 'visible';
+                    input.style.opacity = '1';
+                    input.style.width = '100%';
+                    input.style.height = 'auto';
+                });
+                
+                // Asegurar que todos los labels sean visibles
+                const formLabels = document.querySelectorAll('.form-group label');
+                formLabels.forEach(label => {
+                    label.style.display = 'block';
+                    label.style.visibility = 'visible';
+                    label.style.opacity = '1';
+                });
+                
+                // Mostrar todos los métodos de pago inmediatamente
+                const allPaymentButtons = document.querySelectorAll('.payment-method-btn');
+                allPaymentButtons.forEach(btn => {
+                    btn.style.display = 'flex';
+                    btn.style.visibility = 'visible';
+                    btn.style.opacity = '1';
+                });
+                
+                // Verificar disponibilidad (pero mostrar todos de todas formas)
+                checkPaymentMethodsAvailability();
+                
+                // Añadir listeners a los campos del formulario
+                const formFields = ['customerName', 'customerEmail', 'customerPhone', 'customerDNI', 
+                                  'customerAddress', 'customerCity', 'customerPostalCode', 'customerCountry',
+                                  'startDate', 'endDate'];
+                formFields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) {
+                        // Asegurar visibilidad
+                        field.style.display = 'block';
+                        field.style.visibility = 'visible';
+                        field.style.opacity = '1';
+                        field.style.width = '100%';
+                        // Remover listeners anteriores si existen
+                        field.removeEventListener('input', validateAndShowPayButton);
+                        field.removeEventListener('change', validateAndShowPayButton);
+                        // Añadir nuevos listeners
+                        field.addEventListener('input', () => validateAndShowPayButton(false));
+                        field.addEventListener('change', () => validateAndShowPayButton(false));
+                    } else {
+                        console.error('Campo no encontrado:', fieldId);
+                    }
+                });
+                
+                // Debug: verificar que los campos existan
+                console.log('Campos del formulario verificados:', formFields.map(id => ({
+                    id,
+                    exists: !!document.getElementById(id),
+                    visible: document.getElementById(id) ? window.getComputedStyle(document.getElementById(id)).display !== 'none' : false
+                })));
+            }, 100);
         }
 
         // Cerrar modal
