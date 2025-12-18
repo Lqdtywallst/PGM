@@ -545,6 +545,36 @@
                 gap: 3rem;
             }
         }
+        .contact-map-container {
+            width: 100%;
+            margin-top: 3rem;
+            grid-column: 1 / -1;
+        }
+        .contact-map-container h3 {
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+        .contact-map {
+            width: 100%;
+            height: 450px;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 2px solid var(--gold);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+        }
+        .contact-map iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            filter: grayscale(20%) contrast(1.1);
+        }
+        @media (max-width: 768px) {
+            .contact-map {
+                height: 350px;
+            }
+        }
         .contact-info {
             display: flex;
             flex-direction: column;
@@ -933,6 +963,30 @@
                     <button type="submit">SEND MESSAGE</button>
                     <div id="contactFormStatus" style="text-align: center; margin-top: 1rem;"></div>
                 </form>
+            </div>
+            
+            <!-- Mapa de Google Maps -->
+            <div class="contact-map-container">
+                <h3>Find Us</h3>
+                <div class="contact-map">
+                    <iframe 
+                        src="https://www.google.com/maps?q=Calle+Cicón+27+Spain&output=embed&zoom=15"
+                        allowfullscreen=""
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        title="Prestige Goal Motion - Calle Cicón, 27, Spain">
+                    </iframe>
+                </div>
+                <p style="text-align: center; color: var(--silver); margin-top: 1rem;">
+                    <i class="fas fa-map-marker-alt" style="color: var(--gold); margin-right: 0.5rem;"></i>
+                    <a href="https://www.google.com/maps/search/?api=1&query=Calle+Cicón+27+Spain" target="_blank" style="color: var(--gold); text-decoration: none;">
+                        Calle Cicón, 27, Spain
+                    </a>
+                    <span style="margin: 0 0.5rem;">|</span>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=Calle+Cicón+27+Spain" target="_blank" style="color: var(--gold); text-decoration: none;">
+                        Get Directions
+                    </a>
+                </p>
             </div>
         </div>
     </section>
