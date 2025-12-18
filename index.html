@@ -257,18 +257,24 @@
             color: var(--gold);
         }
         .reservation-form {
-            display: grid;
+            display: grid !important;
             gap: 2rem;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
         .form-group {
-            display: flex;
+            display: flex !important;
             flex-direction: column;
             gap: 0.5rem;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
         .form-group label {
             color: var(--gold);
             font-weight: 600;
             font-size: 1rem;
+            display: block !important;
+            visibility: visible !important;
         }
         .form-group input,
         .form-group select {
@@ -278,6 +284,10 @@
             border: 1px solid #444;
             border-radius: 10px;
             font-size: 1rem;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            width: 100%;
         }
         .form-group input:focus,
         .form-group select:focus {
@@ -285,13 +295,18 @@
             border-color: var(--gold);
         }
         .form-row {
-            display: grid;
+            display: grid !important;
             grid-template-columns: 1fr 1fr;
             gap: 1rem;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
         @media (max-width: 768px) {
             .form-row {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr !important;
+                display: grid !important;
+                visibility: visible !important;
+                opacity: 1 !important;
             }
             
             /* Centrar modal de reservas en móvil */
@@ -1804,6 +1819,38 @@
                 validationMsg.style.display = 'none';
             }
             
+            // Asegurar que todos los campos del formulario sean visibles
+            const reservationForm = document.querySelector('.reservation-form');
+            if (reservationForm) {
+                reservationForm.style.display = 'grid';
+                reservationForm.style.visibility = 'visible';
+                reservationForm.style.opacity = '1';
+            }
+            
+            // Asegurar que todos los grupos de formulario sean visibles
+            const formGroups = document.querySelectorAll('.form-group');
+            formGroups.forEach(group => {
+                group.style.display = 'flex';
+                group.style.visibility = 'visible';
+                group.style.opacity = '1';
+            });
+            
+            // Asegurar que todos los inputs y selects sean visibles
+            const formInputs = document.querySelectorAll('.form-group input, .form-group select');
+            formInputs.forEach(input => {
+                input.style.display = 'block';
+                input.style.visibility = 'visible';
+                input.style.opacity = '1';
+            });
+            
+            // Asegurar que todos los labels sean visibles
+            const formLabels = document.querySelectorAll('.form-group label');
+            formLabels.forEach(label => {
+                label.style.display = 'block';
+                label.style.visibility = 'visible';
+                label.style.opacity = '1';
+            });
+            
             // Mostrar todos los métodos de pago inmediatamente
             const allPaymentButtons = document.querySelectorAll('.payment-method-btn');
             allPaymentButtons.forEach(btn => {
@@ -1820,6 +1867,10 @@
             formFields.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
                 if (field) {
+                    // Asegurar visibilidad
+                    field.style.display = 'block';
+                    field.style.visibility = 'visible';
+                    field.style.opacity = '1';
                     field.addEventListener('input', () => validateAndShowPayButton(false));
                     field.addEventListener('change', () => validateAndShowPayButton(false));
                 }
