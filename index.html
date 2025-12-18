@@ -1763,6 +1763,9 @@
                         const methodName = method === 'applepay' ? 'Apple Pay' : 'Google Pay';
                         showPaymentStatus(`¡Pago procesado exitosamente con ${methodName}!`, 'success');
                         
+                        // Enviar email de confirmación
+                        await sendConfirmationEmail(data.paymentIntentId, days, customerData);
+                        
                         setTimeout(() => {
                             closeReservationModal();
                             alert(`Reserva confirmada:\n\nVehículo: ${currentSelectedCar}\nDías: ${days}\nTotal: ${totalCents/100} €\n\nRecibirás un email de confirmación.`);
@@ -1854,6 +1857,10 @@
 
                 // Pago exitoso
                 showPaymentStatus('¡Pago procesado exitosamente!', 'success');
+                
+                // Enviar email de confirmación
+                await sendConfirmationEmail(data.paymentIntentId, days, customerData);
+                
                 setTimeout(() => {
                     closeReservationModal();
                     alert(`Reserva confirmada:\n\nVehículo: ${currentSelectedCar}\nDías: ${days}\nTotal: ${totalCents/100} €\n\nRecibirás un email de confirmación.`);
@@ -1945,6 +1952,10 @@
                 if (paymentIntent) {
                     if (paymentIntent.status === 'succeeded') {
                         showPaymentStatus('¡Pago procesado exitosamente con Link!', 'success');
+                        
+                        // Enviar email de confirmación
+                        await sendConfirmationEmail(data.paymentIntentId, days, customerData);
+                        
                         setTimeout(() => {
                             closeReservationModal();
                             alert(`Reserva confirmada:\n\nVehículo: ${currentSelectedCar}\nDías: ${days}\nTotal: ${totalCents/100} €\n\nRecibirás un email de confirmación.`);
@@ -2071,6 +2082,40 @@
                 }, 1500);
             } catch (error) {
                 throw new Error('Error al procesar transferencia bancaria: ' + error.message);
+            }
+        }
+
+        // Función para enviar email de confirmación
+        async function sendConfirmationEmail(paymentIntentId, days, customerData) {
+            try {
+                const reservationData = {
+                    car: currentSelectedCar,
+                    pricePerDay: currentPricePerDay,
+                    days: days,
+                    startDate: document.getElementById('startDate').value,
+                    endDate: document.getElementById('endDate').value
+                };
+
+                const response = await fetch(`${BACKEND_URL}/api/send-confirmation-email`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        paymentIntentId: paymentIntentId,
+                        reservationData: reservationData,
+                        customerData: customerData
+                    })
+                });
+
+                if (!response.ok) {
+                    console.warn('No se pudo enviar el email de confirmación, pero el pago fue exitoso');
+                } else {
+                    console.log('Email de confirmación enviado correctamente');
+                }
+            } catch (error) {
+                // No bloquear el flujo si falla el email
+                console.warn('Error al enviar email de confirmación:', error);
             }
         }
 

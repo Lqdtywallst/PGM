@@ -1,12 +1,200 @@
 // Ejemplo de Backend para Stripe - Node.js/Express
-// Instala las dependencias: npm install express stripe cors dotenv
+// Instala las dependencias: npm install express stripe cors dotenv nodemailer
 
 require('dotenv').config();
 const express = require('express');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const cors = require('cors');
+const nodemailer = require('nodemailer');
 
 const app = express();
+
+// Configurar transporter de email
+// Opción 1: Usar Gmail (requiere contraseña de aplicación)
+// Opción 2: Usar otro servicio SMTP (configurar en .env)
+const emailTransporter = nodemailer.createTransport({
+    service: process.env.EMAIL_SERVICE || 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER || 'prestigegoalmotion@gmail.com',
+        pass: process.env.EMAIL_PASSWORD || process.env.EMAIL_APP_PASSWORD, // Contraseña de aplicación de Gmail
+    },
+});
+
+// Función para enviar email de confirmación de reserva
+async function sendReservationEmail(reservationData, customerData, paymentIntentId) {
+    const companyEmail = 'prestigegoalmotion@gmail.com';
+    
+    // Email para la empresa (notificación de nueva reserva)
+    const companyEmailHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background: #0a0a0a; color: #d4af37; padding: 20px; text-align: center; }
+                .content { background: #f9f9f9; padding: 20px; margin-top: 20px; }
+                .info-row { margin: 10px 0; padding: 10px; background: white; border-left: 3px solid #d4af37; }
+                .label { font-weight: bold; color: #0a0a0a; }
+                .footer { margin-top: 20px; padding: 20px; text-align: center; color: #666; font-size: 12px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🚗 Nueva Reserva - Prestige Goal Motion</h1>
+                </div>
+                <div class="content">
+                    <h2>Detalles de la Reserva</h2>
+                    
+                    <div class="info-row">
+                        <span class="label">Vehículo:</span> ${reservationData.car}
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Fecha de inicio:</span> ${reservationData.startDate}
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Fecha de fin:</span> ${reservationData.endDate}
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Días:</span> ${reservationData.days}
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Precio por día:</span> ${reservationData.pricePerDay} €
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Total:</span> ${(reservationData.pricePerDay * reservationData.days).toFixed(2)} €
+                    </div>
+                    
+                    <h2 style="margin-top: 30px;">Datos del Cliente</h2>
+                    
+                    <div class="info-row">
+                        <span class="label">Nombre:</span> ${customerData.name}
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Email:</span> ${customerData.email}
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Teléfono:</span> ${customerData.phone}
+                    </div>
+                    <div class="info-row">
+                        <span class="label">DNI:</span> ${customerData.dni}
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Dirección:</span> ${customerData.address}
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Ciudad:</span> ${customerData.city}
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Código Postal:</span> ${customerData.postalCode}
+                    </div>
+                    <div class="info-row">
+                        <span class="label">País:</span> ${customerData.country}
+                    </div>
+                    
+                    <div class="info-row" style="margin-top: 20px; background: #e8f5e9; border-left-color: #4caf50;">
+                        <span class="label">ID de Pago Stripe:</span> ${paymentIntentId}
+                    </div>
+                </div>
+                <div class="footer">
+                    <p>Este es un email automático de Prestige Goal Motion</p>
+                    <p>Fecha: ${new Date().toLocaleString('es-ES')}</p>
+                </div>
+            </div>
+        </body>
+        </html>
+    `;
+
+    // Email para el cliente (confirmación)
+    const customerEmailHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background: #0a0a0a; color: #d4af37; padding: 20px; text-align: center; }
+                .content { background: #f9f9f9; padding: 20px; margin-top: 20px; }
+                .info-row { margin: 10px 0; padding: 10px; background: white; border-left: 3px solid #d4af37; }
+                .label { font-weight: bold; color: #0a0a0a; }
+                .success-box { background: #e8f5e9; border-left-color: #4caf50; padding: 15px; margin: 20px 0; }
+                .footer { margin-top: 20px; padding: 20px; text-align: center; color: #666; font-size: 12px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>✅ Reserva Confirmada</h1>
+                </div>
+                <div class="content">
+                    <div class="success-box">
+                        <h2 style="margin-top: 0; color: #4caf50;">¡Gracias por tu reserva!</h2>
+                        <p>Tu reserva ha sido confirmada y el pago procesado exitosamente.</p>
+                    </div>
+                    
+                    <h2>Detalles de tu Reserva</h2>
+                    
+                    <div class="info-row">
+                        <span class="label">Vehículo:</span> ${reservationData.car}
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Fecha de inicio:</span> ${reservationData.startDate}
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Fecha de fin:</span> ${reservationData.endDate}
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Días:</span> ${reservationData.days}
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Total pagado:</span> ${(reservationData.pricePerDay * reservationData.days).toFixed(2)} €
+                    </div>
+                    
+                    <h2 style="margin-top: 30px;">Información de Contacto</h2>
+                    <p>Si tienes alguna pregunta o necesitas modificar tu reserva, contáctanos:</p>
+                    <ul>
+                        <li><strong>Teléfono:</strong> +34 680 162 813</li>
+                        <li><strong>Email:</strong> prestigegoalmotion@gmail.com</li>
+                        <li><strong>Dirección:</strong> Calle Cicón, 27</li>
+                        <li><strong>Horario:</strong> 24 horas, Lunes a Lunes</li>
+                    </ul>
+                </div>
+                <div class="footer">
+                    <p>Prestige Goal Motion - Alquiler de Coches de Lujo</p>
+                    <p>© 2025 Prestige Goal Motion. Todos los derechos reservados.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+    `;
+
+    try {
+        // Enviar email a la empresa
+        await emailTransporter.sendMail({
+            from: process.env.EMAIL_USER || 'prestigegoalmotion@gmail.com',
+            to: companyEmail,
+            subject: `🚗 Nueva Reserva - ${reservationData.car} - ${customerData.name}`,
+            html: companyEmailHtml,
+        });
+
+        // Enviar email de confirmación al cliente
+        await emailTransporter.sendMail({
+            from: process.env.EMAIL_USER || 'prestigegoalmotion@gmail.com',
+            to: customerData.email,
+            subject: '✅ Reserva Confirmada - Prestige Goal Motion',
+            html: customerEmailHtml,
+        });
+
+        console.log('✅ Emails enviados correctamente');
+        return true;
+    } catch (error) {
+        console.error('❌ Error al enviar emails:', error);
+        return false;
+    }
+}
 
 // Middleware
 app.use(cors());
@@ -193,6 +381,48 @@ app.post('/api/confirm-payment-intent', async (req, res) => {
 
         const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
         
+        // Si el pago fue exitoso, enviar emails
+        if (paymentIntent.status === 'succeeded') {
+            const reservationData = {
+                car: paymentIntent.metadata.car,
+                days: parseInt(paymentIntent.metadata.days),
+                startDate: paymentIntent.metadata.startDate,
+                endDate: paymentIntent.metadata.endDate,
+                pricePerDay: parseFloat(paymentIntent.metadata.pricePerDay),
+            };
+
+            const customerData = {
+                name: paymentIntent.metadata.customerName,
+                email: paymentIntent.metadata.customerEmail,
+                phone: '',
+                dni: '',
+                address: '',
+                city: '',
+                postalCode: '',
+                country: 'ES',
+            };
+
+            // Obtener datos adicionales del cliente
+            try {
+                if (paymentIntent.customer) {
+                    const customer = await stripe.customers.retrieve(paymentIntent.customer);
+                    customerData.phone = customer.phone || '';
+                    customerData.address = customer.address?.line1 || '';
+                    customerData.city = customer.address?.city || '';
+                    customerData.postalCode = customer.address?.postal_code || '';
+                    customerData.country = customer.address?.country || 'ES';
+                    customerData.dni = customer.metadata?.dni || '';
+                }
+            } catch (customerError) {
+                console.warn('No se pudieron obtener datos adicionales del cliente:', customerError.message);
+            }
+
+            // Enviar emails (no esperar para no bloquear la respuesta)
+            sendReservationEmail(reservationData, customerData, paymentIntent.id).catch(err => {
+                console.error('Error al enviar emails (no crítico):', err);
+            });
+        }
+        
         res.json({
             status: paymentIntent.status,
             paymentIntent: paymentIntent
@@ -201,6 +431,37 @@ app.post('/api/confirm-payment-intent', async (req, res) => {
         console.error('Error al confirmar PaymentIntent:', error);
         res.status(500).json({ 
             error: error.message || 'Error al confirmar el pago' 
+        });
+    }
+});
+
+// Endpoint para enviar email de confirmación manualmente
+app.post('/api/send-confirmation-email', async (req, res) => {
+    try {
+        const { paymentIntentId, reservationData, customerData } = req.body;
+
+        if (!paymentIntentId || !reservationData || !customerData) {
+            return res.status(400).json({ 
+                error: 'Faltan datos requeridos' 
+            });
+        }
+
+        const emailSent = await sendReservationEmail(reservationData, customerData, paymentIntentId);
+        
+        if (emailSent) {
+            res.json({ 
+                success: true, 
+                message: 'Emails enviados correctamente' 
+            });
+        } else {
+            res.status(500).json({ 
+                error: 'Error al enviar los emails' 
+            });
+        }
+    } catch (error) {
+        console.error('Error al enviar email:', error);
+        res.status(500).json({ 
+            error: error.message || 'Error al enviar el email' 
         });
     }
 });
@@ -233,20 +494,53 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
             console.log('   Vehículo:', paymentIntent.metadata.car);
             console.log('   Monto:', paymentIntent.amount / 100, paymentIntent.currency.toUpperCase());
             
-            // Aquí guardarías la reserva como confirmada en tu base de datos
-            // y enviarías el email de confirmación al cliente
+            // Preparar datos para el email
+            const reservationData = {
+                car: paymentIntent.metadata.car,
+                days: parseInt(paymentIntent.metadata.days),
+                startDate: paymentIntent.metadata.startDate,
+                endDate: paymentIntent.metadata.endDate,
+                pricePerDay: parseFloat(paymentIntent.metadata.pricePerDay),
+            };
+
+            const customerData = {
+                name: paymentIntent.metadata.customerName,
+                email: paymentIntent.metadata.customerEmail,
+                phone: '', // No está en metadata, se puede obtener del customer
+                dni: '',
+                address: '',
+                city: '',
+                postalCode: '',
+                country: 'ES',
+            };
+
+            // Intentar obtener más datos del cliente desde Stripe
+            try {
+                if (paymentIntent.customer) {
+                    const customer = await stripe.customers.retrieve(paymentIntent.customer);
+                    customerData.phone = customer.phone || '';
+                    customerData.address = customer.address?.line1 || '';
+                    customerData.city = customer.address?.city || '';
+                    customerData.postalCode = customer.address?.postal_code || '';
+                    customerData.country = customer.address?.country || 'ES';
+                    customerData.dni = customer.metadata?.dni || '';
+                }
+            } catch (customerError) {
+                console.warn('No se pudieron obtener datos adicionales del cliente:', customerError.message);
+            }
+
+            // Enviar emails de confirmación
+            await sendReservationEmail(reservationData, customerData, paymentIntent.id);
             
+            // Aquí guardarías la reserva como confirmada en tu base de datos
             // Ejemplo:
             // await saveReservationToDatabase({
             //     paymentIntentId: paymentIntent.id,
             //     customerId: paymentIntent.customer,
             //     status: 'confirmed',
-            //     ...paymentIntent.metadata
+            //     ...reservationData,
+            //     ...customerData
             // });
-            // await sendConfirmationEmail(
-            //     paymentIntent.metadata.customerEmail, 
-            //     paymentIntent.metadata
-            // );
             
             break;
 
