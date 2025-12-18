@@ -10,14 +10,39 @@ const nodemailer = require('nodemailer');
 const app = express();
 
 // Configurar transporter de email
-// Opción 1: Usar Gmail (requiere contraseña de aplicación)
-// Opción 2: Usar otro servicio SMTP (configurar en .env)
-const emailTransporter = nodemailer.createTransport({
+// IMPORTANTE: Para Gmail, necesitas una contraseña de aplicación
+// Obténla en: https://myaccount.google.com/apppasswords
+
+const EMAIL_CONFIG = {
     service: process.env.EMAIL_SERVICE || 'gmail',
+    user: process.env.EMAIL_USER || 'prestigegoalmotion@gmail.com',
+    password: process.env.EMAIL_PASSWORD || process.env.EMAIL_APP_PASSWORD,
+};
+
+// Verificar configuración de email al iniciar
+if (!EMAIL_CONFIG.password) {
+    console.warn('⚠️ ADVERTENCIA: EMAIL_PASSWORD o EMAIL_APP_PASSWORD no está configurado en .env');
+    console.warn('   El envío de emails no funcionará hasta que lo configures.');
+    console.warn('   Ver: CONFIGURACION-EMAIL.md para más información');
+}
+
+const emailTransporter = nodemailer.createTransport({
+    service: EMAIL_CONFIG.service,
     auth: {
-        user: process.env.EMAIL_USER || 'prestigegoalmotion@gmail.com',
-        pass: process.env.EMAIL_PASSWORD || process.env.EMAIL_APP_PASSWORD, // Contraseña de aplicación de Gmail
+        user: EMAIL_CONFIG.user,
+        pass: EMAIL_CONFIG.password,
     },
+});
+
+// Verificar conexión con el servidor de email
+emailTransporter.verify(function(error, success) {
+    if (error) {
+        console.error('❌ Error al verificar conexión con servidor de email:', error.message);
+        console.error('   Verifica tu configuración en .env (EMAIL_USER y EMAIL_APP_PASSWORD)');
+    } else {
+        console.log('✅ Servidor de email configurado correctamente');
+        console.log('   Email de envío:', EMAIL_CONFIG.user);
+    }
 });
 
 // Función para enviar email de confirmación de reserva
@@ -468,7 +493,14 @@ app.post('/api/send-confirmation-email', async (req, res) => {
 
 // Función para enviar email del formulario de contacto
 async function sendContactEmail(contactData) {
+    // SIEMPRE enviar a prestigegoalmotion@gmail.com
     const companyEmail = 'prestigegoalmotion@gmail.com';
+    
+    // Verificar que tenemos la configuración de email
+    if (!EMAIL_CONFIG.password) {
+        console.error('❌ No se puede enviar email: EMAIL_PASSWORD no configurado');
+        throw new Error('Configuración de email incompleta. Verifica tu archivo .env');
+    }
     
     const subjectLabels = {
         'reserva': 'Consulta sobre Reserva',
@@ -538,19 +570,35 @@ async function sendContactEmail(contactData) {
     `;
 
     try {
-        await emailTransporter.sendMail({
-            from: process.env.EMAIL_USER || 'prestigegoalmotion@gmail.com',
-            to: companyEmail,
+        const mailOptions = {
+            from: `"Prestige Goal Motion Web" <${EMAIL_CONFIG.user}>`,
+            to: companyEmail, // SIEMPRE a prestigegoalmotion@gmail.com
             replyTo: contactData.email, // Permite responder directamente al cliente
             subject: `📧 ${subjectLabel} - ${contactData.name}`,
             html: emailHtml,
-        });
+        };
 
+        const info = await emailTransporter.sendMail(mailOptions);
+        
         console.log('✅ Email de contacto enviado correctamente');
+        console.log('   De:', contactData.name, `<${contactData.email}>`);
+        console.log('   Para:', companyEmail);
+        console.log('   Asunto:', mailOptions.subject);
+        console.log('   Message ID:', info.messageId);
+        
         return true;
     } catch (error) {
-        console.error('❌ Error al enviar email de contacto:', error);
-        return false;
+        console.error('❌ Error al enviar email de contacto:', error.message);
+        console.error('   Detalles:', error);
+        
+        // Proporcionar mensajes de error más específicos
+        if (error.code === 'EAUTH') {
+            console.error('   Problema de autenticación. Verifica EMAIL_USER y EMAIL_APP_PASSWORD');
+        } else if (error.code === 'ECONNECTION') {
+            console.error('   No se pudo conectar al servidor de email');
+        }
+        
+        throw error; // Re-lanzar para que el endpoint pueda manejarlo
     }
 }
 
@@ -582,16 +630,36 @@ app.post('/api/contact', async (req, res) => {
             message: message.trim()
         };
 
-        const emailSent = await sendContactEmail(contactData);
-        
-        if (emailSent) {
-            res.json({ 
-                success: true, 
-                message: 'Mensaje enviado exitosamente. Te responderemos pronto.' 
-            });
-        } else {
+        try {
+            const emailSent = await sendContactEmail(contactData);
+            
+            if (emailSent) {
+                res.json({ 
+                    success: true, 
+                    message: 'Mensaje enviado exitosamente a prestigegoalmotion@gmail.com. Te responderemos pronto.' 
+                });
+            } else {
+                res.status(500).json({ 
+                    error: 'Error al enviar el mensaje. Por favor, intenta de nuevo.' 
+                });
+            }
+        } catch (emailError) {
+            console.error('Error detallado al enviar email:', emailError);
+            
+            // Mensajes de error más específicos para el cliente
+            let errorMessage = 'Error al enviar el mensaje. ';
+            
+            if (emailError.message.includes('EAUTH') || emailError.message.includes('autenticación')) {
+                errorMessage += 'Error de configuración del servidor de email.';
+            } else if (emailError.message.includes('ECONNECTION')) {
+                errorMessage += 'No se pudo conectar con el servidor de email.';
+            } else {
+                errorMessage += emailError.message || 'Por favor, intenta de nuevo más tarde.';
+            }
+            
             res.status(500).json({ 
-                error: 'Error al enviar el mensaje. Por favor, intenta de nuevo.' 
+                error: errorMessage,
+                details: process.env.NODE_ENV === 'development' ? emailError.message : undefined
             });
         }
     } catch (error) {
@@ -720,10 +788,36 @@ app.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Endpoint de prueba para verificar que el servidor funciona
+app.get('/api/test', (req, res) => {
+    res.json({ 
+        status: 'ok', 
+        message: 'Servidor funcionando correctamente',
+        timestamp: new Date().toISOString() 
+    });
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Servidor corriendo en puerto ${PORT}`);
-    console.log(`Modo: ${process.env.NODE_ENV || 'development'}`);
+    console.log('\n' + '='.repeat(60));
+    console.log('🚀 SERVIDOR PRESTIGE GOAL MOTION');
+    console.log('='.repeat(60));
+    console.log(`✅ Servidor corriendo en puerto ${PORT}`);
+    console.log(`📧 Email configurado: ${EMAIL_CONFIG.user}`);
+    console.log(`🔧 Modo: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🌐 URL: http://localhost:${PORT}`);
+    console.log(`📬 Endpoint de contacto: http://localhost:${PORT}/api/contact`);
+    console.log(`💳 Endpoint de pagos: http://localhost:${PORT}/api/create-payment-intent`);
+    
+    if (!EMAIL_CONFIG.password) {
+        console.log('\n⚠️  ADVERTENCIA: Email no configurado');
+        console.log('   Configura EMAIL_APP_PASSWORD en tu archivo .env');
+        console.log('   Ver: CONFIGURACION-EMAIL.md');
+    } else {
+        console.log('✅ Email configurado correctamente');
+    }
+    
+    console.log('='.repeat(60) + '\n');
 });
 
 
