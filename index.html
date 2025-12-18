@@ -2167,40 +2167,28 @@
             submitBtn.textContent = 'ENVIANDO...';
             statusDiv.innerHTML = '<p style="color: var(--silver);">Enviando mensaje...</p>';
             
-            // Simulación de envío (en producción, aquí harías una llamada a tu backend)
-            setTimeout(() => {
-                // En producción, harías algo como:
-                /*
-                fetch('/api/contact', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        name: name,
-                        email: email,
-                        phone: phone,
-                        subject: subject,
-                        message: message
-                    })
+            // Enviar mensaje al backend
+            fetch(`${BACKEND_URL}/api/contact`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    subject: subject,
+                    message: message
                 })
-                .then(response => response.json())
-                .then(data => {
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
                     statusDiv.innerHTML = '<p class="success-message">¡Mensaje enviado exitosamente! Te responderemos pronto.</p>';
                     event.target.reset();
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'ENVIAR MENSAJE';
-                })
-                .catch(error => {
-                    statusDiv.innerHTML = '<p class="error-message">Hubo un error al enviar el mensaje. Por favor, intenta de nuevo.</p>';
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'ENVIAR MENSAJE';
-                });
-                */
-                
-                // Simulación para demostración
-                statusDiv.innerHTML = '<p class="success-message">¡Mensaje enviado exitosamente! Te responderemos pronto.</p>';
-                event.target.reset();
+                } else {
+                    statusDiv.innerHTML = '<p class="error-message">' + (data.error || 'Hubo un error al enviar el mensaje. Por favor, intenta de nuevo.') + '</p>';
+                }
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'ENVIAR MENSAJE';
                 
@@ -2208,7 +2196,18 @@
                 setTimeout(() => {
                     statusDiv.innerHTML = '';
                 }, 5000);
-            }, 1500);
+            })
+            .catch(error => {
+                console.error('Error al enviar mensaje:', error);
+                statusDiv.innerHTML = '<p class="error-message">Hubo un error al enviar el mensaje. Por favor, intenta de nuevo.</p>';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'ENVIAR MENSAJE';
+                
+                // Limpiar mensaje después de 5 segundos
+                setTimeout(() => {
+                    statusDiv.innerHTML = '';
+                }, 5000);
+            });
         }
     </script>
 </body>

@@ -466,6 +466,142 @@ app.post('/api/send-confirmation-email', async (req, res) => {
     }
 });
 
+// Función para enviar email del formulario de contacto
+async function sendContactEmail(contactData) {
+    const companyEmail = 'prestigegoalmotion@gmail.com';
+    
+    const subjectLabels = {
+        'reserva': 'Consulta sobre Reserva',
+        'flota': 'Información sobre Flota',
+        'precio': 'Consulta de Precios',
+        'evento': 'Eventos Corporativos',
+        'otro': 'Otro'
+    };
+
+    const subjectLabel = subjectLabels[contactData.subject] || contactData.subject;
+
+    const emailHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background: #0a0a0a; color: #d4af37; padding: 20px; text-align: center; }
+                .content { background: #f9f9f9; padding: 20px; margin-top: 20px; }
+                .info-row { margin: 10px 0; padding: 10px; background: white; border-left: 3px solid #d4af37; }
+                .label { font-weight: bold; color: #0a0a0a; }
+                .message-box { background: white; padding: 15px; margin: 20px 0; border-left: 3px solid #d4af37; }
+                .footer { margin-top: 20px; padding: 20px; text-align: center; color: #666; font-size: 12px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>📧 Nuevo Mensaje de Contacto</h1>
+                </div>
+                <div class="content">
+                    <h2>Información del Contacto</h2>
+                    
+                    <div class="info-row">
+                        <span class="label">Nombre:</span> ${contactData.name}
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Email:</span> <a href="mailto:${contactData.email}">${contactData.email}</a>
+                    </div>
+                    ${contactData.phone ? `
+                    <div class="info-row">
+                        <span class="label">Teléfono:</span> <a href="tel:${contactData.phone}">${contactData.phone}</a>
+                    </div>
+                    ` : ''}
+                    <div class="info-row">
+                        <span class="label">Asunto:</span> ${subjectLabel}
+                    </div>
+                    
+                    <h2 style="margin-top: 30px;">Mensaje</h2>
+                    <div class="message-box">
+                        ${contactData.message.replace(/\n/g, '<br>')}
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-left: 3px solid #2196f3;">
+                        <p style="margin: 0;"><strong>Responder a:</strong> <a href="mailto:${contactData.email}">${contactData.email}</a></p>
+                    </div>
+                </div>
+                <div class="footer">
+                    <p>Este es un email automático del formulario de contacto de Prestige Goal Motion</p>
+                    <p>Fecha: ${new Date().toLocaleString('es-ES')}</p>
+                </div>
+            </div>
+        </body>
+        </html>
+    `;
+
+    try {
+        await emailTransporter.sendMail({
+            from: process.env.EMAIL_USER || 'prestigegoalmotion@gmail.com',
+            to: companyEmail,
+            replyTo: contactData.email, // Permite responder directamente al cliente
+            subject: `📧 ${subjectLabel} - ${contactData.name}`,
+            html: emailHtml,
+        });
+
+        console.log('✅ Email de contacto enviado correctamente');
+        return true;
+    } catch (error) {
+        console.error('❌ Error al enviar email de contacto:', error);
+        return false;
+    }
+}
+
+// Endpoint para el formulario de contacto
+app.post('/api/contact', async (req, res) => {
+    try {
+        const { name, email, phone, subject, message } = req.body;
+
+        // Validación
+        if (!name || !email || !subject || !message) {
+            return res.status(400).json({ 
+                error: 'Faltan campos obligatorios' 
+            });
+        }
+
+        // Validar formato de email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ 
+                error: 'El email proporcionado no es válido' 
+            });
+        }
+
+        const contactData = {
+            name: name.trim(),
+            email: email.trim(),
+            phone: phone ? phone.trim() : '',
+            subject: subject,
+            message: message.trim()
+        };
+
+        const emailSent = await sendContactEmail(contactData);
+        
+        if (emailSent) {
+            res.json({ 
+                success: true, 
+                message: 'Mensaje enviado exitosamente. Te responderemos pronto.' 
+            });
+        } else {
+            res.status(500).json({ 
+                error: 'Error al enviar el mensaje. Por favor, intenta de nuevo.' 
+            });
+        }
+    } catch (error) {
+        console.error('Error al procesar formulario de contacto:', error);
+        res.status(500).json({ 
+            error: error.message || 'Error al procesar el formulario' 
+        });
+    }
+});
+
 // Webhook para confirmar pagos exitosos
 app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
     const sig = req.headers['stripe-signature'];
