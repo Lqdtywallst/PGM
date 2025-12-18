@@ -6,6 +6,7 @@
     <title>Prestige Goal Motion - Alquiler de Coches de Lujo</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://js.stripe.com/v3/"></script>
+    <script src="config.js"></script>
     <style>
         :root {
             --black: #0a0a0a;
@@ -781,7 +782,7 @@
         <h2>Nuestra Flota Exclusiva</h2>
         <div class="fleet-grid">
             <div class="car-card">
-                <img src="https://a.ccdn.es/nuevos/400/mercedes/glecoupe/2020/5od-4.jpg" alt="Mercedes GLE 53 AMG">
+                <img src="https://di-uploads-pod5.dealerinspire.com/mercedesbenzprinceton/uploads/2020/07/2021-Mercedes-Benz-GLE-53-Coupe.png" alt="Mercedes GLE 53 AMG">
                 <div class="car-info">
                     <h3>Mercedes GLE 53 AMG</h3>
                     <div class="price">Desde 450 € / día</div>
@@ -1181,8 +1182,22 @@
             'Mercedes GLE 400D': []
         };
 
-        // Inicializar Stripe (reemplaza con tu clave pública de Stripe)
-        const stripe = Stripe('pk_test_51...'); // Reemplaza con tu clave pública de Stripe
+        // Inicializar Stripe con la configuración
+        // Si config.js no está disponible, usa la clave por defecto
+        const stripePublishableKey = (typeof STRIPE_CONFIG !== 'undefined' && STRIPE_CONFIG.publishableKey) 
+            ? STRIPE_CONFIG.publishableKey 
+            : 'pk_test_51...'; // ⚠️ REEMPLAZA CON TU CLAVE PÚBLICA DE STRIPE
+        
+        if (stripePublishableKey === 'pk_test_51...') {
+            console.warn('⚠️ ADVERTENCIA: Usa tu clave pública de Stripe en config.js');
+        }
+        
+        const stripe = Stripe(stripePublishableKey);
+        
+        // Configuración del backend
+        const BACKEND_URL = (typeof STRIPE_CONFIG !== 'undefined' && STRIPE_CONFIG.backendUrl) 
+            ? STRIPE_CONFIG.backendUrl 
+            : 'http://localhost:3000';
         
         // Inicializar Stripe Elements cuando se abre el modal
         function initializeStripeElements() {
@@ -1694,18 +1709,17 @@
                 }
 
                 paymentRequest.on('paymentmethod', async (ev) => {
-                    // Aquí crearías el PaymentIntent en tu backend
-                    // Por ahora, simulamos la confirmación
                     try {
-                        // En producción, llamarías a tu backend:
-                        /*
-                        const response = await fetch('/api/create-payment-intent', {
+                        // Crear PaymentIntent en el backend
+                        const response = await fetch(`${BACKEND_URL}/api/create-payment-intent`, {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
+                            headers: { 
+                                'Content-Type': 'application/json',
+                            },
                             body: JSON.stringify({
                                 amount: totalCents,
                                 currency: 'eur',
-                                paymentMethod: ev.paymentMethod.id,
+                                paymentMethodId: ev.paymentMethod.id,
                                 customerData: customerData,
                                 reservationData: {
                                     car: currentSelectedCar,
@@ -1716,20 +1730,41 @@
                                 }
                             })
                         });
-                        const { clientSecret } = await response.json();
-                        const { error: confirmError } = await stripe.confirmCardPayment(clientSecret);
-                        */
 
-                        // Simulación
+                        if (!response.ok) {
+                            throw new Error('Error al crear el PaymentIntent');
+                        }
+
+                        const data = await response.json();
+                        
+                        if (data.error) {
+                            throw new Error(data.error);
+                        }
+
+                        // Confirmar el pago
+                        const { error: confirmError } = await stripe.confirmCardPayment(
+                            data.clientSecret,
+                            {
+                                payment_method: ev.paymentMethod.id
+                            }
+                        );
+
+                        if (confirmError) {
+                            throw confirmError;
+                        }
+
+                        // Pago exitoso
                         ev.complete('success');
                         const methodName = method === 'applepay' ? 'Apple Pay' : 'Google Pay';
                         showPaymentStatus(`¡Pago procesado exitosamente con ${methodName}!`, 'success');
+                        
                         setTimeout(() => {
                             closeReservationModal();
                             alert(`Reserva confirmada:\n\nVehículo: ${currentSelectedCar}\nDías: ${days}\nTotal: ${totalCents/100} €\n\nRecibirás un email de confirmación.`);
                         }, 1500);
                     } catch (error) {
                         ev.complete('fail');
+                        showPaymentStatus('Error al procesar el pago: ' + error.message, 'error');
                         throw error;
                     }
                 });
@@ -1768,13 +1803,13 @@
                 throw new Error(pmError.message);
             }
 
-            // En producción, aquí crearías el PaymentIntent en tu backend
+            // Crear PaymentIntent en el backend
             try {
-                // Ejemplo de llamada al backend:
-                /*
-                const response = await fetch('/api/create-payment-intent', {
+                const response = await fetch(`${BACKEND_URL}/api/create-payment-intent`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                    },
                     body: JSON.stringify({
                         amount: totalCents,
                         currency: 'eur',
@@ -1789,14 +1824,30 @@
                         }
                     })
                 });
-                const { clientSecret } = await response.json();
-                const { error: confirmError } = await stripe.confirmCardPayment(clientSecret);
+
+                if (!response.ok) {
+                    throw new Error('Error al crear el PaymentIntent');
+                }
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                // Confirmar el pago
+                const { error: confirmError } = await stripe.confirmCardPayment(
+                    data.clientSecret,
+                    {
+                        payment_method: paymentMethod.id
+                    }
+                );
+                
                 if (confirmError) {
                     throw confirmError;
                 }
-                */
 
-                // Simulación para demostración
+                // Pago exitoso
                 showPaymentStatus('¡Pago procesado exitosamente!', 'success');
                 setTimeout(() => {
                     closeReservationModal();
