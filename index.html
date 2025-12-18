@@ -1572,47 +1572,70 @@
         // Verificar disponibilidad de métodos de pago
         async function checkPaymentMethodsAvailability() {
             try {
-                const paymentRequest = stripe.paymentRequest({
-                    country: 'ES',
-                    currency: 'eur',
-                    total: {
-                        label: 'Reserva',
-                        amount: 0,
-                    },
-                    requestPayerName: true,
-                    requestPayerEmail: true,
-                    requestPayerPhone: true,
-                });
-                
-                const canMakePayment = await paymentRequest.canMakePayment();
-                
-                // Apple Pay - Siempre visible
+                // Mostrar TODOS los métodos de pago siempre
                 const applePayBtn = document.getElementById('applePayBtn');
-                applePayBtn.style.display = 'flex';
-                if (canMakePayment && canMakePayment.applePay) {
-                    applePayBtn.classList.remove('disabled');
-                    applePayBtn.title = 'Apple Pay disponible';
-                } else {
-                    // Mantener visible pero indicar que puede no estar disponible en este dispositivo
-                    applePayBtn.classList.remove('disabled');
-                    applePayBtn.title = 'Apple Pay - Disponible en dispositivos Apple compatibles';
-                }
-                
-                // Google Pay
                 const googlePayBtn = document.getElementById('googlePayBtn');
-                if (canMakePayment && canMakePayment.googlePay) {
-                    googlePayBtn.style.display = 'flex';
-                    googlePayBtn.classList.remove('disabled');
-                } else {
-                    googlePayBtn.style.display = 'none';
-                }
-                
-                // Link de Stripe (siempre disponible si está habilitado en tu cuenta)
                 const linkBtn = document.getElementById('linkBtn');
-                linkBtn.style.display = 'flex';
+                const cardBtn = document.getElementById('cardBtn');
+                const paypalBtn = document.getElementById('paypalBtn');
+                const bizumBtn = document.getElementById('bizumBtn');
+                const bankTransferBtn = document.getElementById('bankTransferBtn');
+                
+                // Mostrar todos los métodos siempre
+                if (applePayBtn) applePayBtn.style.display = 'flex';
+                if (googlePayBtn) googlePayBtn.style.display = 'flex';
+                if (linkBtn) linkBtn.style.display = 'flex';
+                if (cardBtn) cardBtn.style.display = 'flex';
+                if (paypalBtn) paypalBtn.style.display = 'flex';
+                if (bizumBtn) bizumBtn.style.display = 'flex';
+                if (bankTransferBtn) bankTransferBtn.style.display = 'flex';
+                
+                // Verificar disponibilidad real si Stripe está configurado
+                if (stripe) {
+                    const paymentRequest = stripe.paymentRequest({
+                        country: 'ES',
+                        currency: 'eur',
+                        total: {
+                            label: 'Reserva',
+                            amount: 0,
+                        },
+                        requestPayerName: true,
+                        requestPayerEmail: true,
+                        requestPayerPhone: true,
+                    });
+                    
+                    const canMakePayment = await paymentRequest.canMakePayment();
+                    
+                    // Actualizar estado de Apple Pay
+                    if (applePayBtn) {
+                        if (canMakePayment && canMakePayment.applePay) {
+                            applePayBtn.classList.remove('disabled');
+                            applePayBtn.title = 'Apple Pay available';
+                        } else {
+                            applePayBtn.classList.remove('disabled');
+                            applePayBtn.title = 'Apple Pay - Available on compatible Apple devices';
+                        }
+                    }
+                    
+                    // Actualizar estado de Google Pay
+                    if (googlePayBtn) {
+                        if (canMakePayment && canMakePayment.googlePay) {
+                            googlePayBtn.classList.remove('disabled');
+                            googlePayBtn.title = 'Google Pay available';
+                        } else {
+                            googlePayBtn.classList.remove('disabled');
+                            googlePayBtn.title = 'Google Pay - Available on compatible devices';
+                        }
+                    }
+                }
                 
             } catch (error) {
                 console.error('Error checking payment methods:', error);
+                // Aún así, mostrar todos los métodos
+                const allButtons = document.querySelectorAll('.payment-method-btn');
+                allButtons.forEach(btn => {
+                    btn.style.display = 'flex';
+                });
             }
         }
         
@@ -1761,6 +1784,14 @@
             
             generateCalendar();
             resetForm();
+            
+            // Mostrar todos los métodos de pago inmediatamente
+            const allPaymentButtons = document.querySelectorAll('.payment-method-btn');
+            allPaymentButtons.forEach(btn => {
+                btn.style.display = 'flex';
+            });
+            
+            // Verificar disponibilidad (pero mostrar todos de todas formas)
             checkPaymentMethodsAvailability();
             
             // Añadir listeners a los campos del formulario
