@@ -792,7 +792,7 @@
             }
         nav ul { gap: 1.2rem; }
         
-        /* Botón de menú hamburguesa para móvil */
+        /* Botón de menú hamburguesa para móvil - Oculto en desktop */
         .menu-toggle {
             display: none;
             background: none;
@@ -816,10 +816,20 @@
             display: inline-block;
         }
         
-        /* Menú móvil */
+        /* Menú móvil - Oculto en desktop, visible solo en móvil */
+        @media (min-width: 769px) {
+            .menu-toggle {
+                display: none !important;
+            }
+            nav {
+                display: flex !important;
+            }
+        }
+        
         @media (max-width: 768px) {
+            /* Ocultar menú normal en móvil */
             nav { 
-                display: none;
+                display: none !important;
                 position: absolute;
                 top: 100%;
                 left: 0;
@@ -831,7 +841,7 @@
                 z-index: 1000;
             }
             nav.active {
-                display: block;
+                display: block !important;
             }
             nav ul {
                 flex-direction: column;
@@ -853,8 +863,9 @@
                 background: rgba(212, 175, 55, 0.1);
                 padding-left: 2.5rem;
             }
+            /* Mostrar botón hamburguesa solo en móvil */
             .menu-toggle {
-                display: block;
+                display: block !important;
             }
         }
             .footer-banner img {
