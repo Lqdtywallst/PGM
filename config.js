@@ -8,8 +8,8 @@ const STRIPE_CONFIG = {
     // Clave pública de Stripe (Publishable Key)
     // Para pruebas (Test Mode): pk_test_...
     // Para producción (Live Mode): pk_live_...
-    // ⚠️ REEMPLAZA CON TU CLAVE PÚBLICA REAL
-    publishableKey: 'pk_test_51...', 
+    // ✅ Clave pública configurada (Modo Live/Producción)
+    publishableKey: 'pk_live_51RsMXQ3DSCa2l71zZiMkmlBXXpLu1HF0Sy4N4xSsB1TvUWu6wJLlKR5z7HrCa0AIlWQjfZo4tL8d1qcxtgExNHS300EPCAtXti', 
     
     // URL de tu backend para procesar pagos
     // Desarrollo local: 'http://localhost:3000'
