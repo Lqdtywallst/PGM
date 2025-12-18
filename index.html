@@ -792,16 +792,23 @@
             }
         nav ul { gap: 1.2rem; }
         
-        /* Botón de menú hamburguesa para móvil - Oculto por defecto */
+        /* Botón de menú hamburguesa para móvil - Completamente oculto en desktop */
         .menu-toggle {
             display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            position: absolute !important;
+            width: 0 !important;
+            height: 0 !important;
+            overflow: hidden !important;
             background: none;
             border: none;
             color: var(--gold);
             font-size: 2rem;
             cursor: pointer;
-            padding: 0.5rem;
-            transition: color 0.3s;
+            padding: 0;
+            margin: 0;
+            transition: none;
         }
         .menu-toggle:hover {
             color: var(--silver);
@@ -816,11 +823,36 @@
             display: inline-block;
         }
         
-        /* Menú móvil - Oculto en desktop, visible solo en móvil */
+        /* Asegurar que en desktop el botón esté completamente oculto y el menú normal visible */
+        @media (min-width: 769px) {
+            .menu-toggle {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                position: absolute !important;
+                width: 0 !important;
+                height: 0 !important;
+                overflow: hidden !important;
+                pointer-events: none !important;
+            }
+            nav {
+                display: flex !important;
+            }
+        }
+        
+        /* Menú móvil - Visible solo en móvil */
         @media (max-width: 768px) {
             /* Mostrar botón hamburguesa solo en móvil */
             .menu-toggle {
                 display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                position: relative !important;
+                width: auto !important;
+                height: auto !important;
+                overflow: visible !important;
+                pointer-events: auto !important;
+                padding: 0.5rem !important;
             }
             
             /* Ocultar menú normal en móvil */
@@ -858,13 +890,6 @@
             nav a:hover {
                 background: rgba(212, 175, 55, 0.1);
                 padding-left: 2.5rem;
-            }
-        }
-        
-        /* Asegurar que en desktop el menú normal esté visible */
-        @media (min-width: 769px) {
-            nav {
-                display: flex !important;
             }
         }
             .footer-banner img {
