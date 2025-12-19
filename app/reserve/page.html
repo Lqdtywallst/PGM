@@ -188,6 +188,114 @@
             font-size: 0.9rem;
         }
 
+        /* Calendar Styles */
+        .calendar-container {
+            margin-bottom: 2rem;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .calendar-nav {
+            background: transparent;
+            border: 1px solid #444;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .calendar-nav:hover {
+            border-color: #d4af37;
+            color: #d4af37;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            background: #111;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            color: #a1a1aa;
+        }
+
+        .calendar-day.header {
+            color: #d4af37;
+            font-weight: 600;
+            cursor: default;
+            font-size: 0.85rem;
+        }
+
+        .calendar-day.past {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .calendar-day.available {
+            color: white;
+        }
+
+        .calendar-day.available:hover {
+            background: rgba(212, 175, 55, 0.2);
+            color: #d4af37;
+        }
+
+        .calendar-day.today {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid #d4af37;
+            color: #d4af37;
+            font-weight: 600;
+        }
+
+        .calendar-day.selected {
+            background: #d4af37;
+            color: #000;
+            font-weight: 600;
+        }
+
+        .calendar-day.start-date {
+            background: linear-gradient(135deg, #d4af37, rgba(212, 175, 55, 0.8));
+            color: #000;
+        }
+
+        .calendar-day.end-date {
+            background: linear-gradient(135deg, #d4af37, rgba(212, 175, 55, 0.8));
+            color: #000;
+        }
+
+        .calendar-day.in-range {
+            background: rgba(212, 175, 55, 0.2);
+            color: #d4af37;
+        }
+
+        .calendar-day.unavailable {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .reservation-summary {
+            font-size: 0.95rem;
+        }
+
         @media (max-width: 768px) {
             .reserve-container {
                 padding: 1.5rem;
@@ -204,6 +312,15 @@
             .step-navigation .btn,
             .step-navigation .btn-secondary {
                 width: 100%;
+            }
+
+            .calendar-grid {
+                gap: 2px;
+                padding: 0.5rem;
+            }
+
+            .calendar-day {
+                font-size: 0.75rem;
             }
         }
     </style>
@@ -259,20 +376,49 @@
         <!-- STEP 2: Dates -->
         <div id="step2" class="step-content">
             <h2 style="color: #d4af37; margin-bottom: 1.5rem;">Select Your Dates</h2>
-            <div class="form-group">
-                <label style="display: block; margin-bottom: 0.5rem; color: #d4af37;">Start Date & Time *</label>
-                <input type="datetime-local" id="startDate" name="startDate" class="input" required>
+            
+            <!-- Calendar Container -->
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <button class="calendar-nav" onclick="changeMonth(-1)">‹ Previous</button>
+                    <h3 id="currentMonth" style="margin: 0; color: #d4af37;"></h3>
+                    <button class="calendar-nav" onclick="changeMonth(1)">Next ›</button>
+                </div>
+                <div id="calendarGrid" class="calendar-grid"></div>
+            </div>
+
+            <!-- Date Inputs (hidden but used for form submission) -->
+            <div class="form-group" style="margin-top: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: #d4af37;">Start Date *</label>
+                <input type="date" id="startDate" name="startDate" class="input" required onchange="updateCalendarFromInputs()">
             </div>
             <div class="form-group">
-                <label style="display: block; margin-bottom: 0.5rem; color: #d4af37;">End Date & Time *</label>
-                <input type="datetime-local" id="endDate" name="endDate" class="input" required>
+                <label style="display: block; margin-bottom: 0.5rem; color: #d4af37;">End Date *</label>
+                <input type="date" id="endDate" name="endDate" class="input" required onchange="updateCalendarFromInputs()">
             </div>
-            <div class="form-group">
+
+            <!-- Reservation Summary -->
+            <div class="reservation-summary" style="margin-top: 1.5rem; padding: 1rem; background: rgba(212, 175, 55, 0.05); border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.2);">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Days:</span>
+                    <span id="summaryDays" style="color: #d4af37; font-weight: 600;">0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Price per day:</span>
+                    <span id="summaryPricePerDay" style="color: #d4af37;">€0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-top: 0.5rem; border-top: 1px solid rgba(212, 175, 55, 0.2); font-size: 1.2rem; font-weight: 600;">
+                    <span>Total:</span>
+                    <span id="summaryTotal" style="color: #d4af37;">€0.00</span>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 1.5rem;">
                 <input type="text" id="pickupLocation" name="pickupLocation" placeholder="Pickup Location *" class="input" required>
             </div>
             <div class="step-navigation">
                 <button onclick="prevStep()" class="btn-secondary">← Back</button>
-                <button onclick="nextStep()" class="btn">Continue to Payment →</button>
+                <button onclick="nextStep()" class="btn" id="continueToPaymentBtn" disabled style="opacity: 0.5; cursor: not-allowed;">Continue to Payment →</button>
             </div>
         </div>
 
@@ -299,6 +445,11 @@
         let currentStep = 1;
         let selectedCar = 'Mercedes GLE 53 AMG';
         let pricePerDay = 500;
+        
+        // Estado del calendario
+        let currentDate = new Date();
+        let selectedStartDate = null;
+        let selectedEndDate = null;
 
         // Obtener parámetros de la URL (si vienen del index.html)
         const urlParams = new URLSearchParams(window.location.search);
@@ -310,6 +461,12 @@
 
         // Actualizar información del vehículo
         document.getElementById('selectedCar').textContent = selectedCar;
+        document.getElementById('summaryPricePerDay').textContent = `€${pricePerDay}`;
+        
+        // Inicializar calendario cuando se carga la página
+        if (document.getElementById('step2').classList.contains('active')) {
+            generateCalendar();
+        }
 
         // Navegación entre pasos
         function nextStep() {
@@ -351,6 +508,11 @@
                 // Calcular total
                 calculateTotal();
             }
+            
+            // Inicializar calendario cuando se entra al paso 2
+            if (currentStep === 2) {
+                generateCalendar();
+            }
 
             if (currentStep < 3) {
                 currentStep++;
@@ -382,24 +544,217 @@
                     indicator.classList.remove('active');
                 }
             });
-        }
-
-        function calculateTotal() {
-            const startDate = new Date(document.getElementById('startDate').value);
-            const endDate = new Date(document.getElementById('endDate').value);
             
-            if (startDate && endDate && endDate > startDate) {
-                const diffTime = Math.abs(endDate - startDate);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                const total = diffDays * pricePerDay;
-                
-                document.getElementById('totalAmount').textContent = `€${total.toFixed(2)}`;
+            // Inicializar calendario cuando se muestra el paso 2
+            if (currentStep === 2) {
+                generateCalendar();
+            }
+        }
+        
+        // Funciones del calendario
+        function generateCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDayOfWeek = firstDay.getDay();
+
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('currentMonth').textContent = `${monthNames[month]} ${year}`;
+
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+
+            // Días de la semana
+            const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            weekDays.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day header';
+                dayElement.textContent = day;
+                grid.appendChild(dayElement);
+            });
+
+            // Espacios vacíos al inicio
+            for (let i = 0; i < startingDayOfWeek; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day';
+                grid.appendChild(emptyDay);
+            }
+
+            // Días del mes
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const dateStr = formatDate(date);
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
+
+                // Verificar si es una fecha pasada
+                if (date < today) {
+                    dayElement.classList.add('past', 'unavailable');
+                } else {
+                    dayElement.classList.add('available');
+                    dayElement.onclick = () => selectDate(date);
+                }
+
+                // Marcar hoy
+                if (dateStr === formatDate(today)) {
+                    dayElement.classList.add('today');
+                }
+
+                // Marcar fechas seleccionadas y rango
+                if (selectedStartDate && selectedEndDate) {
+                    const startStr = formatDate(selectedStartDate);
+                    const endStr = formatDate(selectedEndDate);
+                    
+                    if (dateStr === startStr) {
+                        dayElement.classList.add('selected', 'start-date');
+                    } else if (dateStr === endStr) {
+                        dayElement.classList.add('selected', 'end-date');
+                    } else if (date >= selectedStartDate && date <= selectedEndDate) {
+                        dayElement.classList.add('in-range');
+                    }
+                } else if (selectedStartDate && formatDate(selectedStartDate) === dateStr) {
+                    dayElement.classList.add('selected', 'start-date');
+                }
+
+                grid.appendChild(dayElement);
             }
         }
 
+        function selectDate(date) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // No permitir seleccionar fechas pasadas
+            if (date < today) {
+                return;
+            }
+            
+            if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
+                // Primera selección o resetear selección
+                selectedStartDate = date;
+                selectedEndDate = null;
+                document.getElementById('startDate').value = formatDateInput(date);
+                document.getElementById('endDate').value = '';
+            } else if (date > selectedStartDate) {
+                // Segunda selección (fecha final)
+                selectedEndDate = date;
+                document.getElementById('endDate').value = formatDateInput(date);
+            } else if (date < selectedStartDate) {
+                // Si selecciona una fecha anterior a la inicial, hacerla la nueva inicial
+                selectedStartDate = date;
+                selectedEndDate = null;
+                document.getElementById('startDate').value = formatDateInput(date);
+                document.getElementById('endDate').value = '';
+            } else {
+                // Si hace clic en la misma fecha, resetear
+                selectedStartDate = null;
+                selectedEndDate = null;
+                document.getElementById('startDate').value = '';
+                document.getElementById('endDate').value = '';
+            }
+            
+            generateCalendar();
+            calculateTotal();
+            updateContinueButton();
+        }
+
+        function changeMonth(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            generateCalendar();
+        }
+
+        function formatDateInput(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatDate(date) {
+            return formatDateInput(date);
+        }
+        
+        function updateCalendarFromInputs() {
+            const startDateValue = document.getElementById('startDate').value;
+            const endDateValue = document.getElementById('endDate').value;
+            
+            if (startDateValue) {
+                selectedStartDate = new Date(startDateValue);
+            } else {
+                selectedStartDate = null;
+            }
+            
+            if (endDateValue) {
+                selectedEndDate = new Date(endDateValue);
+            } else {
+                selectedEndDate = null;
+            }
+            
+            generateCalendar();
+            calculateTotal();
+            updateContinueButton();
+        }
+        
+        function updateContinueButton() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const continueBtn = document.getElementById('continueToPaymentBtn');
+            
+            if (startDate && endDate && new Date(endDate) > new Date(startDate)) {
+                continueBtn.disabled = false;
+                continueBtn.style.opacity = '1';
+                continueBtn.style.cursor = 'pointer';
+            } else {
+                continueBtn.disabled = true;
+                continueBtn.style.opacity = '0.5';
+                continueBtn.style.cursor = 'not-allowed';
+            }
+        }
+
+        function calculateTotal() {
+            const startDateValue = document.getElementById('startDate').value;
+            const endDateValue = document.getElementById('endDate').value;
+            
+            if (startDateValue && endDateValue) {
+                const startDate = new Date(startDateValue);
+                const endDate = new Date(endDateValue);
+                
+                if (endDate > startDate) {
+                    const diffTime = Math.abs(endDate - startDate);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    const total = diffDays * pricePerDay;
+                    
+                    document.getElementById('summaryDays').textContent = diffDays;
+                    document.getElementById('summaryTotal').textContent = `€${total.toFixed(2)}`;
+                    document.getElementById('totalAmount').textContent = `€${total.toFixed(2)}`;
+                } else {
+                    document.getElementById('summaryDays').textContent = '0';
+                    document.getElementById('summaryTotal').textContent = '€0.00';
+                    document.getElementById('totalAmount').textContent = '€0.00';
+                }
+            } else {
+                document.getElementById('summaryDays').textContent = '0';
+                document.getElementById('summaryTotal').textContent = '€0.00';
+                document.getElementById('totalAmount').textContent = '€0.00';
+            }
+            
+            updateContinueButton();
+        }
+
         // Escuchar cambios en las fechas para calcular total
-        document.getElementById('startDate').addEventListener('change', calculateTotal);
-        document.getElementById('endDate').addEventListener('change', calculateTotal);
+        document.getElementById('startDate').addEventListener('change', function() {
+            updateCalendarFromInputs();
+        });
+        document.getElementById('endDate').addEventListener('change', function() {
+            updateCalendarFromInputs();
+        });
 
         async function submitReservation() {
             const submitBtn = document.getElementById('submitBtn');
