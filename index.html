@@ -684,6 +684,20 @@
             background: var(--gold);
             color: var(--black);
             font-weight: bold;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+        .calendar-day.start-date {
+            border-top-left-radius: 50%;
+            border-bottom-left-radius: 50%;
+        }
+        .calendar-day.end-date {
+            border-top-right-radius: 50%;
+            border-bottom-right-radius: 50%;
+        }
+        .calendar-day.in-range {
+            background: rgba(212, 175, 55, 0.2);
+            color: var(--gold);
         }
         .calendar-day.today {
             border: 2px solid var(--gold);
@@ -1314,7 +1328,7 @@
     <!-- Modal de Reserva - Diseño Moderno -->
     <div id="reservationModal" class="modal">
         <div class="modal-content">
-            <button class="close-modal" onclick="closeReservationModal()">&times;</button>
+            <button class="close-modal" onclick="handleCloseOrBack()">&times;</button>
             
             <!-- Header del Modal -->
             <div class="modal-header">
@@ -1452,7 +1466,7 @@
 
                     <div class="step-navigation">
                         <button type="button" class="btn-step-back" onclick="goToStep(1)">← Back</button>
-                        <button type="button" class="btn-step-next" onclick="goToStep(3)">Continue to Payment →</button>
+                        <button type="button" class="btn-step-next" id="continueToPaymentBtn" onclick="goToStep(3)" disabled style="opacity: 0.5; cursor: not-allowed;">Continue to Payment →</button>
                     </div>
                 </div>
 
@@ -2048,6 +2062,17 @@
             if (step === 2) {
                 generateCalendar();
                 calculateTotal();
+                // Asegurar que el botón esté deshabilitado inicialmente
+                const continueBtn = document.getElementById('continueToPaymentBtn');
+                if (continueBtn) {
+                    const startDate = document.getElementById('startDate').value;
+                    const endDate = document.getElementById('endDate').value;
+                    if (!startDate || !endDate) {
+                        continueBtn.disabled = true;
+                        continueBtn.style.opacity = '0.5';
+                        continueBtn.style.cursor = 'not-allowed';
+                    }
+                }
             } else if (step === 3) {
                 updateCustomerSummary();
                 validateAndShowPayButton();
@@ -2193,6 +2218,17 @@
             }, 100);
         }
 
+        // Manejar cierre o retroceso
+        function handleCloseOrBack() {
+            if (currentStep > 1) {
+                // Si no está en el paso 1, ir atrás
+                goToStep(currentStep - 1);
+            } else {
+                // Si está en el paso 1, cerrar el modal
+                closeReservationModal();
+            }
+        }
+        
         // Cerrar modal
         function closeReservationModal() {
             const modal = document.getElementById('reservationModal');
@@ -2295,12 +2331,20 @@
                     dayElement.classList.add('today');
                 }
 
-                // Marcar fechas seleccionadas
-                if (selectedStartDate && formatDate(selectedStartDate) === dateStr) {
-                    dayElement.classList.add('selected');
-                }
-                if (selectedEndDate && formatDate(selectedEndDate) === dateStr) {
-                    dayElement.classList.add('selected');
+                // Marcar fechas seleccionadas y rango
+                if (selectedStartDate && selectedEndDate) {
+                    const startStr = formatDate(selectedStartDate);
+                    const endStr = formatDate(selectedEndDate);
+                    
+                    if (dateStr === startStr) {
+                        dayElement.classList.add('selected', 'start-date');
+                    } else if (dateStr === endStr) {
+                        dayElement.classList.add('selected', 'end-date');
+                    } else if (date >= selectedStartDate && date <= selectedEndDate) {
+                        dayElement.classList.add('in-range');
+                    }
+                } else if (selectedStartDate && formatDate(selectedStartDate) === dateStr) {
+                    dayElement.classList.add('selected', 'start-date');
                 }
 
                 grid.appendChild(dayElement);
@@ -2316,21 +2360,63 @@
 
         // Seleccionar fecha
         function selectDate(date) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // No permitir seleccionar fechas pasadas
+            if (date < today) {
+                return;
+            }
+            
             if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
-                selectedStartDate = date;
-                selectedEndDate = null;
-                document.getElementById('startDate').value = formatDateInput(date);
-            } else if (date > selectedStartDate) {
-                selectedEndDate = date;
-                document.getElementById('endDate').value = formatDateInput(date);
-            } else {
+                // Primera selección o resetear selección
                 selectedStartDate = date;
                 selectedEndDate = null;
                 document.getElementById('startDate').value = formatDateInput(date);
                 document.getElementById('endDate').value = '';
+            } else if (date > selectedStartDate) {
+                // Segunda selección (fecha final)
+                selectedEndDate = date;
+                document.getElementById('endDate').value = formatDateInput(date);
+            } else if (date < selectedStartDate) {
+                // Si selecciona una fecha anterior a la inicial, hacerla la nueva inicial
+                selectedStartDate = date;
+                selectedEndDate = null;
+                document.getElementById('startDate').value = formatDateInput(date);
+                document.getElementById('endDate').value = '';
+            } else {
+                // Si hace clic en la misma fecha, resetear
+                selectedStartDate = null;
+                selectedEndDate = null;
+                document.getElementById('startDate').value = '';
+                document.getElementById('endDate').value = '';
             }
+            
             generateCalendar();
             calculateTotal();
+            
+            // Si ambas fechas están seleccionadas, mostrar mensaje de confirmación
+            if (selectedStartDate && selectedEndDate) {
+                const days = Math.ceil((selectedEndDate - selectedStartDate) / (1000 * 60 * 60 * 24)) + 1;
+                const total = days * currentPricePerDay;
+                
+                // Actualizar resumen visualmente
+                updateDateSummary();
+            }
+        }
+        
+        // Actualizar resumen de fechas
+        function updateDateSummary() {
+            if (selectedStartDate && selectedEndDate) {
+                const days = Math.ceil((selectedEndDate - selectedStartDate) / (1000 * 60 * 60 * 24)) + 1;
+                const total = days * currentPricePerDay;
+                
+                // Mostrar feedback visual
+                const summaryPreview = document.querySelector('.reservation-summary-preview');
+                if (summaryPreview) {
+                    summaryPreview.style.animation = 'pulse 0.5s ease';
+                }
+            }
         }
 
         // Cambiar mes
@@ -2356,23 +2442,49 @@
         function calculateTotal() {
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
+            const continueBtn = document.getElementById('continueToPaymentBtn');
 
             if (startDate && endDate) {
                 const start = new Date(startDate);
                 const end = new Date(endDate);
+                
+                // Validar que la fecha final sea posterior a la inicial
+                if (end < start) {
+                    document.getElementById('summaryDays').textContent = '0';
+                    document.getElementById('summaryTotal').textContent = '0 €';
+                    if (continueBtn) {
+                        continueBtn.disabled = true;
+                        continueBtn.style.opacity = '0.5';
+                        continueBtn.style.cursor = 'not-allowed';
+                    }
+                    return;
+                }
+                
                 const diffTime = Math.abs(end - start);
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
                 if (diffDays > 0) {
                     const total = diffDays * currentPricePerDay;
                     document.getElementById('summaryDays').textContent = diffDays;
-                    document.getElementById('summaryTotal').textContent = total + ' €';
-                    document.getElementById('totalPriceDisplay').textContent = 'Total: ' + total + ' €';
+                    document.getElementById('summaryTotal').textContent = total.toFixed(2) + ' €';
+                    
+                    // Habilitar botón de continuar
+                    if (continueBtn) {
+                        continueBtn.disabled = false;
+                        continueBtn.style.opacity = '1';
+                        continueBtn.style.cursor = 'pointer';
+                    }
                 }
             } else {
                 document.getElementById('summaryDays').textContent = '0';
                 document.getElementById('summaryTotal').textContent = '0 €';
-                document.getElementById('totalPriceDisplay').textContent = 'Total: 0 €';
+                
+                // Deshabilitar botón de continuar
+                if (continueBtn) {
+                    continueBtn.disabled = true;
+                    continueBtn.style.opacity = '0.5';
+                    continueBtn.style.cursor = 'not-allowed';
+                }
             }
         }
 
