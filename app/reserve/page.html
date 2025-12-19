@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserve - Prestige Goal Motion</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #000;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .reserve-container {
+            width: 100%;
+            max-width: 800px;
+            background: #18181b;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(212, 175, 55, 0.2);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .steps-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            color: #71717a;
+        }
+
+        .steps-indicator span {
+            transition: color 0.3s;
+        }
+
+        .steps-indicator span.active {
+            color: #d4af37;
+            font-weight: 600;
+        }
+
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            background: #111;
+            border: 1px solid #333;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+
+        .input::placeholder {
+            color: #71717a;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #d4af37, rgba(212, 175, 55, 0.8));
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            padding: 12px 24px;
+            background: transparent;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            border-color: #d4af37;
+            color: #d4af37;
+        }
+
+        .step-navigation {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .step-navigation .btn {
+            margin-top: 0;
+        }
+
+        .step-navigation .btn-secondary {
+            flex: 1;
+        }
+
+        .step-navigation .btn {
+            flex: 2;
+        }
+
+        .summary-section {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(212, 175, 55, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            margin-bottom: 2rem;
+        }
+
+        .summary-section h3 {
+            color: #d4af37;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .summary-section .total {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #d4af37;
+            margin-top: 1rem;
+        }
+
+        .error-message {
+            color: #ef4444;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .success-message {
+            color: #10b981;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .reserve-container {
+                padding: 1.5rem;
+            }
+
+            .steps-indicator {
+                font-size: 0.8rem;
+            }
+
+            .step-navigation {
+                flex-direction: column;
+            }
+
+            .step-navigation .btn,
+            .step-navigation .btn-secondary {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="reserve-container">
+        <!-- STEPS INDICATOR -->
+        <div class="steps-indicator">
+            <span id="step1-indicator" class="active">1. Info</span>
+            <span id="step2-indicator">2. Dates</span>
+            <span id="step3-indicator">3. Payment</span>
+        </div>
+
+        <!-- STEP 1: Customer Information -->
+        <div id="step1" class="step-content active">
+            <h2 style="color: #d4af37; margin-bottom: 1.5rem;">Your Information</h2>
+            <div class="form-group">
+                <input type="text" id="fullName" name="fullName" placeholder="Full Name *" class="input" required>
+            </div>
+            <div class="form-group">
+                <input type="text" id="passport" name="passport" placeholder="ID / Passport *" class="input" required>
+            </div>
+            <div class="form-group">
+                <input type="email" id="email" name="email" placeholder="Email *" class="input" required>
+            </div>
+            <div class="form-group">
+                <input type="tel" id="phone" name="phone" placeholder="Phone / WhatsApp *" class="input" required>
+            </div>
+            <div class="form-group">
+                <input type="text" id="address" name="address" placeholder="Full Address *" class="input" required>
+            </div>
+            <div class="form-group">
+                <input type="text" id="city" name="city" placeholder="City *" class="input" required>
+            </div>
+            <div class="form-group">
+                <input type="text" id="postalCode" name="postalCode" placeholder="Postal Code *" class="input" required>
+            </div>
+            <div class="form-group">
+                <select id="country" name="country" class="input" required>
+                    <option value="Spain">Spain</option>
+                    <option value="France">France</option>
+                    <option value="Italy">Italy</option>
+                    <option value="Germany">Germany</option>
+                    <option value="United Kingdom">United Kingdom</option>
+                    <option value="United States">United States</option>
+                    <option value="United Arab Emirates">United Arab Emirates</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <button onclick="nextStep()" class="btn">Continue to Dates →</button>
+        </div>
+
+        <!-- STEP 2: Dates -->
+        <div id="step2" class="step-content">
+            <h2 style="color: #d4af37; margin-bottom: 1.5rem;">Select Your Dates</h2>
+            <div class="form-group">
+                <label style="display: block; margin-bottom: 0.5rem; color: #d4af37;">Start Date & Time *</label>
+                <input type="datetime-local" id="startDate" name="startDate" class="input" required>
+            </div>
+            <div class="form-group">
+                <label style="display: block; margin-bottom: 0.5rem; color: #d4af37;">End Date & Time *</label>
+                <input type="datetime-local" id="endDate" name="endDate" class="input" required>
+            </div>
+            <div class="form-group">
+                <input type="text" id="pickupLocation" name="pickupLocation" placeholder="Pickup Location *" class="input" required>
+            </div>
+            <div class="step-navigation">
+                <button onclick="prevStep()" class="btn-secondary">← Back</button>
+                <button onclick="nextStep()" class="btn">Continue to Payment →</button>
+            </div>
+        </div>
+
+        <!-- STEP 3: Payment -->
+        <div id="step3" class="step-content">
+            <h2 style="color: #d4af37; margin-bottom: 1.5rem; text-align: center;">Payment</h2>
+            <div class="summary-section">
+                <h3 id="selectedCar">Mercedes GLE 53 AMG</h3>
+                <p style="margin-top: 1rem; color: #a1a1aa;">Total Amount</p>
+                <p class="total" id="totalAmount">€0.00</p>
+            </div>
+            <div id="paymentStatus"></div>
+            <button onclick="submitReservation()" class="btn" id="submitBtn">
+                Confirm & Pay
+            </button>
+            <div class="step-navigation" style="margin-top: 1rem;">
+                <button onclick="prevStep()" class="btn-secondary">← Back</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado del formulario
+        let currentStep = 1;
+        let selectedCar = 'Mercedes GLE 53 AMG';
+        let pricePerDay = 500;
+
+        // Obtener parámetros de la URL (si vienen del index.html)
+        const urlParams = new URLSearchParams(window.location.search);
+        const carName = urlParams.get('car');
+        const price = urlParams.get('price');
+        
+        if (carName) selectedCar = decodeURIComponent(carName);
+        if (price) pricePerDay = parseFloat(price);
+
+        // Actualizar información del vehículo
+        document.getElementById('selectedCar').textContent = selectedCar;
+
+        // Navegación entre pasos
+        function nextStep() {
+            if (currentStep === 1) {
+                // Validar paso 1
+                const required = ['fullName', 'passport', 'email', 'phone', 'address', 'city', 'postalCode', 'country'];
+                let isValid = true;
+                
+                required.forEach(field => {
+                    const input = document.getElementById(field);
+                    if (!input.value.trim()) {
+                        isValid = false;
+                        input.style.borderColor = '#ef4444';
+                    } else {
+                        input.style.borderColor = '#333';
+                    }
+                });
+
+                if (!isValid) {
+                    showMessage('Please complete all required fields', 'error');
+                    return;
+                }
+            } else if (currentStep === 2) {
+                // Validar paso 2
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                const pickupLocation = document.getElementById('pickupLocation').value;
+
+                if (!startDate || !endDate || !pickupLocation) {
+                    showMessage('Please complete all required fields', 'error');
+                    return;
+                }
+
+                if (new Date(endDate) <= new Date(startDate)) {
+                    showMessage('End date must be after start date', 'error');
+                    return;
+                }
+
+                // Calcular total
+                calculateTotal();
+            }
+
+            if (currentStep < 3) {
+                currentStep++;
+                updateStepDisplay();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStepDisplay();
+            }
+        }
+
+        function updateStepDisplay() {
+            // Ocultar todos los pasos
+            document.querySelectorAll('.step-content').forEach(step => {
+                step.classList.remove('active');
+            });
+
+            // Mostrar paso actual
+            document.getElementById(`step${currentStep}`).classList.add('active');
+
+            // Actualizar indicadores
+            document.querySelectorAll('.steps-indicator span').forEach((indicator, index) => {
+                if (index + 1 === currentStep) {
+                    indicator.classList.add('active');
+                } else {
+                    indicator.classList.remove('active');
+                }
+            });
+        }
+
+        function calculateTotal() {
+            const startDate = new Date(document.getElementById('startDate').value);
+            const endDate = new Date(document.getElementById('endDate').value);
+            
+            if (startDate && endDate && endDate > startDate) {
+                const diffTime = Math.abs(endDate - startDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const total = diffDays * pricePerDay;
+                
+                document.getElementById('totalAmount').textContent = `€${total.toFixed(2)}`;
+            }
+        }
+
+        // Escuchar cambios en las fechas para calcular total
+        document.getElementById('startDate').addEventListener('change', calculateTotal);
+        document.getElementById('endDate').addEventListener('change', calculateTotal);
+
+        async function submitReservation() {
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
+
+            // Recopilar datos del formulario
+            const formData = {
+                fullName: document.getElementById('fullName').value,
+                passport: document.getElementById('passport').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                city: document.getElementById('city').value,
+                postalCode: document.getElementById('postalCode').value,
+                country: document.getElementById('country').value,
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value,
+                pickupLocation: document.getElementById('pickupLocation').value,
+            };
+
+            // Calcular días y total
+            const startDate = new Date(formData.startDate);
+            const endDate = new Date(formData.endDate);
+            const diffTime = Math.abs(endDate - startDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            const total = diffDays * pricePerDay;
+            const totalCents = Math.round(total * 100);
+
+            try {
+                // Preparar datos para la API
+                const reservationData = {
+                    amount: totalCents,
+                    currency: 'eur',
+                    customerData: {
+                        name: formData.fullName,
+                        email: formData.email,
+                        phone: formData.phone,
+                        dni: formData.passport,
+                        address: formData.address,
+                        city: formData.city,
+                        postalCode: formData.postalCode,
+                        country: formData.country,
+                    },
+                    reservationData: {
+                        car: selectedCar,
+                        pricePerDay: pricePerDay,
+                        days: diffDays,
+                        startDate: formData.startDate.split('T')[0],
+                        endDate: formData.endDate.split('T')[0],
+                        pickupLocation: formData.pickupLocation,
+                    }
+                };
+
+                // Obtener URL del backend (usar relativa o configurar)
+                const BACKEND_URL = window.BACKEND_URL || 'http://localhost:3000';
+
+                const response = await fetch(`${BACKEND_URL}/api/reserve`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(reservationData),
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.clientSecret) {
+                    showMessage('Reservation created successfully! Redirecting to payment...', 'success');
+                    
+                    // Aquí podrías redirigir a Stripe Checkout o procesar el pago
+                    // Por ahora, mostramos un mensaje de éxito
+                    setTimeout(() => {
+                        alert(`Reservation confirmed!\n\nVehicle: ${selectedCar}\nDays: ${diffDays}\nTotal: €${total.toFixed(2)}\n\nYou will receive a confirmation email.`);
+                        // Redirigir a la página principal
+                        window.location.href = '../index.html';
+                    }, 2000);
+                } else {
+                    throw new Error(data.error || 'Error processing reservation');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('Error processing reservation: ' + error.message, 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Confirm & Pay';
+            }
+        }
+
+        function showMessage(message, type) {
+            const statusDiv = document.getElementById('paymentStatus');
+            statusDiv.textContent = message;
+            statusDiv.className = type === 'error' ? 'error-message' : 'success-message';
+            statusDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

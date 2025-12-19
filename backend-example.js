@@ -19,6 +19,9 @@ const nodemailer = require('nodemailer');
 
 const app = express();
 
+// Importar rutas de reserva
+const reserveRoutes = require('./app/api/reserve/route');
+
 // Configurar transporter de email
 // IMPORTANTE: Para Gmail, necesitas una contraseña de aplicación
 // Obténla en: https://myaccount.google.com/apppasswords
@@ -235,7 +238,10 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
 app.use(cors());
 app.use(express.json());
 
-// Endpoint para crear PaymentIntent
+// Usar rutas de reserva
+app.use('/api/reserve', reserveRoutes);
+
+// Endpoint para crear PaymentIntent (mantener para compatibilidad)
 app.post('/api/create-payment-intent', async (req, res) => {
     try {
         const { 

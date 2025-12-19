@@ -2652,7 +2652,7 @@
                 paymentRequest.on('paymentmethod', async (ev) => {
                     try {
                         // Crear PaymentIntent en el backend
-                        const response = await fetch(`${BACKEND_URL}/api/create-payment-intent`, {
+                        const response = await fetch(`${BACKEND_URL}/api/reserve`, {
                             method: 'POST',
                             headers: { 
                                 'Content-Type': 'application/json',
@@ -3046,7 +3046,7 @@
                     endDate: document.getElementById('endDate').value
                 };
 
-                const response = await fetch(`${BACKEND_URL}/api/send-confirmation-email`, {
+                const response = await fetch(`${BACKEND_URL}/api/reserve/confirm`, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
