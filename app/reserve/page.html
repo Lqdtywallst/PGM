@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reserve - Prestige Goal Motion</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="/config.js"></script>
     <style>
         * {
             margin: 0;
@@ -115,6 +117,31 @@
         }
 
         .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .confirm-pay-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #d4af37, rgba(212, 175, 55, 0.8));
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .confirm-pay-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+        }
+
+        .confirm-pay-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
@@ -471,8 +498,17 @@
                 <p style="margin-top: 1rem; color: #a1a1aa;">Total Amount</p>
                 <p class="total" id="totalAmount">€0.00</p>
             </div>
+            
+            <!-- Stripe Payment Form -->
+            <div id="payment-form-container" style="margin-top: 2rem; display: none;">
+                <div id="card-element" style="background: #0a0a0a; padding: 1rem; border-radius: 8px; border: 1px solid #333; margin-bottom: 1rem;">
+                    <!-- Stripe Elements will create form elements here -->
+                </div>
+                <div id="card-errors" role="alert" style="color: #ef4444; margin-bottom: 1rem; min-height: 20px;"></div>
+            </div>
+            
             <div id="paymentStatus"></div>
-            <button onclick="submitReservation()" class="btn" id="submitBtn">
+            <button id="payButton" class="confirm-pay-btn" onclick="submitReservation()">
                 Confirm & Pay
             </button>
             <div class="step-navigation" style="margin-top: 1rem;">
@@ -491,6 +527,12 @@
         let currentDate = new Date();
         let selectedStartDate = null;
         let selectedEndDate = null;
+        
+        // Stripe
+        let stripe = null;
+        let elements = null;
+        let cardElement = null;
+        let paymentIntentClientSecret = null;
 
         // Obtener parámetros de la URL (si vienen del index.html)
         const urlParams = new URLSearchParams(window.location.search);
@@ -503,6 +545,13 @@
         // Actualizar información del vehículo
         document.getElementById('selectedCar').textContent = selectedCar;
         document.getElementById('summaryPricePerDay').textContent = `€${pricePerDay}`;
+        
+        // Inicializar Stripe
+        const STRIPE_PUBLISHABLE_KEY = window.STRIPE_CONFIG?.publishableKey || 'pk_live_51RsMXQ3DSCa2l71zZiMkmlBXXpLu1HF0Sy4N4xSsB1TvUWu6wJLlKR5z7HrCa0AIlWQjfZo4tL8d1qcxtgExNHS300EPCAtXti';
+        if (typeof Stripe !== 'undefined') {
+            stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+            elements = stripe.elements();
+        }
         
         // Inicializar calendario cuando se carga la página
         if (document.getElementById('step2').classList.contains('active')) {
@@ -589,6 +638,11 @@
             // Inicializar calendario cuando se muestra el paso 2
             if (currentStep === 2) {
                 generateCalendar();
+            }
+            
+            // Inicializar Stripe Elements cuando se muestra el paso 3
+            if (currentStep === 3) {
+                initializeStripeElements();
             }
         }
         
@@ -797,10 +851,57 @@
             updateCalendarFromInputs();
         });
 
+        // Inicializar Stripe Elements
+        function initializeStripeElements() {
+            if (!stripe || !elements) {
+                console.error('Stripe no está inicializado');
+                return;
+            }
+
+            // Si ya existe el elemento, no lo recreamos
+            if (cardElement) {
+                return;
+            }
+
+            // Crear el elemento de tarjeta
+            cardElement = elements.create('card', {
+                style: {
+                    base: {
+                        fontSize: '16px',
+                        color: '#ffffff',
+                        '::placeholder': {
+                            color: '#71717a',
+                        },
+                        fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+                    },
+                    invalid: {
+                        color: '#ef4444',
+                        iconColor: '#ef4444',
+                    },
+                },
+            });
+
+            // Montar el elemento en el contenedor
+            cardElement.mount('#card-element');
+
+            // Manejar errores de validación en tiempo real
+            cardElement.on('change', function(event) {
+                const displayError = document.getElementById('card-errors');
+                if (event.error) {
+                    displayError.textContent = event.error.message;
+                } else {
+                    displayError.textContent = '';
+                }
+            });
+
+            // Mostrar el contenedor del formulario
+            document.getElementById('payment-form-container').style.display = 'block';
+        }
+
         async function submitReservation() {
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Processing...';
+            const payButton = document.getElementById('payButton');
+            payButton.disabled = true;
+            payButton.textContent = 'Processing...';
 
             // Recopilar datos del formulario
             const formData = {
@@ -826,61 +927,119 @@
             const totalCents = Math.round(total * 100);
 
             try {
-                // Preparar datos para la API
-                const reservationData = {
-                    amount: totalCents,
-                    currency: 'eur',
-                    customerData: {
-                        name: formData.fullName,
-                        email: formData.email,
-                        phone: formData.phone,
-                        dni: formData.passport,
-                        address: formData.address,
-                        city: formData.city,
-                        postalCode: formData.postalCode,
-                        country: formData.country,
-                    },
-                    reservationData: {
-                        car: selectedCar,
-                        pricePerDay: pricePerDay,
-                        days: diffDays,
-                        startDate: formData.startDate.split('T')[0],
-                        endDate: formData.endDate.split('T')[0],
-                        pickupLocation: formData.pickupLocation,
+                // Obtener URL del backend
+                const BACKEND_URL = window.BACKEND_URL || window.STRIPE_CONFIG?.backendUrl || 'http://localhost:3000';
+
+                // Si no tenemos clientSecret, crear la reserva primero
+                if (!paymentIntentClientSecret) {
+                    // Preparar datos para la API
+                    const reservationData = {
+                        amount: totalCents,
+                        currency: 'eur',
+                        customerData: {
+                            name: formData.fullName,
+                            email: formData.email,
+                            phone: formData.phone,
+                            dni: formData.passport,
+                            address: formData.address,
+                            city: formData.city,
+                            postalCode: formData.postalCode,
+                            country: formData.country,
+                        },
+                        reservationData: {
+                            car: selectedCar,
+                            pricePerDay: pricePerDay,
+                            days: diffDays,
+                            startDate: formData.startDate.split('T')[0],
+                            endDate: formData.endDate.split('T')[0],
+                            pickupLocation: formData.pickupLocation,
+                        }
+                    };
+
+                    const response = await fetch(`${BACKEND_URL}/api/reserve`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(reservationData),
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok || !data.clientSecret) {
+                        throw new Error(data.error || 'Error creating reservation');
                     }
-                };
 
-                // Obtener URL del backend (usar relativa o configurar)
-                const BACKEND_URL = window.BACKEND_URL || 'http://localhost:3000';
+                    paymentIntentClientSecret = data.clientSecret;
+                    showMessage('Reservation created. Please complete payment...', 'success');
+                }
 
-                const response = await fetch(`${BACKEND_URL}/api/reserve`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(reservationData),
-                });
+                // Confirmar el pago con Stripe
+                if (!stripe || !cardElement) {
+                    throw new Error('Stripe no está inicializado. Por favor, recarga la página.');
+                }
 
-                const data = await response.json();
+                const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(
+                    paymentIntentClientSecret,
+                    {
+                        payment_method: {
+                            card: cardElement,
+                            billing_details: {
+                                name: formData.fullName,
+                                email: formData.email,
+                                phone: formData.phone,
+                                address: {
+                                    line1: formData.address,
+                                    city: formData.city,
+                                    postal_code: formData.postalCode,
+                                    country: formData.country,
+                                },
+                            },
+                        },
+                    }
+                );
 
-                if (response.ok && data.clientSecret) {
-                    showMessage('Reservation created successfully! Redirecting to payment...', 'success');
+                if (stripeError) {
+                    // Mostrar error al usuario
+                    const displayError = document.getElementById('card-errors');
+                    displayError.textContent = stripeError.message;
+                    throw new Error(stripeError.message);
+                }
+
+                // Pago exitoso
+                if (paymentIntent.status === 'succeeded') {
+                    showMessage('Payment successful! Processing reservation...', 'success');
                     
-                    // Aquí podrías redirigir a Stripe Checkout o procesar el pago
-                    // Por ahora, mostramos un mensaje de éxito
+                    // Confirmar la reserva en el backend
+                    try {
+                        const BACKEND_URL = window.BACKEND_URL || window.STRIPE_CONFIG?.backendUrl || 'http://localhost:3000';
+                        await fetch(`${BACKEND_URL}/api/reserve/confirm`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                paymentIntentId: paymentIntent.id,
+                            }),
+                        });
+                    } catch (confirmError) {
+                        console.warn('Error confirming reservation:', confirmError);
+                        // No fallar si la confirmación falla, el pago ya fue exitoso
+                    }
+
+                    // Mostrar mensaje de éxito y redirigir
                     setTimeout(() => {
-                        alert(`Reservation confirmed!\n\nVehicle: ${selectedCar}\nDays: ${diffDays}\nTotal: €${total.toFixed(2)}\n\nYou will receive a confirmation email.`);
-                        // Redirigir a la página principal
-                        window.location.href = '../index.html';
-                    }, 2000);
+                        alert(`✅ Payment Successful!\n\nVehicle: ${selectedCar}\nDays: ${diffDays}\nTotal: €${total.toFixed(2)}\n\nYou will receive a confirmation email.`);
+                        window.location.href = '/index.html';
+                    }, 1500);
                 } else {
-                    throw new Error(data.error || 'Error processing reservation');
+                    throw new Error('Payment status: ' + paymentIntent.status);
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showMessage('Error processing reservation: ' + error.message, 'error');
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Confirm & Pay';
+                showMessage('Error processing payment: ' + error.message, 'error');
+                payButton.disabled = false;
+                payButton.textContent = 'Confirm & Pay';
             }
         }
 
