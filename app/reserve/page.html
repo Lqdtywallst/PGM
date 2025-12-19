@@ -296,6 +296,29 @@
             font-size: 0.95rem;
         }
 
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #d4af37;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-home:hover {
+            background: rgba(212, 175, 55, 0.1);
+            border-color: #d4af37;
+            transform: translateX(-3px);
+        }
+
+        .btn-home i {
+            font-size: 0.85rem;
+        }
+
         @media (max-width: 768px) {
             .reserve-container {
                 padding: 1.5rem;
@@ -336,6 +359,12 @@
 
         <!-- STEP 1: Customer Information -->
         <div id="step1" class="step-content active">
+            <div style="margin-bottom: 1.5rem;">
+                <a href="/index.html" class="btn-home">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Home</span>
+                </a>
+            </div>
             <h2 style="color: #d4af37; margin-bottom: 1.5rem;">Your Information</h2>
             <div class="form-group">
                 <input type="text" id="fullName" name="fullName" placeholder="Full Name *" class="input" required>
@@ -375,6 +404,12 @@
 
         <!-- STEP 2: Dates -->
         <div id="step2" class="step-content">
+            <div style="margin-bottom: 1.5rem;">
+                <a href="/index.html" class="btn-home">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Home</span>
+                </a>
+            </div>
             <h2 style="color: #d4af37; margin-bottom: 1.5rem;">Select Your Dates</h2>
             
             <!-- Calendar Container -->
@@ -424,6 +459,12 @@
 
         <!-- STEP 3: Payment -->
         <div id="step3" class="step-content">
+            <div style="margin-bottom: 1.5rem;">
+                <a href="/index.html" class="btn-home">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Home</span>
+                </a>
+            </div>
             <h2 style="color: #d4af37; margin-bottom: 1.5rem; text-align: center;">Payment</h2>
             <div class="summary-section">
                 <h3 id="selectedCar">Mercedes GLE 53 AMG</h3>
