@@ -548,9 +548,20 @@
         
         // Inicializar Stripe
         const STRIPE_PUBLISHABLE_KEY = window.STRIPE_CONFIG?.publishableKey || 'pk_live_51RsMXQ3DSCa2l71zZiMkmlBXXpLu1HF0Sy4N4xSsB1TvUWu6wJLlKR5z7HrCa0AIlWQjfZo4tL8d1qcxtgExNHS300EPCAtXti';
+        console.log('[STRIPE INIT] Inicializando Stripe...');
+        console.log('[STRIPE INIT] Clave pública:', STRIPE_PUBLISHABLE_KEY ? STRIPE_PUBLISHABLE_KEY.substring(0, 20) + '...' : 'NO ENCONTRADA');
+        console.log('[STRIPE INIT] Stripe disponible:', typeof Stripe !== 'undefined');
+        
         if (typeof Stripe !== 'undefined') {
-            stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
-            elements = stripe.elements();
+            try {
+                stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+                elements = stripe.elements();
+                console.log('[STRIPE INIT] ✅ Stripe inicializado correctamente');
+            } catch (error) {
+                console.error('[STRIPE INIT] ❌ Error inicializando Stripe:', error);
+            }
+        } else {
+            console.error('[STRIPE INIT] ❌ Stripe no está disponible (script no cargado)');
         }
         
         // Inicializar calendario cuando se carga la página
@@ -853,55 +864,105 @@
 
         // Inicializar Stripe Elements
         function initializeStripeElements() {
+            console.log('[STRIPE ELEMENTS] Inicializando elementos de Stripe...');
+            console.log('[STRIPE ELEMENTS] Stripe disponible:', !!stripe);
+            console.log('[STRIPE ELEMENTS] Elements disponible:', !!elements);
+            
             if (!stripe || !elements) {
-                console.error('Stripe no está inicializado');
+                console.error('[STRIPE ELEMENTS] ❌ Stripe no está inicializado');
                 return;
             }
 
             // Si ya existe el elemento, no lo recreamos
             if (cardElement) {
+                console.log('[STRIPE ELEMENTS] ⚠️ Elemento de tarjeta ya existe');
                 return;
             }
 
-            // Crear el elemento de tarjeta
-            cardElement = elements.create('card', {
-                style: {
-                    base: {
-                        fontSize: '16px',
-                        color: '#ffffff',
-                        '::placeholder': {
-                            color: '#71717a',
+            try {
+                // Crear el elemento de tarjeta
+                console.log('[STRIPE ELEMENTS] Creando elemento de tarjeta...');
+                cardElement = elements.create('card', {
+                    style: {
+                        base: {
+                            fontSize: '16px',
+                            color: '#ffffff',
+                            '::placeholder': {
+                                color: '#71717a',
+                            },
+                            fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
                         },
-                        fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+                        invalid: {
+                            color: '#ef4444',
+                            iconColor: '#ef4444',
+                        },
                     },
-                    invalid: {
-                        color: '#ef4444',
-                        iconColor: '#ef4444',
-                    },
-                },
-            });
+                });
 
-            // Montar el elemento en el contenedor
-            cardElement.mount('#card-element');
-
-            // Manejar errores de validación en tiempo real
-            cardElement.on('change', function(event) {
-                const displayError = document.getElementById('card-errors');
-                if (event.error) {
-                    displayError.textContent = event.error.message;
-                } else {
-                    displayError.textContent = '';
+                // Montar el elemento en el contenedor
+                const cardContainer = document.getElementById('card-element');
+                if (!cardContainer) {
+                    console.error('[STRIPE ELEMENTS] ❌ Contenedor #card-element no encontrado');
+                    return;
                 }
-            });
+                
+                cardElement.mount('#card-element');
+                console.log('[STRIPE ELEMENTS] ✅ Elemento de tarjeta montado correctamente');
 
-            // Mostrar el contenedor del formulario
-            document.getElementById('payment-form-container').style.display = 'block';
+                // Manejar errores de validación en tiempo real
+                cardElement.on('change', function(event) {
+                    const displayError = document.getElementById('card-errors');
+                    if (event.error) {
+                        console.log('[STRIPE ELEMENTS] ⚠️ Error de validación:', event.error.message);
+                        displayError.textContent = event.error.message;
+                    } else {
+                        displayError.textContent = '';
+                    }
+                });
+
+                // Mostrar el contenedor del formulario
+                document.getElementById('payment-form-container').style.display = 'block';
+                console.log('[STRIPE ELEMENTS] ✅ Formulario de pago visible');
+            } catch (error) {
+                console.error('[STRIPE ELEMENTS] ❌ Error creando elemento:', error);
+            }
+        }
+
+        // Función para verificar conexión con el servidor
+        async function checkServerConnection() {
+            const BACKEND_URL = window.BACKEND_URL || window.STRIPE_CONFIG?.backendUrl || 'http://localhost:3000';
+            try {
+                console.log('[CONNECTION CHECK] Verificando conexión con servidor...');
+                const response = await fetch(`${BACKEND_URL}/api/test`, {
+                    method: 'GET',
+                    signal: AbortSignal.timeout(5000)
+                });
+                const data = await response.json();
+                console.log('[CONNECTION CHECK] ✅ Servidor conectado:', data);
+                return true;
+            } catch (error) {
+                console.error('[CONNECTION CHECK] ❌ Error conectando al servidor:', error);
+                return false;
+            }
         }
 
         async function submitReservation() {
+            console.log('[PAYMENT] ========== INICIANDO PROCESO DE PAGO ==========');
             const payButton = document.getElementById('payButton');
             payButton.disabled = true;
             payButton.textContent = 'Processing...';
+
+            // Verificar conexión con el servidor primero
+            const BACKEND_URL = window.BACKEND_URL || window.STRIPE_CONFIG?.backendUrl || 'http://localhost:3000';
+            const isConnected = await checkServerConnection();
+            if (!isConnected) {
+                const errorMsg = `No se pudo conectar al servidor en ${BACKEND_URL}. Por favor, verifica que el servidor esté corriendo.`;
+                console.error('[PAYMENT] ❌', errorMsg);
+                showMessage(errorMsg, 'error');
+                payButton.disabled = false;
+                payButton.textContent = 'Confirm & Pay';
+                return;
+            }
 
             // Recopilar datos del formulario
             const formData = {
@@ -918,6 +979,16 @@
                 pickupLocation: document.getElementById('pickupLocation').value,
             };
 
+            console.log('[PAYMENT] Datos del formulario recopilados:', {
+                fullName: formData.fullName,
+                email: formData.email,
+                phone: formData.phone,
+                startDate: formData.startDate,
+                endDate: formData.endDate,
+                car: selectedCar,
+                pricePerDay: pricePerDay
+            });
+
             // Calcular días y total
             const startDate = new Date(formData.startDate);
             const endDate = new Date(formData.endDate);
@@ -926,12 +997,22 @@
             const total = diffDays * pricePerDay;
             const totalCents = Math.round(total * 100);
 
+            console.log('[PAYMENT] Cálculos:', {
+                diffDays: diffDays,
+                total: total,
+                totalCents: totalCents
+            });
+
             try {
                 // Obtener URL del backend
                 const BACKEND_URL = window.BACKEND_URL || window.STRIPE_CONFIG?.backendUrl || 'http://localhost:3000';
+                console.log('[PAYMENT] Backend URL:', BACKEND_URL);
+                console.log('[PAYMENT] ClientSecret existente:', !!paymentIntentClientSecret);
 
                 // Si no tenemos clientSecret, crear la reserva primero
                 if (!paymentIntentClientSecret) {
+                    console.log('[PAYMENT] No hay clientSecret, creando reserva...');
+                    
                     // Preparar datos para la API
                     const reservationData = {
                         amount: totalCents,
@@ -956,29 +1037,79 @@
                         }
                     };
 
-                    const response = await fetch(`${BACKEND_URL}/api/reserve`, {
+                    console.log('[PAYMENT] Enviando datos al servidor:', {
+                        url: `${BACKEND_URL}/api/reserve`,
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(reservationData),
+                        data: reservationData
                     });
 
-                    const data = await response.json();
+                    let response;
+                    try {
+                        response = await fetch(`${BACKEND_URL}/api/reserve`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(reservationData),
+                            signal: AbortSignal.timeout(30000) // Timeout de 30 segundos
+                        });
+                    } catch (fetchError) {
+                        console.error('[PAYMENT] ❌ Error de conexión:', fetchError);
+                        if (fetchError.name === 'AbortError') {
+                            throw new Error('Timeout: El servidor no respondió a tiempo. Verifica que el servidor esté corriendo en ' + BACKEND_URL);
+                        } else if (fetchError.message.includes('Failed to fetch') || fetchError.message.includes('NetworkError')) {
+                            throw new Error('Error de conexión: No se pudo conectar al servidor. Verifica que el servidor esté corriendo en ' + BACKEND_URL);
+                        } else {
+                            throw new Error('Error de conexión: ' + fetchError.message);
+                        }
+                    }
+
+                    console.log('[PAYMENT] Respuesta del servidor:', {
+                        status: response.status,
+                        statusText: response.statusText,
+                        ok: response.ok
+                    });
+
+                    let data;
+                    try {
+                        data = await response.json();
+                    } catch (jsonError) {
+                        console.error('[PAYMENT] ❌ Error parseando respuesta JSON:', jsonError);
+                        const textResponse = await response.text();
+                        console.error('[PAYMENT] Respuesta del servidor (texto):', textResponse);
+                        throw new Error('Error: El servidor respondió con un formato inválido. Verifica los logs del servidor.');
+                    }
+
+                    console.log('[PAYMENT] Datos recibidos del servidor:', data);
 
                     if (!response.ok || !data.clientSecret) {
-                        throw new Error(data.error || 'Error creating reservation');
+                        console.error('[PAYMENT] ❌ Error en respuesta del servidor:', {
+                            ok: response.ok,
+                            status: response.status,
+                            clientSecret: !!data.clientSecret,
+                            error: data.error
+                        });
+                        throw new Error(data.error || `Error del servidor (${response.status}): ${response.statusText}`);
                     }
 
                     paymentIntentClientSecret = data.clientSecret;
+                    console.log('[PAYMENT] ✅ ClientSecret recibido:', paymentIntentClientSecret ? paymentIntentClientSecret.substring(0, 20) + '...' : 'NO RECIBIDO');
                     showMessage('Reservation created. Please complete payment...', 'success');
+                } else {
+                    console.log('[PAYMENT] Usando clientSecret existente');
                 }
 
                 // Confirmar el pago con Stripe
+                console.log('[PAYMENT] Verificando Stripe antes de confirmar pago...');
+                console.log('[PAYMENT] Stripe disponible:', !!stripe);
+                console.log('[PAYMENT] CardElement disponible:', !!cardElement);
+                
                 if (!stripe || !cardElement) {
+                    console.error('[PAYMENT] ❌ Stripe no está inicializado');
                     throw new Error('Stripe no está inicializado. Por favor, recarga la página.');
                 }
 
+                console.log('[PAYMENT] Confirmando pago con Stripe...');
                 const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(
                     paymentIntentClientSecret,
                     {
@@ -999,7 +1130,17 @@
                     }
                 );
 
+                console.log('[PAYMENT] Resultado de confirmación Stripe:', {
+                    error: stripeError ? stripeError.message : null,
+                    paymentIntent: paymentIntent ? {
+                        id: paymentIntent.id,
+                        status: paymentIntent.status,
+                        amount: paymentIntent.amount
+                    } : null
+                });
+
                 if (stripeError) {
+                    console.error('[PAYMENT] ❌ Error de Stripe:', stripeError);
                     // Mostrar error al usuario
                     const displayError = document.getElementById('card-errors');
                     displayError.textContent = stripeError.message;
@@ -1008,12 +1149,14 @@
 
                 // Pago exitoso
                 if (paymentIntent.status === 'succeeded') {
+                    console.log('[PAYMENT] ✅ Pago exitoso! PaymentIntent ID:', paymentIntent.id);
                     showMessage('Payment successful! Processing reservation...', 'success');
                     
                     // Confirmar la reserva en el backend
                     try {
+                        console.log('[PAYMENT] Confirmando reserva en el backend...');
                         const BACKEND_URL = window.BACKEND_URL || window.STRIPE_CONFIG?.backendUrl || 'http://localhost:3000';
-                        await fetch(`${BACKEND_URL}/api/reserve/confirm`, {
+                        const confirmResponse = await fetch(`${BACKEND_URL}/api/reserve/confirm`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -1022,21 +1165,27 @@
                                 paymentIntentId: paymentIntent.id,
                             }),
                         });
+                        
+                        const confirmData = await confirmResponse.json();
+                        console.log('[PAYMENT] Respuesta de confirmación:', confirmData);
                     } catch (confirmError) {
-                        console.warn('Error confirming reservation:', confirmError);
+                        console.warn('[PAYMENT] ⚠️ Error confirmando reserva (no crítico):', confirmError);
                         // No fallar si la confirmación falla, el pago ya fue exitoso
                     }
 
                     // Mostrar mensaje de éxito y redirigir
+                    console.log('[PAYMENT] ✅ Proceso completado exitosamente');
                     setTimeout(() => {
                         alert(`✅ Payment Successful!\n\nVehicle: ${selectedCar}\nDays: ${diffDays}\nTotal: €${total.toFixed(2)}\n\nYou will receive a confirmation email.`);
                         window.location.href = '/index.html';
                     }, 1500);
                 } else {
+                    console.error('[PAYMENT] ❌ Estado de pago inesperado:', paymentIntent.status);
                     throw new Error('Payment status: ' + paymentIntent.status);
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('[PAYMENT] ❌ ERROR GENERAL:', error);
+                console.error('[PAYMENT] Stack trace:', error.stack);
                 showMessage('Error processing payment: ' + error.message, 'error');
                 payButton.disabled = false;
                 payButton.textContent = 'Confirm & Pay';

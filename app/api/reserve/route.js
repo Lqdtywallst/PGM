@@ -204,26 +204,36 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
 
 // POST /api/reserve - Crear reserva
 router.post('/', async (req, res) => {
+    console.log('[API] ========== NUEVA PETICIÓN DE RESERVA ==========');
+    console.log('[API] Timestamp:', new Date().toISOString());
+    console.log('[API] Headers:', req.headers);
+    
     try {
         const data = req.body;
+        console.log('[API] Datos recibidos:', JSON.stringify(data, null, 2));
 
         // Validación básica (similar al código TypeScript proporcionado)
+        console.log('[API] Validando datos...');
         if (!data.fullName && !data.customerData?.name) {
+            console.error('[API] ❌ Validación fallida: Missing fullName');
             return res.status(400).json({ error: 'Missing fullName' });
         }
 
         if (!data.email && !data.customerData?.email) {
+            console.error('[API] ❌ Validación fallida: Missing email');
             return res.status(400).json({ error: 'Missing email' });
         }
 
         if (!data.startDate && !data.reservationData?.startDate) {
+            console.error('[API] ❌ Validación fallida: Missing startDate');
             return res.status(400).json({ error: 'Missing startDate' });
         }
 
-        // Log de la nueva reserva
-        console.log('NEW RESERVATION:', data);
+        console.log('[API] ✅ Validación pasada');
+        console.log('[API] NEW RESERVATION:', data);
 
         // Normalizar datos (soporta ambos formatos: directo o anidado)
+        console.log('[API] Normalizando datos...');
         const customerData = data.customerData || {
             name: data.fullName,
             email: data.email,
@@ -244,21 +254,34 @@ router.post('/', async (req, res) => {
             pickupLocation: data.pickupLocation,
         };
 
+        console.log('[API] Datos normalizados:', {
+            customer: customerData,
+            reservation: reservationData
+        });
+
         // Calcular total si no viene
         if (!data.amount && !reservationData.total) {
+            console.log('[API] Calculando total...');
             const start = new Date(reservationData.startDate);
             const end = new Date(reservationData.endDate);
             const diffTime = Math.abs(end - start);
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
             reservationData.days = diffDays;
             reservationData.total = diffDays * reservationData.pricePerDay;
+            console.log('[API] Total calculado:', {
+                days: diffDays,
+                pricePerDay: reservationData.pricePerDay,
+                total: reservationData.total
+            });
         }
 
         // Enviar email de notificación ANTES del pago
+        console.log('[API] Enviando email de notificación...');
         try {
-            await sendReservationNotificationEmail(reservationData, customerData);
+            const emailResult = await sendReservationNotificationEmail(reservationData, customerData);
+            console.log('[API] Resultado email notificación:', emailResult);
         } catch (emailError) {
-            console.warn('Error enviando email de notificación (no crítico):', emailError);
+            console.warn('[API] ⚠️ Error enviando email de notificación (no crítico):', emailError);
             // No fallar la reserva si falla el email
         }
 
@@ -267,15 +290,28 @@ router.post('/', async (req, res) => {
         let customer = null;
 
         if (data.amount) {
+            console.log('[API] Monto recibido:', data.amount);
+            console.log('[API] Creando PaymentIntent con Stripe...');
+            
             // Validar formato de email
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(customerData.email)) {
+                console.error('[API] ❌ Email inválido:', customerData.email);
                 return res.status(400).json({ 
                     error: 'Invalid email format' 
                 });
             }
 
+            // Verificar que Stripe esté configurado
+            if (!stripe) {
+                console.error('[API] ❌ Stripe no está inicializado');
+                return res.status(500).json({ 
+                    error: 'Stripe not configured' 
+                });
+            }
+
             // Crear o recuperar cliente en Stripe
+            console.log('[API] Buscando/creando cliente en Stripe...');
             try {
                 const existingCustomers = await stripe.customers.list({
                     email: customerData.email,
@@ -284,6 +320,7 @@ router.post('/', async (req, res) => {
 
                 if (existingCustomers.data.length > 0) {
                     customer = existingCustomers.data[0];
+                    console.log('[API] Cliente existente encontrado:', customer.id);
                     // Actualizar información del cliente
                     await stripe.customers.update(customer.id, {
                         name: customerData.name,
@@ -298,7 +335,9 @@ router.post('/', async (req, res) => {
                             dni: customerData.dni || '',
                         },
                     });
+                    console.log('[API] Cliente actualizado');
                 } else {
+                    console.log('[API] Creando nuevo cliente...');
                     customer = await stripe.customers.create({
                         email: customerData.email,
                         name: customerData.name,
@@ -313,17 +352,24 @@ router.post('/', async (req, res) => {
                             dni: customerData.dni || '',
                         },
                     });
+                    console.log('[API] ✅ Cliente creado:', customer.id);
                 }
             } catch (error) {
-                console.error('Error creando/actualizando cliente:', error);
+                console.error('[API] ❌ Error creando/actualizando cliente:', error);
+                console.error('[API] Error details:', {
+                    message: error.message,
+                    type: error.type,
+                    code: error.code
+                });
                 return res.status(500).json({ 
                     error: 'Error processing customer data: ' + error.message 
                 });
             }
 
             // Crear PaymentIntent
+            console.log('[API] Creando PaymentIntent...');
             try {
-                paymentIntent = await stripe.paymentIntents.create({
+                const paymentIntentData = {
                     amount: Math.round(data.amount),
                     currency: data.currency || 'eur',
                     customer: customer.id,
@@ -342,24 +388,48 @@ router.post('/', async (req, res) => {
                         pickupLocation: reservationData.pickupLocation || '',
                     },
                     payment_method_types: ['card', 'apple_pay', 'google_pay', 'link'],
+                };
+                
+                console.log('[API] Datos del PaymentIntent:', {
+                    amount: paymentIntentData.amount,
+                    currency: paymentIntentData.currency,
+                    customer: paymentIntentData.customer,
+                    description: paymentIntentData.description
+                });
+                
+                paymentIntent = await stripe.paymentIntents.create(paymentIntentData);
+                console.log('[API] ✅ PaymentIntent creado:', {
+                    id: paymentIntent.id,
+                    status: paymentIntent.status,
+                    client_secret: paymentIntent.client_secret ? paymentIntent.client_secret.substring(0, 20) + '...' : null
                 });
             } catch (error) {
-                console.error('Error creando PaymentIntent:', error);
+                console.error('[API] ❌ Error creando PaymentIntent:', error);
+                console.error('[API] Error details:', {
+                    message: error.message,
+                    type: error.type,
+                    code: error.code,
+                    decline_code: error.decline_code
+                });
                 return res.status(500).json({ 
                     error: 'Error creating payment intent: ' + error.message 
                 });
             }
+        } else {
+            console.log('[API] ⚠️ No se recibió amount, no se creará PaymentIntent');
         }
 
         // Enviar emails de confirmación
+        console.log('[API] Enviando emails de confirmación...');
         try {
-            await sendReservationEmail(
+            const emailResult = await sendReservationEmail(
                 reservationData,
                 customerData,
                 paymentIntent?.id || null
             );
+            console.log('[API] Resultado emails confirmación:', emailResult);
         } catch (emailError) {
-            console.warn('Error enviando emails (no crítico):', emailError);
+            console.warn('[API] ⚠️ Error enviando emails (no crítico):', emailError);
             // No fallar la reserva si falla el email
         }
 
@@ -374,22 +444,32 @@ router.post('/', async (req, res) => {
         // });
 
         // Respuesta
+        console.log('[API] Preparando respuesta...');
         if (paymentIntent) {
-            return res.json({
+            const response = {
                 success: true,
                 clientSecret: paymentIntent.client_secret,
                 paymentIntentId: paymentIntent.id,
                 customerId: customer.id,
+            };
+            console.log('[API] ✅ Respuesta exitosa con PaymentIntent:', {
+                paymentIntentId: response.paymentIntentId,
+                customerId: response.customerId,
+                hasClientSecret: !!response.clientSecret
             });
+            return res.json(response);
         } else {
-            return res.json({
+            const response = {
                 success: true,
                 message: 'Reservation created successfully',
-            });
+            };
+            console.log('[API] ✅ Respuesta exitosa sin PaymentIntent');
+            return res.json(response);
         }
 
     } catch (error) {
-        console.error('Error en /api/reserve:', error);
+        console.error('[API] ❌ ERROR GENERAL:', error);
+        console.error('[API] Stack trace:', error.stack);
         return res.status(500).json({ 
             error: 'Error processing reservation: ' + error.message 
         });
@@ -398,19 +478,36 @@ router.post('/', async (req, res) => {
 
 // POST /api/reserve/confirm - Confirmar pago y enviar emails
 router.post('/confirm', async (req, res) => {
+    console.log('[API CONFIRM] ========== CONFIRMACIÓN DE RESERVA ==========');
+    console.log('[API CONFIRM] Timestamp:', new Date().toISOString());
+    
     try {
         const { paymentIntentId, reservationData, customerData } = req.body;
+        console.log('[API CONFIRM] Datos recibidos:', {
+            paymentIntentId: paymentIntentId,
+            hasReservationData: !!reservationData,
+            hasCustomerData: !!customerData
+        });
 
         if (!paymentIntentId) {
+            console.error('[API CONFIRM] ❌ PaymentIntentId requerido');
             return res.status(400).json({ 
                 error: 'Payment Intent ID is required' 
             });
         }
 
         // Verificar el estado del pago
+        console.log('[API CONFIRM] Recuperando PaymentIntent de Stripe...');
         const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+        console.log('[API CONFIRM] PaymentIntent recuperado:', {
+            id: paymentIntent.id,
+            status: paymentIntent.status,
+            amount: paymentIntent.amount,
+            currency: paymentIntent.currency
+        });
 
         if (paymentIntent.status === 'succeeded') {
+            console.log('[API CONFIRM] ✅ Pago exitoso, enviando emails...');
             // Enviar emails de confirmación
             const emailResult = await sendReservationEmail(
                 reservationData || {
@@ -428,6 +525,7 @@ router.post('/confirm', async (req, res) => {
                 paymentIntentId
             );
 
+            console.log('[API CONFIRM] ✅ Confirmación completada');
             return res.json({
                 success: true,
                 paymentIntentId: paymentIntent.id,
@@ -435,6 +533,7 @@ router.post('/confirm', async (req, res) => {
                 emailSent: emailResult.success,
             });
         } else {
+            console.log('[API CONFIRM] ⚠️ Pago no completado, estado:', paymentIntent.status);
             return res.json({
                 success: false,
                 paymentIntentId: paymentIntent.id,
@@ -443,7 +542,8 @@ router.post('/confirm', async (req, res) => {
             });
         }
     } catch (error) {
-        console.error('Error en /api/reserve/confirm:', error);
+        console.error('[API CONFIRM] ❌ ERROR:', error);
+        console.error('[API CONFIRM] Stack trace:', error.stack);
         return res.status(500).json({ 
             error: 'Error confirming reservation: ' + error.message 
         });

@@ -235,8 +235,22 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
 }
 
 // Middleware
-app.use(cors());
+// Configurar CORS para permitir todas las conexiones (desarrollo)
+app.use(cors({
+    origin: '*', // En producción, especifica el dominio exacto
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
+
+// Middleware para logging de requests
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+    next();
+});
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Usar rutas de reserva
 app.use('/api/reserve', reserveRoutes);
@@ -799,6 +813,26 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
     res.json({ received: true });
 });
 
+// Ruta raíz - Información del servidor
+app.get('/', (req, res) => {
+    res.json({
+        status: 'ok',
+        message: '🚗 Prestige Goal Motion - API Server',
+        version: '1.0.0',
+        endpoints: {
+            health: '/health',
+            test: '/api/test',
+            reserve: '/api/reserve',
+            createPaymentIntent: '/api/create-payment-intent',
+            confirmPayment: '/api/confirm-payment-intent',
+            sendEmail: '/api/send-confirmation-email',
+            contact: '/api/contact',
+            webhook: '/api/webhook'
+        },
+        timestamp: new Date().toISOString()
+    });
+});
+
 // Endpoint de salud (opcional)
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
@@ -809,7 +843,8 @@ app.get('/api/test', (req, res) => {
     res.json({ 
         status: 'ok', 
         message: 'Servidor funcionando correctamente',
-        timestamp: new Date().toISOString() 
+        timestamp: new Date().toISOString(),
+        server: 'Prestige Goal Motion API'
     });
 });
 
