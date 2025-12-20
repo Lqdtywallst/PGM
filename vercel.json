@@ -1,4 +1,10 @@
 {
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
   "redirects": [
     {
       "source": "/reservas",
@@ -34,7 +40,11 @@
       "source": "/nuestra-colección-exclusiva/",
       "destination": "/#fleet",
       "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "destination": "/#fleet",
+      "permanent": true
     }
   ]
 }
-
