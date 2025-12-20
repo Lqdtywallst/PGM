@@ -1034,7 +1034,7 @@
             .logo {
                 height: 40px;
             }
-        nav ul { gap: 1.2rem; }
+            nav ul { gap: 1.2rem; }
         
         /* Botón de menú hamburguesa para móvil - Completamente oculto en desktop */
         .menu-toggle {
@@ -1241,8 +1241,8 @@
                 <img src="https://www.km77.com/images/medium/4/6/3/5/mercedes-amg-gle-63-s-coupe-2023-lateral-frontal.364635.jpg" alt="Mercedes GLE 400D">
                 <div class="car-info">
                     <h3>Mercedes GLE 400D</h3>
-                    <div class="price">From 1 € / day</div>
-                    <a href="/app/reserve/page.html?car=Mercedes GLE 400D&price=1" class="btn-reservar">BOOK NOW</a>
+                    <div class="price">From 400 € / day</div>
+                    <a href="/app/reserve/page.html?car=Mercedes GLE 400D&price=400" class="btn-reservar">BOOK NOW</a>
                     <div class="contact-buttons">
                         <a href="tel:+34680162813" class="btn-contact">
                             <i class="fas fa-phone"></i>
@@ -1459,7 +1459,7 @@
                         referrerpolicy="no-referrer-when-downgrade"
                         title="Prestige Goal Motion - Calle Cicón, 27, Spain">
                     </iframe>
-                </div>
+                    </div>
                 <p style="text-align: center; color: var(--silver); margin-top: 1rem;">
                     <i class="fas fa-map-marker-alt" style="color: var(--gold); margin-right: 0.5rem;"></i>
                     <a href="https://www.google.com/maps/search/?api=1&query=Calle+Cicón+27+Spain" target="_blank" style="color: var(--gold); text-decoration: none;">
@@ -1469,9 +1469,9 @@
                     <a href="https://www.google.com/maps/dir/?api=1&destination=Calle+Cicón+27+Spain" target="_blank" style="color: var(--gold); text-decoration: none;">
                         Get Directions
                     </a>
-                </p>
-            </div>
-        </div>
+                        </p>
+                    </div>
+                    </div>
     </section>
 
     <!-- Modal de Reserva eliminado - Usar /app/reserve/page.html -->
@@ -1495,7 +1495,7 @@
         window.addEventListener('scroll', () => {
             document.querySelector('header').classList.toggle('scrolled', window.scrollY > 50);
         });
-        
+
         // Eliminar completamente el botón del menú móvil en desktop
         function hideMobileMenuButton() {
             const menuToggle = document.getElementById('menuToggle');
@@ -1526,7 +1526,7 @@
                     menuToggle.style.opacity = '0';
                     menuToggle.style.pointerEvents = 'none';
                 }
-            } else {
+                } else {
                 // Restaurar en móvil si fue removido
                 const header = document.querySelector('header');
                 if (header && !document.getElementById('menuToggle')) {
@@ -1544,7 +1544,7 @@
         // Ejecutar inmediatamente
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', hideMobileMenuButton);
-        } else {
+                } else {
             hideMobileMenuButton();
         }
         
@@ -1624,21 +1624,21 @@
                 statusDiv.innerHTML = '<p class="error-message">Please complete all required fields.</p>';
                 return;
             }
-            
+
             // Validar formato de email
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 statusDiv.innerHTML = '<p class="error-message">Please enter a valid email address.</p>';
                 return;
             }
-            
+
             // Deshabilitar botón durante el envío
             const submitBtn = event.target.querySelector('button[type="submit"]');
             if (!submitBtn) {
                 console.error('No se encontró el botón de envío');
                 return;
             }
-            
+
             submitBtn.disabled = true;
             submitBtn.textContent = 'SENDING...';
             statusDiv.innerHTML = '<p style="color: var(--silver);">Sending message...</p>';
@@ -1658,11 +1658,11 @@
             
             // Enviar mensaje al backend
             fetch(`${BACKEND_URL}/api/contact`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
+                            method: 'POST',
+                            headers: { 
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
                     name: name,
                     email: email,
                     phone: phone,
@@ -1680,7 +1680,7 @@
                     const text = await response.text();
                     throw new Error(`Server error (${response.status}): ${text || response.statusText}`);
                 }
-                
+
                 if (!response.ok) {
                     throw new Error(data.error || `Error ${response.status}: ${response.statusText}`);
                 }
@@ -1736,8 +1736,8 @@
                 }
                 
                 statusDiv.innerHTML = '<p class="error-message">' + errorMessage + '</p>';
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'ENVIAR MENSAJE';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'ENVIAR MENSAJE';
                 
                 // Limpiar mensaje después de 10 segundos
                 setTimeout(() => {

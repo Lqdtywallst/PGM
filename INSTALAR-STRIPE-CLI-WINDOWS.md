@@ -98,3 +98,4 @@ Esto te dará un webhook secret que empieza con `whsec_...`
 - Para producción, configura el webhook directamente en el Dashboard de Stripe
 - El webhook secret de desarrollo local cambia cada vez que reinicias `stripe listen`
 
+

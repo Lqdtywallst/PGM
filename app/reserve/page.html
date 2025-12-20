@@ -931,19 +931,62 @@
         // Función para verificar conexión con el servidor
         async function checkServerConnection() {
             const BACKEND_URL = window.BACKEND_URL || window.STRIPE_CONFIG?.backendUrl || 'http://localhost:3000';
-            try {
-                console.log('[CONNECTION CHECK] Verificando conexión con servidor...');
-                const response = await fetch(`${BACKEND_URL}/api/test`, {
-                    method: 'GET',
-                    signal: AbortSignal.timeout(5000)
-                });
-                const data = await response.json();
-                console.log('[CONNECTION CHECK] ✅ Servidor conectado:', data);
-                return true;
-            } catch (error) {
-                console.error('[CONNECTION CHECK] ❌ Error conectando al servidor:', error);
-                return false;
+            console.log('[CONNECTION CHECK] Verificando conexión con servidor:', BACKEND_URL);
+            console.log('[CONNECTION CHECK] Protocolo actual:', window.location.protocol);
+            
+            // Verificar si estamos en file:// (puede causar problemas de CORS)
+            if (window.location.protocol === 'file:') {
+                console.warn('[CONNECTION CHECK] ⚠️ Archivo abierto como file://. Esto puede causar problemas de CORS.');
+                console.warn('[CONNECTION CHECK] Considera usar un servidor web local o abrir desde http://localhost');
             }
+            
+            // Intentar múltiples endpoints
+            const endpoints = ['/api/test', '/health', '/'];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    console.log(`[CONNECTION CHECK] Intentando conectar a: ${BACKEND_URL}${endpoint}`);
+                    
+                    // Crear un AbortController para el timeout
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 10000);
+                    
+                    const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        mode: 'cors', // Forzar CORS
+                        signal: controller.signal
+                    });
+                    
+                    clearTimeout(timeoutId);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log('[CONNECTION CHECK] ✅ Servidor conectado:', data);
+                        return true;
+                    } else {
+                        console.warn(`[CONNECTION CHECK] ⚠️ Respuesta no OK (${response.status}) desde ${endpoint}`);
+                    }
+                } catch (error) {
+                    if (error.name === 'AbortError') {
+                        console.error(`[CONNECTION CHECK] ❌ Timeout al conectar a ${endpoint} (10 segundos)`);
+                    } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                        console.error(`[CONNECTION CHECK] ❌ Error de red al conectar a ${endpoint}:`, error.message);
+                        console.error('[CONNECTION CHECK] Posibles causas:');
+                        console.error('[CONNECTION CHECK] - El servidor no está corriendo');
+                        console.error('[CONNECTION CHECK] - Problema de CORS (intenta abrir desde http://localhost)');
+                        console.error('[CONNECTION CHECK] - Firewall bloqueando la conexión');
+                    } else {
+                        console.warn(`[CONNECTION CHECK] ⚠️ Error con ${endpoint}:`, error.message);
+                    }
+                    // Continuar con el siguiente endpoint
+                }
+            }
+            
+            console.error('[CONNECTION CHECK] ❌ No se pudo conectar a ningún endpoint');
+            return false;
         }
 
         async function submitReservation() {
@@ -954,15 +997,21 @@
 
             // Verificar conexión con el servidor primero
             const BACKEND_URL = window.BACKEND_URL || window.STRIPE_CONFIG?.backendUrl || 'http://localhost:3000';
+            console.log('[PAYMENT] Verificando conexión con servidor antes de procesar pago...');
             const isConnected = await checkServerConnection();
             if (!isConnected) {
-                const errorMsg = `No se pudo conectar al servidor en ${BACKEND_URL}. Por favor, verifica que el servidor esté corriendo.`;
+                const errorMsg = `No se pudo conectar al servidor en ${BACKEND_URL}. Por favor, verifica que el servidor esté corriendo. Abre la consola (F12) para más detalles.`;
                 console.error('[PAYMENT] ❌', errorMsg);
+                console.error('[PAYMENT] Verifica que:');
+                console.error('[PAYMENT] 1. El servidor esté corriendo en el puerto 3000');
+                console.error('[PAYMENT] 2. Puedas acceder a http://localhost:3000 en tu navegador');
+                console.error('[PAYMENT] 3. No haya errores de CORS en la consola');
                 showMessage(errorMsg, 'error');
                 payButton.disabled = false;
                 payButton.textContent = 'Confirm & Pay';
                 return;
             }
+            console.log('[PAYMENT] ✅ Conexión con servidor verificada, procediendo con el pago...');
 
             // Recopilar datos del formulario
             const formData = {

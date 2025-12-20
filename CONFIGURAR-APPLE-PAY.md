@@ -146,3 +146,4 @@ if (canMakePayment && canMakePayment.applePay) {
 
 ¡Listo! Apple Pay debería funcionar automáticamente una vez que el dominio esté verificado. 🎉
 
+
