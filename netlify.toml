@@ -10,3 +10,27 @@
   status = 301
   force = true
 
+[[redirects]]
+  from = "/blog"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/blog/*"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/stock-disponible-a-la-venta"
+  to = "/#flota"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/nuestra-colección-exclusiva"
+  to = "/#flota"
+  status = 301
+  force = true
+

@@ -47,6 +47,15 @@
     # Redirección /reservas a sección de reservas
     RewriteRule ^reservas/?$ /#reserva [R=301,L]
     
+    # Redirección /blog a home
+    RewriteRule ^blog/?$ / [R=301,L]
+    
+    # Redirección /stock-disponible-a-la-venta a flota
+    RewriteRule ^stock-disponible-a-la-venta/?$ /#flota [R=301,L]
+    
+    # Redirección /nuestra-colección-exclusiva a flota
+    RewriteRule ^nuestra-colección-exclusiva/?$ /#flota [R=301,L]
+    
     # Redirección HTTPS (descomentar en producción)
     # RewriteCond %{HTTPS} off
     # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

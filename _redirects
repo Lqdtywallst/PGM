@@ -1,3 +1,7 @@
 /reservas /#reserva 301
 /reservas/ /#reserva 301
+/blog / 301
+/blog/ / 301
+/stock-disponible-a-la-venta /#flota 301
+/nuestra-colección-exclusiva /#flota 301
 

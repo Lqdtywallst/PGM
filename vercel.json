@@ -9,6 +9,26 @@
       "source": "/reservas/",
       "destination": "/#reserva",
       "permanent": true
+    },
+    {
+      "source": "/blog",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/stock-disponible-a-la-venta",
+      "destination": "/#flota",
+      "permanent": true
+    },
+    {
+      "source": "/nuestra-colección-exclusiva",
+      "destination": "/#flota",
+      "permanent": true
     }
   ]
 }
