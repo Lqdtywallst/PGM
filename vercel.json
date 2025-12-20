@@ -2,12 +2,12 @@
   "redirects": [
     {
       "source": "/reservas",
-      "destination": "/app/reserve/page.html",
+      "destination": "/#reserva",
       "permanent": true
     },
     {
       "source": "/reservas/",
-      "destination": "/app/reserve/page.html",
+      "destination": "/#reserva",
       "permanent": true
     }
   ]

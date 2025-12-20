@@ -44,8 +44,8 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
     
-    # Redirección /reservas a página de reservas
-    RewriteRule ^reservas/?$ /app/reserve/page.html [R=301,L]
+    # Redirección /reservas a sección de reservas
+    RewriteRule ^reservas/?$ /#reserva [R=301,L]
     
     # Redirección HTTPS (descomentar en producción)
     # RewriteCond %{HTTPS} off
