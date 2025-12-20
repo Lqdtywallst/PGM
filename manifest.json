@@ -1,0 +1,30 @@
+{
+  "name": "Prestige Goal Motion - Luxury Car Rental",
+  "short_name": "PGM",
+  "description": "Alquiler de coches de lujo en España. Mercedes, Lamborghini, Ferrari y más.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#d4af37",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo-pgm.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-pgm.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["automotive", "travel", "business"],
+  "lang": "es-ES",
+  "dir": "ltr",
+  "scope": "/",
+  "prefer_related_applications": false
+}
+

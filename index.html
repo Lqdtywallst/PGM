@@ -1,17 +1,86 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prestige Goal Motion - Luxury Car Rental</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- Primary Meta Tags -->
+    <title>Prestige Goal Motion - Alquiler de Coches de Lujo en España | Mercedes, Lamborghini, Ferrari</title>
+    <meta name="title" content="Prestige Goal Motion - Alquiler de Coches de Lujo en España">
+    <meta name="description" content="Alquila los mejores coches de lujo en España. Mercedes GLE, Lamborghini Huracán, Ferrari 296 GTS. Reserva online con pago seguro. Disponible 24/7.">
+    <meta name="keywords" content="alquiler coches lujo, mercedes gle, lamborghini huracán, ferrari, alquiler coches españa, luxury car rental spain">
+    <meta name="author" content="Prestige Goal Motion">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="Spanish">
+    <meta name="revisit-after" content="7 days">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://prestigegoalmotion.com/">
+    <meta property="og:title" content="Prestige Goal Motion - Alquiler de Coches de Lujo">
+    <meta property="og:description" content="Alquila los mejores coches de lujo en España. Mercedes, Lamborghini, Ferrari. Reserva online con pago seguro.">
+    <meta property="og:image" content="/logo-pgm.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:locale" content="es_ES">
+    <meta property="og:site_name" content="Prestige Goal Motion">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://prestigegoalmotion.com/">
+    <meta name="twitter:title" content="Prestige Goal Motion - Alquiler de Coches de Lujo">
+    <meta name="twitter:description" content="Alquila los mejores coches de lujo en España. Mercedes, Lamborghini, Ferrari.">
+    <meta name="twitter:image" content="/logo-pgm.png">
+    
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="/logo-pgm.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/logo-pgm.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/logo-pgm.png">
     <link rel="shortcut icon" href="/logo-pgm.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <script src="https://js.stripe.com/v3/"></script>
-    <script src="config.js"></script>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0a0a0a">
+    
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://js.stripe.com" crossorigin>
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://js.stripe.com">
+    <link rel="dns-prefetch" href="https://images.unsplash.com">
+    
+    <!-- Font Awesome with async loading -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"></noscript>
+    
+    <!-- Stripe.js with defer -->
+    <script src="https://js.stripe.com/v3/" defer></script>
+    <script src="config.js" defer></script>
+    
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CarRental",
+      "name": "Prestige Goal Motion",
+      "description": "Alquiler de coches de lujo en España",
+      "url": "https://prestigegoalmotion.com",
+      "logo": "https://prestigegoalmotion.com/logo-pgm.png",
+      "image": "https://prestigegoalmotion.com/logo-pgm.png",
+      "telephone": "+34680162813",
+      "email": "prestigegoalmotion@gmail.com",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Calle Cicón, 27",
+        "addressCountry": "ES"
+      },
+      "openingHours": "Mo-Su 00:00-23:59",
+      "priceRange": "€€€",
+      "sameAs": [
+        "https://www.instagram.com/prestigegoalmotion"
+      ]
+    }
+    </script>
     <style>
         :root {
             --black: #0a0a0a;
@@ -33,11 +102,13 @@
             z-index: 1000;
             background: rgba(10, 10, 10, 0.85);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             padding: 1rem 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.3s;
+            transition: background-color 0.3s ease;
+            will-change: background-color;
         }
         header.scrolled { background: rgba(10, 10, 10, 0.95); }
         .logo {
@@ -163,8 +234,9 @@
             background: var(--darkgray);
             border-radius: 15px;
             overflow: hidden;
-            transition: all 0.4s;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
             border: 1px solid #333;
+            will-change: transform;
         }
         .car-card:hover {
             transform: translateY(-15px);
@@ -176,6 +248,14 @@
             object-fit: cover;
             display: block;
             background: var(--darkgray);
+            transition: opacity 0.3s ease;
+        }
+        .car-card img[loading="lazy"] {
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
         }
         .car-info {
             padding: 2rem;
@@ -1146,30 +1226,32 @@
 <body>
 
     <!-- Header -->
-    <header>
+    <header role="banner">
         <div class="logo">
-            <img src="https://static.wixstatic.com/media/a11208_3c3efc0ce03a49b5b22d8e9fc1451ee2~mv2.png/v1/crop/x_0,y_68,w_765,h_443/fill/w_342,h_198,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/LOGO%20FINAL%20PGM.png" alt="Prestige Goal Motion">
+            <a href="#inicio" aria-label="Prestige Goal Motion Home">
+                <img src="https://static.wixstatic.com/media/a11208_3c3efc0ce03a49b5b22d8e9fc1451ee2~mv2.png/v1/crop/x_0,y_68,w_765,h_443/fill/w_342,h_198,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/LOGO%20FINAL%20PGM.png" alt="Prestige Goal Motion - Luxury Car Rental" width="342" height="198" decoding="async">
+            </a>
         </div>
-        <button class="menu-toggle" id="menuToggle" onclick="toggleMobileMenu()" aria-label="Toggle menu">
-            <i class="fas fa-bars"></i>
-            <i class="fas fa-times"></i>
+        <button class="menu-toggle" id="menuToggle" onclick="toggleMobileMenu()" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mobileNav">
+            <i class="fas fa-bars" aria-hidden="true"></i>
+            <i class="fas fa-times" aria-hidden="true"></i>
         </button>
-        <nav id="mobileNav">
+        <nav id="mobileNav" role="navigation" aria-label="Main navigation">
             <ul>
-                <li><a href="#inicio" onclick="closeMobileMenu()">Home</a></li>
-                <li><a href="#flota" onclick="closeMobileMenu()">Fleet</a></li>
-                <li><a href="#reserva" onclick="closeMobileMenu()">Reservations</a></li>
-                <li><a href="#contacto" onclick="closeMobileMenu()">Contact</a></li>
+                <li><a href="#inicio" onclick="closeMobileMenu()" aria-label="Go to home section">Home</a></li>
+                <li><a href="#flota" onclick="closeMobileMenu()" aria-label="View our fleet">Fleet</a></li>
+                <li><a href="#reserva" onclick="closeMobileMenu()" aria-label="Make a reservation">Reservations</a></li>
+                <li><a href="#contacto" onclick="closeMobileMenu()" aria-label="Contact us">Contact</a></li>
             </ul>
         </nav>
     </header>
 
     <!-- Hero -->
-    <section id="inicio" class="hero">
-        <img src="https://static.wixstatic.com/media/a11208_3c3efc0ce03a49b5b22d8e9fc1451ee2~mv2.png/v1/crop/x_0,y_303,w_765,h_163/fill/w_1068,h_228,al_c,lg_1,q_85,enc_avif,quality_auto/a11208_3c3efc0ce03a49b5b22d8e9fc1451ee2~mv2.png" alt="Prestige Goal Motion" class="hero-title-img">
+    <section id="inicio" class="hero" role="banner">
+        <img src="https://static.wixstatic.com/media/a11208_3c3efc0ce03a49b5b22d8e9fc1451ee2~mv2.png/v1/crop/x_0,y_303,w_765,h_163/fill/w_1068,h_228,al_c,lg_1,q_85,enc_avif,quality_auto/a11208_3c3efc0ce03a49b5b22d8e9fc1451ee2~mv2.png" alt="Prestige Goal Motion - Drive Luxury" class="hero-title-img" width="1068" height="228" decoding="async" fetchpriority="high">
         <h1>DRIVE LUXURY</h1>
         <p>Supercar and high-end vehicle rental in Spain. Drive your dream supercar today.</p>
-        <a href="#reserva" class="btn">BOOK NOW</a>
+        <a href="#reserva" class="btn" aria-label="Book a luxury car now">BOOK NOW</a>
     </section>
 
     <!-- Presentación -->
@@ -1180,29 +1262,29 @@
     </section>
 
     <!-- Flota -->
-    <section id="flota">
-        <h2>Our Exclusive Fleet</h2>
+    <section id="flota" aria-labelledby="fleet-heading">
+        <h2 id="fleet-heading">Our Exclusive Fleet</h2>
         <div class="fleet-grid">
             <div class="car-card">
-                <img src="https://di-uploads-pod5.dealerinspire.com/mercedesbenzprinceton/uploads/2020/07/2021-Mercedes-Benz-GLE-53-Coupe.png" alt="Mercedes GLE 53 AMG">
+                <img src="https://di-uploads-pod5.dealerinspire.com/mercedesbenzprinceton/uploads/2020/07/2021-Mercedes-Benz-GLE-53-Coupe.png" alt="Mercedes GLE 53 AMG - Luxury SUV Rental" loading="lazy" width="350" height="250" decoding="async">
                 <div class="car-info">
                     <h3>Mercedes GLE 53 AMG</h3>
                     <div class="price">From 500 € / day</div>
                     <a href="/app/reserve/page.html?car=Mercedes GLE 53 AMG&price=500" class="btn-reservar">BOOK NOW</a>
                     <div class="contact-buttons">
-                        <a href="tel:+34680162813" class="btn-contact">
-                            <i class="fas fa-phone"></i>
+                        <a href="tel:+34680162813" class="btn-contact" aria-label="Call us at +34 680 162 813">
+                            <i class="fas fa-phone" aria-hidden="true"></i>
                             <span>Call</span>
                         </a>
-                        <a href="https://wa.me/34680162813?text=Hello!%20I%20am%20interested%20in%20reserving%20the%20Mercedes%20GLE%2053%20AMG.%20Could%20you%20please%20provide%20more%20information?" target="_blank" class="btn-contact">
-                            <i class="fab fa-whatsapp"></i>
+                        <a href="https://wa.me/34680162813?text=Hello!%20I%20am%20interested%20in%20reserving%20the%20Mercedes%20GLE%2053%20AMG.%20Could%20you%20please%20provide%20more%20information?" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us via WhatsApp">
+                            <i class="fab fa-whatsapp" aria-hidden="true"></i>
                             <span>WhatsApp</span>
                         </a>
                     </div>
                 </div>
             </div>
             <div class="car-card">
-                <img src="https://static.wixstatic.com/media/a11208_cdff107bcc264bd99ce840ca61df422c~mv2.webp/v1/fill/w_1024,h_768,al_c,q_85,enc_auto/a11208_cdff107bcc264bd99ce840ca61df422c~mv2.webp" alt="Mercedes GLE Coupe 400 D">
+                <img src="https://static.wixstatic.com/media/a11208_cdff107bcc264bd99ce840ca61df422c~mv2.webp/v1/fill/w_1024,h_768,al_c,q_85,enc_auto/a11208_cdff107bcc264bd99ce840ca61df422c~mv2.webp" alt="Mercedes GLE Coupe 400 D - Premium Diesel SUV" loading="lazy" width="350" height="250" decoding="async">
                 <div class="car-info">
                     <h3>Mercedes GLE Coupe 400 D</h3>
                     <div class="price">From 400 € / day</div>
@@ -1212,7 +1294,7 @@
                             <i class="fas fa-phone"></i>
                             <span>Call</span>
                         </a>
-                        <a href="https://wa.me/34680162813?text=Hello!%20I%20am%20interested%20in%20reserving%20the%20Mercedes%20GLE%20Coupe%20400%20D.%20Could%20you%20please%20provide%20more%20information?" target="_blank" class="btn-contact">
+                        <a href="https://wa.me/34680162813?text=Hello!%20I%20am%20interested%20in%20reserving%20the%20Mercedes%20GLE%20Coupe%20400%20D.%20Could%20you%20please%20provide%20more%20information?" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us via WhatsApp">
                             <i class="fab fa-whatsapp"></i>
                             <span>WhatsApp</span>
                         </a>
@@ -1220,7 +1302,7 @@
                 </div>
             </div>
             <div class="car-card">
-                <img src="https://images.unsplash.com/photo-1543854589-fdd815f176e0?q=80&w=1904&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Lamborghini Huracán">
+                <img src="https://images.unsplash.com/photo-1543854589-fdd815f176e0?q=80&w=1904&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Lamborghini Huracán - Supercar Rental Spain" loading="lazy" width="350" height="250" decoding="async">
                 <div class="car-info">
                     <h3>Lamborghini Huracán</h3>
                     <div class="price">From 1,500 € / day</div>
@@ -1230,7 +1312,7 @@
                             <i class="fas fa-phone"></i>
                             <span>Call</span>
                         </a>
-                        <a href="https://wa.me/34680162813?text=Hello!%20I%20am%20interested%20in%20reserving%20the%20Lamborghini%20Hurac%C3%A1n.%20Could%20you%20please%20provide%20more%20information?" target="_blank" class="btn-contact">
+                        <a href="https://wa.me/34680162813?text=Hello!%20I%20am%20interested%20in%20reserving%20the%20Lamborghini%20Hurac%C3%A1n.%20Could%20you%20please%20provide%20more%20information?" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us via WhatsApp">
                             <i class="fab fa-whatsapp"></i>
                             <span>WhatsApp</span>
                         </a>
@@ -1238,7 +1320,7 @@
                 </div>
             </div>
             <div class="car-card">
-                <img src="https://www.km77.com/images/medium/4/6/3/5/mercedes-amg-gle-63-s-coupe-2023-lateral-frontal.364635.jpg" alt="Mercedes GLE 400D">
+                <img src="https://www.km77.com/images/medium/4/6/3/5/mercedes-amg-gle-63-s-coupe-2023-lateral-frontal.364635.jpg" alt="Mercedes GLE 400D - Luxury Diesel SUV" loading="lazy" width="350" height="250" decoding="async">
                 <div class="car-info">
                     <h3>Mercedes GLE 400D</h3>
                     <div class="price">From 400 € / day</div>
@@ -1248,7 +1330,7 @@
                             <i class="fas fa-phone"></i>
                             <span>Call</span>
                         </a>
-                        <a href="https://wa.me/34680162813?text=Hello!%20I%20am%20interested%20in%20reserving%20the%20Mercedes%20GLE%20400D.%20Could%20you%20please%20provide%20more%20information?" target="_blank" class="btn-contact">
+                        <a href="https://wa.me/34680162813?text=Hello!%20I%20am%20interested%20in%20reserving%20the%20Mercedes%20GLE%20400D.%20Could%20you%20please%20provide%20more%20information?" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us via WhatsApp">
                             <i class="fab fa-whatsapp"></i>
                             <span>WhatsApp</span>
                         </a>
@@ -1256,7 +1338,7 @@
                 </div>
             </div>
             <div class="car-card">
-                <img src="https://www.europeanprestige.co.uk/blobs/stock/637/images/ecbeba9b-5a32-4bea-8974-83af94d99597/296-4.jpg?width=2000&height=1333" alt="Ferrari 296 GTS" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1600510424051-30d592a75353?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGxhbWJvcmdoaW5pfGVufDB8fDB8fHww';">
+                <img src="https://www.europeanprestige.co.uk/blobs/stock/637/images/ecbeba9b-5a32-4bea-8974-83af94d99597/296-4.jpg?width=2000&height=1333" alt="Ferrari 296 GTS - Hybrid Supercar Rental" loading="lazy" width="350" height="250" decoding="async" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1600510424051-30d592a75353?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGxhbWJvcmdoaW5pfGVufDB8fDB8fHww';">
                 <div class="car-info">
                     <h3>Ferrari 296 GTS</h3>
                     <div class="price">From 1,749 € / day</div>
@@ -1267,7 +1349,7 @@
                             <i class="fas fa-phone"></i>
                             <span>Call</span>
                         </a>
-                        <a href="https://wa.me/34680162813?text=Hello!%20I%20am%20interested%20in%20reserving%20the%20Ferrari%20296%20GTS.%20Could%20you%20please%20provide%20more%20information?" target="_blank" class="btn-contact">
+                        <a href="https://wa.me/34680162813?text=Hello!%20I%20am%20interested%20in%20reserving%20the%20Ferrari%20296%20GTS.%20Could%20you%20please%20provide%20more%20information?" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us via WhatsApp">
                             <i class="fab fa-whatsapp"></i>
                             <span>WhatsApp</span>
                         </a>
@@ -1286,7 +1368,7 @@
                             <i class="fas fa-phone"></i>
                             <span>Call</span>
                         </a>
-                        <a href="https://wa.me/34680162813?text=Hello!%20I%20am%20interested%20in%20reserving%20the%20Mercedes%20G%2063%20AMG.%20Could%20you%20please%20provide%20more%20information?" target="_blank" class="btn-contact">
+                        <a href="https://wa.me/34680162813?text=Hello!%20I%20am%20interested%20in%20reserving%20the%20Mercedes%20G%2063%20AMG.%20Could%20you%20please%20provide%20more%20information?" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us via WhatsApp">
                             <i class="fab fa-whatsapp"></i>
                             <span>WhatsApp</span>
                         </a>
@@ -1305,7 +1387,7 @@
                             <i class="fas fa-phone"></i>
                             <span>Call</span>
                         </a>
-                        <a href="https://wa.me/34680162813?text=Hello!%20I%20am%20interested%20in%20reserving%20the%20Lamborghini%20Urus%20Sport.%20Could%20you%20please%20provide%20more%20information?" target="_blank" class="btn-contact">
+                        <a href="https://wa.me/34680162813?text=Hello!%20I%20am%20interested%20in%20reserving%20the%20Lamborghini%20Urus%20Sport.%20Could%20you%20please%20provide%20more%20information?" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us via WhatsApp">
                             <i class="fab fa-whatsapp"></i>
                             <span>WhatsApp</span>
                         </a>
@@ -1324,7 +1406,7 @@
                             <i class="fas fa-phone"></i>
                             <span>Call</span>
                         </a>
-                        <a href="https://wa.me/34680162813?text=Hello!%20I%20am%20interested%20in%20reserving%20the%20Porsche%20992%20GT3.%20Could%20you%20please%20provide%20more%20information?" target="_blank" class="btn-contact">
+                        <a href="https://wa.me/34680162813?text=Hello!%20I%20am%20interested%20in%20reserving%20the%20Porsche%20992%20GT3.%20Could%20you%20please%20provide%20more%20information?" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us via WhatsApp">
                             <i class="fab fa-whatsapp"></i>
                             <span>WhatsApp</span>
                         </a>
@@ -1374,7 +1456,7 @@
                     </div>
                     <div class="contact-details">
                         <h3>WhatsApp</h3>
-                        <p><a href="https://wa.me/34680162813" target="_blank">+34 680 162 813</a></p>
+                        <p><a href="https://wa.me/34680162813" target="_blank" rel="noopener noreferrer">+34 680 162 813</a></p>
                         <p style="color: var(--silver); font-size: 0.9rem;">Available 24/7</p>
                     </div>
                 </div>
@@ -1402,33 +1484,36 @@
                 </div>
 
                 <div class="social-links-contact">
-                    <a href="https://wa.me/34680162813" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-                    <a href="https://www.instagram.com/prestigegoalmotion" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://wa.me/34680162813" target="_blank" rel="noopener noreferrer" title="WhatsApp" aria-label="Contact us on WhatsApp"><i class="fab fa-whatsapp" aria-hidden="true"></i></a>
+                    <a href="https://www.instagram.com/prestigegoalmotion" target="_blank" rel="noopener noreferrer" title="Instagram" aria-label="Follow us on Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
                 </div>
             </div>
 
             <!-- Formulario de Contacto -->
             <div class="contact-form-container">
                 <h3 style="color: var(--gold); margin-bottom: 1.5rem;">Send Us a Message</h3>
-                <form class="contact-form" id="contactForm" onsubmit="handleContactSubmit(event)">
+                <form class="contact-form" id="contactForm" onsubmit="handleContactSubmit(event)" novalidate aria-label="Contact form">
                     <div class="form-group">
-                        <label>Full Name *</label>
-                        <input type="text" id="contactName" required>
+                        <label for="contactName">Full Name *</label>
+                        <input type="text" id="contactName" name="name" required aria-required="true" autocomplete="name" aria-describedby="name-error">
+                        <span id="name-error" class="error-message" role="alert" aria-live="polite"></span>
                     </div>
                     
                     <div class="form-group">
-                        <label>Email *</label>
-                        <input type="email" id="contactEmail" required>
+                        <label for="contactEmail">Email *</label>
+                        <input type="email" id="contactEmail" name="email" required aria-required="true" autocomplete="email" aria-describedby="email-error">
+                        <span id="email-error" class="error-message" role="alert" aria-live="polite"></span>
                     </div>
                     
                     <div class="form-group">
-                        <label>Phone</label>
-                        <input type="tel" id="contactPhone">
+                        <label for="contactPhone">Phone</label>
+                        <input type="tel" id="contactPhone" name="phone" autocomplete="tel" aria-describedby="phone-error">
+                        <span id="phone-error" class="error-message" role="alert" aria-live="polite"></span>
                     </div>
                     
                     <div class="form-group">
-                        <label>Subject *</label>
-                        <select id="contactSubject" required>
+                        <label for="contactSubject">Subject *</label>
+                        <select id="contactSubject" name="subject" required aria-required="true" aria-describedby="subject-error">
                             <option value="">Select a subject</option>
                             <option value="reserva">Reservation Inquiry</option>
                             <option value="flota">Fleet Information</option>
@@ -1436,15 +1521,17 @@
                             <option value="evento">Corporate Events</option>
                             <option value="otro">Other</option>
                         </select>
+                        <span id="subject-error" class="error-message" role="alert" aria-live="polite"></span>
                     </div>
                     
                     <div class="form-group">
-                        <label>Message *</label>
-                        <textarea id="contactMessage" required placeholder="Write your message here..."></textarea>
+                        <label for="contactMessage">Message *</label>
+                        <textarea id="contactMessage" name="message" required aria-required="true" placeholder="Write your message here..." rows="6" aria-describedby="message-error"></textarea>
+                        <span id="message-error" class="error-message" role="alert" aria-live="polite"></span>
                     </div>
                     
-                    <button type="submit">SEND MESSAGE</button>
-                    <div id="contactFormStatus" style="text-align: center; margin-top: 1rem;"></div>
+                    <button type="submit" aria-label="Send contact message">SEND MESSAGE</button>
+                    <div id="contactFormStatus" style="text-align: center; margin-top: 1rem;" role="status" aria-live="polite"></div>
                 </form>
             </div>
             
@@ -1462,11 +1549,11 @@
                     </div>
                 <p style="text-align: center; color: var(--silver); margin-top: 1rem;">
                     <i class="fas fa-map-marker-alt" style="color: var(--gold); margin-right: 0.5rem;"></i>
-                    <a href="https://www.google.com/maps/search/?api=1&query=Calle+Cicón+27+Spain" target="_blank" style="color: var(--gold); text-decoration: none;">
+                    <a href="https://www.google.com/maps/search/?api=1&query=Calle+Cicón+27+Spain" target="_blank" rel="noopener noreferrer" style="color: var(--gold); text-decoration: none;" aria-label="View location on Google Maps">
                         Calle Cicón, 27, Spain
                     </a>
                     <span style="margin: 0 0.5rem;">|</span>
-                    <a href="https://www.google.com/maps/dir/?api=1&destination=Calle+Cicón+27+Spain" target="_blank" style="color: var(--gold); text-decoration: none;">
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=Calle+Cicón+27+Spain" target="_blank" rel="noopener noreferrer" style="color: var(--gold); text-decoration: none;" aria-label="Get directions to our location">
                         Get Directions
                     </a>
                         </p>
@@ -1478,15 +1565,15 @@
 
     <!-- Banner del Footer -->
     <div class="footer-banner">
-        <img src="https://images.unsplash.com/photo-1761285713453-cb6ea5e56544?q=80&w=1287&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Prestige Goal Motion Banner">
+        <img src="https://images.unsplash.com/photo-1761285713453-cb6ea5e56544?q=80&w=1287&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Prestige Goal Motion - Luxury Car Rental Banner" loading="lazy" width="1920" height="400" decoding="async">
     </div>
 
     <!-- Footer -->
     <footer>
         <p>&copy; 2025 Prestige Goal Motion. All rights reserved.</p>
         <div>
-            <a href="https://wa.me/34680162813" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-            <a href="https://www.instagram.com/prestigegoalmotion" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="https://wa.me/34680162813" target="_blank" rel="noopener noreferrer" title="WhatsApp" aria-label="Contact us on WhatsApp"><i class="fab fa-whatsapp" aria-hidden="true"></i></a>
+            <a href="https://www.instagram.com/prestigegoalmotion" target="_blank" rel="noopener noreferrer" title="Instagram" aria-label="Follow us on Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
         </div>
     </footer>
 
@@ -1743,6 +1830,30 @@
                 setTimeout(() => {
                     statusDiv.innerHTML = '';
                 }, 10000);
+            });
+        }
+
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('[SW] Service Worker registrado:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('[SW] Error al registrar Service Worker:', error);
+                    });
+            });
+        }
+
+        // Mejorar rendimiento: Preload crítico
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(() => {
+                // Precargar recursos no críticos
+                const link = document.createElement('link');
+                link.rel = 'prefetch';
+                link.href = '/app/reserve/page.html';
+                document.head.appendChild(link);
             });
         }
     </script>

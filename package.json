@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node backend-example.js",
     "dev": "node backend-example.js",
-    "verify": "node verificar-stripe.js"
+    "verify": "node verificar-stripe.js",
+    "test": "node test-server.js",
+    "http": "node server-http.js"
   },
   "keywords": [
     "stripe",

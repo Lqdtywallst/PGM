@@ -1,0 +1,62 @@
+# Prestige Goal Motion - Configuración Apache para Producción
+
+# Habilitar compresión
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
+
+# Cache de navegador
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType text/html "access plus 0 seconds"
+    ExpiresByType application/json "access plus 0 seconds"
+</IfModule>
+
+# Headers de seguridad
+<IfModule mod_headers.c>
+    # Prevenir clickjacking
+    Header always set X-Frame-Options "SAMEORIGIN"
+    
+    # XSS Protection
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Prevenir MIME type sniffing
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # Referrer Policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # Permissions Policy
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    
+    # Content Security Policy (ajustar según necesidades)
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https:; font-src 'self' https://cdnjs.cloudflare.com; connect-src 'self' https://api.stripe.com; frame-src https://js.stripe.com;"
+</IfModule>
+
+# Redirección HTTPS (descomentar en producción)
+# <IfModule mod_rewrite.c>
+#     RewriteEngine On
+#     RewriteCond %{HTTPS} off
+#     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# </IfModule>
+
+# Prevenir acceso a archivos sensibles
+<FilesMatch "\.(env|log|md)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Optimización de archivos estáticos
+<IfModule mod_mime.c>
+    AddType image/webp .webp
+    AddType image/avif .avif
+    AddType application/manifest+json .webmanifest
+</IfModule>
+

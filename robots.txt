@@ -1,0 +1,11 @@
+# Prestige Goal Motion - Robots.txt
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /app/api/
+Disallow: /*.json$
+Disallow: /node_modules/
+
+# Sitemap (actualizar con tu dominio real)
+Sitemap: https://prestigegoalmotion.com/sitemap.xml
+
