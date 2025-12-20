@@ -1857,6 +1857,457 @@
                 document.head.appendChild(link);
             });
         }
+
+        // Chat IA Widget
+        let chatOpen = false;
+        const chatWidget = document.createElement('div');
+        chatWidget.id = 'ai-chat-widget';
+        chatWidget.innerHTML = `
+            <div class="chat-button" id="chatButton" onclick="toggleChat()">
+                <i class="fas fa-comments"></i>
+                <span class="chat-badge">AI</span>
+            </div>
+            <div class="chat-window" id="chatWindow">
+                <div class="chat-header">
+                    <div class="chat-header-info">
+                        <i class="fas fa-robot" style="color: var(--gold); margin-right: 0.5rem;"></i>
+                        <div>
+                            <h3>AI Assistant</h3>
+                            <p>I'm here to help you with reservations</p>
+                        </div>
+                    </div>
+                    <button class="chat-close" onclick="toggleChat()" aria-label="Close chat">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot-message">
+                        <div class="message-content">
+                            <i class="fas fa-robot" style="color: var(--gold); margin-right: 0.5rem;"></i>
+                            <div>
+                                <p>Hello! 👋 I'm your AI assistant for Prestige Goal Motion.</p>
+                                <p>I can help you with:</p>
+                                <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+                                    <li>Vehicle reservations</li>
+                                    <li>Pricing information</li>
+                                    <li>Fleet details</li>
+                                    <li>Booking process</li>
+                                </ul>
+                                <p>How can I assist you today?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-container">
+                    <input type="text" id="chatInput" class="chat-input" placeholder="Type your message..." onkeypress="handleChatKeyPress(event)">
+                    <button class="chat-send" onclick="sendChatMessage()" aria-label="Send message">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="chat-quick-actions" id="chatQuickActions">
+                    <button class="quick-action-btn" onclick="sendQuickMessage('I want to make a reservation')">
+                        <i class="fas fa-calendar-check"></i> Make Reservation
+                    </button>
+                    <button class="quick-action-btn" onclick="sendQuickMessage('Show me available vehicles')">
+                        <i class="fas fa-car"></i> View Fleet
+                    </button>
+                    <button class="quick-action-btn" onclick="sendQuickMessage('What are your prices?')">
+                        <i class="fas fa-euro-sign"></i> Pricing
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(chatWidget);
+
+        // Agregar estilos del chat
+        const chatStyles = document.createElement('style');
+        chatStyles.textContent = `
+            #ai-chat-widget {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 10000;
+                font-family: 'Segoe UI', sans-serif;
+            }
+
+            .chat-button {
+                width: 60px;
+                height: 60px;
+                background: linear-gradient(135deg, var(--gold), #b8941f);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .chat-button:hover {
+                transform: scale(1.1);
+                box-shadow: 0 6px 30px rgba(212, 175, 55, 0.6);
+            }
+
+            .chat-button i {
+                font-size: 24px;
+                color: var(--black);
+            }
+
+            .chat-badge {
+                position: absolute;
+                top: -5px;
+                right: -5px;
+                background: #ef4444;
+                color: white;
+                font-size: 10px;
+                font-weight: bold;
+                padding: 2px 6px;
+                border-radius: 10px;
+                border: 2px solid var(--black);
+            }
+
+            .chat-window {
+                position: absolute;
+                bottom: 80px;
+                right: 0;
+                width: 380px;
+                max-width: calc(100vw - 40px);
+                height: 600px;
+                max-height: calc(100vh - 100px);
+                background: var(--darkgray);
+                border-radius: 20px;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+                border: 2px solid var(--gold);
+                display: none;
+                flex-direction: column;
+                overflow: hidden;
+            }
+
+            .chat-window.open {
+                display: flex;
+                animation: slideUp 0.3s ease;
+            }
+
+            @keyframes slideUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .chat-header {
+                background: linear-gradient(135deg, var(--gold), #b8941f);
+                padding: 1rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                color: var(--black);
+            }
+
+            .chat-header-info {
+                display: flex;
+                align-items: center;
+            }
+
+            .chat-header-info h3 {
+                margin: 0;
+                font-size: 1.1rem;
+                font-weight: bold;
+            }
+
+            .chat-header-info p {
+                margin: 0;
+                font-size: 0.85rem;
+                opacity: 0.8;
+            }
+
+            .chat-close {
+                background: transparent;
+                border: none;
+                color: var(--black);
+                font-size: 1.2rem;
+                cursor: pointer;
+                padding: 0.5rem;
+                border-radius: 50%;
+                transition: all 0.3s;
+            }
+
+            .chat-close:hover {
+                background: rgba(0, 0, 0, 0.1);
+            }
+
+            .chat-messages {
+                flex: 1;
+                overflow-y: auto;
+                padding: 1rem;
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .chat-messages::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .chat-messages::-webkit-scrollbar-track {
+                background: var(--black);
+            }
+
+            .chat-messages::-webkit-scrollbar-thumb {
+                background: var(--gold);
+                border-radius: 3px;
+            }
+
+            .message {
+                display: flex;
+                flex-direction: column;
+                max-width: 85%;
+                animation: fadeIn 0.3s ease;
+            }
+
+            .user-message {
+                align-self: flex-end;
+            }
+
+            .bot-message {
+                align-self: flex-start;
+            }
+
+            .message-content {
+                padding: 0.75rem 1rem;
+                border-radius: 15px;
+                display: flex;
+                align-items: flex-start;
+            }
+
+            .user-message .message-content {
+                background: var(--gold);
+                color: var(--black);
+                border-bottom-right-radius: 5px;
+            }
+
+            .bot-message .message-content {
+                background: rgba(212, 175, 55, 0.1);
+                color: white;
+                border: 1px solid rgba(212, 175, 55, 0.3);
+                border-bottom-left-radius: 5px;
+            }
+
+            .message-content p {
+                margin: 0.25rem 0;
+            }
+
+            .message-content ul {
+                margin: 0.5rem 0;
+            }
+
+            .chat-input-container {
+                padding: 1rem;
+                border-top: 1px solid rgba(212, 175, 55, 0.2);
+                display: flex;
+                gap: 0.5rem;
+            }
+
+            .chat-input {
+                flex: 1;
+                padding: 0.75rem;
+                background: var(--black);
+                border: 1px solid rgba(212, 175, 55, 0.3);
+                border-radius: 25px;
+                color: white;
+                font-size: 0.9rem;
+            }
+
+            .chat-input:focus {
+                outline: none;
+                border-color: var(--gold);
+                box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+            }
+
+            .chat-send {
+                width: 40px;
+                height: 40px;
+                background: var(--gold);
+                border: none;
+                border-radius: 50%;
+                color: var(--black);
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s;
+            }
+
+            .chat-send:hover {
+                transform: scale(1.1);
+                box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+            }
+
+            .chat-quick-actions {
+                padding: 0.75rem 1rem;
+                border-top: 1px solid rgba(212, 175, 55, 0.2);
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .quick-action-btn {
+                padding: 0.6rem 1rem;
+                background: rgba(212, 175, 55, 0.1);
+                border: 1px solid rgba(212, 175, 55, 0.3);
+                border-radius: 10px;
+                color: white;
+                cursor: pointer;
+                font-size: 0.85rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                transition: all 0.3s;
+            }
+
+            .quick-action-btn:hover {
+                background: rgba(212, 175, 55, 0.2);
+                border-color: var(--gold);
+                transform: translateX(5px);
+            }
+
+            .quick-action-btn i {
+                color: var(--gold);
+            }
+
+            .cta-button {
+                display: inline-block;
+                margin-top: 0.75rem;
+                padding: 0.6rem 1.2rem;
+                background: var(--gold);
+                color: var(--black);
+                text-decoration: none;
+                border-radius: 25px;
+                font-weight: bold;
+                font-size: 0.9rem;
+                transition: all 0.3s;
+            }
+
+            .cta-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+            }
+
+            @media (max-width: 768px) {
+                .chat-window {
+                    width: calc(100vw - 20px);
+                    height: calc(100vh - 100px);
+                    bottom: 70px;
+                    right: 10px;
+                }
+
+                .chat-button {
+                    width: 55px;
+                    height: 55px;
+                    bottom: 15px;
+                    right: 15px;
+                }
+            }
+        `;
+        document.head.appendChild(chatStyles);
+
+        // Funciones del chat
+        function toggleChat() {
+            chatOpen = !chatOpen;
+            const chatWindow = document.getElementById('chatWindow');
+            if (chatOpen) {
+                chatWindow.classList.add('open');
+                document.getElementById('chatInput').focus();
+            } else {
+                chatWindow.classList.remove('open');
+            }
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+
+        function sendQuickMessage(message) {
+            document.getElementById('chatInput').value = message;
+            sendChatMessage();
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            // Agregar mensaje del usuario
+            addMessage(message, 'user');
+            input.value = '';
+
+            // Simular respuesta de IA (aquí puedes integrar una API real)
+            setTimeout(() => {
+                const response = generateAIResponse(message);
+                addMessage(response.text, 'bot', response.cta);
+            }, 500);
+        }
+
+        function addMessage(text, type, cta = null) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}-message`;
+            
+            let ctaHtml = '';
+            if (cta) {
+                ctaHtml = `<a href="${cta.url}" class="cta-button">${cta.text}</a>`;
+            }
+
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    ${type === 'bot' ? '<i class="fas fa-robot" style="color: var(--gold); margin-right: 0.5rem;"></i>' : ''}
+                    <div>
+                        ${text.split('\n').map(p => `<p>${p}</p>`).join('')}
+                        ${ctaHtml}
+                    </div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function generateAIResponse(userMessage) {
+            const message = userMessage.toLowerCase();
+            let response = { text: '', cta: null };
+
+            // Detectar intención y responder
+            if (message.includes('reserv') || message.includes('book') || message.includes('rent')) {
+                response.text = `Great! I can help you make a reservation. 🚗\n\nOur booking process is simple:\n1. Select your vehicle\n2. Choose your dates\n3. Complete your information\n4. Secure payment with Stripe\n\nWould you like to start your reservation now?`;
+                response.cta = { url: '#reserva', text: 'Start Reservation →' };
+            } else if (message.includes('price') || message.includes('cost') || message.includes('€') || message.includes('euro')) {
+                response.text = `Our luxury vehicle rental prices start from:\n\n• Mercedes GLE 400D: From 400€/day\n• Mercedes GLE 53 AMG: From 500€/day\n• Mercedes G 63 AMG: From 950€/day\n• Porsche 992 GT3: From 1,000€/day\n• Lamborghini Urus Sport: From 1,649€/day\n• Lamborghini Huracán: From 1,500€/day\n• Ferrari 296 GTS: From 1,749€/day\n\nAll prices include insurance. Security deposits may apply for premium vehicles.`;
+                response.cta = { url: '#fleet', text: 'View All Vehicles →' };
+            } else if (message.includes('fleet') || message.includes('vehicle') || message.includes('car') || message.includes('available')) {
+                response.text = `We have an exclusive fleet of luxury vehicles! 🏎️\n\nOur collection includes:\n• Mercedes GLE series (400D, 53 AMG, Coupe)\n• Mercedes G 63 AMG\n• Lamborghini Huracán & Urus Sport\n• Ferrari 296 GTS\n• Porsche 992 GT3\n\nAll vehicles are maintained to the highest standards.`;
+                response.cta = { url: '#fleet', text: 'Explore Fleet →' };
+            } else if (message.includes('contact') || message.includes('phone') || message.includes('email') || message.includes('whatsapp')) {
+                response.text = `You can reach us through:\n\n📞 Phone: +34 680 162 813\n💬 WhatsApp: +34 680 162 813\n📧 Email: prestigegoalmotion@gmail.com\n📍 Address: Calle Cicón, 27, Spain\n\nWe're available 24/7!`;
+            } else if (message.includes('payment') || message.includes('stripe') || message.includes('pay')) {
+                response.text = `We accept secure payments through Stripe! 💳\n\nPayment methods:\n• Credit/Debit Cards\n• Apple Pay\n• Google Pay\n• Stripe Link\n\nAll transactions are secure and encrypted.`;
+                response.cta = { url: '#reserva', text: 'Start Booking →' };
+            } else if (message.includes('hello') || message.includes('hi') || message.includes('help')) {
+                response.text = `Hello! 👋 I'm here to help you with:\n\n✅ Vehicle reservations\n✅ Pricing information\n✅ Fleet details\n✅ Booking assistance\n✅ General inquiries\n\nWhat would you like to know?`;
+            } else {
+                response.text = `I understand you're asking about "${userMessage}".\n\nI can help you with:\n• Making a reservation\n• Vehicle information and pricing\n• Booking process\n• Contact information\n\nHow would you like to proceed?`;
+                response.cta = { url: '#reserva', text: 'Make Reservation →' };
+            }
+
+            return response;
+        }
     </script>
 </body>
 </html>
