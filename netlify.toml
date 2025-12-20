@@ -1,0 +1,12 @@
+[[redirects]]
+  from = "/reservas"
+  to = "/app/reserve/page.html"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/reservas/*"
+  to = "/app/reserve/page.html"
+  status = 301
+  force = true
+

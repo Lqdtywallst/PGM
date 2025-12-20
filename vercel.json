@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/reservas",
+      "destination": "/app/reserve/page.html",
+      "permanent": true
+    },
+    {
+      "source": "/reservas/",
+      "destination": "/app/reserve/page.html",
+      "permanent": true
+    }
+  ]
+}
+
