@@ -188,6 +188,14 @@ router.post('/', async (req, res) => {
             reservationData.total = diffDays * reservationData.pricePerDay;
         }
 
+        // Enviar email de notificación ANTES del pago
+        try {
+            await sendReservationNotificationEmail(reservationData, customerData);
+        } catch (emailError) {
+            console.warn('Error enviando email de notificación (no crítico):', emailError);
+            // No fallar la reserva si falla el email
+        }
+
         // Si viene amount, crear PaymentIntent con Stripe
         let paymentIntent = null;
         let customer = null;
