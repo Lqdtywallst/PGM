@@ -544,12 +544,25 @@
         const carName = urlParams.get('car');
         const price = urlParams.get('price');
         
+        console.log('[RESERVE PAGE] Parámetros recibidos:', { carName, price });
+        
         if (carName) selectedCar = decodeURIComponent(carName);
         if (price) pricePerDay = parseFloat(price);
-
+        
+        console.log('[RESERVE PAGE] Vehículo seleccionado:', selectedCar, 'Precio:', pricePerDay);
+        
         // Actualizar información del vehículo
-        document.getElementById('selectedCar').textContent = selectedCar;
-        document.getElementById('summaryPricePerDay').textContent = `€${pricePerDay}`;
+        const selectedCarElement = document.getElementById('selectedCar');
+        const summaryPriceElement = document.getElementById('summaryPricePerDay');
+        
+        if (selectedCarElement) {
+            selectedCarElement.textContent = selectedCar;
+        }
+        if (summaryPriceElement) {
+            summaryPriceElement.textContent = `€${pricePerDay}`;
+        }
+        
+        console.log('[RESERVE PAGE] Página inicializada correctamente');
         
         // Inicializar Stripe
         const STRIPE_PUBLISHABLE_KEY = window.STRIPE_CONFIG?.publishableKey || 'pk_live_51RsMXQ3DSCa2l71zZiMkmlBXXpLu1HF0Sy4N4xSsB1TvUWu6wJLlKR5z7HrCa0AIlWQjfZo4tL8d1qcxtgExNHS300EPCAtXti';

@@ -1,7 +1,7 @@
 {
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!app/).*)",
       "destination": "/index.html"
     }
   ],
@@ -38,11 +38,6 @@
     },
     {
       "source": "/nuestra-colección-exclusiva/",
-      "destination": "/#fleet",
-      "permanent": true
-    },
-    {
-      "source": "/:path*",
       "destination": "/#fleet",
       "permanent": true
     }
