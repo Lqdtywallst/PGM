@@ -23,6 +23,72 @@ const emailTransporter = nodemailer.createTransport({
     },
 });
 
+// Función para enviar email de notificación ANTES del pago
+async function sendReservationNotificationEmail(reservationData, customerData) {
+    const companyEmail = 'prestigegoalmotion@gmail.com';
+    
+    // Email de notificación para la empresa (reserva pendiente de pago)
+    const notificationEmailHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background: #0a0a0a; color: #d4af37; padding: 20px; text-align: center; }
+                .content { background: #f9f9f9; padding: 20px; margin-top: 20px; }
+                .info-row { margin: 10px 0; padding: 10px; background: white; border-left: 3px solid #d4af37; }
+                .label { font-weight: bold; color: #0a0a0a; }
+                .status { background: #ff9800; color: white; padding: 10px; text-align: center; font-weight: bold; margin: 20px 0; border-radius: 5px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🔔 Nueva Reserva Pendiente - Prestige Goal Motion</h1>
+                </div>
+                <div class="content">
+                    <div class="status">⏳ RESERVA PENDIENTE DE PAGO</div>
+                    <h2>Detalles de la Reserva</h2>
+                    <div class="info-row"><span class="label">Vehículo:</span> ${reservationData.car || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Fecha de inicio:</span> ${reservationData.startDate || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Fecha de fin:</span> ${reservationData.endDate || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Días:</span> ${reservationData.days || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Precio por día:</span> ${reservationData.pricePerDay || 'N/A'} €</div>
+                    <div class="info-row"><span class="label">Total:</span> ${reservationData.total || 'N/A'} €</div>
+                    ${reservationData.pickupLocation ? `<div class="info-row"><span class="label">Ubicación de recogida:</span> ${reservationData.pickupLocation}</div>` : ''}
+                    <h3>Datos del Cliente</h3>
+                    <div class="info-row"><span class="label">Nombre:</span> ${customerData.name || customerData.fullName || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Email:</span> ${customerData.email || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Teléfono:</span> ${customerData.phone || 'N/A'}</div>
+                    ${customerData.dni || customerData.passport ? `<div class="info-row"><span class="label">DNI/Passport:</span> ${customerData.dni || customerData.passport}</div>` : ''}
+                    ${customerData.address ? `<div class="info-row"><span class="label">Dirección:</span> ${customerData.address}</div>` : ''}
+                    ${customerData.city ? `<div class="info-row"><span class="label">Ciudad:</span> ${customerData.city}</div>` : ''}
+                    ${customerData.postalCode ? `<div class="info-row"><span class="label">Código Postal:</span> ${customerData.postalCode}</div>` : ''}
+                    ${customerData.country ? `<div class="info-row"><span class="label">País:</span> ${customerData.country}</div>` : ''}
+                    <p style="margin-top: 20px; color: #666; font-size: 0.9rem;">Esta reserva está pendiente de pago. El cliente procederá con el pago a continuación.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+    `;
+    
+    try {
+        await emailTransporter.sendMail({
+            from: EMAIL_CONFIG.user,
+            to: companyEmail,
+            subject: `Nueva Reserva Pendiente: ${reservationData.car || 'Vehículo'} - ${customerData.name || customerData.fullName || 'Cliente'}`,
+            html: notificationEmailHtml,
+        });
+        
+        return { success: true };
+    } catch (error) {
+        console.error('Error enviando email de notificación:', error);
+        return { success: false, error: error.message };
+    }
+}
+
 // Función para enviar email de confirmación
 async function sendReservationEmail(reservationData, customerData, paymentIntentId) {
     const companyEmail = 'prestigegoalmotion@gmail.com';
