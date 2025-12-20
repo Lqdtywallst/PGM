@@ -22,12 +22,17 @@
     },
     {
       "source": "/stock-disponible-a-la-venta",
-      "destination": "/#flota",
+      "destination": "/#fleet",
       "permanent": true
     },
     {
       "source": "/nuestra-colección-exclusiva",
-      "destination": "/#flota",
+      "destination": "/#fleet",
+      "permanent": true
+    },
+    {
+      "source": "/nuestra-colección-exclusiva/",
+      "destination": "/#fleet",
       "permanent": true
     }
   ]

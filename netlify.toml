@@ -24,13 +24,19 @@
 
 [[redirects]]
   from = "/stock-disponible-a-la-venta"
-  to = "/#flota"
+  to = "/#fleet"
   status = 301
   force = true
 
 [[redirects]]
   from = "/nuestra-colección-exclusiva"
-  to = "/#flota"
+  to = "/#fleet"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/nuestra-colección-exclusiva/*"
+  to = "/#fleet"
   status = 301
   force = true
 
