@@ -421,14 +421,14 @@
             </div>
             <div class="form-group">
                 <select id="country" name="country" class="input" required>
-                    <option value="Spain">Spain</option>
-                    <option value="France">France</option>
-                    <option value="Italy">Italy</option>
-                    <option value="Germany">Germany</option>
-                    <option value="United Kingdom">United Kingdom</option>
-                    <option value="United States">United States</option>
-                    <option value="United Arab Emirates">United Arab Emirates</option>
-                    <option value="Other">Other</option>
+                    <option value="ES">Spain</option>
+                    <option value="FR">France</option>
+                    <option value="IT">Italy</option>
+                    <option value="DE">Germany</option>
+                    <option value="GB">United Kingdom</option>
+                    <option value="US">United States</option>
+                    <option value="AE">United Arab Emirates</option>
+                    <option value="">Other</option>
                 </select>
             </div>
             <button onclick="nextStep()" class="btn">Continue to Dates →</button>
@@ -1118,7 +1118,7 @@
                                 'Content-Type': 'application/json',
                             },
                             body: JSON.stringify(reservationData),
-                            signal: AbortSignal.timeout(30000) // Timeout de 30 segundos
+                            signal: AbortSignal.timeout(60000) // Timeout de 60 segundos
                         });
                     } catch (fetchError) {
                         console.error('[PAYMENT] ❌ Error de conexión:', fetchError);

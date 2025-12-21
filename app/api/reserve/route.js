@@ -8,6 +8,31 @@ const nodemailer = require('nodemailer');
 
 const router = express.Router();
 
+// Mapeo de nombres de países a códigos ISO de 2 caracteres
+const countryNameToCode = {
+    'Spain': 'ES',
+    'France': 'FR',
+    'Italy': 'IT',
+    'Germany': 'DE',
+    'United Kingdom': 'GB',
+    'UK': 'GB',
+    'United States': 'US',
+    'USA': 'US',
+    'United Arab Emirates': 'AE',
+    'UAE': 'AE',
+};
+
+// Función para convertir nombre de país a código ISO
+function normalizeCountryCode(country) {
+    if (!country) return null;
+    // Si ya es un código ISO de 2 caracteres, devolverlo
+    if (country.length === 2 && /^[A-Z]{2}$/i.test(country)) {
+        return country.toUpperCase();
+    }
+    // Si es un nombre de país, convertirlo a código
+    return countryNameToCode[country] || country;
+}
+
 // Configuración de email
 const EMAIL_CONFIG = {
     service: process.env.EMAIL_SERVICE || 'gmail',
@@ -242,7 +267,7 @@ router.post('/', async (req, res) => {
             address: data.address,
             city: data.city,
             postalCode: data.postalCode,
-            country: data.country,
+            country: normalizeCountryCode(data.country), // Convertir a código ISO
         };
 
         const reservationData = data.reservationData || {
@@ -374,7 +399,7 @@ router.post('/', async (req, res) => {
                     currency: data.currency || 'eur',
                     customer: customer.id,
                     payment_method: data.paymentMethodId,
-                    confirmation_method: 'manual',
+                    confirmation_method: 'automatic',
                     confirm: false,
                     description: `Reserva: ${reservationData.car} - ${reservationData.days} días`,
                     metadata: {
@@ -397,12 +422,36 @@ router.post('/', async (req, res) => {
                     description: paymentIntentData.description
                 });
                 
-                paymentIntent = await stripe.paymentIntents.create(paymentIntentData);
-                console.log('[API] ✅ PaymentIntent creado:', {
-                    id: paymentIntent.id,
-                    status: paymentIntent.status,
-                    client_secret: paymentIntent.client_secret ? paymentIntent.client_secret.substring(0, 20) + '...' : null
-                });
+                try {
+                    paymentIntent = await stripe.paymentIntents.create(paymentIntentData);
+                    console.log('[API] ✅ PaymentIntent creado:', {
+                        id: paymentIntent.id,
+                        status: paymentIntent.status,
+                        client_secret: paymentIntent.client_secret ? paymentIntent.client_secret.substring(0, 20) + '...' : null
+                    });
+                } catch (paymentError) {
+                    // Si el error es por métodos de pago no activados (Apple Pay/Google Pay), intentar solo con métodos básicos
+                    const errorMessage = paymentError.message || paymentError.toString() || '';
+                    const isPaymentMethodError = errorMessage.includes('payment method type') || 
+                                                 errorMessage.includes('invalid') ||
+                                                 errorMessage.includes('apple_pay') ||
+                                                 errorMessage.includes('google_pay');
+                    
+                    if (isPaymentMethodError) {
+                        console.log('[API] ⚠️ Métodos de pago no disponibles, usando solo card y link...');
+                        console.log('[API] Error original:', errorMessage);
+                        try {
+                            paymentIntentData.payment_method_types = ['card', 'link'];
+                            paymentIntent = await stripe.paymentIntents.create(paymentIntentData);
+                            console.log('[API] ✅ PaymentIntent creado con métodos básicos');
+                        } catch (retryError) {
+                            console.error('[API] ❌ Error en segundo intento:', retryError);
+                            throw retryError;
+                        }
+                    } else {
+                        throw paymentError;
+                    }
+                }
             } catch (error) {
                 console.error('[API] ❌ Error creando PaymentIntent:', error);
                 console.error('[API] Error details:', {
@@ -419,19 +468,19 @@ router.post('/', async (req, res) => {
             console.log('[API] ⚠️ No se recibió amount, no se creará PaymentIntent');
         }
 
-        // Enviar emails de confirmación
-        console.log('[API] Enviando emails de confirmación...');
-        try {
-            const emailResult = await sendReservationEmail(
-                reservationData,
-                customerData,
-                paymentIntent?.id || null
-            );
-            console.log('[API] Resultado emails confirmación:', emailResult);
-        } catch (emailError) {
-            console.warn('[API] ⚠️ Error enviando emails (no crítico):', emailError);
+        // Enviar emails de confirmación de forma asíncrona (no bloquea la respuesta)
+        // No esperamos la respuesta para evitar timeouts
+        console.log('[API] Enviando emails de confirmación (asíncrono)...');
+        sendReservationEmail(
+            reservationData,
+            customerData,
+            paymentIntent?.id || null
+        ).then((emailResult) => {
+            console.log('[API] ✅ Emails enviados (asíncrono):', emailResult);
+        }).catch((emailError) => {
+            console.warn('[API] ⚠️ Error enviando emails (no crítico, asíncrono):', emailError);
             // No fallar la reserva si falla el email
-        }
+        });
 
         // Aquí puedes guardar en base de datos
         // Ejemplo:
