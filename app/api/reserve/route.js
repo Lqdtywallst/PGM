@@ -202,28 +202,67 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
     `;
     
     try {
+        console.log('[EMAIL] ========== INICIANDO ENVÍO DE EMAILS ==========');
+        console.log('[EMAIL] Configuración:', {
+            from: EMAIL_CONFIG.user,
+            service: EMAIL_CONFIG.service,
+            hasPassword: !!EMAIL_CONFIG.password
+        });
+        console.log('[EMAIL] Datos de reserva:', {
+            car: reservationData.car,
+            days: reservationData.days,
+            total: reservationData.total
+        });
+        console.log('[EMAIL] Datos del cliente:', {
+            name: customerData.name || customerData.fullName,
+            email: customerData.email,
+            hasEmail: !!customerData.email
+        });
+        
         // Enviar email a la empresa
-        await emailTransporter.sendMail({
+        console.log('[EMAIL] Enviando email a la empresa:', companyEmail);
+        const companyEmailResult = await emailTransporter.sendMail({
             from: EMAIL_CONFIG.user,
             to: companyEmail,
             subject: `Nueva Reserva: ${reservationData.car || 'Vehículo'} - ${customerData.name || customerData.fullName || 'Cliente'}`,
             html: companyEmailHtml,
         });
+        console.log('[EMAIL] ✅ Email a empresa enviado:', {
+            messageId: companyEmailResult.messageId,
+            accepted: companyEmailResult.accepted,
+            rejected: companyEmailResult.rejected
+        });
         
         // Enviar email al cliente
         if (customerData.email) {
-            await emailTransporter.sendMail({
+            console.log('[EMAIL] Enviando email al cliente:', customerData.email);
+            const customerEmailResult = await emailTransporter.sendMail({
                 from: EMAIL_CONFIG.user,
                 to: customerData.email,
                 subject: `Reserva Confirmada - Prestige Goal Motion`,
                 html: customerEmailHtml,
                 replyTo: companyEmail,
             });
+            console.log('[EMAIL] ✅ Email al cliente enviado:', {
+                messageId: customerEmailResult.messageId,
+                accepted: customerEmailResult.accepted,
+                rejected: customerEmailResult.rejected
+            });
+        } else {
+            console.warn('[EMAIL] ⚠️ No se envió email al cliente: no hay email en customerData');
         }
         
+        console.log('[EMAIL] ✅ Todos los emails enviados correctamente');
         return { success: true };
     } catch (error) {
-        console.error('Error enviando emails:', error);
+        console.error('[EMAIL] ❌ ERROR ENVIANDO EMAILS:', error);
+        console.error('[EMAIL] Error details:', {
+            message: error.message,
+            code: error.code,
+            command: error.command,
+            response: error.response,
+            responseCode: error.responseCode
+        });
         return { success: false, error: error.message };
     }
 }
@@ -600,18 +639,30 @@ router.post('/confirm', async (req, res) => {
             }
             
             // Enviar emails de confirmación
+            console.log('[API CONFIRM] Llamando a sendReservationEmail con datos:', {
+                reservationData: finalReservationData,
+                customerData: {
+                    name: finalCustomerData.name || finalCustomerData.fullName,
+                    email: finalCustomerData.email,
+                    hasEmail: !!finalCustomerData.email
+                },
+                paymentIntentId: paymentIntentId
+            });
+            
             const emailResult = await sendReservationEmail(
                 finalReservationData,
                 finalCustomerData,
                 paymentIntentId
             );
 
+            console.log('[API CONFIRM] Resultado del envío de emails:', emailResult);
             console.log('[API CONFIRM] ✅ Confirmación completada');
             return res.json({
                 success: true,
                 paymentIntentId: paymentIntent.id,
                 status: paymentIntent.status,
                 emailSent: emailResult.success,
+                emailError: emailResult.error || null,
             });
         } else {
             console.log('[API CONFIRM] ⚠️ Pago no completado, estado:', paymentIntent.status);

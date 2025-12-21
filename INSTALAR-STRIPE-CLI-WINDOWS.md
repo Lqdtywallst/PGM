@@ -99,3 +99,4 @@ Esto te dará un webhook secret que empieza con `whsec_...`
 - El webhook secret de desarrollo local cambia cada vez que reinicias `stripe listen`
 
 
+
