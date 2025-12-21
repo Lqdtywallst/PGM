@@ -1219,22 +1219,51 @@
                     console.log('[PAYMENT] ✅ Pago exitoso! PaymentIntent ID:', paymentIntent.id);
                     showMessage('Payment successful! Processing reservation...', 'success');
                     
-                    // Confirmar la reserva en el backend
+                    // Confirmar la reserva en el backend y enviar emails
                     try {
                         console.log('[PAYMENT] Confirmando reserva en el backend...');
                         const BACKEND_URL = window.BACKEND_URL || window.STRIPE_CONFIG?.backendUrl || 'http://localhost:3000';
+                        
+                        // Preparar datos completos para el email de confirmación
+                        const confirmData = {
+                            paymentIntentId: paymentIntent.id,
+                            reservationData: {
+                                car: selectedCar,
+                                pricePerDay: pricePerDay,
+                                days: diffDays,
+                                startDate: formData.startDate.split('T')[0],
+                                endDate: formData.endDate.split('T')[0],
+                                pickupLocation: formData.pickupLocation,
+                                total: total.toFixed(2) + ' €'
+                            },
+                            customerData: {
+                                name: formData.fullName,
+                                email: formData.email,
+                                phone: formData.phone,
+                                dni: formData.passport,
+                                address: formData.address,
+                                city: formData.city,
+                                postalCode: formData.postalCode,
+                                country: formData.country,
+                            }
+                        };
+                        
                         const confirmResponse = await fetch(`${BACKEND_URL}/api/reserve/confirm`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                             },
-                            body: JSON.stringify({
-                                paymentIntentId: paymentIntent.id,
-                            }),
+                            body: JSON.stringify(confirmData),
                         });
                         
-                        const confirmData = await confirmResponse.json();
-                        console.log('[PAYMENT] Respuesta de confirmación:', confirmData);
+                        const confirmResult = await confirmResponse.json();
+                        console.log('[PAYMENT] Respuesta de confirmación:', confirmResult);
+                        
+                        if (confirmResult.emailSent) {
+                            console.log('[PAYMENT] ✅ Email de confirmación enviado');
+                        } else {
+                            console.warn('[PAYMENT] ⚠️ Email de confirmación no enviado');
+                        }
                     } catch (confirmError) {
                         console.warn('[PAYMENT] ⚠️ Error confirmando reserva (no crítico):', confirmError);
                         // No fallar si la confirmación falla, el pago ya fue exitoso

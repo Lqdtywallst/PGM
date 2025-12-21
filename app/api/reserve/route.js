@@ -191,7 +191,8 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
                     <div class="info-row"><span class="label">Fecha de inicio:</span> ${reservationData.startDate || 'N/A'}</div>
                     <div class="info-row"><span class="label">Fecha de fin:</span> ${reservationData.endDate || 'N/A'}</div>
                     <div class="info-row"><span class="label">Días:</span> ${reservationData.days || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Total:</span> ${reservationData.total || 'N/A'} €</div>
+                    <div class="info-row"><span class="label">Precio por día:</span> ${reservationData.pricePerDay || 'N/A'} €</div>
+                    <div class="info-row"><span class="label">Total:</span> ${reservationData.total || (reservationData.pricePerDay && reservationData.days ? (parseFloat(reservationData.pricePerDay) * parseInt(reservationData.days)).toFixed(2) + ' €' : 'N/A')}</div>
                     ${reservationData.pickupLocation ? `<div class="info-row"><span class="label">Ubicación de recogida:</span> ${reservationData.pickupLocation}</div>` : ''}
                     <p style="margin-top: 20px;">Gracias por confiar en Prestige Goal Motion.</p>
                 </div>
@@ -557,20 +558,51 @@ router.post('/confirm', async (req, res) => {
 
         if (paymentIntent.status === 'succeeded') {
             console.log('[API CONFIRM] ✅ Pago exitoso, enviando emails...');
-            // Enviar emails de confirmación
-            const emailResult = await sendReservationEmail(
-                reservationData || {
-                    car: paymentIntent.metadata.car,
-                    days: parseInt(paymentIntent.metadata.days),
-                    startDate: paymentIntent.metadata.startDate,
-                    endDate: paymentIntent.metadata.endDate,
-                    pricePerDay: parseFloat(paymentIntent.metadata.pricePerDay),
-                    pickupLocation: paymentIntent.metadata.pickupLocation,
-                },
-                customerData || {
+            
+            // Preparar datos de reserva (usar datos enviados o metadatos del PaymentIntent)
+            let finalReservationData = reservationData || {
+                car: paymentIntent.metadata.car,
+                days: parseInt(paymentIntent.metadata.days) || 1,
+                startDate: paymentIntent.metadata.startDate,
+                endDate: paymentIntent.metadata.endDate,
+                pricePerDay: parseFloat(paymentIntent.metadata.pricePerDay) || 0,
+                pickupLocation: paymentIntent.metadata.pickupLocation,
+            };
+            
+            // Calcular total si no viene en los datos
+            if (!finalReservationData.total && finalReservationData.pricePerDay && finalReservationData.days) {
+                const calculatedTotal = (parseFloat(finalReservationData.pricePerDay) * parseInt(finalReservationData.days)).toFixed(2);
+                finalReservationData.total = calculatedTotal + ' €';
+            }
+            
+            // Preparar datos del cliente (usar datos enviados o metadatos del PaymentIntent)
+            let finalCustomerData = customerData;
+            if (!finalCustomerData) {
+                finalCustomerData = {
                     name: paymentIntent.metadata.customerName,
                     email: paymentIntent.metadata.customerEmail,
-                },
+                };
+                
+                // Intentar obtener datos completos del cliente de Stripe
+                try {
+                    if (paymentIntent.customer) {
+                        const customer = await stripe.customers.retrieve(paymentIntent.customer);
+                        finalCustomerData.phone = customer.phone || '';
+                        finalCustomerData.address = customer.address?.line1 || '';
+                        finalCustomerData.city = customer.address?.city || '';
+                        finalCustomerData.postalCode = customer.address?.postal_code || '';
+                        finalCustomerData.country = customer.address?.country || '';
+                        finalCustomerData.dni = customer.metadata?.dni || '';
+                    }
+                } catch (customerError) {
+                    console.warn('[API CONFIRM] ⚠️ Error obteniendo datos del cliente:', customerError);
+                }
+            }
+            
+            // Enviar emails de confirmación
+            const emailResult = await sendReservationEmail(
+                finalReservationData,
+                finalCustomerData,
                 paymentIntentId
             );
 
