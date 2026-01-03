@@ -61,15 +61,20 @@ const emailTransporter = nodemailer.createTransport({
     maxMessages: 3
 });
 
-// Verificar conexión con el servidor de email
+// Verificar conexión con el servidor de email (no bloqueante)
+// Hacer esto de forma asíncrona para no bloquear el inicio del servidor
 emailTransporter.verify(function(error, success) {
     if (error) {
         console.error('❌ Error al verificar conexión con servidor de email:', error.message);
         console.error('   Verifica tu configuración en .env (EMAIL_USER y EMAIL_APP_PASSWORD)');
+        console.error('   El servidor continuará funcionando, pero los emails pueden fallar');
     } else {
         console.log('✅ Servidor de email configurado correctamente');
         console.log('   Email de envío:', EMAIL_CONFIG.user);
     }
+}).catch(err => {
+    console.error('⚠️ Error al verificar email (no crítico):', err.message);
+    console.error('   El servidor continuará funcionando');
 });
 
 // Función para enviar email de confirmación de reserva
@@ -906,13 +911,27 @@ app.listen(PORT, '0.0.0.0', () => {
     process.exit(1);
 });
 
-// Manejar errores no capturados
+// Manejar errores no capturados (pero no terminar el proceso)
 process.on('uncaughtException', (err) => {
     console.error('❌ Error no capturado:', err);
+    console.error('   Stack:', err.stack);
+    // NO hacer process.exit() para que Railway pueda manejar el error
 });
 
 process.on('unhandledRejection', (reason, promise) => {
     console.error('❌ Promesa rechazada no manejada:', reason);
+    // NO hacer process.exit() para que Railway pueda manejar el error
+});
+
+// Mantener el proceso vivo
+process.on('SIGTERM', () => {
+    console.log('⚠️ SIGTERM recibido, cerrando servidor...');
+    process.exit(0);
+});
+
+process.on('SIGINT', () => {
+    console.log('⚠️ SIGINT recibido, cerrando servidor...');
+    process.exit(0);
 });
 
 
