@@ -889,7 +889,18 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log(`📬 Endpoint de contacto: http://0.0.0.0:${PORT}/api/contact`);
     console.log(`💳 Endpoint de pagos: http://0.0.0.0:${PORT}/api/create-payment-intent`);
     console.log('='.repeat(60));
-    console.log('✅ Servidor listo para recibir peticiones');
+    
+    // Verificar configuración de email
+    if (!EMAIL_CONFIG.password) {
+        console.log('\n⚠️  ADVERTENCIA: Email no configurado');
+        console.log('   Configura EMAIL_APP_PASSWORD en tu archivo .env');
+        console.log('   Ver: CONFIGURACION-EMAIL.md');
+    } else {
+        console.log('✅ Email configurado correctamente');
+    }
+    
+    console.log('='.repeat(60));
+    console.log('✅ Servidor listo para recibir peticiones\n');
 }).on('error', (err) => {
     console.error('❌ Error al iniciar el servidor:', err);
     process.exit(1);
@@ -902,17 +913,6 @@ process.on('uncaughtException', (err) => {
 
 process.on('unhandledRejection', (reason, promise) => {
     console.error('❌ Promesa rechazada no manejada:', reason);
-});
-    
-    if (!EMAIL_CONFIG.password) {
-        console.log('\n⚠️  ADVERTENCIA: Email no configurado');
-        console.log('   Configura EMAIL_APP_PASSWORD en tu archivo .env');
-        console.log('   Ver: CONFIGURACION-EMAIL.md');
-    } else {
-        console.log('✅ Email configurado correctamente');
-    }
-    
-    console.log('='.repeat(60) + '\n');
 });
 
 
