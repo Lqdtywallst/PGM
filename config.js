@@ -4,25 +4,38 @@
 // IMPORTANTE: Reemplaza estas claves con tus claves reales de Stripe
 // Obtén tus claves en: https://dashboard.stripe.com/apikeys
 
-const STRIPE_CONFIG = {
-    // Clave pública de Stripe (Publishable Key)
-    // Para pruebas (Test Mode): pk_test_...
-    // Para producción (Live Mode): pk_live_...
-    // ✅ Clave pública configurada (Modo Live/Producción)
-    publishableKey: 'pk_live_51RsMXQ3DSCa2l71zZiMkmlBXXpLu1HF0Sy4N4xSsB1TvUWu6wJLlKR5z7HrCa0AIlWQjfZo4tL8d1qcxtgExNHS300EPCAtXti', 
-    
-    // URL de tu backend para procesar pagos
-    // Desarrollo local: 'http://localhost:3000'
-    // Producción: 'https://api.tudominio.com'
-    // ⚠️ CONFIGURA LA URL CORRECTA DE TU BACKEND
+// ============================================
+// CONFIGURACIÓN DE ENTORNO
+// ============================================
+// Cambia 'development' a 'production' cuando despliegues
+const ENVIRONMENT = 'production'; // 'development' | 'production'
+
+// ============================================
+// CONFIGURACIÓN DE DESARROLLO
+// ============================================
+const DEV_CONFIG = {
+    publishableKey: 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', // Clave de PRUEBA
     backendUrl: 'http://localhost:3000',
-    
-    // Moneda para los pagos
     currency: 'eur',
-    
-    // País por defecto
     country: 'ES'
 };
+
+// ============================================
+// CONFIGURACIÓN DE PRODUCCIÓN (RAILWAY)
+// ============================================
+// ✅ URL de Railway configurada
+const PROD_CONFIG = {
+    publishableKey: 'pk_live_51RsMXQ3DSCa2l71zZiMkmlBXXpLu1HF0Sy4N4xSsB1TvUWu6wJLlKR5z7HrCa0AIlWQjfZo4tL8d1qcxtgExNHS300EPCAtXti', // Clave LIVE
+    backendUrl: 'https://pgm-production.up.railway.app', // ✅ URL de Railway configurada
+    currency: 'eur',
+    country: 'ES'
+};
+
+// ============================================
+// CONFIGURACIÓN FINAL
+// ============================================
+// Se selecciona automáticamente según ENVIRONMENT
+const STRIPE_CONFIG = ENVIRONMENT === 'production' ? PROD_CONFIG : DEV_CONFIG;
 
 // Exportar configuración para uso en Node.js
 if (typeof module !== 'undefined' && module.exports) {
