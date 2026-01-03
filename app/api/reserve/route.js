@@ -3,7 +3,14 @@
 
 require('dotenv').config();
 const express = require('express');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+// Verificar que STRIPE_SECRET_KEY esté configurada
+if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('tu_clave')) {
+    console.error('[RESERVE ROUTE] ❌ ERROR: STRIPE_SECRET_KEY no está configurada');
+    console.error('[RESERVE ROUTE] El módulo se cargará pero las funciones de pago no funcionarán');
+}
+
+const stripe = process.env.STRIPE_SECRET_KEY ? require('stripe')(process.env.STRIPE_SECRET_KEY) : null;
 const nodemailer = require('nodemailer');
 
 const router = express.Router();
@@ -41,11 +48,18 @@ const EMAIL_CONFIG = {
 };
 
 const emailTransporter = nodemailer.createTransport({
-    service: EMAIL_CONFIG.service,
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // true para 465, false para otros puertos
+    requireTLS: true,
     auth: {
         user: EMAIL_CONFIG.user,
         pass: EMAIL_CONFIG.password,
     },
+    tls: {
+        // No fallar en certificados inválidos
+        rejectUnauthorized: false
+    }
 });
 
 // Función para enviar email de notificación ANTES del pago
