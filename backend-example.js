@@ -72,9 +72,6 @@ emailTransporter.verify(function(error, success) {
         console.log('✅ Servidor de email configurado correctamente');
         console.log('   Email de envío:', EMAIL_CONFIG.user);
     }
-}).catch(err => {
-    console.error('⚠️ Error al verificar email (no crítico):', err.message);
-    console.error('   El servidor continuará funcionando');
 });
 
 // Función para enviar email de confirmación de reserva
