@@ -40,11 +40,25 @@ if (!EMAIL_CONFIG.password) {
 }
 
 const emailTransporter = nodemailer.createTransport({
-    service: EMAIL_CONFIG.service,
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // true para 465, false para otros puertos
+    requireTLS: true,
     auth: {
         user: EMAIL_CONFIG.user,
         pass: EMAIL_CONFIG.password,
     },
+    tls: {
+        // No fallar en certificados inválidos
+        rejectUnauthorized: false
+    },
+    connectionTimeout: 10000, // 10 segundos para establecer conexión
+    greetingTimeout: 10000, // 10 segundos para saludo SMTP
+    socketTimeout: 10000, // 10 segundos para operaciones de socket
+    // Reintentar conexión si falla
+    pool: false,
+    maxConnections: 1,
+    maxMessages: 3
 });
 
 // Verificar conexión con el servidor de email
@@ -619,13 +633,21 @@ async function sendContactEmail(contactData) {
         return true;
     } catch (error) {
         console.error('❌ Error al enviar email de contacto:', error.message);
-        console.error('   Detalles:', error);
+        console.error('   Código de error:', error.code);
+        console.error('   Detalles completos:', error);
         
         // Proporcionar mensajes de error más específicos
         if (error.code === 'EAUTH') {
             console.error('   Problema de autenticación. Verifica EMAIL_USER y EMAIL_APP_PASSWORD');
-        } else if (error.code === 'ECONNECTION') {
-            console.error('   No se pudo conectar al servidor de email');
+        } else if (error.code === 'ECONNECTION' || error.code === 'ETIMEDOUT' || error.message.includes('ETIMEDOUT')) {
+            console.error('   ⚠️ Timeout al conectar con el servidor de email');
+            console.error('   Posibles causas:');
+            console.error('   1. Firewall bloqueando la conexión SMTP (puerto 587)');
+            console.error('   2. Problemas de red o conexión a internet');
+            console.error('   3. Gmail bloqueando la conexión (verifica que la App Password sea correcta)');
+            console.error('   4. El servidor SMTP de Gmail está temporalmente no disponible');
+        } else if (error.code === 'ESOCKET' || error.message.includes('socket')) {
+            console.error('   Error de socket. Verifica tu conexión a internet');
         }
         
         throw error; // Re-lanzar para que el endpoint pueda manejarlo
@@ -681,8 +703,14 @@ app.post('/api/contact', async (req, res) => {
             
             if (emailError.message.includes('EAUTH') || emailError.message.includes('autenticación')) {
                 errorMessage += 'Error de configuración del servidor de email.';
-            } else if (emailError.message.includes('ECONNECTION')) {
-                errorMessage += 'No se pudo conectar con el servidor de email.';
+            } else if (emailError.message.includes('ECONNECTION') || 
+                       emailError.message.includes('ETIMEDOUT') || 
+                       emailError.code === 'ETIMEDOUT' ||
+                       emailError.code === 'ECONNECTION') {
+                errorMessage += 'No se pudo conectar con el servidor de email. ';
+                errorMessage += 'Por favor, verifica tu conexión a internet e intenta de nuevo.';
+            } else if (emailError.message.includes('ESOCKET') || emailError.message.includes('socket')) {
+                errorMessage += 'Error de conexión. Por favor, intenta de nuevo.';
             } else {
                 errorMessage += emailError.message || 'Por favor, intenta de nuevo más tarde.';
             }
@@ -849,16 +877,17 @@ app.get('/api/test', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+// Escuchar en 0.0.0.0 para aceptar conexiones externas (necesario para Railway)
+app.listen(PORT, '0.0.0.0', () => {
     console.log('\n' + '='.repeat(60));
     console.log('🚀 SERVIDOR PRESTIGE GOAL MOTION');
     console.log('='.repeat(60));
     console.log(`✅ Servidor corriendo en puerto ${PORT}`);
     console.log(`📧 Email configurado: ${EMAIL_CONFIG.user}`);
     console.log(`🔧 Modo: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🌐 URL: http://localhost:${PORT}`);
-    console.log(`📬 Endpoint de contacto: http://localhost:${PORT}/api/contact`);
-    console.log(`💳 Endpoint de pagos: http://localhost:${PORT}/api/create-payment-intent`);
+    console.log(`🌐 URL: http://0.0.0.0:${PORT}`);
+    console.log(`📬 Endpoint de contacto: http://0.0.0.0:${PORT}/api/contact`);
+    console.log(`💳 Endpoint de pagos: http://0.0.0.0:${PORT}/api/create-payment-intent`);
     
     if (!EMAIL_CONFIG.password) {
         console.log('\n⚠️  ADVERTENCIA: Email no configurado');
