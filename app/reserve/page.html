@@ -1111,19 +1111,40 @@
                     });
 
                     let response;
+                    const startTime = Date.now();
                     try {
+                        console.log('[PAYMENT] Iniciando petición al servidor...', {
+                            url: `${BACKEND_URL}/api/reserve`,
+                            timestamp: new Date().toISOString()
+                        });
+                        
+                        // Usar AbortController para mejor control del timeout
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => {
+                            controller.abort();
+                            const elapsed = Date.now() - startTime;
+                            console.error(`[PAYMENT] ❌ Timeout después de ${elapsed}ms (180 segundos)`);
+                        }, 180000); // 3 minutos
+                        
                         response = await fetch(`${BACKEND_URL}/api/reserve`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                             },
                             body: JSON.stringify(reservationData),
-                            signal: AbortSignal.timeout(120000) // Timeout de 120 segundos (2 minutos)
+                            signal: controller.signal
                         });
+                        
+                        clearTimeout(timeoutId);
+                        const elapsed = Date.now() - startTime;
+                        console.log(`[PAYMENT] ✅ Respuesta recibida en ${elapsed}ms`);
                     } catch (fetchError) {
+                        const elapsed = Date.now() - startTime;
                         console.error('[PAYMENT] ❌ Error de conexión:', fetchError);
-                        if (fetchError.name === 'AbortError') {
-                            throw new Error('Timeout: El servidor no respondió a tiempo. Verifica que el servidor esté corriendo en ' + BACKEND_URL);
+                        console.error(`[PAYMENT] Tiempo transcurrido: ${elapsed}ms`);
+                        
+                        if (fetchError.name === 'AbortError' || fetchError.message.includes('timeout') || fetchError.message.includes('timed out')) {
+                            throw new Error(`Timeout: El servidor no respondió después de ${Math.round(elapsed/1000)} segundos. Esto puede deberse a:\n1. El servidor está sobrecargado\n2. Problemas de red\n3. Stripe está tardando mucho en responder\n\nIntenta nuevamente o verifica los logs del servidor en Railway.`);
                         } else if (fetchError.message.includes('Failed to fetch') || fetchError.message.includes('NetworkError')) {
                             throw new Error('Error de conexión: No se pudo conectar al servidor. Verifica que el servidor esté corriendo en ' + BACKEND_URL);
                         } else {

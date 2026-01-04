@@ -354,15 +354,16 @@ router.post('/', async (req, res) => {
             });
         }
 
-        // Enviar email de notificación ANTES del pago
-        console.log('[API] Enviando email de notificación...');
-        try {
-            const emailResult = await sendReservationNotificationEmail(reservationData, customerData);
-            console.log('[API] Resultado email notificación:', emailResult);
-        } catch (emailError) {
-            console.warn('[API] ⚠️ Error enviando email de notificación (no crítico):', emailError);
-            // No fallar la reserva si falla el email
-        }
+        // Enviar email de notificación ANTES del pago (asíncrono, no bloquea)
+        console.log('[API] Enviando email de notificación (asíncrono)...');
+        sendReservationNotificationEmail(reservationData, customerData)
+            .then((emailResult) => {
+                console.log('[API] ✅ Email de notificación enviado (asíncrono):', emailResult);
+            })
+            .catch((emailError) => {
+                console.warn('[API] ⚠️ Error enviando email de notificación (no crítico, asíncrono):', emailError);
+                // No fallar la reserva si falla el email
+            });
 
         // Si viene amount, crear PaymentIntent con Stripe
         let paymentIntent = null;
