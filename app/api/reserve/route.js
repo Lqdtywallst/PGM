@@ -665,33 +665,40 @@ router.post('/confirm', async (req, res) => {
             }
             
             // Enviar emails de confirmación
-            // EMAIL DESHABILITADO - Comentado por solicitud del usuario
-            // console.log('[API CONFIRM] Llamando a sendReservationEmail con datos:', {
-            //     reservationData: finalReservationData,
-            //     customerData: {
-            //         name: finalCustomerData.name || finalCustomerData.fullName,
-            //         email: finalCustomerData.email,
-            //         hasEmail: !!finalCustomerData.email
-            //     },
-            //     paymentIntentId: paymentIntentId
-            // });
+            console.log('[API CONFIRM] Enviando emails de confirmación...');
+            console.log('[API CONFIRM] Llamando a sendReservationEmail con datos:', {
+                reservationData: finalReservationData,
+                customerData: {
+                    name: finalCustomerData.name || finalCustomerData.fullName,
+                    email: finalCustomerData.email,
+                    hasEmail: !!finalCustomerData.email
+                },
+                paymentIntentId: paymentIntentId
+            });
             
-            // const emailResult = await sendReservationEmail(
-            //     finalReservationData,
-            //     finalCustomerData,
-            //     paymentIntentId
-            // );
-
-            // console.log('[API CONFIRM] Resultado del envío de emails:', emailResult);
-            console.log('[API CONFIRM] ℹ️ Notificación de email deshabilitada');
+            let emailResult = null;
+            let emailError = null;
+            try {
+                emailResult = await sendReservationEmail(
+                    finalReservationData,
+                    finalCustomerData,
+                    paymentIntentId
+                );
+                console.log('[API CONFIRM] ✅ Resultado del envío de emails:', emailResult);
+            } catch (emailErr) {
+                emailError = emailErr.message || emailErr.toString();
+                console.error('[API CONFIRM] ❌ Error enviando emails:', emailError);
+                // No fallar la confirmación si falla el email, el pago ya fue exitoso
+            }
+            
             console.log('[API CONFIRM] ✅ Confirmación completada');
             return res.json({
                 success: true,
                 paymentIntentId: paymentIntent.id,
                 status: paymentIntent.status,
-                emailSent: false,
-                emailError: null,
-                message: 'Email notifications disabled'
+                emailSent: emailResult?.success || false,
+                emailError: emailError,
+                message: emailResult?.success ? 'Reservation confirmed and emails sent' : (emailError ? 'Reservation confirmed but email failed' : 'Reservation confirmed')
             });
         } else {
             console.log('[API CONFIRM] ⚠️ Pago no completado, estado:', paymentIntent.status);

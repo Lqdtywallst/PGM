@@ -1415,8 +1415,8 @@
                 <img src="https://www.km77.com/images/medium/4/6/3/5/mercedes-amg-gle-63-s-coupe-2023-lateral-frontal.364635.jpg" alt="Mercedes GLE 400D - Luxury Diesel SUV" loading="lazy" width="350" height="250" decoding="async">
                 <div class="car-info">
                     <h3>Mercedes GLE 400D</h3>
-                    <div class="price" data-i18n="fleet.price_from" data-price="1">From 1 € / day</div>
-                    <a href="/app/reserve/page.html?car=Mercedes GLE 400D&price=1" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
+                    <div class="price" data-i18n="fleet.price_from" data-price="400">From 400 € / day</div>
+                    <a href="/app/reserve/page.html?car=Mercedes GLE 400D&price=400" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
                     <div class="contact-buttons">
                         <a href="tel:+34680162813" class="btn-contact">
                             <i class="fas fa-phone"></i>
@@ -2647,7 +2647,7 @@
                 response.text = `Great! I can help you make a reservation. 🚗\n\nOur booking process is simple:\n1. Select your vehicle\n2. Choose your dates\n3. Complete your information\n4. Secure payment with Stripe\n\nWould you like to start your reservation now?`;
                 response.cta = { url: '#reserva', text: 'Start Reservation →' };
             } else if (message.includes('price') || message.includes('cost') || message.includes('€') || message.includes('euro')) {
-                response.text = `Our luxury vehicle rental prices start from:\n\n• Mercedes GLE 400D: From 1€/day\n• Mercedes GLE 53 AMG: From 500€/day\n• Mercedes G 63 AMG: From 950€/day\n• Porsche 992 GT3: From 1,000€/day\n• Lamborghini Urus Sport: From 1,649€/day\n• Lamborghini Huracán: From 1,500€/day\n• Ferrari 296 GTS: From 1,749€/day\n\nAll prices include insurance. Security deposits may apply for premium vehicles.`;
+                response.text = `Our luxury vehicle rental prices start from:\n\n• Mercedes GLE 400D: From 400€/day\n• Mercedes GLE 53 AMG: From 500€/day\n• Mercedes G 63 AMG: From 950€/day\n• Porsche 992 GT3: From 1,000€/day\n• Lamborghini Urus Sport: From 1,649€/day\n• Lamborghini Huracán: From 1,500€/day\n• Ferrari 296 GTS: From 1,749€/day\n\nAll prices include insurance. Security deposits may apply for premium vehicles.`;
                 response.cta = { url: '#fleet', text: 'View All Vehicles →' };
             } else if (message.includes('fleet') || message.includes('vehicle') || message.includes('car') || message.includes('available')) {
                 response.text = `We have an exclusive fleet of luxury vehicles! 🏎️\n\nOur collection includes:\n• Mercedes GLE series (400D, 53 AMG, Coupe)\n• Mercedes G 63 AMG\n• Lamborghini Huracán & Urus Sport\n• Ferrari 296 GTS\n• Porsche 992 GT3\n\nAll vehicles are maintained to the highest standards.`;
