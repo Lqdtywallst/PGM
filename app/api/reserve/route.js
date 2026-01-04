@@ -460,7 +460,6 @@ router.post('/', async (req, res) => {
                     amount: Math.round(data.amount),
                     currency: data.currency || 'eur',
                     customer: customer.id,
-                    payment_method: data.paymentMethodId,
                     confirmation_method: 'automatic',
                     confirm: false,
                     description: `Reserva: ${reservationData.car} - ${reservationData.days} días`,
