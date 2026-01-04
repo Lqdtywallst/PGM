@@ -1415,8 +1415,8 @@
                 <img src="https://www.km77.com/images/medium/4/6/3/5/mercedes-amg-gle-63-s-coupe-2023-lateral-frontal.364635.jpg" alt="Mercedes GLE 400D - Luxury Diesel SUV" loading="lazy" width="350" height="250" decoding="async">
                 <div class="car-info">
                     <h3>Mercedes GLE 400D</h3>
-                    <div class="price" data-i18n="fleet.price_from" data-price="400">From 400 € / day</div>
-                    <a href="/app/reserve/page.html?car=Mercedes GLE 400D&price=400" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
+                    <div class="price" data-i18n="fleet.price_from" data-price="1">From 1 € / day</div>
+                    <a href="/app/reserve/page.html?car=Mercedes GLE 400D&price=1" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
                     <div class="contact-buttons">
                         <a href="tel:+34680162813" class="btn-contact">
                             <i class="fas fa-phone"></i>
@@ -1991,26 +1991,52 @@
             }
         });
 
-        // Configuración del backend
-        const BACKEND_URL = (typeof STRIPE_CONFIG !== 'undefined' && STRIPE_CONFIG.backendUrl) 
-            ? STRIPE_CONFIG.backendUrl 
-            : 'http://localhost:3000';
-        
-        // Verificar conexión con el backend al cargar la página
-        (async function checkBackendConnection() {
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/test`);
-                if (response.ok) {
-                    console.log('✅ Backend conectado correctamente');
-                } else {
-                    console.warn('⚠️ Backend responde pero con error:', response.status);
-                }
-            } catch (error) {
-                console.warn('⚠️ No se pudo conectar con el backend en', BACKEND_URL);
-                console.warn('   Asegúrate de que el servidor esté corriendo: npm start');
-                console.warn('   Error:', error.message);
+        // Configuración del backend - Esperar a que config.js se cargue
+        function initializeBackend() {
+            // Esperar a que STRIPE_CONFIG esté disponible
+            if (typeof STRIPE_CONFIG === 'undefined' || !STRIPE_CONFIG) {
+                console.warn('⚠️ Esperando a que config.js se cargue...');
+                setTimeout(initializeBackend, 100);
+                return;
             }
-        })();
+            
+            const BACKEND_URL = (STRIPE_CONFIG.backendUrl) 
+                ? STRIPE_CONFIG.backendUrl 
+                : 'http://localhost:3000';
+            
+            console.log('🔧 Backend URL configurada:', BACKEND_URL);
+            
+            // Hacer BACKEND_URL disponible globalmente
+            window.BACKEND_URL = BACKEND_URL;
+            
+            // Verificar conexión con el backend al cargar la página
+            (async function checkBackendConnection() {
+                try {
+                    const response = await fetch(`${BACKEND_URL}/api/test`);
+                    if (response.ok) {
+                        console.log('✅ Backend conectado correctamente:', BACKEND_URL);
+                    } else {
+                        console.warn('⚠️ Backend responde pero con error:', response.status);
+                    }
+                } catch (error) {
+                    console.warn('⚠️ No se pudo conectar con el backend en', BACKEND_URL);
+                    if (BACKEND_URL.includes('localhost')) {
+                        console.warn('   Asegúrate de que el servidor esté corriendo: npm start');
+                    } else {
+                        console.warn('   Verifica que el backend esté desplegado en Railway');
+                        console.warn('   URL:', BACKEND_URL);
+                    }
+                    console.warn('   Error:', error.message);
+                }
+            })();
+        }
+        
+        // Inicializar cuando el DOM esté listo
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeBackend);
+        } else {
+            initializeBackend();
+        }
         
         // Código de reservas eliminado - Usar /app/reserve/page.html
 
@@ -2049,6 +2075,11 @@
             submitBtn.textContent = 'SENDING...';
             statusDiv.innerHTML = '<p style="color: var(--silver);">Sending message...</p>';
             
+            // Obtener BACKEND_URL (global o desde STRIPE_CONFIG)
+            const BACKEND_URL = window.BACKEND_URL || 
+                               (typeof STRIPE_CONFIG !== 'undefined' && STRIPE_CONFIG.backendUrl) || 
+                               'http://localhost:3000';
+            
             // Verificar que BACKEND_URL esté configurado
             if (!BACKEND_URL) {
                 const errorMsg = 'Error: BACKEND_URL no está configurado. Verifica config.js';
@@ -2059,6 +2090,7 @@
                 return;
             }
             
+            console.log('🔧 Backend URL:', BACKEND_URL);
             console.log('Enviando mensaje a:', `${BACKEND_URL}/api/contact`);
             console.log('Datos:', { name, email, phone, subject, message: message.substring(0, 50) + '...' });
             
@@ -2119,10 +2151,18 @@
                     error.message.includes('NetworkError') || 
                     error.message.includes('Network request failed') ||
                     error.name === 'TypeError') {
+                    const currentBackendUrl = window.BACKEND_URL || 
+                                             (typeof STRIPE_CONFIG !== 'undefined' && STRIPE_CONFIG.backendUrl) || 
+                                             'http://localhost:3000';
                     errorMessage = '⚠️ Could not connect to the server. ';
                     errorMessage += '<br><br><strong>Possible solutions:</strong>';
-                    errorMessage += '<br>1. Verify that the backend is running: <code>npm start</code>';
-                    errorMessage += '<br>2. Verify the backend URL in config.js: <code>' + BACKEND_URL + '</code>';
+                    if (currentBackendUrl.includes('localhost')) {
+                        errorMessage += '<br>1. Verify that the backend is running: <code>npm start</code>';
+                    } else {
+                        errorMessage += '<br>1. Verify that the backend is deployed on Railway';
+                        errorMessage += '<br>   Check Railway logs for errors';
+                    }
+                    errorMessage += '<br>2. Verify the backend URL in config.js: <code>' + currentBackendUrl + '</code>';
                     errorMessage += '<br>3. Open the browser console (F12) for more details';
                     showDetails = true;
                 } else if (error.message.includes('CORS')) {
@@ -2607,7 +2647,7 @@
                 response.text = `Great! I can help you make a reservation. 🚗\n\nOur booking process is simple:\n1. Select your vehicle\n2. Choose your dates\n3. Complete your information\n4. Secure payment with Stripe\n\nWould you like to start your reservation now?`;
                 response.cta = { url: '#reserva', text: 'Start Reservation →' };
             } else if (message.includes('price') || message.includes('cost') || message.includes('€') || message.includes('euro')) {
-                response.text = `Our luxury vehicle rental prices start from:\n\n• Mercedes GLE 400D: From 400€/day\n• Mercedes GLE 53 AMG: From 500€/day\n• Mercedes G 63 AMG: From 950€/day\n• Porsche 992 GT3: From 1,000€/day\n• Lamborghini Urus Sport: From 1,649€/day\n• Lamborghini Huracán: From 1,500€/day\n• Ferrari 296 GTS: From 1,749€/day\n\nAll prices include insurance. Security deposits may apply for premium vehicles.`;
+                response.text = `Our luxury vehicle rental prices start from:\n\n• Mercedes GLE 400D: From 1€/day\n• Mercedes GLE 53 AMG: From 500€/day\n• Mercedes G 63 AMG: From 950€/day\n• Porsche 992 GT3: From 1,000€/day\n• Lamborghini Urus Sport: From 1,649€/day\n• Lamborghini Huracán: From 1,500€/day\n• Ferrari 296 GTS: From 1,749€/day\n\nAll prices include insurance. Security deposits may apply for premium vehicles.`;
                 response.cta = { url: '#fleet', text: 'View All Vehicles →' };
             } else if (message.includes('fleet') || message.includes('vehicle') || message.includes('car') || message.includes('available')) {
                 response.text = `We have an exclusive fleet of luxury vehicles! 🏎️\n\nOur collection includes:\n• Mercedes GLE series (400D, 53 AMG, Coupe)\n• Mercedes G 63 AMG\n• Lamborghini Huracán & Urus Sport\n• Ferrari 296 GTS\n• Porsche 992 GT3\n\nAll vehicles are maintained to the highest standards.`;

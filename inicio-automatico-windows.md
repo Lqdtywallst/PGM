@@ -84,3 +84,8 @@ pm2 resurrect
 3. Ejecuta: `pm2 status`
 4. Deberías ver `prestige-backend` con status `online`
 
+
+
+
+
+

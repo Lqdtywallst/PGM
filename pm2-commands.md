@@ -76,3 +76,8 @@ Para configurar el backend para que se inicie automáticamente al arrancar Windo
 
 Esto hará que el backend se inicie automáticamente cada vez que enciendas tu computadora.
 
+
+
+
+
+

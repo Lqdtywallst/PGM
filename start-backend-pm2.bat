@@ -23,3 +23,8 @@ echo Para reiniciar: pm2 restart prestige-backend
 echo.
 pause
 
+
+
+
+
+
