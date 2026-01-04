@@ -19,8 +19,18 @@ const nodemailer = require('nodemailer');
 
 const app = express();
 
-// Importar rutas de reserva
-const reserveRoutes = require('./app/api/reserve/route');
+// Importar rutas de reserva (con manejo de errores)
+let reserveRoutes;
+try {
+    reserveRoutes = require('./app/api/reserve/route');
+    console.log('✅ Rutas de reserva cargadas correctamente');
+} catch (error) {
+    console.error('⚠️ Error al cargar rutas de reserva:', error.message);
+    console.error('   El servidor continuará funcionando sin estas rutas');
+    // Crear un router vacío para evitar errores
+    const express = require('express');
+    reserveRoutes = express.Router();
+}
 
 // Configurar transporter de email
 // IMPORTANTE: Para Gmail, necesitas una contraseña de aplicación
@@ -902,7 +912,16 @@ app.listen(PORT, '0.0.0.0', () => {
     }
     
     console.log('='.repeat(60));
-    console.log('✅ Servidor listo para recibir peticiones\n');
+    console.log('✅ Servidor listo para recibir peticiones');
+    console.log('✅ Proceso PID:', process.pid);
+    console.log('✅ Node.js versión:', process.version);
+    console.log('✅ Plataforma:', process.platform);
+    console.log('='.repeat(60) + '\n');
+    
+    // Mantener el proceso vivo - logging periódico para debugging
+    setInterval(() => {
+        console.log(`[${new Date().toISOString()}] Servidor activo - PID: ${process.pid}`);
+    }, 60000); // Cada minuto
 }).on('error', (err) => {
     console.error('❌ Error al iniciar el servidor:', err);
     process.exit(1);
