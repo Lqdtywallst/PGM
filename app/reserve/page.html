@@ -1210,11 +1210,20 @@
                     console.error('[PAYMENT] ❌ Error de Stripe:', stripeError);
                     // Mostrar error al usuario
                     const displayError = document.getElementById('card-errors');
-                    displayError.textContent = stripeError.message;
+                    if (displayError) {
+                        displayError.textContent = stripeError.message;
+                    }
                     throw new Error(stripeError.message);
                 }
 
-                // Pago exitoso
+                if (!paymentIntent) {
+                    console.error('[PAYMENT] ❌ PaymentIntent no recibido');
+                    throw new Error('No se recibió respuesta del procesador de pagos');
+                }
+
+                console.log('[PAYMENT] Estado del PaymentIntent:', paymentIntent.status);
+
+                // Manejar diferentes estados del pago
                 if (paymentIntent.status === 'succeeded') {
                     console.log('[PAYMENT] ✅ Pago exitoso! PaymentIntent ID:', paymentIntent.id);
                     showMessage('Payment successful! Processing reservation...', 'success');
@@ -1275,9 +1284,53 @@
                         alert(`✅ Payment Successful!\n\nVehicle: ${selectedCar}\nDays: ${diffDays}\nTotal: €${total.toFixed(2)}\n\nYou will receive a confirmation email.`);
                         window.location.href = '/index.html';
                     }, 1500);
+                } else if (paymentIntent.status === 'processing') {
+                    console.log('[PAYMENT] ⏳ Pago en proceso. Verificando estado...');
+                    showMessage('Payment is processing. Please wait...', 'success');
+                    // Verificar el estado del pago después de unos segundos
+                    setTimeout(async () => {
+                        try {
+                            const BACKEND_URL = window.BACKEND_URL || window.STRIPE_CONFIG?.backendUrl || 'http://localhost:3000';
+                            const checkResponse = await fetch(`${BACKEND_URL}/api/reserve/${paymentIntent.id}`);
+                            const checkData = await checkResponse.json();
+                            console.log('[PAYMENT] Estado verificado:', checkData.status);
+                            
+                            if (checkData.status === 'succeeded') {
+                                showMessage('Payment successful! Processing reservation...', 'success');
+                                // Llamar a la misma lógica de éxito
+                                location.reload(); // Recargar para procesar el pago exitoso
+                            } else {
+                                showMessage('Payment is still processing. Please check your email for confirmation.', 'success');
+                                payButton.disabled = false;
+                                payButton.textContent = 'Confirm & Pay';
+                            }
+                        } catch (checkError) {
+                            console.warn('[PAYMENT] Error verificando estado:', checkError);
+                            showMessage('Payment is processing. You will receive a confirmation email shortly.', 'success');
+                            payButton.disabled = false;
+                            payButton.textContent = 'Confirm & Pay';
+                        }
+                    }, 3000);
+                } else if (paymentIntent.status === 'requires_action') {
+                    console.log('[PAYMENT] ⚠️ Se requiere autenticación adicional (3D Secure)');
+                    showMessage('Please complete the authentication in the popup window...', 'success');
+                    // Stripe manejará automáticamente el flujo 3D Secure
+                    // El PaymentIntent se actualizará automáticamente
+                    // El usuario debe completar la autenticación en el popup
+                } else if (paymentIntent.status === 'requires_payment_method') {
+                    console.error('[PAYMENT] ❌ El método de pago falló');
+                    showMessage('Payment method failed. Please try a different card.', 'error');
+                    payButton.disabled = false;
+                    payButton.textContent = 'Confirm & Pay';
+                    const displayError = document.getElementById('card-errors');
+                    if (displayError) {
+                        displayError.textContent = 'Payment method failed. Please try a different card.';
+                    }
                 } else {
                     console.error('[PAYMENT] ❌ Estado de pago inesperado:', paymentIntent.status);
-                    throw new Error('Payment status: ' + paymentIntent.status);
+                    showMessage('Unexpected payment status: ' + paymentIntent.status, 'error');
+                    payButton.disabled = false;
+                    payButton.textContent = 'Confirm & Pay';
                 }
             } catch (error) {
                 console.error('[PAYMENT] ❌ ERROR GENERAL:', error);
