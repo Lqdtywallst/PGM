@@ -889,43 +889,69 @@ app.get('/api/test', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
+
+console.log('🔧 Preparando para iniciar servidor en puerto:', PORT);
+console.log('🔧 Escuchando en: 0.0.0.0');
+
 // Escuchar en 0.0.0.0 para aceptar conexiones externas (necesario para Railway)
-app.listen(PORT, '0.0.0.0', () => {
-    console.log('\n' + '='.repeat(60));
-    console.log('🚀 SERVIDOR PRESTIGE GOAL MOTION');
-    console.log('='.repeat(60));
-    console.log(`✅ Servidor corriendo en puerto ${PORT}`);
-    console.log(`📧 Email configurado: ${EMAIL_CONFIG.user}`);
-    console.log(`🔧 Modo: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🌐 URL: http://0.0.0.0:${PORT}`);
-    console.log(`📬 Endpoint de contacto: http://0.0.0.0:${PORT}/api/contact`);
-    console.log(`💳 Endpoint de pagos: http://0.0.0.0:${PORT}/api/create-payment-intent`);
-    console.log('='.repeat(60));
+try {
+    const server = app.listen(PORT, '0.0.0.0', () => {
+        console.log('\n' + '='.repeat(60));
+        console.log('🚀 SERVIDOR PRESTIGE GOAL MOTION');
+        console.log('='.repeat(60));
+        console.log(`✅ Servidor corriendo en puerto ${PORT}`);
+        console.log(`📧 Email configurado: ${EMAIL_CONFIG.user}`);
+        console.log(`🔧 Modo: ${process.env.NODE_ENV || 'development'}`);
+        console.log(`🌐 URL: http://0.0.0.0:${PORT}`);
+        console.log(`📬 Endpoint de contacto: http://0.0.0.0:${PORT}/api/contact`);
+        console.log(`💳 Endpoint de pagos: http://0.0.0.0:${PORT}/api/create-payment-intent`);
+        console.log('='.repeat(60));
+        
+        try {
+            // Verificar configuración de email
+            if (!EMAIL_CONFIG.password) {
+                console.log('\n⚠️  ADVERTENCIA: Email no configurado');
+                console.log('   Configura EMAIL_APP_PASSWORD en tu archivo .env');
+                console.log('   Ver: CONFIGURACION-EMAIL.md');
+            } else {
+                console.log('✅ Email configurado correctamente');
+            }
+            
+            console.log('='.repeat(60));
+            console.log('✅ Servidor listo para recibir peticiones');
+            console.log('✅ Proceso PID:', process.pid);
+            console.log('✅ Node.js versión:', process.version);
+            console.log('✅ Plataforma:', process.platform);
+            console.log('='.repeat(60) + '\n');
+            
+            // Mantener el proceso vivo - logging periódico para debugging
+            setInterval(() => {
+                console.log(`[${new Date().toISOString()}] Servidor activo - PID: ${process.pid}`);
+            }, 60000); // Cada minuto
+            
+            console.log('✅ Callback de app.listen() completado exitosamente');
+        } catch (callbackError) {
+            console.error('❌ Error en callback de app.listen():', callbackError);
+            console.error('   Stack:', callbackError.stack);
+        }
+    });
     
-    // Verificar configuración de email
-    if (!EMAIL_CONFIG.password) {
-        console.log('\n⚠️  ADVERTENCIA: Email no configurado');
-        console.log('   Configura EMAIL_APP_PASSWORD en tu archivo .env');
-        console.log('   Ver: CONFIGURACION-EMAIL.md');
-    } else {
-        console.log('✅ Email configurado correctamente');
-    }
+    server.on('error', (err) => {
+        console.error('❌ Error en el servidor:', err);
+        console.error('   Stack:', err.stack);
+        process.exit(1);
+    });
     
-    console.log('='.repeat(60));
-    console.log('✅ Servidor listo para recibir peticiones');
-    console.log('✅ Proceso PID:', process.pid);
-    console.log('✅ Node.js versión:', process.version);
-    console.log('✅ Plataforma:', process.platform);
-    console.log('='.repeat(60) + '\n');
+    server.on('listening', () => {
+        console.log('✅ Servidor escuchando en puerto:', PORT);
+    });
     
-    // Mantener el proceso vivo - logging periódico para debugging
-    setInterval(() => {
-        console.log(`[${new Date().toISOString()}] Servidor activo - PID: ${process.pid}`);
-    }, 60000); // Cada minuto
-}).on('error', (err) => {
-    console.error('❌ Error al iniciar el servidor:', err);
+    console.log('✅ app.listen() llamado, esperando callback...');
+} catch (listenError) {
+    console.error('❌ Error al llamar app.listen():', listenError);
+    console.error('   Stack:', listenError.stack);
     process.exit(1);
-});
+}
 
 // Manejar errores no capturados (pero no terminar el proceso)
 process.on('uncaughtException', (err) => {
