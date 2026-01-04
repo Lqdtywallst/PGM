@@ -1,15 +1,15 @@
-// Ejemplo de Backend para Stripe - Node.js/Express
+﻿// Ejemplo de Backend para Stripe - Node.js/Express
 // Instala las dependencias: npm install express stripe cors dotenv nodemailer
 
 require('dotenv').config();
 const express = require('express');
 
-// Verificar que STRIPE_SECRET_KEY esté configurada
+// Verificar que STRIPE_SECRET_KEY estÃ© configurada
 if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('tu_clave')) {
-    console.error('\n❌ ERROR: STRIPE_SECRET_KEY no está configurada en .env');
+    console.error('\nâŒ ERROR: STRIPE_SECRET_KEY no estÃ¡ configurada en .env');
     console.error('   Por favor, configura tu clave secreta de Stripe en el archivo .env');
-    console.error('   Obtén tu clave en: https://dashboard.stripe.com/apikeys');
-    console.error('   Ver: CONFIGURAR-STRIPE.md para más información\n');
+    console.error('   ObtÃ©n tu clave en: https://dashboard.stripe.com/apikeys');
+    console.error('   Ver: CONFIGURAR-STRIPE.md para mÃ¡s informaciÃ³n\n');
     process.exit(1);
 }
 
@@ -26,18 +26,18 @@ const app = express();
 let reserveRoutes;
 try {
     reserveRoutes = require('./app/api/reserve/route');
-    console.log('✅ Rutas de reserva cargadas correctamente');
+    console.log('âœ… Rutas de reserva cargadas correctamente');
 } catch (error) {
-    console.error('⚠️ Error al cargar rutas de reserva:', error.message);
-    console.error('   El servidor continuará funcionando sin estas rutas');
-    // Crear un router vacío para evitar errores
+    console.error('âš ï¸ Error al cargar rutas de reserva:', error.message);
+    console.error('   El servidor continuarÃ¡ funcionando sin estas rutas');
+    // Crear un router vacÃ­o para evitar errores
     const express = require('express');
     reserveRoutes = express.Router();
 }
 
 // Configurar transporter de email
-// IMPORTANTE: Para Gmail, necesitas una contraseña de aplicación
-// Obténla en: https://myaccount.google.com/apppasswords
+// IMPORTANTE: Para Gmail, necesitas una contraseÃ±a de aplicaciÃ³n
+// ObtÃ©nla en: https://myaccount.google.com/apppasswords
 
 const EMAIL_CONFIG = {
     service: process.env.EMAIL_SERVICE || 'gmail',
@@ -45,11 +45,11 @@ const EMAIL_CONFIG = {
     password: process.env.EMAIL_PASSWORD || process.env.EMAIL_APP_PASSWORD,
 };
 
-// Verificar configuración de email al iniciar
+// Verificar configuraciÃ³n de email al iniciar
 if (!EMAIL_CONFIG.password) {
-    console.warn('⚠️ ADVERTENCIA: EMAIL_PASSWORD o EMAIL_APP_PASSWORD no está configurado en .env');
-    console.warn('   El envío de emails no funcionará hasta que lo configures.');
-    console.warn('   Ver: CONFIGURACION-EMAIL.md para más información');
+    console.warn('âš ï¸ ADVERTENCIA: EMAIL_PASSWORD o EMAIL_APP_PASSWORD no estÃ¡ configurado en .env');
+    console.warn('   El envÃ­o de emails no funcionarÃ¡ hasta que lo configures.');
+    console.warn('   Ver: CONFIGURACION-EMAIL.md para mÃ¡s informaciÃ³n');
 }
 
 const emailTransporter = nodemailer.createTransport({
@@ -62,211 +62,36 @@ const emailTransporter = nodemailer.createTransport({
         pass: EMAIL_CONFIG.password,
     },
     tls: {
-        // No fallar en certificados inválidos
+        // No fallar en certificados invÃ¡lidos
         rejectUnauthorized: false
     },
-    connectionTimeout: 10000, // 10 segundos para establecer conexión
+    connectionTimeout: 10000, // 10 segundos para establecer conexiÃ³n
     greetingTimeout: 10000, // 10 segundos para saludo SMTP
     socketTimeout: 10000, // 10 segundos para operaciones de socket
-    // Reintentar conexión si falla
+    // Reintentar conexiÃ³n si falla
     pool: false,
     maxConnections: 1,
     maxMessages: 3
 });
 
-// Verificar conexión con el servidor de email (no bloqueante)
-// Hacer esto de forma asíncrona para no bloquear el inicio del servidor
+// Verificar conexiÃ³n con el servidor de email (no bloqueante)
+// Hacer esto de forma asÃ­ncrona para no bloquear el inicio del servidor
 emailTransporter.verify(function(error, success) {
     if (error) {
-        console.error('❌ Error al verificar conexión con servidor de email:', error.message);
-        console.error('   Verifica tu configuración en .env (EMAIL_USER y EMAIL_APP_PASSWORD)');
-        console.error('   El servidor continuará funcionando, pero los emails pueden fallar');
+        console.error('âŒ Error al verificar conexiÃ³n con servidor de email:', error.message);
+        console.error('   Verifica tu configuraciÃ³n en .env (EMAIL_USER y EMAIL_APP_PASSWORD)');
+        console.error('   El servidor continuarÃ¡ funcionando, pero los emails pueden fallar');
     } else {
-        console.log('✅ Servidor de email configurado correctamente');
-        console.log('   Email de envío:', EMAIL_CONFIG.user);
+        console.log('âœ… Servidor de email configurado correctamente');
+        console.log('   Email de envÃ­o:', EMAIL_CONFIG.user);
     }
 });
 
-// Función para enviar email de confirmación de reserva
-async function sendReservationEmail(reservationData, customerData, paymentIntentId) {
-    const companyEmail = 'prestigegoalmotion@gmail.com';
-    
-    // Email para la empresa (notificación de nueva reserva)
-    const companyEmailHtml = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: #0a0a0a; color: #d4af37; padding: 20px; text-align: center; }
-                .content { background: #f9f9f9; padding: 20px; margin-top: 20px; }
-                .info-row { margin: 10px 0; padding: 10px; background: white; border-left: 3px solid #d4af37; }
-                .label { font-weight: bold; color: #0a0a0a; }
-                .footer { margin-top: 20px; padding: 20px; text-align: center; color: #666; font-size: 12px; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>🚗 Nueva Reserva - Prestige Goal Motion</h1>
-                </div>
-                <div class="content">
-                    <h2>Detalles de la Reserva</h2>
-                    
-                    <div class="info-row">
-                        <span class="label">Vehículo:</span> ${reservationData.car}
-                    </div>
-                    <div class="info-row">
-                        <span class="label">Fecha de inicio:</span> ${reservationData.startDate}
-                    </div>
-                    <div class="info-row">
-                        <span class="label">Fecha de fin:</span> ${reservationData.endDate}
-                    </div>
-                    <div class="info-row">
-                        <span class="label">Días:</span> ${reservationData.days}
-                    </div>
-                    <div class="info-row">
-                        <span class="label">Precio por día:</span> ${reservationData.pricePerDay} €
-                    </div>
-                    <div class="info-row">
-                        <span class="label">Total:</span> ${(reservationData.pricePerDay * reservationData.days).toFixed(2)} €
-                    </div>
-                    
-                    <h2 style="margin-top: 30px;">Datos del Cliente</h2>
-                    
-                    <div class="info-row">
-                        <span class="label">Nombre:</span> ${customerData.name}
-                    </div>
-                    <div class="info-row">
-                        <span class="label">Email:</span> ${customerData.email}
-                    </div>
-                    <div class="info-row">
-                        <span class="label">Teléfono:</span> ${customerData.phone}
-                    </div>
-                    <div class="info-row">
-                        <span class="label">DNI:</span> ${customerData.dni}
-                    </div>
-                    <div class="info-row">
-                        <span class="label">Dirección:</span> ${customerData.address}
-                    </div>
-                    <div class="info-row">
-                        <span class="label">Ciudad:</span> ${customerData.city}
-                    </div>
-                    <div class="info-row">
-                        <span class="label">Código Postal:</span> ${customerData.postalCode}
-                    </div>
-                    <div class="info-row">
-                        <span class="label">País:</span> ${customerData.country}
-                    </div>
-                    
-                    <div class="info-row" style="margin-top: 20px; background: #e8f5e9; border-left-color: #4caf50;">
-                        <span class="label">ID de Pago Stripe:</span> ${paymentIntentId}
-                    </div>
-                </div>
-                <div class="footer">
-                    <p>Este es un email automático de Prestige Goal Motion</p>
-                    <p>Fecha: ${new Date().toLocaleString('es-ES')}</p>
-                </div>
-            </div>
-        </body>
-        </html>
-    `;
-
-    // Email para el cliente (confirmación)
-    const customerEmailHtml = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: #0a0a0a; color: #d4af37; padding: 20px; text-align: center; }
-                .content { background: #f9f9f9; padding: 20px; margin-top: 20px; }
-                .info-row { margin: 10px 0; padding: 10px; background: white; border-left: 3px solid #d4af37; }
-                .label { font-weight: bold; color: #0a0a0a; }
-                .success-box { background: #e8f5e9; border-left-color: #4caf50; padding: 15px; margin: 20px 0; }
-                .footer { margin-top: 20px; padding: 20px; text-align: center; color: #666; font-size: 12px; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>✅ Reserva Confirmada</h1>
-                </div>
-                <div class="content">
-                    <div class="success-box">
-                        <h2 style="margin-top: 0; color: #4caf50;">¡Gracias por tu reserva!</h2>
-                        <p>Tu reserva ha sido confirmada y el pago procesado exitosamente.</p>
-                    </div>
-                    
-                    <h2>Detalles de tu Reserva</h2>
-                    
-                    <div class="info-row">
-                        <span class="label">Vehículo:</span> ${reservationData.car}
-                    </div>
-                    <div class="info-row">
-                        <span class="label">Fecha de inicio:</span> ${reservationData.startDate}
-                    </div>
-                    <div class="info-row">
-                        <span class="label">Fecha de fin:</span> ${reservationData.endDate}
-                    </div>
-                    <div class="info-row">
-                        <span class="label">Días:</span> ${reservationData.days}
-                    </div>
-                    <div class="info-row">
-                        <span class="label">Total pagado:</span> ${(reservationData.pricePerDay * reservationData.days).toFixed(2)} €
-                    </div>
-                    
-                    <h2 style="margin-top: 30px;">Información de Contacto</h2>
-                    <p>Si tienes alguna pregunta o necesitas modificar tu reserva, contáctanos:</p>
-                    <ul>
-                        <li><strong>Teléfono:</strong> +34 680 162 813</li>
-                        <li><strong>Email:</strong> prestigegoalmotion@gmail.com</li>
-                        <li><strong>Dirección:</strong> Calle Cicón, 27</li>
-                        <li><strong>Horario:</strong> 24 horas, Lunes a Lunes</li>
-                    </ul>
-                </div>
-                <div class="footer">
-                    <p>Prestige Goal Motion - Alquiler de Coches de Lujo</p>
-                    <p>© 2025 Prestige Goal Motion. Todos los derechos reservados.</p>
-                </div>
-            </div>
-        </body>
-        </html>
-    `;
-
-    try {
-        // Enviar email a la empresa
-        await emailTransporter.sendMail({
-            from: process.env.EMAIL_USER || 'prestigegoalmotion@gmail.com',
-            to: companyEmail,
-            subject: `🚗 Nueva Reserva - ${reservationData.car} - ${customerData.name}`,
-            html: companyEmailHtml,
-        });
-
-        // Enviar email de confirmación al cliente
-        await emailTransporter.sendMail({
-            from: process.env.EMAIL_USER || 'prestigegoalmotion@gmail.com',
-            to: customerData.email,
-            subject: '✅ Reserva Confirmada - Prestige Goal Motion',
-            html: customerEmailHtml,
-        });
-
-        console.log('✅ Emails enviados correctamente');
-        return true;
-    } catch (error) {
-        console.error('❌ Error al enviar emails:', error);
-        return false;
-    }
-}
 
 // Middleware
 // Configurar CORS para permitir todas las conexiones (desarrollo)
 app.use(cors({
-    origin: '*', // En producción, especifica el dominio exacto
+    origin: '*', // En producciÃ³n, especifica el dominio exacto
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
@@ -295,7 +120,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
             reservationData 
         } = req.body;
 
-        // Validación básica
+        // ValidaciÃ³n bÃ¡sica
         if (!amount || amount <= 0) {
             return res.status(400).json({ 
                 error: 'El monto es requerido y debe ser mayor a 0' 
@@ -318,7 +143,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(customerData.email)) {
             return res.status(400).json({ 
-                error: 'El email proporcionado no es válido' 
+                error: 'El email proporcionado no es vÃ¡lido' 
             });
         }
 
@@ -333,7 +158,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
 
             if (existingCustomers.data.length > 0) {
                 customer = existingCustomers.data[0];
-                // Actualizar información del cliente si es necesario
+                // Actualizar informaciÃ³n del cliente si es necesario
                 if (customerData.name || customerData.phone || customerData.address) {
                     await stripe.customers.update(customer.id, {
                         name: customerData.name || customer.name,
@@ -380,7 +205,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
             customer: customer.id,
             confirmation_method: 'manual',
             confirm: false,
-            description: `Reserva: ${reservationData.car} - ${reservationData.days} días`,
+            description: `Reserva: ${reservationData.car} - ${reservationData.days} dÃ­as`,
             metadata: {
                 car: reservationData.car,
                 days: reservationData.days.toString(),
@@ -407,7 +232,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
         // Crear PaymentIntent
         const paymentIntent = await stripe.paymentIntents.create(paymentIntentParams);
 
-        // Aquí podrías guardar la reserva en tu base de datos
+        // AquÃ­ podrÃ­as guardar la reserva en tu base de datos
         // con estado "pendiente" hasta que se confirme el pago
         // Ejemplo:
         // await saveReservation({
@@ -427,22 +252,22 @@ app.post('/api/create-payment-intent', async (req, res) => {
     } catch (error) {
         console.error('Error al crear PaymentIntent:', error);
         
-        // Manejar errores específicos de Stripe
+        // Manejar errores especÃ­ficos de Stripe
         if (error.type === 'StripeCardError') {
             return res.status(400).json({ 
                 error: 'Error con la tarjeta: ' + error.message 
             });
         } else if (error.type === 'StripeRateLimitError') {
             return res.status(429).json({ 
-                error: 'Demasiadas solicitudes. Por favor, intenta de nuevo más tarde.' 
+                error: 'Demasiadas solicitudes. Por favor, intenta de nuevo mÃ¡s tarde.' 
             });
         } else if (error.type === 'StripeInvalidRequestError') {
             return res.status(400).json({ 
-                error: 'Solicitud inválida: ' + error.message 
+                error: 'Solicitud invÃ¡lida: ' + error.message 
             });
         } else if (error.type === 'StripeAPIError') {
             return res.status(500).json({ 
-                error: 'Error del servidor de Stripe. Por favor, intenta de nuevo más tarde.' 
+                error: 'Error del servidor de Stripe. Por favor, intenta de nuevo mÃ¡s tarde.' 
             });
         }
         
@@ -452,7 +277,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
     }
 });
 
-// Endpoint para confirmar un PaymentIntent (útil para pagos con autenticación adicional)
+// Endpoint para confirmar un PaymentIntent (Ãºtil para pagos con autenticaciÃ³n adicional)
 app.post('/api/confirm-payment-intent', async (req, res) => {
     try {
         const { paymentIntentId } = req.body;
@@ -504,9 +329,9 @@ app.post('/api/confirm-payment-intent', async (req, res) => {
             // Enviar emails (no esperar para no bloquear la respuesta)
             // EMAIL DESHABILITADO - Comentado por solicitud del usuario
             // sendReservationEmail(reservationData, customerData, paymentIntent.id).catch(err => {
-            //     console.error('Error al enviar emails (no crítico):', err);
+            //     console.error('Error al enviar emails (no crÃ­tico):', err);
             // });
-            console.log('ℹ️ Notificación de email deshabilitada');
+            console.log('â„¹ï¸ NotificaciÃ³n de email deshabilitada');
         }
         
         res.json({
@@ -521,7 +346,7 @@ app.post('/api/confirm-payment-intent', async (req, res) => {
     }
 });
 
-// Endpoint para enviar email de confirmación manualmente
+// Endpoint para enviar email de confirmaciÃ³n manualmente
 app.post('/api/send-confirmation-email', async (req, res) => {
     try {
         const { paymentIntentId, reservationData, customerData } = req.body;
@@ -545,10 +370,10 @@ app.post('/api/send-confirmation-email', async (req, res) => {
         //         error: 'Error al enviar los emails' 
         //     });
         // }
-        console.log('ℹ️ Notificación de email deshabilitada');
+        console.log('â„¹ï¸ NotificaciÃ³n de email deshabilitada');
         res.json({ 
             success: true, 
-            message: 'Endpoint deshabilitado - emails no se envían' 
+            message: 'Endpoint deshabilitado - emails no se envÃ­an' 
         });
     } catch (error) {
         console.error('Error al enviar email:', error);
@@ -558,20 +383,20 @@ app.post('/api/send-confirmation-email', async (req, res) => {
     }
 });
 
-// Función para enviar email del formulario de contacto
+// FunciÃ³n para enviar email del formulario de contacto
 async function sendContactEmail(contactData) {
     // SIEMPRE enviar a prestigegoalmotion@gmail.com
     const companyEmail = 'prestigegoalmotion@gmail.com';
     
-    // Verificar que tenemos la configuración de email
+    // Verificar que tenemos la configuraciÃ³n de email
     if (!EMAIL_CONFIG.password) {
-        console.error('❌ No se puede enviar email: EMAIL_PASSWORD no configurado');
-        throw new Error('Configuración de email incompleta. Verifica tu archivo .env');
+        console.error('âŒ No se puede enviar email: EMAIL_PASSWORD no configurado');
+        throw new Error('ConfiguraciÃ³n de email incompleta. Verifica tu archivo .env');
     }
     
     const subjectLabels = {
         'reserva': 'Consulta sobre Reserva',
-        'flota': 'Información sobre Flota',
+        'flota': 'InformaciÃ³n sobre Flota',
         'precio': 'Consulta de Precios',
         'evento': 'Eventos Corporativos',
         'otro': 'Otro'
@@ -598,10 +423,10 @@ async function sendContactEmail(contactData) {
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>📧 Nuevo Mensaje de Contacto</h1>
+                    <h1>ðŸ“§ Nuevo Mensaje de Contacto</h1>
                 </div>
                 <div class="content">
-                    <h2>Información del Contacto</h2>
+                    <h2>InformaciÃ³n del Contacto</h2>
                     
                     <div class="info-row">
                         <span class="label">Nombre:</span> ${contactData.name}
@@ -611,7 +436,7 @@ async function sendContactEmail(contactData) {
                     </div>
                     ${contactData.phone ? `
                     <div class="info-row">
-                        <span class="label">Teléfono:</span> <a href="tel:${contactData.phone}">${contactData.phone}</a>
+                        <span class="label">TelÃ©fono:</span> <a href="tel:${contactData.phone}">${contactData.phone}</a>
                     </div>
                     ` : ''}
                     <div class="info-row">
@@ -628,7 +453,7 @@ async function sendContactEmail(contactData) {
                     </div>
                 </div>
                 <div class="footer">
-                    <p>Este es un email automático del formulario de contacto de Prestige Goal Motion</p>
+                    <p>Este es un email automÃ¡tico del formulario de contacto de Prestige Goal Motion</p>
                     <p>Fecha: ${new Date().toLocaleString('es-ES')}</p>
                 </div>
             </div>
@@ -641,13 +466,13 @@ async function sendContactEmail(contactData) {
             from: `"Prestige Goal Motion Web" <${EMAIL_CONFIG.user}>`,
             to: companyEmail, // SIEMPRE a prestigegoalmotion@gmail.com
             replyTo: contactData.email, // Permite responder directamente al cliente
-            subject: `📧 ${subjectLabel} - ${contactData.name}`,
+            subject: `ðŸ“§ ${subjectLabel} - ${contactData.name}`,
             html: emailHtml,
         };
 
         const info = await emailTransporter.sendMail(mailOptions);
         
-        console.log('✅ Email de contacto enviado correctamente');
+        console.log('âœ… Email de contacto enviado correctamente');
         console.log('   De:', contactData.name, `<${contactData.email}>`);
         console.log('   Para:', companyEmail);
         console.log('   Asunto:', mailOptions.subject);
@@ -655,22 +480,22 @@ async function sendContactEmail(contactData) {
         
         return true;
     } catch (error) {
-        console.error('❌ Error al enviar email de contacto:', error.message);
-        console.error('   Código de error:', error.code);
+        console.error('âŒ Error al enviar email de contacto:', error.message);
+        console.error('   CÃ³digo de error:', error.code);
         console.error('   Detalles completos:', error);
         
-        // Proporcionar mensajes de error más específicos
+        // Proporcionar mensajes de error mÃ¡s especÃ­ficos
         if (error.code === 'EAUTH') {
-            console.error('   Problema de autenticación. Verifica EMAIL_USER y EMAIL_APP_PASSWORD');
+            console.error('   Problema de autenticaciÃ³n. Verifica EMAIL_USER y EMAIL_APP_PASSWORD');
         } else if (error.code === 'ECONNECTION' || error.code === 'ETIMEDOUT' || error.message.includes('ETIMEDOUT')) {
-            console.error('   ⚠️ Timeout al conectar con el servidor de email');
+            console.error('   âš ï¸ Timeout al conectar con el servidor de email');
             console.error('   Posibles causas:');
-            console.error('   1. Firewall bloqueando la conexión SMTP (puerto 587)');
-            console.error('   2. Problemas de red o conexión a internet');
-            console.error('   3. Gmail bloqueando la conexión (verifica que la App Password sea correcta)');
-            console.error('   4. El servidor SMTP de Gmail está temporalmente no disponible');
+            console.error('   1. Firewall bloqueando la conexiÃ³n SMTP (puerto 587)');
+            console.error('   2. Problemas de red o conexiÃ³n a internet');
+            console.error('   3. Gmail bloqueando la conexiÃ³n (verifica que la App Password sea correcta)');
+            console.error('   4. El servidor SMTP de Gmail estÃ¡ temporalmente no disponible');
         } else if (error.code === 'ESOCKET' || error.message.includes('socket')) {
-            console.error('   Error de socket. Verifica tu conexión a internet');
+            console.error('   Error de socket. Verifica tu conexiÃ³n a internet');
         }
         
         throw error; // Re-lanzar para que el endpoint pueda manejarlo
@@ -682,7 +507,7 @@ app.post('/api/contact', async (req, res) => {
     try {
         const { name, email, phone, subject, message } = req.body;
 
-        // Validación
+        // ValidaciÃ³n
         if (!name || !email || !subject || !message) {
             return res.status(400).json({ 
                 error: 'Faltan campos obligatorios' 
@@ -693,7 +518,7 @@ app.post('/api/contact', async (req, res) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             return res.status(400).json({ 
-                error: 'El email proporcionado no es válido' 
+                error: 'El email proporcionado no es vÃ¡lido' 
             });
         }
 
@@ -721,21 +546,21 @@ app.post('/api/contact', async (req, res) => {
         } catch (emailError) {
             console.error('Error detallado al enviar email:', emailError);
             
-            // Mensajes de error más específicos para el cliente
+            // Mensajes de error mÃ¡s especÃ­ficos para el cliente
             let errorMessage = 'Error al enviar el mensaje. ';
             
-            if (emailError.message.includes('EAUTH') || emailError.message.includes('autenticación')) {
-                errorMessage += 'Error de configuración del servidor de email.';
+            if (emailError.message.includes('EAUTH') || emailError.message.includes('autenticaciÃ³n')) {
+                errorMessage += 'Error de configuraciÃ³n del servidor de email.';
             } else if (emailError.message.includes('ECONNECTION') || 
                        emailError.message.includes('ETIMEDOUT') || 
                        emailError.code === 'ETIMEDOUT' ||
                        emailError.code === 'ECONNECTION') {
                 errorMessage += 'No se pudo conectar con el servidor de email. ';
-                errorMessage += 'Por favor, verifica tu conexión a internet e intenta de nuevo.';
+                errorMessage += 'Por favor, verifica tu conexiÃ³n a internet e intenta de nuevo.';
             } else if (emailError.message.includes('ESOCKET') || emailError.message.includes('socket')) {
-                errorMessage += 'Error de conexión. Por favor, intenta de nuevo.';
+                errorMessage += 'Error de conexiÃ³n. Por favor, intenta de nuevo.';
             } else {
-                errorMessage += emailError.message || 'Por favor, intenta de nuevo más tarde.';
+                errorMessage += emailError.message || 'Por favor, intenta de nuevo mÃ¡s tarde.';
             }
             
             res.status(500).json({ 
@@ -757,7 +582,7 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
     if (!webhookSecret) {
-        console.warn('⚠️ STRIPE_WEBHOOK_SECRET no configurado. Los webhooks no funcionarán correctamente.');
+        console.warn('âš ï¸ STRIPE_WEBHOOK_SECRET no configurado. Los webhooks no funcionarÃ¡n correctamente.');
         return res.status(500).send('Webhook secret no configurado');
     }
 
@@ -774,9 +599,9 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
     switch (event.type) {
         case 'payment_intent.succeeded':
             const paymentIntent = event.data.object;
-            console.log('✅ Pago exitoso:', paymentIntent.id);
+            console.log('âœ… Pago exitoso:', paymentIntent.id);
             console.log('   Cliente:', paymentIntent.metadata.customerEmail);
-            console.log('   Vehículo:', paymentIntent.metadata.car);
+            console.log('   VehÃ­culo:', paymentIntent.metadata.car);
             console.log('   Monto:', paymentIntent.amount / 100, paymentIntent.currency.toUpperCase());
             
             // Preparar datos para el email
@@ -791,7 +616,7 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
             const customerData = {
                 name: paymentIntent.metadata.customerName,
                 email: paymentIntent.metadata.customerEmail,
-                phone: '', // No está en metadata, se puede obtener del customer
+                phone: '', // No estÃ¡ en metadata, se puede obtener del customer
                 dni: '',
                 address: '',
                 city: '',
@@ -799,7 +624,7 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
                 country: 'ES',
             };
 
-            // Intentar obtener más datos del cliente desde Stripe
+            // Intentar obtener mÃ¡s datos del cliente desde Stripe
             try {
                 if (paymentIntent.customer) {
                     const customer = await stripe.customers.retrieve(paymentIntent.customer);
@@ -814,12 +639,12 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
                 console.warn('No se pudieron obtener datos adicionales del cliente:', customerError.message);
             }
 
-            // Enviar emails de confirmación
+            // Enviar emails de confirmaciÃ³n
             // EMAIL DESHABILITADO - Comentado por solicitud del usuario
             // await sendReservationEmail(reservationData, customerData, paymentIntent.id);
-            console.log('ℹ️ Notificación de email deshabilitada - Webhook');
+            console.log('â„¹ï¸ NotificaciÃ³n de email deshabilitada - Webhook');
             
-            // Aquí guardarías la reserva como confirmada en tu base de datos
+            // AquÃ­ guardarÃ­as la reserva como confirmada en tu base de datos
             // Ejemplo:
             // await saveReservationToDatabase({
             //     paymentIntentId: paymentIntent.id,
@@ -833,10 +658,10 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
 
         case 'payment_intent.payment_failed':
             const failedPayment = event.data.object;
-            console.log('❌ Pago fallido:', failedPayment.id);
-            console.log('   Razón:', failedPayment.last_payment_error?.message || 'Desconocida');
+            console.log('âŒ Pago fallido:', failedPayment.id);
+            console.log('   RazÃ³n:', failedPayment.last_payment_error?.message || 'Desconocida');
             
-            // Aquí podrías notificar al cliente o actualizar el estado de la reserva
+            // AquÃ­ podrÃ­as notificar al cliente o actualizar el estado de la reserva
             // Ejemplo:
             // await updateReservationStatus(failedPayment.id, 'failed');
             // await sendFailureEmail(failedPayment.metadata.customerEmail, failedPayment);
@@ -845,7 +670,7 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
 
         case 'payment_intent.canceled':
             const canceledPayment = event.data.object;
-            console.log('🚫 Pago cancelado:', canceledPayment.id);
+            console.log('ðŸš« Pago cancelado:', canceledPayment.id);
             
             // Actualizar estado de la reserva
             // await updateReservationStatus(canceledPayment.id, 'canceled');
@@ -854,23 +679,23 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
 
         case 'payment_intent.requires_action':
             const requiresAction = event.data.object;
-            console.log('⚠️ Pago requiere acción adicional:', requiresAction.id);
-            // El cliente necesita completar una acción (ej: 3D Secure)
+            console.log('âš ï¸ Pago requiere acciÃ³n adicional:', requiresAction.id);
+            // El cliente necesita completar una acciÃ³n (ej: 3D Secure)
             
             break;
 
         default:
-            console.log(`ℹ️ Evento no manejado: ${event.type}`);
+            console.log(`â„¹ï¸ Evento no manejado: ${event.type}`);
     }
 
     res.json({ received: true });
 });
 
-// Ruta raíz - Información del servidor
+// Ruta raÃ­z - InformaciÃ³n del servidor
 app.get('/', (req, res) => {
     res.json({
         status: 'ok',
-        message: '🚗 Prestige Goal Motion - API Server',
+        message: 'ðŸš— Prestige Goal Motion - API Server',
         version: '1.0.0',
         endpoints: {
             health: '/health',
@@ -903,91 +728,86 @@ app.get('/api/test', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-console.log('🔧 Preparando para iniciar servidor en puerto:', PORT);
-console.log('🔧 Escuchando en: 0.0.0.0');
+console.log('ðŸ”§ Preparando para iniciar servidor en puerto:', PORT);
+console.log('ðŸ”§ Escuchando en: 0.0.0.0');
 
 // Escuchar en 0.0.0.0 para aceptar conexiones externas (necesario para Railway)
 try {
     const server = app.listen(PORT, '0.0.0.0', () => {
         console.log('\n' + '='.repeat(60));
-        console.log('🚀 SERVIDOR PRESTIGE GOAL MOTION');
+        console.log('ðŸš€ SERVIDOR PRESTIGE GOAL MOTION');
         console.log('='.repeat(60));
-        console.log(`✅ Servidor corriendo en puerto ${PORT}`);
-        console.log(`📧 Email configurado: ${EMAIL_CONFIG.user}`);
-        console.log(`🔧 Modo: ${process.env.NODE_ENV || 'development'}`);
-        console.log(`🌐 URL: http://0.0.0.0:${PORT}`);
-        console.log(`📬 Endpoint de contacto: http://0.0.0.0:${PORT}/api/contact`);
-        console.log(`💳 Endpoint de pagos: http://0.0.0.0:${PORT}/api/create-payment-intent`);
+        console.log(`âœ… Servidor corriendo en puerto ${PORT}`);
+        console.log(`ðŸ“§ Email configurado: ${EMAIL_CONFIG.user}`);
+        console.log(`ðŸ”§ Modo: ${process.env.NODE_ENV || 'development'}`);
+        console.log(`ðŸŒ URL: http://0.0.0.0:${PORT}`);
+        console.log(`ðŸ“¬ Endpoint de contacto: http://0.0.0.0:${PORT}/api/contact`);
+        console.log(`ðŸ’³ Endpoint de pagos: http://0.0.0.0:${PORT}/api/create-payment-intent`);
         console.log('='.repeat(60));
         
         try {
-            // Verificar configuración de email
+            // Verificar configuraciÃ³n de email
             if (!EMAIL_CONFIG.password) {
-                console.log('\n⚠️  ADVERTENCIA: Email no configurado');
+                console.log('\nâš ï¸  ADVERTENCIA: Email no configurado');
                 console.log('   Configura EMAIL_APP_PASSWORD en tu archivo .env');
                 console.log('   Ver: CONFIGURACION-EMAIL.md');
             } else {
-                console.log('✅ Email configurado correctamente');
+                console.log('âœ… Email configurado correctamente');
             }
             
             console.log('='.repeat(60));
-            console.log('✅ Servidor listo para recibir peticiones');
-            console.log('✅ Proceso PID:', process.pid);
-            console.log('✅ Node.js versión:', process.version);
-            console.log('✅ Plataforma:', process.platform);
+            console.log('âœ… Servidor listo para recibir peticiones');
+            console.log('âœ… Proceso PID:', process.pid);
+            console.log('âœ… Node.js versiÃ³n:', process.version);
+            console.log('âœ… Plataforma:', process.platform);
             console.log('='.repeat(60) + '\n');
             
-            // Mantener el proceso vivo - logging periódico para debugging
-            setInterval(() => {
-                console.log(`[${new Date().toISOString()}] Servidor activo - PID: ${process.pid}`);
-            }, 60000); // Cada minuto
             
-            console.log('✅ Callback de app.listen() completado exitosamente');
         } catch (callbackError) {
-            console.error('❌ Error en callback de app.listen():', callbackError);
+            console.error('âŒ Error en callback de app.listen():', callbackError);
             console.error('   Stack:', callbackError.stack);
         }
     });
     
     server.on('error', (err) => {
-        console.error('❌ Error en el servidor:', err);
+        console.error('âŒ Error en el servidor:', err);
         console.error('   Stack:', err.stack);
         process.exit(1);
     });
     
     server.on('listening', () => {
-        console.log('✅ Servidor escuchando en puerto:', PORT);
+        console.log('âœ… Servidor escuchando en puerto:', PORT);
     });
     
-    console.log('✅ app.listen() llamado, esperando callback...');
+    console.log('âœ… app.listen() llamado, esperando callback...');
 } catch (listenError) {
-    console.error('❌ Error al llamar app.listen():', listenError);
+    console.error('âŒ Error al llamar app.listen():', listenError);
     console.error('   Stack:', listenError.stack);
     process.exit(1);
 }
 
 // Manejar errores no capturados (pero no terminar el proceso)
 process.on('uncaughtException', (err) => {
-    console.error('❌ Error no capturado:', err);
+    console.error('âŒ Error no capturado:', err);
     console.error('   Stack:', err.stack);
     // NO hacer process.exit() para que Railway pueda manejar el error
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-    console.error('❌ Promesa rechazada no manejada:', reason);
+    console.error('âŒ Promesa rechazada no manejada:', reason);
     // NO hacer process.exit() para que Railway pueda manejar el error
 });
 
-// Mantener el proceso vivo
 process.on('SIGTERM', () => {
-    console.log('⚠️ SIGTERM recibido, cerrando servidor...');
+    console.log('âš ï¸ SIGTERM recibido, cerrando servidor...');
     process.exit(0);
 });
 
 process.on('SIGINT', () => {
-    console.log('⚠️ SIGINT recibido, cerrando servidor...');
+    console.log('âš ï¸ SIGINT recibido, cerrando servidor...');
     process.exit(0);
 });
+
 
 
 
