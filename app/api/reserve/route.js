@@ -461,7 +461,7 @@ router.post('/', async (req, res) => {
                     amount: Math.round(data.amount),
                     currency: data.currency || 'eur',
                     customer: customer.id,
-                    confirmation_method: 'manual',
+                    confirmation_method: 'automatic',
                     confirm: false,
                     description: `Reserva: ${reservationData.car} - ${reservationData.days} días`,
                     metadata: {
