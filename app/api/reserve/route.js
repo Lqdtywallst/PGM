@@ -534,17 +534,19 @@ router.post('/', async (req, res) => {
 
         // Enviar emails de confirmación de forma asíncrona (no bloquea la respuesta)
         // No esperamos la respuesta para evitar timeouts
-        console.log('[API] Enviando emails de confirmación (asíncrono)...');
-        sendReservationEmail(
-            reservationData,
-            customerData,
-            paymentIntent?.id || null
-        ).then((emailResult) => {
-            console.log('[API] ✅ Emails enviados (asíncrono):', emailResult);
-        }).catch((emailError) => {
-            console.warn('[API] ⚠️ Error enviando emails (no crítico, asíncrono):', emailError);
-            // No fallar la reserva si falla el email
-        });
+        // EMAIL DESHABILITADO - Comentado por solicitud del usuario
+        // console.log('[API] Enviando emails de confirmación (asíncrono)...');
+        // sendReservationEmail(
+        //     reservationData,
+        //     customerData,
+        //     paymentIntent?.id || null
+        // ).then((emailResult) => {
+        //     console.log('[API] ✅ Emails enviados (asíncrono):', emailResult);
+        // }).catch((emailError) => {
+        //     console.warn('[API] ⚠️ Error enviando emails (no crítico, asíncrono):', emailError);
+        //     // No fallar la reserva si falla el email
+        // });
+        console.log('[API] ℹ️ Notificación de email deshabilitada');
 
         // Aquí puedes guardar en base de datos
         // Ejemplo:
@@ -663,30 +665,33 @@ router.post('/confirm', async (req, res) => {
             }
             
             // Enviar emails de confirmación
-            console.log('[API CONFIRM] Llamando a sendReservationEmail con datos:', {
-                reservationData: finalReservationData,
-                customerData: {
-                    name: finalCustomerData.name || finalCustomerData.fullName,
-                    email: finalCustomerData.email,
-                    hasEmail: !!finalCustomerData.email
-                },
-                paymentIntentId: paymentIntentId
-            });
+            // EMAIL DESHABILITADO - Comentado por solicitud del usuario
+            // console.log('[API CONFIRM] Llamando a sendReservationEmail con datos:', {
+            //     reservationData: finalReservationData,
+            //     customerData: {
+            //         name: finalCustomerData.name || finalCustomerData.fullName,
+            //         email: finalCustomerData.email,
+            //         hasEmail: !!finalCustomerData.email
+            //     },
+            //     paymentIntentId: paymentIntentId
+            // });
             
-            const emailResult = await sendReservationEmail(
-                finalReservationData,
-                finalCustomerData,
-                paymentIntentId
-            );
+            // const emailResult = await sendReservationEmail(
+            //     finalReservationData,
+            //     finalCustomerData,
+            //     paymentIntentId
+            // );
 
-            console.log('[API CONFIRM] Resultado del envío de emails:', emailResult);
+            // console.log('[API CONFIRM] Resultado del envío de emails:', emailResult);
+            console.log('[API CONFIRM] ℹ️ Notificación de email deshabilitada');
             console.log('[API CONFIRM] ✅ Confirmación completada');
             return res.json({
                 success: true,
                 paymentIntentId: paymentIntent.id,
                 status: paymentIntent.status,
-                emailSent: emailResult.success,
-                emailError: emailResult.error || null,
+                emailSent: false,
+                emailError: null,
+                message: 'Email notifications disabled'
             });
         } else {
             console.log('[API CONFIRM] ⚠️ Pago no completado, estado:', paymentIntent.status);

@@ -502,9 +502,11 @@ app.post('/api/confirm-payment-intent', async (req, res) => {
             }
 
             // Enviar emails (no esperar para no bloquear la respuesta)
-            sendReservationEmail(reservationData, customerData, paymentIntent.id).catch(err => {
-                console.error('Error al enviar emails (no crítico):', err);
-            });
+            // EMAIL DESHABILITADO - Comentado por solicitud del usuario
+            // sendReservationEmail(reservationData, customerData, paymentIntent.id).catch(err => {
+            //     console.error('Error al enviar emails (no crítico):', err);
+            // });
+            console.log('ℹ️ Notificación de email deshabilitada');
         }
         
         res.json({
@@ -530,18 +532,24 @@ app.post('/api/send-confirmation-email', async (req, res) => {
             });
         }
 
-        const emailSent = await sendReservationEmail(reservationData, customerData, paymentIntentId);
+        // EMAIL DESHABILITADO - Comentado por solicitud del usuario
+        // const emailSent = await sendReservationEmail(reservationData, customerData, paymentIntentId);
         
-        if (emailSent) {
-            res.json({ 
-                success: true, 
-                message: 'Emails enviados correctamente' 
-            });
-        } else {
-            res.status(500).json({ 
-                error: 'Error al enviar los emails' 
-            });
-        }
+        // if (emailSent) {
+        //     res.json({ 
+        //         success: true, 
+        //         message: 'Emails enviados correctamente' 
+        //     });
+        // } else {
+        //     res.status(500).json({ 
+        //         error: 'Error al enviar los emails' 
+        //     });
+        // }
+        console.log('ℹ️ Notificación de email deshabilitada');
+        res.json({ 
+            success: true, 
+            message: 'Endpoint deshabilitado - emails no se envían' 
+        });
     } catch (error) {
         console.error('Error al enviar email:', error);
         res.status(500).json({ 
@@ -807,7 +815,9 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
             }
 
             // Enviar emails de confirmación
-            await sendReservationEmail(reservationData, customerData, paymentIntent.id);
+            // EMAIL DESHABILITADO - Comentado por solicitud del usuario
+            // await sendReservationEmail(reservationData, customerData, paymentIntent.id);
+            console.log('ℹ️ Notificación de email deshabilitada - Webhook');
             
             // Aquí guardarías la reserva como confirmada en tu base de datos
             // Ejemplo:
