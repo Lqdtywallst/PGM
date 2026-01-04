@@ -391,6 +391,7 @@ router.post('/', async (req, res) => {
 
             // Crear o recuperar cliente en Stripe
             console.log('[API] Buscando/creando cliente en Stripe...');
+            const customerStartTime = Date.now();
             try {
                 const existingCustomers = await stripe.customers.list({
                     email: customerData.email,
@@ -399,8 +400,10 @@ router.post('/', async (req, res) => {
 
                 if (existingCustomers.data.length > 0) {
                     customer = existingCustomers.data[0];
-                    console.log('[API] Cliente existente encontrado:', customer.id);
+                    const customerLookupDuration = Date.now() - customerStartTime;
+                    console.log('[API] Cliente existente encontrado:', customer.id, `(${customerLookupDuration}ms)`);
                     // Actualizar información del cliente
+                    const updateStartTime = Date.now();
                     await stripe.customers.update(customer.id, {
                         name: customerData.name,
                         phone: customerData.phone,
@@ -414,9 +417,11 @@ router.post('/', async (req, res) => {
                             dni: customerData.dni || '',
                         },
                     });
-                    console.log('[API] Cliente actualizado');
+                    const updateDuration = Date.now() - updateStartTime;
+                    console.log('[API] Cliente actualizado', `(${updateDuration}ms)`);
                 } else {
                     console.log('[API] Creando nuevo cliente...');
+                    const createStartTime = Date.now();
                     customer = await stripe.customers.create({
                         email: customerData.email,
                         name: customerData.name,
@@ -431,7 +436,9 @@ router.post('/', async (req, res) => {
                             dni: customerData.dni || '',
                         },
                     });
-                    console.log('[API] ✅ Cliente creado:', customer.id);
+                    const createDuration = Date.now() - createStartTime;
+                    const totalCustomerDuration = Date.now() - customerStartTime;
+                    console.log('[API] ✅ Cliente creado:', customer.id, `(${createDuration}ms, total: ${totalCustomerDuration}ms)`);
                 }
             } catch (error) {
                 console.error('[API] ❌ Error creando/actualizando cliente:', error);
@@ -447,6 +454,7 @@ router.post('/', async (req, res) => {
 
             // Crear PaymentIntent
             console.log('[API] Creando PaymentIntent...');
+            const paymentIntentStartTime = Date.now();
             try {
                 const paymentIntentData = {
                     amount: Math.round(data.amount),
@@ -478,10 +486,12 @@ router.post('/', async (req, res) => {
                 
                 try {
                     paymentIntent = await stripe.paymentIntents.create(paymentIntentData);
+                    const paymentIntentDuration = Date.now() - paymentIntentStartTime;
                     console.log('[API] ✅ PaymentIntent creado:', {
                         id: paymentIntent.id,
                         status: paymentIntent.status,
-                        client_secret: paymentIntent.client_secret ? paymentIntent.client_secret.substring(0, 20) + '...' : null
+                        client_secret: paymentIntent.client_secret ? paymentIntent.client_secret.substring(0, 20) + '...' : null,
+                        duration: `${paymentIntentDuration}ms`
                     });
                 } catch (paymentError) {
                     // Si el error es por métodos de pago no activados (Apple Pay/Google Pay), intentar solo con métodos básicos

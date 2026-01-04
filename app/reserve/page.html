@@ -1118,7 +1118,7 @@
                                 'Content-Type': 'application/json',
                             },
                             body: JSON.stringify(reservationData),
-                            signal: AbortSignal.timeout(60000) // Timeout de 60 segundos
+                            signal: AbortSignal.timeout(120000) // Timeout de 120 segundos (2 minutos)
                         });
                     } catch (fetchError) {
                         console.error('[PAYMENT] ❌ Error de conexión:', fetchError);

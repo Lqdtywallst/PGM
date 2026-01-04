@@ -13,7 +13,10 @@ if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('tu
     process.exit(1);
 }
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {
+    timeout: 30000, // 30 segundos para operaciones de Stripe
+    maxNetworkRetries: 2 // Reintentar hasta 2 veces en caso de error de red
+});
 const cors = require('cors');
 const nodemailer = require('nodemailer');
 
