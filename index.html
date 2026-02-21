@@ -2239,7 +2239,7 @@
                             <p>I'm here to help you with reservations</p>
                         </div>
                     </div>
-                    <button class="chat-close" onclick="toggleChat()" aria-label="Close chat">
+                    <button class="chat-close" onclick="closeChat()" aria-label="Close chat">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -2591,6 +2591,14 @@
             }
         }
 
+        function closeChat() {
+            chatOpen = false;
+            const chatWindow = document.getElementById('chatWindow');
+            if (chatWindow) {
+                chatWindow.classList.remove('open');
+            }
+        }
+
         function handleChatKeyPress(event) {
             if (event.key === 'Enter') {
                 sendChatMessage();
@@ -2626,7 +2634,7 @@
             
             let ctaHtml = '';
             if (cta) {
-                ctaHtml = `<a href="${cta.url}" class="cta-button">${cta.text}</a>`;
+                ctaHtml = `<a href="${cta.url}" class="cta-button" onclick="closeChat()">${cta.text}</a>`;
             }
 
             messageDiv.innerHTML = `
@@ -2650,7 +2658,7 @@
             // Detectar intención y responder
             if (message.includes('reserv') || message.includes('book') || message.includes('rent')) {
                 response.text = `Great! I can help you make a reservation. 🚗\n\nOur booking process is simple:\n1. Select your vehicle\n2. Choose your dates\n3. Complete your information\n4. Secure payment with Stripe\n\nWould you like to start your reservation now?`;
-                response.cta = { url: '#reserva', text: 'Start Reservation →' };
+                response.cta = { url: '/app/reserve/page.html', text: 'Start Reservation →' };
             } else if (message.includes('price') || message.includes('cost') || message.includes('€') || message.includes('euro')) {
                 response.text = `Our luxury vehicle rental prices start from:\n\n• Mercedes GLE 400D: From 400€/day\n• Mercedes GLE 53 AMG: From 500€/day\n• Mercedes G 63 AMG: From 950€/day\n• Porsche 992 GT3: From 1,000€/day\n• Lamborghini Urus Sport: From 1,649€/day\n• Lamborghini Huracán: From 1,500€/day\n• Ferrari 296 GTS: From 1,749€/day\n\nAll prices include insurance. Security deposits may apply for premium vehicles.`;
                 response.cta = { url: '#fleet', text: 'View All Vehicles →' };
@@ -2661,12 +2669,12 @@
                 response.text = `You can reach us through:\n\n📞 Phone: +34 625 179 867\n💬 WhatsApp: +34 625 179 867\n📧 Email: prestigegoalmotion@gmail.com\n📍 Address: Calle Ciclon, 27, 28042 Madrid\n\nWe're available 24/7!`;
             } else if (message.includes('payment') || message.includes('stripe') || message.includes('pay')) {
                 response.text = `We accept secure payments through Stripe! 💳\n\nPayment methods:\n• Credit/Debit Cards\n• Apple Pay\n• Google Pay\n• Stripe Link\n\nAll transactions are secure and encrypted.`;
-                response.cta = { url: '#reserva', text: 'Start Booking →' };
+                response.cta = { url: '/app/reserve/page.html', text: 'Start Booking →' };
             } else if (message.includes('hello') || message.includes('hi') || message.includes('help')) {
                 response.text = `Hello! 👋 I'm here to help you with:\n\n✅ Vehicle reservations\n✅ Pricing information\n✅ Fleet details\n✅ Booking assistance\n✅ General inquiries\n\nWhat would you like to know?`;
             } else {
                 response.text = `I understand you're asking about "${userMessage}".\n\nI can help you with:\n• Making a reservation\n• Vehicle information and pricing\n• Booking process\n• Contact information\n\nHow would you like to proceed?`;
-                response.cta = { url: '#reserva', text: 'Make Reservation →' };
+                response.cta = { url: '/app/reserve/page.html', text: 'Make Reservation →' };
             }
 
             return response;
