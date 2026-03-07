@@ -154,7 +154,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
         // Crear PaymentIntent
         const paymentIntentParams = {
             amount: Math.round(amount),
-            currency: (currency || 'eur').toLowerCase(),
+            currency: (currency || 'aed').toLowerCase(),
             customer: customer.id,
             confirmation_method: 'manual',
             confirm: false,

@@ -471,11 +471,11 @@
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                     <span>Price per day:</span>
-                    <span id="summaryPricePerDay" style="color: #d4af37;">€0</span>
+                    <span id="summaryPricePerDay" style="color: #d4af37;">AED 0</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; padding-top: 0.5rem; border-top: 1px solid rgba(212, 175, 55, 0.2); font-size: 1.2rem; font-weight: 600;">
                     <span>Total:</span>
-                    <span id="summaryTotal" style="color: #d4af37;">€0.00</span>
+                    <span id="summaryTotal" style="color: #d4af37;">AED 0.00</span>
                 </div>
             </div>
 
@@ -500,7 +500,7 @@
             <div class="summary-section">
                 <h3 id="selectedCar">Mercedes GLE 53 AMG</h3>
                 <p style="margin-top: 1rem; color: #a1a1aa;">Total Amount</p>
-                <p class="total" id="totalAmount">€0.00</p>
+                <p class="total" id="totalAmount">AED 0.00</p>
             </div>
             
             <!-- Stripe Payment Form -->
@@ -525,7 +525,7 @@
         // Form state
         let currentStep = 1;
         let selectedCar = 'Mercedes GLE 53 AMG';
-        let pricePerDay = 500;
+        let pricePerDay = 2000;
         
         // Calendar state
         let currentDate = new Date();
@@ -558,7 +558,7 @@
             selectedCarElement.textContent = selectedCar;
         }
         if (summaryPriceElement) {
-            summaryPriceElement.textContent = `€${pricePerDay}`;
+            summaryPriceElement.textContent = `AED ${pricePerDay}`;
         }
         
         console.log('[RESERVE PAGE] Page initialized successfully');
@@ -855,17 +855,17 @@
                     const total = diffDays * pricePerDay;
                     
                     document.getElementById('summaryDays').textContent = diffDays;
-                    document.getElementById('summaryTotal').textContent = `€${total.toFixed(2)}`;
-                    document.getElementById('totalAmount').textContent = `€${total.toFixed(2)}`;
+                    document.getElementById('summaryTotal').textContent = `AED ${total.toFixed(2)}`;
+                    document.getElementById('totalAmount').textContent = `AED ${total.toFixed(2)}`;
                 } else {
                     document.getElementById('summaryDays').textContent = '0';
-                    document.getElementById('summaryTotal').textContent = '€0.00';
-                    document.getElementById('totalAmount').textContent = '€0.00';
+                    document.getElementById('summaryTotal').textContent = 'AED 0.00';
+                    document.getElementById('totalAmount').textContent = 'AED 0.00';
                 }
             } else {
                 document.getElementById('summaryDays').textContent = '0';
-                document.getElementById('summaryTotal').textContent = '€0.00';
-                document.getElementById('totalAmount').textContent = '€0.00';
+                document.getElementById('summaryTotal').textContent = 'AED 0.00';
+                document.getElementById('totalAmount').textContent = 'AED 0.00';
             }
             
             updateContinueButton();
@@ -1082,7 +1082,7 @@
                     // Prepare data for the API
                     const reservationData = {
                         amount: totalCents,
-                        currency: 'eur',
+                        currency: 'aed',
                         customerData: {
                             name: formData.fullName,
                             email: formData.email,
@@ -1263,7 +1263,7 @@
                                 startDate: formData.startDate.split('T')[0],
                                 endDate: formData.endDate.split('T')[0],
                                 pickupLocation: formData.pickupLocation,
-                                total: total.toFixed(2) + ' €'
+                                total: total.toFixed(2) + ' AED'
                             },
                             customerData: {
                                 name: formData.fullName,
@@ -1301,7 +1301,7 @@
                     // Show success message and redirect
                     console.log('[PAYMENT] ✅ Process completed successfully');
                     setTimeout(() => {
-                        alert(`✅ Payment Successful!\n\nVehicle: ${selectedCar}\nDays: ${diffDays}\nTotal: €${total.toFixed(2)}\n\nYou will receive a confirmation email.`);
+                        alert(`✅ Payment Successful!\n\nVehicle: ${selectedCar}\nDays: ${diffDays}\nTotal: AED ${total.toFixed(2)}\n\nYou will receive a confirmation email.`);
                         window.location.href = '/index.html';
                     }, 1500);
                 } else if (paymentIntent.status === 'processing') {

@@ -16,7 +16,7 @@ const ENVIRONMENT = 'production'; // 'development' | 'production'
 const DEV_CONFIG = {
     publishableKey: 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', // TEST key
     backendUrl: 'http://localhost:3000',
-    currency: 'eur',
+    currency: 'aed',
     country: 'AE'
 };
 
@@ -27,7 +27,7 @@ const DEV_CONFIG = {
 const PROD_CONFIG = {
     publishableKey: 'pk_live_51RsMXQ3DSCa2l71zZiMkmlBXXpLu1HF0Sy4N4xSsB1TvUWu6wJLlKR5z7HrCa0AIlWQjfZo4tL8d1qcxtgExNHS300EPCAtXti', // LIVE key
     backendUrl: 'https://pgm-production.up.railway.app', // ✅ Railway URL configured
-    currency: 'eur',
+    currency: 'aed',
     country: 'AE'
 };
 

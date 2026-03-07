@@ -49,8 +49,8 @@ Stripe payments are fully implemented. See `STRIPE-IMPLEMENTACION.md` for full d
 
 ## 📞 Contact
 
-- **Address**: Dubai, UAE
-- **Phone**: +34 680 162 813
+- **Address**: Palm Jumeirah, Dubai, UAE
+- **Phone**: +971 586122568
 - **Email**: prestigegoalmotion@gmail.com
 - **Instagram**: @prestigegoalmotion
 - **Hours**: 24/7, Monday to Monday
