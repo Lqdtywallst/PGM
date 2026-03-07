@@ -1,7 +1,7 @@
 {
   "name": "prestige-goal-motion-web",
   "version": "1.0.0",
-  "description": "Web oficial de Prestige Goal Motion - Alquiler de Coches de Lujo",
+  "description": "Web oficial de Dynasty Prestige - Alquiler de Coches de Lujo",
   "main": "backend-example.js",
   "scripts": {
     "start": "node backend-example.js",
@@ -16,7 +16,7 @@
     "luxury-cars",
     "rental"
   ],
-  "author": "Prestige Goal Motion",
+  "author": "Dynasty Prestige",
   "license": "ISC",
   "dependencies": {
     "@stripe/react-stripe-js": "^2.9.0",

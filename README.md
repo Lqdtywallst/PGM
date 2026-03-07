@@ -1,23 +1,23 @@
-# Prestige Goal Motion - Web Oficial
+# Dynasty Prestige - Official Website
 
-Sitio web profesional para Prestige Goal Motion - Alquiler de Coches de Lujo
+Professional website for Dynasty Prestige - Luxury Car Rental
 
-## 🚗 Características
+## 🚗 Features
 
-- **Diseño Profesional**: Interfaz elegante con paleta de colores negra, dorada y plateada
-- **Sistema de Reservas**: Calendario interactivo con disponibilidad de vehículos
-- **Pasarela de Pago**: Integración completa con Stripe (Apple Pay, Google Pay, Tarjetas, Stripe Link)
-- **Formulario de Contacto**: Sistema completo de contacto con validación
-- **Responsive Design**: Adaptado para todos los dispositivos
+- **Professional Design**: Elegant interface with black, gold, and silver palette
+- **Reservation System**: Interactive calendar with vehicle availability
+- **Payment Gateway**: Full Stripe integration (Apple Pay, Google Pay, Cards, Stripe Link)
+- **Contact Form**: Full contact system with validation
+- **Responsive Design**: Adapted for all devices
 
-## 🚙 Flota de Vehículos
+## 🚙 Vehicle Fleet
 
 - Mercedes GLE 53 AMG
 - Mercedes GLE Coupe 400 D
 - Mercedes GLE 400D
 - Lamborghini Huracán
 
-## 📋 Tecnologías Utilizadas
+## 📋 Technologies Used
 
 - HTML5
 - CSS3
@@ -26,41 +26,41 @@ Sitio web profesional para Prestige Goal Motion - Alquiler de Coches de Lujo
 - Node.js / Express (Backend)
 - Font Awesome
 
-## 🔧 Configuración
+## 🔧 Setup
 
-1. Clonar el repositorio
-2. Instalar dependencias: `npm install`
-3. Configurar variables de entorno en `.env`:
-   - `STRIPE_SECRET_KEY` - Clave secreta de Stripe
-   - `STRIPE_WEBHOOK_SECRET` - Secreto del webhook (opcional)
-4. Configurar `config.js` con tu clave pública de Stripe
-5. Iniciar el servidor backend: `npm start`
-6. Abrir `index.html` en un navegador
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Configure environment variables in `.env`:
+   - `STRIPE_SECRET_KEY` - Stripe secret key
+   - `STRIPE_WEBHOOK_SECRET` - Webhook secret (optional)
+4. Configure `config.js` with your Stripe publishable key
+5. Start the backend server: `npm start`
+6. Open `index.html` in a browser
 
-## 💳 Integración de Pagos Stripe
+## 💳 Stripe Payments Integration
 
-La pasarela de pagos Stripe está completamente implementada. Ver `STRIPE-IMPLEMENTACION.md` para detalles completos.
+Stripe payments are fully implemented. See `STRIPE-IMPLEMENTACION.md` for full details.
 
-### Métodos de pago disponibles:
-- ✅ Tarjetas de crédito/débito (Stripe Elements)
+### Available payment methods:
+- ✅ Credit/Debit cards (Stripe Elements)
 - ✅ Apple Pay
 - ✅ Google Pay
 - ✅ Stripe Link
 
-## 📞 Contacto
+## 📞 Contact
 
-- **Dirección**: Calle Cicón, 27
-- **Teléfono**: +34 680 162 813
+- **Address**: Dubai, UAE
+- **Phone**: +34 680 162 813
 - **Email**: prestigegoalmotion@gmail.com
 - **Instagram**: @prestigegoalmotion
-- **Horario**: 24 horas, Lunes a Lunes
+- **Hours**: 24/7, Monday to Monday
 
-## 📝 Notas
+## 📝 Notes
 
-- El sistema de pagos requiere configuración del backend con Stripe
-- Las imágenes utilizan URLs externas (considerar hosting propio para producción)
-- El calendario de disponibilidad está simulado (conectar con base de datos real)
+- The payment system requires backend configuration with Stripe
+- Images use external URLs (consider hosting your own for production)
+- Availability calendar is simulated (connect to a real database)
 
-## 📄 Licencia
+## 📄 License
 
-© 2025 Prestige Goal Motion. Todos los derechos reservados.
+© 2025 Dynasty Prestige. All rights reserved.

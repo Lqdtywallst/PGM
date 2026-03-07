@@ -1,4 +1,4 @@
-# Prestige Goal Motion - Robots.txt
+# Dynasty Prestige - Robots.txt
 User-agent: *
 Allow: /
 Disallow: /api/

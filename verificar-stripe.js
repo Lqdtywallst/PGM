@@ -1,22 +1,22 @@
-// Script de verificación de configuración de Stripe
-// Ejecuta: node verificar-stripe.js
+// Stripe configuration verification script
+// Run: node verificar-stripe.js
 
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 
 console.log('\n' + '='.repeat(60));
-console.log('🔍 VERIFICACIÓN DE CONFIGURACIÓN STRIPE');
+console.log('🔍 STRIPE CONFIGURATION CHECK');
 console.log('='.repeat(60) + '\n');
 
 let errors = [];
 let warnings = [];
 let success = [];
 
-// 1. Verificar archivo .env
-console.log('1️⃣ Verificando archivo .env...');
+// 1. Check .env file
+console.log('1️⃣ Checking .env file...');
 if (fs.existsSync('.env')) {
-    success.push('✅ Archivo .env existe');
+    success.push('✅ .env file exists');
     
     const envContent = fs.readFileSync('.env', 'utf8');
     
@@ -24,24 +24,24 @@ if (fs.existsSync('.env')) {
         const match = envContent.match(/STRIPE_SECRET_KEY=(.+)/);
         if (match && match[1] && !match[1].includes('tu_clave') && match[1].trim() !== '') {
             if (match[1].startsWith('sk_test_') || match[1].startsWith('sk_live_')) {
-                success.push('✅ STRIPE_SECRET_KEY configurada correctamente');
+                success.push('✅ STRIPE_SECRET_KEY configured correctly');
             } else {
-                errors.push('❌ STRIPE_SECRET_KEY no tiene formato válido (debe empezar con sk_test_ o sk_live_)');
+                errors.push('❌ STRIPE_SECRET_KEY has invalid format (must start with sk_test_ or sk_live_)');
             }
         } else {
-            errors.push('❌ STRIPE_SECRET_KEY no está configurada o tiene valor placeholder');
+            errors.push('❌ STRIPE_SECRET_KEY is not configured or has a placeholder value');
         }
     } else {
-        errors.push('❌ STRIPE_SECRET_KEY no encontrada en .env');
+        errors.push('❌ STRIPE_SECRET_KEY not found in .env');
     }
 } else {
-    errors.push('❌ Archivo .env no existe. Crea uno con STRIPE_SECRET_KEY');
+    errors.push('❌ .env file does not exist. Create one with STRIPE_SECRET_KEY');
 }
 
-// 2. Verificar config.js
-console.log('\n2️⃣ Verificando config.js...');
+// 2. Check config.js
+console.log('\n2️⃣ Checking config.js...');
 if (fs.existsSync('config.js')) {
-    success.push('✅ Archivo config.js existe');
+    success.push('✅ config.js file exists');
     
     const configContent = fs.readFileSync('config.js', 'utf8');
     
@@ -49,31 +49,31 @@ if (fs.existsSync('config.js')) {
         const match = configContent.match(/publishableKey:\s*['"](.+?)['"]/);
         if (match && match[1] && !match[1].includes('...') && match[1].trim() !== '') {
             if (match[1].startsWith('pk_test_') || match[1].startsWith('pk_live_')) {
-                success.push('✅ publishableKey configurada correctamente');
+                success.push('✅ publishableKey configured correctly');
             } else {
-                errors.push('❌ publishableKey no tiene formato válido (debe empezar con pk_test_ o pk_live_)');
+                errors.push('❌ publishableKey has invalid format (must start with pk_test_ or pk_live_)');
             }
         } else {
-            errors.push('❌ publishableKey no está configurada o tiene valor placeholder');
+            errors.push('❌ publishableKey is not configured or has a placeholder value');
         }
     } else {
-        errors.push('❌ publishableKey no encontrada en config.js');
+        errors.push('❌ publishableKey not found in config.js');
     }
     
     if (configContent.includes('backendUrl:')) {
         const match = configContent.match(/backendUrl:\s*['"](.+?)['"]/);
         if (match && match[1]) {
-            success.push(`✅ backendUrl configurada: ${match[1]}`);
+            success.push(`✅ backendUrl configured: ${match[1]}`);
         }
     }
 } else {
-    errors.push('❌ Archivo config.js no existe');
+    errors.push('❌ config.js file does not exist');
 }
 
-// 3. Verificar dependencias
-console.log('\n3️⃣ Verificando dependencias...');
+// 3. Check dependencies
+console.log('\n3️⃣ Checking dependencies...');
 if (fs.existsSync('node_modules')) {
-    success.push('✅ node_modules existe');
+    success.push('✅ node_modules exists');
     
     const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
     const requiredDeps = ['stripe', 'express', 'cors', 'dotenv', 'nodemailer'];
@@ -81,54 +81,54 @@ if (fs.existsSync('node_modules')) {
     requiredDeps.forEach(dep => {
         const depPath = path.join('node_modules', dep);
         if (fs.existsSync(depPath)) {
-            success.push(`✅ ${dep} instalado`);
+            success.push(`✅ ${dep} installed`);
         } else {
-            errors.push(`❌ ${dep} no está instalado. Ejecuta: npm install`);
+            errors.push(`❌ ${dep} is not installed. Run: npm install`);
         }
     });
 } else {
-    errors.push('❌ node_modules no existe. Ejecuta: npm install');
+    errors.push('❌ node_modules does not exist. Run: npm install');
 }
 
-// 4. Verificar backend
-console.log('\n4️⃣ Verificando backend...');
+// 4. Check backend
+console.log('\n4️⃣ Checking backend...');
 if (fs.existsSync('backend-example.js')) {
-    success.push('✅ backend-example.js existe');
+    success.push('✅ backend-example.js exists');
 } else {
-    errors.push('❌ backend-example.js no existe');
+    errors.push('❌ backend-example.js does not exist');
 }
 
-// Mostrar resultados
+// Show results
 console.log('\n' + '='.repeat(60));
-console.log('📊 RESULTADOS');
+console.log('📊 RESULTS');
 console.log('='.repeat(60) + '\n');
 
 if (success.length > 0) {
-    console.log('✅ ÉXITOS:');
+    console.log('✅ SUCCESSES:');
     success.forEach(msg => console.log('   ' + msg));
     console.log('');
 }
 
 if (warnings.length > 0) {
-    console.log('⚠️  ADVERTENCIAS:');
+    console.log('⚠️  WARNINGS:');
     warnings.forEach(msg => console.log('   ' + msg));
     console.log('');
 }
 
 if (errors.length > 0) {
-    console.log('❌ ERRORES:');
+    console.log('❌ ERRORS:');
     errors.forEach(msg => console.log('   ' + msg));
     console.log('');
     console.log('='.repeat(60));
-    console.log('❌ CONFIGURACIÓN INCOMPLETA');
+    console.log('❌ CONFIGURATION INCOMPLETE');
     console.log('='.repeat(60));
-    console.log('\n📖 Sigue la guía en: CONFIGURAR-STRIPE.md\n');
+    console.log('\n📖 Follow the guide in: CONFIGURAR-STRIPE.md\n');
     process.exit(1);
 } else {
     console.log('='.repeat(60));
-    console.log('✅ CONFIGURACIÓN COMPLETA');
+    console.log('✅ CONFIGURATION COMPLETE');
     console.log('='.repeat(60));
-    console.log('\n🚀 Puedes iniciar el servidor con: npm start\n');
+    console.log('\n🚀 You can start the server with: npm start\n');
     process.exit(0);
 }
 

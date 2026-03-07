@@ -1,13 +1,13 @@
-// API Route para Reservas
-// Maneja todas las operaciones relacionadas con reservas
+// API route for reservations
+// Handles all reservation-related operations
 
 require('dotenv').config();
 const express = require('express');
 
-// Verificar que STRIPE_SECRET_KEY esté configurada
+// Verify that STRIPE_SECRET_KEY is configured
 if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('tu_clave')) {
-    console.error('[RESERVE ROUTE] ❌ ERROR: STRIPE_SECRET_KEY no está configurada');
-    console.error('[RESERVE ROUTE] El módulo se cargará pero las funciones de pago no funcionarán');
+    console.error('[RESERVE ROUTE] ❌ ERROR: STRIPE_SECRET_KEY is not configured');
+    console.error('[RESERVE ROUTE] The module will load but payment functions will not work');
 }
 
 const stripe = process.env.STRIPE_SECRET_KEY ? require('stripe')(process.env.STRIPE_SECRET_KEY) : null;
@@ -15,9 +15,8 @@ const nodemailer = require('nodemailer');
 
 const router = express.Router();
 
-// Mapeo de nombres de países a códigos ISO de 2 caracteres
+// Map country names to 2-character ISO codes
 const countryNameToCode = {
-    'Spain': 'ES',
     'France': 'FR',
     'Italy': 'IT',
     'Germany': 'DE',
@@ -29,18 +28,18 @@ const countryNameToCode = {
     'UAE': 'AE',
 };
 
-// Función para convertir nombre de país a código ISO
+// Function to convert country name to ISO code
 function normalizeCountryCode(country) {
     if (!country) return null;
-    // Si ya es un código ISO de 2 caracteres, devolverlo
+    // If it's already a 2-character ISO code, return it
     if (country.length === 2 && /^[A-Z]{2}$/i.test(country)) {
         return country.toUpperCase();
     }
-    // Si es un nombre de país, convertirlo a código
+    // If it's a country name, convert it to a code
     return countryNameToCode[country] || country;
 }
 
-// Configuración de email
+// Email configuration
 const EMAIL_CONFIG = {
     service: process.env.EMAIL_SERVICE || 'gmail',
     user: process.env.EMAIL_USER || 'prestigegoalmotion@gmail.com',
@@ -50,23 +49,23 @@ const EMAIL_CONFIG = {
 const emailTransporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,
-    secure: false, // true para 465, false para otros puertos
+    secure: false, // true for 465, false for other ports
     requireTLS: true,
     auth: {
         user: EMAIL_CONFIG.user,
         pass: EMAIL_CONFIG.password,
     },
     tls: {
-        // No fallar en certificados inválidos
+        // Do not fail on invalid certificates
         rejectUnauthorized: false
     }
 });
 
-// Función para enviar email de notificación ANTES del pago
+// Function to send notification email BEFORE payment
 async function sendReservationNotificationEmail(reservationData, customerData) {
     const companyEmail = 'prestigegoalmotion@gmail.com';
     
-    // Email de notificación para la empresa (reserva pendiente de pago)
+    // Company notification email (reservation pending payment)
     const notificationEmailHtml = `
         <!DOCTYPE html>
         <html>
@@ -85,28 +84,28 @@ async function sendReservationNotificationEmail(reservationData, customerData) {
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>🔔 Nueva Reserva Pendiente - Prestige Goal Motion</h1>
+                    <h1>🔔 New Pending Reservation - Dynasty Prestige</h1>
                 </div>
                 <div class="content">
-                    <div class="status">⏳ RESERVA PENDIENTE DE PAGO</div>
-                    <h2>Detalles de la Reserva</h2>
-                    <div class="info-row"><span class="label">Vehículo:</span> ${reservationData.car || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Fecha de inicio:</span> ${reservationData.startDate || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Fecha de fin:</span> ${reservationData.endDate || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Días:</span> ${reservationData.days || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Precio por día:</span> ${reservationData.pricePerDay || 'N/A'} €</div>
+                    <div class="status">⏳ PAYMENT PENDING</div>
+                    <h2>Reservation Details</h2>
+                    <div class="info-row"><span class="label">Vehicle:</span> ${reservationData.car || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Start date:</span> ${reservationData.startDate || 'N/A'}</div>
+                    <div class="info-row"><span class="label">End date:</span> ${reservationData.endDate || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Days:</span> ${reservationData.days || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Price per day:</span> ${reservationData.pricePerDay || 'N/A'} €</div>
                     <div class="info-row"><span class="label">Total:</span> ${reservationData.total || 'N/A'} €</div>
-                    ${reservationData.pickupLocation ? `<div class="info-row"><span class="label">Ubicación de recogida:</span> ${reservationData.pickupLocation}</div>` : ''}
-                    <h3>Datos del Cliente</h3>
-                    <div class="info-row"><span class="label">Nombre:</span> ${customerData.name || customerData.fullName || 'N/A'}</div>
+                    ${reservationData.pickupLocation ? `<div class="info-row"><span class="label">Pickup location:</span> ${reservationData.pickupLocation}</div>` : ''}
+                    <h3>Customer Details</h3>
+                    <div class="info-row"><span class="label">Name:</span> ${customerData.name || customerData.fullName || 'N/A'}</div>
                     <div class="info-row"><span class="label">Email:</span> ${customerData.email || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Teléfono:</span> ${customerData.phone || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Phone:</span> ${customerData.phone || 'N/A'}</div>
                     ${customerData.dni || customerData.passport ? `<div class="info-row"><span class="label">DNI/Passport:</span> ${customerData.dni || customerData.passport}</div>` : ''}
-                    ${customerData.address ? `<div class="info-row"><span class="label">Dirección:</span> ${customerData.address}</div>` : ''}
-                    ${customerData.city ? `<div class="info-row"><span class="label">Ciudad:</span> ${customerData.city}</div>` : ''}
-                    ${customerData.postalCode ? `<div class="info-row"><span class="label">Código Postal:</span> ${customerData.postalCode}</div>` : ''}
-                    ${customerData.country ? `<div class="info-row"><span class="label">País:</span> ${customerData.country}</div>` : ''}
-                    <p style="margin-top: 20px; color: #666; font-size: 0.9rem;">Esta reserva está pendiente de pago. El cliente procederá con el pago a continuación.</p>
+                    ${customerData.address ? `<div class="info-row"><span class="label">Address:</span> ${customerData.address}</div>` : ''}
+                    ${customerData.city ? `<div class="info-row"><span class="label">City:</span> ${customerData.city}</div>` : ''}
+                    ${customerData.postalCode ? `<div class="info-row"><span class="label">Postal Code:</span> ${customerData.postalCode}</div>` : ''}
+                    ${customerData.country ? `<div class="info-row"><span class="label">Country:</span> ${customerData.country}</div>` : ''}
+                    <p style="margin-top: 20px; color: #666; font-size: 0.9rem;">This reservation is pending payment. The customer will proceed with payment next.</p>
                 </div>
             </div>
         </body>
@@ -117,22 +116,22 @@ async function sendReservationNotificationEmail(reservationData, customerData) {
         await emailTransporter.sendMail({
             from: EMAIL_CONFIG.user,
             to: companyEmail,
-            subject: `Nueva Reserva Pendiente: ${reservationData.car || 'Vehículo'} - ${customerData.name || customerData.fullName || 'Cliente'}`,
+            subject: `New Pending Reservation: ${reservationData.car || 'Vehicle'} - ${customerData.name || customerData.fullName || 'Customer'}`,
             html: notificationEmailHtml,
         });
         
         return { success: true };
     } catch (error) {
-        console.error('Error enviando email de notificación:', error);
+        console.error('Error sending notification email:', error);
         return { success: false, error: error.message };
     }
 }
 
-// Función para enviar email de confirmación
+// Function to send confirmation email
 async function sendReservationEmail(reservationData, customerData, paymentIntentId) {
     const companyEmail = 'prestigegoalmotion@gmail.com';
     
-    // Email para la empresa
+    // Company email
     const companyEmailHtml = `
         <!DOCTYPE html>
         <html>
@@ -150,34 +149,34 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>🚗 Nueva Reserva - Prestige Goal Motion</h1>
+                    <h1>🚗 New Reservation - Dynasty Prestige</h1>
                 </div>
                 <div class="content">
-                    <h2>Detalles de la Reserva</h2>
-                    <div class="info-row"><span class="label">Vehículo:</span> ${reservationData.car || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Fecha de inicio:</span> ${reservationData.startDate || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Fecha de fin:</span> ${reservationData.endDate || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Días:</span> ${reservationData.days || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Precio por día:</span> ${reservationData.pricePerDay || 'N/A'} €</div>
+                    <h2>Reservation Details</h2>
+                    <div class="info-row"><span class="label">Vehicle:</span> ${reservationData.car || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Start date:</span> ${reservationData.startDate || 'N/A'}</div>
+                    <div class="info-row"><span class="label">End date:</span> ${reservationData.endDate || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Days:</span> ${reservationData.days || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Price per day:</span> ${reservationData.pricePerDay || 'N/A'} €</div>
                     <div class="info-row"><span class="label">Total:</span> ${reservationData.total || 'N/A'} €</div>
-                    ${reservationData.pickupLocation ? `<div class="info-row"><span class="label">Ubicación de recogida:</span> ${reservationData.pickupLocation}</div>` : ''}
+                    ${reservationData.pickupLocation ? `<div class="info-row"><span class="label">Pickup location:</span> ${reservationData.pickupLocation}</div>` : ''}
                     ${paymentIntentId ? `<div class="info-row"><span class="label">Payment Intent ID:</span> ${paymentIntentId}</div>` : ''}
-                    <h3>Datos del Cliente</h3>
-                    <div class="info-row"><span class="label">Nombre:</span> ${customerData.name || customerData.fullName || 'N/A'}</div>
+                    <h3>Customer Details</h3>
+                    <div class="info-row"><span class="label">Name:</span> ${customerData.name || customerData.fullName || 'N/A'}</div>
                     <div class="info-row"><span class="label">Email:</span> ${customerData.email || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Teléfono:</span> ${customerData.phone || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Phone:</span> ${customerData.phone || 'N/A'}</div>
                     ${customerData.dni || customerData.passport ? `<div class="info-row"><span class="label">DNI/Passport:</span> ${customerData.dni || customerData.passport}</div>` : ''}
-                    ${customerData.address ? `<div class="info-row"><span class="label">Dirección:</span> ${customerData.address}</div>` : ''}
-                    ${customerData.city ? `<div class="info-row"><span class="label">Ciudad:</span> ${customerData.city}</div>` : ''}
-                    ${customerData.postalCode ? `<div class="info-row"><span class="label">Código Postal:</span> ${customerData.postalCode}</div>` : ''}
-                    ${customerData.country ? `<div class="info-row"><span class="label">País:</span> ${customerData.country}</div>` : ''}
+                    ${customerData.address ? `<div class="info-row"><span class="label">Address:</span> ${customerData.address}</div>` : ''}
+                    ${customerData.city ? `<div class="info-row"><span class="label">City:</span> ${customerData.city}</div>` : ''}
+                    ${customerData.postalCode ? `<div class="info-row"><span class="label">Postal Code:</span> ${customerData.postalCode}</div>` : ''}
+                    ${customerData.country ? `<div class="info-row"><span class="label">Country:</span> ${customerData.country}</div>` : ''}
                 </div>
             </div>
         </body>
         </html>
     `;
     
-    // Email para el cliente
+    // Customer email
     const customerEmailHtml = `
         <!DOCTYPE html>
         <html>
@@ -195,20 +194,20 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>✅ Reserva Confirmada - Prestige Goal Motion</h1>
+                    <h1>✅ Reservation Confirmed - Dynasty Prestige</h1>
                 </div>
                 <div class="content">
-                    <p>Estimado/a ${customerData.name || customerData.fullName || 'Cliente'},</p>
-                    <p>Su reserva ha sido confirmada exitosamente. A continuación encontrará los detalles:</p>
-                    <h2>Detalles de la Reserva</h2>
-                    <div class="info-row"><span class="label">Vehículo:</span> ${reservationData.car || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Fecha de inicio:</span> ${reservationData.startDate || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Fecha de fin:</span> ${reservationData.endDate || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Días:</span> ${reservationData.days || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Precio por día:</span> ${reservationData.pricePerDay || 'N/A'} €</div>
+                    <p>Dear ${customerData.name || customerData.fullName || 'Customer'},</p>
+                    <p>Your reservation has been confirmed successfully. Below are the details:</p>
+                    <h2>Reservation Details</h2>
+                    <div class="info-row"><span class="label">Vehicle:</span> ${reservationData.car || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Start date:</span> ${reservationData.startDate || 'N/A'}</div>
+                    <div class="info-row"><span class="label">End date:</span> ${reservationData.endDate || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Days:</span> ${reservationData.days || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Price per day:</span> ${reservationData.pricePerDay || 'N/A'} €</div>
                     <div class="info-row"><span class="label">Total:</span> ${reservationData.total || (reservationData.pricePerDay && reservationData.days ? (parseFloat(reservationData.pricePerDay) * parseInt(reservationData.days)).toFixed(2) + ' €' : 'N/A')}</div>
-                    ${reservationData.pickupLocation ? `<div class="info-row"><span class="label">Ubicación de recogida:</span> ${reservationData.pickupLocation}</div>` : ''}
-                    <p style="margin-top: 20px;">Gracias por confiar en Prestige Goal Motion.</p>
+                    ${reservationData.pickupLocation ? `<div class="info-row"><span class="label">Pickup location:</span> ${reservationData.pickupLocation}</div>` : ''}
+                    <p style="margin-top: 20px;">Thank you for choosing Dynasty Prestige.</p>
                 </div>
             </div>
         </body>
@@ -216,60 +215,60 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
     `;
     
     try {
-        console.log('[EMAIL] ========== INICIANDO ENVÍO DE EMAILS ==========');
-        console.log('[EMAIL] Configuración:', {
+        console.log('[EMAIL] ========== STARTING EMAIL DELIVERY ==========');
+        console.log('[EMAIL] Configuration:', {
             from: EMAIL_CONFIG.user,
             service: EMAIL_CONFIG.service,
             hasPassword: !!EMAIL_CONFIG.password
         });
-        console.log('[EMAIL] Datos de reserva:', {
+        console.log('[EMAIL] Reservation data:', {
             car: reservationData.car,
             days: reservationData.days,
             total: reservationData.total
         });
-        console.log('[EMAIL] Datos del cliente:', {
+        console.log('[EMAIL] Customer data:', {
             name: customerData.name || customerData.fullName,
             email: customerData.email,
             hasEmail: !!customerData.email
         });
         
-        // Enviar email a la empresa
-        console.log('[EMAIL] Enviando email a la empresa:', companyEmail);
+        // Send email to the company
+        console.log('[EMAIL] Sending email to company:', companyEmail);
         const companyEmailResult = await emailTransporter.sendMail({
             from: EMAIL_CONFIG.user,
             to: companyEmail,
-            subject: `Nueva Reserva: ${reservationData.car || 'Vehículo'} - ${customerData.name || customerData.fullName || 'Cliente'}`,
+            subject: `New Reservation: ${reservationData.car || 'Vehicle'} - ${customerData.name || customerData.fullName || 'Customer'}`,
             html: companyEmailHtml,
         });
-        console.log('[EMAIL] ✅ Email a empresa enviado:', {
+        console.log('[EMAIL] ✅ Company email sent:', {
             messageId: companyEmailResult.messageId,
             accepted: companyEmailResult.accepted,
             rejected: companyEmailResult.rejected
         });
         
-        // Enviar email al cliente
+        // Send email to customer
         if (customerData.email) {
-            console.log('[EMAIL] Enviando email al cliente:', customerData.email);
+            console.log('[EMAIL] Sending email to customer:', customerData.email);
             const customerEmailResult = await emailTransporter.sendMail({
                 from: EMAIL_CONFIG.user,
                 to: customerData.email,
-                subject: `Reserva Confirmada - Prestige Goal Motion`,
+                subject: `Reservation Confirmed - Dynasty Prestige`,
                 html: customerEmailHtml,
                 replyTo: companyEmail,
             });
-            console.log('[EMAIL] ✅ Email al cliente enviado:', {
+            console.log('[EMAIL] ✅ Customer email sent:', {
                 messageId: customerEmailResult.messageId,
                 accepted: customerEmailResult.accepted,
                 rejected: customerEmailResult.rejected
             });
         } else {
-            console.warn('[EMAIL] ⚠️ No se envió email al cliente: no hay email en customerData');
+            console.warn('[EMAIL] ⚠️ Customer email not sent: no email in customerData');
         }
         
-        console.log('[EMAIL] ✅ Todos los emails enviados correctamente');
+        console.log('[EMAIL] ✅ All emails sent successfully');
         return { success: true };
     } catch (error) {
-        console.error('[EMAIL] ❌ ERROR ENVIANDO EMAILS:', error);
+        console.error('[EMAIL] ❌ ERROR SENDING EMAILS:', error);
         console.error('[EMAIL] Error details:', {
             message: error.message,
             code: error.code,
@@ -281,38 +280,38 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
     }
 }
 
-// POST /api/reserve - Crear reserva
+// POST /api/reserve - Create reservation
 router.post('/', async (req, res) => {
-    console.log('[API] ========== NUEVA PETICIÓN DE RESERVA ==========');
+    console.log('[API] ========== NEW RESERVATION REQUEST ==========');
     console.log('[API] Timestamp:', new Date().toISOString());
     console.log('[API] Headers:', req.headers);
     
     try {
         const data = req.body;
-        console.log('[API] Datos recibidos:', JSON.stringify(data, null, 2));
-
-        // Validación básica (similar al código TypeScript proporcionado)
-        console.log('[API] Validando datos...');
+        console.log('[API] Data received:', JSON.stringify(data, null, 2));
+        
+        // Basic validation (similar to the provided TypeScript code)
+        console.log('[API] Validating data...');
         if (!data.fullName && !data.customerData?.name) {
-            console.error('[API] ❌ Validación fallida: Missing fullName');
+        console.error('[API] ❌ Validation failed: Missing fullName');
             return res.status(400).json({ error: 'Missing fullName' });
         }
 
         if (!data.email && !data.customerData?.email) {
-            console.error('[API] ❌ Validación fallida: Missing email');
+        console.error('[API] ❌ Validation failed: Missing email');
             return res.status(400).json({ error: 'Missing email' });
         }
 
         if (!data.startDate && !data.reservationData?.startDate) {
-            console.error('[API] ❌ Validación fallida: Missing startDate');
+        console.error('[API] ❌ Validation failed: Missing startDate');
             return res.status(400).json({ error: 'Missing startDate' });
         }
 
-        console.log('[API] ✅ Validación pasada');
+        console.log('[API] ✅ Validation passed');
         console.log('[API] NEW RESERVATION:', data);
 
-        // Normalizar datos (soporta ambos formatos: directo o anidado)
-        console.log('[API] Normalizando datos...');
+        // Normalize data (supports both formats: direct or nested)
+        console.log('[API] Normalizing data...');
         const customerData = data.customerData || {
             name: data.fullName,
             email: data.email,
@@ -321,7 +320,7 @@ router.post('/', async (req, res) => {
             address: data.address,
             city: data.city,
             postalCode: data.postalCode,
-            country: normalizeCountryCode(data.country), // Convertir a código ISO
+            country: normalizeCountryCode(data.country), // Convert to ISO code
         };
 
         const reservationData = data.reservationData || {
@@ -333,65 +332,65 @@ router.post('/', async (req, res) => {
             pickupLocation: data.pickupLocation,
         };
 
-        console.log('[API] Datos normalizados:', {
+        console.log('[API] Normalized data:', {
             customer: customerData,
             reservation: reservationData
         });
 
-        // Calcular total si no viene
+        // Calculate total if not provided
         if (!data.amount && !reservationData.total) {
-            console.log('[API] Calculando total...');
+            console.log('[API] Calculating total...');
             const start = new Date(reservationData.startDate);
             const end = new Date(reservationData.endDate);
             const diffTime = Math.abs(end - start);
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
             reservationData.days = diffDays;
             reservationData.total = diffDays * reservationData.pricePerDay;
-            console.log('[API] Total calculado:', {
+            console.log('[API] Calculated total:', {
                 days: diffDays,
                 pricePerDay: reservationData.pricePerDay,
                 total: reservationData.total
             });
         }
 
-        // Enviar email de notificación ANTES del pago (asíncrono, no bloquea)
-        console.log('[API] Enviando email de notificación (asíncrono)...');
+        // Send notification email BEFORE payment (async, non-blocking)
+        console.log('[API] Sending notification email (async)...');
         sendReservationNotificationEmail(reservationData, customerData)
             .then((emailResult) => {
-                console.log('[API] ✅ Email de notificación enviado (asíncrono):', emailResult);
+                console.log('[API] ✅ Notification email sent (async):', emailResult);
             })
             .catch((emailError) => {
-                console.warn('[API] ⚠️ Error enviando email de notificación (no crítico, asíncrono):', emailError);
-                // No fallar la reserva si falla el email
+                console.warn('[API] ⚠️ Error sending notification email (non-critical, async):', emailError);
+                // Do not fail reservation if email fails
             });
 
-        // Si viene amount, crear PaymentIntent con Stripe
+        // If amount is provided, create PaymentIntent with Stripe
         let paymentIntent = null;
         let customer = null;
 
         if (data.amount) {
-            console.log('[API] Monto recibido:', data.amount);
-            console.log('[API] Creando PaymentIntent con Stripe...');
+            console.log('[API] Amount received:', data.amount);
+            console.log('[API] Creating PaymentIntent with Stripe...');
             
-            // Validar formato de email
+            // Validate email format
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(customerData.email)) {
-                console.error('[API] ❌ Email inválido:', customerData.email);
+                console.error('[API] ❌ Invalid email:', customerData.email);
                 return res.status(400).json({ 
                     error: 'Invalid email format' 
                 });
             }
 
-            // Verificar que Stripe esté configurado
+            // Verify Stripe is configured
             if (!stripe) {
-                console.error('[API] ❌ Stripe no está inicializado');
+                console.error('[API] ❌ Stripe is not initialized');
                 return res.status(500).json({ 
                     error: 'Stripe not configured' 
                 });
             }
 
-            // Crear o recuperar cliente en Stripe
-            console.log('[API] Buscando/creando cliente en Stripe...');
+            // Create or retrieve customer in Stripe
+            console.log('[API] Looking up/creating Stripe customer...');
             const customerStartTime = Date.now();
             try {
                 const existingCustomers = await stripe.customers.list({
@@ -402,8 +401,8 @@ router.post('/', async (req, res) => {
                 if (existingCustomers.data.length > 0) {
                     customer = existingCustomers.data[0];
                     const customerLookupDuration = Date.now() - customerStartTime;
-                    console.log('[API] Cliente existente encontrado:', customer.id, `(${customerLookupDuration}ms)`);
-                    // Actualizar información del cliente
+                    console.log('[API] Existing customer found:', customer.id, `(${customerLookupDuration}ms)`);
+                    // Update customer information
                     const updateStartTime = Date.now();
                     await stripe.customers.update(customer.id, {
                         name: customerData.name,
@@ -419,9 +418,9 @@ router.post('/', async (req, res) => {
                         },
                     });
                     const updateDuration = Date.now() - updateStartTime;
-                    console.log('[API] Cliente actualizado', `(${updateDuration}ms)`);
+                    console.log('[API] Customer updated', `(${updateDuration}ms)`);
                 } else {
-                    console.log('[API] Creando nuevo cliente...');
+                    console.log('[API] Creating new customer...');
                     const createStartTime = Date.now();
                     customer = await stripe.customers.create({
                         email: customerData.email,
@@ -439,10 +438,10 @@ router.post('/', async (req, res) => {
                     });
                     const createDuration = Date.now() - createStartTime;
                     const totalCustomerDuration = Date.now() - customerStartTime;
-                    console.log('[API] ✅ Cliente creado:', customer.id, `(${createDuration}ms, total: ${totalCustomerDuration}ms)`);
+                    console.log('[API] ✅ Customer created:', customer.id, `(${createDuration}ms, total: ${totalCustomerDuration}ms)`);
                 }
             } catch (error) {
-                console.error('[API] ❌ Error creando/actualizando cliente:', error);
+                console.error('[API] ❌ Error creating/updating customer:', error);
                 console.error('[API] Error details:', {
                     message: error.message,
                     type: error.type,
@@ -453,8 +452,8 @@ router.post('/', async (req, res) => {
                 });
             }
 
-            // Crear PaymentIntent
-            console.log('[API] Creando PaymentIntent...');
+            // Create PaymentIntent
+            console.log('[API] Creating PaymentIntent...');
             const paymentIntentStartTime = Date.now();
             try {
                 const paymentIntentData = {
@@ -463,7 +462,7 @@ router.post('/', async (req, res) => {
                     customer: customer.id,
                     confirmation_method: 'automatic',
                     confirm: false,
-                    description: `Reserva: ${reservationData.car} - ${reservationData.days} días`,
+                    description: `Reservation: ${reservationData.car} - ${reservationData.days} days`,
                     metadata: {
                         car: reservationData.car,
                         days: reservationData.days.toString(),
@@ -477,7 +476,7 @@ router.post('/', async (req, res) => {
                     payment_method_types: ['card', 'apple_pay', 'google_pay', 'link'],
                 };
                 
-                console.log('[API] Datos del PaymentIntent:', {
+                console.log('[API] PaymentIntent data:', {
                     amount: paymentIntentData.amount,
                     currency: paymentIntentData.currency,
                     customer: paymentIntentData.customer,
@@ -487,14 +486,14 @@ router.post('/', async (req, res) => {
                 try {
                     paymentIntent = await stripe.paymentIntents.create(paymentIntentData);
                     const paymentIntentDuration = Date.now() - paymentIntentStartTime;
-                    console.log('[API] ✅ PaymentIntent creado:', {
+                    console.log('[API] ✅ PaymentIntent created:', {
                         id: paymentIntent.id,
                         status: paymentIntent.status,
                         client_secret: paymentIntent.client_secret ? paymentIntent.client_secret.substring(0, 20) + '...' : null,
                         duration: `${paymentIntentDuration}ms`
                     });
                 } catch (paymentError) {
-                    // Si el error es por métodos de pago no activados (Apple Pay/Google Pay), intentar solo con métodos básicos
+                    // If the error is due to payment methods not enabled (Apple Pay/Google Pay), try only basic methods
                     const errorMessage = paymentError.message || paymentError.toString() || '';
                     const isPaymentMethodError = errorMessage.includes('payment method type') || 
                                                  errorMessage.includes('invalid') ||
@@ -502,14 +501,14 @@ router.post('/', async (req, res) => {
                                                  errorMessage.includes('google_pay');
                     
                     if (isPaymentMethodError) {
-                        console.log('[API] ⚠️ Métodos de pago no disponibles, usando solo card y link...');
+                        console.log('[API] ⚠️ Payment methods not available, using only card and link...');
                         console.log('[API] Error original:', errorMessage);
                         try {
                             paymentIntentData.payment_method_types = ['card', 'link'];
                             paymentIntent = await stripe.paymentIntents.create(paymentIntentData);
-                            console.log('[API] ✅ PaymentIntent creado con métodos básicos');
+                            console.log('[API] ✅ PaymentIntent created with basic methods');
                         } catch (retryError) {
-                            console.error('[API] ❌ Error en segundo intento:', retryError);
+                            console.error('[API] ❌ Error on second attempt:', retryError);
                             throw retryError;
                         }
                     } else {
@@ -517,7 +516,7 @@ router.post('/', async (req, res) => {
                     }
                 }
             } catch (error) {
-                console.error('[API] ❌ Error creando PaymentIntent:', error);
+                console.error('[API] ❌ Error creating PaymentIntent:', error);
                 console.error('[API] Error details:', {
                     message: error.message,
                     type: error.type,
@@ -529,26 +528,26 @@ router.post('/', async (req, res) => {
                 });
             }
         } else {
-            console.log('[API] ⚠️ No se recibió amount, no se creará PaymentIntent');
+            console.log('[API] ⚠️ Amount not received, PaymentIntent will not be created');
         }
 
-        // Enviar emails de confirmación de forma asíncrona (no bloquea la respuesta)
-        // No esperamos la respuesta para evitar timeouts
-        // EMAIL DESHABILITADO - Comentado por solicitud del usuario
-        // console.log('[API] Enviando emails de confirmación (asíncrono)...');
+        // Send confirmation emails asynchronously (non-blocking)
+        // We do not wait for the response to avoid timeouts
+        // EMAIL DISABLED - Commented out per user request
+        // console.log('[API] Sending confirmation emails (async)...');
         // sendReservationEmail(
         //     reservationData,
         //     customerData,
         //     paymentIntent?.id || null
         // ).then((emailResult) => {
-        //     console.log('[API] ✅ Emails enviados (asíncrono):', emailResult);
+        //     console.log('[API] ✅ Emails sent (async):', emailResult);
         // }).catch((emailError) => {
-        //     console.warn('[API] ⚠️ Error enviando emails (no crítico, asíncrono):', emailError);
-        //     // No fallar la reserva si falla el email
+        //     console.warn('[API] ⚠️ Error sending emails (non-critical, async):', emailError);
+        //     // Do not fail the reservation if email fails
         // });
-        console.log('[API] ℹ️ Notificación de email deshabilitada');
+        console.log('[API] ℹ️ Email notification disabled');
 
-        // Aquí puedes guardar en base de datos
+        // Here you can save to the database
         // Ejemplo:
         // await saveReservation({
         //     paymentIntentId: paymentIntent?.id,
@@ -558,8 +557,8 @@ router.post('/', async (req, res) => {
         //     ...customerData
         // });
 
-        // Respuesta
-        console.log('[API] Preparando respuesta...');
+        // Response
+        console.log('[API] Preparing response...');
         if (paymentIntent) {
             const response = {
                 success: true,
@@ -567,7 +566,7 @@ router.post('/', async (req, res) => {
                 paymentIntentId: paymentIntent.id,
                 customerId: customer.id,
             };
-            console.log('[API] ✅ Respuesta exitosa con PaymentIntent:', {
+            console.log('[API] ✅ Successful response with PaymentIntent:', {
                 paymentIntentId: response.paymentIntentId,
                 customerId: response.customerId,
                 hasClientSecret: !!response.clientSecret
@@ -578,12 +577,12 @@ router.post('/', async (req, res) => {
                 success: true,
                 message: 'Reservation created successfully',
             };
-            console.log('[API] ✅ Respuesta exitosa sin PaymentIntent');
+            console.log('[API] ✅ Successful response without PaymentIntent');
             return res.json(response);
         }
 
     } catch (error) {
-        console.error('[API] ❌ ERROR GENERAL:', error);
+        console.error('[API] ❌ GENERAL ERROR:', error);
         console.error('[API] Stack trace:', error.stack);
         return res.status(500).json({ 
             error: 'Error processing reservation: ' + error.message 
@@ -591,30 +590,30 @@ router.post('/', async (req, res) => {
     }
 });
 
-// POST /api/reserve/confirm - Confirmar pago y enviar emails
+// POST /api/reserve/confirm - Confirm payment and send emails
 router.post('/confirm', async (req, res) => {
-    console.log('[API CONFIRM] ========== CONFIRMACIÓN DE RESERVA ==========');
+    console.log('[API CONFIRM] ========== RESERVATION CONFIRMATION ==========');
     console.log('[API CONFIRM] Timestamp:', new Date().toISOString());
     
     try {
         const { paymentIntentId, reservationData, customerData } = req.body;
-        console.log('[API CONFIRM] Datos recibidos:', {
+        console.log('[API CONFIRM] Data received:', {
             paymentIntentId: paymentIntentId,
             hasReservationData: !!reservationData,
             hasCustomerData: !!customerData
         });
 
         if (!paymentIntentId) {
-            console.error('[API CONFIRM] ❌ PaymentIntentId requerido');
+            console.error('[API CONFIRM] ❌ PaymentIntentId required');
             return res.status(400).json({ 
                 error: 'Payment Intent ID is required' 
             });
         }
 
-        // Verificar el estado del pago
-        console.log('[API CONFIRM] Recuperando PaymentIntent de Stripe...');
+        // Check payment status
+        console.log('[API CONFIRM] Retrieving PaymentIntent from Stripe...');
         const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-        console.log('[API CONFIRM] PaymentIntent recuperado:', {
+        console.log('[API CONFIRM] PaymentIntent retrieved:', {
             id: paymentIntent.id,
             status: paymentIntent.status,
             amount: paymentIntent.amount,
@@ -622,9 +621,9 @@ router.post('/confirm', async (req, res) => {
         });
 
         if (paymentIntent.status === 'succeeded') {
-            console.log('[API CONFIRM] ✅ Pago exitoso, enviando emails...');
+            console.log('[API CONFIRM] ✅ Payment successful, sending emails...');
             
-            // Preparar datos de reserva (usar datos enviados o metadatos del PaymentIntent)
+            // Prepare reservation data (use provided data or PaymentIntent metadata)
             let finalReservationData = reservationData || {
                 car: paymentIntent.metadata.car,
                 days: parseInt(paymentIntent.metadata.days) || 1,
@@ -634,13 +633,13 @@ router.post('/confirm', async (req, res) => {
                 pickupLocation: paymentIntent.metadata.pickupLocation,
             };
             
-            // Calcular total si no viene en los datos
+            // Calculate total if not provided
             if (!finalReservationData.total && finalReservationData.pricePerDay && finalReservationData.days) {
                 const calculatedTotal = (parseFloat(finalReservationData.pricePerDay) * parseInt(finalReservationData.days)).toFixed(2);
                 finalReservationData.total = calculatedTotal + ' €';
             }
             
-            // Preparar datos del cliente (usar datos enviados o metadatos del PaymentIntent)
+            // Prepare customer data (use provided data or PaymentIntent metadata)
             let finalCustomerData = customerData;
             if (!finalCustomerData) {
                 finalCustomerData = {
@@ -648,7 +647,7 @@ router.post('/confirm', async (req, res) => {
                     email: paymentIntent.metadata.customerEmail,
                 };
                 
-                // Intentar obtener datos completos del cliente de Stripe
+                // Try to fetch full customer data from Stripe
                 try {
                     if (paymentIntent.customer) {
                         const customer = await stripe.customers.retrieve(paymentIntent.customer);
@@ -660,13 +659,13 @@ router.post('/confirm', async (req, res) => {
                         finalCustomerData.dni = customer.metadata?.dni || '';
                     }
                 } catch (customerError) {
-                    console.warn('[API CONFIRM] ⚠️ Error obteniendo datos del cliente:', customerError);
+                    console.warn('[API CONFIRM] ⚠️ Error fetching customer data:', customerError);
                 }
             }
             
-            // Enviar emails de confirmación
-            console.log('[API CONFIRM] Enviando emails de confirmación...');
-            console.log('[API CONFIRM] Llamando a sendReservationEmail con datos:', {
+            // Send confirmation emails
+            console.log('[API CONFIRM] Sending confirmation emails...');
+            console.log('[API CONFIRM] Calling sendReservationEmail with data:', {
                 reservationData: finalReservationData,
                 customerData: {
                     name: finalCustomerData.name || finalCustomerData.fullName,
@@ -684,14 +683,14 @@ router.post('/confirm', async (req, res) => {
                     finalCustomerData,
                     paymentIntentId
                 );
-                console.log('[API CONFIRM] ✅ Resultado del envío de emails:', emailResult);
+                console.log('[API CONFIRM] ✅ Email send result:', emailResult);
             } catch (emailErr) {
                 emailError = emailErr.message || emailErr.toString();
-                console.error('[API CONFIRM] ❌ Error enviando emails:', emailError);
-                // No fallar la confirmación si falla el email, el pago ya fue exitoso
+                console.error('[API CONFIRM] ❌ Error sending emails:', emailError);
+                // Do not fail confirmation if email fails; payment already succeeded
             }
             
-            console.log('[API CONFIRM] ✅ Confirmación completada');
+            console.log('[API CONFIRM] ✅ Confirmation completed');
             return res.json({
                 success: true,
                 paymentIntentId: paymentIntent.id,
@@ -701,7 +700,7 @@ router.post('/confirm', async (req, res) => {
                 message: emailResult?.success ? 'Reservation confirmed and emails sent' : (emailError ? 'Reservation confirmed but email failed' : 'Reservation confirmed')
             });
         } else {
-            console.log('[API CONFIRM] ⚠️ Pago no completado, estado:', paymentIntent.status);
+            console.log('[API CONFIRM] ⚠️ Payment not completed, status:', paymentIntent.status);
             return res.json({
                 success: false,
                 paymentIntentId: paymentIntent.id,
@@ -718,7 +717,7 @@ router.post('/confirm', async (req, res) => {
     }
 });
 
-// GET /api/reserve/:paymentIntentId - Obtener estado de una reserva
+// GET /api/reserve/:paymentIntentId - Get reservation status
 router.get('/:paymentIntentId', async (req, res) => {
     try {
         const { paymentIntentId } = req.params;
@@ -733,7 +732,7 @@ router.get('/:paymentIntentId', async (req, res) => {
             metadata: paymentIntent.metadata,
         });
     } catch (error) {
-        console.error('Error obteniendo reserva:', error);
+        console.error('Error retrieving reservation:', error);
         return res.status(500).json({ 
             error: 'Error retrieving reservation: ' + error.message 
         });

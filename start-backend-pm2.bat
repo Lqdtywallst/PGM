@@ -1,25 +1,25 @@
 @echo off
 echo ========================================
-echo Iniciando Backend con PM2
+echo Starting backend with PM2
 echo ========================================
 echo.
 
-REM Iniciar el backend con PM2
+REM Start the backend with PM2
 pm2 start backend-example.js --name "prestige-backend"
 
-REM Guardar la configuración para que se inicie al arrancar el sistema
+REM Save the configuration to start on boot
 pm2 save
 pm2 startup
 
 echo.
 echo ========================================
-echo Backend iniciado correctamente!
+echo Backend started successfully!
 echo ========================================
 echo.
-echo Para ver el estado: pm2 status
-echo Para ver los logs: pm2 logs prestige-backend
-echo Para detener: pm2 stop prestige-backend
-echo Para reiniciar: pm2 restart prestige-backend
+echo To see status: pm2 status
+echo To view logs: pm2 logs prestige-backend
+echo To stop: pm2 stop prestige-backend
+echo To restart: pm2 restart prestige-backend
 echo.
 pause
 

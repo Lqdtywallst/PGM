@@ -1,7 +1,7 @@
 {
-  "name": "Prestige Goal Motion - Luxury Car Rental",
-  "short_name": "PGM",
-  "description": "Alquiler de coches de lujo en España. Mercedes, Lamborghini, Ferrari y más.",
+  "name": "Dynasty Prestige - Luxury Car Rental",
+  "short_name": "DP",
+  "description": "Luxury car rental in Dubai. Mercedes, Lamborghini, Ferrari and more.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
@@ -22,7 +22,7 @@
     }
   ],
   "categories": ["automotive", "travel", "business"],
-  "lang": "es-ES",
+  "lang": "en-AE",
   "dir": "ltr",
   "scope": "/",
   "prefer_related_applications": false

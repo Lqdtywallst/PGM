@@ -1,11 +1,11 @@
-// Service Worker para Prestige Goal Motion
-// Cache de recursos estáticos para mejor rendimiento
+// Service Worker for Dynasty Prestige
+// Cache static assets for better performance
 
 const CACHE_NAME = 'pgm-v1.0.0';
 const STATIC_CACHE = 'pgm-static-v1';
 const DYNAMIC_CACHE = 'pgm-dynamic-v1';
 
-// Recursos a cachear en la instalación
+// Assets to cache during install
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -16,7 +16,7 @@ const STATIC_ASSETS = [
   'https://js.stripe.com/v3/'
 ];
 
-// Instalación del Service Worker
+// Service Worker install
 self.addEventListener('install', (event) => {
   console.log('[SW] Installing service worker...');
   event.waitUntil(
@@ -32,7 +32,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// Activación del Service Worker
+// Service Worker activation
 self.addEventListener('activate', (event) => {
   console.log('[SW] Activating service worker...');
   event.waitUntil(
@@ -50,17 +50,17 @@ self.addEventListener('activate', (event) => {
   return self.clients.claim();
 });
 
-// Estrategia de cache: Cache First para recursos estáticos, Network First para dinámicos
+// Cache strategy: Cache First for static assets, Network First for dynamic content
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // No cachear requests a APIs del backend
+  // Do not cache backend API requests
   if (url.pathname.startsWith('/api/')) {
     return;
   }
 
-  // Cache First para recursos estáticos
+  // Cache First for static assets
   if (request.method === 'GET' && 
       (request.destination === 'image' || 
        request.destination === 'style' || 
@@ -83,14 +83,14 @@ self.addEventListener('fetch', (event) => {
           });
         })
         .catch(() => {
-          // Fallback si falla la red y no hay cache
+          // Fallback if the network fails and there is no cache
           if (request.destination === 'image') {
             return new Response('', { status: 404 });
           }
         })
     );
   } else {
-    // Network First para HTML
+    // Network First for HTML
     event.respondWith(
       fetch(request)
         .then((response) => {
@@ -109,7 +109,7 @@ self.addEventListener('fetch', (event) => {
   }
 });
 
-// Limpiar cache antiguo periódicamente
+// Periodically clean old cache
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();

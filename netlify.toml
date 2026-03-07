@@ -1,11 +1,11 @@
 [[redirects]]
-  from = "/reservas"
+  from = "/reservations"
   to = "/#reserva"
   status = 301
   force = true
 
 [[redirects]]
-  from = "/reservas/*"
+  from = "/reservations/*"
   to = "/#reserva"
   status = 301
   force = true
@@ -23,19 +23,19 @@
   force = true
 
 [[redirects]]
-  from = "/stock-disponible-a-la-venta"
+  from = "/available-stock-for-sale"
   to = "/#fleet"
   status = 301
   force = true
 
 [[redirects]]
-  from = "/nuestra-colección-exclusiva"
+  from = "/exclusive-collection"
   to = "/#fleet"
   status = 301
   force = true
 
 [[redirects]]
-  from = "/nuestra-colección-exclusiva/*"
+  from = "/exclusive-collection/*"
   to = "/#fleet"
   status = 301
   force = true

@@ -1,36 +1,32 @@
-# ✅ Cómo Verificar si el Servidor Funciona
+# ✅ How to Verify the Server Is Working
 
-## 🔍 Métodos de Verificación
+## 🔍 Verification Methods
 
-### Método 1: Desde el Navegador
+### Method 1: Browser
 
-Abre estos URLs en tu navegador:
+Open these URLs:
 
-#### Test 1: Endpoint de Prueba
+#### Test 1: API Test
 ```
 https://pgm-production.up.railway.app/api/test
 ```
 
-**Si funciona, verás:**
+Expected response:
 ```json
 {
   "status": "ok",
-  "message": "Servidor funcionando correctamente",
+  "message": "Server running correctly",
   "timestamp": "2026-01-04T...",
-  "server": "Prestige Goal Motion API"
+  "server": "Dynasty Prestige API"
 }
 ```
-
-**Si NO funciona, verás:**
-- Error 502 Bad Gateway
-- Página de error de Railway
 
 #### Test 2: Health Check
 ```
 https://pgm-production.up.railway.app/health
 ```
 
-**Si funciona, verás:**
+Expected response:
 ```json
 {
   "status": "ok",
@@ -38,16 +34,16 @@ https://pgm-production.up.railway.app/health
 }
 ```
 
-#### Test 3: Root Endpoint
+#### Test 3: Root
 ```
 https://pgm-production.up.railway.app/
 ```
 
-**Si funciona, verás:**
+Expected response:
 ```json
 {
   "status": "ok",
-  "message": "🚗 Prestige Goal Motion - API Server",
+  "message": "🚗 Dynasty Prestige - API Server",
   "version": "1.0.0",
   "endpoints": {...}
 }
@@ -55,117 +51,52 @@ https://pgm-production.up.railway.app/
 
 ---
 
-### Método 2: Desde la Consola del Navegador
+### Method 2: Browser Console
 
-1. Abre tu sitio web
-2. Presiona **F12** para abrir la consola
-3. Ve a la pestaña **"Network"** (Red)
-4. Intenta hacer una reserva o enviar un mensaje
-5. Busca las peticiones a `pgm-production.up.railway.app`
-6. Haz clic en la petición para ver los detalles
+1. Open your website
+2. Press **F12** → **Network**
+3. Try to make a reservation or send a message
+4. Look for requests to `pgm-production.up.railway.app`
 
-**Si funciona:**
+If it works:
 - Status: `200 OK`
-- Response: JSON con datos
+- Response: JSON
 
-**Si NO funciona:**
-- Status: `502 Bad Gateway`
-- O `Failed to fetch`
-
----
-
-### Método 3: Desde HTTP Logs en Railway
-
-1. Railway → Tu Servicio → **"HTTP Logs"**
-2. Intenta acceder a `https://pgm-production.up.railway.app/api/test` desde tu navegador
-3. Deberías ver la petición en los HTTP Logs
-
-**Si funciona:**
-- Status: `200`
-- Método: `GET`
-- Path: `/api/test`
-
-**Si NO funciona:**
-- Status: `502`
-- O no aparece la petición
+If it fails:
+- `502 Bad Gateway`
+- Or `Failed to fetch`
 
 ---
 
-### Método 4: Desde PowerShell/Terminal
+### Method 3: Railway HTTP Logs
 
-Ejecuta estos comandos:
+1. Railway → Your Service → **HTTP Logs**
+2. Hit `https://pgm-production.up.railway.app/api/test`
+3. Confirm the request appears
+
+---
+
+### Method 4: PowerShell/Terminal
 
 ```powershell
-# Test 1: Endpoint de prueba
+# API Test
 Invoke-WebRequest -Uri "https://pgm-production.up.railway.app/api/test" -UseBasicParsing
 
-# Test 2: Health check
+# Health Check
 Invoke-WebRequest -Uri "https://pgm-production.up.railway.app/health" -UseBasicParsing
 
-# Test 3: Root
+# Root
 Invoke-WebRequest -Uri "https://pgm-production.up.railway.app/" -UseBasicParsing
 ```
 
-**Si funciona:**
-- StatusCode: `200`
-- Content: JSON con datos
-
-**Si NO funciona:**
-- Error: `502 Bad Gateway`
-
 ---
 
-## 📊 Interpretación de Resultados
+## 📊 Interpreting Results
 
-### ✅ Si Funciona (Status 200)
+### ✅ If It Works (Status 200)
+- JSON response
+- No 5xx errors
 
-El servidor está funcionando correctamente:
-- ✅ Backend responde
-- ✅ Railway está enrutando correctamente
-- ✅ Todo está bien configurado
-
-### ❌ Si NO Funciona (Status 502)
-
-El servidor está activo pero Railway no puede conectarse:
-- ✅ El código está correcto
-- ✅ El servidor está corriendo (según logs)
-- ❌ Railway no está enrutando el tráfico
-
-**Posibles causas:**
-1. Railway necesita más tiempo
-2. Problema de configuración en Railway
-3. Limitaciones del plan gratuito
-
----
-
-## 🔍 Verificación Adicional
-
-### Verificar que el Proceso Está Activo
-
-En Railway → Deploy Logs, busca:
-
-```
-[2026-01-04T...] Servidor activo - PID: 25
-```
-
-Si ves estos mensajes cada minuto, el proceso está activo.
-
-### Verificar HTTP Logs
-
-En Railway → HTTP Logs:
-- Si haces una petición, debería aparecer
-- Si no aparece, Railway no está recibiendo el tráfico
-- Si aparece con 502, Railway recibe pero no puede conectar
-
----
-
-## 🎯 Resumen
-
-**Para verificar si funciona:**
-
-1. **Abre en el navegador:** `https://pgm-production.up.railway.app/api/test`
-2. **Si ves JSON** → ✅ Funciona
-3. **Si ves 502** → ❌ Railway no está enrutando correctamente
-
-**El servidor está funcionando** (según los logs), pero Railway puede tener problemas de enrutamiento.
-
+### ❌ If It Fails
+- `502` or timeout errors
+- No response in Railway logs

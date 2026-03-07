@@ -7,12 +7,12 @@
   ],
   "redirects": [
     {
-      "source": "/reservas",
+      "source": "/reservations",
       "destination": "/#reserva",
       "permanent": true
     },
     {
-      "source": "/reservas/",
+      "source": "/reservations/",
       "destination": "/#reserva",
       "permanent": true
     },
@@ -27,17 +27,17 @@
       "permanent": true
     },
     {
-      "source": "/stock-disponible-a-la-venta",
+      "source": "/available-stock-for-sale",
       "destination": "/#fleet",
       "permanent": true
     },
     {
-      "source": "/nuestra-colección-exclusiva",
+      "source": "/exclusive-collection",
       "destination": "/#fleet",
       "permanent": true
     },
     {
-      "source": "/nuestra-colección-exclusiva/",
+      "source": "/exclusive-collection/",
       "destination": "/#fleet",
       "permanent": true
     }

@@ -1,5 +1,5 @@
 @echo off
-echo Iniciando servidor backend...
+echo Starting backend server...
 echo.
 node backend-example.js
 pause

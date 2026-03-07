@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reserve - Prestige Goal Motion</title>
+    <title>Reserve - Dynasty Prestige</title>
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="/logo-pgm.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/logo-pgm.png">
@@ -421,13 +421,12 @@
             </div>
             <div class="form-group">
                 <select id="country" name="country" class="input" required>
-                    <option value="ES">Spain</option>
+                    <option value="AE" selected>United Arab Emirates</option>
                     <option value="FR">France</option>
                     <option value="IT">Italy</option>
                     <option value="DE">Germany</option>
                     <option value="GB">United Kingdom</option>
                     <option value="US">United States</option>
-                    <option value="AE">United Arab Emirates</option>
                     <option value="">Other</option>
                 </select>
             </div>
@@ -523,12 +522,12 @@
     </div>
 
     <script>
-        // Estado del formulario
+        // Form state
         let currentStep = 1;
         let selectedCar = 'Mercedes GLE 53 AMG';
         let pricePerDay = 500;
         
-        // Estado del calendario
+        // Calendar state
         let currentDate = new Date();
         let selectedStartDate = null;
         let selectedEndDate = null;
@@ -539,19 +538,19 @@
         let cardElement = null;
         let paymentIntentClientSecret = null;
 
-        // Obtener parámetros de la URL (si vienen del index.html)
+        // Get URL parameters (if coming from index.html)
         const urlParams = new URLSearchParams(window.location.search);
         const carName = urlParams.get('car');
         const price = urlParams.get('price');
         
-        console.log('[RESERVE PAGE] Parámetros recibidos:', { carName, price });
+        console.log('[RESERVE PAGE] Received parameters:', { carName, price });
         
         if (carName) selectedCar = decodeURIComponent(carName);
         if (price) pricePerDay = parseFloat(price);
         
-        console.log('[RESERVE PAGE] Vehículo seleccionado:', selectedCar, 'Precio:', pricePerDay);
+        console.log('[RESERVE PAGE] Selected vehicle:', selectedCar, 'Price:', pricePerDay);
         
-        // Actualizar información del vehículo
+        // Update vehicle information
         const selectedCarElement = document.getElementById('selectedCar');
         const summaryPriceElement = document.getElementById('summaryPricePerDay');
         
@@ -562,35 +561,35 @@
             summaryPriceElement.textContent = `€${pricePerDay}`;
         }
         
-        console.log('[RESERVE PAGE] Página inicializada correctamente');
+        console.log('[RESERVE PAGE] Page initialized successfully');
         
-        // Inicializar Stripe
+        // Initialize Stripe
         const STRIPE_PUBLISHABLE_KEY = window.STRIPE_CONFIG?.publishableKey || 'pk_live_51RsMXQ3DSCa2l71zZiMkmlBXXpLu1HF0Sy4N4xSsB1TvUWu6wJLlKR5z7HrCa0AIlWQjfZo4tL8d1qcxtgExNHS300EPCAtXti';
-        console.log('[STRIPE INIT] Inicializando Stripe...');
-        console.log('[STRIPE INIT] Clave pública:', STRIPE_PUBLISHABLE_KEY ? STRIPE_PUBLISHABLE_KEY.substring(0, 20) + '...' : 'NO ENCONTRADA');
-        console.log('[STRIPE INIT] Stripe disponible:', typeof Stripe !== 'undefined');
+        console.log('[STRIPE INIT] Initializing Stripe...');
+        console.log('[STRIPE INIT] Publishable key:', STRIPE_PUBLISHABLE_KEY ? STRIPE_PUBLISHABLE_KEY.substring(0, 20) + '...' : 'NOT FOUND');
+        console.log('[STRIPE INIT] Stripe available:', typeof Stripe !== 'undefined');
         
         if (typeof Stripe !== 'undefined') {
             try {
                 stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
                 elements = stripe.elements();
-                console.log('[STRIPE INIT] ✅ Stripe inicializado correctamente');
+                console.log('[STRIPE INIT] ✅ Stripe initialized successfully');
             } catch (error) {
-                console.error('[STRIPE INIT] ❌ Error inicializando Stripe:', error);
+                console.error('[STRIPE INIT] ❌ Error initializing Stripe:', error);
             }
         } else {
-            console.error('[STRIPE INIT] ❌ Stripe no está disponible (script no cargado)');
+            console.error('[STRIPE INIT] ❌ Stripe is not available (script not loaded)');
         }
         
-        // Inicializar calendario cuando se carga la página
+        // Initialize calendar when the page loads
         if (document.getElementById('step2').classList.contains('active')) {
             generateCalendar();
         }
 
-        // Navegación entre pasos
+        // Step navigation
         function nextStep() {
             if (currentStep === 1) {
-                // Validar paso 1
+                // Validate step 1
                 const required = ['fullName', 'passport', 'email', 'phone', 'address', 'city', 'postalCode', 'country'];
                 let isValid = true;
                 
@@ -624,7 +623,7 @@
                     return;
                 }
 
-                // Calcular total
+                // Calculate total
                 calculateTotal();
             }
             
@@ -652,7 +651,7 @@
                 step.classList.remove('active');
             });
 
-            // Mostrar paso actual
+            // Show current step
             document.getElementById(`step${currentStep}`).classList.add('active');
 
             // Actualizar indicadores
@@ -669,13 +668,13 @@
                 generateCalendar();
             }
             
-            // Inicializar Stripe Elements cuando se muestra el paso 3
+        // Initialize Stripe Elements when step 3 is shown
             if (currentStep === 3) {
                 initializeStripeElements();
             }
         }
         
-        // Funciones del calendario
+        // Calendar functions
         function generateCalendar() {
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
@@ -691,7 +690,7 @@
             const grid = document.getElementById('calendarGrid');
             grid.innerHTML = '';
 
-            // Días de la semana
+            // Days of the week
             const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
             weekDays.forEach(day => {
                 const dayElement = document.createElement('div');
@@ -700,14 +699,14 @@
                 grid.appendChild(dayElement);
             });
 
-            // Espacios vacíos al inicio
+            // Empty slots at the start
             for (let i = 0; i < startingDayOfWeek; i++) {
                 const emptyDay = document.createElement('div');
                 emptyDay.className = 'calendar-day';
                 grid.appendChild(emptyDay);
             }
 
-            // Días del mes
+            // Days of the month
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
@@ -718,7 +717,7 @@
                 dayElement.className = 'calendar-day';
                 dayElement.textContent = day;
 
-                // Verificar si es una fecha pasada
+                // Check if this is a past date
                 if (date < today) {
                     dayElement.classList.add('past', 'unavailable');
                 } else {
@@ -726,12 +725,12 @@
                     dayElement.onclick = () => selectDate(date);
                 }
 
-                // Marcar hoy
+                // Mark today
                 if (dateStr === formatDate(today)) {
                     dayElement.classList.add('today');
                 }
 
-                // Marcar fechas seleccionadas y rango
+                // Mark selected dates and range
                 if (selectedStartDate && selectedEndDate) {
                     const startStr = formatDate(selectedStartDate);
                     const endStr = formatDate(selectedEndDate);
@@ -755,29 +754,29 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            // No permitir seleccionar fechas pasadas
+            // Do not allow selecting past dates
             if (date < today) {
                 return;
             }
             
             if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
-                // Primera selección o resetear selección
+                // First selection or reset selection
                 selectedStartDate = date;
                 selectedEndDate = null;
                 document.getElementById('startDate').value = formatDateInput(date);
                 document.getElementById('endDate').value = '';
             } else if (date > selectedStartDate) {
-                // Segunda selección (fecha final)
+                // Second selection (end date)
                 selectedEndDate = date;
                 document.getElementById('endDate').value = formatDateInput(date);
             } else if (date < selectedStartDate) {
-                // Si selecciona una fecha anterior a la inicial, hacerla la nueva inicial
+                // If the selected date is before the start, make it the new start
                 selectedStartDate = date;
                 selectedEndDate = null;
                 document.getElementById('startDate').value = formatDateInput(date);
                 document.getElementById('endDate').value = '';
             } else {
-                // Si hace clic en la misma fecha, resetear
+                // If clicking the same date, reset
                 selectedStartDate = null;
                 selectedEndDate = null;
                 document.getElementById('startDate').value = '';
@@ -872,7 +871,7 @@
             updateContinueButton();
         }
 
-        // Escuchar cambios en las fechas para calcular total
+        // Listen for date changes to calculate the total
         document.getElementById('startDate').addEventListener('change', function() {
             updateCalendarFromInputs();
         });
@@ -880,26 +879,26 @@
             updateCalendarFromInputs();
         });
 
-        // Inicializar Stripe Elements
+        // Initialize Stripe Elements
         function initializeStripeElements() {
-            console.log('[STRIPE ELEMENTS] Inicializando elementos de Stripe...');
-            console.log('[STRIPE ELEMENTS] Stripe disponible:', !!stripe);
-            console.log('[STRIPE ELEMENTS] Elements disponible:', !!elements);
+            console.log('[STRIPE ELEMENTS] Initializing Stripe elements...');
+            console.log('[STRIPE ELEMENTS] Stripe available:', !!stripe);
+            console.log('[STRIPE ELEMENTS] Elements available:', !!elements);
             
             if (!stripe || !elements) {
-                console.error('[STRIPE ELEMENTS] ❌ Stripe no está inicializado');
+                console.error('[STRIPE ELEMENTS] ❌ Stripe is not initialized');
                 return;
             }
 
-            // Si ya existe el elemento, no lo recreamos
+            // If the element already exists, do not recreate it
             if (cardElement) {
-                console.log('[STRIPE ELEMENTS] ⚠️ Elemento de tarjeta ya existe');
+                console.log('[STRIPE ELEMENTS] ⚠️ Card element already exists');
                 return;
             }
 
             try {
-                // Crear el elemento de tarjeta
-                console.log('[STRIPE ELEMENTS] Creando elemento de tarjeta...');
+                // Create the card element
+                console.log('[STRIPE ELEMENTS] Creating card element...');
                 cardElement = elements.create('card', {
                     style: {
                         base: {
@@ -917,55 +916,55 @@
                     },
                 });
 
-                // Montar el elemento en el contenedor
+                // Mount the element in the container
                 const cardContainer = document.getElementById('card-element');
                 if (!cardContainer) {
-                    console.error('[STRIPE ELEMENTS] ❌ Contenedor #card-element no encontrado');
+                    console.error('[STRIPE ELEMENTS] ❌ #card-element container not found');
                     return;
                 }
                 
                 cardElement.mount('#card-element');
-                console.log('[STRIPE ELEMENTS] ✅ Elemento de tarjeta montado correctamente');
+                console.log('[STRIPE ELEMENTS] ✅ Card element mounted successfully');
 
-                // Manejar errores de validación en tiempo real
+                // Handle real-time validation errors
                 cardElement.on('change', function(event) {
                     const displayError = document.getElementById('card-errors');
                     if (event.error) {
-                        console.log('[STRIPE ELEMENTS] ⚠️ Error de validación:', event.error.message);
+                        console.log('[STRIPE ELEMENTS] ⚠️ Validation error:', event.error.message);
                         displayError.textContent = event.error.message;
                     } else {
                         displayError.textContent = '';
                     }
                 });
 
-                // Mostrar el contenedor del formulario
+                // Show the payment form container
                 document.getElementById('payment-form-container').style.display = 'block';
-                console.log('[STRIPE ELEMENTS] ✅ Formulario de pago visible');
+                console.log('[STRIPE ELEMENTS] ✅ Payment form is visible');
             } catch (error) {
-                console.error('[STRIPE ELEMENTS] ❌ Error creando elemento:', error);
+                console.error('[STRIPE ELEMENTS] ❌ Error creating element:', error);
             }
         }
 
-        // Función para verificar conexión con el servidor
+        // Function to check server connection
         async function checkServerConnection() {
             const BACKEND_URL = window.BACKEND_URL || window.STRIPE_CONFIG?.backendUrl || 'http://localhost:3000';
-            console.log('[CONNECTION CHECK] Verificando conexión con servidor:', BACKEND_URL);
+            console.log('[CONNECTION CHECK] Checking connection to server:', BACKEND_URL);
             console.log('[CONNECTION CHECK] Protocolo actual:', window.location.protocol);
             
-            // Verificar si estamos en file:// (puede causar problemas de CORS)
+            // Check if we are in file:// (can cause CORS issues)
             if (window.location.protocol === 'file:') {
-                console.warn('[CONNECTION CHECK] ⚠️ Archivo abierto como file://. Esto puede causar problemas de CORS.');
-                console.warn('[CONNECTION CHECK] Considera usar un servidor web local o abrir desde http://localhost');
+                console.warn('[CONNECTION CHECK] ⚠️ File opened as file://. This can cause CORS issues.');
+                console.warn('[CONNECTION CHECK] Consider using a local web server or opening from http://localhost');
             }
             
-            // Intentar múltiples endpoints
+            // Try multiple endpoints
             const endpoints = ['/api/test', '/health', '/'];
             
             for (const endpoint of endpoints) {
                 try {
-                    console.log(`[CONNECTION CHECK] Intentando conectar a: ${BACKEND_URL}${endpoint}`);
+                    console.log(`[CONNECTION CHECK] Trying to connect to: ${BACKEND_URL}${endpoint}`);
                     
-                    // Crear un AbortController para el timeout
+                    // Create an AbortController for the timeout
                     const controller = new AbortController();
                     const timeoutId = setTimeout(() => controller.abort(), 10000);
                     
@@ -974,7 +973,7 @@
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        mode: 'cors', // Forzar CORS
+                        mode: 'cors', // Force CORS
                         signal: controller.signal
                     });
                     
@@ -982,56 +981,56 @@
                     
                     if (response.ok) {
                         const data = await response.json();
-                        console.log('[CONNECTION CHECK] ✅ Servidor conectado:', data);
+                        console.log('[CONNECTION CHECK] ✅ Server connected:', data);
                         return true;
                     } else {
-                        console.warn(`[CONNECTION CHECK] ⚠️ Respuesta no OK (${response.status}) desde ${endpoint}`);
+                        console.warn(`[CONNECTION CHECK] ⚠️ Non-OK response (${response.status}) from ${endpoint}`);
                     }
                 } catch (error) {
                     if (error.name === 'AbortError') {
-                        console.error(`[CONNECTION CHECK] ❌ Timeout al conectar a ${endpoint} (10 segundos)`);
+                        console.error(`[CONNECTION CHECK] ❌ Timeout connecting to ${endpoint} (10 seconds)`);
                     } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-                        console.error(`[CONNECTION CHECK] ❌ Error de red al conectar a ${endpoint}:`, error.message);
-                        console.error('[CONNECTION CHECK] Posibles causas:');
-                        console.error('[CONNECTION CHECK] - El servidor no está corriendo');
-                        console.error('[CONNECTION CHECK] - Problema de CORS (intenta abrir desde http://localhost)');
-                        console.error('[CONNECTION CHECK] - Firewall bloqueando la conexión');
+                        console.error(`[CONNECTION CHECK] ❌ Network error connecting to ${endpoint}:`, error.message);
+                        console.error('[CONNECTION CHECK] Possible causes:');
+                        console.error('[CONNECTION CHECK] - The server is not running');
+                        console.error('[CONNECTION CHECK] - CORS issue (try opening from http://localhost)');
+                        console.error('[CONNECTION CHECK] - Firewall blocking the connection');
                     } else {
-                        console.warn(`[CONNECTION CHECK] ⚠️ Error con ${endpoint}:`, error.message);
+                        console.warn(`[CONNECTION CHECK] ⚠️ Error with ${endpoint}:`, error.message);
                     }
-                    // Continuar con el siguiente endpoint
+                    // Continue with the next endpoint
                 }
             }
             
-            console.error('[CONNECTION CHECK] ❌ No se pudo conectar a ningún endpoint');
+            console.error('[CONNECTION CHECK] ❌ Could not connect to any endpoint');
             return false;
         }
 
         async function submitReservation() {
-            console.log('[PAYMENT] ========== INICIANDO PROCESO DE PAGO ==========');
+            console.log('[PAYMENT] ========== STARTING PAYMENT PROCESS ==========');
             const payButton = document.getElementById('payButton');
             payButton.disabled = true;
             payButton.textContent = 'Processing...';
 
-            // Verificar conexión con el servidor primero
+            // Check server connection first
             const BACKEND_URL = window.BACKEND_URL || window.STRIPE_CONFIG?.backendUrl || 'http://localhost:3000';
-            console.log('[PAYMENT] Verificando conexión con servidor antes de procesar pago...');
+            console.log('[PAYMENT] Checking server connection before processing payment...');
             const isConnected = await checkServerConnection();
             if (!isConnected) {
-                const errorMsg = `No se pudo conectar al servidor en ${BACKEND_URL}. Por favor, verifica que el servidor esté corriendo. Abre la consola (F12) para más detalles.`;
+                const errorMsg = `Could not connect to the server at ${BACKEND_URL}. Please verify that the server is running. Open the console (F12) for more details.`;
                 console.error('[PAYMENT] ❌', errorMsg);
-                console.error('[PAYMENT] Verifica que:');
-                console.error('[PAYMENT] 1. El servidor esté corriendo en el puerto 3000');
-                console.error('[PAYMENT] 2. Puedas acceder a http://localhost:3000 en tu navegador');
-                console.error('[PAYMENT] 3. No haya errores de CORS en la consola');
+                console.error('[PAYMENT] Verify that:');
+                console.error('[PAYMENT] 1. The server is running on port 3000');
+                console.error('[PAYMENT] 2. You can access http://localhost:3000 in your browser');
+                console.error('[PAYMENT] 3. There are no CORS errors in the console');
                 showMessage(errorMsg, 'error');
                 payButton.disabled = false;
                 payButton.textContent = 'Confirm & Pay';
                 return;
             }
-            console.log('[PAYMENT] ✅ Conexión con servidor verificada, procediendo con el pago...');
+            console.log('[PAYMENT] ✅ Server connection verified, proceeding with payment...');
 
-            // Recopilar datos del formulario
+            // Collect form data
             const formData = {
                 fullName: document.getElementById('fullName').value,
                 passport: document.getElementById('passport').value,
@@ -1046,7 +1045,7 @@
                 pickupLocation: document.getElementById('pickupLocation').value,
             };
 
-            console.log('[PAYMENT] Datos del formulario recopilados:', {
+            console.log('[PAYMENT] Collected form data:', {
                 fullName: formData.fullName,
                 email: formData.email,
                 phone: formData.phone,
@@ -1056,7 +1055,7 @@
                 pricePerDay: pricePerDay
             });
 
-            // Calcular días y total
+            // Calculate days and total
             const startDate = new Date(formData.startDate);
             const endDate = new Date(formData.endDate);
             const diffTime = Math.abs(endDate - startDate);
@@ -1064,23 +1063,23 @@
             const total = diffDays * pricePerDay;
             const totalCents = Math.round(total * 100);
 
-            console.log('[PAYMENT] Cálculos:', {
+            console.log('[PAYMENT] Calculations:', {
                 diffDays: diffDays,
                 total: total,
                 totalCents: totalCents
             });
 
             try {
-                // Obtener URL del backend
+                // Get backend URL
                 const BACKEND_URL = window.BACKEND_URL || window.STRIPE_CONFIG?.backendUrl || 'http://localhost:3000';
                 console.log('[PAYMENT] Backend URL:', BACKEND_URL);
                 console.log('[PAYMENT] ClientSecret existente:', !!paymentIntentClientSecret);
 
-                // Si no tenemos clientSecret, crear la reserva primero
+                // If we don't have a clientSecret, create the reservation first
                 if (!paymentIntentClientSecret) {
-                    console.log('[PAYMENT] No hay clientSecret, creando reserva...');
+                    console.log('[PAYMENT] No clientSecret, creating reservation...');
                     
-                    // Preparar datos para la API
+                    // Prepare data for the API
                     const reservationData = {
                         amount: totalCents,
                         currency: 'eur',
@@ -1104,7 +1103,7 @@
                         }
                     };
 
-                    console.log('[PAYMENT] Enviando datos al servidor:', {
+                    console.log('[PAYMENT] Sending data to the server:', {
                         url: `${BACKEND_URL}/api/reserve`,
                         method: 'POST',
                         data: reservationData
@@ -1113,17 +1112,17 @@
                     let response;
                     const startTime = Date.now();
                     try {
-                        console.log('[PAYMENT] Iniciando petición al servidor...', {
+                        console.log('[PAYMENT] Starting request to server...', {
                             url: `${BACKEND_URL}/api/reserve`,
                             timestamp: new Date().toISOString()
                         });
                         
-                        // Usar AbortController para mejor control del timeout
+                        // Use AbortController for better timeout control
                         const controller = new AbortController();
                         const timeoutId = setTimeout(() => {
                             controller.abort();
                             const elapsed = Date.now() - startTime;
-                            console.error(`[PAYMENT] ❌ Timeout después de ${elapsed}ms (180 segundos)`);
+                            console.error(`[PAYMENT] ❌ Timeout after ${elapsed}ms (180 seconds)`);
                         }, 180000); // 3 minutos
                         
                         response = await fetch(`${BACKEND_URL}/api/reserve`, {
@@ -1137,22 +1136,22 @@
                         
                         clearTimeout(timeoutId);
                         const elapsed = Date.now() - startTime;
-                        console.log(`[PAYMENT] ✅ Respuesta recibida en ${elapsed}ms`);
+                        console.log(`[PAYMENT] ✅ Response received in ${elapsed}ms`);
                     } catch (fetchError) {
                         const elapsed = Date.now() - startTime;
-                        console.error('[PAYMENT] ❌ Error de conexión:', fetchError);
-                        console.error(`[PAYMENT] Tiempo transcurrido: ${elapsed}ms`);
+                        console.error('[PAYMENT] ❌ Connection error:', fetchError);
+                        console.error(`[PAYMENT] Elapsed time: ${elapsed}ms`);
                         
                         if (fetchError.name === 'AbortError' || fetchError.message.includes('timeout') || fetchError.message.includes('timed out')) {
-                            throw new Error(`Timeout: El servidor no respondió después de ${Math.round(elapsed/1000)} segundos. Esto puede deberse a:\n1. El servidor está sobrecargado\n2. Problemas de red\n3. Stripe está tardando mucho en responder\n\nIntenta nuevamente o verifica los logs del servidor en Railway.`);
+                            throw new Error(`Timeout: The server did not respond after ${Math.round(elapsed/1000)} seconds. This may be due to:\n1. The server is overloaded\n2. Network issues\n3. Stripe is taking too long to respond\n\nTry again or check the server logs in Railway.`);
                         } else if (fetchError.message.includes('Failed to fetch') || fetchError.message.includes('NetworkError')) {
-                            throw new Error('Error de conexión: No se pudo conectar al servidor. Verifica que el servidor esté corriendo en ' + BACKEND_URL);
+                            throw new Error('Connection error: Could not connect to the server. Verify that the server is running at ' + BACKEND_URL);
                         } else {
-                            throw new Error('Error de conexión: ' + fetchError.message);
+                            throw new Error('Connection error: ' + fetchError.message);
                         }
                     }
 
-                    console.log('[PAYMENT] Respuesta del servidor:', {
+                    console.log('[PAYMENT] Server response:', {
                         status: response.status,
                         statusText: response.statusText,
                         ok: response.ok
@@ -1162,42 +1161,42 @@
                     try {
                         data = await response.json();
                     } catch (jsonError) {
-                        console.error('[PAYMENT] ❌ Error parseando respuesta JSON:', jsonError);
+                        console.error('[PAYMENT] ❌ Error parsing JSON response:', jsonError);
                         const textResponse = await response.text();
-                        console.error('[PAYMENT] Respuesta del servidor (texto):', textResponse);
-                        throw new Error('Error: El servidor respondió con un formato inválido. Verifica los logs del servidor.');
+                        console.error('[PAYMENT] Server response (text):', textResponse);
+                        throw new Error('Error: The server responded with an invalid format. Check the server logs.');
                     }
 
-                    console.log('[PAYMENT] Datos recibidos del servidor:', data);
+                    console.log('[PAYMENT] Data received from server:', data);
 
                     if (!response.ok || !data.clientSecret) {
-                        console.error('[PAYMENT] ❌ Error en respuesta del servidor:', {
+                        console.error('[PAYMENT] ❌ Error in server response:', {
                             ok: response.ok,
                             status: response.status,
                             clientSecret: !!data.clientSecret,
                             error: data.error
                         });
-                        throw new Error(data.error || `Error del servidor (${response.status}): ${response.statusText}`);
+                        throw new Error(data.error || `Server error (${response.status}): ${response.statusText}`);
                     }
 
                     paymentIntentClientSecret = data.clientSecret;
-                    console.log('[PAYMENT] ✅ ClientSecret recibido:', paymentIntentClientSecret ? paymentIntentClientSecret.substring(0, 20) + '...' : 'NO RECIBIDO');
+                    console.log('[PAYMENT] ✅ ClientSecret received:', paymentIntentClientSecret ? paymentIntentClientSecret.substring(0, 20) + '...' : 'NOT RECEIVED');
                     showMessage('Reservation created. Please complete payment...', 'success');
                 } else {
-                    console.log('[PAYMENT] Usando clientSecret existente');
+                    console.log('[PAYMENT] Using existing clientSecret');
                 }
 
-                // Confirmar el pago con Stripe
-                console.log('[PAYMENT] Verificando Stripe antes de confirmar pago...');
-                console.log('[PAYMENT] Stripe disponible:', !!stripe);
-                console.log('[PAYMENT] CardElement disponible:', !!cardElement);
+                // Confirm the payment with Stripe
+                console.log('[PAYMENT] Checking Stripe before confirming payment...');
+                console.log('[PAYMENT] Stripe available:', !!stripe);
+                console.log('[PAYMENT] CardElement available:', !!cardElement);
                 
                 if (!stripe || !cardElement) {
-                    console.error('[PAYMENT] ❌ Stripe no está inicializado');
-                    throw new Error('Stripe no está inicializado. Por favor, recarga la página.');
+                    console.error('[PAYMENT] ❌ Stripe is not initialized');
+                    throw new Error('Stripe is not initialized. Please reload the page.');
                 }
 
-                console.log('[PAYMENT] Confirmando pago con Stripe...');
+                console.log('[PAYMENT] Confirming payment with Stripe...');
                 const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(
                     paymentIntentClientSecret,
                     {
@@ -1218,7 +1217,7 @@
                     }
                 );
 
-                console.log('[PAYMENT] Resultado de confirmación Stripe:', {
+                console.log('[PAYMENT] Stripe confirmation result:', {
                     error: stripeError ? stripeError.message : null,
                     paymentIntent: paymentIntent ? {
                         id: paymentIntent.id,
@@ -1228,8 +1227,8 @@
                 });
 
                 if (stripeError) {
-                    console.error('[PAYMENT] ❌ Error de Stripe:', stripeError);
-                    // Mostrar error al usuario
+                    console.error('[PAYMENT] ❌ Stripe error:', stripeError);
+                    // Show error to the user
                     const displayError = document.getElementById('card-errors');
                     if (displayError) {
                         displayError.textContent = stripeError.message;
@@ -1238,23 +1237,23 @@
                 }
 
                 if (!paymentIntent) {
-                    console.error('[PAYMENT] ❌ PaymentIntent no recibido');
-                    throw new Error('No se recibió respuesta del procesador de pagos');
+                    console.error('[PAYMENT] ❌ PaymentIntent not received');
+                    throw new Error('No response received from the payment processor');
                 }
 
-                console.log('[PAYMENT] Estado del PaymentIntent:', paymentIntent.status);
+                console.log('[PAYMENT] PaymentIntent status:', paymentIntent.status);
 
-                // Manejar diferentes estados del pago
+                // Handle different payment states
                 if (paymentIntent.status === 'succeeded') {
-                    console.log('[PAYMENT] ✅ Pago exitoso! PaymentIntent ID:', paymentIntent.id);
+                    console.log('[PAYMENT] ✅ Payment successful! PaymentIntent ID:', paymentIntent.id);
                     showMessage('Payment successful! Processing reservation...', 'success');
                     
-                    // Confirmar la reserva en el backend y enviar emails
+                    // Confirm the reservation in the backend and send emails
                     try {
-                        console.log('[PAYMENT] Confirmando reserva en el backend...');
+                        console.log('[PAYMENT] Confirming reservation in the backend...');
                         const BACKEND_URL = window.BACKEND_URL || window.STRIPE_CONFIG?.backendUrl || 'http://localhost:3000';
                         
-                        // Preparar datos completos para el email de confirmación
+                        // Prepare full data for the confirmation email
                         const confirmData = {
                             paymentIntentId: paymentIntent.id,
                             reservationData: {
@@ -1287,59 +1286,59 @@
                         });
                         
                         const confirmResult = await confirmResponse.json();
-                        console.log('[PAYMENT] Respuesta de confirmación:', confirmResult);
+                        console.log('[PAYMENT] Confirmation response:', confirmResult);
                         
                         if (confirmResult.emailSent) {
-                            console.log('[PAYMENT] ✅ Email de confirmación enviado');
+                            console.log('[PAYMENT] ✅ Confirmation email sent');
                         } else {
-                            console.warn('[PAYMENT] ⚠️ Email de confirmación no enviado');
+                            console.warn('[PAYMENT] ⚠️ Confirmation email not sent');
                         }
                     } catch (confirmError) {
-                        console.warn('[PAYMENT] ⚠️ Error confirmando reserva (no crítico):', confirmError);
-                        // No fallar si la confirmación falla, el pago ya fue exitoso
+                        console.warn('[PAYMENT] ⚠️ Error confirming reservation (non-critical):', confirmError);
+                        // Do not fail if confirmation fails; the payment already succeeded
                     }
 
-                    // Mostrar mensaje de éxito y redirigir
-                    console.log('[PAYMENT] ✅ Proceso completado exitosamente');
+                    // Show success message and redirect
+                    console.log('[PAYMENT] ✅ Process completed successfully');
                     setTimeout(() => {
                         alert(`✅ Payment Successful!\n\nVehicle: ${selectedCar}\nDays: ${diffDays}\nTotal: €${total.toFixed(2)}\n\nYou will receive a confirmation email.`);
                         window.location.href = '/index.html';
                     }, 1500);
                 } else if (paymentIntent.status === 'processing') {
-                    console.log('[PAYMENT] ⏳ Pago en proceso. Verificando estado...');
+                    console.log('[PAYMENT] ⏳ Payment is processing. Checking status...');
                     showMessage('Payment is processing. Please wait...', 'success');
-                    // Verificar el estado del pago después de unos segundos
+                    // Check the payment status after a few seconds
                     setTimeout(async () => {
                         try {
                             const BACKEND_URL = window.BACKEND_URL || window.STRIPE_CONFIG?.backendUrl || 'http://localhost:3000';
                             const checkResponse = await fetch(`${BACKEND_URL}/api/reserve/${paymentIntent.id}`);
                             const checkData = await checkResponse.json();
-                            console.log('[PAYMENT] Estado verificado:', checkData.status);
+                            console.log('[PAYMENT] Status checked:', checkData.status);
                             
                             if (checkData.status === 'succeeded') {
                                 showMessage('Payment successful! Processing reservation...', 'success');
-                                // Llamar a la misma lógica de éxito
-                                location.reload(); // Recargar para procesar el pago exitoso
+                                // Call the same success logic
+                                location.reload(); // Reload to process the successful payment
                             } else {
                                 showMessage('Payment is still processing. Please check your email for confirmation.', 'success');
                                 payButton.disabled = false;
                                 payButton.textContent = 'Confirm & Pay';
                             }
                         } catch (checkError) {
-                            console.warn('[PAYMENT] Error verificando estado:', checkError);
+                            console.warn('[PAYMENT] Error checking status:', checkError);
                             showMessage('Payment is processing. You will receive a confirmation email shortly.', 'success');
                             payButton.disabled = false;
                             payButton.textContent = 'Confirm & Pay';
                         }
                     }, 3000);
                 } else if (paymentIntent.status === 'requires_action') {
-                    console.log('[PAYMENT] ⚠️ Se requiere autenticación adicional (3D Secure)');
+                    console.log('[PAYMENT] ⚠️ Additional authentication required (3D Secure)');
                     showMessage('Please complete the authentication in the popup window...', 'success');
-                    // Stripe manejará automáticamente el flujo 3D Secure
-                    // El PaymentIntent se actualizará automáticamente
-                    // El usuario debe completar la autenticación en el popup
+                    // Stripe will automatically handle the 3D Secure flow
+                    // The PaymentIntent will be updated automatically
+                    // The user must complete authentication in the popup
                 } else if (paymentIntent.status === 'requires_payment_method') {
-                    console.error('[PAYMENT] ❌ El método de pago falló');
+                    console.error('[PAYMENT] ❌ Payment method failed');
                     showMessage('Payment method failed. Please try a different card.', 'error');
                     payButton.disabled = false;
                     payButton.textContent = 'Confirm & Pay';
@@ -1348,13 +1347,13 @@
                         displayError.textContent = 'Payment method failed. Please try a different card.';
                     }
                 } else {
-                    console.error('[PAYMENT] ❌ Estado de pago inesperado:', paymentIntent.status);
+                    console.error('[PAYMENT] ❌ Unexpected payment status:', paymentIntent.status);
                     showMessage('Unexpected payment status: ' + paymentIntent.status, 'error');
                     payButton.disabled = false;
                     payButton.textContent = 'Confirm & Pay';
                 }
             } catch (error) {
-                console.error('[PAYMENT] ❌ ERROR GENERAL:', error);
+                console.error('[PAYMENT] ❌ GENERAL ERROR:', error);
                 console.error('[PAYMENT] Stack trace:', error.stack);
                 showMessage('Error processing payment: ' + error.message, 'error');
                 payButton.disabled = false;

@@ -1,48 +1,48 @@
 // ============================================
-// CONFIGURACIÓN DE STRIPE - FRONTEND
+// STRIPE CONFIGURATION - FRONTEND
 // ============================================
-// IMPORTANTE: Reemplaza estas claves con tus claves reales de Stripe
-// Obtén tus claves en: https://dashboard.stripe.com/apikeys
+// IMPORTANT: Replace these keys with your real Stripe keys
+// Get your keys at: https://dashboard.stripe.com/apikeys
 
 // ============================================
-// CONFIGURACIÓN DE ENTORNO
+// ENVIRONMENT CONFIGURATION
 // ============================================
-// Cambia 'development' a 'production' cuando despliegues
+// Change 'development' to 'production' when deploying
 const ENVIRONMENT = 'production'; // 'development' | 'production'
 
 // ============================================
-// CONFIGURACIÓN DE DESARROLLO
+// DEVELOPMENT CONFIGURATION
 // ============================================
 const DEV_CONFIG = {
-    publishableKey: 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', // Clave de PRUEBA
+    publishableKey: 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', // TEST key
     backendUrl: 'http://localhost:3000',
     currency: 'eur',
-    country: 'ES'
+    country: 'AE'
 };
 
 // ============================================
-// CONFIGURACIÓN DE PRODUCCIÓN (RAILWAY)
+// PRODUCTION CONFIGURATION (RAILWAY)
 // ============================================
-// ✅ URL de Railway configurada
+// ✅ Railway URL configured
 const PROD_CONFIG = {
-    publishableKey: 'pk_live_51RsMXQ3DSCa2l71zZiMkmlBXXpLu1HF0Sy4N4xSsB1TvUWu6wJLlKR5z7HrCa0AIlWQjfZo4tL8d1qcxtgExNHS300EPCAtXti', // Clave LIVE
-    backendUrl: 'https://pgm-production.up.railway.app', // ✅ URL de Railway configurada
+    publishableKey: 'pk_live_51RsMXQ3DSCa2l71zZiMkmlBXXpLu1HF0Sy4N4xSsB1TvUWu6wJLlKR5z7HrCa0AIlWQjfZo4tL8d1qcxtgExNHS300EPCAtXti', // LIVE key
+    backendUrl: 'https://pgm-production.up.railway.app', // ✅ Railway URL configured
     currency: 'eur',
-    country: 'ES'
+    country: 'AE'
 };
 
 // ============================================
-// CONFIGURACIÓN FINAL
+// FINAL CONFIGURATION
 // ============================================
-// Se selecciona automáticamente según ENVIRONMENT
+// Automatically selected based on ENVIRONMENT
 const STRIPE_CONFIG = ENVIRONMENT === 'production' ? PROD_CONFIG : DEV_CONFIG;
 
-// Exportar configuración para uso en Node.js
+// Export configuration for Node.js usage
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = STRIPE_CONFIG;
 }
 
-// Hacer disponible globalmente para el navegador
+// Make globally available for the browser
 if (typeof window !== 'undefined') {
     window.STRIPE_CONFIG = STRIPE_CONFIG;
 }
