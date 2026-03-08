@@ -246,6 +246,7 @@
             transition: transform 0.4s ease, box-shadow 0.4s ease;
             border: 1px solid #333;
             will-change: transform;
+            cursor: pointer;
         }
         .car-card:hover {
             transform: translateY(-15px);
@@ -269,6 +270,105 @@
         .car-info {
             padding: 2rem;
             text-align: center;
+        }
+        .view-gallery {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            font-size: 0.95rem;
+            color: var(--silver);
+        }
+
+        /* Gallery Modal */
+        .gallery-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 2rem;
+        }
+        .gallery-modal.active {
+            display: flex;
+        }
+        .gallery-content {
+            width: min(1000px, 95vw);
+            background: #0f0f0f;
+            border: 1px solid #333;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .gallery-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #222;
+        }
+        .gallery-title {
+            font-size: 1.2rem;
+            color: var(--gold);
+            font-weight: 600;
+        }
+        .gallery-close {
+            background: transparent;
+            border: none;
+            color: var(--silver);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .gallery-body {
+            position: relative;
+            background: #000;
+        }
+        .gallery-main {
+            width: 100%;
+            height: 520px;
+            object-fit: cover;
+            display: block;
+        }
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #444;
+            color: #fff;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .gallery-nav.prev { left: 16px; }
+        .gallery-nav.next { right: 16px; }
+        .gallery-thumbs {
+            display: flex;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem 1.5rem;
+            overflow-x: auto;
+            background: #0f0f0f;
+        }
+        .gallery-thumb {
+            width: 120px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+        .gallery-thumb.active {
+            border-color: var(--gold);
+        }
+        @media (max-width: 768px) {
+            .gallery-main {
+                height: 320px;
+            }
         }
         .car-info h3 {
             font-size: 1.8rem;
@@ -1259,7 +1359,7 @@
 
     <!-- Hero -->
     <section id="inicio" class="hero" role="banner">
-        <img src="https://static.wixstatic.com/media/a11208_3c3efc0ce03a49b5b22d8e9fc1451ee2~mv2.png/v1/crop/x_0,y_303,w_765,h_163/fill/w_1068,h_228,al_c,lg_1,q_85,enc_avif,quality_auto/a11208_3c3efc0ce03a49b5b22d8e9fc1451ee2~mv2.png" alt="Dynasty Prestige - Drive Luxury" class="hero-title-img" width="1068" height="228" decoding="async" fetchpriority="high">
+        <img src="/hero-title.png" alt="Dynasty Prestige" class="hero-title-img" width="1068" height="228" decoding="async" fetchpriority="high">
         <h1 data-i18n="hero.title">DRIVE LUXURY</h1>
         <p data-i18n="hero.subtitle">Supercar and high-end vehicle rental in Dubai. Drive your dream supercar today.</p>
         <a href="#reserva" class="btn" aria-label="Book a luxury car now" data-i18n="hero.button">BOOK NOW</a>
@@ -1283,11 +1383,12 @@
     <section id="fleet" aria-labelledby="fleet-heading">
         <h2 id="fleet-heading" data-i18n="fleet.title">Our Exclusive Fleet</h2>
         <div class="fleet-grid">
-            <div class="car-card">
+            <div class="car-card" data-title="Mercedes GLE 53 AMG" data-gallery='["https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bWVyY2VkZXN8ZW58MHx8MHx8fDA%3D","https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bWVyY2VkZXN8ZW58MHx8MHx8fDA%3D"]'>
                 <img src="https://di-uploads-pod5.dealerinspire.com/mercedesbenzprinceton/uploads/2020/07/2021-Mercedes-Benz-GLE-53-Coupe.png" alt="Mercedes GLE 53 AMG - Luxury SUV Rental" loading="lazy" width="350" height="250" decoding="async">
                 <div class="car-info">
                     <h3>Mercedes GLE 53 AMG</h3>
                     <div class="price" data-i18n="fleet.price_from" data-price="2000">From 2,000 AED / day</div>
+                    <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
                     <a href="/app/reserve/page.html?car=Mercedes GLE 53 AMG&price=2000" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
                     <div class="contact-buttons">
                         <a href="tel:+971586122568" class="btn-contact" aria-label="Call us at +971 586122568">
@@ -1301,11 +1402,12 @@
                     </div>
                 </div>
             </div>
-            <div class="car-card">
+            <div class="car-card" data-title="Mercedes GLE Coupe 400 D" data-gallery='["https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bWVyY2VkZXN8ZW58MHx8MHx8fDA%3D","https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bWVyY2VkZXN8ZW58MHx8MHx8fDA%3D"]'>
                 <img src="https://static.wixstatic.com/media/a11208_cdff107bcc264bd99ce840ca61df422c~mv2.webp/v1/fill/w_1024,h_768,al_c,q_85,enc_auto/a11208_cdff107bcc264bd99ce840ca61df422c~mv2.webp" alt="Mercedes GLE Coupe 400 D - Premium Diesel SUV" loading="lazy" width="350" height="250" decoding="async">
                 <div class="car-info">
                     <h3>Mercedes GLE Coupe 400 D</h3>
                     <div class="price" data-i18n="fleet.price_from" data-price="1600">From 1,600 AED / day</div>
+                    <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
                     <a href="/app/reserve/page.html?car=Mercedes GLE Coupe 400 D&price=1600" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
                     <div class="contact-buttons">
                         <a href="tel:+971586122568" class="btn-contact">
@@ -1319,11 +1421,12 @@
                     </div>
                 </div>
             </div>
-            <div class="car-card">
+            <div class="car-card" data-title="Lamborghini Huracán" data-gallery='["https://images.unsplash.com/photo-1543854589-fdd815f176e0?auto=format&fit=crop&w=900&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bGFtYm9yZ2hpbml8ZW58MHx8MHx8fDA%3D","https://images.unsplash.com/photo-1543854589-fdd815f176e0?auto=format&fit=crop&w=1200&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bGFtYm9yZ2hpbml8ZW58MHx8MHx8fDA%3D"]'>
                 <img src="https://images.unsplash.com/photo-1543854589-fdd815f176e0?q=80&w=1904&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Lamborghini Huracán - Supercar Rental Dubai" loading="lazy" width="350" height="250" decoding="async">
                 <div class="car-info">
                     <h3>Lamborghini Huracán</h3>
                     <div class="price" data-i18n="fleet.price_from" data-price="6000">From 6,000 AED / day</div>
+                    <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
                     <a href="/app/reserve/page.html?car=Lamborghini Huracán&price=6000" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
                     <div class="contact-buttons">
                         <a href="tel:+971586122568" class="btn-contact">
@@ -1337,11 +1440,12 @@
                     </div>
                 </div>
             </div>
-            <div class="car-card">
+            <div class="car-card" data-title="Mercedes GLE 400D" data-gallery='["https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=900&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bWVyY2VkZXMlMjBiZW56fGVufDB8fDB8fHww","https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=1200&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bWVyY2VkZXMlMjBiZW56fGVufDB8fDB8fHww"]'>
                 <img src="https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=900&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bWVyY2VkZXMlMjBiZW56fGVufDB8fDB8fHww" alt="Mercedes GLE 400D - Luxury Diesel SUV" loading="lazy" width="350" height="250" decoding="async">
                 <div class="car-info">
                     <h3>Mercedes GLE 400D</h3>
                     <div class="price" data-i18n="fleet.price_from" data-price="1600">From 1,600 AED / day</div>
+                    <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
                     <a href="/app/reserve/page.html?car=Mercedes GLE 400D&price=1600" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
                     <div class="contact-buttons">
                         <a href="tel:+971586122568" class="btn-contact">
@@ -1355,11 +1459,12 @@
                     </div>
                 </div>
             </div>
-            <div class="car-card">
+            <div class="car-card" data-title="Ferrari 296 GTS" data-gallery='["https://www.europeanprestige.co.uk/blobs/stock/637/images/ecbeba9b-5a32-4bea-8974-83af94d99597/296-4.jpg?width=2000&height=1333","https://images.unsplash.com/photo-1600510424051-30d592a75353?auto=format&fit=crop&w=1200&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGxhbWJvcmdoaW5pfGVufDB8fDB8fHww"]'>
                 <img src="https://www.europeanprestige.co.uk/blobs/stock/637/images/ecbeba9b-5a32-4bea-8974-83af94d99597/296-4.jpg?width=2000&height=1333" alt="Ferrari 296 GTS - Hybrid Supercar Rental" loading="lazy" width="350" height="250" decoding="async" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1600510424051-30d592a75353?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGxhbWJvcmdoaW5pfGVufDB8fDB8fHww';">
                 <div class="car-info">
                     <h3>Ferrari 296 GTS</h3>
                     <div class="price" data-i18n="fleet.price_from" data-price="6996">From 6,996 AED / day</div>
+                    <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
                     <div class="price" style="font-size: 0.9rem; color: var(--silver); margin-top: 0.5rem;" data-i18n="fleet.security_deposit" data-deposit="28000">Security Deposit: 28,000 AED</div>
                     <a href="/app/reserve/page.html?car=Ferrari 296 GTS&price=6996" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
                     <div class="contact-buttons">
@@ -1374,11 +1479,12 @@
                     </div>
                 </div>
             </div>
-            <div class="car-card">
+            <div class="car-card" data-title="Mercedes G 63 AMG" data-gallery='["https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=900&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Z2xhc3N3YWdlbnxlbnwwfHwwfHx8MA%3D%3D","https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1200&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Z2xhc3N3YWdlbnxlbnwwfHwwfHx8MA%3D%3D"]'>
                 <img src="https://i.ytimg.com/vi/H0H_R8acXmI/maxresdefault.jpg" alt="Mercedes G 63 AMG" loading="lazy" style="min-height: 250px;">
                 <div class="car-info">
                     <h3>Mercedes G 63 AMG</h3>
                     <div class="price" data-i18n="fleet.price_from" data-price="3800">From 3,800 AED / day</div>
+                    <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
                     <div class="price" style="font-size: 0.9rem; color: var(--silver); margin-top: 0.5rem;" data-i18n="fleet.security_deposit" data-deposit="20000">Security Deposit: 20,000 AED</div>
                     <a href="/app/reserve/page.html?car=Mercedes G 63 AMG&price=3800" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
                     <div class="contact-buttons">
@@ -1393,11 +1499,12 @@
                     </div>
                 </div>
             </div>
-            <div class="car-card">
+            <div class="car-card" data-title="Lamborghini Urus Sport" data-gallery='["https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bGFtYm9yZ2hpbml8ZW58MHx8MHx8fDA%3D","https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bGFtYm9yZ2hpbml8ZW58MHx8MHx8fDA%3D"]'>
                 <img src="https://i.pinimg.com/736x/e3/94/20/e39420a37c1513775fc04369cc2606e1.jpg" alt="Lamborghini Urus Sport" loading="lazy" style="min-height: 250px;">
                 <div class="car-info">
                     <h3>Lamborghini Urus Sport</h3>
                     <div class="price" data-i18n="fleet.price_from" data-price="6596">From 6,596 AED / day</div>
+                    <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
                     <div class="price" style="font-size: 0.9rem; color: var(--silver); margin-top: 0.5rem;" data-i18n="fleet.security_deposit" data-deposit="24000">Security Deposit: 24,000 AED</div>
                     <a href="/app/reserve/page.html?car=Lamborghini Urus Sport&price=6596" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
                     <div class="contact-buttons">
@@ -1412,11 +1519,12 @@
                     </div>
                 </div>
             </div>
-            <div class="car-card">
+            <div class="car-card" data-title="Porsche 992 GT3" data-gallery='["https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=900&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cG9yc2NoZXxlbnwwfHwwfHx8MA%3D%3D","https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1200&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cG9yc2NoZXxlbnwwfHwwfHx8MA%3D%3D"]'>
                 <img src="https://www.chicagomotorcars.com/imagetag/11513/main/l/Used-2024-Porsche-911-GT3-RS-Weissach!-Full-Body-PPF!-Front-End-Lifter!-Sinister-Spec!-Loaded!-1707950268.jpg" alt="Porsche 992 GT3" loading="lazy" style="min-height: 250px;">
                 <div class="car-info">
                     <h3>Porsche 992 GT3</h3>
                     <div class="price" data-i18n="fleet.price_from" data-price="4000">From 4,000 AED / day</div>
+                    <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
                     <div class="price" style="font-size: 0.9rem; color: var(--silver); margin-top: 0.5rem;" data-i18n="fleet.security_deposit" data-deposit="20000">Security Deposit: 20,000 AED</div>
                     <a href="/app/reserve/page.html?car=Porsche 992 GT3&price=4000" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
                     <div class="contact-buttons">
@@ -1572,6 +1680,22 @@
     </section>
 
     <!-- Reservation modal removed - Use /app/reserve/page.html -->
+
+    <!-- Vehicle Gallery Modal -->
+    <div class="gallery-modal" id="galleryModal" role="dialog" aria-modal="true" aria-label="Vehicle gallery">
+        <div class="gallery-content">
+            <div class="gallery-header">
+                <div class="gallery-title" id="galleryTitle">Vehicle Gallery</div>
+                <button class="gallery-close" id="galleryClose" aria-label="Close gallery">×</button>
+            </div>
+            <div class="gallery-body">
+                <img class="gallery-main" id="galleryMain" alt="Vehicle photo">
+                <button class="gallery-nav prev" id="galleryPrev" aria-label="Previous photo">‹</button>
+                <button class="gallery-nav next" id="galleryNext" aria-label="Next photo">›</button>
+            </div>
+            <div class="gallery-thumbs" id="galleryThumbs"></div>
+        </div>
+    </div>
 
     <!-- Footer Banner -->
     <div class="footer-banner">
@@ -1791,6 +1915,80 @@
         } else {
             initTranslations();
         }
+
+        // Vehicle gallery modal
+        const galleryModal = document.getElementById('galleryModal');
+        const galleryTitle = document.getElementById('galleryTitle');
+        const galleryMain = document.getElementById('galleryMain');
+        const galleryThumbs = document.getElementById('galleryThumbs');
+        const galleryPrev = document.getElementById('galleryPrev');
+        const galleryNext = document.getElementById('galleryNext');
+        const galleryClose = document.getElementById('galleryClose');
+        let galleryImages = [];
+        let galleryIndex = 0;
+
+        function renderGallery() {
+            if (!galleryImages.length) return;
+            galleryMain.src = galleryImages[galleryIndex];
+            galleryThumbs.innerHTML = '';
+            galleryImages.forEach((src, idx) => {
+                const thumb = document.createElement('img');
+                thumb.src = src;
+                thumb.alt = `Gallery photo ${idx + 1}`;
+                thumb.className = 'gallery-thumb' + (idx === galleryIndex ? ' active' : '');
+                thumb.addEventListener('click', () => {
+                    galleryIndex = idx;
+                    renderGallery();
+                });
+                galleryThumbs.appendChild(thumb);
+            });
+            const showNav = galleryImages.length > 1;
+            galleryPrev.style.display = showNav ? 'flex' : 'none';
+            galleryNext.style.display = showNav ? 'flex' : 'none';
+        }
+
+        function openGallery(card) {
+            try {
+                const images = JSON.parse(card.getAttribute('data-gallery') || '[]');
+                galleryImages = images.length ? images : [];
+                galleryIndex = 0;
+                galleryTitle.textContent = card.getAttribute('data-title') || 'Vehicle Gallery';
+                if (!galleryImages.length) return;
+                renderGallery();
+                galleryModal.classList.add('active');
+            } catch (error) {
+                console.error('Failed to open gallery:', error);
+            }
+        }
+
+        function closeGallery() {
+            galleryModal.classList.remove('active');
+        }
+
+        document.querySelectorAll('.car-card').forEach(card => {
+            card.addEventListener('click', (event) => {
+                const tag = event.target.tagName.toLowerCase();
+                if (tag === 'a' || tag === 'button' || event.target.closest('a') || event.target.closest('button')) {
+                    return;
+                }
+                openGallery(card);
+            });
+        });
+
+        galleryPrev.addEventListener('click', () => {
+            galleryIndex = (galleryIndex - 1 + galleryImages.length) % galleryImages.length;
+            renderGallery();
+        });
+        galleryNext.addEventListener('click', () => {
+            galleryIndex = (galleryIndex + 1) % galleryImages.length;
+            renderGallery();
+        });
+        galleryClose.addEventListener('click', closeGallery);
+        galleryModal.addEventListener('click', (event) => {
+            if (event.target === galleryModal) {
+                closeGallery();
+            }
+        });
 
         // Efecto header al hacer scroll
         window.addEventListener('scroll', () => {
