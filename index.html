@@ -142,76 +142,6 @@
         }
         nav a:hover { color: var(--gold); }
 
-        /* Language Toggle Button */
-        .language-toggle {
-            background: transparent;
-            border: 2px solid var(--gold);
-            color: var(--gold);
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1.2rem;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-            width: 50px;
-            height: 40px;
-        }
-        .language-toggle:hover {
-            background: var(--gold);
-            color: var(--black);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
-        }
-        .lang-text {
-            font-size: 0.9rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-        /* Hide language button in desktop nav */
-        @media (min-width: 769px) {
-            nav .language-toggle {
-                display: none !important;
-            }
-        }
-        @media (max-width: 968px) {
-            .desktop-lang-toggle {
-                display: none !important;
-            }
-            nav .language-toggle {
-                display: flex !important;
-            }
-            .language-toggle {
-                margin-left: 0;
-                margin-top: 1rem;
-                width: auto;
-                justify-content: center;
-            }
-            nav ul {
-                flex-direction: column;
-                gap: 0;
-                padding: 1rem 0;
-            }
-            nav li {
-                width: 100%;
-                border-bottom: 1px solid #333;
-            }
-            nav a {
-                display: block;
-                padding: 1.2rem 2rem;
-                width: 100%;
-                text-align: left;
-                transition: all 0.3s;
-            }
-            nav a:hover {
-                background: rgba(212, 175, 55, 0.1);
-                padding-left: 2.5rem;
-            }
-        }
-
         /* Hero */
         .hero {
             height: 100vh;
@@ -1312,9 +1242,6 @@
                     <img src="https://static.wixstatic.com/media/a11208_3c3efc0ce03a49b5b22d8e9fc1451ee2~mv2.png/v1/crop/x_0,y_68,w_765,h_443/fill/w_342,h_198,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/LOGO%20FINAL%20PGM.png" alt="Dynasty Prestige - Luxury Car Rental" width="342" height="198" decoding="async">
                 </a>
             </div>
-            <button class="language-toggle desktop-lang-toggle" onclick="toggleLanguage()" aria-label="Toggle language">
-                <span id="lang-text-desktop" class="lang-text">ES</span>
-            </button>
         </div>
         <button class="menu-toggle" id="menuToggle" onclick="toggleMobileMenu()" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mobileNav">
             <i class="fas fa-bars" aria-hidden="true"></i>
@@ -1326,11 +1253,6 @@
                 <li><a href="#reserva" onclick="closeMobileMenu()" aria-label="Make a reservation" data-i18n="nav.reservations">Reservations</a></li>
                 <li><a href="#fleet" onclick="closeMobileMenu()" aria-label="View our fleet" data-i18n="nav.fleet">Fleet</a></li>
                 <li><a href="#contacto" onclick="closeMobileMenu()" aria-label="Contact us" data-i18n="nav.contact">Contact</a></li>
-                <li>
-                    <button class="language-toggle" onclick="toggleLanguage()" aria-label="Toggle language">
-                        <span id="lang-text" class="lang-text">ES</span>
-                    </button>
-                </li>
             </ul>
         </nav>
     </header>
@@ -1807,19 +1729,7 @@
             }
         };
 
-        let currentLang = localStorage.getItem('language') || 'en';
-        
-        // Initialize language text based on current language
-        function initializeLangText() {
-            const langTexts = document.querySelectorAll('#lang-text, #lang-text-desktop');
-            langTexts.forEach(el => {
-                if (currentLang === 'es') {
-                    el.textContent = 'EN';
-                } else {
-                    el.textContent = 'ES';
-                }
-            });
-        }
+        const currentLang = 'en';
 
         function getTranslation(key, lang = currentLang) {
             const keys = key.split('.');
@@ -1867,32 +1777,13 @@
                 element.placeholder = translation;
             });
 
-            // Update language button text
-            const langTexts = document.querySelectorAll('#lang-text, #lang-text-desktop');
-            langTexts.forEach(el => {
-                if (lang === 'es') {
-                    // Current language is Spanish, show EN to switch to English
-                    el.textContent = 'EN';
-                } else {
-                    // Current language is English, show ES to switch to Spanish
-                    el.textContent = 'ES';
-                }
-            });
-
             // Update HTML lang attribute
             document.documentElement.lang = lang;
-        }
-
-        function toggleLanguage() {
-            currentLang = currentLang === 'en' ? 'es' : 'en';
-            localStorage.setItem('language', currentLang);
-            applyTranslations(currentLang);
         }
 
         // Apply translations on page load
         function initTranslations() {
             applyTranslations(currentLang);
-            initializeLangText();
         }
 
         if (document.readyState === 'loading') {
