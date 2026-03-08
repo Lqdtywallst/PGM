@@ -49,7 +49,7 @@ Stripe payments are fully implemented. See `STRIPE-IMPLEMENTACION.md` for full d
 
 ## 📞 Contact
 
-- **Address**: Palm Jumeirah, Dubai, UAE
+- **Address (UAE)**: Emaar Beachfront - Address The Bay - Marsa Dubai - Dubai
 - **Phone**: +971 586122568
 - **Email**: prestigegoalmotion@gmail.com
 - **Instagram**: @prestigegoalmotion
