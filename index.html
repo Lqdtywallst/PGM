@@ -1991,6 +1991,17 @@
                 }
             });
 
+            // Update image for Mercedes G 63 AMG in Dubai section
+            var g63Card = document.querySelector('.car-card[data-title="Mercedes G 63 AMG"]');
+            if (g63Card) {
+                var img = g63Card.querySelector('img');
+                if (img) {
+                    img.src = region === 'AE'
+                        ? 'https://toyzrentalme.com/wp-content/uploads/2025/03/URB00168.jpg'
+                        : 'https://i.ytimg.com/vi/H0H_R8acXmI/maxresdefault.jpg';
+                }
+            }
+
             // Region selector UI
             document.querySelectorAll('.region-btn').forEach(function(btn) {
                 var isActive = btn.getAttribute('data-region') === region;
