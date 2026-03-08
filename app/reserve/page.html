@@ -471,11 +471,11 @@
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                     <span>Price per day:</span>
-                    <span id="summaryPricePerDay" style="color: #d4af37;">AED 0</span>
+                    <span id="summaryPricePerDay" style="color: #d4af37;">0 €</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; padding-top: 0.5rem; border-top: 1px solid rgba(212, 175, 55, 0.2); font-size: 1.2rem; font-weight: 600;">
                     <span>Total:</span>
-                    <span id="summaryTotal" style="color: #d4af37;">AED 0.00</span>
+                    <span id="summaryTotal" style="color: #d4af37;">0,00 €</span>
                 </div>
             </div>
 
@@ -500,7 +500,7 @@
             <div class="summary-section">
                 <h3 id="selectedCar">Mercedes GLE 53 AMG</h3>
                 <p style="margin-top: 1rem; color: #a1a1aa;">Total Amount</p>
-                <p class="total" id="totalAmount">AED 0.00</p>
+                <p class="total" id="totalAmount">0,00 €</p>
             </div>
             
             <!-- Stripe Payment Form -->
@@ -522,10 +522,26 @@
     </div>
 
     <script>
+        // Region from URL or localStorage (ES = Spain/EUR, AE = UAE/AED)
+        const urlParams = new URLSearchParams(window.location.search);
+        const RESERVE_REGION = urlParams.get('region') || (typeof localStorage !== 'undefined' && localStorage.getItem('pgm_region')) || 'ES';
+        if (typeof localStorage !== 'undefined') try { localStorage.setItem('pgm_region', RESERVE_REGION); } catch (e) {}
+        if (typeof window !== 'undefined' && window.STRIPE_CONFIG_ES && window.STRIPE_CONFIG_AE) {
+            window.STRIPE_CONFIG = RESERVE_REGION === 'AE' ? window.STRIPE_CONFIG_AE : window.STRIPE_CONFIG_ES;
+        }
+        const isAED = RESERVE_REGION === 'AE';
+        const CURRENCY_SYMBOL = isAED ? 'AED' : '€';
+        const CURRENCY_ZERO = isAED ? 'AED 0.00' : '0,00 €';
+        function formatAmount(n) {
+            const num = typeof n === 'number' ? n : parseFloat(n);
+            if (isAED) return 'AED ' + num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            return num.toFixed(2).replace('.', ',') + ' €';
+        }
+
         // Form state
         let currentStep = 1;
         let selectedCar = 'Mercedes GLE 53 AMG';
-        let pricePerDay = 2000;
+        let pricePerDay = isAED ? 2000 : 500;
         
         // Calendar state
         let currentDate = new Date();
@@ -539,11 +555,10 @@
         let paymentIntentClientSecret = null;
 
         // Get URL parameters (if coming from index.html)
-        const urlParams = new URLSearchParams(window.location.search);
         const carName = urlParams.get('car');
         const price = urlParams.get('price');
         
-        console.log('[RESERVE PAGE] Received parameters:', { carName, price });
+        console.log('[RESERVE PAGE] Received parameters:', { carName, price, region: RESERVE_REGION });
         
         if (carName) selectedCar = decodeURIComponent(carName);
         if (price) pricePerDay = parseFloat(price);
@@ -558,8 +573,12 @@
             selectedCarElement.textContent = selectedCar;
         }
         if (summaryPriceElement) {
-            summaryPriceElement.textContent = `AED ${pricePerDay}`;
+            summaryPriceElement.textContent = isAED ? `AED ${pricePerDay}` : `${pricePerDay} €`;
         }
+        var summaryTotalEl = document.getElementById('summaryTotal');
+        var totalAmountEl = document.getElementById('totalAmount');
+        if (summaryTotalEl) summaryTotalEl.textContent = CURRENCY_ZERO;
+        if (totalAmountEl) totalAmountEl.textContent = CURRENCY_ZERO;
         
         console.log('[RESERVE PAGE] Page initialized successfully');
         
@@ -855,17 +874,17 @@
                     const total = diffDays * pricePerDay;
                     
                     document.getElementById('summaryDays').textContent = diffDays;
-                    document.getElementById('summaryTotal').textContent = `AED ${total.toFixed(2)}`;
-                    document.getElementById('totalAmount').textContent = `AED ${total.toFixed(2)}`;
+                    document.getElementById('summaryTotal').textContent = formatAmount(total);
+                    document.getElementById('totalAmount').textContent = formatAmount(total);
                 } else {
                     document.getElementById('summaryDays').textContent = '0';
-                    document.getElementById('summaryTotal').textContent = 'AED 0.00';
-                    document.getElementById('totalAmount').textContent = 'AED 0.00';
+                    document.getElementById('summaryTotal').textContent = CURRENCY_ZERO;
+                    document.getElementById('totalAmount').textContent = CURRENCY_ZERO;
                 }
             } else {
                 document.getElementById('summaryDays').textContent = '0';
-                document.getElementById('summaryTotal').textContent = 'AED 0.00';
-                document.getElementById('totalAmount').textContent = 'AED 0.00';
+                document.getElementById('summaryTotal').textContent = CURRENCY_ZERO;
+                document.getElementById('totalAmount').textContent = CURRENCY_ZERO;
             }
             
             updateContinueButton();
@@ -1082,7 +1101,7 @@
                     // Prepare data for the API
                     const reservationData = {
                         amount: totalCents,
-                        currency: 'aed',
+                        currency: (window.STRIPE_CONFIG && window.STRIPE_CONFIG.currency) || (isAED ? 'aed' : 'eur'),
                         customerData: {
                             name: formData.fullName,
                             email: formData.email,
@@ -1263,7 +1282,7 @@
                                 startDate: formData.startDate.split('T')[0],
                                 endDate: formData.endDate.split('T')[0],
                                 pickupLocation: formData.pickupLocation,
-                                total: total.toFixed(2) + ' AED'
+                                total: (isAED ? total.toFixed(2) + ' AED' : total.toFixed(2) + ' €')
                             },
                             customerData: {
                                 name: formData.fullName,
@@ -1301,7 +1320,7 @@
                     // Show success message and redirect
                     console.log('[PAYMENT] ✅ Process completed successfully');
                     setTimeout(() => {
-                        alert(`✅ Payment Successful!\n\nVehicle: ${selectedCar}\nDays: ${diffDays}\nTotal: AED ${total.toFixed(2)}\n\nYou will receive a confirmation email.`);
+                        alert(isAED ? `✅ Payment successful!\n\nVehicle: ${selectedCar}\nDays: ${diffDays}\nTotal: AED ${total.toFixed(2)}\n\nYou will receive a confirmation email.` : `✅ ¡Pago realizado!\n\nVehículo: ${selectedCar}\nDías: ${diffDays}\nTotal: ${total.toFixed(2)} €\n\nRecibirás un email de confirmación.`);
                         window.location.href = '/index.html';
                     }, 1500);
                 } else if (paymentIntent.status === 'processing') {

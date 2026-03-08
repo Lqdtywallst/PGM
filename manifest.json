@@ -1,7 +1,7 @@
 {
   "name": "Dynasty Prestige - Luxury Car Rental",
   "short_name": "DP",
-  "description": "Luxury car rental in Dubai. Mercedes, Lamborghini, Ferrari and more.",
+  "description": "Alquiler de coches de lujo en Madrid. Mercedes, Lamborghini, Ferrari y más.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
@@ -22,7 +22,7 @@
     }
   ],
   "categories": ["automotive", "travel", "business"],
-  "lang": "en-AE",
+  "lang": "es",
   "dir": "ltr",
   "scope": "/",
   "prefer_related_applications": false

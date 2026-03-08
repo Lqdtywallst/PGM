@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     
     <!-- Primary Meta Tags -->
-    <title>Dynasty Prestige - Luxury Car Rental in Dubai | Mercedes, Lamborghini, Ferrari</title>
-    <meta name="title" content="Dynasty Prestige - Luxury Car Rental in Dubai">
-    <meta name="description" content="Rent the best luxury cars in Dubai. Mercedes GLE, Lamborghini Huracán, Ferrari 296 GTS. Book online with secure payment. Available 24/7.">
-    <meta name="keywords" content="luxury car rental dubai, mercedes gle, lamborghini huracán, ferrari, supercar rental uae">
+    <title>Dynasty Prestige - Alquiler de coches de lujo en Madrid | Mercedes, Lamborghini, Ferrari</title>
+    <meta name="title" content="Dynasty Prestige - Alquiler de coches de lujo en Madrid">
+    <meta name="description" content="Alquila los mejores coches de lujo en Madrid. Mercedes GLE, Lamborghini Huracán, Ferrari 296 GTS. Reserva online con pago seguro. Disponible 24/7.">
+    <meta name="keywords" content="alquiler coches de lujo madrid, mercedes gle, lamborghini huracán, ferrari, alquiler superdeportivos españa">
     <meta name="author" content="Dynasty Prestige">
     <meta name="robots" content="index, follow">
-    <meta name="language" content="English">
+    <meta name="language" content="Spanish">
     <meta name="revisit-after" content="7 days">
 
     <link rel="icon" type="image/png" href="/favicon-dp.png">
@@ -21,19 +21,19 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://prestigegoalmotion.com/">
-    <meta property="og:title" content="Dynasty Prestige - Luxury Car Rental">
-    <meta property="og:description" content="Rent the best luxury cars in Dubai. Mercedes, Lamborghini, Ferrari. Book online with secure payment.">
+    <meta property="og:title" content="Dynasty Prestige - Alquiler de coches de lujo">
+    <meta property="og:description" content="Alquila los mejores coches de lujo en Madrid. Mercedes, Lamborghini, Ferrari. Reserva online con pago seguro.">
     <meta property="og:image" content="/logo-dp.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:locale" content="en_AE">
+    <meta property="og:locale" content="es_ES">
     <meta property="og:site_name" content="Dynasty Prestige">
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://prestigegoalmotion.com/">
-    <meta name="twitter:title" content="Dynasty Prestige - Luxury Car Rental">
-    <meta name="twitter:description" content="Rent the best luxury cars in Dubai. Mercedes, Lamborghini, Ferrari.">
+    <meta name="twitter:title" content="Dynasty Prestige - Alquiler de coches de lujo">
+    <meta name="twitter:description" content="Alquila los mejores coches de lujo en Madrid. Mercedes, Lamborghini, Ferrari.">
     <meta name="twitter:image" content="/logo-dp.png">
     
     <!-- Favicon -->
@@ -71,20 +71,20 @@
       "@context": "https://schema.org",
       "@type": "CarRental",
       "name": "Dynasty Prestige",
-      "description": "Luxury car rental in Dubai",
+      "description": "Alquiler de coches de lujo en Madrid",
       "url": "https://prestigegoalmotion.com",
       "logo": "https://prestigegoalmotion.com/logo-dp.png",
       "image": "https://prestigegoalmotion.com/logo-dp.png",
-      "telephone": "+971586122568",
+      "telephone": "+34625179867",
       "email": "prestigegoalmotion@gmail.com",
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "Palm Jumeirah Street Address",
-        "addressLocality": "Dubai",
-        "addressCountry": "AE"
+        "streetAddress": "Calle Ciclon 27, 28042 Madrid",
+        "addressLocality": "Madrid",
+        "addressCountry": "ES"
       },
       "openingHours": "Mo-Su 00:00-23:59",
-      "priceRange": "AED",
+      "priceRange": "EUR",
       "sameAs": [
         "https://www.instagram.com/prestigegoalmotion"
       ]
@@ -149,6 +149,19 @@
             transition: color 0.3s;
         }
         nav a:hover { color: var(--gold); }
+        .region-selector { display: flex; gap: 0.25rem; align-items: center; }
+        .region-btn {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.85rem;
+            background: transparent;
+            color: var(--silver);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: color 0.2s, border-color 0.2s, background 0.2s;
+        }
+        .region-btn:hover { color: var(--gold); border-color: var(--gold); }
+        .region-btn.active { background: var(--gold); color: var(--black); border-color: var(--gold); }
 
         /* Hero */
         .hero {
@@ -1364,12 +1377,16 @@
                 <li><a href="#contacto" onclick="closeMobileMenu()" aria-label="Contact us" data-i18n="nav.contact">Contact</a></li>
             </ul>
         </nav>
+        <div class="region-selector" role="group" aria-label="Region">
+            <button type="button" class="region-btn active" data-region="ES" aria-pressed="true" title="España">🇪🇸 España</button>
+            <button type="button" class="region-btn" data-region="AE" aria-pressed="false" title="UAE">🇦🇪 UAE</button>
+        </div>
     </header>
 
     <!-- Hero -->
     <section id="inicio" class="hero" role="banner">
         <h1 data-i18n="hero.title">DYNASTY PRESTIGE</h1>
-        <p data-i18n="hero.subtitle">Supercar and high-end vehicle rental in Dubai. Drive your dream supercar today.</p>
+        <p data-i18n="hero.subtitle">Alquiler de superdeportivos y vehiculos de alta gama en Madrid. Conduce tu coche soñado hoy.</p>
         <a href="#reserva" class="btn" aria-label="Book a luxury car now" data-i18n="hero.button">BOOK NOW</a>
     </section>
 
@@ -1391,118 +1408,118 @@
     <section id="fleet" aria-labelledby="fleet-heading">
         <h2 id="fleet-heading" data-i18n="fleet.title">Our Exclusive Fleet</h2>
         <div class="fleet-grid">
-            <div class="car-card" data-title="Mercedes GLE 53 AMG" data-gallery='["https://di-uploads-pod5.dealerinspire.com/mercedesbenzprinceton/uploads/2020/07/2021-Mercedes-Benz-GLE-53-Coupe.png"]'>
+            <div class="car-card" data-title="Mercedes GLE 53 AMG" data-price-eur="500" data-price-aed="2000" data-gallery='["https://di-uploads-pod5.dealerinspire.com/mercedesbenzprinceton/uploads/2020/07/2021-Mercedes-Benz-GLE-53-Coupe.png"]'>
                 <img src="https://di-uploads-pod5.dealerinspire.com/mercedesbenzprinceton/uploads/2020/07/2021-Mercedes-Benz-GLE-53-Coupe.png" alt="Mercedes GLE 53 AMG - Luxury SUV Rental" loading="lazy" width="350" height="250" decoding="async">
                 <div class="car-info">
                     <h3>Mercedes GLE 53 AMG</h3>
-                    <div class="price" data-i18n="fleet.price_from" data-price="2000">From 2,000 AED / day</div>
+                    <div class="price" data-i18n="fleet.price_from" data-price="500">Desde 500 € / dia</div>
                     <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
-                    <a href="/app/reserve/page.html?car=Mercedes GLE 53 AMG&price=2000" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
+                    <a href="/app/reserve/page.html?car=Mercedes GLE 53 AMG&price=500" class="btn-reservar" data-i18n="fleet.book_now">RESERVAR</a>
                     <div class="contact-buttons">
-                        <a href="tel:+971586122568" class="btn-contact" aria-label="Call us at +971 586122568">
+                        <a href="tel:+34625179867" class="btn-contact" aria-label="Llámanos al +34 625179867">
                             <i class="fas fa-phone" aria-hidden="true"></i>
                             <span data-i18n="fleet.call">Call</span>
                         </a>
-                        <a href="https://wa.me/971586122568?text=Hello!%20I%20am%20interested%20in%20reserving%20the%20Mercedes%20GLE%2053%20AMG.%20Could%20you%20please%20provide%20more%20information?" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us via WhatsApp">
+                        <a href="https://wa.me/34625179867?text=Hola!%20Estoy%20interesado%20en%20reservar%20el%20Mercedes%20GLE%2053%20AMG.%20Podrias%20darme%20mas%20informacion?" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contacta con nosotros por WhatsApp">
                             <i class="fab fa-whatsapp" aria-hidden="true"></i>
                             <span data-i18n="fleet.whatsapp">WhatsApp</span>
                         </a>
                     </div>
                 </div>
             </div>
-            <div class="car-card" data-title="Lamborghini Huracán" data-gallery='["https://images.unsplash.com/photo-1543854589-fdd815f176e0?q=80&w=1904&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'>
-                <img src="https://images.unsplash.com/photo-1543854589-fdd815f176e0?q=80&w=1904&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Lamborghini Huracán - Supercar Rental Dubai" loading="lazy" width="350" height="250" decoding="async">
+            <div class="car-card" data-title="Lamborghini Huracán" data-price-eur="1500" data-price-aed="6000" data-gallery='["https://images.unsplash.com/photo-1543854589-fdd815f176e0?q=80&w=1904&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'>
+                <img src="https://images.unsplash.com/photo-1543854589-fdd815f176e0?q=80&w=1904&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Lamborghini Huracán - Alquiler de superdeportivos en Madrid" loading="lazy" width="350" height="250" decoding="async">
                 <div class="car-info">
                     <h3>Lamborghini Huracán</h3>
-                    <div class="price" data-i18n="fleet.price_from" data-price="6000">From 6,000 AED / day</div>
+                    <div class="price" data-i18n="fleet.price_from" data-price="1500">Desde 1.500 € / dia</div>
                     <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
-                    <a href="/app/reserve/page.html?car=Lamborghini Huracán&price=6000" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
+                    <a href="/app/reserve/page.html?car=Lamborghini Huracán&price=1500" class="btn-reservar" data-i18n="fleet.book_now">RESERVAR</a>
                     <div class="contact-buttons">
-                        <a href="tel:+971586122568" class="btn-contact">
+                        <a href="tel:+34625179867" class="btn-contact">
                             <i class="fas fa-phone"></i>
                             <span data-i18n="fleet.call">Call</span>
                         </a>
-                        <a href="https://wa.me/971586122568?text=Hello!%20I%20am%20interested%20in%20reserving%20the%20Lamborghini%20Hurac%C3%A1n.%20Could%20you%20please%20provide%20more%20information?" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us via WhatsApp">
+                        <a href="https://wa.me/34625179867?text=Hola!%20Estoy%20interesado%20en%20reservar%20el%20Lamborghini%20Hurac%C3%A1n.%20Podrias%20darme%20mas%20informacion?" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contacta con nosotros por WhatsApp">
                             <i class="fab fa-whatsapp"></i>
                             <span data-i18n="fleet.whatsapp">WhatsApp</span>
                         </a>
                     </div>
                 </div>
             </div>
-            <div class="car-card" data-title="Ferrari 296 GTS" data-gallery='["https://www.europeanprestige.co.uk/blobs/stock/637/images/ecbeba9b-5a32-4bea-8974-83af94d99597/296-4.jpg?width=2000&height=1333"]'>
+            <div class="car-card" data-title="Ferrari 296 GTS" data-price-eur="1749" data-price-aed="6996" data-deposit-eur="7000" data-deposit-aed="28000" data-gallery='["https://www.europeanprestige.co.uk/blobs/stock/637/images/ecbeba9b-5a32-4bea-8974-83af94d99597/296-4.jpg?width=2000&height=1333"]'>
                 <img src="https://www.europeanprestige.co.uk/blobs/stock/637/images/ecbeba9b-5a32-4bea-8974-83af94d99597/296-4.jpg?width=2000&height=1333" alt="Ferrari 296 GTS - Hybrid Supercar Rental" loading="lazy" width="350" height="250" decoding="async" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1600510424051-30d592a75353?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGxhbWJvcmdoaW5pfGVufDB8fDB8fHww';">
                 <div class="car-info">
                     <h3>Ferrari 296 GTS</h3>
-                    <div class="price" data-i18n="fleet.price_from" data-price="6996">From 6,996 AED / day</div>
+                    <div class="price" data-i18n="fleet.price_from" data-price="1749">Desde 1.749 € / dia</div>
                     <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
-                    <div class="price" style="font-size: 0.9rem; color: var(--silver); margin-top: 0.5rem;" data-i18n="fleet.security_deposit" data-deposit="28000">Security Deposit: 28,000 AED</div>
-                    <a href="/app/reserve/page.html?car=Ferrari 296 GTS&price=6996" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
+                    <div class="price" style="font-size: 0.9rem; color: var(--silver); margin-top: 0.5rem;" data-i18n="fleet.security_deposit" data-deposit="7000">Fianza: 7.000 €</div>
+                    <a href="/app/reserve/page.html?car=Ferrari 296 GTS&price=1749" class="btn-reservar" data-i18n="fleet.book_now">RESERVAR</a>
                     <div class="contact-buttons">
-                        <a href="tel:+971586122568" class="btn-contact">
+                        <a href="tel:+34625179867" class="btn-contact">
                             <i class="fas fa-phone"></i>
                             <span data-i18n="fleet.call">Call</span>
                         </a>
-                        <a href="https://wa.me/971586122568?text=Hello!%20I%20am%20interested%20in%20reserving%20the%20Ferrari%20296%20GTS.%20Could%20you%20please%20provide%20more%20information?" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us via WhatsApp">
+                        <a href="https://wa.me/34625179867?text=Hola!%20Estoy%20interesado%20en%20reservar%20el%20Ferrari%20296%20GTS.%20Podrias%20darme%20mas%20informacion?" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contacta con nosotros por WhatsApp">
                             <i class="fab fa-whatsapp"></i>
                             <span data-i18n="fleet.whatsapp">WhatsApp</span>
                         </a>
                     </div>
                 </div>
             </div>
-            <div class="car-card" data-title="Mercedes G 63 AMG" data-gallery='["https://i.ytimg.com/vi/H0H_R8acXmI/maxresdefault.jpg"]'>
+            <div class="car-card" data-title="Mercedes G 63 AMG" data-price-eur="950" data-price-aed="3800" data-deposit-eur="5000" data-deposit-aed="20000" data-gallery='["https://i.ytimg.com/vi/H0H_R8acXmI/maxresdefault.jpg"]'>
                 <img src="https://i.ytimg.com/vi/H0H_R8acXmI/maxresdefault.jpg" alt="Mercedes G 63 AMG" loading="lazy" style="min-height: 250px;">
                 <div class="car-info">
                     <h3>Mercedes G 63 AMG</h3>
-                    <div class="price" data-i18n="fleet.price_from" data-price="3800">From 3,800 AED / day</div>
+                    <div class="price" data-i18n="fleet.price_from" data-price="950">Desde 950 € / dia</div>
                     <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
-                    <div class="price" style="font-size: 0.9rem; color: var(--silver); margin-top: 0.5rem;" data-i18n="fleet.security_deposit" data-deposit="20000">Security Deposit: 20,000 AED</div>
-                    <a href="/app/reserve/page.html?car=Mercedes G 63 AMG&price=3800" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
+                    <div class="price" style="font-size: 0.9rem; color: var(--silver); margin-top: 0.5rem;" data-i18n="fleet.security_deposit" data-deposit="5000">Fianza: 5.000 €</div>
+                    <a href="/app/reserve/page.html?car=Mercedes G 63 AMG&price=950" class="btn-reservar" data-i18n="fleet.book_now">RESERVAR</a>
                     <div class="contact-buttons">
-                        <a href="tel:+971586122568" class="btn-contact">
+                        <a href="tel:+34625179867" class="btn-contact">
                             <i class="fas fa-phone"></i>
                             <span data-i18n="fleet.call">Call</span>
                         </a>
-                        <a href="https://wa.me/971586122568?text=Hello!%20I%20am%20interested%20in%20reserving%20the%20Mercedes%20G%2063%20AMG.%20Could%20you%20please%20provide%20more%20information?" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us via WhatsApp">
+                        <a href="https://wa.me/34625179867?text=Hola!%20Estoy%20interesado%20en%20reservar%20el%20Mercedes%20G%2063%20AMG.%20Podrias%20darme%20mas%20informacion?" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contacta con nosotros por WhatsApp">
                             <i class="fab fa-whatsapp"></i>
                             <span data-i18n="fleet.whatsapp">WhatsApp</span>
                         </a>
                     </div>
                 </div>
             </div>
-            <div class="car-card" data-title="Lamborghini Urus Sport" data-gallery='["https://i.pinimg.com/736x/e3/94/20/e39420a37c1513775fc04369cc2606e1.jpg"]'>
+            <div class="car-card" data-title="Lamborghini Urus Sport" data-price-eur="1649" data-price-aed="6596" data-deposit-eur="6000" data-deposit-aed="24000" data-gallery='["https://i.pinimg.com/736x/e3/94/20/e39420a37c1513775fc04369cc2606e1.jpg"]'>
                 <img src="https://i.pinimg.com/736x/e3/94/20/e39420a37c1513775fc04369cc2606e1.jpg" alt="Lamborghini Urus Sport" loading="lazy" style="min-height: 250px;">
                 <div class="car-info">
                     <h3>Lamborghini Urus Sport</h3>
-                    <div class="price" data-i18n="fleet.price_from" data-price="6596">From 6,596 AED / day</div>
+                    <div class="price" data-i18n="fleet.price_from" data-price="1649">Desde 1.649 € / dia</div>
                     <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
-                    <div class="price" style="font-size: 0.9rem; color: var(--silver); margin-top: 0.5rem;" data-i18n="fleet.security_deposit" data-deposit="24000">Security Deposit: 24,000 AED</div>
-                    <a href="/app/reserve/page.html?car=Lamborghini Urus Sport&price=6596" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
+                    <div class="price" style="font-size: 0.9rem; color: var(--silver); margin-top: 0.5rem;" data-i18n="fleet.security_deposit" data-deposit="6000">Fianza: 6.000 €</div>
+                    <a href="/app/reserve/page.html?car=Lamborghini Urus Sport&price=1649" class="btn-reservar" data-i18n="fleet.book_now">RESERVAR</a>
                     <div class="contact-buttons">
-                        <a href="tel:+971586122568" class="btn-contact">
+                        <a href="tel:+34625179867" class="btn-contact">
                             <i class="fas fa-phone"></i>
                             <span data-i18n="fleet.call">Call</span>
                         </a>
-                        <a href="https://wa.me/971586122568?text=Hello!%20I%20am%20interested%20in%20reserving%20the%20Lamborghini%20Urus%20Sport.%20Could%20you%20please%20provide%20more%20information?" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us via WhatsApp">
+                        <a href="https://wa.me/34625179867?text=Hola!%20Estoy%20interesado%20en%20reservar%20el%20Lamborghini%20Urus%20Sport.%20Podrias%20darme%20mas%20informacion?" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contacta con nosotros por WhatsApp">
                             <i class="fab fa-whatsapp"></i>
                             <span data-i18n="fleet.whatsapp">WhatsApp</span>
                         </a>
                     </div>
                 </div>
             </div>
-            <div class="car-card" data-title="Porsche 992 GT3" data-gallery='["https://www.chicagomotorcars.com/imagetag/11513/main/l/Used-2024-Porsche-911-GT3-RS-Weissach!-Full-Body-PPF!-Front-End-Lifter!-Sinister-Spec!-Loaded!-1707950268.jpg"]'>
+            <div class="car-card" data-title="Porsche 992 GT3" data-price-eur="1000" data-price-aed="4000" data-deposit-eur="5000" data-deposit-aed="20000" data-gallery='["https://www.chicagomotorcars.com/imagetag/11513/main/l/Used-2024-Porsche-911-GT3-RS-Weissach!-Full-Body-PPF!-Front-End-Lifter!-Sinister-Spec!-Loaded!-1707950268.jpg"]'>
                 <img src="https://www.chicagomotorcars.com/imagetag/11513/main/l/Used-2024-Porsche-911-GT3-RS-Weissach!-Full-Body-PPF!-Front-End-Lifter!-Sinister-Spec!-Loaded!-1707950268.jpg" alt="Porsche 992 GT3" loading="lazy" style="min-height: 250px;">
                 <div class="car-info">
                     <h3>Porsche 992 GT3</h3>
-                    <div class="price" data-i18n="fleet.price_from" data-price="4000">From 4,000 AED / day</div>
+                    <div class="price" data-i18n="fleet.price_from" data-price="1000">Desde 1.000 € / dia</div>
                     <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
-                    <div class="price" style="font-size: 0.9rem; color: var(--silver); margin-top: 0.5rem;" data-i18n="fleet.security_deposit" data-deposit="20000">Security Deposit: 20,000 AED</div>
-                    <a href="/app/reserve/page.html?car=Porsche 992 GT3&price=4000" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
+                    <div class="price" style="font-size: 0.9rem; color: var(--silver); margin-top: 0.5rem;" data-i18n="fleet.security_deposit" data-deposit="5000">Fianza: 5.000 €</div>
+                    <a href="/app/reserve/page.html?car=Porsche 992 GT3&price=1000" class="btn-reservar" data-i18n="fleet.book_now">RESERVAR</a>
                     <div class="contact-buttons">
-                        <a href="tel:+971586122568" class="btn-contact">
+                        <a href="tel:+34625179867" class="btn-contact">
                             <i class="fas fa-phone"></i>
                             <span data-i18n="fleet.call">Call</span>
                         </a>
-                        <a href="https://wa.me/971586122568?text=Hello!%20I%20am%20interested%20in%20reserving%20the%20Porsche%20992%20GT3.%20Could%20you%20please%20provide%20more%20information?" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us via WhatsApp">
+                        <a href="https://wa.me/34625179867?text=Hola!%20Estoy%20interesado%20en%20reservar%20el%20Porsche%20992%20GT3.%20Podrias%20darme%20mas%20informacion?" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contacta con nosotros por WhatsApp">
                             <i class="fab fa-whatsapp"></i>
                             <span data-i18n="fleet.whatsapp">WhatsApp</span>
                         </a>
@@ -1514,7 +1531,7 @@
 
     <!-- Contact -->
     <section id="contacto">
-        <h2 data-i18n="contact.title">Contact Us</h2>
+        <h2 data-i18n="contact.title">Contacto</h2>
         <div class="contact-container">
             <!-- Contact Information -->
             <div class="contact-info">
@@ -1523,9 +1540,9 @@
                         <i class="fas fa-map-marker-alt"></i>
                     </div>
                     <div class="contact-details">
-                        <h3 data-i18n="contact.main_office">Main Office</h3>
-                        <p>Palm Jumeirah</p>
-                        <p data-i18n="contact.spain">Palm Jumeirah, Dubai, UAE</p>
+                        <h3 data-i18n="contact.main_office">Oficina principal</h3>
+                        <p>Calle Ciclon 27</p>
+                        <p data-i18n="contact.spain">Calle Ciclon 27, 28042 Madrid</p>
                     </div>
                 </div>
 
@@ -1534,9 +1551,9 @@
                         <i class="fas fa-phone"></i>
                     </div>
                     <div class="contact-details">
-                        <h3 data-i18n="contact.phone">Phone</h3>
-                        <p><a href="tel:+971586122568">+971 586122568</a></p>
-                        <p style="color: var(--silver); font-size: 0.9rem;" data-i18n="contact.available_24h">Available 24 hours</p>
+                        <h3 data-i18n="contact.phone">Telefono</h3>
+                        <p><a href="tel:+34625179867">+34 625179867</a></p>
+                        <p style="color: var(--silver); font-size: 0.9rem;" data-i18n="contact.available_24h">Disponible 24 horas</p>
                     </div>
                 </div>
 
@@ -1546,8 +1563,8 @@
                     </div>
                     <div class="contact-details">
                         <h3 data-i18n="contact.whatsapp">WhatsApp</h3>
-                        <p><a href="https://wa.me/971586122568" target="_blank" rel="noopener noreferrer">+971 586122568</a></p>
-                        <p style="color: var(--silver); font-size: 0.9rem;" data-i18n="contact.available_24_7">Available 24/7</p>
+                        <p><a href="https://wa.me/34625179867" target="_blank" rel="noopener noreferrer">+34 625179867</a></p>
+                        <p style="color: var(--silver); font-size: 0.9rem;" data-i18n="contact.available_24_7">Disponible 24/7</p>
                     </div>
                 </div>
 
@@ -1574,7 +1591,7 @@
                 </div>
 
                 <div class="social-links-contact">
-                    <a href="https://wa.me/971586122568" target="_blank" rel="noopener noreferrer" title="WhatsApp" aria-label="Contact us on WhatsApp"><i class="fab fa-whatsapp" aria-hidden="true"></i></a>
+                    <a href="https://wa.me/34625179867" target="_blank" rel="noopener noreferrer" title="WhatsApp" aria-label="Contacta con nosotros por WhatsApp"><i class="fab fa-whatsapp" aria-hidden="true"></i></a>
                     <a href="https://www.instagram.com/prestigegoalmotion" target="_blank" rel="noopener noreferrer" title="Instagram" aria-label="Follow us on Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
                 </div>
             </div>
@@ -1627,23 +1644,23 @@
             
             <!-- Google Maps -->
             <div class="contact-map-container">
-                <h3 data-i18n="contact.find_us">Find Us</h3>
+                <h3 data-i18n="contact.find_us">Encuentranos</h3>
                 <div class="contact-map">
                     <iframe 
-                        src="https://www.google.com/maps?q=Palm+Jumeirah+Dubai+UAE&output=embed&zoom=12"
+                        src="https://www.google.com/maps?q=Calle+Ciclon+27+28042+Madrid&output=embed&zoom=14"
                         allowfullscreen=""
                         loading="lazy"
                         referrerpolicy="no-referrer-when-downgrade"
-                        title="Dynasty Prestige - Palm Jumeirah, Dubai, UAE">
+                        title="Dynasty Prestige - Calle Ciclon 27, 28042 Madrid">
                     </iframe>
                     </div>
                 <p style="text-align: center; color: var(--silver); margin-top: 1rem;">
                     <i class="fas fa-map-marker-alt" style="color: var(--gold); margin-right: 0.5rem;"></i>
-                    <a href="https://www.google.com/maps/search/?api=1&query=Palm+Jumeirah+Dubai+UAE" target="_blank" rel="noopener noreferrer" style="color: var(--gold); text-decoration: none;" aria-label="View location on Google Maps">
-                        Palm Jumeirah, Dubai, UAE
+                    <a href="https://www.google.com/maps/search/?api=1&query=Calle+Ciclon+27+28042+Madrid" target="_blank" rel="noopener noreferrer" style="color: var(--gold); text-decoration: none;" aria-label="Ver ubicacion en Google Maps">
+                        Calle Ciclon 27, 28042 Madrid
                     </a>
                     <span style="margin: 0 0.5rem;">|</span>
-                    <a href="https://www.google.com/maps/dir/?api=1&destination=Palm+Jumeirah+Dubai+UAE" target="_blank" rel="noopener noreferrer" style="color: var(--gold); text-decoration: none;" aria-label="Get directions to our location" data-i18n="contact.get_directions">Get Directions</a>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=Calle+Ciclon+27+28042+Madrid" target="_blank" rel="noopener noreferrer" style="color: var(--gold); text-decoration: none;" aria-label="Obtener indicaciones" data-i18n="contact.get_directions">Como llegar</a>
                         </p>
                     </div>
                     </div>
@@ -1679,12 +1696,45 @@
             <a href="terminos-condiciones.html" style="color: var(--silver); text-decoration: none; font-size: 0.9rem; margin: 0 1rem;" data-i18n="footer.terms">Terms and Conditions</a>
         </div>
         <div>
-            <a href="https://wa.me/971586122568" target="_blank" rel="noopener noreferrer" title="WhatsApp" aria-label="Contact us on WhatsApp"><i class="fab fa-whatsapp" aria-hidden="true"></i></a>
+            <a href="https://wa.me/34625179867" target="_blank" rel="noopener noreferrer" title="WhatsApp" aria-label="Contacta con nosotros por WhatsApp"><i class="fab fa-whatsapp" aria-hidden="true"></i></a>
             <a href="https://www.instagram.com/prestigegoalmotion" target="_blank" rel="noopener noreferrer" title="Instagram" aria-label="Follow us on Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
         </div>
     </footer>
 
     <script>
+        // Region: ES = Spain (Madrid, EUR), AE = UAE (Dubai, AED)
+        const REGIONS = {
+            ES: {
+                locale: 'es',
+                currency: 'EUR',
+                symbol: '€',
+                phone: '+34625179867',
+                phoneDisplay: '+34 625 179 867',
+                whatsapp: '34625179867',
+                address: 'Calle Ciclon 27, 28042 Madrid',
+                mapEmbed: 'https://www.google.com/maps?q=Calle+Ciclon+27+28042+Madrid&output=embed&zoom=14',
+                mapLink: 'https://www.google.com/maps/search/?api=1&query=Calle+Ciclon+27+28042+Madrid',
+                mapDirLink: 'https://www.google.com/maps/dir/?api=1&destination=Calle+Ciclon+27+28042+Madrid',
+                termsHref: 'terminos-condiciones.html'
+            },
+            AE: {
+                locale: 'en',
+                currency: 'AED',
+                symbol: 'AED',
+                phone: '+971586122568',
+                phoneDisplay: '+971 586122568',
+                whatsapp: '971586122568',
+                address: 'Palm Jumeirah, Dubai, UAE',
+                mapEmbed: 'https://www.google.com/maps?q=Palm+Jumeirah+Dubai+UAE&output=embed&zoom=12',
+                mapLink: 'https://www.google.com/maps/search/?api=1&query=Palm+Jumeirah+Dubai+UAE',
+                mapDirLink: 'https://www.google.com/maps/dir/?api=1&destination=Palm+Jumeirah+Dubai+UAE',
+                termsHref: 'terminos-condiciones-ae.html'
+            }
+        };
+        const REGION_STORAGE_KEY = 'pgm_region';
+        function getRegion() { try { return localStorage.getItem(REGION_STORAGE_KEY) || 'ES'; } catch (e) { return 'ES'; } }
+        function setRegion(r) { try { localStorage.setItem(REGION_STORAGE_KEY, r); } catch (e) {} }
+
         // Translation System
         const translations = {
             en: {
@@ -1756,74 +1806,74 @@
             },
             es: {
                 nav: {
-                    home: 'Home',
-                    reservations: 'Reservations',
-                    fleet: 'Fleet',
-                    contact: 'Contact'
+                    home: 'Inicio',
+                    reservations: 'Reservas',
+                    fleet: 'Flota',
+                    contact: 'Contacto'
                 },
                 hero: {
                     title: 'DYNASTY PRESTIGE',
-                    subtitle: 'Supercar and high-end vehicle rental in Dubai. Drive your dream supercar today.',
-                    button: 'BOOK NOW'
+                    subtitle: 'Alquiler de superdeportivos y vehiculos de alta gama en Madrid. Conduce tu coche soñado hoy.',
+                    button: 'RESERVAR'
                 },
                 presentation: {
-                    title: 'ONE GOAL, ONE VISION',
-                    subtitle: 'Explore our wide range of luxury cars and drive your dream car today.',
-                    description: 'At Dynasty Prestige, we redefine the luxury car rental experience, combining elegance, exclusivity and excellence in every detail. We specialize in offering high-end vehicles that not only transport, but elevate every journey to an extraordinary level.'
+                    title: 'UN OBJETIVO, UNA VISION',
+                    subtitle: 'Explora nuestra amplia gama de coches de lujo y conduce el coche de tus sueños hoy.',
+                    description: 'En Dynasty Prestige redefinimos la experiencia de alquiler de coches de lujo, combinando elegancia, exclusividad y excelencia en cada detalle. Nos especializamos en ofrecer vehiculos de alta gama que no solo transportan, sino que elevan cada viaje a un nivel extraordinario.'
                 },
                 reservation: {
-                    title: 'Book Your Experience',
-                    subtitle: 'Select a vehicle from our fleet and complete your reservation',
-                    button: 'VIEW OUR FLEET'
+                    title: 'Reserva tu experiencia',
+                    subtitle: 'Selecciona un vehiculo de nuestra flota y completa tu reserva',
+                    button: 'VER FLOTA'
                 },
                 fleet: {
-                    title: 'Our Exclusive Fleet',
-                    price_from: 'From {price} AED / day',
-                    security_deposit: 'Security Deposit: {deposit} AED',
-                    book_now: 'BOOK NOW',
-                    call: 'Call',
+                    title: 'Nuestra flota exclusiva',
+                    price_from: 'Desde {price} € / dia',
+                    security_deposit: 'Fianza: {deposit} €',
+                    book_now: 'RESERVAR',
+                    call: 'Llamar',
                     whatsapp: 'WhatsApp'
                 },
                 contact: {
-                    title: 'Contact Us',
-                    main_office: 'Main Office',
-                    spain: 'Palm Jumeirah, Dubai, UAE',
-                    phone: 'Phone',
-                    available_24h: 'Available 24 hours',
+                    title: 'Contacto',
+                    main_office: 'Oficina principal',
+                    spain: 'Calle Ciclon 27, 28042 Madrid',
+                    phone: 'Telefono',
+                    available_24h: 'Disponible 24 horas',
                     whatsapp: 'WhatsApp',
-                    available_24_7: 'Available 24/7',
+                    available_24_7: 'Disponible 24/7',
                     email: 'Email',
-                    business_hours: 'Business Hours',
-                    hours_24: '24 hours',
-                    monday_to_monday: 'Monday to Monday',
-                    always_available: 'Always available',
-                    find_us: 'Find Us',
-                    get_directions: 'Get Directions',
+                    business_hours: 'Horario',
+                    hours_24: '24 horas',
+                    monday_to_monday: 'Lunes a lunes',
+                    always_available: 'Siempre disponible',
+                    find_us: 'Encuentranos',
+                    get_directions: 'Como llegar',
                     form: {
-                        title: 'Send Us a Message',
-                        full_name: 'Full Name *',
+                        title: 'Envianos un mensaje',
+                        full_name: 'Nombre completo *',
                         email: 'Email *',
-                        phone: 'Phone',
-                        subject: 'Subject *',
-                        select_subject: 'Select a subject',
-                        reservation_inquiry: 'Reservation Inquiry',
-                        fleet_info: 'Fleet Information',
-                        price_inquiry: 'Price Inquiry',
-                        corporate_events: 'Corporate Events',
-                        other: 'Other',
-                        message: 'Message *',
-                        message_placeholder: 'Write your message here...',
-                        send: 'SEND MESSAGE'
+                        phone: 'Telefono',
+                        subject: 'Asunto *',
+                        select_subject: 'Selecciona un asunto',
+                        reservation_inquiry: 'Consulta de reserva',
+                        fleet_info: 'Informacion de flota',
+                        price_inquiry: 'Consulta de precios',
+                        corporate_events: 'Eventos corporativos',
+                        other: 'Otro',
+                        message: 'Mensaje *',
+                        message_placeholder: 'Escribe tu mensaje aqui...',
+                        send: 'ENVIAR MENSAJE'
                     }
                 },
                 footer: {
-                    rights: 'All rights reserved.',
-                    terms: 'Terms and Conditions'
+                    rights: 'Todos los derechos reservados.',
+                    terms: 'Terminos y condiciones'
                 }
             }
         };
 
-        const currentLang = 'en';
+        let currentLang = 'es';
 
         function getTranslation(key, lang = currentLang) {
             const keys = key.split('.');
@@ -1875,15 +1925,100 @@
             document.documentElement.lang = lang;
         }
 
+        function applyRegion(region) {
+            const R = REGIONS[region] || REGIONS.ES;
+            currentLang = R.locale;
+            document.documentElement.lang = currentLang;
+            applyTranslations(currentLang);
+
+            // Contact: tel and WhatsApp
+            document.querySelectorAll('a[href^="tel:"]').forEach(function(a) { a.setAttribute('href', 'tel:' + R.phone.replace(/\s/g, '')); });
+            document.querySelectorAll('a[href^="https://wa.me/"]').forEach(function(a) {
+                a.href = a.href.replace(/wa\.me\/[0-9]+/, 'wa.me/' + R.whatsapp);
+            });
+            // Map iframe and address
+            var iframe = document.querySelector('.contact-map iframe');
+            if (iframe) { iframe.src = R.mapEmbed; iframe.title = 'Dynasty Prestige - ' + R.address; }
+            var addrLink = document.querySelector('.contact-map-container a[href*="google.com/maps"]');
+            if (addrLink) { addrLink.href = R.mapLink; addrLink.textContent = R.address; }
+            var dirLink = document.querySelector('.contact-map-container a[href*="destination="]');
+            if (dirLink) dirLink.href = R.mapDirLink;
+            var addrParagraph = document.querySelector('.contact-info .contact-details p[data-i18n="contact.spain"]');
+            if (addrParagraph) addrParagraph.textContent = R.address;
+            var contactDetailsP = document.querySelectorAll('.contact-info .contact-details p');
+            var displayPhone = R.phoneDisplay || R.phone;
+            contactDetailsP.forEach(function(p) {
+                var tel = p.querySelector('a[href^="tel:"]');
+                var wa = p.querySelector('a[href^="https://wa.me/"]');
+                if (tel) tel.textContent = displayPhone;
+                if (wa) wa.textContent = displayPhone;
+            });
+            // Footer terms and WhatsApp
+            var footerTerms = document.querySelector('footer a[href*="terminos-condiciones"]');
+            if (footerTerms) footerTerms.href = R.termsHref;
+            var footerWa = document.querySelector('footer a[href^="https://wa.me/"]');
+            if (footerWa) footerWa.href = 'https://wa.me/' + R.whatsapp;
+
+            // Fleet: prices and reserve links
+            document.querySelectorAll('.car-card').forEach(function(card) {
+                var priceEur = card.getAttribute('data-price-eur');
+                var priceAed = card.getAttribute('data-price-aed');
+                var priceVal = region === 'AE' && priceAed != null ? priceAed : priceEur;
+                var depositEur = card.getAttribute('data-deposit-eur');
+                var depositAed = card.getAttribute('data-deposit-aed');
+                var depositVal = region === 'AE' && depositAed != null ? depositAed : depositEur;
+                var priceEl = card.querySelector('.price[data-i18n="fleet.price_from"]');
+                if (priceEl && priceVal != null) {
+                    priceEl.setAttribute('data-price', priceVal);
+                    translateElement(priceEl, 'fleet.price_from', currentLang);
+                }
+                var depositEl = card.querySelector('.price[data-i18n="fleet.security_deposit"]');
+                if (depositEl && depositVal != null) {
+                    depositEl.setAttribute('data-deposit', depositVal);
+                    translateElement(depositEl, 'fleet.security_deposit', currentLang);
+                }
+                var btn = card.querySelector('a.btn-reservar[href*="page.html"]');
+                if (btn && priceVal != null) {
+                    var u = new URL(btn.href, window.location.origin);
+                    u.searchParams.set('price', priceVal);
+                    u.searchParams.set('region', region);
+                    btn.href = u.pathname + '?' + u.searchParams.toString();
+                }
+            });
+
+            // Region selector UI
+            document.querySelectorAll('.region-btn').forEach(function(btn) {
+                var isActive = btn.getAttribute('data-region') === region;
+                btn.classList.toggle('active', isActive);
+                btn.setAttribute('aria-pressed', isActive);
+            });
+            if (typeof window.STRIPE_CONFIG !== 'undefined') {
+                window.STRIPE_CONFIG = region === 'AE' ? (window.STRIPE_CONFIG_AE || window.STRIPE_CONFIG) : (window.STRIPE_CONFIG_ES || window.STRIPE_CONFIG);
+            }
+        }
+
         // Apply translations on page load
         function initTranslations() {
             applyTranslations(currentLang);
         }
 
+        function initRegion() {
+            var region = getRegion();
+            setRegion(region);
+            applyRegion(region);
+            document.querySelectorAll('.region-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var r = this.getAttribute('data-region');
+                    setRegion(r);
+                    applyRegion(r);
+                });
+            });
+        }
+
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initTranslations);
+            document.addEventListener('DOMContentLoaded', initRegion);
         } else {
-            initTranslations();
+            initRegion();
         }
 
         // Vehicle gallery modal
@@ -2717,14 +2852,14 @@
             if (message.includes('reserv') || message.includes('book') || message.includes('rent')) {
                 response.text = `Great! I can help you make a reservation. 🚗\n\nOur booking process is simple:\n1. Select your vehicle\n2. Choose your dates\n3. Complete your information\n4. Secure payment with Stripe\n\nWould you like to start your reservation now?`;
                 response.cta = { url: '/app/reserve/page.html', text: 'Start Reservation →' };
-            } else if (message.includes('price') || message.includes('cost') || message.includes('aed') || message.includes('dirham')) {
-                response.text = `Our luxury vehicle rental prices start from:\n\n• Mercedes GLE 400D: From 1,600 AED/day\n• Mercedes GLE 53 AMG: From 2,000 AED/day\n• Mercedes G 63 AMG: From 3,800 AED/day\n• Porsche 992 GT3: From 4,000 AED/day\n• Lamborghini Urus Sport: From 6,596 AED/day\n• Lamborghini Huracán: From 6,000 AED/day\n• Ferrari 296 GTS: From 6,996 AED/day\n\nAll prices include insurance. Security deposits may apply for premium vehicles.`;
+            } else if (message.includes('price') || message.includes('cost') || message.includes('eur') || message.includes('euro') || message.includes('precio') || message.includes('precios') || message.includes('aed') || message.includes('dirham')) {
+                response.text = `Nuestros precios de alquiler empiezan desde:\n\n• Mercedes GLE 53 AMG: Desde 500 €/día\n• Lamborghini Huracán: Desde 1.500 €/día\n• Ferrari 296 GTS: Desde 1.500 €/día\n\nTodos los precios incluyen seguro. Puede aplicarse fianza en vehículos premium.`;
                 response.cta = { url: '#fleet', text: 'View All Vehicles →' };
             } else if (message.includes('fleet') || message.includes('vehicle') || message.includes('car') || message.includes('available')) {
                 response.text = `We have an exclusive fleet of luxury vehicles! 🏎️\n\nOur collection includes:\n• Mercedes GLE series (400D, 53 AMG, Coupe)\n• Mercedes G 63 AMG\n• Lamborghini Huracán & Urus Sport\n• Ferrari 296 GTS\n• Porsche 992 GT3\n\nAll vehicles are maintained to the highest standards.`;
                 response.cta = { url: '#fleet', text: 'Explore Fleet →' };
-            } else if (message.includes('contact') || message.includes('phone') || message.includes('email') || message.includes('whatsapp')) {
-                response.text = `You can reach us through:\n\n📞 Phone: +971 586122568\n💬 WhatsApp: +971 586122568\n📧 Email: prestigegoalmotion@gmail.com\n📍 Address: Palm Jumeirah, Dubai, UAE\n\nWe're available 24/7!`;
+            } else if (message.includes('contact') || message.includes('phone') || message.includes('email') || message.includes('whatsapp') || message.includes('contacto') || message.includes('telefono')) {
+                response.text = `Puedes contactarnos:\n\n📞 Teléfono: +34 625 179 867\n💬 WhatsApp: +34 625 179 867\n📧 Email: prestigegoalmotion@gmail.com\n📍 Calle Ciclon 27, 28042 Madrid\n\n¡Disponibles 24/7!`;
             } else if (message.includes('payment') || message.includes('stripe') || message.includes('pay')) {
                 response.text = `We accept secure payments through Stripe! 💳\n\nPayment methods:\n• Credit/Debit Cards\n• Apple Pay\n• Google Pay\n• Stripe Link\n\nAll transactions are secure and encrypted.`;
                 response.cta = { url: '/app/reserve/page.html', text: 'Start Booking →' };

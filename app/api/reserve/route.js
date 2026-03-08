@@ -93,8 +93,8 @@ async function sendReservationNotificationEmail(reservationData, customerData) {
                     <div class="info-row"><span class="label">Start date:</span> ${reservationData.startDate || 'N/A'}</div>
                     <div class="info-row"><span class="label">End date:</span> ${reservationData.endDate || 'N/A'}</div>
                     <div class="info-row"><span class="label">Days:</span> ${reservationData.days || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Price per day:</span> ${reservationData.pricePerDay || 'N/A'} AED</div>
-                    <div class="info-row"><span class="label">Total:</span> ${reservationData.total || 'N/A'} AED</div>
+                    <div class="info-row"><span class="label">Price per day:</span> ${reservationData.pricePerDay || 'N/A'} €</div>
+                    <div class="info-row"><span class="label">Total:</span> ${reservationData.total || 'N/A'} €</div>
                     ${reservationData.pickupLocation ? `<div class="info-row"><span class="label">Pickup location:</span> ${reservationData.pickupLocation}</div>` : ''}
                     <h3>Customer Details</h3>
                     <div class="info-row"><span class="label">Name:</span> ${customerData.name || customerData.fullName || 'N/A'}</div>
@@ -157,8 +157,8 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
                     <div class="info-row"><span class="label">Start date:</span> ${reservationData.startDate || 'N/A'}</div>
                     <div class="info-row"><span class="label">End date:</span> ${reservationData.endDate || 'N/A'}</div>
                     <div class="info-row"><span class="label">Days:</span> ${reservationData.days || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Price per day:</span> ${reservationData.pricePerDay || 'N/A'} AED</div>
-                    <div class="info-row"><span class="label">Total:</span> ${reservationData.total || 'N/A'} AED</div>
+                    <div class="info-row"><span class="label">Price per day:</span> ${reservationData.pricePerDay || 'N/A'} €</div>
+                    <div class="info-row"><span class="label">Total:</span> ${reservationData.total || 'N/A'} €</div>
                     ${reservationData.pickupLocation ? `<div class="info-row"><span class="label">Pickup location:</span> ${reservationData.pickupLocation}</div>` : ''}
                     ${paymentIntentId ? `<div class="info-row"><span class="label">Payment Intent ID:</span> ${paymentIntentId}</div>` : ''}
                     <h3>Customer Details</h3>
@@ -204,8 +204,8 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
                     <div class="info-row"><span class="label">Start date:</span> ${reservationData.startDate || 'N/A'}</div>
                     <div class="info-row"><span class="label">End date:</span> ${reservationData.endDate || 'N/A'}</div>
                     <div class="info-row"><span class="label">Days:</span> ${reservationData.days || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Price per day:</span> ${reservationData.pricePerDay || 'N/A'} AED</div>
-                    <div class="info-row"><span class="label">Total:</span> ${reservationData.total || (reservationData.pricePerDay && reservationData.days ? (parseFloat(reservationData.pricePerDay) * parseInt(reservationData.days)).toFixed(2) + ' AED' : 'N/A')}</div>
+                    <div class="info-row"><span class="label">Price per day:</span> ${reservationData.pricePerDay || 'N/A'} €</div>
+                    <div class="info-row"><span class="label">Total:</span> ${reservationData.total || (reservationData.pricePerDay && reservationData.days ? (parseFloat(reservationData.pricePerDay) * parseInt(reservationData.days)).toFixed(2) + ' €' : 'N/A')}</div>
                     ${reservationData.pickupLocation ? `<div class="info-row"><span class="label">Pickup location:</span> ${reservationData.pickupLocation}</div>` : ''}
                     <p style="margin-top: 20px;">Thank you for choosing Dynasty Prestige.</p>
                 </div>
@@ -636,7 +636,7 @@ router.post('/confirm', async (req, res) => {
             // Calculate total if not provided
             if (!finalReservationData.total && finalReservationData.pricePerDay && finalReservationData.days) {
                 const calculatedTotal = (parseFloat(finalReservationData.pricePerDay) * parseInt(finalReservationData.days)).toFixed(2);
-                finalReservationData.total = calculatedTotal + ' AED';
+                finalReservationData.total = calculatedTotal + ' €';
             }
             
             // Prepare customer data (use provided data or PaymentIntent metadata)
