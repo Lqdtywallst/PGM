@@ -1,5 +1,5 @@
 // ============================================
-// STRIPE CONFIGURATION - FRONTEND
+// STRIPE CONFIGURATION - FRONTEND (Dubai only)
 // ============================================
 // IMPORTANT: Replace these keys with your real Stripe keys
 // Get your keys at: https://dashboard.stripe.com/apikeys
@@ -11,15 +11,9 @@
 const ENVIRONMENT = 'production'; // 'development' | 'production'
 
 // ============================================
-// DEVELOPMENT CONFIGURATION (per region)
+// DEVELOPMENT CONFIGURATION (Dubai only)
 // ============================================
-const DEV_CONFIG_ES = {
-    publishableKey: 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-    backendUrl: 'http://localhost:3000',
-    currency: 'eur',
-    country: 'ES'
-};
-const DEV_CONFIG_AE = {
+const DEV_CONFIG_DUBAI = {
     publishableKey: 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
     backendUrl: 'http://localhost:3000',
     currency: 'aed',
@@ -27,15 +21,9 @@ const DEV_CONFIG_AE = {
 };
 
 // ============================================
-// PRODUCTION CONFIGURATION (RAILWAY) - per region
+// PRODUCTION CONFIGURATION (Railway – Dubai)
 // ============================================
-const PROD_CONFIG_ES = {
-    publishableKey: 'pk_live_51RsMXQ3DSCa2l71zZiMkmlBXXpLu1HF0Sy4N4xSsB1TvUWu6wJLlKR5z7HrCa0AIlWQjfZo4tL8d1qcxtgExNHS300EPCAtXti',
-    backendUrl: 'https://pgm-production.up.railway.app',
-    currency: 'eur',
-    country: 'ES'
-};
-const PROD_CONFIG_AE = {
+const PROD_CONFIG_DUBAI = {
     publishableKey: 'pk_live_51RsMXQ3DSCa2l71zZiMkmlBXXpLu1HF0Sy4N4xSsB1TvUWu6wJLlKR5z7HrCa0AIlWQjfZo4tL8d1qcxtgExNHS300EPCAtXti',
     backendUrl: 'https://pgm-production.up.railway.app',
     currency: 'aed',
@@ -43,17 +31,14 @@ const PROD_CONFIG_AE = {
 };
 
 // ============================================
-// FINAL CONFIGURATION (by region from localStorage)
+// FINAL CONFIGURATION (Dubai only)
 // ============================================
 function getStripeConfig() {
-    const region = (typeof localStorage !== 'undefined' && localStorage.getItem('pgm_region')) || 'ES';
     const dev = ENVIRONMENT !== 'production';
-    if (region === 'AE') return dev ? DEV_CONFIG_AE : PROD_CONFIG_AE;
-    return dev ? DEV_CONFIG_ES : PROD_CONFIG_ES;
+    return dev ? DEV_CONFIG_DUBAI : PROD_CONFIG_DUBAI;
 }
+
 const STRIPE_CONFIG = getStripeConfig();
-const STRIPE_CONFIG_ES = ENVIRONMENT === 'production' ? PROD_CONFIG_ES : DEV_CONFIG_ES;
-const STRIPE_CONFIG_AE = ENVIRONMENT === 'production' ? PROD_CONFIG_AE : DEV_CONFIG_AE;
 
 // Export configuration for Node.js usage
 if (typeof module !== 'undefined' && module.exports) {
@@ -63,6 +48,5 @@ if (typeof module !== 'undefined' && module.exports) {
 // Make globally available for the browser
 if (typeof window !== 'undefined') {
     window.STRIPE_CONFIG = STRIPE_CONFIG;
-    window.STRIPE_CONFIG_ES = STRIPE_CONFIG_ES;
-    window.STRIPE_CONFIG_AE = STRIPE_CONFIG_AE;
 }
+

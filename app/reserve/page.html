@@ -522,20 +522,15 @@
     </div>
 
     <script>
-        // Region from URL or localStorage (ES = Spain/EUR, AE = UAE/AED)
+        // Region (Dubai-only site, AED currency)
         const urlParams = new URLSearchParams(window.location.search);
-        const RESERVE_REGION = urlParams.get('region') || (typeof localStorage !== 'undefined' && localStorage.getItem('pgm_region')) || 'ES';
-        if (typeof localStorage !== 'undefined') try { localStorage.setItem('pgm_region', RESERVE_REGION); } catch (e) {}
-        if (typeof window !== 'undefined' && window.STRIPE_CONFIG_ES && window.STRIPE_CONFIG_AE) {
-            window.STRIPE_CONFIG = RESERVE_REGION === 'AE' ? window.STRIPE_CONFIG_AE : window.STRIPE_CONFIG_ES;
-        }
-        const isAED = RESERVE_REGION === 'AE';
-        const CURRENCY_SYMBOL = isAED ? 'AED' : '€';
-        const CURRENCY_ZERO = isAED ? 'AED 0.00' : '0,00 €';
+        const RESERVE_REGION = 'AE';
+        const isAED = true;
+        const CURRENCY_SYMBOL = 'AED';
+        const CURRENCY_ZERO = 'AED 0.00';
         function formatAmount(n) {
             const num = typeof n === 'number' ? n : parseFloat(n);
-            if (isAED) return 'AED ' + num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-            return num.toFixed(2).replace('.', ',') + ' €';
+            return 'AED ' + num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         }
 
         // Form state
