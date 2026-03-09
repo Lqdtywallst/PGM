@@ -1,4 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Core pages -->
+  <url>
+    <loc>https://prestigegoalmotion.com/</loc>
+    <priority>1.0</priority>
+    <changefreq>daily</changefreq>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/app/reserve/page.html</loc>
+    <priority>0.9</priority>
+    <changefreq>daily</changefreq>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/terminos-condiciones.html</loc>
+    <priority>0.4</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+
+  <!-- Dynasty Prestige Dubai landing pages -->
+  <url>
+    <loc>https://prestigegoalmotion.com/dynasty-prestige/</loc>
+    <priority>0.7</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/dynasty-prestige/luxury-car-rental-dubai.html</loc>
+    <priority>0.8</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/dynasty-prestige/fleet.html</loc>
+    <priority>0.7</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/dynasty-prestige/about.html</loc>
+    <priority>0.5</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/dynasty-prestige/contact.html</loc>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+
+  <!-- High-intent car rental detail pages -->
+  <url>
+    <loc>https://prestigegoalmotion.com/dynasty-prestige/g63-rental-dubai.html</loc>
+    <priority>0.9</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/dynasty-prestige/lamborghini-huracan-rental-dubai.html</loc>
+    <priority>0.9</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/dynasty-prestige/ferrari-296-rental-dubai.html</loc>
+    <priority>0.9</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/dynasty-prestige/rolls-royce-rental-dubai.html</loc>
+    <priority>0.6</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/dynasty-prestige/ferrari-rental-dubai.html</loc>
+    <priority>0.8</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/dynasty-prestige/lamborghini-rental-dubai.html</loc>
+    <priority>0.8</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+</urlset>
+
+<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
