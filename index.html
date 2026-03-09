@@ -15,8 +15,12 @@
     <meta name="language" content="Spanish">
     <meta name="revisit-after" content="7 days">
 
-    <link rel="icon" type="image/png" href="/favicon-dp.png">
-    <link rel="apple-touch-icon" href="/favicon-dp.png">
+    <!-- Favicon / App Icons -->
+    <link rel="icon" type="image/png" sizes="16x16" href="/logo-dp.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/logo-dp.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/logo-dp.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/logo-dp.png">
+    <link rel="shortcut icon" href="/logo-dp.png">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
@@ -40,11 +44,7 @@
     <meta name="twitter:image" content="https://prestigegoalmotion.com/logo-dp.png">
     <meta name="twitter:image:alt" content="Dynasty Prestige - Luxury car rental Madrid and Dubai">
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/logo-dp.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/logo-dp.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/logo-dp.png">
-    <link rel="shortcut icon" href="/logo-dp.png">
+    <!-- Favicon (fallbacks) -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#0a0a0a">
 
@@ -85,6 +85,97 @@
       "description": "Luxury and supercar rental in Madrid and Dubai. Mercedes, Lamborghini, Ferrari.",
       "inLanguage": ["es", "en"],
       "publisher": { "@type": "Organization", "name": "Dynasty Prestige", "logo": { "@type": "ImageObject", "url": "https://prestigegoalmotion.com/logo-dp.png" } }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Vehicle",
+          "name": "Mercedes GLE 53 AMG",
+          "brand": "Mercedes-Benz",
+          "model": "GLE 53 AMG",
+          "bodyType": "SUV",
+          "image": "https://di-uploads-pod5.dealerinspire.com/mercedesbenzprinceton/uploads/2020/07/2021-Mercedes-Benz-GLE-53-Coupe.png",
+          "offers": {
+            "@type": "Offer",
+            "price": "500",
+            "priceCurrency": "EUR",
+            "availability": "https://schema.org/InStock"
+          }
+        },
+        {
+          "@type": "Vehicle",
+          "name": "Lamborghini Huracán",
+          "brand": "Lamborghini",
+          "model": "Huracán",
+          "bodyType": "Coupe",
+          "image": "https://images.unsplash.com/photo-1543854589-fdd815f176e0?q=80&w=1904&auto=format&fit=crop",
+          "offers": {
+            "@type": "Offer",
+            "price": "1500",
+            "priceCurrency": "EUR",
+            "availability": "https://schema.org/InStock"
+          }
+        },
+        {
+          "@type": "Vehicle",
+          "name": "Ferrari 296 GTS",
+          "brand": "Ferrari",
+          "model": "296 GTS",
+          "bodyType": "Convertible",
+          "image": "https://www.europeanprestige.co.uk/blobs/stock/637/images/ecbeba9b-5a32-4bea-8974-83af94d99597/296-4.jpg?width=2000&height=1333",
+          "offers": {
+            "@type": "Offer",
+            "price": "1749",
+            "priceCurrency": "EUR",
+            "availability": "https://schema.org/InStock"
+          }
+        },
+        {
+          "@type": "Vehicle",
+          "name": "Mercedes G 63 AMG",
+          "brand": "Mercedes-Benz",
+          "model": "G 63 AMG",
+          "bodyType": "SUV",
+          "image": "https://toyzrentalme.com/wp-content/uploads/2025/03/URB00168.jpg",
+          "offers": {
+            "@type": "Offer",
+            "price": "950",
+            "priceCurrency": "EUR",
+            "availability": "https://schema.org/InStock"
+          }
+        },
+        {
+          "@type": "Vehicle",
+          "name": "Lamborghini Urus Sport",
+          "brand": "Lamborghini",
+          "model": "Urus Sport",
+          "bodyType": "SUV",
+          "image": "https://i.pinimg.com/736x/e3/94/20/e39420a37c1513775fc04369cc2606e1.jpg",
+          "offers": {
+            "@type": "Offer",
+            "price": "1649",
+            "priceCurrency": "EUR",
+            "availability": "https://schema.org/InStock"
+          }
+        },
+        {
+          "@type": "Vehicle",
+          "name": "Porsche 992 GT3",
+          "brand": "Porsche",
+          "model": "992 GT3",
+          "bodyType": "Coupe",
+          "image": "https://www.chicagomotorcars.com/imagetag/11513/main/l/Used-2024-Porsche-911-GT3-RS-Weissach!-Full-Body-PPF!-Front-End-Lifter!-Sinister-Spec!-Loaded!-1707950268.jpg",
+          "offers": {
+            "@type": "Offer",
+            "price": "1000",
+            "priceCurrency": "EUR",
+            "availability": "https://schema.org/InStock"
+          }
+        }
+      ]
     }
     </script>
     <script type="application/ld+json">
@@ -326,6 +417,12 @@
         .car-info {
             padding: 2rem;
             text-align: center;
+        }
+        .car-description {
+            font-size: 0.95rem;
+            color: var(--silver);
+            margin: 0.75rem 0 1rem;
+            min-height: 3.5rem;
         }
         .view-gallery {
             display: inline-flex;
@@ -1277,8 +1374,8 @@
                 margin-bottom: 1.5rem;
             }
             .logo {
-                height: 72px;
-                width: 72px;
+                height: 90px;
+                width: auto;
             }
             nav ul { gap: 1.2rem; }
         
@@ -1444,9 +1541,10 @@
         <h2 id="fleet-heading" data-i18n="fleet.title">Our Exclusive Fleet</h2>
         <div class="fleet-grid">
             <div class="car-card" data-region="ES" data-title="Mercedes GLE 53 AMG" data-price-eur="500" data-price-aed="2000" data-gallery='["https://di-uploads-pod5.dealerinspire.com/mercedesbenzprinceton/uploads/2020/07/2021-Mercedes-Benz-GLE-53-Coupe.png"]'>
-                <img src="https://di-uploads-pod5.dealerinspire.com/mercedesbenzprinceton/uploads/2020/07/2021-Mercedes-Benz-GLE-53-Coupe.png" alt="Mercedes GLE 53 AMG - Luxury SUV Rental" loading="lazy" width="350" height="250" decoding="async">
+                <img src="https://di-uploads-pod5.dealerinspire.com/mercedesbenzprinceton/uploads/2020/07/2021-Mercedes-Benz-GLE-53-Coupe.png" alt="Mercedes GLE 53 AMG alquiler SUV de lujo en Madrid" loading="lazy" width="350" height="250" decoding="async">
                 <div class="car-info">
                     <h3>Mercedes GLE 53 AMG</h3>
+                    <p class="car-description">SUV de alto rendimiento con motor AMG, tracción 4MATIC+ y espacio para viajar con máximo confort en Madrid.</p>
                     <div class="price" data-i18n="fleet.price_from" data-price="500">Desde 500 € / dia</div>
                     <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
                     <a href="/app/reserve/page.html?car=Mercedes GLE 53 AMG&price=500" class="btn-reservar" data-i18n="fleet.book_now">RESERVAR</a>
@@ -1463,9 +1561,10 @@
                 </div>
             </div>
             <div class="car-card" data-region="ES" data-title="Lamborghini Huracán" data-price-eur="1500" data-price-aed="6000" data-gallery='["https://images.unsplash.com/photo-1543854589-fdd815f176e0?q=80&w=1904&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'>
-                <img src="https://images.unsplash.com/photo-1543854589-fdd815f176e0?q=80&w=1904&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Lamborghini Huracán - Alquiler de superdeportivos en Madrid" loading="lazy" width="350" height="250" decoding="async">
+                <img src="https://images.unsplash.com/photo-1543854589-fdd815f176e0?q=80&w=1904&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Lamborghini Huracán alquiler superdeportivo en Madrid" loading="lazy" width="350" height="250" decoding="async">
                 <div class="car-info">
                     <h3>Lamborghini Huracán</h3>
+                    <p class="car-description">Superdeportivo V10 con sonido brutal y diseño italiano, ideal para experiencias exclusivas en Madrid.</p>
                     <div class="price" data-i18n="fleet.price_from" data-price="1500">Desde 1.500 € / dia</div>
                     <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
                     <a href="/app/reserve/page.html?car=Lamborghini Huracán&price=1500" class="btn-reservar" data-i18n="fleet.book_now">RESERVAR</a>
@@ -1482,9 +1581,10 @@
                 </div>
             </div>
             <div class="car-card" data-region="ES" data-title="Ferrari 296 GTS" data-price-eur="1749" data-price-aed="6996" data-deposit-eur="7000" data-deposit-aed="28000" data-gallery='["https://www.europeanprestige.co.uk/blobs/stock/637/images/ecbeba9b-5a32-4bea-8974-83af94d99597/296-4.jpg?width=2000&height=1333"]'>
-                <img src="https://www.europeanprestige.co.uk/blobs/stock/637/images/ecbeba9b-5a32-4bea-8974-83af94d99597/296-4.jpg?width=2000&height=1333" alt="Ferrari 296 GTS - Hybrid Supercar Rental" loading="lazy" width="350" height="250" decoding="async" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1600510424051-30d592a75353?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGxhbWJvcmdoaW5pfGVufDB8fDB8fHww';">
+                <img src="https://www.europeanprestige.co.uk/blobs/stock/637/images/ecbeba9b-5a32-4bea-8974-83af94d99597/296-4.jpg?width=2000&height=1333" alt="Ferrari 296 GTS híbrido alquiler superdeportivo en Madrid" loading="lazy" width="350" height="250" decoding="async" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1600510424051-30d592a75353?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGxhbWJvcmdoaW5pfGVufDB8fDB8fHww';">
                 <div class="car-info">
                     <h3>Ferrari 296 GTS</h3>
+                    <p class="car-description">Ferrari híbrido descapotable con más de 800 CV, perfecto para rutas premium y eventos de lujo.</p>
                     <div class="price" data-i18n="fleet.price_from" data-price="1749">Desde 1.749 € / dia</div>
                     <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
                     <div class="price" style="font-size: 0.9rem; color: var(--silver); margin-top: 0.5rem;" data-i18n="fleet.security_deposit" data-deposit="7000">Fianza: 7.000 €</div>
@@ -1502,9 +1602,10 @@
                 </div>
             </div>
             <div class="car-card" data-region="ES AE" data-title="Mercedes G 63 AMG" data-price-eur="950" data-price-aed="3800" data-deposit-eur="5000" data-deposit-aed="20000" data-gallery='["https://i.ytimg.com/vi/H0H_R8acXmI/maxresdefault.jpg"]'>
-                <img src="https://i.ytimg.com/vi/H0H_R8acXmI/maxresdefault.jpg" alt="Mercedes G 63 AMG" loading="lazy" style="min-height: 250px;">
+                <img src="https://i.ytimg.com/vi/H0H_R8acXmI/maxresdefault.jpg" alt="Mercedes G 63 AMG alquiler SUV de lujo en Madrid y Dubai" loading="lazy" style="min-height: 250px;">
                 <div class="car-info">
                     <h3>Mercedes G 63 AMG</h3>
+                    <p class="car-description">SUV 4x4 icónico con motor V8 biturbo AMG, disponible para alquiler exclusivo en Madrid y Dubai.</p>
                     <div class="price" data-i18n="fleet.price_from" data-price="950">Desde 950 € / dia</div>
                     <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
                     <div class="price" style="font-size: 0.9rem; color: var(--silver); margin-top: 0.5rem;" data-i18n="fleet.security_deposit" data-deposit="5000">Fianza: 5.000 €</div>
@@ -1522,9 +1623,10 @@
                 </div>
             </div>
             <div class="car-card" data-region="ES" data-title="Lamborghini Urus Sport" data-price-eur="1649" data-price-aed="6596" data-deposit-eur="6000" data-deposit-aed="24000" data-gallery='["https://i.pinimg.com/736x/e3/94/20/e39420a37c1513775fc04369cc2606e1.jpg"]'>
-                <img src="https://i.pinimg.com/736x/e3/94/20/e39420a37c1513775fc04369cc2606e1.jpg" alt="Lamborghini Urus Sport" loading="lazy" style="min-height: 250px;">
+                <img src="https://i.pinimg.com/736x/e3/94/20/e39420a37c1513775fc04369cc2606e1.jpg" alt="Lamborghini Urus Sport alquiler SUV deportivo de lujo" loading="lazy" style="min-height: 250px;">
                 <div class="car-info">
                     <h3>Lamborghini Urus Sport</h3>
+                    <p class="car-description">SUV superdeportivo que combina la practicidad de un 4x4 con las prestaciones de un Lamborghini.</p>
                     <div class="price" data-i18n="fleet.price_from" data-price="1649">Desde 1.649 € / dia</div>
                     <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
                     <div class="price" style="font-size: 0.9rem; color: var(--silver); margin-top: 0.5rem;" data-i18n="fleet.security_deposit" data-deposit="6000">Fianza: 6.000 €</div>
@@ -1542,9 +1644,10 @@
                 </div>
             </div>
             <div class="car-card" data-region="ES" data-title="Porsche 992 GT3" data-price-eur="1000" data-price-aed="4000" data-deposit-eur="5000" data-deposit-aed="20000" data-gallery='["https://www.chicagomotorcars.com/imagetag/11513/main/l/Used-2024-Porsche-911-GT3-RS-Weissach!-Full-Body-PPF!-Front-End-Lifter!-Sinister-Spec!-Loaded!-1707950268.jpg"]'>
-                <img src="https://www.chicagomotorcars.com/imagetag/11513/main/l/Used-2024-Porsche-911-GT3-RS-Weissach!-Full-Body-PPF!-Front-End-Lifter!-Sinister-Spec!-Loaded!-1707950268.jpg" alt="Porsche 992 GT3" loading="lazy" style="min-height: 250px;">
+                <img src="https://www.chicagomotorcars.com/imagetag/11513/main/l/Used-2024-Porsche-911-GT3-RS-Weissach!-Full-Body-PPF!-Front-End-Lifter!-Sinister-Spec!-Loaded!-1707950268.jpg" alt="Porsche 992 GT3 alquiler coche deportivo de circuito" loading="lazy" style="min-height: 250px;">
                 <div class="car-info">
                     <h3>Porsche 992 GT3</h3>
+                    <p class="car-description">Porsche de circuito homologado para calle, perfecto para disfrutar de una experiencia GT3 pura.</p>
                     <div class="price" data-i18n="fleet.price_from" data-price="1000">Desde 1.000 € / dia</div>
                     <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
                     <div class="price" style="font-size: 0.9rem; color: var(--silver); margin-top: 0.5rem;" data-i18n="fleet.security_deposit" data-deposit="5000">Fianza: 5.000 €</div>
