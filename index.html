@@ -242,11 +242,6 @@
             will-change: background-color;
         }
         header.scrolled { background: #000000; }
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
         .logo {
             height: 120px;
             width: auto;
@@ -1368,12 +1363,6 @@
         footer a:hover { color: var(--gold); }
 
         @media (max-width: 768px) {
-            header {
-                padding: 0.5rem 5%;
-            }
-            .header-left {
-                gap: 1rem;
-            }
             .hero h1 { font-size: 3rem; }
             .hero-title-img {
                 max-width: 90%;
@@ -1496,13 +1485,6 @@
 
     <!-- Header -->
     <header role="banner">
-        <div class="header-left">
-            <div class="logo">
-                <a href="#inicio" aria-label="Dynasty Prestige Home">
-                    <img src="/logo-dp.png" alt="Dynasty Prestige - Luxury Car Rental" decoding="async">
-                </a>
-            </div>
-        </div>
         <button class="menu-toggle" id="menuToggle" onclick="toggleMobileMenu()" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mobileNav">
             <i class="fas fa-bars" aria-hidden="true"></i>
             <i class="fas fa-times" aria-hidden="true"></i>
