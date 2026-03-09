@@ -289,14 +289,55 @@
             to { opacity: 1; }
         }
         .car-info {
-            padding: 2rem;
+            padding: 2rem 2.25rem 2.5rem;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .car-name {
+            font-size: 1.4rem;
+            letter-spacing: 0.04em;
+        }
+        .car-tagline {
+            font-size: 0.95rem;
+            color: var(--silver);
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+        }
+        .car-price {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gold);
+            margin-top: 0.25rem;
+        }
+        .car-benefits {
+            list-style: none;
+            margin: 0.5rem 0 0.75rem;
+            padding: 0;
+            font-size: 0.85rem;
+            color: var(--silver);
+        }
+        .car-benefits li::before {
+            content: "• ";
+            color: var(--gold);
         }
         .car-description {
             font-size: 0.95rem;
             color: var(--silver);
-            margin: 0.75rem 0 1rem;
+            margin: 0.5rem 0 1.25rem;
             min-height: 3.5rem;
+        }
+        .car-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+        }
+        .car-actions .btn,
+        .car-actions .btn-contact {
+            min-width: 130px;
         }
         .view-gallery {
             display: inline-flex;
@@ -395,6 +436,20 @@
         @media (max-width: 768px) {
             .gallery-main {
                 height: 320px;
+            }
+            .fleet-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            .car-info {
+                padding: 1.5rem 1.5rem 2rem;
+            }
+            .car-actions {
+                flex-direction: column;
+            }
+            .car-actions .btn,
+            .car-actions .btn-contact {
+                width: 100%;
             }
         }
         .car-info h3 {
@@ -1409,14 +1464,19 @@
                     <h3>Mercedes GLE 53 AMG</h3>
                     <p class="car-description">High-performance AMG SUV with 4MATIC+ traction and space for comfortable journeys across Dubai.</p>
                     <div class="price" data-i18n="fleet.price_from" data-price="1200">From 1,200 AED / day</div>
+                    <ul class="car-benefits">
+                        <li>No Deposit Required</li>
+                        <li>Free Delivery in Dubai</li>
+                        <li>24/7 Customer Support</li>
+                    </ul>
                     <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
-                    <a href="/app/reserve/page.html?car=Mercedes GLE 53 AMG&price=1200" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
-                    <div class="contact-buttons">
+                    <div class="car-actions">
+                        <a href="/app/reserve/page.html?car=Mercedes GLE 53 AMG&price=1200" class="btn btn-primary" data-i18n="fleet.book_now">Book Now</a>
                         <a href="tel:+971586122568" class="btn-contact" aria-label="Call Dynasty Prestige Dubai">
                             <i class="fas fa-phone" aria-hidden="true"></i>
                             <span data-i18n="fleet.call">Call</span>
                         </a>
-                        <a href="https://wa.me/971586122568?text=Hi!%20I%27m%20interested%20in%20renting%20the%20Mercedes%20GLE%2053%20AMG%20in%20Dubai.%20Please%20share%20details." target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us on WhatsApp">
+                        <a href="https://wa.me/971586122568" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us on WhatsApp">
                             <i class="fab fa-whatsapp" aria-hidden="true"></i>
                             <span data-i18n="fleet.whatsapp">WhatsApp</span>
                         </a>
@@ -1427,16 +1487,21 @@
                 <img src="https://images.unsplash.com/photo-1543854589-fdd815f176e0?q=80&w=1904&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Lamborghini Huracán supercar rental Dubai" loading="lazy" width="350" height="250" decoding="async">
                 <div class="car-info">
                     <h3>Lamborghini Huracán</h3>
-                    <p class="car-description">V10 Italian supercar, perfect for late-night Sheikh Zayed Road runs and Dubai skyline photos.</p>
-                    <div class="price" data-i18n="fleet.price_from" data-price="1500">From 1,500 AED / day</div>
+                    <p class="car-description">Iconic V10 Lamborghini supercar delivering an unforgettable driving experience in Dubai.</p>
+                    <div class="price" data-i18n="fleet.price_from" data-price="2900">From 2,900 AED / day</div>
+                    <ul class="car-benefits">
+                        <li>No Deposit Required</li>
+                        <li>Free Delivery in Dubai</li>
+                        <li>24/7 Customer Support</li>
+                    </ul>
                     <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
-                    <a href="/app/reserve/page.html?car=Lamborghini Huracán&price=1500" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
-                    <div class="contact-buttons">
+                    <div class="car-actions">
+                        <a href="/app/reserve/page.html?car=Lamborghini Huracán&price=2900" class="btn btn-primary" data-i18n="fleet.book_now">Book Now</a>
                         <a href="tel:+971586122568" class="btn-contact" aria-label="Call Dynasty Prestige Dubai">
                             <i class="fas fa-phone"></i>
                             <span data-i18n="fleet.call">Call</span>
                         </a>
-                        <a href="https://wa.me/971586122568?text=Hi!%20I%27m%20interested%20in%20renting%20the%20Lamborghini%20Hurac%C3%A1n%20in%20Dubai.%20Please%20share%20details." target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us on WhatsApp">
+                        <a href="https://wa.me/971586122568" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us on WhatsApp">
                             <i class="fab fa-whatsapp"></i>
                             <span data-i18n="fleet.whatsapp">WhatsApp</span>
                         </a>
@@ -1447,17 +1512,21 @@
                 <img src="https://www.europeanprestige.co.uk/blobs/stock/637/images/ecbeba9b-5a32-4bea-8974-83af94d99597/296-4.jpg?width=2000&height=1333" alt="Ferrari 296 GTS hybrid supercar rental Dubai" loading="lazy" width="350" height="250" decoding="async" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1600510424051-30d592a75353?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGxhbWJvcmdoaW5pfGVufDB8fDB8fHww';">
                 <div class="car-info">
                     <h3>Ferrari 296 GTS</h3>
-                    <p class="car-description">Latest-generation hybrid Ferrari convertible, ideal for premium Dubai waterfront drives and events.</p>
-                    <div class="price" data-i18n="fleet.price_from" data-price="1700">From 1,700 AED / day</div>
+                    <p class="car-description">Hybrid Ferrari supercar combining cutting-edge technology with extreme performance.</p>
+                    <div class="price" data-i18n="fleet.price_from" data-price="3400">From 3,400 AED / day</div>
+                    <ul class="car-benefits">
+                        <li>No Deposit Required</li>
+                        <li>Free Delivery in Dubai</li>
+                        <li>24/7 Customer Support</li>
+                    </ul>
                     <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
-                    <div class="price" style="font-size: 0.9rem; color: var(--silver); margin-top: 0.5rem;" data-i18n="fleet.security_deposit" data-deposit="7000">Security Deposit: 7,000 AED</div>
-                    <a href="/app/reserve/page.html?car=Ferrari 296 GTS&price=1700" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
-                    <div class="contact-buttons">
+                    <div class="car-actions">
+                        <a href="/app/reserve/page.html?car=Ferrari 296 GTS&price=3400" class="btn btn-primary" data-i18n="fleet.book_now">Book Now</a>
                         <a href="tel:+971586122568" class="btn-contact" aria-label="Call Dynasty Prestige Dubai">
                             <i class="fas fa-phone"></i>
                             <span data-i18n="fleet.call">Call</span>
                         </a>
-                        <a href="https://wa.me/971586122568?text=Hi!%20I%27m%20interested%20in%20renting%20the%20Ferrari%20296%20GTS%20in%20Dubai.%20Please%20share%20details." target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us on WhatsApp">
+                        <a href="https://wa.me/971586122568" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us on WhatsApp">
                             <i class="fab fa-whatsapp"></i>
                             <span data-i18n="fleet.whatsapp">WhatsApp</span>
                         </a>
@@ -1468,17 +1537,21 @@
                 <img src="https://toyzrentalme.com/wp-content/uploads/2025/03/URB00168.jpg" alt="Mercedes G 63 AMG luxury SUV rental Dubai" loading="lazy" style="min-height: 250px;">
                 <div class="car-info">
                     <h3>Mercedes G 63 AMG</h3>
-                    <p class="car-description">Iconic luxury 4x4 with AMG V8 biturbo, the perfect SUV for Palm Jumeirah, Downtown and Dubai Marina.</p>
-                    <div class="price" data-i18n="fleet.price_from" data-price="950">From 950 AED / day</div>
+                    <p class="car-description">Luxury SUV with V8 AMG engine, perfect for driving in Dubai with power, comfort and prestige.</p>
+                    <div class="price" data-i18n="fleet.price_from" data-price="1650">From 1,650 AED / day</div>
+                    <ul class="car-benefits">
+                        <li>No Deposit Required</li>
+                        <li>Free Delivery in Dubai</li>
+                        <li>24/7 Customer Support</li>
+                    </ul>
                     <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
-                    <div class="price" style="font-size: 0.9rem; color: var(--silver); margin-top: 0.5rem;" data-i18n="fleet.security_deposit" data-deposit="5000">Security Deposit: 5,000 AED</div>
-                    <a href="/app/reserve/page.html?car=Mercedes G 63 AMG&price=950" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
-                    <div class="contact-buttons">
+                    <div class="car-actions">
+                        <a href="/app/reserve/page.html?car=Mercedes G 63 AMG&price=1650" class="btn btn-primary" data-i18n="fleet.book_now">Book Now</a>
                         <a href="tel:+971586122568" class="btn-contact" aria-label="Call Dynasty Prestige Dubai">
                             <i class="fas fa-phone"></i>
                             <span data-i18n="fleet.call">Call</span>
                         </a>
-                        <a href="https://wa.me/971586122568?text=Hi!%20I%27m%20interested%20in%20renting%20the%20Mercedes%20G%2063%20AMG%20in%20Dubai.%20Please%20share%20details." target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us on WhatsApp">
+                        <a href="https://wa.me/971586122568" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us on WhatsApp">
                             <i class="fab fa-whatsapp"></i>
                             <span data-i18n="fleet.whatsapp">WhatsApp</span>
                         </a>
@@ -1489,17 +1562,21 @@
                 <img src="https://i.pinimg.com/736x/e3/94/20/e39420a37c1513775fc04369cc2606e1.jpg" alt="Lamborghini Urus Sport luxury SUV rental Dubai" loading="lazy" style="min-height: 250px;">
                 <div class="car-info">
                     <h3>Lamborghini Urus Sport</h3>
-                    <p class="car-description">Super SUV that combines everyday practicality with true Lamborghini performance for Dubai streets.</p>
-                    <div class="price" data-i18n="fleet.price_from" data-price="1600">From 1,600 AED / day</div>
+                    <p class="car-description">Super SUV from Lamborghini offering the perfect balance between luxury and performance.</p>
+                    <div class="price" data-i18n="fleet.price_from" data-price="2600">From 2,600 AED / day</div>
+                    <ul class="car-benefits">
+                        <li>No Deposit Required</li>
+                        <li>Free Delivery in Dubai</li>
+                        <li>24/7 Customer Support</li>
+                    </ul>
                     <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
-                    <div class="price" style="font-size: 0.9rem; color: var(--silver); margin-top: 0.5rem;" data-i18n="fleet.security_deposit" data-deposit="6000">Security Deposit: 6,000 AED</div>
-                    <a href="/app/reserve/page.html?car=Lamborghini Urus Sport&price=1600" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
-                    <div class="contact-buttons">
+                    <div class="car-actions">
+                        <a href="/app/reserve/page.html?car=Lamborghini Urus Sport&price=2600" class="btn btn-primary" data-i18n="fleet.book_now">Book Now</a>
                         <a href="tel:+971586122568" class="btn-contact" aria-label="Call Dynasty Prestige Dubai">
                             <i class="fas fa-phone"></i>
                             <span data-i18n="fleet.call">Call</span>
                         </a>
-                        <a href="https://wa.me/971586122568?text=Hi!%20I%27m%20interested%20in%20renting%20the%20Lamborghini%20Urus%20Sport%20in%20Dubai.%20Please%20share%20details." target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us on WhatsApp">
+                        <a href="https://wa.me/971586122568" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us on WhatsApp">
                             <i class="fab fa-whatsapp"></i>
                             <span data-i18n="fleet.whatsapp">WhatsApp</span>
                         </a>
@@ -1510,17 +1587,21 @@
                 <img src="https://www.chicagomotorcars.com/imagetag/11513/main/l/Used-2024-Porsche-911-GT3-RS-Weissach!-Full-Body-PPF!-Front-End-Lifter!-Sinister-Spec!-Loaded!-1707950268.jpg" alt="Porsche 992 GT3 track-focused rental Dubai" loading="lazy" style="min-height: 250px;">
                 <div class="car-info">
                     <h3>Porsche 992 GT3</h3>
-                    <p class="car-description">Track-focused Porsche for drivers who want a pure GT3 experience on Dubai roads.</p>
-                    <div class="price" data-i18n="fleet.price_from" data-price="1400">From 1,400 AED / day</div>
+                    <p class="car-description">Track-inspired Porsche sports car designed for pure driving performance.</p>
+                    <div class="price" data-i18n="fleet.price_from" data-price="2100">From 2,100 AED / day</div>
+                    <ul class="car-benefits">
+                        <li>No Deposit Required</li>
+                        <li>Free Delivery in Dubai</li>
+                        <li>24/7 Customer Support</li>
+                    </ul>
                     <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
-                    <div class="price" style="font-size: 0.9rem; color: var(--silver); margin-top: 0.5rem;" data-i18n="fleet.security_deposit" data-deposit="5000">Security Deposit: 5,000 AED</div>
-                    <a href="/app/reserve/page.html?car=Porsche 992 GT3&price=1400" class="btn-reservar" data-i18n="fleet.book_now">BOOK NOW</a>
-                    <div class="contact-buttons">
+                    <div class="car-actions">
+                        <a href="/app/reserve/page.html?car=Porsche 992 GT3&price=2100" class="btn btn-primary" data-i18n="fleet.book_now">Book Now</a>
                         <a href="tel:+971586122568" class="btn-contact" aria-label="Call Dynasty Prestige Dubai">
                             <i class="fas fa-phone"></i>
                             <span data-i18n="fleet.call">Call</span>
                         </a>
-                        <a href="https://wa.me/971586122568?text=Hi!%20I%27m%20interested%20in%20renting%20the%20Porsche%20992%20GT3%20in%20Dubai.%20Please%20share%20details." target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us on WhatsApp">
+                        <a href="https://wa.me/971586122568" target="_blank" rel="noopener noreferrer" class="btn-contact" aria-label="Contact us on WhatsApp">
                             <i class="fab fa-whatsapp"></i>
                             <span data-i18n="fleet.whatsapp">WhatsApp</span>
                         </a>
