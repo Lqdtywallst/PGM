@@ -113,26 +113,42 @@
             top: 0;
             z-index: 1000;
             background: transparent;
-            padding: 1rem 5%;
+            padding: 0.6rem 6%;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            transition: background-color 0.3s ease;
-            will-change: background-color;
+            transition: background-color 0.3s ease, padding 0.3s ease, box-shadow 0.3s ease;
+            will-change: background-color, padding, box-shadow;
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         }
-        header.scrolled { background: rgba(0, 0, 0, 0.70); }
+        header.scrolled {
+            background: rgba(0, 0, 0, 0.88);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.75);
+            padding-top: 0.4rem;
+            padding-bottom: 0.4rem;
+        }
         .logo {
-            height: 120px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            height: 80px;
             width: auto;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            z-index: 1;
         }
         .logo img {
             height: 100%;
             width: auto;
             max-width: 260px;
             object-fit: contain;
+        }
+        nav {
+            z-index: 2;
         }
         nav ul {
             list-style: none;
@@ -163,8 +179,10 @@
         /* Hero */
         .hero {
             height: 100vh;
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.8)),
-                        url('https://images.unsplash.com/photo-1600510424051-30d592a75353?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGxhbWJvcmdoaW5pfGVufDB8fDB8fHww') center/cover no-repeat;
+            background:
+                linear-gradient(120deg, rgba(0,0,0,0.88), rgba(0,0,0,0.5)),
+                linear-gradient(to top, rgba(0,0,0,0.95) 0, rgba(0,0,0,0.2) 40%, transparent 70%),
+                url('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -189,20 +207,57 @@
             margin-bottom: 2.5rem;
             color: var(--silver);
         }
+        .hero-trust {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.2rem;
+            margin-top: 1rem;
+        }
+        .hero-trust-badge {
+            padding: 0.45rem 1.2rem;
+            border-radius: 999px;
+            border: 1px solid rgba(212, 175, 55, 0.7);
+            background: radial-gradient(circle at top, rgba(212, 175, 55, 0.3), rgba(10, 10, 10, 0.95));
+            color: #f5f5f5;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+        }
         .btn {
-            background: var(--gold);
+            background: #d4af37;
             color: var(--black);
             padding: 1rem 2.5rem;
             text-decoration: none;
             font-weight: bold;
             border-radius: 50px;
-            transition: all 0.3s;
+            border: 1px solid rgba(0, 0, 0, 0.6);
+            box-shadow: 0 14px 40px rgba(212, 175, 55, 0.45);
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease, color 0.25s ease;
             font-size: 1.2rem;
             display: inline-block;
         }
         .btn:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+            box-shadow: 0 0 35px rgba(212, 175, 55, 0.85), 0 18px 40px rgba(0, 0, 0, 0.9);
+            background: #e0c15a;
+            color: #050505;
+        }
+        .btn-primary {
+            background: #d4af37;
+            color: #050505;
+            border-radius: 999px;
+            padding: 0.75rem 1.8rem;
+            font-size: 0.95rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            border: 1px solid rgba(0, 0, 0, 0.6);
+            box-shadow: 0 10px 26px rgba(212, 175, 55, 0.5);
+        }
+        .btn-primary:hover {
+            box-shadow: 0 0 28px rgba(212, 175, 55, 0.9), 0 16px 36px rgba(0, 0, 0, 0.8);
         }
 
         /* Presentation section */
@@ -256,14 +311,32 @@
             background: var(--darkgray);
             border-radius: 15px;
             overflow: hidden;
-            transition: transform 0.4s ease, box-shadow 0.4s ease;
-            border: 1px solid #333;
+            transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.25s ease, background 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.03);
             will-change: transform;
             cursor: pointer;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);
+            position: relative;
         }
         .car-card:hover {
             transform: translateY(-15px);
-            box-shadow: 0 20px 40px rgba(212, 175, 55, 0.2);
+            box-shadow: 0 26px 70px rgba(212, 175, 55, 0.38);
+            border-color: rgba(212, 175, 55, 0.45);
+            background: radial-gradient(circle at top left, #252525 0, #101010 45%, #050505 100%);
+        }
+        .limited-badge {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            padding: 0.35rem 0.9rem;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #ff6b3d, #d7263d);
+            color: #fff;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            font-weight: 600;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.65);
         }
         .car-card img {
             width: 100%;
@@ -297,11 +370,26 @@
             text-transform: uppercase;
             letter-spacing: 0.18em;
         }
+        .price,
         .car-price {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--gold);
-            margin-top: 0.25rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #050505;
+            background: linear-gradient(135deg, #d4af37, #f6e7a7);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.4rem 1.6rem;
+            border-radius: 999px;
+            margin: 0.5rem auto 1rem;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.6);
+        }
+        .price span,
+        .car-price span {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-left: 0.35rem;
+            opacity: 0.9;
         }
         .car-benefits {
             list-style: none;
@@ -338,6 +426,276 @@
             margin-top: 0.75rem;
             font-size: 0.95rem;
             color: var(--silver);
+        }
+
+        /* Luxury Car Brands strip */
+        .luxury-brands {
+            background:
+                radial-gradient(circle at top, #1b1b1b 0, #050505 55%);
+            padding: 6rem 5%;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .luxury-brands-inner {
+            max-width: 1300px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .luxury-brands-eyebrow {
+            font-size: 0.9rem;
+            letter-spacing: 0.24em;
+            text-transform: uppercase;
+            color: var(--silver);
+            margin-bottom: 0.75rem;
+        }
+        .luxury-brands-title {
+            font-family: 'Cinzel', serif;
+            font-size: 2.4rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 1.25rem;
+        }
+        .luxury-brands-copy {
+            max-width: 720px;
+            margin: 0 auto 2.5rem;
+            color: var(--silver);
+            font-size: 1.05rem;
+        }
+        .brand-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2.25rem 3.5rem;
+        }
+        .brand-card {
+            min-width: 150px;
+            padding: 1.1rem 1.8rem;
+            border-radius: 999px;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            background: radial-gradient(circle at top, rgba(212, 175, 55, 0.22), rgba(10, 10, 10, 0.95));
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.9);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.7rem;
+            color: #f5f5f5;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .brand-icon-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            border: 1px solid rgba(249, 241, 181, 0.9);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #141414;
+            background: radial-gradient(circle at 30% 20%, #fff7c8, #d4af37);
+            box-shadow: 0 0 18px rgba(212, 175, 55, 0.7);
+        }
+
+        /* Why Choose Dynasty Prestige */
+        .why-choose {
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .why-choose-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .why-choose h2 {
+            font-size: 3rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 2.5rem;
+        }
+        .why-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.8rem;
+        }
+        .why-item {
+            padding: 1.6rem 1.8rem;
+            border-radius: 16px;
+            background: radial-gradient(circle at top, #181818, #050505);
+            border: 1px solid rgba(212, 175, 55, 0.22);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .why-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            border: 1px solid rgba(212, 175, 55, 0.7);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold);
+            margin-bottom: 0.4rem;
+        }
+        .why-label {
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        /* Delivery Locations */
+        .delivery-locations {
+            background: var(--black);
+        }
+        .delivery-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .delivery-locations h2 {
+            font-size: 3rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 2.2rem;
+        }
+        .delivery-tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+        .delivery-tag {
+            padding: 0.6rem 1.6rem;
+            border-radius: 999px;
+            border: 1px solid rgba(192, 192, 192, 0.35);
+            color: var(--silver);
+            font-size: 0.98rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            background: radial-gradient(circle at top, rgba(255, 255, 255, 0.08), rgba(5, 5, 5, 0.96));
+        }
+
+        /* Customer Reviews */
+        .reviews {
+            background: #050505;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .reviews-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .reviews h2 {
+            text-align: center;
+            font-size: 3rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 2.5rem;
+        }
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2rem;
+        }
+        .review-card {
+            background: radial-gradient(circle at top, #181818, #050505);
+            border-radius: 18px;
+            border: 1px solid rgba(212, 175, 55, 0.22);
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.85);
+            padding: 1.8rem 1.9rem;
+        }
+        .review-stars {
+            color: #f6e27f;
+            margin-bottom: 0.8rem;
+        }
+        .review-text {
+            font-size: 0.98rem;
+            color: var(--silver);
+            margin-bottom: 1.1rem;
+        }
+        .review-name {
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            color: #f0f0f0;
+        }
+
+        /* FAQ */
+        .faq {
+            background: var(--black);
+        }
+        .faq-inner {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+        .faq h2 {
+            text-align: center;
+            font-size: 3rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 2.5rem;
+        }
+        .faq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .faq-item {
+            border-radius: 14px;
+            border: 1px solid rgba(192, 192, 192, 0.25);
+            background: radial-gradient(circle at top, #181818, #050505);
+            overflow: hidden;
+        }
+        .faq-item summary {
+            cursor: pointer;
+            padding: 1.1rem 1.4rem;
+            list-style: none;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .faq-item summary::-webkit-details-marker {
+            display: none;
+        }
+        .faq-item p {
+            padding: 0 1.4rem 1.4rem;
+            color: var(--silver);
+            font-size: 0.98rem;
+        }
+
+        /* Sticky WhatsApp button */
+        .whatsapp-fab {
+            position: fixed;
+            right: 1.5rem;
+            bottom: 1.5rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #25D366;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 1.7rem;
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.65);
+            z-index: 2200;
+            text-decoration: none;
+        }
+        .whatsapp-fab:hover {
+            box-shadow: 0 0 26px rgba(37, 211, 102, 0.9), 0 18px 40px rgba(0, 0, 0, 0.85);
+            transform: translateY(-3px);
         }
 
         /* Gallery Modal */
@@ -479,18 +837,18 @@
             justify-content: center;
         }
         .btn-contact {
-            background: var(--darkgray);
+            background: #111111;
             color: var(--gold);
-            padding: 0.6rem 1rem;
+            padding: 0.65rem 1.1rem;
             text-decoration: none;
             font-weight: 500;
-            border-radius: 8px;
+            border-radius: 999px;
             transition: all 0.3s;
             font-size: 0.9rem;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            border: 1px solid var(--gold);
+            border: 1px solid rgba(212, 175, 55, 0.8);
             flex: 1;
             justify-content: center;
         }
@@ -1295,7 +1653,7 @@
                 margin-bottom: 1.5rem;
             }
             .logo {
-                height: 80px;
+                height: 64px;
                 width: auto;
             }
             nav ul { gap: 1.2rem; }
@@ -1411,6 +1769,9 @@
 
     <!-- Header -->
     <header role="banner">
+        <a href="#inicio" class="logo" aria-label="Dynasty Prestige Dubai luxury car rental">
+            <img src="/logo-dp.png" alt="Dynasty Prestige logo">
+        </a>
         <button class="menu-toggle" id="menuToggle" onclick="toggleMobileMenu()" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mobileNav">
             <i class="fas fa-bars" aria-hidden="true"></i>
             <i class="fas fa-times" aria-hidden="true"></i>
@@ -1429,7 +1790,12 @@
     <section id="inicio" class="hero" role="banner">
         <h1>Luxury Car Rental Dubai</h1>
         <p class="hero-subtitle">Drive Lamborghini, Ferrari and Mercedes G63 in Dubai with Dynasty Prestige.</p>
-        <a href="#reserva" class="btn" aria-label="Book a luxury car now">BOOK NOW</a>
+        <a href="#reserva" class="btn" aria-label="Book a luxury car now">Book Your Supercar</a>
+        <div class="hero-trust" aria-label="Key benefits">
+            <span class="hero-trust-badge">No Deposit Required</span>
+            <span class="hero-trust-badge">Free Delivery in Dubai</span>
+            <span class="hero-trust-badge">24/7 Support</span>
+        </div>
     </section>
 
     <!-- Presentation -->
@@ -1437,6 +1803,96 @@
         <h2 data-i18n="presentation.title">ONE GOAL, ONE VISION</h2>
         <p class="subtitle" data-i18n="presentation.subtitle">Explore our wide range of luxury cars and drive your dream car today.</p>
         <p class="description" data-i18n="presentation.description">At Dynasty Prestige, we redefine the luxury car rental experience, combining elegance, exclusivity and excellence in every detail. We specialize in offering high-end vehicles that not only transport, but elevate every journey to an extraordinary level.</p>
+    </section>
+
+    <!-- Luxury Car Brands -->
+    <section class="luxury-brands" aria-label="Luxury car brands available">
+        <div class="luxury-brands-inner">
+            <p class="luxury-brands-eyebrow">Our Marques</p>
+            <h2 class="luxury-brands-title">Luxury Car Brands</h2>
+            <p class="luxury-brands-copy">
+                Choose from the world’s most desired marques, curated for Dubai’s skyline lifestyle.
+            </p>
+            <div class="brand-grid">
+                <div class="brand-card">
+                    <span class="brand-icon-circle">F</span>
+                    <span>Ferrari</span>
+                </div>
+                <div class="brand-card">
+                    <span class="brand-icon-circle">L</span>
+                    <span>Lamborghini</span>
+                </div>
+                <div class="brand-card">
+                    <span class="brand-icon-circle">P</span>
+                    <span>Porsche</span>
+                </div>
+                <div class="brand-card">
+                    <span class="brand-icon-circle">M</span>
+                    <span>Mercedes</span>
+                </div>
+                <div class="brand-card">
+                    <span class="brand-icon-circle">R</span>
+                    <span>Rolls&nbsp;Royce</span>
+                </div>
+                <div class="brand-card">
+                    <span class="brand-icon-circle">Mc</span>
+                    <span>McLaren</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Dynasty Prestige -->
+    <section class="why-choose" id="why-dynasty">
+        <div class="why-choose-inner">
+            <h2>Why Choose Dynasty Prestige</h2>
+            <div class="why-grid">
+                <div class="why-item">
+                    <div class="why-icon">
+                        <i class="fas fa-shield-alt" aria-hidden="true"></i>
+                    </div>
+                    <span class="why-label">No Deposit Required</span>
+                </div>
+                <div class="why-item">
+                    <div class="why-icon">
+                        <i class="fas fa-location-arrow" aria-hidden="true"></i>
+                    </div>
+                    <span class="why-label">Free Delivery Across Dubai</span>
+                </div>
+                <div class="why-item">
+                    <div class="why-icon">
+                        <i class="fas fa-credit-card" aria-hidden="true"></i>
+                    </div>
+                    <span class="why-label">Flexible Payment Options</span>
+                </div>
+                <div class="why-item">
+                    <div class="why-icon">
+                        <i class="fas fa-coins" aria-hidden="true"></i>
+                    </div>
+                    <span class="why-label">Crypto / Bank / Cash</span>
+                </div>
+                <div class="why-item">
+                    <div class="why-icon">
+                        <i class="fas fa-headset" aria-hidden="true"></i>
+                    </div>
+                    <span class="why-label">24/7 Customer Support</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Delivery Locations -->
+    <section class="delivery-locations" id="delivery">
+        <div class="delivery-inner">
+            <h2>Delivery Locations</h2>
+            <div class="delivery-tags">
+                <span class="delivery-tag">Dubai Marina</span>
+                <span class="delivery-tag">Palm Jumeirah</span>
+                <span class="delivery-tag">Downtown Dubai</span>
+                <span class="delivery-tag">JBR</span>
+                <span class="delivery-tag">Dubai Airport</span>
+            </div>
+        </div>
     </section>
 
     <!-- Reservation -->
@@ -1451,6 +1907,7 @@
         <h2 id="fleet-heading" data-i18n="fleet.title">Our Exclusive Fleet</h2>
         <div class="fleet-grid">
             <div class="car-card" data-region="ES" data-title="Mercedes GLE 53 AMG" data-price-eur="500" data-price-aed="2000" data-gallery='["https://di-uploads-pod5.dealerinspire.com/mercedesbenzprinceton/uploads/2020/07/2021-Mercedes-Benz-GLE-53-Coupe.png"]'>
+                <span class="limited-badge">Limited Availability</span>
                 <img src="https://di-uploads-pod5.dealerinspire.com/mercedesbenzprinceton/uploads/2020/07/2021-Mercedes-Benz-GLE-53-Coupe.png" alt="Mercedes GLE 53 AMG luxury SUV rental Dubai" loading="lazy" width="350" height="250" decoding="async">
                 <div class="car-info">
                     <h3>Mercedes GLE 53 AMG</h3>
@@ -1476,6 +1933,7 @@
                 </div>
             </div>
             <div class="car-card" data-region="ES" data-title="Lamborghini Huracán" data-price-eur="1500" data-price-aed="6000" data-gallery='["https://images.unsplash.com/photo-1543854589-fdd815f176e0?q=80&w=1904&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'>
+                <span class="limited-badge">Limited Availability</span>
                 <img src="https://images.unsplash.com/photo-1543854589-fdd815f176e0?q=80&w=1904&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Lamborghini Huracán supercar rental Dubai" loading="lazy" width="350" height="250" decoding="async">
                 <div class="car-info">
                     <h3>Lamborghini Huracán</h3>
@@ -1501,6 +1959,7 @@
                 </div>
             </div>
             <div class="car-card" data-region="ES" data-title="Ferrari 296 GTS" data-price-eur="1749" data-price-aed="6996" data-deposit-eur="7000" data-deposit-aed="28000" data-gallery='["https://www.europeanprestige.co.uk/blobs/stock/637/images/ecbeba9b-5a32-4bea-8974-83af94d99597/296-4.jpg?width=2000&height=1333"]'>
+                <span class="limited-badge">Limited Availability</span>
                 <img src="https://www.europeanprestige.co.uk/blobs/stock/637/images/ecbeba9b-5a32-4bea-8974-83af94d99597/296-4.jpg?width=2000&height=1333" alt="Ferrari 296 GTS hybrid supercar rental Dubai" loading="lazy" width="350" height="250" decoding="async" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1600510424051-30d592a75353?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGxhbWJvcmdoaW5pfGVufDB8fDB8fHww';">
                 <div class="car-info">
                     <h3>Ferrari 296 GTS</h3>
@@ -1526,6 +1985,7 @@
                 </div>
             </div>
             <div class="car-card" data-region="ES AE" data-title="Mercedes G 63 AMG" data-price-eur="950" data-price-aed="3800" data-deposit-eur="5000" data-deposit-aed="20000" data-gallery='["https://i.ytimg.com/vi/H0H_R8acXmI/maxresdefault.jpg"]'>
+                <span class="limited-badge">Limited Availability</span>
                 <img src="https://toyzrentalme.com/wp-content/uploads/2025/03/URB00168.jpg" alt="Mercedes G 63 AMG luxury SUV rental Dubai" loading="lazy" style="min-height: 250px;">
                 <div class="car-info">
                     <h3>Mercedes G 63 AMG</h3>
@@ -1551,6 +2011,7 @@
                 </div>
             </div>
             <div class="car-card" data-region="ES" data-title="Lamborghini Urus Sport" data-price-eur="1649" data-price-aed="6596" data-deposit-eur="6000" data-deposit-aed="24000" data-gallery='["https://i.pinimg.com/736x/e3/94/20/e39420a37c1513775fc04369cc2606e1.jpg"]'>
+                <span class="limited-badge">Limited Availability</span>
                 <img src="https://i.pinimg.com/736x/e3/94/20/e39420a37c1513775fc04369cc2606e1.jpg" alt="Lamborghini Urus Sport luxury SUV rental Dubai" loading="lazy" style="min-height: 250px;">
                 <div class="car-info">
                     <h3>Lamborghini Urus Sport</h3>
@@ -1576,6 +2037,7 @@
                 </div>
             </div>
             <div class="car-card" data-region="ES" data-title="Porsche 992 GT3" data-price-eur="1000" data-price-aed="4000" data-deposit-eur="5000" data-deposit-aed="20000" data-gallery='["https://www.chicagomotorcars.com/imagetag/11513/main/l/Used-2024-Porsche-911-GT3-RS-Weissach!-Full-Body-PPF!-Front-End-Lifter!-Sinister-Spec!-Loaded!-1707950268.jpg"]'>
+                <span class="limited-badge">Limited Availability</span>
                 <img src="https://www.chicagomotorcars.com/imagetag/11513/main/l/Used-2024-Porsche-911-GT3-RS-Weissach!-Full-Body-PPF!-Front-End-Lifter!-Sinister-Spec!-Loaded!-1707950268.jpg" alt="Porsche 992 GT3 track-focused rental Dubai" loading="lazy" style="min-height: 250px;">
                 <div class="car-info">
                     <h3>Porsche 992 GT3</h3>
@@ -1602,6 +2064,103 @@
             </div>
         </div>
     </section>
+
+    <!-- Customer Reviews -->
+    <section class="reviews" id="reviews">
+        <div class="reviews-inner">
+            <h2>Customer Reviews</h2>
+            <div class="reviews-grid">
+                <div class="review-card">
+                    <div class="review-stars" aria-label="5 out of 5 stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="review-text">
+                        “Flawless service from airport pickup to vehicle return. The G 63 was immaculate.”
+                    </p>
+                    <div class="review-name">Omar, Dubai</div>
+                </div>
+                <div class="review-card">
+                    <div class="review-stars" aria-label="5 out of 5 stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="review-text">
+                        “Same-day Lamborghini delivery to our hotel on Palm Jumeirah. Highly recommended.”
+                    </p>
+                    <div class="review-name">Sofia, Spain</div>
+                </div>
+                <div class="review-card">
+                    <div class="review-stars" aria-label="5 out of 5 stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="review-text">
+                        “Professional team, transparent pricing and 24/7 WhatsApp support. True Dubai luxury.”
+                    </p>
+                    <div class="review-name">James, UK</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq" id="faq">
+        <div class="faq-inner">
+            <h2>FAQ</h2>
+            <div class="faq-list">
+                <details class="faq-item">
+                    <summary>Do I need to leave a deposit?</summary>
+                    <p>
+                        For most rentals in Dubai we do not require a deposit. In special cases for hypercars,
+                        a refundable security amount may be requested and will be clearly communicated before booking.
+                    </p>
+                </details>
+                <details class="faq-item">
+                    <summary>Is insurance included in the rental price?</summary>
+                    <p>
+                        Comprehensive basic insurance is included with every vehicle. Optional extra coverage can be added
+                        on request for additional peace of mind.
+                    </p>
+                </details>
+                <details class="faq-item">
+                    <summary>Where can you deliver the car?</summary>
+                    <p>
+                        We offer free delivery across key Dubai locations including Dubai Marina, Palm Jumeirah,
+                        Downtown Dubai, JBR and Dubai Airport. Other areas can be arranged on request.
+                    </p>
+                </details>
+                <details class="faq-item">
+                    <summary>What payment methods do you accept?</summary>
+                    <p>
+                        We accept bank transfer, major credit/debit cards, cash and selected cryptocurrencies.
+                        Our team will confirm the best option for your reservation.
+                    </p>
+                </details>
+                <details class="faq-item">
+                    <summary>Can I contact you 24/7?</summary>
+                    <p>
+                        Yes, our support team is available 24/7 via phone and WhatsApp to assist with bookings,
+                        delivery timing or any questions during your rental.
+                    </p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sticky WhatsApp CTA -->
+    <a href="https://wa.me/971586122568" class="whatsapp-fab" aria-label="Chat on WhatsApp with Dynasty Prestige" target="_blank" rel="noopener noreferrer">
+        <i class="fab fa-whatsapp" aria-hidden="true"></i>
+    </a>
 
     <!-- Contact -->
     <section id="contacto">
