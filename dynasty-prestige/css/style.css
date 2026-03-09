@@ -373,6 +373,69 @@ img {
     margin-top: 0.4rem;
 }
 
+/* Why Choose / Brands / SEO */
+
+.why-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.8rem;
+    margin-top: 2rem;
+}
+
+.why-item {
+    background: radial-gradient(circle at top, #191c27 0, #05060a 60%);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.04);
+    padding: 1.4rem 1.5rem 1.6rem;
+    box-shadow: 0 14px 32px rgba(0,0,0,0.75);
+}
+
+.why-item h3 {
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--gold-soft);
+    margin-bottom: 0.6rem;
+}
+
+.why-item p {
+    font-size: 0.9rem;
+    color: var(--silver);
+}
+
+.brands-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.9rem;
+    margin-top: 1.8rem;
+}
+
+.brand-badge {
+    min-width: 120px;
+    padding: 0.55rem 1.2rem;
+    border-radius: 999px;
+    border: 1px solid rgba(212,175,55,0.65);
+    background: radial-gradient(circle at 30% 0, #f6e7b3 0, #d4af37 45%, #1a1406 100%);
+    color: #101010;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    text-align: center;
+    box-shadow: 0 10px 26px rgba(212,175,55,0.45);
+}
+
+.seo-text {
+    max-width: 820px;
+    margin: 0 auto;
+    color: var(--silver);
+    font-size: 0.96rem;
+}
+
+.seo-text p + p {
+    margin-top: 0.9rem;
+}
+
 /* Contact layout */
 
 .contact-grid {
@@ -446,6 +509,9 @@ img {
     .hero {
         padding-top: 96px;
         padding-bottom: 3rem;
+    }
+    .why-grid {
+        grid-template-columns: 1fr;
     }
     .contact-grid {
         grid-template-columns: 1fr;
