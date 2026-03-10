@@ -1342,6 +1342,32 @@
         }
         footer a:hover { color: var(--gold); }
 
+        .floating-whatsapp {
+            position: fixed;
+            right: 1.5rem;
+            bottom: 1.5rem;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #25d366;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.7);
+            z-index: 1200;
+            text-decoration: none;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+        }
+        .floating-whatsapp i {
+            font-size: 1.6rem;
+        }
+        .floating-whatsapp:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 38px rgba(0,0,0,0.85);
+            background: #2ee070;
+        }
+
         @media (max-width: 768px) {
             .hero h1 { font-size: 3rem; }
             .hero-title-img {
@@ -1482,11 +1508,28 @@
 
     <!-- Hero -->
     <section id="inicio" class="hero" role="banner" data-animate="fade">
-        <h1>Luxury Car Rental Dubai</h1>
-        <p class="hero-subtitle">Drive Lamborghini, Ferrari and Mercedes G63 in Dubai.</p>
+        <h1>DYNASTY PRESTIGE</h1>
+        <p class="hero-subtitle">Drive Lamborghini, Ferrari and Mercedes G63 in Dubai with Dynasty Prestige.</p>
+        
+        <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin:1.5rem 0 2.5rem;">
+            <div style="min-width:180px;padding:0.75rem 1.25rem;border-radius:999px;border:1px solid rgba(255,255,255,0.12);background:rgba(15,17,18,0.85);font-size:0.85rem;color:var(--silver-soft);">
+                <span style="color:var(--gold);font-weight:600;">No Deposit</span> &nbsp;&mdash;&nbsp; Book instantly
+            </div>
+            <div style="min-width:180px;padding:0.75rem 1.25rem;border-radius:999px;border:1px solid rgba(255,255,255,0.12);background:rgba(15,17,18,0.85);font-size:0.85rem;color:var(--silver-soft);">
+                <span style="color:var(--gold);font-weight:600;">Free Delivery</span> &nbsp;&mdash;&nbsp; Across Dubai
+            </div>
+            <div style="min-width:180px;padding:0.75rem 1.25rem;border-radius:999px;border:1px solid rgba(255,255,255,0.12);background:rgba(15,17,18,0.85);font-size:0.85rem;color:var(--silver-soft);">
+                <span style="color:var(--gold);font-weight:600;">24/7 Support</span> &nbsp;&mdash;&nbsp; Dedicated team
+            </div>
+        </div>
+
         <div style="display:flex; gap:1rem; flex-wrap:wrap; justify-content:center;">
             <a href="#fleet" class="btn" aria-label="View our fleet of luxury cars">VIEW FLEET</a>
             <a href="#reserva" class="btn" aria-label="Book a luxury car now" style="background:transparent;border:1px solid var(--gold);color:var(--gold);">BOOK NOW</a>
+            <a href="https://wa.me/971586122568" data-wa-key="general" class="btn" aria-label="Chat on WhatsApp" style="background:transparent;border:1px solid var(--gold);color:var(--gold);display:inline-flex;align-items:center;gap:0.5rem;">
+                <i class="fab fa-whatsapp" aria-hidden="true"></i>
+                WHATSAPP
+            </a>
         </div>
     </section>
 
@@ -1671,25 +1714,38 @@
         </div>
     </section>
 
+    <!-- Luxury Car Brands -->
+    <section id="brands" data-animate="fade" style="background:var(--bg-primary);padding:7rem 5%;">
+        <h2 style="margin-bottom:3rem;">LUXURY CAR BRANDS</h2>
+        <div style="display:flex;flex-wrap:wrap;gap:2rem;justify-content:center;max-width:1100px;margin:0 auto;">
+            <div style="flex:1 1 120px;min-width:120px;text-align:center;color:var(--silver-soft);font-family:'Orbitron',system-ui,sans-serif;letter-spacing:0.18em;text-transform:uppercase;">Ferrari</div>
+            <div style="flex:1 1 120px;min-width:120px;text-align:center;color:var(--silver-soft);font-family:'Orbitron',system-ui,sans-serif;letter-spacing:0.18em;text-transform:uppercase;">Lamborghini</div>
+            <div style="flex:1 1 120px;min-width:120px;text-align:center;color:var(--silver-soft);font-family:'Orbitron',system-ui,sans-serif;letter-spacing:0.18em;text-transform:uppercase;">Porsche</div>
+            <div style="flex:1 1 120px;min-width:120px;text-align:center;color:var(--silver-soft);font-family:'Orbitron',system-ui,sans-serif;letter-spacing:0.18em;text-transform:uppercase;">Mercedes</div>
+            <div style="flex:1 1 120px;min-width:120px;text-align:center;color:var(--silver-soft);font-family:'Orbitron',system-ui,sans-serif;letter-spacing:0.18em;text-transform:uppercase;">Rolls Royce</div>
+            <div style="flex:1 1 120px;min-width:120px;text-align:center;color:var(--silver-soft);font-family:'Orbitron',system-ui,sans-serif;letter-spacing:0.18em;text-transform:uppercase;">McLaren</div>
+        </div>
+    </section>
+
     <!-- Why Dynasty Prestige -->
-    <section id="why" data-animate="fade" style="background:var(--bg-primary);padding:7rem 5%;">
-        <h2 style="margin-bottom:3rem;">WHY DYNASTY PRESTIGE</h2>
+    <section id="why" data-animate="fade" style="background:var(--bg-secondary);padding:7rem 5%;">
+        <h2 style="margin-bottom:3rem;">WHY CHOOSE DYNASTY PRESTIGE</h2>
         <div style="display:flex;flex-wrap:wrap;gap:1.75rem;justify-content:center;max-width:1100px;margin:0 auto;">
             <div style="flex:1 1 220px;max-width:260px;padding:1.8rem 1.9rem;background:var(--bg-accent);border-radius:18px;border:1px solid rgba(255,255,255,0.06);">
-                <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.5rem;">Premium Supercars</h3>
-                <p style="color:var(--silver-soft);font-size:0.95rem;">Curated selection of Lamborghini, Ferrari, Mercedes G63 and more.</p>
+                <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.5rem;">No Deposit Required</h3>
+                <p style="color:var(--silver-soft);font-size:0.95rem;">Rent your luxury car in Dubai without large security deposits.</p>
             </div>
             <div style="flex:1 1 220px;max-width:260px;padding:1.8rem 1.9rem;background:var(--bg-accent);border-radius:18px;border:1px solid rgba(255,255,255,0.06);">
-                <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.5rem;">Professional Service</h3>
-                <p style="color:var(--silver-soft);font-size:0.95rem;">Discreet, on‑time and English‑speaking team focused on your comfort.</p>
+                <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.5rem;">Free Delivery</h3>
+                <p style="color:var(--silver-soft);font-size:0.95rem;">Complimentary delivery and collection anywhere within Dubai.</p>
             </div>
             <div style="flex:1 1 220px;max-width:260px;padding:1.8rem 1.9rem;background:var(--bg-accent);border-radius:18px;border:1px solid rgba(255,255,255,0.06);">
-                <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.5rem;">Dubai‑Wide Delivery</h3>
-                <p style="color:var(--silver-soft);font-size:0.95rem;">We deliver and collect your car anywhere in Dubai on your schedule.</p>
+                <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.5rem;">Flexible Payments</h3>
+                <p style="color:var(--silver-soft);font-size:0.95rem;">Pay using bank transfer, cash on delivery or cryptocurrency.</p>
             </div>
             <div style="flex:1 1 220px;max-width:260px;padding:1.8rem 1.9rem;background:var(--bg-accent);border-radius:18px;border:1px solid rgba(255,255,255,0.06);">
-                <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.5rem;">Instant Booking</h3>
-                <p style="color:var(--silver-soft);font-size:0.95rem;">Fast confirmation via WhatsApp, phone or email with clear pricing.</p>
+                <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.5rem;">24/7 Support</h3>
+                <p style="color:var(--silver-soft);font-size:0.95rem;">Round‑the‑clock customer support during your rental in Dubai.</p>
             </div>
         </div>
     </section>
@@ -1703,6 +1759,28 @@
             <div style="flex:1 1 180px;min-width:180px;padding:1.2rem 1.4rem;background:var(--bg-accent);border-radius:14px;border:1px solid rgba(255,255,255,0.06);text-align:center;">Downtown Dubai</div>
             <div style="flex:1 1 180px;min-width:180px;padding:1.2rem 1.4rem;background:var(--bg-accent);border-radius:14px;border:1px solid rgba(255,255,255,0.06);text-align:center;">JBR</div>
             <div style="flex:1 1 180px;min-width:180px;padding:1.2rem 1.4rem;background:var(--bg-accent);border-radius:14px;border:1px solid rgba(255,255,255,0.06);text-align:center;">Dubai Airport</div>
+        </div>
+    </section>
+
+    <!-- Customer Reviews -->
+    <section id="reviews" data-animate="fade" style="background:var(--bg-primary);padding:7rem 5%;">
+        <h2 style="margin-bottom:3rem;">CUSTOMER REVIEWS</h2>
+        <div style="display:flex;flex-wrap:wrap;gap:1.75rem;justify-content:center;max-width:1100px;margin:0 auto;">
+            <div style="flex:1 1 260px;max-width:320px;padding:1.8rem 1.9rem;background:var(--bg-accent);border-radius:18px;border:1px solid rgba(255,255,255,0.06);">
+                <div style="color:var(--gold);margin-bottom:0.5rem;">★★★★★</div>
+                <p style="color:var(--silver);font-size:0.98rem;margin-bottom:0.5rem;">Amazing experience renting a Lamborghini in Dubai.</p>
+                <p style="color:var(--silver-soft);font-size:0.85rem;">— Ahmed, Saudi Arabia</p>
+            </div>
+            <div style="flex:1 1 260px;max-width:320px;padding:1.8rem 1.9rem;background:var(--bg-accent);border-radius:18px;border:1px solid rgba(255,255,255,0.06);">
+                <div style="color:var(--gold);margin-bottom:0.5rem;">★★★★★</div>
+                <p style="color:var(--silver);font-size:0.98rem;margin-bottom:0.5rem;">Delivery to our hotel was perfectly on time and the G63 was brand new.</p>
+                <p style="color:var(--silver-soft);font-size:0.85rem;">— Maria, Spain</p>
+            </div>
+            <div style="flex:1 1 260px;max-width:320px;padding:1.8rem 1.9rem;background:var(--bg-accent);border-radius:18px;border:1px solid rgba(255,255,255,0.06);">
+                <div style="color:var(--gold);margin-bottom:0.5rem;">★★★★★</div>
+                <p style="color:var(--silver);font-size:0.98rem;margin-bottom:0.5rem;">Great communication on WhatsApp and very flexible with our flight schedule.</p>
+                <p style="color:var(--silver-soft);font-size:0.85rem;">— James, United Kingdom</p>
+            </div>
         </div>
     </section>
 
@@ -1883,11 +1961,11 @@
     <section class="seo-section" style="padding: 4rem 5%; background: #0b0b0b; border-top: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06);">
         <h2 style="font-size: 2.2rem; margin-bottom: 1.5rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.1em;">Luxury Car Rental Dubai</h2>
         <div style="max-width: 900px; color: var(--silver); font-size: 1.05rem;">
-            <p>Dynasty Prestige offers exclusive luxury car rental services in Dubai.</p>
-            <p>Our premium fleet includes Lamborghini Huracan, Ferrari 296, Porsche GT3 and Mercedes G63 AMG.</p>
-            <p>Whether you are visiting Dubai for business or leisure, our supercars deliver the ultimate driving experience.</p>
-            <p>We offer flexible payment options including bank transfer, crypto, cash and payment links.</p>
-            <p>Book your luxury car in Dubai today with Dynasty Prestige.</p>
+            <p>Dynasty Prestige offers exclusive <strong>luxury car rental in Dubai</strong> with a dedicated fleet of Lamborghini, Ferrari, Porsche GT3 and Mercedes G63 AMG.</p>
+            <p>Our <strong>supercar rental Dubai</strong> service is designed for clients who expect a premium experience from the first WhatsApp message to the final vehicle collection.</p>
+            <p>Whether you are looking for <strong>Lamborghini rental Dubai</strong>, <strong>Ferrari rental Dubai</strong> or a powerful <strong>G63 rental Dubai</strong>, our team will help you choose the right model and explain all details clearly.</p>
+            <p>We offer flexible payment options including bank transfer, crypto, cash and secure payment links, with transparent pricing and no hidden fees.</p>
+            <p>Book your luxury car in Dubai today with Dynasty Prestige and enjoy a smooth, unforgettable driving experience across the city.</p>
         </div>
     </section>
 
@@ -1907,6 +1985,11 @@
             <a href="https://www.instagram.com/prestigegoalmotion" target="_blank" rel="noopener noreferrer" title="Instagram" aria-label="Follow us on Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
         </div>
     </footer>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/971586122568" data-wa-key="general" class="floating-whatsapp" aria-label="Chat on WhatsApp">
+        <i class="fab fa-whatsapp" aria-hidden="true"></i>
+    </a>
 
     <script>
         // Vehicle gallery modal (Dubai-only site)
