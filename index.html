@@ -95,16 +95,20 @@
     </script>
     <style>
         :root {
-            --black: #0a0a0a;
-            --gold: #d4af37;
-            --silver: #c0c0c0;
+            --black: #050505;
+            --black-soft: #0b0b0b;
+            --black-alt: #111111;
+            --gold: #c9a23a;
+            --gold-soft: #f0c96b;
+            --silver: #d8d8d8;
+            --silver-soft: #b5b5b5;
             --darkgray: #1a1a1a;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', sans-serif;
-            background: var(--black);
-            color: white;
+            background: radial-gradient(circle at top, var(--black-alt) 0, var(--black) 55%);
+            color: var(--silver);
             line-height: 1.6;
         }
         header {
@@ -120,7 +124,7 @@
             transition: background-color 0.3s ease;
             will-change: background-color;
         }
-        header.scrolled { background: rgba(0, 0, 0, 0.70); }
+        header.scrolled { background: rgba(0, 0, 0, 0.80); }
         .logo {
             height: 120px;
             width: auto;
@@ -140,7 +144,7 @@
             gap: 2.5rem;
         }
         nav a {
-            color: var(--silver);
+            color: var(--silver-soft);
             text-decoration: none;
             font-weight: 500;
             transition: color 0.3s;
@@ -179,18 +183,18 @@
             font-weight: 700;
             letter-spacing: 0.04em;
             margin-bottom: 1rem;
-            color: var(--gold);
-            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+            color: var(--gold-soft);
+            text-shadow: 0 0 26px rgba(240, 201, 107, 0.75);
             display: block;
         }
         .hero p {
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             max-width: 700px;
             margin-bottom: 2.5rem;
             color: var(--silver);
         }
         .btn {
-            background: var(--gold);
+            background: linear-gradient(135deg, var(--gold-soft), var(--gold));
             color: var(--black);
             padding: 1rem 2.5rem;
             text-decoration: none;
@@ -202,12 +206,12 @@
         }
         .btn:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+            box-shadow: 0 14px 36px rgba(240, 201, 107, 0.55);
         }
 
         /* Presentation section */
         .presentation {
-            background: var(--black);
+            background: radial-gradient(circle at top, var(--black-alt) 0, var(--black) 65%);
             padding: 6rem 5%;
             text-align: center;
         }
@@ -253,7 +257,7 @@
             margin: 0 auto;
         }
         .car-card {
-            background: var(--darkgray);
+            background: linear-gradient(145deg, #1b1b1b 0%, #101010 100%);
             border-radius: 15px;
             overflow: hidden;
             transition: transform 0.4s ease, box-shadow 0.4s ease;
@@ -450,12 +454,12 @@
         }
         .price {
             font-size: 1.5rem;
-            color: var(--gold);
+            color: var(--gold-soft);
             font-weight: bold;
             margin: 1rem 0;
         }
         .btn-reservar {
-            background: var(--gold);
+            background: linear-gradient(135deg, var(--gold-soft), var(--gold));
             color: var(--black);
             padding: 0.8rem 2rem;
             text-decoration: none;
@@ -470,7 +474,7 @@
         }
         .btn-reservar:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+            box-shadow: 0 10px 30px rgba(240, 201, 107, 0.55);
         }
         .contact-buttons {
             display: flex;
@@ -479,26 +483,26 @@
             justify-content: center;
         }
         .btn-contact {
-            background: var(--darkgray);
-            color: var(--gold);
+            background: transparent;
+            color: var(--gold-soft);
             padding: 0.6rem 1rem;
             text-decoration: none;
             font-weight: 500;
-            border-radius: 8px;
+            border-radius: 999px;
             transition: all 0.3s;
             font-size: 0.9rem;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            border: 1px solid var(--gold);
+            border: 1px solid var(--gold-soft);
             flex: 1;
             justify-content: center;
         }
         .btn-contact:hover {
-            background: var(--gold);
+            background: var(--gold-soft);
             color: var(--black);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+            box-shadow: 0 5px 15px rgba(240, 201, 107, 0.45);
         }
         .btn-contact i {
             font-size: 1rem;
@@ -1606,7 +1610,7 @@
 
     <!-- Contact -->
     <section id="contacto">
-        <h2 data-i18n="contact.title">Contact Dynasty Prestige</h2>
+        <h2 data-i18n="contact.title">Contact Whit Us</h2>
         <div class="contact-container">
             <!-- Contact Information -->
             <div class="contact-info">
