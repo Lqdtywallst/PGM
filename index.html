@@ -1184,10 +1184,12 @@
             text-decoration: underline;
         }
         .contact-form-container {
-            background: var(--bg-accent);
+            background: radial-gradient(circle at top left, rgba(201,162,58,0.12), rgba(5,5,5,0.92));
             padding: 3rem;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,0.04);
+            box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease;
         }
         .contact-form {
             display: flex;
