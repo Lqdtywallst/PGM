@@ -1759,22 +1759,33 @@
 
     <!-- Customer Reviews -->
     <section id="reviews" data-animate="fade" style="background:var(--bg-primary);padding:7rem 5%;">
-        <h2 style="margin-bottom:3rem;">CUSTOMER REVIEWS</h2>
-        <div style="display:flex;flex-wrap:wrap;gap:1.75rem;justify-content:center;max-width:1100px;margin:0 auto;">
-            <div style="flex:1 1 260px;max-width:320px;padding:1.8rem 1.9rem;background:var(--bg-accent);border-radius:18px;border:1px solid rgba(255,255,255,0.06);">
-                <div style="color:var(--gold);margin-bottom:0.5rem;">★★★★★</div>
-                <p style="color:var(--silver);font-size:0.98rem;margin-bottom:0.5rem;">Amazing experience renting a Lamborghini in Dubai.</p>
-                <p style="color:var(--silver-soft);font-size:0.85rem;">— Ahmed, Saudi Arabia</p>
+        <div style="max-width:1100px;margin:0 auto;">
+            <h2 style="margin-bottom:2rem;">CUSTOMER REVIEWS</h2>
+
+            <!-- Rating summary -->
+            <div class="reviews-summary" style="display:flex;flex-wrap:wrap;align-items:center;gap:1.5rem;margin-bottom:2.5rem;">
+                <div style="display:flex;flex-direction:column;gap:0.25rem;">
+                    <span id="reviews-average" style="font-size:2.4rem;font-weight:600;color:var(--gold);">5.0</span>
+                    <span style="color:var(--silver-soft);font-size:0.9rem;">Average Google rating</span>
+                </div>
+                <div>
+                    <div id="reviews-stars" style="color:var(--gold);font-size:1.4rem;letter-spacing:0.1em;">★★★★★</div>
+                    <div id="reviews-count" style="color:var(--silver-soft);font-size:0.9rem;">Based on Google reviews</div>
+                </div>
+                <div style="margin-left:auto;">
+                    <a id="google-review-link" href="#" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.95rem;padding:0.75rem 1.9rem;">
+                        LEAVE A REVIEW ON GOOGLE
+                    </a>
+                </div>
             </div>
-            <div style="flex:1 1 260px;max-width:320px;padding:1.8rem 1.9rem;background:var(--bg-accent);border-radius:18px;border:1px solid rgba(255,255,255,0.06);">
-                <div style="color:var(--gold);margin-bottom:0.5rem;">★★★★★</div>
-                <p style="color:var(--silver);font-size:0.98rem;margin-bottom:0.5rem;">Delivery to our hotel was perfectly on time and the G63 was brand new.</p>
-                <p style="color:var(--silver-soft);font-size:0.85rem;">— Maria, Spain</p>
-            </div>
-            <div style="flex:1 1 260px;max-width:320px;padding:1.8rem 1.9rem;background:var(--bg-accent);border-radius:18px;border:1px solid rgba(255,255,255,0.06);">
-                <div style="color:var(--gold);margin-bottom:0.5rem;">★★★★★</div>
-                <p style="color:var(--silver);font-size:0.98rem;margin-bottom:0.5rem;">Great communication on WhatsApp and very flexible with our flight schedule.</p>
-                <p style="color:var(--silver-soft);font-size:0.85rem;">— James, United Kingdom</p>
+
+            <!-- Reviews slider -->
+            <div class="reviews-slider" style="position:relative;overflow:hidden;">
+                <div id="reviews-track" class="reviews-track" style="display:flex;transition:transform 0.6s ease;">
+                    <!-- Slides injected dynamically -->
+                </div>
+                <button type="button" id="reviews-prev" aria-label="Previous review" style="position:absolute;left:0.5rem;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:999px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;">‹</button>
+                <button type="button" id="reviews-next" aria-label="Next review" style="position:absolute;right:0.5rem;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:999px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;">›</button>
             </div>
         </div>
     </section>
@@ -2101,6 +2112,125 @@
                 link.rel = 'noopener noreferrer';
             }
         });
+
+        // Google Reviews slider (frontend example using Places API)
+        (function initGoogleReviews() {
+            const placeId = 'YOUR_GOOGLE_PLACE_ID';
+            const apiKey = 'YOUR_GOOGLE_API_KEY';
+            const reviewsTrack = document.getElementById('reviews-track');
+            const avgEl = document.getElementById('reviews-average');
+            const starsEl = document.getElementById('reviews-stars');
+            const countEl = document.getElementById('reviews-count');
+            const prevBtn = document.getElementById('reviews-prev');
+            const nextBtn = document.getElementById('reviews-next');
+            const reviewLink = document.getElementById('google-review-link');
+
+            if (!reviewsTrack || !placeId || !apiKey) {
+                return;
+            }
+
+            let reviews = [];
+            let currentIndex = 0;
+            let autoTimer;
+
+            function renderSlides() {
+                reviewsTrack.innerHTML = '';
+                reviews.forEach((review) => {
+                    const slide = document.createElement('article');
+                    slide.className = 'review-slide';
+                    slide.style.flex = '0 0 100%';
+                    slide.style.padding = '1.8rem 1.9rem';
+                    slide.style.background = 'var(--bg-accent)';
+                    slide.style.borderRadius = '18px';
+                    slide.style.border = '1px solid rgba(255,255,255,0.06)';
+
+                    const stars = '★★★★★'.slice(0, Math.round(review.rating || 5));
+                    const empty = '☆☆☆☆☆'.slice(Math.round(review.rating || 5));
+
+                    slide.innerHTML = `
+                        <div style="color:var(--gold);margin-bottom:0.5rem;font-size:1.2rem;">${stars}<span style="color:rgba(255,255,255,0.25);">${empty}</span></div>
+                        <p style="color:var(--silver);font-size:0.98rem;margin-bottom:0.75rem;">${review.text || ''}</p>
+                        <p style="color:var(--silver-soft);font-size:0.85rem;">— ${review.author_name || 'Google user'}</p>
+                    `;
+                    reviewsTrack.appendChild(slide);
+                });
+                updateSliderPosition();
+            }
+
+            function updateSliderPosition() {
+                const offset = -currentIndex * 100;
+                reviewsTrack.style.transform = `translateX(${offset}%)`;
+            }
+
+            function nextReview() {
+                if (!reviews.length) return;
+                currentIndex = (currentIndex + 1) % reviews.length;
+                updateSliderPosition();
+            }
+
+            function prevReview() {
+                if (!reviews.length) return;
+                currentIndex = (currentIndex - 1 + reviews.length) % reviews.length;
+                updateSliderPosition();
+            }
+
+            function startAuto() {
+                stopAuto();
+                autoTimer = setInterval(nextReview, 8000);
+            }
+
+            function stopAuto() {
+                if (autoTimer) clearInterval(autoTimer);
+            }
+
+            prevBtn && prevBtn.addEventListener('click', () => {
+                stopAuto();
+                prevReview();
+                startAuto();
+            });
+
+            nextBtn && nextBtn.addEventListener('click', () => {
+                stopAuto();
+                nextReview();
+                startAuto();
+            });
+
+            // Example Places API call (replace with secure backend proxy in production)
+            const fields = 'rating,user_ratings_total,reviews';
+            const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(placeId)}&fields=${fields}&key=${encodeURIComponent(apiKey)}`;
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data || !data.result) return;
+                    const result = data.result;
+                    reviews = (result.reviews || []).slice(0, 10);
+
+                    if (!reviews.length) return;
+
+                    // Rating summary
+                    if (typeof result.rating === 'number') {
+                        avgEl.textContent = result.rating.toFixed(1);
+                        const fullStars = '★★★★★'.slice(0, Math.round(result.rating));
+                        const emptyStars = '☆☆☆☆☆'.slice(Math.round(result.rating));
+                        starsEl.innerHTML = `<span style="color:var(--gold);">${fullStars}</span><span style="color:rgba(255,255,255,0.25);">${emptyStars}</span>`;
+                    }
+                    if (typeof result.user_ratings_total === 'number') {
+                        countEl.textContent = `Based on ${result.user_ratings_total} Google reviews`;
+                    }
+
+                    // Google review link
+                    if (reviewLink) {
+                        reviewLink.href = `https://search.google.com/local/writereview?placeid=${encodeURIComponent(placeId)}`;
+                    }
+
+                    renderSlides();
+                    startAuto();
+                })
+                .catch(err => {
+                    console.error('Failed to load Google reviews', err);
+                });
+        })();
 
         // Remove the mobile menu button entirely on desktop
         function hideMobileMenuButton() {
