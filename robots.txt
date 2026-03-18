@@ -1,25 +1,13 @@
 User-agent: *
+Allow: /
+Disallow: /api/
 Disallow: /app/api/
+Disallow: /node_modules/
 Disallow: /backend-example.js
 Disallow: /server-http.js
 Disallow: /verificar-stripe.js
 
-Allow: /
-
-Sitemap: https://prestigegoalmotion.com/sitemap.xml
-
-# Primary site: Dynasty Prestige – Luxury Car Rental Dubai
 Host: prestigegoalmotion.com
-
-# Dynasty Prestige - Robots.txt
-User-agent: *
-Allow: /
-Disallow: /api/
-Disallow: /app/api/
-Disallow: /*.json$
-Disallow: /node_modules/
-
-# Sitemap (actualizar con tu dominio real)
 Sitemap: https://prestigegoalmotion.com/sitemap.xml
 
 

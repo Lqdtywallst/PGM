@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reserve - Dynasty Prestige</title>
+    <meta name="description" content="Complete your Dynasty Prestige luxury car reservation in Dubai with secure Stripe checkout.">
+    <meta name="robots" content="index,follow,max-image-preview:large">
+    <link rel="canonical" href="https://prestigegoalmotion.com/app/reserve/page.html">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Reserve Luxury Car in Dubai | Dynasty Prestige">
+    <meta property="og:description" content="Book your supercar reservation in Dubai in three simple steps.">
+    <meta property="og:url" content="https://prestigegoalmotion.com/app/reserve/page.html">
+    <meta property="og:image" content="https://prestigegoalmotion.com/logo-dp-transparent.png">
+    <meta name="twitter:card" content="summary_large_image">
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="/logo-dp-transparent.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/logo-dp-transparent.png">
@@ -83,6 +92,13 @@
         .form-group {
             margin-bottom: 1rem;
         }
+        .field-label {
+            display: block;
+            margin-bottom: 0.45rem;
+            color: #d4af37;
+            font-weight: 600;
+            font-size: 0.92rem;
+        }
 
         .input {
             width: 100%;
@@ -103,6 +119,26 @@
 
         .input::placeholder {
             color: #71717a;
+        }
+        .input.invalid {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+        }
+        .field-error {
+            margin-top: 0.4rem;
+            color: #fca5a5;
+            font-size: 0.82rem;
+            min-height: 1rem;
+        }
+        .form-feedback {
+            display: none;
+            margin: 0 0 1rem;
+            padding: 0.75rem 0.9rem;
+            border-radius: 8px;
+            border: 1px solid rgba(239, 68, 68, 0.45);
+            background: rgba(239, 68, 68, 0.12);
+            color: #fecaca;
+            font-size: 0.9rem;
         }
 
         .btn {
@@ -258,6 +294,18 @@
             color: #10b981;
             margin-top: 0.5rem;
             font-size: 0.9rem;
+        }
+        .payment-trust {
+            margin-top: 1rem;
+            padding: 0.9rem;
+            border-radius: 10px;
+            border: 1px solid rgba(212, 175, 55, 0.28);
+            background: rgba(212, 175, 55, 0.08);
+            color: #d6d3d1;
+            font-size: 0.9rem;
+        }
+        .payment-trust strong {
+            color: #d4af37;
         }
 
         /* Calendar Styles */
@@ -438,29 +486,45 @@
                 </a>
             </div>
             <h2 style="color: #d4af37; margin-bottom: 1.5rem;">Your Information</h2>
+            <div id="step1Validation" class="form-feedback" role="alert"></div>
             <div class="form-group">
-                <input type="text" id="fullName" name="fullName" placeholder="Full Name *" class="input" required>
+                <label for="fullName" class="field-label">Full Name *</label>
+                <input type="text" id="fullName" name="fullName" placeholder="e.g. John Smith" class="input" data-label="Full name" required>
+                <p class="field-error" id="fullName-error"></p>
             </div>
             <div class="form-group">
-                <input type="text" id="passport" name="passport" placeholder="ID / Passport *" class="input" required>
+                <label for="passport" class="field-label">ID / Passport *</label>
+                <input type="text" id="passport" name="passport" placeholder="Passport or Emirates ID number" class="input" data-label="ID / Passport" required>
+                <p class="field-error" id="passport-error"></p>
             </div>
             <div class="form-group">
-                <input type="email" id="email" name="email" placeholder="Email *" class="input" required>
+                <label for="email" class="field-label">Email *</label>
+                <input type="email" id="email" name="email" placeholder="name@email.com" class="input" data-label="Email" required>
+                <p class="field-error" id="email-error"></p>
             </div>
             <div class="form-group">
-                <input type="tel" id="phone" name="phone" placeholder="Phone / WhatsApp *" class="input" required>
+                <label for="phone" class="field-label">Phone / WhatsApp *</label>
+                <input type="tel" id="phone" name="phone" placeholder="+971 ..." class="input" data-label="Phone / WhatsApp" required>
+                <p class="field-error" id="phone-error"></p>
             </div>
             <div class="form-group">
-                <input type="text" id="address" name="address" placeholder="Full Address *" class="input" required>
+                <label for="address" class="field-label">Full Address *</label>
+                <input type="text" id="address" name="address" placeholder="Building / Street / Area" class="input" data-label="Full address" required>
+                <p class="field-error" id="address-error"></p>
             </div>
             <div class="form-group">
-                <input type="text" id="city" name="city" placeholder="City *" class="input" required>
+                <label for="city" class="field-label">City *</label>
+                <input type="text" id="city" name="city" placeholder="Dubai" class="input" data-label="City" required>
+                <p class="field-error" id="city-error"></p>
             </div>
             <div class="form-group">
-                <input type="text" id="postalCode" name="postalCode" placeholder="Postal Code *" class="input" required>
+                <label for="postalCode" class="field-label">Postal Code *</label>
+                <input type="text" id="postalCode" name="postalCode" placeholder="00000" class="input" data-label="Postal code" required>
+                <p class="field-error" id="postalCode-error"></p>
             </div>
             <div class="form-group">
-                <select id="country" name="country" class="input" required>
+                <label for="country" class="field-label">Country *</label>
+                <select id="country" name="country" class="input" data-label="Country" required>
                     <option value="AE" selected>United Arab Emirates</option>
                     <option value="FR">France</option>
                     <option value="IT">Italy</option>
@@ -469,6 +533,7 @@
                     <option value="US">United States</option>
                     <option value="">Other</option>
                 </select>
+                <p class="field-error" id="country-error"></p>
             </div>
             <button onclick="nextStep()" class="btn">Continue to Dates →</button>
         </div>
@@ -482,6 +547,7 @@
                 </a>
             </div>
             <h2 style="color: #d4af37; margin-bottom: 1.5rem;">Select Your Dates</h2>
+            <div id="step2Validation" class="form-feedback" role="alert"></div>
             
             <!-- Calendar Container -->
             <div class="calendar-container">
@@ -522,6 +588,7 @@
             <div class="form-group" style="margin-top: 1.5rem;">
                 <label for="pickupLocation" style="display: block; margin-bottom: 0.5rem; color: #d4af37;">Delivery Location *</label>
                 <input type="text" id="pickupLocation" name="pickupLocation" placeholder="Enter delivery location in Dubai (e.g. Palm Jumeirah, Marina, Downtown) *" class="input" required>
+                <p class="field-error" id="pickupLocation-error"></p>
                 <div class="delivery-map-wrapper">
                     <iframe
                         title="Dubai delivery area map"
@@ -563,6 +630,10 @@
                     <!-- Stripe Elements will create form elements here -->
                 </div>
                 <div id="card-errors" role="alert" style="color: #ef4444; margin-bottom: 1rem; min-height: 20px;"></div>
+            </div>
+            <div class="payment-trust">
+                <strong>Secure checkout:</strong> card payments are processed by Stripe with encrypted transmission.
+                Need support before paying? Contact us on WhatsApp: <a href="https://wa.me/971586122568" style="color:#d4af37;">+971 58 612 2568</a>.
             </div>
             
             <div id="paymentStatus"></div>
@@ -655,39 +726,130 @@
         }
 
         // Step navigation
+        function showStepValidation(stepId, message) {
+            const feedback = document.getElementById(`${stepId}Validation`);
+            if (!feedback) return;
+            if (message) {
+                feedback.textContent = message;
+                feedback.style.display = 'block';
+            } else {
+                feedback.textContent = '';
+                feedback.style.display = 'none';
+            }
+        }
+
+        function setFieldError(fieldId, message) {
+            const input = document.getElementById(fieldId);
+            const errorEl = document.getElementById(`${fieldId}-error`);
+            if (!input || !errorEl) return;
+            input.classList.add('invalid');
+            input.setAttribute('aria-invalid', 'true');
+            errorEl.textContent = message;
+        }
+
+        function clearFieldError(fieldId) {
+            const input = document.getElementById(fieldId);
+            const errorEl = document.getElementById(`${fieldId}-error`);
+            if (!input || !errorEl) return;
+            input.classList.remove('invalid');
+            input.removeAttribute('aria-invalid');
+            errorEl.textContent = '';
+        }
+
+        function validateStep1() {
+            const required = ['fullName', 'passport', 'email', 'phone', 'address', 'city', 'postalCode', 'country'];
+            const missing = [];
+
+            required.forEach((fieldId) => {
+                const input = document.getElementById(fieldId);
+                const label = input?.dataset?.label || fieldId;
+                const value = input ? input.value.trim() : '';
+
+                if (!value) {
+                    setFieldError(fieldId, `${label} is required.`);
+                    missing.push(label);
+                    return;
+                }
+
+                if (fieldId === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                    setFieldError(fieldId, 'Please enter a valid email address.');
+                    missing.push('valid email');
+                    return;
+                }
+
+                if (fieldId === 'phone' && value.replace(/[^\d+]/g, '').length < 8) {
+                    setFieldError(fieldId, 'Please enter a valid phone number.');
+                    missing.push('valid phone number');
+                    return;
+                }
+
+                clearFieldError(fieldId);
+            });
+
+            if (missing.length) {
+                showStepValidation('step1', 'Please complete all required fields before continuing.');
+                return false;
+            }
+
+            showStepValidation('step1', '');
+            return true;
+        }
+
+        function validateStep2() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const pickupLocation = document.getElementById('pickupLocation').value.trim();
+
+            clearFieldError('pickupLocation');
+
+            if (!pickupLocation) {
+                setFieldError('pickupLocation', 'Delivery location is required.');
+                showStepValidation('step2', 'Please choose dates and provide a delivery location.');
+                return false;
+            }
+
+            if (!startDate || !endDate) {
+                showStepValidation('step2', 'Please select start and end date.');
+                return false;
+            }
+
+            if (new Date(endDate) <= new Date(startDate)) {
+                showStepValidation('step2', 'End date must be after start date.');
+                return false;
+            }
+
+            showStepValidation('step2', '');
+            return true;
+        }
+
+        function bindRealtimeValidation() {
+            ['fullName', 'passport', 'email', 'phone', 'address', 'city', 'postalCode', 'country'].forEach((fieldId) => {
+                const input = document.getElementById(fieldId);
+                if (!input) return;
+                const eventName = input.tagName === 'SELECT' ? 'change' : 'input';
+                input.addEventListener(eventName, () => {
+                    clearFieldError(fieldId);
+                    showStepValidation('step1', '');
+                });
+            });
+
+            const pickupInput = document.getElementById('pickupLocation');
+            if (pickupInput) {
+                pickupInput.addEventListener('input', () => {
+                    clearFieldError('pickupLocation');
+                    showStepValidation('step2', '');
+                    updateContinueButton();
+                });
+            }
+        }
+
         function nextStep() {
             if (currentStep === 1) {
-                // Validate step 1
-                const required = ['fullName', 'passport', 'email', 'phone', 'address', 'city', 'postalCode', 'country'];
-                let isValid = true;
-                
-                required.forEach(field => {
-                    const input = document.getElementById(field);
-                    if (!input.value.trim()) {
-                        isValid = false;
-                        input.style.borderColor = '#ef4444';
-                    } else {
-                        input.style.borderColor = '#333';
-                    }
-                });
-
-                if (!isValid) {
-                    showMessage('Please complete all required fields', 'error');
+                if (!validateStep1()) {
                     return;
                 }
             } else if (currentStep === 2) {
-                // Validar paso 2
-                const startDate = document.getElementById('startDate').value;
-                const endDate = document.getElementById('endDate').value;
-                const pickupLocation = document.getElementById('pickupLocation').value;
-
-                if (!startDate || !endDate || !pickupLocation) {
-                    showMessage('Please complete all required fields', 'error');
-                    return;
-                }
-
-                if (new Date(endDate) <= new Date(startDate)) {
-                    showMessage('End date must be after start date', 'error');
+                if (!validateStep2()) {
                     return;
                 }
 
@@ -896,9 +1058,10 @@
         function updateContinueButton() {
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
+            const pickupLocation = document.getElementById('pickupLocation').value.trim();
             const continueBtn = document.getElementById('continueToPaymentBtn');
             
-            if (startDate && endDate && new Date(endDate) > new Date(startDate)) {
+            if (startDate && endDate && pickupLocation && new Date(endDate) > new Date(startDate)) {
                 continueBtn.disabled = false;
                 continueBtn.style.opacity = '1';
                 continueBtn.style.cursor = 'pointer';
@@ -946,6 +1109,7 @@
         document.getElementById('endDate').addEventListener('change', function() {
             updateCalendarFromInputs();
         });
+        bindRealtimeValidation();
 
         // Initialize Stripe Elements
         function initializeStripeElements() {
