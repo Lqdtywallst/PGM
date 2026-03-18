@@ -1370,6 +1370,113 @@
             background: #2ee070;
         }
 
+        /* Delivery map */
+        .delivery-zone-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            justify-content: center;
+            max-width: 980px;
+            margin: 0 auto;
+        }
+        .delivery-zone-chip {
+            background: rgba(24, 28, 31, 0.95);
+            color: var(--silver);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 999px;
+            padding: 0.65rem 1.1rem;
+            font-size: 0.92rem;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .delivery-zone-chip:hover {
+            color: var(--gold);
+            border-color: rgba(212,175,55,0.7);
+        }
+        .delivery-zone-chip.active {
+            color: #0f1112;
+            background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+            border-color: var(--gold);
+            font-weight: 700;
+        }
+        .delivery-map-shell {
+            max-width: 980px;
+            margin: 1.25rem auto 0;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(212,175,55,0.22);
+            box-shadow: 0 20px 45px rgba(0,0,0,0.35);
+            background: #0e0f11;
+        }
+        .delivery-map-shell iframe {
+            width: 100%;
+            height: 360px;
+            border: 0;
+            display: block;
+            opacity: 1;
+            transition: opacity 0.35s ease;
+        }
+        .delivery-map-shell.is-loading iframe {
+            opacity: 0.35;
+        }
+        .delivery-meta {
+            max-width: 980px;
+            margin: 1rem auto 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            align-items: center;
+            justify-content: center;
+            color: var(--silver-soft);
+        }
+        .delivery-stat {
+            background: rgba(24,28,31,0.9);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 0.55rem 0.85rem;
+            font-size: 0.9rem;
+        }
+        .delivery-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.68rem 1rem;
+            background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+            color: #101010;
+            text-decoration: none;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        .delivery-note {
+            max-width: 980px;
+            margin: 0.9rem auto 0;
+            text-align: center;
+            color: var(--silver-soft);
+            font-size: 0.92rem;
+        }
+        .delivery-legend {
+            max-width: 980px;
+            margin: 0.95rem auto 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            justify-content: center;
+        }
+        .delivery-legend-item {
+            font-size: 0.82rem;
+            color: var(--silver-soft);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 999px;
+            padding: 0.42rem 0.75rem;
+            background: rgba(24,28,31,0.75);
+        }
+        .delivery-legend-item strong {
+            color: var(--gold);
+            font-weight: 600;
+        }
+
         /* Mobile hamburger menu button - hidden by default (desktop) */
         .menu-toggle {
             display: none;
@@ -1492,6 +1599,13 @@
             .footer-banner img {
                 min-height: 200px;
                 object-fit: cover;
+            }
+            .delivery-map-shell iframe {
+                height: 280px;
+            }
+            .delivery-zone-chip {
+                font-size: 0.86rem;
+                padding: 0.58rem 0.95rem;
             }
         }
     </style>
@@ -1752,13 +1866,40 @@
     <!-- Delivery Locations -->
     <section id="delivery" data-animate="fade" style="background:var(--bg-secondary);padding:7rem 5%;">
         <h2 style="margin-bottom:3rem;">DELIVERY LOCATIONS</h2>
-        <div style="display:flex;flex-wrap:wrap;gap:1.5rem;justify-content:center;max-width:900px;margin:0 auto;">
-            <div style="flex:1 1 180px;min-width:180px;padding:1.2rem 1.4rem;background:var(--bg-accent);border-radius:14px;border:1px solid rgba(255,255,255,0.06);text-align:center;">Dubai Marina</div>
-            <div style="flex:1 1 180px;min-width:180px;padding:1.2rem 1.4rem;background:var(--bg-accent);border-radius:14px;border:1px solid rgba(255,255,255,0.06);text-align:center;">Palm Jumeirah</div>
-            <div style="flex:1 1 180px;min-width:180px;padding:1.2rem 1.4rem;background:var(--bg-accent);border-radius:14px;border:1px solid rgba(255,255,255,0.06);text-align:center;">Downtown Dubai</div>
-            <div style="flex:1 1 180px;min-width:180px;padding:1.2rem 1.4rem;background:var(--bg-accent);border-radius:14px;border:1px solid rgba(255,255,255,0.06);text-align:center;">JBR</div>
-            <div style="flex:1 1 180px;min-width:180px;padding:1.2rem 1.4rem;background:var(--bg-accent);border-radius:14px;border:1px solid rgba(255,255,255,0.06);text-align:center;">Dubai Airport</div>
+        <div class="delivery-zone-chips">
+            <button class="delivery-zone-chip active" data-zone="palm" type="button">Palm Jumeirah</button>
+            <button class="delivery-zone-chip" data-zone="marina" type="button">Dubai Marina</button>
+            <button class="delivery-zone-chip" data-zone="downtown" type="button">Downtown Dubai</button>
+            <button class="delivery-zone-chip" data-zone="jbr" type="button">JBR</button>
+            <button class="delivery-zone-chip" data-zone="airport" type="button">Dubai Airport</button>
         </div>
+        <div class="delivery-map-shell" id="deliveryMapShell">
+            <iframe
+                title="Dubai delivery zones map"
+                id="deliveryMap"
+                src="https://www.openstreetmap.org/export/embed.html?bbox=55.08%2C25.06%2C55.20%2C25.16&layer=mapnik&marker=25.1124%2C55.1390"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+        </div>
+        <div class="delivery-meta">
+            <span class="delivery-stat">ETA: <strong id="deliveryEta" style="color:var(--gold);">20-35 min</strong></span>
+            <span class="delivery-stat">Delivery fee: <strong id="deliveryFee" style="color:var(--gold);">Free</strong></span>
+            <a id="deliveryMapsLink" class="delivery-cta" href="https://www.google.com/maps/search/?api=1&query=Palm+Jumeirah+Dubai" target="_blank" rel="noopener noreferrer">
+                <i class="fas fa-map-marked-alt" aria-hidden="true"></i>
+                Open in Google Maps
+            </a>
+            <a id="deliveryWhatsappLink" class="delivery-cta" href="https://wa.me/971586122568?text=Hello%2C%20I%20need%20delivery%20in%20Palm%20Jumeirah%2C%20Dubai." target="_blank" rel="noopener noreferrer" style="background:transparent;border:1px solid var(--gold);color:var(--gold);">
+                <i class="fab fa-whatsapp" aria-hidden="true"></i>
+                Quote via WhatsApp
+            </a>
+        </div>
+        <div class="delivery-legend">
+            <span class="delivery-legend-item"><strong>Free:</strong> Palm, Marina, Downtown, JBR</span>
+            <span class="delivery-legend-item"><strong>Airport:</strong> from 150 AED</span>
+            <span class="delivery-legend-item"><strong>Support:</strong> 24/7 coordination</span>
+        </div>
+        <p class="delivery-note" id="deliveryZoneText">Main delivery point: Palm Jumeirah, Dubai.</p>
     </section>
 
     <!-- Customer Reviews -->
@@ -1930,7 +2071,7 @@
                 <h3 data-i18n="contact.find_us">Find Us</h3>
                 <div class="contact-map">
                     <iframe 
-                        src="https://www.google.com/maps?q=Palm+Jumeirah+Dubai&output=embed"
+                        src="https://www.openstreetmap.org/export/embed.html?bbox=55.08%2C25.06%2C55.20%2C25.16&layer=mapnik&marker=25.1124%2C55.1390"
                         allowfullscreen=""
                         loading="lazy"
                         referrerpolicy="no-referrer-when-downgrade"
@@ -2303,6 +2444,100 @@
             nav.classList.remove('active');
             toggle.classList.remove('active');
         }
+
+        // Delivery zones map (homepage)
+        const DELIVERY_ZONES = {
+            palm: {
+                label: 'Palm Jumeirah',
+                mapSrc: 'https://www.openstreetmap.org/export/embed.html?bbox=55.08%2C25.06%2C55.20%2C25.16&layer=mapnik&marker=25.1124%2C55.1390',
+                mapsQuery: 'Palm+Jumeirah+Dubai',
+                eta: '20-35 min',
+                fee: 'Free',
+                note: 'Main delivery point: Palm Jumeirah, Dubai.'
+            },
+            marina: {
+                label: 'Dubai Marina',
+                mapSrc: 'https://www.openstreetmap.org/export/embed.html?bbox=55.12%2C25.04%2C55.20%2C25.11&layer=mapnik&marker=25.0803%2C55.1404',
+                mapsQuery: 'Dubai+Marina',
+                eta: '25-40 min',
+                fee: 'Free',
+                note: 'Delivery available in Dubai Marina with flexible handover times.'
+            },
+            downtown: {
+                label: 'Downtown Dubai',
+                mapSrc: 'https://www.openstreetmap.org/export/embed.html?bbox=55.24%2C25.16%2C55.31%2C25.23&layer=mapnik&marker=25.1972%2C55.2744',
+                mapsQuery: 'Downtown+Dubai',
+                eta: '25-45 min',
+                fee: 'Free',
+                note: 'Downtown Dubai deliveries include hotels, residences and business venues.'
+            },
+            jbr: {
+                label: 'JBR',
+                mapSrc: 'https://www.openstreetmap.org/export/embed.html?bbox=55.12%2C25.06%2C55.16%2C25.10&layer=mapnik&marker=25.0800%2C55.1345',
+                mapsQuery: 'JBR+Dubai',
+                eta: '25-40 min',
+                fee: 'Free',
+                note: 'JBR deliveries are coordinated with your preferred drop-off point.'
+            },
+            airport: {
+                label: 'Dubai Airport',
+                mapSrc: 'https://www.openstreetmap.org/export/embed.html?bbox=55.33%2C25.22%2C55.39%2C25.28&layer=mapnik&marker=25.2532%2C55.3657',
+                mapsQuery: 'Dubai+International+Airport',
+                eta: '35-55 min',
+                fee: 'From 150 AED',
+                note: 'Airport delivery available with prior booking and flight details.'
+            }
+        };
+
+        function setDeliveryZone(zoneKey) {
+            const zone = DELIVERY_ZONES[zoneKey];
+            if (!zone) return;
+
+            const frame = document.getElementById('deliveryMap');
+            const mapShell = document.getElementById('deliveryMapShell');
+            const zoneText = document.getElementById('deliveryZoneText');
+            const eta = document.getElementById('deliveryEta');
+            const fee = document.getElementById('deliveryFee');
+            const mapsLink = document.getElementById('deliveryMapsLink');
+            const waLink = document.getElementById('deliveryWhatsappLink');
+
+            if (frame) {
+                if (mapShell) mapShell.classList.add('is-loading');
+                window.setTimeout(() => {
+                    frame.src = zone.mapSrc;
+                }, 120);
+            }
+            if (zoneText) zoneText.textContent = zone.note;
+            if (eta) eta.textContent = zone.eta;
+            if (fee) fee.textContent = zone.fee;
+            if (mapsLink) mapsLink.href = `https://www.google.com/maps/search/?api=1&query=${zone.mapsQuery}`;
+            if (waLink) {
+                const msg = encodeURIComponent(`Hello, I need delivery in ${zone.label}, Dubai. Please send availability and exact pricing.`);
+                waLink.href = `https://wa.me/971586122568?text=${msg}`;
+            }
+
+            document.querySelectorAll('.delivery-zone-chip').forEach((chip) => {
+                chip.classList.toggle('active', chip.dataset.zone === zoneKey);
+            });
+        }
+
+        function initDeliveryZoneMap() {
+            const chips = document.querySelectorAll('.delivery-zone-chip');
+            const frame = document.getElementById('deliveryMap');
+            const mapShell = document.getElementById('deliveryMapShell');
+            if (!chips.length) return;
+            chips.forEach((chip) => {
+                chip.addEventListener('click', () => {
+                    setDeliveryZone(chip.dataset.zone);
+                });
+            });
+            if (frame && mapShell) {
+                frame.addEventListener('load', () => {
+                    mapShell.classList.remove('is-loading');
+                });
+            }
+            setDeliveryZone('palm');
+        }
         
         // Close menu when clicking outside
         document.addEventListener('click', (e) => {
@@ -2370,6 +2605,12 @@
             document.addEventListener('DOMContentLoaded', initializeBackend);
         } else {
             initializeBackend();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initDeliveryZoneMap);
+        } else {
+            initDeliveryZoneMap();
         }
         
         // Handle contact form submission
