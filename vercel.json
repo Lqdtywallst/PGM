@@ -1,0 +1,45 @@
+{
+  "rewrites": [
+    {
+      "source": "/((?!app/).*)",
+      "destination": "/index.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/reservations",
+      "destination": "/#reserva",
+      "permanent": true
+    },
+    {
+      "source": "/reservations/",
+      "destination": "/#reserva",
+      "permanent": true
+    },
+    {
+      "source": "/blog",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/available-stock-for-sale",
+      "destination": "/#fleet",
+      "permanent": true
+    },
+    {
+      "source": "/exclusive-collection",
+      "destination": "/#fleet",
+      "permanent": true
+    },
+    {
+      "source": "/exclusive-collection/",
+      "destination": "/#fleet",
+      "permanent": true
+    }
+  ]
+}

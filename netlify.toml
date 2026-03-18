@@ -1,0 +1,42 @@
+[[redirects]]
+  from = "/reservations"
+  to = "/#reserva"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/reservations/*"
+  to = "/#reserva"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/blog"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/blog/*"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/available-stock-for-sale"
+  to = "/#fleet"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/exclusive-collection"
+  to = "/#fleet"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/exclusive-collection/*"
+  to = "/#fleet"
+  status = 301
+  force = true
+
