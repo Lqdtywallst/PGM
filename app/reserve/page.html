@@ -33,7 +33,10 @@
 
         body {
             min-height: 100vh;
-            background: #000;
+            background:
+                radial-gradient(circle at top, rgba(212, 175, 55, 0.16), transparent 26%),
+                radial-gradient(circle at bottom right, rgba(212, 175, 55, 0.08), transparent 24%),
+                #000;
             color: white;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
@@ -44,29 +47,96 @@
 
         .reserve-container {
             width: 100%;
-            max-width: 800px;
-            background: #18181b;
+            max-width: 1080px;
+            background: linear-gradient(180deg, rgba(24, 24, 27, 0.96), rgba(11, 11, 13, 0.98));
             padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(212, 175, 55, 0.2);
+            border-radius: 24px;
+            box-shadow: 0 28px 90px rgba(0, 0, 0, 0.55), 0 20px 60px rgba(212, 175, 55, 0.12);
             border: 1px solid rgba(212, 175, 55, 0.2);
+            backdrop-filter: blur(12px);
         }
 
         .steps-indicator {
             display: flex;
-            justify-content: space-between;
+            gap: 0.9rem;
             margin-bottom: 2rem;
-            font-size: 0.9rem;
             color: #71717a;
         }
-
-        .steps-indicator span {
-            transition: color 0.3s;
+        .step-pill {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            padding: 0.9rem 1rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.025);
+            transition: all 0.28s ease;
         }
-
-        .steps-indicator span.active {
-            color: #d4af37;
+        .step-pill:hover {
+            transform: translateY(-2px);
+            border-color: rgba(212, 175, 55, 0.2);
+        }
+        .step-pill-index {
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #d4d4d8;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.03);
+            flex: 0 0 auto;
+        }
+        .step-pill-copy {
+            display: grid;
+            gap: 0.12rem;
+            min-width: 0;
+        }
+        .step-pill-label {
+            color: #f4f4f5;
+            font-size: 0.94rem;
             font-weight: 600;
+        }
+        .step-pill-meta {
+            color: #8f8f96;
+            font-size: 0.78rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+        .step-pill.active {
+            border-color: rgba(212, 175, 55, 0.4);
+            background: linear-gradient(180deg, rgba(212, 175, 55, 0.14), rgba(255, 255, 255, 0.03));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        }
+        .step-pill.active .step-pill-index {
+            border-color: rgba(212, 175, 55, 0.5);
+            background: linear-gradient(135deg, #d4af37, rgba(212, 175, 55, 0.78));
+            color: #111;
+        }
+        .step-pill.active .step-pill-label,
+        .step-pill.active .step-pill-meta {
+            color: #f5deb0;
+        }
+        .step-pill.completed {
+            border-color: rgba(212, 175, 55, 0.22);
+            background: rgba(212, 175, 55, 0.05);
+        }
+        .step-pill.completed .step-pill-index {
+            color: #111;
+            border-color: rgba(212, 175, 55, 0.4);
+            background: rgba(212, 175, 55, 0.85);
+        }
+        .step-pill.completed .step-pill-index::before {
+            content: "\f00c";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            font-size: 0.82rem;
+        }
+        .step-pill.completed .step-pill-index {
+            font-size: 0;
         }
 
         .step-content {
@@ -75,7 +145,7 @@
 
         .step-content.active {
             display: block;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.42s ease;
         }
 
         @keyframes fadeIn {
@@ -88,9 +158,230 @@
                 transform: translateY(0);
             }
         }
+        @keyframes riseIn {
+            from {
+                opacity: 0;
+                transform: translateY(18px) scale(0.985);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        @keyframes shimmerPulse {
+            0% {
+                box-shadow: 0 0 0 rgba(212, 175, 55, 0);
+                transform: translateY(0);
+            }
+            50% {
+                box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.15), 0 12px 28px rgba(212, 175, 55, 0.12);
+                transform: translateY(-1px);
+            }
+            100% {
+                box-shadow: 0 0 0 rgba(212, 175, 55, 0);
+                transform: translateY(0);
+            }
+        }
+        @keyframes textPulse {
+            0% {
+                opacity: 0.65;
+                transform: translateY(2px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
         .form-group {
             margin-bottom: 1rem;
+        }
+        .step-heading {
+            color: #f5deb0;
+            margin-bottom: 1.25rem;
+            font-size: clamp(1.8rem, 2.6vw, 2.35rem);
+            letter-spacing: 0.03em;
+        }
+        .step-heading-sub {
+            margin: -0.4rem 0 1.5rem;
+            color: #b3b3b9;
+            font-size: 0.96rem;
+            line-height: 1.6;
+            max-width: 760px;
+        }
+        .step2-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+            gap: 1.25rem;
+            align-items: start;
+        }
+        .step2-main,
+        .step2-side {
+            display: grid;
+            gap: 1.25rem;
+        }
+        .step1-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+            gap: 1.25rem;
+            align-items: start;
+        }
+        .step1-main,
+        .step1-side {
+            display: grid;
+            gap: 1.25rem;
+        }
+        .info-card {
+            padding: 1.35rem;
+            border-radius: 18px;
+            border: 1px solid rgba(212, 175, 55, 0.18);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(10, 10, 11, 0.9));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+        }
+        .info-card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            margin: 0 0 0.35rem;
+            color: #f5deb0;
+            font-size: 1.02rem;
+        }
+        .info-card-note {
+            margin: 0 0 1rem;
+            color: #a1a1aa;
+            font-size: 0.92rem;
+            line-height: 1.55;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+        }
+        .info-grid .form-group {
+            margin: 0;
+            padding: 1rem;
+            border-radius: 14px;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .info-grid .form-group.span-2 {
+            grid-column: span 2;
+        }
+        .assurance-card {
+            padding: 1.35rem;
+            border-radius: 18px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            background: linear-gradient(180deg, rgba(212, 175, 55, 0.08), rgba(255, 255, 255, 0.02));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+        }
+        .assurance-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            margin-bottom: 0.8rem;
+            padding: 0.4rem 0.7rem;
+            border-radius: 999px;
+            background: rgba(212, 175, 55, 0.12);
+            color: #f3d58c;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .assurance-title {
+            margin: 0 0 0.45rem;
+            color: #fff8e7;
+            font-size: 1.28rem;
+        }
+        .assurance-note {
+            margin: 0 0 1rem;
+            color: #d4d4d8;
+            font-size: 0.93rem;
+            line-height: 1.6;
+        }
+        .assurance-list {
+            display: grid;
+            gap: 0.85rem;
+        }
+        .assurance-item {
+            display: flex;
+            gap: 0.8rem;
+            align-items: flex-start;
+            padding: 0.9rem;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .assurance-item i {
+            margin-top: 0.15rem;
+            color: #f3d58c;
+        }
+        .assurance-item strong {
+            display: block;
+            margin-bottom: 0.2rem;
+            color: #fff;
+            font-size: 0.95rem;
+        }
+        .assurance-item span {
+            color: #b8b8be;
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+        .contact-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 0.7rem 0.95rem;
+            border-radius: 999px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            color: #f0d58e;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .contact-chip:hover {
+            border-color: rgba(212, 175, 55, 0.5);
+            color: #fff0c5;
+        }
+        .schedule-card {
+            padding: 1.35rem;
+            border-radius: 18px;
+            border: 1px solid rgba(212, 175, 55, 0.24);
+            background: linear-gradient(180deg, rgba(212, 175, 55, 0.08), rgba(255, 255, 255, 0.02));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+        }
+        .schedule-card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            margin: 0 0 0.35rem;
+            color: #d4af37;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .schedule-card-note {
+            margin: 0 0 1rem;
+            color: #d4d4d8;
+            font-size: 0.92rem;
+        }
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+        }
+        .schedule-grid .form-group {
+            margin: 0;
+            padding: 1rem;
+            border-radius: 14px;
+            border: 1px solid rgba(212, 175, 55, 0.12);
+            background: rgba(255, 255, 255, 0.02);
         }
         .field-label {
             display: block;
@@ -99,16 +390,24 @@
             font-weight: 600;
             font-size: 0.92rem;
         }
+        .field-label i {
+            margin-right: 0.4rem;
+            opacity: 0.85;
+        }
 
         .input {
             width: 100%;
             padding: 12px 16px;
-            border-radius: 8px;
-            background: #111;
-            border: 1px solid #333;
+            border-radius: 12px;
+            background: rgba(8, 8, 10, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             color: white;
             font-size: 1rem;
             transition: all 0.3s;
+        }
+        select.input:hover,
+        input.input:hover {
+            border-color: rgba(212, 175, 55, 0.24);
         }
 
         .input:focus {
@@ -143,11 +442,11 @@
 
         .btn {
             width: 100%;
-            padding: 14px;
+            padding: 15px 18px;
             background: linear-gradient(135deg, #d4af37, rgba(212, 175, 55, 0.8));
             color: #000;
             border: none;
-            border-radius: 8px;
+            border-radius: 14px;
             font-weight: bold;
             font-size: 1rem;
             cursor: pointer;
@@ -168,16 +467,17 @@
 
         .confirm-pay-btn {
             width: 100%;
-            padding: 14px;
+            padding: 16px 18px;
             background: linear-gradient(135deg, #d4af37, rgba(212, 175, 55, 0.8));
             color: #000;
             border: none;
-            border-radius: 8px;
+            border-radius: 14px;
             font-weight: bold;
-            font-size: 1rem;
+            font-size: 1.02rem;
             cursor: pointer;
             transition: all 0.3s;
             margin-top: 1rem;
+            box-shadow: 0 16px 36px rgba(212, 175, 55, 0.18);
         }
 
         .confirm-pay-btn:hover {
@@ -195,7 +495,7 @@
             padding: 12px 24px;
             background: transparent;
             border: 1px solid #444;
-            border-radius: 8px;
+            border-radius: 14px;
             color: white;
             cursor: pointer;
             transition: all 0.3s;
@@ -226,8 +526,8 @@
         }
 
         .delivery-map-wrapper {
-            margin-top: 0.75rem;
-            border-radius: 10px;
+            margin-top: 0.9rem;
+            border-radius: 16px;
             overflow: hidden;
             border: 1px solid rgba(212, 175, 55, 0.25);
             background: #0f0f10;
@@ -265,10 +565,112 @@
         .summary-section {
             text-align: center;
             padding: 2rem;
-            background: rgba(212, 175, 55, 0.05);
-            border-radius: 8px;
+            background: linear-gradient(180deg, rgba(212, 175, 55, 0.08), rgba(255, 255, 255, 0.02));
+            border-radius: 18px;
             border: 1px solid rgba(212, 175, 55, 0.2);
             margin-bottom: 2rem;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+        }
+        .payment-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(280px, 0.72fr);
+            gap: 1.25rem;
+            align-items: start;
+        }
+        .payment-main,
+        .payment-side {
+            display: grid;
+            gap: 1.1rem;
+        }
+        .payment-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            margin-bottom: 0.8rem;
+            padding: 0.42rem 0.72rem;
+            border-radius: 999px;
+            background: rgba(212, 175, 55, 0.12);
+            color: #f3d58c;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .payment-caption {
+            margin: 0.55rem auto 0;
+            max-width: 520px;
+            color: #bcbcc4;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .payment-breakdown {
+            display: grid;
+            gap: 0.85rem;
+            padding-top: 1rem;
+            margin-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .payment-breakdown-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            color: #d4d4d8;
+        }
+        .payment-breakdown-row strong {
+            color: #fff;
+            font-size: 1.02rem;
+        }
+        .payment-side-card {
+            padding: 1.35rem;
+            border-radius: 18px;
+            border: 1px solid rgba(212, 175, 55, 0.18);
+            background: rgba(255, 255, 255, 0.025);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+        }
+        .payment-side-title {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            margin: 0 0 0.45rem;
+            color: #f5deb0;
+            font-size: 1.02rem;
+        }
+        .payment-side-copy {
+            margin: 0 0 1rem;
+            color: #b4b4bb;
+            line-height: 1.55;
+            font-size: 0.92rem;
+        }
+        .payment-perks {
+            display: grid;
+            gap: 0.75rem;
+        }
+        .payment-perk {
+            display: flex;
+            gap: 0.7rem;
+            align-items: flex-start;
+            padding: 0.8rem 0.9rem;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .payment-perk i {
+            margin-top: 0.15rem;
+            color: #f3d58c;
+        }
+        .payment-perk strong {
+            display: block;
+            color: #fff;
+            margin-bottom: 0.15rem;
+            font-size: 0.92rem;
+        }
+        .payment-perk span {
+            color: #b8b8be;
+            line-height: 1.45;
+            font-size: 0.86rem;
         }
 
         .summary-section h3 {
@@ -278,10 +680,17 @@
         }
 
         .summary-section .total {
-            font-size: 2rem;
+            font-size: 2.35rem;
             font-weight: bold;
             color: #d4af37;
             margin-top: 1rem;
+            text-shadow: 0 8px 24px rgba(212, 175, 55, 0.16);
+        }
+        .price-refresh {
+            animation: shimmerPulse 0.42s ease;
+        }
+        .price-text-refresh {
+            animation: textPulse 0.34s ease;
         }
 
         .error-message {
@@ -297,12 +706,13 @@
         }
         .payment-trust {
             margin-top: 1rem;
-            padding: 0.9rem;
-            border-radius: 10px;
+            padding: 1rem 1.1rem;
+            border-radius: 14px;
             border: 1px solid rgba(212, 175, 55, 0.28);
             background: rgba(212, 175, 55, 0.08);
             color: #d6d3d1;
             font-size: 0.9rem;
+            transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
         }
         .payment-trust strong {
             color: #d4af37;
@@ -310,7 +720,12 @@
 
         /* Calendar Styles */
         .calendar-container {
-            margin-bottom: 2rem;
+            padding: 1.3rem;
+            border-radius: 18px;
+            border: 1px solid rgba(212, 175, 55, 0.18);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(10, 10, 11, 0.86));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
         }
 
         .calendar-header {
@@ -322,10 +737,10 @@
 
         .calendar-nav {
             background: transparent;
-            border: 1px solid #444;
+            border: 1px solid rgba(255, 255, 255, 0.14);
             color: white;
             padding: 8px 16px;
-            border-radius: 6px;
+            border-radius: 999px;
             cursor: pointer;
             transition: all 0.3s;
             font-size: 1rem;
@@ -340,10 +755,10 @@
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 4px;
-            background: #111;
+            background: rgba(10, 10, 12, 0.85);
             padding: 1rem;
-            border-radius: 8px;
-            border: 1px solid #333;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .calendar-day {
@@ -413,7 +828,134 @@
         }
 
         .reservation-summary {
+            padding: 1.35rem;
+            border-radius: 18px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            background: linear-gradient(180deg, rgba(212, 175, 55, 0.08), rgba(255, 255, 255, 0.02));
             font-size: 0.95rem;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+        }
+        .summary-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            margin-bottom: 0.75rem;
+            padding: 0.4rem 0.7rem;
+            border-radius: 999px;
+            background: rgba(212, 175, 55, 0.12);
+            color: #f3d58c;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .summary-title {
+            margin: 0 0 0.35rem;
+            color: #f7f7f8;
+            font-size: 1.25rem;
+        }
+        .summary-caption {
+            margin: 0 0 1rem;
+            color: #a1a1aa;
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .summary-row:last-child {
+            border-bottom: 0;
+            padding-bottom: 0;
+        }
+        .summary-row span:first-child {
+            color: #d4d4d8;
+        }
+        .summary-value {
+            color: #fff;
+            font-weight: 600;
+        }
+        .summary-value.gold {
+            color: #f3d58c;
+        }
+        .summary-row.highlight {
+            margin-top: 0.25rem;
+            padding-top: 1rem;
+        }
+        .summary-row.highlight .summary-value {
+            font-size: 1.15rem;
+        }
+        .summary-row.primary-payment {
+            margin-top: 0.85rem;
+            padding: 1rem;
+            border-radius: 14px;
+            border: 1px solid rgba(212, 175, 55, 0.22);
+            background: rgba(212, 175, 55, 0.08);
+        }
+        .summary-row.primary-payment .summary-value {
+            font-size: 1.2rem;
+            color: #f7d88f;
+        }
+        .delivery-card {
+            padding: 1.35rem;
+            border-radius: 18px;
+            border: 1px solid rgba(212, 175, 55, 0.18);
+            background: rgba(255, 255, 255, 0.02);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+        }
+        .delivery-card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            margin: 0 0 0.35rem;
+            color: #f5deb0;
+            font-size: 1.05rem;
+        }
+        .delivery-card-note {
+            margin: 0 0 1rem;
+            color: #a1a1aa;
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+        .info-card:hover,
+        .assurance-card:hover,
+        .schedule-card:hover,
+        .calendar-container:hover,
+        .reservation-summary:hover,
+        .delivery-card:hover,
+        .summary-section:hover,
+        .payment-side-card:hover,
+        .payment-trust:hover {
+            transform: translateY(-2px);
+            border-color: rgba(212, 175, 55, 0.28);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 18px 40px rgba(0, 0, 0, 0.18);
+        }
+        .step-content.active .info-card,
+        .step-content.active .assurance-card,
+        .step-content.active .calendar-container,
+        .step-content.active .schedule-card,
+        .step-content.active .reservation-summary,
+        .step-content.active .delivery-card,
+        .step-content.active .summary-section,
+        .step-content.active .payment-side-card,
+        .step-content.active .payment-trust {
+            animation: riseIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .step-content.active .assurance-card,
+        .step-content.active .schedule-card,
+        .step-content.active .reservation-summary,
+        .step-content.active .payment-side-card {
+            animation-delay: 0.06s;
+        }
+        .step-content.active .delivery-card,
+        .step-content.active .payment-trust {
+            animation-delay: 0.12s;
         }
 
         .btn-home {
@@ -442,10 +984,36 @@
         @media (max-width: 768px) {
             .reserve-container {
                 padding: 1.5rem;
+                border-radius: 18px;
             }
 
             .steps-indicator {
-                font-size: 0.8rem;
+                flex-direction: column;
+            }
+            .step1-layout,
+            .step2-layout {
+                grid-template-columns: 1fr;
+            }
+            .payment-layout {
+                grid-template-columns: 1fr;
+            }
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            .info-grid .form-group.span-2 {
+                grid-column: auto;
+            }
+            .step-pill:hover,
+            .info-card:hover,
+            .assurance-card:hover,
+            .schedule-card:hover,
+            .calendar-container:hover,
+            .reservation-summary:hover,
+            .delivery-card:hover,
+            .summary-section:hover,
+            .payment-side-card:hover,
+            .payment-trust:hover {
+                transform: none;
             }
 
             .step-navigation {
@@ -465,6 +1033,9 @@
             .calendar-day {
                 font-size: 0.75rem;
             }
+            .schedule-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -472,9 +1043,27 @@
     <div class="reserve-container">
         <!-- STEPS INDICATOR -->
         <div class="steps-indicator">
-            <span id="step1-indicator" class="active">1. Info</span>
-            <span id="step2-indicator">2. Dates</span>
-            <span id="step3-indicator">3. Payment</span>
+            <div id="step1-indicator" class="step-pill active">
+                <span class="step-pill-index">1</span>
+                <span class="step-pill-copy">
+                    <span class="step-pill-label">Guest Info</span>
+                    <span class="step-pill-meta">Identity and contact</span>
+                </span>
+            </div>
+            <div id="step2-indicator" class="step-pill">
+                <span class="step-pill-index">2</span>
+                <span class="step-pill-copy">
+                    <span class="step-pill-label">Schedule</span>
+                    <span class="step-pill-meta">Dates, hours and location</span>
+                </span>
+            </div>
+            <div id="step3-indicator" class="step-pill">
+                <span class="step-pill-index">3</span>
+                <span class="step-pill-copy">
+                    <span class="step-pill-label">Secure Payment</span>
+                    <span class="step-pill-meta">50% upfront checkout</span>
+                </span>
+            </div>
         </div>
 
         <!-- STEP 1: Customer Information -->
@@ -485,55 +1074,108 @@
                     <span>Back to Home</span>
                 </a>
             </div>
-            <h2 style="color: #d4af37; margin-bottom: 1.5rem;">Your Information</h2>
+            <h2 class="step-heading">Tell Us About You</h2>
+            <p class="step-heading-sub">Share your contact and identification details so we can secure the vehicle, validate availability, and prepare a smooth handover experience.</p>
             <div id="step1Validation" class="form-feedback" role="alert"></div>
-            <div class="form-group">
-                <label for="fullName" class="field-label">Full Name *</label>
-                <input type="text" id="fullName" name="fullName" placeholder="e.g. John Smith" class="input" data-label="Full name" required>
-                <p class="field-error" id="fullName-error"></p>
-            </div>
-            <div class="form-group">
-                <label for="passport" class="field-label">ID / Passport *</label>
-                <input type="text" id="passport" name="passport" placeholder="Passport or Emirates ID number" class="input" data-label="ID / Passport" required>
-                <p class="field-error" id="passport-error"></p>
-            </div>
-            <div class="form-group">
-                <label for="email" class="field-label">Email *</label>
-                <input type="email" id="email" name="email" placeholder="name@email.com" class="input" data-label="Email" required>
-                <p class="field-error" id="email-error"></p>
-            </div>
-            <div class="form-group">
-                <label for="phone" class="field-label">Phone / WhatsApp *</label>
-                <input type="tel" id="phone" name="phone" placeholder="+971 ..." class="input" data-label="Phone / WhatsApp" required>
-                <p class="field-error" id="phone-error"></p>
-            </div>
-            <div class="form-group">
-                <label for="address" class="field-label">Full Address *</label>
-                <input type="text" id="address" name="address" placeholder="Building / Street / Area" class="input" data-label="Full address" required>
-                <p class="field-error" id="address-error"></p>
-            </div>
-            <div class="form-group">
-                <label for="city" class="field-label">City *</label>
-                <input type="text" id="city" name="city" placeholder="Dubai" class="input" data-label="City" required>
-                <p class="field-error" id="city-error"></p>
-            </div>
-            <div class="form-group">
-                <label for="postalCode" class="field-label">Postal Code *</label>
-                <input type="text" id="postalCode" name="postalCode" placeholder="00000" class="input" data-label="Postal code" required>
-                <p class="field-error" id="postalCode-error"></p>
-            </div>
-            <div class="form-group">
-                <label for="country" class="field-label">Country *</label>
-                <select id="country" name="country" class="input" data-label="Country" required>
-                    <option value="AE" selected>United Arab Emirates</option>
-                    <option value="FR">France</option>
-                    <option value="IT">Italy</option>
-                    <option value="DE">Germany</option>
-                    <option value="GB">United Kingdom</option>
-                    <option value="US">United States</option>
-                    <option value="">Other</option>
-                </select>
-                <p class="field-error" id="country-error"></p>
+            <div class="step1-layout">
+                <div class="step1-main">
+                    <div class="info-card">
+                        <h3 class="info-card-title"><i class="fa-regular fa-address-card"></i> Guest Details</h3>
+                        <p class="info-card-note">Use the same details you want associated with the reservation and payment confirmation.</p>
+                        <div class="info-grid">
+                            <div class="form-group span-2">
+                                <label for="fullName" class="field-label"><i class="fa-regular fa-user"></i>Full Name *</label>
+                                <input type="text" id="fullName" name="fullName" placeholder="e.g. John Smith" class="input" data-label="Full name" required>
+                                <p class="field-error" id="fullName-error"></p>
+                            </div>
+                            <div class="form-group">
+                                <label for="passport" class="field-label"><i class="fa-regular fa-id-card"></i>ID / Passport *</label>
+                                <input type="text" id="passport" name="passport" placeholder="Passport or Emirates ID number" class="input" data-label="ID / Passport" required>
+                                <p class="field-error" id="passport-error"></p>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone" class="field-label"><i class="fa-brands fa-whatsapp"></i>Phone / WhatsApp *</label>
+                                <input type="tel" id="phone" name="phone" placeholder="+971 ..." class="input" data-label="Phone / WhatsApp" required>
+                                <p class="field-error" id="phone-error"></p>
+                            </div>
+                            <div class="form-group span-2">
+                                <label for="email" class="field-label"><i class="fa-regular fa-envelope"></i>Email *</label>
+                                <input type="email" id="email" name="email" placeholder="name@email.com" class="input" data-label="Email" required>
+                                <p class="field-error" id="email-error"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3 class="info-card-title"><i class="fa-solid fa-location-dot"></i> Billing Address</h3>
+                        <p class="info-card-note">These details are used for payment verification and reservation records.</p>
+                        <div class="info-grid">
+                            <div class="form-group span-2">
+                                <label for="address" class="field-label"><i class="fa-solid fa-road"></i>Full Address *</label>
+                                <input type="text" id="address" name="address" placeholder="Building / Street / Area" class="input" data-label="Full address" required>
+                                <p class="field-error" id="address-error"></p>
+                            </div>
+                            <div class="form-group">
+                                <label for="city" class="field-label"><i class="fa-regular fa-building"></i>City *</label>
+                                <input type="text" id="city" name="city" placeholder="Dubai" class="input" data-label="City" required>
+                                <p class="field-error" id="city-error"></p>
+                            </div>
+                            <div class="form-group">
+                                <label for="postalCode" class="field-label"><i class="fa-solid fa-mailbox"></i>Postal Code *</label>
+                                <input type="text" id="postalCode" name="postalCode" placeholder="00000" class="input" data-label="Postal code" required>
+                                <p class="field-error" id="postalCode-error"></p>
+                            </div>
+                            <div class="form-group span-2">
+                                <label for="country" class="field-label"><i class="fa-solid fa-earth-asia"></i>Country *</label>
+                                <select id="country" name="country" class="input" data-label="Country" required>
+                                    <option value="AE" selected>United Arab Emirates</option>
+                                    <option value="FR">France</option>
+                                    <option value="IT">Italy</option>
+                                    <option value="DE">Germany</option>
+                                    <option value="GB">United Kingdom</option>
+                                    <option value="US">United States</option>
+                                    <option value="">Other</option>
+                                </select>
+                                <p class="field-error" id="country-error"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step1-side">
+                    <div class="assurance-card">
+                        <div class="assurance-kicker"><i class="fa-solid fa-shield-halved"></i> Reservation Care</div>
+                        <h3 class="assurance-title">A Smooth Luxury Booking Experience</h3>
+                        <p class="assurance-note">We only ask for essential information so your reservation can be reviewed quickly, billed securely, and delivered without friction.</p>
+                        <div class="assurance-list">
+                            <div class="assurance-item">
+                                <i class="fa-solid fa-bolt"></i>
+                                <div>
+                                    <strong>Fast confirmation</strong>
+                                    <span>Your request is prepared for immediate review before moving to schedule and payment.</span>
+                                </div>
+                            </div>
+                            <div class="assurance-item">
+                                <i class="fa-solid fa-lock"></i>
+                                <div>
+                                    <strong>Protected checkout</strong>
+                                    <span>Your details are used only for reservation handling and secure payment processing.</span>
+                                </div>
+                            </div>
+                            <div class="assurance-item">
+                                <i class="fa-solid fa-car-side"></i>
+                                <div>
+                                    <strong>White-glove delivery</strong>
+                                    <span>We coordinate the vehicle handover around your preferred Dubai location and timing.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <a class="contact-chip" href="https://wa.me/971586122568" target="_blank" rel="noopener noreferrer">
+                            <i class="fa-brands fa-whatsapp"></i>
+                            Need help before booking?
+                        </a>
+                    </div>
+                </div>
             </div>
             <button onclick="nextStep()" class="btn">Continue to Dates →</button>
         </div>
@@ -546,62 +1188,100 @@
                     <span>Back to Home</span>
                 </a>
             </div>
-            <h2 style="color: #d4af37; margin-bottom: 1.5rem;">Select Your Dates</h2>
+            <h2 class="step-heading">Design Your Rental Schedule</h2>
+            <p class="step-heading-sub">Choose your preferred delivery and return timing, review the prorated pricing instantly, and confirm the schedule that fits your stay in Dubai.</p>
             <div id="step2Validation" class="form-feedback" role="alert"></div>
-            
-            <!-- Calendar Container -->
-            <div class="calendar-container">
-                <div class="calendar-header">
-                    <button class="calendar-nav" onclick="changeMonth(-1)">‹ Previous</button>
-                    <h3 id="currentMonth" style="margin: 0; color: #d4af37;"></h3>
-                    <button class="calendar-nav" onclick="changeMonth(1)">Next ›</button>
-                </div>
-                <div id="calendarGrid" class="calendar-grid"></div>
-            </div>
+            <div class="step2-layout">
+                <div class="step2-main">
+                    <div class="calendar-container">
+                        <div class="calendar-header">
+                            <button class="calendar-nav" onclick="changeMonth(-1)">‹ Previous</button>
+                            <h3 id="currentMonth" style="margin: 0; color: #d4af37;"></h3>
+                            <button class="calendar-nav" onclick="changeMonth(1)">Next ›</button>
+                        </div>
+                        <div id="calendarGrid" class="calendar-grid"></div>
+                    </div>
 
-            <!-- Date Inputs (hidden but used for form submission) -->
-            <div class="form-group" style="margin-top: 1.5rem;">
-                <label style="display: block; margin-bottom: 0.5rem; color: #d4af37;">Start Date *</label>
-                <input type="date" id="startDate" name="startDate" class="input" required onchange="updateCalendarFromInputs()">
-            </div>
-            <div class="form-group">
-                <label style="display: block; margin-bottom: 0.5rem; color: #d4af37;">End Date *</label>
-                <input type="date" id="endDate" name="endDate" class="input" required onchange="updateCalendarFromInputs()">
-            </div>
+                    <div class="schedule-card">
+                        <p class="schedule-card-title"><i class="fa-regular fa-clock"></i> Delivery And Return Schedule</p>
+                        <p class="schedule-card-note">Choose both the date and exact time for delivery and return. Pricing is calculated on a 24-hour basis and prorated by hours.</p>
+                        <div class="schedule-grid">
+                            <div class="form-group">
+                                <label class="field-label" for="startDate"><i class="fa-solid fa-calendar-day"></i>Delivery Date *</label>
+                                <input type="date" id="startDate" name="startDate" class="input" required onchange="updateCalendarFromInputs()">
+                            </div>
+                            <div class="form-group">
+                                <label class="field-label" for="pickupTime"><i class="fa-regular fa-clock"></i>Delivery Time *</label>
+                                <select id="pickupTime" name="pickupTime" class="input" required></select>
+                                <p class="field-error" id="pickupTime-error"></p>
+                            </div>
+                            <div class="form-group">
+                                <label class="field-label" for="endDate"><i class="fa-solid fa-calendar-check"></i>Return Date *</label>
+                                <input type="date" id="endDate" name="endDate" class="input" required onchange="updateCalendarFromInputs()">
+                            </div>
+                            <div class="form-group">
+                                <label class="field-label" for="dropoffTime"><i class="fa-regular fa-clock"></i>Return Time *</label>
+                                <select id="dropoffTime" name="dropoffTime" class="input" required></select>
+                                <p class="field-error" id="dropoffTime-error"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-            <!-- Reservation Summary -->
-            <div class="reservation-summary" style="margin-top: 1.5rem; padding: 1rem; background: rgba(212, 175, 55, 0.05); border-radius: 8px; border: 1px solid rgba(212, 175, 55, 0.2);">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                    <span>Days:</span>
-                    <span id="summaryDays" style="color: #d4af37; font-weight: 600;">0</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                    <span>Price per day:</span>
-                    <span id="summaryPricePerDay" style="color: #d4af37;">AED 0.00</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding-top: 0.5rem; border-top: 1px solid rgba(212, 175, 55, 0.2); font-size: 1.2rem; font-weight: 600;">
-                    <span>Total:</span>
-                    <span id="summaryTotal" style="color: #d4af37;">AED 0.00</span>
-                </div>
-            </div>
+                <div class="step2-side">
+                    <div class="reservation-summary">
+                        <div class="summary-kicker"><i class="fa-solid fa-gem"></i> Instant Quote</div>
+                        <h3 class="summary-title">Reservation Overview</h3>
+                        <p class="summary-caption">Your premium rental estimate updates live as you adjust the schedule.</p>
+                        <div class="summary-row">
+                            <span>Rental duration</span>
+                            <span id="summaryDays" class="summary-value gold">0h</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Price per day</span>
+                            <span id="summaryPricePerDay" class="summary-value gold">AED 0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Billable days</span>
+                            <span id="summaryBillableDays" class="summary-value">0</span>
+                        </div>
+                        <div class="summary-row highlight">
+                            <span>Total reservation</span>
+                            <span id="summaryTotal" class="summary-value gold">AED 0.00</span>
+                        </div>
+                        <div class="summary-row primary-payment">
+                            <span>Pay now (50%)</span>
+                            <span id="summaryDeposit" class="summary-value">AED 0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Remaining balance</span>
+                            <span id="summaryRemaining" class="summary-value">AED 0.00</span>
+                        </div>
+                    </div>
 
-            <div class="form-group" style="margin-top: 1.5rem;">
-                <label for="pickupLocation" style="display: block; margin-bottom: 0.5rem; color: #d4af37;">Delivery Location *</label>
-                <input type="text" id="pickupLocation" name="pickupLocation" placeholder="Enter delivery location in Dubai (e.g. Palm Jumeirah, Marina, Downtown) *" class="input" required>
-                <p class="field-error" id="pickupLocation-error"></p>
-                <div class="delivery-map-wrapper">
-                    <iframe
-                        title="Dubai delivery area map"
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"
-                        src="https://www.openstreetmap.org/export/embed.html?bbox=54.95%2C24.85%2C55.65%2C25.45&layer=mapnik&marker=25.2048%2C55.2708">
-                    </iframe>
+                    <div class="delivery-card">
+                        <h3 class="delivery-card-title"><i class="fa-solid fa-location-dot"></i> Delivery Location</h3>
+                        <p class="delivery-card-note">Tell us where you want the vehicle delivered. Our coverage includes premium Dubai destinations and nearby zones.</p>
+                        <div class="form-group" style="margin-top: 0;">
+                            <label for="pickupLocation" class="field-label"><i class="fa-solid fa-map-pin"></i>Delivery Address *</label>
+                            <input type="text" id="pickupLocation" name="pickupLocation" placeholder="Enter delivery location in Dubai (e.g. Palm Jumeirah, Marina, Downtown) *" class="input" required>
+                            <p class="field-error" id="pickupLocation-error"></p>
+                            <div class="delivery-map-wrapper">
+                                <iframe
+                                    title="Dubai delivery area map"
+                                    loading="lazy"
+                                    referrerpolicy="no-referrer-when-downgrade"
+                                    src="https://www.openstreetmap.org/export/embed.html?bbox=54.95%2C24.85%2C55.65%2C25.45&layer=mapnik&marker=25.2048%2C55.2708">
+                                </iframe>
+                            </div>
+                            <a class="delivery-map-link" href="https://www.google.com/maps/search/?api=1&query=Dubai+Palm+Jumeirah+Marina+Downtown+JBR+Airport" target="_blank" rel="noopener noreferrer">
+                                <i class="fas fa-map-marked-alt" aria-hidden="true"></i>
+                                Open map in Google Maps
+                            </a>
+                            <p class="delivery-map-hint">Delivery area includes Dubai and nearby zones such as Palm Jumeirah, Dubai Marina, Downtown Dubai, JBR and Dubai Airport.</p>
+                        </div>
+                    </div>
                 </div>
-                <a class="delivery-map-link" href="https://www.google.com/maps/search/?api=1&query=Dubai+Palm+Jumeirah+Marina+Downtown+JBR+Airport" target="_blank" rel="noopener noreferrer">
-                    <i class="fas fa-map-marked-alt" aria-hidden="true"></i>
-                    Open map in Google Maps
-                </a>
-                <p class="delivery-map-hint">Delivery area includes Dubai and nearby zones such as Palm Jumeirah, Dubai Marina, Downtown Dubai, JBR and Dubai Airport.</p>
             </div>
             <div class="step-navigation">
                 <button onclick="prevStep()" class="btn-secondary">← Back</button>
@@ -617,29 +1297,74 @@
                     <span>Back to Home</span>
                 </a>
             </div>
-            <h2 style="color: #d4af37; margin-bottom: 1.5rem; text-align: center;">Payment</h2>
-            <div class="summary-section">
-                <h3 id="selectedCar">Mercedes GLE 53 AMG</h3>
-                <p style="margin-top: 1rem; color: #a1a1aa;">Total Amount</p>
-                <p class="total" id="totalAmount">AED 0.00</p>
-            </div>
-            
-            <!-- Stripe Payment Form -->
-            <div id="payment-form-container" style="margin-top: 2rem; display: none;">
-                <div id="card-element" style="background: #0a0a0a; padding: 1rem; border-radius: 8px; border: 1px solid #333; margin-bottom: 1rem;">
-                    <!-- Stripe Elements will create form elements here -->
+            <h2 class="step-heading" style="text-align: center;">Secure Your Reservation</h2>
+            <div class="payment-layout">
+                <div class="payment-main">
+                    <div class="summary-section">
+                        <div class="payment-kicker"><i class="fa-solid fa-lock"></i> Secure Checkout</div>
+                        <h3 id="selectedCar">Mercedes GLE 53 AMG</h3>
+                        <p style="margin-top: 1rem; color: #a1a1aa;">Total Reservation</p>
+                        <p class="total" id="totalAmount">AED 0.00</p>
+                        <p class="payment-caption">Confirm your luxury booking with a protected `50%` upfront payment. The remaining balance is settled before delivery.</p>
+                        <div class="payment-breakdown">
+                            <div class="payment-breakdown-row">
+                                <span>Pay now</span>
+                                <strong id="payNowAmount">AED 0.00</strong>
+                            </div>
+                            <div class="payment-breakdown-row">
+                                <span>Remaining before delivery</span>
+                                <span id="remainingBalance">AED 0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Stripe Payment Form -->
+                    <div id="payment-form-container" style="margin-top: 0; display: none;">
+                        <div id="card-element" style="background: #0a0a0a; padding: 1rem; border-radius: 14px; border: 1px solid #333; margin-bottom: 1rem;">
+                            <!-- Stripe Elements will create form elements here -->
+                        </div>
+                        <div id="card-errors" role="alert" style="color: #ef4444; margin-bottom: 1rem; min-height: 20px;"></div>
+                    </div>
+                    <div class="payment-trust">
+                        <strong>Secure checkout:</strong> card payments are processed by Stripe with encrypted transmission.
+                        Need support before paying? Contact us on WhatsApp: <a href="https://wa.me/971586122568" style="color:#d4af37;">+971 58 612 2568</a>.
+                    </div>
+                    
+                    <div id="paymentStatus"></div>
+                    <button id="payButton" class="confirm-pay-btn" onclick="submitReservation()">
+                        Pay 50% Now
+                    </button>
                 </div>
-                <div id="card-errors" role="alert" style="color: #ef4444; margin-bottom: 1rem; min-height: 20px;"></div>
+                <div class="payment-side">
+                    <div class="payment-side-card">
+                        <h3 class="payment-side-title"><i class="fa-solid fa-medal"></i> What Happens Next</h3>
+                        <p class="payment-side-copy">Once the upfront payment is confirmed, your reservation is locked in and our team prepares the handover details.</p>
+                        <div class="payment-perks">
+                            <div class="payment-perk">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <div>
+                                    <strong>Reservation secured</strong>
+                                    <span>Your selected vehicle and schedule are reserved for your requested period.</span>
+                                </div>
+                            </div>
+                            <div class="payment-perk">
+                                <i class="fa-solid fa-envelope-open-text"></i>
+                                <div>
+                                    <strong>Confirmation sent</strong>
+                                    <span>You receive a booking confirmation by email with the main reservation details.</span>
+                                </div>
+                            </div>
+                            <div class="payment-perk">
+                                <i class="fa-solid fa-key"></i>
+                                <div>
+                                    <strong>Delivery coordination</strong>
+                                    <span>Our team finalizes the remaining balance and handover timing before delivery.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="payment-trust">
-                <strong>Secure checkout:</strong> card payments are processed by Stripe with encrypted transmission.
-                Need support before paying? Contact us on WhatsApp: <a href="https://wa.me/971586122568" style="color:#d4af37;">+971 58 612 2568</a>.
-            </div>
-            
-            <div id="paymentStatus"></div>
-            <button id="payButton" class="confirm-pay-btn" onclick="submitReservation()">
-                Confirm & Pay
-            </button>
             <div class="step-navigation" style="margin-top: 1rem;">
                 <button onclick="prevStep()" class="btn-secondary">← Back</button>
             </div>
@@ -656,6 +1381,105 @@
         function formatAmount(n) {
             const num = typeof n === 'number' ? n : parseFloat(n);
             return 'AED ' + num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+        const HOURS_PER_DAY = 24;
+        const UPFRONT_PAYMENT_RATIO = 0.5;
+        function formatCount(value) {
+            const rounded = Math.round(value * 100) / 100;
+            return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(2);
+        }
+        function getDateTimeValue(dateValue, timeValue) {
+            if (!dateValue || !timeValue) return null;
+            return new Date(`${dateValue}T${timeValue}:00`);
+        }
+        function formatDurationLabel(totalHours) {
+            if (!Number.isFinite(totalHours) || totalHours <= 0) return '0h';
+            const totalMinutes = Math.round(totalHours * 60);
+            const days = Math.floor(totalMinutes / (60 * 24));
+            const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+            const minutes = totalMinutes % 60;
+            const parts = [];
+            if (days) parts.push(`${days}d`);
+            if (hours) parts.push(`${hours}h`);
+            if (minutes) parts.push(`${minutes}m`);
+            return parts.join(' ') || '0h';
+        }
+        function getReservationPricing() {
+            const startDateValue = document.getElementById('startDate').value;
+            const endDateValue = document.getElementById('endDate').value;
+            const pickupTimeValue = document.getElementById('pickupTime').value;
+            const dropoffTimeValue = document.getElementById('dropoffTime').value;
+            const startDateTime = getDateTimeValue(startDateValue, pickupTimeValue);
+            const endDateTime = getDateTimeValue(endDateValue, dropoffTimeValue);
+
+            if (!startDateTime || !endDateTime) {
+                return { isValid: false, durationHours: 0, billingDays: 0, total: 0, upfrontAmount: 0, remainingAmount: 0, durationLabel: '0h' };
+            }
+
+            const durationMs = endDateTime - startDateTime;
+            if (durationMs <= 0) {
+                return { isValid: false, durationHours: 0, billingDays: 0, total: 0, upfrontAmount: 0, remainingAmount: 0, durationLabel: '0h' };
+            }
+
+            const durationHours = durationMs / (1000 * 60 * 60);
+            const billingDays = durationHours / HOURS_PER_DAY;
+            const total = billingDays * pricePerDay;
+            const upfrontAmount = total * UPFRONT_PAYMENT_RATIO;
+            const remainingAmount = total - upfrontAmount;
+
+            return {
+                isValid: true,
+                durationHours,
+                billingDays,
+                total,
+                upfrontAmount,
+                remainingAmount,
+                durationLabel: formatDurationLabel(durationHours),
+            };
+        }
+        function initializeTimeSelect(fieldId, defaultValue = '10:00') {
+            const select = document.getElementById(fieldId);
+            if (!select) return;
+
+            select.innerHTML = '';
+            for (let hour = 0; hour < 24; hour += 1) {
+                for (let minute = 0; minute < 60; minute += 30) {
+                    const timeValue = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+                    const option = document.createElement('option');
+                    option.value = timeValue;
+                    option.textContent = timeValue;
+                    if (timeValue === defaultValue) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                }
+            }
+        }
+        function restorePayButtonLabel() {
+            const pricing = getReservationPricing();
+            return pricing.isValid ? `Pay 50% Now (${formatAmount(pricing.upfrontAmount)})` : 'Pay 50% Now';
+        }
+        function applyTransientClass(element, className) {
+            if (!element) return;
+            element.classList.remove(className);
+            void element.offsetWidth;
+            element.classList.add(className);
+        }
+        function triggerPriceRefreshAnimation() {
+            [
+                document.getElementById('summaryTotal'),
+                document.getElementById('summaryDeposit'),
+                document.getElementById('summaryRemaining'),
+                document.getElementById('totalAmount'),
+                document.getElementById('payNowAmount'),
+                document.getElementById('remainingBalance')
+            ].forEach((element) => applyTransientClass(element, 'price-text-refresh'));
+
+            [
+                document.querySelector('.reservation-summary'),
+                document.querySelector('.summary-section'),
+                document.getElementById('payButton')
+            ].forEach((element) => applyTransientClass(element, 'price-refresh'));
         }
 
         // Form state
@@ -695,6 +1519,8 @@
         if (summaryPriceElement) {
             summaryPriceElement.textContent = `AED ${pricePerDay}`;
         }
+        initializeTimeSelect('pickupTime', '10:00');
+        initializeTimeSelect('dropoffTime', '10:00');
         var summaryTotalEl = document.getElementById('summaryTotal');
         var totalAmountEl = document.getElementById('totalAmount');
         if (summaryTotalEl) summaryTotalEl.textContent = CURRENCY_ZERO;
@@ -798,9 +1624,13 @@
         function validateStep2() {
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
+            const pickupTime = document.getElementById('pickupTime').value;
+            const dropoffTime = document.getElementById('dropoffTime').value;
             const pickupLocation = document.getElementById('pickupLocation').value.trim();
 
             clearFieldError('pickupLocation');
+            clearFieldError('pickupTime');
+            clearFieldError('dropoffTime');
 
             if (!pickupLocation) {
                 setFieldError('pickupLocation', 'Delivery location is required.');
@@ -808,13 +1638,15 @@
                 return false;
             }
 
-            if (!startDate || !endDate) {
-                showStepValidation('step2', 'Please select start and end date.');
+            if (!startDate || !endDate || !pickupTime || !dropoffTime) {
+                if (!pickupTime) setFieldError('pickupTime', 'Delivery time is required.');
+                if (!dropoffTime) setFieldError('dropoffTime', 'Return time is required.');
+                showStepValidation('step2', 'Please complete delivery and return date/time.');
                 return false;
             }
 
-            if (new Date(endDate) <= new Date(startDate)) {
-                showStepValidation('step2', 'End date must be after start date.');
+            if (!getReservationPricing().isValid) {
+                showStepValidation('step2', 'Return date/time must be after delivery date/time.');
                 return false;
             }
 
@@ -841,6 +1673,15 @@
                     updateContinueButton();
                 });
             }
+            ['pickupTime', 'dropoffTime'].forEach((fieldId) => {
+                const input = document.getElementById(fieldId);
+                if (!input) return;
+                input.addEventListener('input', () => {
+                    clearFieldError(fieldId);
+                    showStepValidation('step2', '');
+                    calculateTotal();
+                });
+            });
         }
 
         function nextStep() {
@@ -884,12 +1725,13 @@
             // Show current step
             document.getElementById(`step${currentStep}`).classList.add('active');
 
-            // Actualizar indicadores
-            document.querySelectorAll('.steps-indicator span').forEach((indicator, index) => {
-                if (index + 1 === currentStep) {
-                    indicator.classList.add('active');
-                } else {
-                    indicator.classList.remove('active');
+            // Update progress indicators
+            document.querySelectorAll('.step-pill').forEach((indicator, index) => {
+                const stepNumber = index + 1;
+                indicator.classList.toggle('active', stepNumber === currentStep);
+                indicator.classList.toggle('completed', stepNumber < currentStep);
+                if (stepNumber === currentStep) {
+                    applyTransientClass(indicator, 'price-refresh');
                 }
             });
             
@@ -1058,10 +1900,12 @@
         function updateContinueButton() {
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
+            const pickupTime = document.getElementById('pickupTime').value;
+            const dropoffTime = document.getElementById('dropoffTime').value;
             const pickupLocation = document.getElementById('pickupLocation').value.trim();
             const continueBtn = document.getElementById('continueToPaymentBtn');
             
-            if (startDate && endDate && pickupLocation && new Date(endDate) > new Date(startDate)) {
+            if (startDate && endDate && pickupTime && dropoffTime && pickupLocation && getReservationPricing().isValid) {
                 continueBtn.disabled = false;
                 continueBtn.style.opacity = '1';
                 continueBtn.style.cursor = 'pointer';
@@ -1073,32 +1917,31 @@
         }
 
         function calculateTotal() {
-            const startDateValue = document.getElementById('startDate').value;
-            const endDateValue = document.getElementById('endDate').value;
-            
-            if (startDateValue && endDateValue) {
-                const startDate = new Date(startDateValue);
-                const endDate = new Date(endDateValue);
-                
-                if (endDate > startDate) {
-                    const diffTime = Math.abs(endDate - startDate);
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                    const total = diffDays * pricePerDay;
-                    
-                    document.getElementById('summaryDays').textContent = diffDays;
-                    document.getElementById('summaryTotal').textContent = formatAmount(total);
-                    document.getElementById('totalAmount').textContent = formatAmount(total);
-                } else {
-                    document.getElementById('summaryDays').textContent = '0';
-                    document.getElementById('summaryTotal').textContent = CURRENCY_ZERO;
-                    document.getElementById('totalAmount').textContent = CURRENCY_ZERO;
-                }
+            const pricing = getReservationPricing();
+
+            if (pricing.isValid) {
+                document.getElementById('summaryDays').textContent = pricing.durationLabel;
+                document.getElementById('summaryBillableDays').textContent = formatCount(pricing.billingDays);
+                document.getElementById('summaryTotal').textContent = formatAmount(pricing.total);
+                document.getElementById('summaryDeposit').textContent = formatAmount(pricing.upfrontAmount);
+                document.getElementById('summaryRemaining').textContent = formatAmount(pricing.remainingAmount);
+                document.getElementById('totalAmount').textContent = formatAmount(pricing.total);
+                document.getElementById('payNowAmount').textContent = formatAmount(pricing.upfrontAmount);
+                document.getElementById('remainingBalance').textContent = formatAmount(pricing.remainingAmount);
+                document.getElementById('payButton').textContent = `Pay 50% Now (${formatAmount(pricing.upfrontAmount)})`;
+                triggerPriceRefreshAnimation();
             } else {
-                document.getElementById('summaryDays').textContent = '0';
+                document.getElementById('summaryDays').textContent = '0h';
+                document.getElementById('summaryBillableDays').textContent = '0';
                 document.getElementById('summaryTotal').textContent = CURRENCY_ZERO;
+                document.getElementById('summaryDeposit').textContent = CURRENCY_ZERO;
+                document.getElementById('summaryRemaining').textContent = CURRENCY_ZERO;
                 document.getElementById('totalAmount').textContent = CURRENCY_ZERO;
+                document.getElementById('payNowAmount').textContent = CURRENCY_ZERO;
+                document.getElementById('remainingBalance').textContent = CURRENCY_ZERO;
+                document.getElementById('payButton').textContent = 'Pay 50% Now';
             }
-            
+
             updateContinueButton();
         }
 
@@ -1108,6 +1951,12 @@
         });
         document.getElementById('endDate').addEventListener('change', function() {
             updateCalendarFromInputs();
+        });
+        document.getElementById('pickupTime').addEventListener('change', function() {
+            calculateTotal();
+        });
+        document.getElementById('dropoffTime').addEventListener('change', function() {
+            calculateTotal();
         });
         bindRealtimeValidation();
 
@@ -1257,7 +2106,7 @@
                 console.error('[PAYMENT] 3. There are no CORS errors in the console');
                 showMessage(errorMsg, 'error');
                 payButton.disabled = false;
-                payButton.textContent = 'Confirm & Pay';
+                payButton.textContent = restorePayButtonLabel();
                 return;
             }
             console.log('[PAYMENT] ✅ Server connection verified, proceeding with payment...');
@@ -1274,6 +2123,8 @@
                 country: document.getElementById('country').value,
                 startDate: document.getElementById('startDate').value,
                 endDate: document.getElementById('endDate').value,
+                pickupTime: document.getElementById('pickupTime').value,
+                dropoffTime: document.getElementById('dropoffTime').value,
                 pickupLocation: document.getElementById('pickupLocation').value,
             };
 
@@ -1287,17 +2138,25 @@
                 pricePerDay: pricePerDay
             });
 
-            // Calculate days and total
-            const startDate = new Date(formData.startDate);
-            const endDate = new Date(formData.endDate);
-            const diffTime = Math.abs(endDate - startDate);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            const total = diffDays * pricePerDay;
-            const totalCents = Math.round(total * 100);
+            // Calculate pricing: 24h base rental + hourly proration
+            const pricing = getReservationPricing();
+            if (!pricing.isValid) {
+                showMessage('Invalid delivery/return schedule. Please review dates and times.', 'error');
+                payButton.disabled = false;
+                payButton.textContent = restorePayButtonLabel();
+                return;
+            }
+            const total = pricing.total;
+            const upfrontAmount = pricing.upfrontAmount;
+            const remainingAmount = pricing.remainingAmount;
+            const totalCents = Math.round(upfrontAmount * 100);
 
             console.log('[PAYMENT] Calculations:', {
-                diffDays: diffDays,
+                durationHours: pricing.durationHours,
+                billingDays: pricing.billingDays,
                 total: total,
+                upfrontAmount: upfrontAmount,
+                remainingAmount: remainingAmount,
                 totalCents: totalCents
             });
 
@@ -1328,9 +2187,19 @@
                         reservationData: {
                             car: selectedCar,
                             pricePerDay: pricePerDay,
-                            days: diffDays,
+                            days: Number(pricing.billingDays.toFixed(2)),
                             startDate: formData.startDate.split('T')[0],
                             endDate: formData.endDate.split('T')[0],
+                            pickupTime: formData.pickupTime,
+                            dropoffTime: formData.dropoffTime,
+                            durationHours: Number(pricing.durationHours.toFixed(2)),
+                            durationLabel: pricing.durationLabel,
+                            totalAmount: Number(total.toFixed(2)),
+                            total: formatAmount(total),
+                            upfrontAmount: Number(upfrontAmount.toFixed(2)),
+                            upfrontDisplay: formatAmount(upfrontAmount),
+                            remainingAmount: Number(remainingAmount.toFixed(2)),
+                            remainingDisplay: formatAmount(remainingAmount),
                             pickupLocation: formData.pickupLocation,
                         }
                     };
@@ -1491,11 +2360,20 @@
                             reservationData: {
                                 car: selectedCar,
                                 pricePerDay: pricePerDay,
-                                days: diffDays,
+                                days: Number(pricing.billingDays.toFixed(2)),
                                 startDate: formData.startDate.split('T')[0],
                                 endDate: formData.endDate.split('T')[0],
+                                pickupTime: formData.pickupTime,
+                                dropoffTime: formData.dropoffTime,
+                                durationHours: Number(pricing.durationHours.toFixed(2)),
+                                durationLabel: pricing.durationLabel,
                                 pickupLocation: formData.pickupLocation,
-                                total: total.toFixed(2) + ' AED'
+                                totalAmount: Number(total.toFixed(2)),
+                                total: formatAmount(total),
+                                upfrontAmount: Number(upfrontAmount.toFixed(2)),
+                                upfrontDisplay: formatAmount(upfrontAmount),
+                                remainingAmount: Number(remainingAmount.toFixed(2)),
+                                remainingDisplay: formatAmount(remainingAmount)
                             },
                             customerData: {
                                 name: formData.fullName,
@@ -1533,7 +2411,7 @@
                     // Show success message and redirect
                     console.log('[PAYMENT] ✅ Process completed successfully');
                     setTimeout(() => {
-                        alert(`✅ Payment successful!\n\nVehicle: ${selectedCar}\nDays: ${diffDays}\nTotal: AED ${total.toFixed(2)}\n\nYou will receive a confirmation email.`);
+                        alert(`✅ Payment successful!\n\nVehicle: ${selectedCar}\nDuration: ${pricing.durationLabel}\nTotal reservation: ${formatAmount(total)}\nPaid now: ${formatAmount(upfrontAmount)}\nRemaining balance: ${formatAmount(remainingAmount)}\n\nYou will receive a confirmation email.`);
                         window.location.href = '/index.html';
                     }, 1500);
                 } else if (paymentIntent.status === 'processing') {
@@ -1554,13 +2432,13 @@
                             } else {
                                 showMessage('Payment is still processing. Please check your email for confirmation.', 'success');
                                 payButton.disabled = false;
-                                payButton.textContent = 'Confirm & Pay';
+                                payButton.textContent = restorePayButtonLabel();
                             }
                         } catch (checkError) {
                             console.warn('[PAYMENT] Error checking status:', checkError);
                             showMessage('Payment is processing. You will receive a confirmation email shortly.', 'success');
                             payButton.disabled = false;
-                            payButton.textContent = 'Confirm & Pay';
+                            payButton.textContent = restorePayButtonLabel();
                         }
                     }, 3000);
                 } else if (paymentIntent.status === 'requires_action') {
@@ -1573,7 +2451,7 @@
                     console.error('[PAYMENT] ❌ Payment method failed');
                     showMessage('Payment method failed. Please try a different card.', 'error');
                     payButton.disabled = false;
-                    payButton.textContent = 'Confirm & Pay';
+                    payButton.textContent = restorePayButtonLabel();
                     const displayError = document.getElementById('card-errors');
                     if (displayError) {
                         displayError.textContent = 'Payment method failed. Please try a different card.';
@@ -1582,14 +2460,14 @@
                     console.error('[PAYMENT] ❌ Unexpected payment status:', paymentIntent.status);
                     showMessage('Unexpected payment status: ' + paymentIntent.status, 'error');
                     payButton.disabled = false;
-                    payButton.textContent = 'Confirm & Pay';
+                    payButton.textContent = restorePayButtonLabel();
                 }
             } catch (error) {
                 console.error('[PAYMENT] ❌ GENERAL ERROR:', error);
                 console.error('[PAYMENT] Stack trace:', error.stack);
                 showMessage('Error processing payment: ' + error.message, 'error');
                 payButton.disabled = false;
-                payButton.textContent = 'Confirm & Pay';
+                payButton.textContent = restorePayButtonLabel();
             }
         }
 

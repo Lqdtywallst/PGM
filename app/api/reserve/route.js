@@ -39,6 +39,62 @@ function normalizeCountryCode(country) {
     return countryNameToCode[country] || country;
 }
 
+function parseMoneyValue(value) {
+    if (value === undefined || value === null || value === '') return null;
+    if (typeof value === 'number') return Number.isFinite(value) ? value : null;
+    const cleaned = String(value).replace(/[^0-9.-]+/g, '');
+    const parsed = parseFloat(cleaned);
+    return Number.isFinite(parsed) ? parsed : null;
+}
+
+function formatMoneyDisplay(amount, currency = 'aed') {
+    const normalizedCurrency = (currency || 'aed').toUpperCase();
+    const numericAmount = Number.isFinite(amount) ? amount : parseMoneyValue(amount) || 0;
+    return `${normalizedCurrency} ${numericAmount.toFixed(2)}`;
+}
+
+function buildReservationDateTime(dateValue, timeValue) {
+    if (!dateValue) return null;
+    return new Date(`${dateValue}T${timeValue || '10:00'}:00`);
+}
+
+function enrichReservationPricing(reservationData, currency = 'aed') {
+    const normalizedCurrency = (currency || 'aed').toLowerCase();
+    const startDateTime = buildReservationDateTime(reservationData.startDate, reservationData.pickupTime);
+    const endDateTime = buildReservationDateTime(reservationData.endDate, reservationData.dropoffTime);
+
+    let durationHours = parseMoneyValue(reservationData.durationHours);
+    if ((!durationHours || durationHours <= 0) && startDateTime && endDateTime && endDateTime > startDateTime) {
+        durationHours = (endDateTime - startDateTime) / (1000 * 60 * 60);
+    }
+
+    let billingDays = parseMoneyValue(reservationData.days);
+    if ((!billingDays || billingDays <= 0) && durationHours) {
+        billingDays = durationHours / 24;
+    }
+    if (!billingDays || billingDays <= 0) {
+        billingDays = 1;
+    }
+
+    const pricePerDay = parseMoneyValue(reservationData.pricePerDay) || 0;
+    const totalAmount = parseMoneyValue(reservationData.totalAmount) ?? parseMoneyValue(reservationData.total) ?? (billingDays * pricePerDay);
+    const upfrontAmount = parseMoneyValue(reservationData.upfrontAmount) ?? (totalAmount * 0.5);
+    const remainingAmount = parseMoneyValue(reservationData.remainingAmount) ?? Math.max(totalAmount - upfrontAmount, 0);
+
+    reservationData.currency = normalizedCurrency.toUpperCase();
+    reservationData.durationHours = Number(durationHours ? durationHours.toFixed(2) : (billingDays * 24).toFixed(2));
+    reservationData.days = Number(billingDays.toFixed(2));
+    reservationData.durationLabel = reservationData.durationLabel || `${reservationData.days} day rental`;
+    reservationData.totalAmount = Number(totalAmount.toFixed(2));
+    reservationData.total = reservationData.total || formatMoneyDisplay(reservationData.totalAmount, normalizedCurrency);
+    reservationData.upfrontAmount = Number(upfrontAmount.toFixed(2));
+    reservationData.upfrontDisplay = reservationData.upfrontDisplay || formatMoneyDisplay(reservationData.upfrontAmount, normalizedCurrency);
+    reservationData.remainingAmount = Number(remainingAmount.toFixed(2));
+    reservationData.remainingDisplay = reservationData.remainingDisplay || formatMoneyDisplay(reservationData.remainingAmount, normalizedCurrency);
+
+    return reservationData;
+}
+
 // Email configuration
 const EMAIL_CONFIG = {
     service: process.env.EMAIL_SERVICE || 'gmail',
@@ -90,11 +146,13 @@ async function sendReservationNotificationEmail(reservationData, customerData) {
                     <div class="status">⏳ PAYMENT PENDING</div>
                     <h2>Reservation Details</h2>
                     <div class="info-row"><span class="label">Vehicle:</span> ${reservationData.car || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Start date:</span> ${reservationData.startDate || 'N/A'}</div>
-                    <div class="info-row"><span class="label">End date:</span> ${reservationData.endDate || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Days:</span> ${reservationData.days || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Price per day:</span> ${reservationData.pricePerDay || 'N/A'} €</div>
-                    <div class="info-row"><span class="label">Total:</span> ${reservationData.total || 'N/A'} €</div>
+                    <div class="info-row"><span class="label">Start date:</span> ${reservationData.startDate || 'N/A'}${reservationData.pickupTime ? ` at ${reservationData.pickupTime}` : ''}</div>
+                    <div class="info-row"><span class="label">End date:</span> ${reservationData.endDate || 'N/A'}${reservationData.dropoffTime ? ` at ${reservationData.dropoffTime}` : ''}</div>
+                    <div class="info-row"><span class="label">Rental duration:</span> ${reservationData.durationLabel || reservationData.days || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Price per day:</span> ${formatMoneyDisplay(reservationData.pricePerDay, reservationData.currency)}</div>
+                    <div class="info-row"><span class="label">Total reservation:</span> ${reservationData.total || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Pay now (50%):</span> ${reservationData.upfrontDisplay || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Remaining balance:</span> ${reservationData.remainingDisplay || 'N/A'}</div>
                     ${reservationData.pickupLocation ? `<div class="info-row"><span class="label">Pickup location:</span> ${reservationData.pickupLocation}</div>` : ''}
                     <h3>Customer Details</h3>
                     <div class="info-row"><span class="label">Name:</span> ${customerData.name || customerData.fullName || 'N/A'}</div>
@@ -154,11 +212,13 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
                 <div class="content">
                     <h2>Reservation Details</h2>
                     <div class="info-row"><span class="label">Vehicle:</span> ${reservationData.car || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Start date:</span> ${reservationData.startDate || 'N/A'}</div>
-                    <div class="info-row"><span class="label">End date:</span> ${reservationData.endDate || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Days:</span> ${reservationData.days || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Price per day:</span> ${reservationData.pricePerDay || 'N/A'} €</div>
-                    <div class="info-row"><span class="label">Total:</span> ${reservationData.total || 'N/A'} €</div>
+                    <div class="info-row"><span class="label">Start date:</span> ${reservationData.startDate || 'N/A'}${reservationData.pickupTime ? ` at ${reservationData.pickupTime}` : ''}</div>
+                    <div class="info-row"><span class="label">End date:</span> ${reservationData.endDate || 'N/A'}${reservationData.dropoffTime ? ` at ${reservationData.dropoffTime}` : ''}</div>
+                    <div class="info-row"><span class="label">Rental duration:</span> ${reservationData.durationLabel || reservationData.days || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Price per day:</span> ${formatMoneyDisplay(reservationData.pricePerDay, reservationData.currency)}</div>
+                    <div class="info-row"><span class="label">Total reservation:</span> ${reservationData.total || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Pay now (50%):</span> ${reservationData.upfrontDisplay || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Remaining balance:</span> ${reservationData.remainingDisplay || 'N/A'}</div>
                     ${reservationData.pickupLocation ? `<div class="info-row"><span class="label">Pickup location:</span> ${reservationData.pickupLocation}</div>` : ''}
                     ${paymentIntentId ? `<div class="info-row"><span class="label">Payment Intent ID:</span> ${paymentIntentId}</div>` : ''}
                     <h3>Customer Details</h3>
@@ -201,11 +261,13 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
                     <p>Your reservation has been confirmed successfully. Below are the details:</p>
                     <h2>Reservation Details</h2>
                     <div class="info-row"><span class="label">Vehicle:</span> ${reservationData.car || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Start date:</span> ${reservationData.startDate || 'N/A'}</div>
-                    <div class="info-row"><span class="label">End date:</span> ${reservationData.endDate || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Days:</span> ${reservationData.days || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Price per day:</span> ${reservationData.pricePerDay || 'N/A'} €</div>
-                    <div class="info-row"><span class="label">Total:</span> ${reservationData.total || (reservationData.pricePerDay && reservationData.days ? (parseFloat(reservationData.pricePerDay) * parseInt(reservationData.days)).toFixed(2) + ' €' : 'N/A')}</div>
+                    <div class="info-row"><span class="label">Start date:</span> ${reservationData.startDate || 'N/A'}${reservationData.pickupTime ? ` at ${reservationData.pickupTime}` : ''}</div>
+                    <div class="info-row"><span class="label">End date:</span> ${reservationData.endDate || 'N/A'}${reservationData.dropoffTime ? ` at ${reservationData.dropoffTime}` : ''}</div>
+                    <div class="info-row"><span class="label">Rental duration:</span> ${reservationData.durationLabel || reservationData.days || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Price per day:</span> ${formatMoneyDisplay(reservationData.pricePerDay, reservationData.currency)}</div>
+                    <div class="info-row"><span class="label">Total reservation:</span> ${reservationData.total || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Paid now (50%):</span> ${reservationData.upfrontDisplay || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Remaining balance:</span> ${reservationData.remainingDisplay || 'N/A'}</div>
                     ${reservationData.pickupLocation ? `<div class="info-row"><span class="label">Pickup location:</span> ${reservationData.pickupLocation}</div>` : ''}
                     <p style="margin-top: 20px;">Thank you for choosing Dynasty Prestige.</p>
                 </div>
@@ -322,6 +384,7 @@ router.post('/', async (req, res) => {
             postalCode: data.postalCode,
             country: normalizeCountryCode(data.country), // Convert to ISO code
         };
+        const reservationCurrency = (data.currency || data.reservationData?.currency || 'aed').toLowerCase();
 
         const reservationData = data.reservationData || {
             car: data.car || 'Mercedes GLE 53 AMG',
@@ -329,29 +392,33 @@ router.post('/', async (req, res) => {
             days: data.days || 1,
             startDate: data.startDate,
             endDate: data.endDate,
+            pickupTime: data.pickupTime,
+            dropoffTime: data.dropoffTime,
+            durationHours: data.durationHours,
+            durationLabel: data.durationLabel,
+            totalAmount: data.totalAmount,
+            total: data.total,
+            upfrontAmount: data.upfrontAmount,
+            upfrontDisplay: data.upfrontDisplay,
+            remainingAmount: data.remainingAmount,
+            remainingDisplay: data.remainingDisplay,
             pickupLocation: data.pickupLocation,
+            currency: reservationCurrency.toUpperCase(),
         };
+        enrichReservationPricing(reservationData, reservationCurrency);
 
         console.log('[API] Normalized data:', {
             customer: customerData,
             reservation: reservationData
         });
 
-        // Calculate total if not provided
-        if (!data.amount && !reservationData.total) {
-            console.log('[API] Calculating total...');
-            const start = new Date(reservationData.startDate);
-            const end = new Date(reservationData.endDate);
-            const diffTime = Math.abs(end - start);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
-            reservationData.days = diffDays;
-            reservationData.total = diffDays * reservationData.pricePerDay;
-            console.log('[API] Calculated total:', {
-                days: diffDays,
-                pricePerDay: reservationData.pricePerDay,
-                total: reservationData.total
-            });
-        }
+        console.log('[API] Pricing summary:', {
+            days: reservationData.days,
+            durationHours: reservationData.durationHours,
+            totalAmount: reservationData.totalAmount,
+            upfrontAmount: reservationData.upfrontAmount,
+            remainingAmount: reservationData.remainingAmount
+        });
 
         // Send notification email BEFORE payment (async, non-blocking)
         console.log('[API] Sending notification email (async)...');
@@ -462,13 +529,23 @@ router.post('/', async (req, res) => {
                     customer: customer.id,
                     confirmation_method: 'automatic',
                     confirm: false,
-                    description: `Reservation: ${reservationData.car} - ${reservationData.days} days`,
+                    description: `Reservation: ${reservationData.car} - 50% upfront`,
                     metadata: {
                         car: reservationData.car,
                         days: reservationData.days.toString(),
                         startDate: reservationData.startDate,
                         endDate: reservationData.endDate,
+                        pickupTime: reservationData.pickupTime || '',
+                        dropoffTime: reservationData.dropoffTime || '',
+                        durationHours: reservationData.durationHours.toString(),
+                        durationLabel: reservationData.durationLabel || '',
                         pricePerDay: reservationData.pricePerDay.toString(),
+                        totalAmount: reservationData.totalAmount.toString(),
+                        totalDisplay: reservationData.total || '',
+                        upfrontAmount: reservationData.upfrontAmount.toString(),
+                        upfrontDisplay: reservationData.upfrontDisplay || '',
+                        remainingAmount: reservationData.remainingAmount.toString(),
+                        remainingDisplay: reservationData.remainingDisplay || '',
                         customerName: customerData.name,
                         customerEmail: customerData.email,
                         pickupLocation: reservationData.pickupLocation || '',
@@ -626,18 +703,24 @@ router.post('/confirm', async (req, res) => {
             // Prepare reservation data (use provided data or PaymentIntent metadata)
             let finalReservationData = reservationData || {
                 car: paymentIntent.metadata.car,
-                days: parseInt(paymentIntent.metadata.days) || 1,
+                days: parseMoneyValue(paymentIntent.metadata.days) || 1,
                 startDate: paymentIntent.metadata.startDate,
                 endDate: paymentIntent.metadata.endDate,
-                pricePerDay: parseFloat(paymentIntent.metadata.pricePerDay) || 0,
+                pickupTime: paymentIntent.metadata.pickupTime,
+                dropoffTime: paymentIntent.metadata.dropoffTime,
+                durationHours: parseMoneyValue(paymentIntent.metadata.durationHours) || 0,
+                durationLabel: paymentIntent.metadata.durationLabel,
+                pricePerDay: parseMoneyValue(paymentIntent.metadata.pricePerDay) || 0,
+                totalAmount: parseMoneyValue(paymentIntent.metadata.totalAmount) || 0,
+                total: paymentIntent.metadata.totalDisplay,
+                upfrontAmount: parseMoneyValue(paymentIntent.metadata.upfrontAmount) || 0,
+                upfrontDisplay: paymentIntent.metadata.upfrontDisplay,
+                remainingAmount: parseMoneyValue(paymentIntent.metadata.remainingAmount) || 0,
+                remainingDisplay: paymentIntent.metadata.remainingDisplay,
                 pickupLocation: paymentIntent.metadata.pickupLocation,
+                currency: paymentIntent.currency || 'aed',
             };
-            
-            // Calculate total if not provided
-            if (!finalReservationData.total && finalReservationData.pricePerDay && finalReservationData.days) {
-                const calculatedTotal = (parseFloat(finalReservationData.pricePerDay) * parseInt(finalReservationData.days)).toFixed(2);
-                finalReservationData.total = calculatedTotal + ' €';
-            }
+            enrichReservationPricing(finalReservationData, finalReservationData.currency || paymentIntent.currency || 'aed');
             
             // Prepare customer data (use provided data or PaymentIntent metadata)
             let finalCustomerData = customerData;
