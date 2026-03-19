@@ -3500,17 +3500,41 @@
             document.querySelector('header').classList.toggle('scrolled', window.scrollY > 50);
         });
 
-        // Fade-in on scroll for sections
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    observer.unobserve(entry.target);
+        // Fade-in on scroll for sections, with a mobile-safe fallback
+        const animatedSections = document.querySelectorAll('[data-animate="fade"]');
+
+        function revealVisibleSections() {
+            animatedSections.forEach((section) => {
+                if (section.classList.contains('is-visible')) return;
+                const rect = section.getBoundingClientRect();
+                if (rect.top <= window.innerHeight * 0.92) {
+                    section.classList.add('is-visible');
                 }
             });
-        }, { threshold: 0.15 });
+        }
 
-        document.querySelectorAll('[data-animate="fade"]').forEach(el => observer.observe(el));
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.08,
+                rootMargin: '0px 0px -10% 0px'
+            });
+
+            animatedSections.forEach((section) => observer.observe(section));
+        } else {
+            animatedSections.forEach((section) => section.classList.add('is-visible'));
+        }
+
+        window.addEventListener('load', revealVisibleSections);
+        window.addEventListener('resize', revealVisibleSections);
+        window.addEventListener('scroll', revealVisibleSections, { passive: true });
+        setTimeout(revealVisibleSections, 250);
 
         // Dynamic WhatsApp links
         const WA_PHONE = '971586122568';
