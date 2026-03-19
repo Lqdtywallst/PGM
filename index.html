@@ -360,6 +360,25 @@
             flex-wrap:wrap;
             justify-content:center;
         }
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            box-shadow: none;
+        }
+        .btn-secondary:hover {
+            background: rgba(212, 175, 55, 0.08);
+        }
+        .btn-tertiary {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.25);
+            color: var(--silver);
+            box-shadow: none;
+        }
+        .btn-tertiary:hover {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+        }
         .btn {
             background: linear-gradient(135deg, #f6d77d 0%, var(--gold-soft) 38%, var(--gold) 100%);
             color: var(--black);
@@ -404,6 +423,40 @@
         .hero-point strong {
             color: var(--gold);
             font-weight: 600;
+        }
+        .hero-proof {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.9rem;
+            margin-top: 1.3rem;
+        }
+        .hero-proof-card {
+            padding: 1rem 1rem 0.95rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.02));
+            text-align: left;
+        }
+        .hero-proof-label {
+            display: block;
+            margin-bottom: 0.35rem;
+            color: var(--gold);
+            font-size: 0.76rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+        .hero-proof-value {
+            display: block;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1.45;
+        }
+        .hero-cta-note {
+            margin-top: 1rem;
+            color: var(--silver-soft);
+            font-size: 0.92rem;
+            line-height: 1.7;
         }
         .feature-grid {
             display: flex;
@@ -993,6 +1046,12 @@
             }
             .hero-actions .btn {
                 width: 100%;
+            }
+            .hero-proof {
+                grid-template-columns: 1fr;
+            }
+            .hero-proof-card {
+                text-align: center;
             }
             .car-actions {
                 flex-direction: column;
@@ -1595,6 +1654,98 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+        }
+        .reservation-panel {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 2.6rem 2.3rem;
+            border-radius: 30px;
+            background: linear-gradient(180deg, rgba(18,21,24,0.82), rgba(10,12,14,0.94));
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: var(--panel-shadow);
+        }
+        .reservation-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            padding: 0.48rem 0.95rem;
+            margin-bottom: 1rem;
+            border-radius: 999px;
+            border: 1px solid rgba(212,175,55,0.22);
+            color: var(--gold-soft);
+            background: rgba(255,255,255,0.03);
+            font-size: 0.78rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+        .reservation-kicker::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+            box-shadow: 0 0 14px rgba(240, 201, 107, 0.45);
+        }
+        .reservation-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .reservation-steps {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+            text-align: left;
+        }
+        .reservation-step {
+            padding: 1.2rem 1.2rem 1.1rem;
+            border-radius: 22px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: linear-gradient(180deg, rgba(26,29,33,0.92), rgba(10,12,14,0.98));
+            box-shadow: 0 18px 45px rgba(0,0,0,0.24);
+        }
+        .reservation-step-index {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            margin-bottom: 0.9rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+            color: var(--black);
+            font-weight: 800;
+            font-size: 0.92rem;
+        }
+        .reservation-step h3 {
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .reservation-step p {
+            color: var(--silver-soft);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        .reservation-inline-trust {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-top: 1.1rem;
+        }
+        .reservation-inline-trust span {
+            padding: 0.62rem 0.95rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.04);
+            color: var(--silver-soft);
+            font-size: 0.84rem;
         }
 
         /* Contact */
@@ -2324,6 +2475,16 @@
                 right: 1rem;
                 bottom: 1rem;
             }
+            .reservation-panel {
+                padding: 1.7rem 1.1rem;
+                border-radius: 24px;
+            }
+            .reservation-actions .btn {
+                width: 100%;
+            }
+            .reservation-steps {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -2370,16 +2531,31 @@
 
             <div class="hero-actions">
                 <a href="/app/reserve/page.html" class="btn" aria-label="Check availability and reserve now">CHECK AVAILABILITY</a>
-                <a href="https://wa.me/971586122568" data-wa-key="general" class="btn" aria-label="Chat on WhatsApp" style="background:transparent;border:1px solid var(--gold);color:var(--gold);display:inline-flex;align-items:center;gap:0.5rem;box-shadow:none;">
+                <a href="https://wa.me/971586122568" data-wa-key="general" class="btn btn-secondary" aria-label="Chat on WhatsApp">
                     <i class="fab fa-whatsapp" aria-hidden="true"></i>
                     WHATSAPP
                 </a>
-                <a href="#fleet" class="btn" aria-label="View our fleet of luxury cars" style="background:transparent;border:1px solid rgba(255,255,255,0.25);color:var(--silver);box-shadow:none;">VIEW FLEET</a>
+                <a href="#fleet" class="btn btn-tertiary" aria-label="View our fleet of luxury cars">VIEW FLEET</a>
             </div>
+            <p class="hero-cta-note">Reserve online in minutes, pay 50% to confirm, and let our team coordinate delivery directly to your hotel, residence or airport arrival.</p>
             <div class="trust-strip" aria-label="Booking trust highlights">
                 <span class="trust-pill">Secure Stripe payments</span>
                 <span class="trust-pill">Response in under 10 min</span>
                 <span class="trust-pill">24/7 concierge support</span>
+            </div>
+            <div class="hero-proof" aria-label="Key booking highlights">
+                <div class="hero-proof-card">
+                    <span class="hero-proof-label">Booking</span>
+                    <span class="hero-proof-value">50% online to confirm your reservation.</span>
+                </div>
+                <div class="hero-proof-card">
+                    <span class="hero-proof-label">Rental Term</span>
+                    <span class="hero-proof-value">24-hour base rental with time-based pricing clarity.</span>
+                </div>
+                <div class="hero-proof-card">
+                    <span class="hero-proof-label">Delivery</span>
+                    <span class="hero-proof-value">Hotel, villa and airport coordination across Dubai.</span>
+                </div>
             </div>
         </div>
     </section>
@@ -2416,19 +2592,45 @@
 
     <!-- Call To Action -->
     <section id="reservation" style="text-align: center; padding: 6rem 5%; background: var(--bg-secondary);" data-animate="fade">
+        <div class="reservation-panel">
+        <div class="reservation-kicker">Fast Booking Flow</div>
         <h2 style="color: var(--gold); font-size: 3.2rem; margin-bottom: 1.5rem; letter-spacing:0.3em; text-transform:uppercase;" data-i18n="reservation.title">
             BOOK YOUR LUXURY CAR
         </h2>
-        <p style="color: var(--silver); font-size: 1.2rem; margin-bottom: 2.5rem; max-width: 720px; margin-left: auto; margin-right: auto;" data-i18n="reservation.subtitle">
+        <p style="color: var(--silver); font-size: 1.2rem; margin-bottom: 0; max-width: 720px; margin-left: auto; margin-right: auto;" data-i18n="reservation.subtitle">
             Choose your supercar, confirm your preferred dates and we deliver your vehicle anywhere in Dubai.
         </p>
-        <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;">
+        <div class="reservation-inline-trust" aria-label="Reservation trust highlights">
+            <span>Secure online payment</span>
+            <span>50% to confirm</span>
+            <span>Dubai delivery coordination</span>
+        </div>
+        <div class="reservation-actions">
             <a href="/app/reserve/page.html" class="btn" aria-label="Start reservation flow now" style="font-size: 1.1rem; padding: 1.1rem 3rem;" data-i18n="reservation.button">
                 CHECK AVAILABILITY
             </a>
-            <a href="https://wa.me/971586122568" data-wa-key="general" class="btn" aria-label="Chat on WhatsApp to book" style="font-size: 1.1rem; padding: 1.1rem 3rem; background:transparent;border:1px solid var(--gold);color:var(--gold);">
+            <a href="https://wa.me/971586122568" data-wa-key="general" class="btn btn-secondary" aria-label="Chat on WhatsApp to book" style="font-size: 1.1rem; padding: 1.1rem 3rem;">
+                <i class="fab fa-whatsapp" aria-hidden="true"></i>
                 WHATSAPP
             </a>
+        </div>
+        <div class="reservation-steps" aria-label="How booking works">
+            <div class="reservation-step">
+                <span class="reservation-step-index">1</span>
+                <h3>Select Your Dates</h3>
+                <p>Choose the vehicle, pickup time and drop-off plan that fits your stay in Dubai.</p>
+            </div>
+            <div class="reservation-step">
+                <span class="reservation-step-index">2</span>
+                <h3>Confirm Securely</h3>
+                <p>Complete the booking flow and pay 50% online to lock in availability.</p>
+            </div>
+            <div class="reservation-step">
+                <span class="reservation-step-index">3</span>
+                <h3>Receive Delivery</h3>
+                <p>Our team confirms the handoff and delivers the car to your chosen Dubai location.</p>
+            </div>
+        </div>
         </div>
     </section>
 
