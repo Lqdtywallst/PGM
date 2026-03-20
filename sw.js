@@ -1,9 +1,10 @@
 // Service Worker for Dynasty Prestige
 // Cache static assets for better performance
 
-const CACHE_NAME = 'pgm-v1.0.0';
-const STATIC_CACHE = 'pgm-static-v1';
-const DYNAMIC_CACHE = 'pgm-dynamic-v1';
+// Subir versión al desplegar cambios visibles (CSS, logos, index): fuerza borrado de cachés antiguos.
+const CACHE_NAME = 'pgm-v1.0.1';
+const STATIC_CACHE = 'pgm-static-v3';
+const DYNAMIC_CACHE = 'pgm-dynamic-v3';
 
 // Assets to cache during install
 const STATIC_ASSETS = [
