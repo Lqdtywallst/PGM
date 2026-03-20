@@ -1,0 +1,40 @@
+# PriceLab — parámetros ajustables (edita sin tocar código)
+
+competitiveness:
+  # índice = mi_precio / precio_medio_mercado
+  overpriced_threshold: 1.2      # por encima → bajar
+  underpriced_threshold: 0.9     # por debajo → subir
+  optimal_low: 0.9               # rango “mantener”
+  optimal_high: 1.1
+  reduce_when_overpriced_pct: 15   # % a bajar (rango sugerido 10–20)
+  increase_when_underpriced_pct: 10 # % a subir (rango sugerido 5–15)
+
+demand:
+  weekend_multiplier: 1.20       # vie–dom Dubai (UTC+4)
+  high_season_multiplier: 1.25     # oct–abr
+  low_season_multiplier: 0.80      # jun–ago
+  high_season_months: [10, 11, 12, 1, 2, 3, 4]
+  low_season_months: [6, 7, 8]
+  weekend_days: [4, 5, 6]         # 0=lun … 6=dom → vie=4, sáb=5, dom=6
+
+availability:
+  single_unit_premium_pct: 15      # solo 1 unidad
+  many_idle_discount_pct: 15     # 3+ unidades libres
+  many_idle_threshold: 3
+
+time_to_booking:
+  stale_hours: 48                 # sin reserva en X h → bajar
+  stale_discount_pct: 10
+  hot_hours: 12                   # reserva en las últimas X h → subir
+  hot_premium_pct: 10
+
+whatsapp:
+  discount_vs_web_pct: 3          # oferta WhatsApp un poco por debajo del web
+
+currency: "AED"
+rounding:
+  nearest: 50                     # redondear recomendación a múltiplo de 50 AED
+
+market:
+  # Si no hay benchmark para un modelo, usar factor sobre precio actual
+  fallback_spread_pct: 15
