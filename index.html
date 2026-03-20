@@ -648,7 +648,40 @@
             max-width: 100%;
             overflow: hidden;
             padding: 0 3rem;
-            cursor: grab;
+            cursor: default;
+        }
+        .brand-slider-viewport:hover .brand-marquee-track,
+        .brand-slider-viewport:focus-within .brand-marquee-track {
+            animation-play-state: paused;
+        }
+        .brand-marquee-track {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            width: max-content;
+            will-change: transform;
+            animation: brandMarqueeScroll 16s linear infinite;
+        }
+        @keyframes brandMarqueeScroll {
+            from {
+                transform: translateX(0);
+            }
+            to {
+                transform: translateX(-50%);
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .brand-marquee-track {
+                animation: none;
+                transform: none;
+                justify-content: center;
+                flex-wrap: wrap;
+                width: 100%;
+                max-width: 100%;
+            }
+            .brand-marquee-track > .brand-filter-list:last-child {
+                display: none;
+            }
         }
         .brand-slider-viewport::before,
         .brand-slider-viewport::after {
@@ -681,17 +714,9 @@
             flex-wrap: nowrap;
             gap: 1.6rem;
             align-items: center;
-            overflow-x: auto;
-            scroll-behavior: smooth;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            max-width: 100%;
-            padding: 0.65rem 0.2rem 0.95rem;
-            scroll-snap-type: x mandatory;
-            will-change: scroll-position;
-        }
-        .brand-filter-list::-webkit-scrollbar {
-            display: none;
+            flex: 0 0 auto;
+            padding: 0.65rem 2.25rem 0.95rem;
+            box-sizing: border-box;
         }
         @keyframes brandFadeUp {
             from {
@@ -701,14 +726,6 @@
             to {
                 opacity: 1;
                 transform: translateY(0);
-            }
-        }
-        @keyframes brandFloat {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-6px);
             }
         }
         @keyframes brandActivePulse {
@@ -737,9 +754,11 @@
             opacity: 1;
             position: relative;
             transition: transform 0.32s ease, opacity 0.32s ease;
-            animation: brandFadeUp 0.68s cubic-bezier(0.16, 1, 0.3, 1) both;
             flex: 0 0 auto;
             scroll-snap-align: center;
+        }
+        .brand-marquee-track > .brand-filter-list:first-child .brand-filter-btn {
+            animation: brandFadeUp 0.68s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
         .brand-filter-btn::after {
             content: "";
@@ -754,11 +773,11 @@
             opacity: 0;
             transition: width 0.32s ease, opacity 0.32s ease;
         }
-        .brand-filter-btn:nth-child(1) { animation-delay: 0.02s; }
-        .brand-filter-btn:nth-child(2) { animation-delay: 0.12s; }
-        .brand-filter-btn:nth-child(3) { animation-delay: 0.22s; }
-        .brand-filter-btn:nth-child(4) { animation-delay: 0.32s; }
-        .brand-filter-btn:nth-child(5) { animation-delay: 0.42s; }
+        .brand-marquee-track > .brand-filter-list:first-child .brand-filter-btn:nth-child(1) { animation-delay: 0.02s; }
+        .brand-marquee-track > .brand-filter-list:first-child .brand-filter-btn:nth-child(2) { animation-delay: 0.12s; }
+        .brand-marquee-track > .brand-filter-list:first-child .brand-filter-btn:nth-child(3) { animation-delay: 0.22s; }
+        .brand-marquee-track > .brand-filter-list:first-child .brand-filter-btn:nth-child(4) { animation-delay: 0.32s; }
+        .brand-marquee-track > .brand-filter-list:first-child .brand-filter-btn:nth-child(5) { animation-delay: 0.42s; }
         .brand-filter-logo {
             width: 74px;
             height: 74px;
@@ -768,7 +787,6 @@
             box-shadow: none;
             flex: 0 0 74px;
             transition: transform 0.32s ease, opacity 0.32s ease, filter 0.32s ease;
-            animation: brandFloat 4.8s ease-in-out infinite;
         }
         .brand-filter-btn:hover {
             transform: translateY(-7px) scale(1.03);
@@ -2717,23 +2735,42 @@
         <p class="fleet-intro">Compare our most requested Dubai rentals, check the daily rate instantly and go straight to reservation or WhatsApp for fast availability confirmation.</p>
         <div class="brand-filter-wrap">
             <p class="brand-filter-title">Choose Your Brand</p>
-            <div class="brand-slider-viewport" id="brandSliderViewport" aria-label="Brand logo slider">
-                <div class="brand-filter-list" id="brandSliderTrack" role="tablist" aria-label="Filter vehicles by brand">
-                    <button class="brand-filter-btn active" type="button" data-brand-filter="all" data-brand-label="All Vehicles" aria-label="Show all vehicles">
-                        <img class="brand-filter-logo" src="/logo-dp-transparent.png" alt="Dynasty Prestige logo">
-                    </button>
-                    <button class="brand-filter-btn" type="button" data-brand-filter="lamborghini" data-brand-label="Lamborghini" aria-label="Filter Lamborghini vehicles">
-                        <img class="brand-filter-logo" src="/brands/lamborghini-clean.png" alt="Lamborghini logo" loading="lazy">
-                    </button>
-                    <button class="brand-filter-btn" type="button" data-brand-filter="ferrari" data-brand-label="Ferrari" aria-label="Filter Ferrari vehicles">
-                        <img class="brand-filter-logo" src="/brands/ferrari-clean.png" alt="Ferrari logo" loading="lazy">
-                    </button>
-                    <button class="brand-filter-btn" type="button" data-brand-filter="mercedes" data-brand-label="Mercedes" aria-label="Filter Mercedes vehicles">
-                        <img class="brand-filter-logo" src="/brands/mercedes-clean.png" alt="Mercedes logo" loading="lazy">
-                    </button>
-                    <button class="brand-filter-btn" type="button" data-brand-filter="porsche" data-brand-label="Porsche" aria-label="Filter Porsche vehicles">
-                        <img class="brand-filter-logo" src="/brands/porsche-clean.png" alt="Porsche logo" loading="lazy">
-                    </button>
+            <div class="brand-slider-viewport" id="brandSliderViewport" aria-label="Brand logos, scroll automatically">
+                <div class="brand-marquee-track" id="brandMarqueeTrack">
+                    <div class="brand-filter-list" role="tablist" aria-label="Filter vehicles by brand">
+                        <button class="brand-filter-btn active" type="button" data-brand-filter="all" data-brand-label="All Vehicles" aria-label="Show all vehicles">
+                            <img class="brand-filter-logo" src="/logo-dp-transparent.png" alt="Dynasty Prestige logo">
+                        </button>
+                        <button class="brand-filter-btn" type="button" data-brand-filter="lamborghini" data-brand-label="Lamborghini" aria-label="Filter Lamborghini vehicles">
+                            <img class="brand-filter-logo" src="/brands/lamborghini-clean.png" alt="Lamborghini logo" loading="lazy">
+                        </button>
+                        <button class="brand-filter-btn" type="button" data-brand-filter="ferrari" data-brand-label="Ferrari" aria-label="Filter Ferrari vehicles">
+                            <img class="brand-filter-logo" src="/brands/ferrari-clean.png" alt="Ferrari logo" loading="lazy">
+                        </button>
+                        <button class="brand-filter-btn" type="button" data-brand-filter="mercedes" data-brand-label="Mercedes" aria-label="Filter Mercedes vehicles">
+                            <img class="brand-filter-logo" src="/brands/mercedes-clean.png" alt="Mercedes logo" loading="lazy">
+                        </button>
+                        <button class="brand-filter-btn" type="button" data-brand-filter="porsche" data-brand-label="Porsche" aria-label="Filter Porsche vehicles">
+                            <img class="brand-filter-logo" src="/brands/porsche-clean.png" alt="Porsche logo" loading="lazy">
+                        </button>
+                    </div>
+                    <div class="brand-filter-list" role="presentation" aria-hidden="true">
+                        <button class="brand-filter-btn active" type="button" tabindex="-1" data-brand-filter="all" data-brand-label="All Vehicles" aria-hidden="true">
+                            <img class="brand-filter-logo" src="/logo-dp-transparent.png" alt="" loading="lazy">
+                        </button>
+                        <button class="brand-filter-btn" type="button" tabindex="-1" data-brand-filter="lamborghini" data-brand-label="Lamborghini" aria-hidden="true">
+                            <img class="brand-filter-logo" src="/brands/lamborghini-clean.png" alt="" loading="lazy">
+                        </button>
+                        <button class="brand-filter-btn" type="button" tabindex="-1" data-brand-filter="ferrari" data-brand-label="Ferrari" aria-hidden="true">
+                            <img class="brand-filter-logo" src="/brands/ferrari-clean.png" alt="" loading="lazy">
+                        </button>
+                        <button class="brand-filter-btn" type="button" tabindex="-1" data-brand-filter="mercedes" data-brand-label="Mercedes" aria-hidden="true">
+                            <img class="brand-filter-logo" src="/brands/mercedes-clean.png" alt="" loading="lazy">
+                        </button>
+                        <button class="brand-filter-btn" type="button" tabindex="-1" data-brand-filter="porsche" data-brand-label="Porsche" aria-hidden="true">
+                            <img class="brand-filter-logo" src="/brands/porsche-clean.png" alt="" loading="lazy">
+                        </button>
+                    </div>
                 </div>
             </div>
             <p class="fleet-status" id="fleetStatus">Showing all 5 vehicles.</p>
@@ -3380,7 +3417,7 @@
         const fleetCards = document.querySelectorAll('.car-card');
         const fleetStatus = document.getElementById('fleetStatus');
         const brandSliderViewport = document.getElementById('brandSliderViewport');
-        const brandSliderTrack = document.getElementById('brandSliderTrack');
+        const brandMarqueeTrack = document.getElementById('brandMarqueeTrack');
 
         function updateFleetStatus(visibleCount, brandLabel) {
             if (!fleetStatus) return;
@@ -3408,76 +3445,26 @@
 
         brandFilterButtons.forEach((button) => {
             button.addEventListener('click', () => {
+                const brand = button.dataset.brandFilter;
                 brandFilterButtons.forEach((btn) => btn.classList.remove('active'));
-                button.classList.add('active');
-                filterFleetByBrand(button.dataset.brandFilter);
-                button.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                document.querySelectorAll(`[data-brand-filter="${brand}"]`).forEach((b) => b.classList.add('active'));
+                filterFleetByBrand(brand);
             });
         });
 
-        if (brandSliderTrack && brandSliderViewport) {
-            let autoScrollDirection = 1;
-            let isBrandSliderPaused = false;
-            let isPointerDown = false;
-            let dragStartX = 0;
-            let startScrollLeft = 0;
-
-            const pauseBrandSlider = () => { isBrandSliderPaused = true; };
-            const resumeBrandSlider = () => { isBrandSliderPaused = false; };
-
-            const tickBrandSlider = () => {
-                if (!isBrandSliderPaused && brandSliderTrack.scrollWidth > brandSliderTrack.clientWidth) {
-                    const maxScroll = brandSliderTrack.scrollWidth - brandSliderTrack.clientWidth;
-                    brandSliderTrack.scrollLeft += 0.45 * autoScrollDirection;
-
-                    if (brandSliderTrack.scrollLeft <= 0) {
-                        autoScrollDirection = 1;
-                    } else if (brandSliderTrack.scrollLeft >= maxScroll) {
-                        autoScrollDirection = -1;
-                    }
-                }
-                requestAnimationFrame(tickBrandSlider);
-            };
-
-            brandSliderViewport.addEventListener('mouseenter', pauseBrandSlider);
-            brandSliderViewport.addEventListener('mouseleave', resumeBrandSlider);
-            brandSliderViewport.addEventListener('touchstart', pauseBrandSlider, { passive: true });
-            brandSliderViewport.addEventListener('touchend', resumeBrandSlider, { passive: true });
-
-            brandSliderViewport.addEventListener('pointerdown', (event) => {
-                isPointerDown = true;
-                dragStartX = event.clientX;
-                startScrollLeft = brandSliderTrack.scrollLeft;
-                pauseBrandSlider();
-                brandSliderViewport.style.cursor = 'grabbing';
-            });
-
-            window.addEventListener('pointermove', (event) => {
-                if (!isPointerDown) return;
-                const delta = event.clientX - dragStartX;
-                brandSliderTrack.scrollLeft = startScrollLeft - delta;
-            });
-
-            window.addEventListener('pointerup', () => {
-                if (!isPointerDown) return;
-                isPointerDown = false;
-                brandSliderViewport.style.cursor = 'grab';
-                resumeBrandSlider();
-            });
-
-            brandSliderViewport.addEventListener('wheel', (event) => {
-                if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
-                    brandSliderTrack.scrollLeft += event.deltaY;
-                } else {
-                    brandSliderTrack.scrollLeft += event.deltaX;
-                }
-                pauseBrandSlider();
-                clearTimeout(brandSliderViewport._wheelTimer);
-                brandSliderViewport._wheelTimer = setTimeout(resumeBrandSlider, 900);
-                event.preventDefault();
-            }, { passive: false });
-
-            requestAnimationFrame(tickBrandSlider);
+        /* Pausa el marquee en táctil para poder pulsar un logo con comodidad */
+        if (brandMarqueeTrack && brandSliderViewport) {
+            let touchMarqueeTimer;
+            brandSliderViewport.addEventListener('touchstart', () => {
+                clearTimeout(touchMarqueeTimer);
+                brandMarqueeTrack.style.animationPlayState = 'paused';
+            }, { passive: true });
+            brandSliderViewport.addEventListener('touchend', () => {
+                clearTimeout(touchMarqueeTimer);
+                touchMarqueeTimer = setTimeout(() => {
+                    brandMarqueeTrack.style.animationPlayState = '';
+                }, 1400);
+            }, { passive: true });
         }
 
         galleryPrev.addEventListener('click', () => {
