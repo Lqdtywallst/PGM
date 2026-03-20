@@ -982,9 +982,18 @@
         }
 
         @media (max-width: 768px) {
+            /* Avoid vertically centering the whole flow on mobile — it breaks scroll order and feels “out of sequence” */
+            body {
+                align-items: flex-start;
+                justify-content: flex-start;
+                padding: 1rem;
+                min-height: 100%;
+            }
+
             .reserve-container {
-                padding: 1.5rem;
+                padding: 1.25rem 1rem 2rem;
                 border-radius: 18px;
+                max-width: 100%;
             }
 
             .steps-indicator {
@@ -994,8 +1003,38 @@
             .step2-layout {
                 grid-template-columns: 1fr;
             }
+            /* Step 2: keep reading order logical on small screens — main (calendar + times) first, then delivery, then live quote */
+            .step2-layout {
+                display: flex;
+                flex-direction: column;
+                gap: 1.25rem;
+            }
+            .step2-main {
+                order: 1;
+            }
+            .step2-side {
+                order: 2;
+                display: flex;
+                flex-direction: column;
+                gap: 1.25rem;
+            }
+            .step2-side .delivery-card {
+                order: 1;
+            }
+            .step2-side .reservation-summary {
+                order: 2;
+            }
             .payment-layout {
                 grid-template-columns: 1fr;
+                display: flex;
+                flex-direction: column;
+                gap: 1.25rem;
+            }
+            .payment-main {
+                order: 1;
+            }
+            .payment-side {
+                order: 2;
             }
             .info-grid {
                 grid-template-columns: 1fr;
