@@ -1,14 +1,21 @@
-/* Dynasty Prestige - Global luxury theme (Dubai only)
-   Black background, gold accents, minimalist luxury automotive layout */
+/* Dynasty Prestige — tema alineado con prestigegoalmotion.com (lujo / superdeportivos Dubai) */
 
 :root {
-    --black: #050608;
-    --black-soft: #0b0d12;
+    --bg-primary: #0f1112;
+    --bg-secondary: #181c1f;
+    --black: #0b0d0f;
+    --black-soft: #12151a;
     --gold: #d4af37;
-    --gold-soft: #f4e3a3;
-    --silver: #c0c0c0;
-    --border: #242733;
-    --font-main: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --gold-soft: #f0c96b;
+    --silver: #d8d8d8;
+    --silver-soft: #b5b5b5;
+    --border: rgba(255, 255, 255, 0.08);
+    --panel-border: rgba(255, 255, 255, 0.08);
+    --panel-shadow: 0 28px 90px rgba(0, 0, 0, 0.42);
+    --font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-display: 'Orbitron', system-ui, sans-serif;
+    --font-nav: 'Montserrat', system-ui, sans-serif;
+    --bridge-h: 2.75rem;
 }
 
 *,
@@ -24,10 +31,13 @@ html {
 }
 
 body {
-    font-family: var(--font-main);
-    background: radial-gradient(circle at top, #161926 0, var(--black) 55%, #020307 100%);
-    color: #f5f5f5;
-    line-height: 1.6;
+    font-family: var(--font-body);
+    background:
+        radial-gradient(circle at top, rgba(212, 175, 55, 0.08) 0, rgba(212, 175, 55, 0) 24%),
+        radial-gradient(circle at top right, rgba(255, 255, 255, 0.04) 0, rgba(255, 255, 255, 0) 18%),
+        linear-gradient(180deg, #171b1d 0%, #0f1112 18%, #0b0d0f 100%);
+    color: #ffffff;
+    line-height: 1.65;
 }
 
 img {
@@ -45,7 +55,7 @@ img {
 }
 
 .section--dark {
-    background: radial-gradient(circle at top, #161926 0, #05060a 60%, #020307 100%);
+    background: linear-gradient(180deg, rgba(11, 13, 15, 0.96) 0%, rgba(24, 28, 31, 0.95) 100%);
 }
 
 .section--bordered {
@@ -54,20 +64,22 @@ img {
 }
 
 .section-title {
-    font-size: clamp(2.1rem, 2.4vw + 1rem, 2.7rem);
+    font-family: var(--font-display);
+    font-size: clamp(1.65rem, 2.2vw + 1rem, 2.35rem);
     text-transform: uppercase;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.18em;
     color: var(--gold);
     margin-bottom: 0.75rem;
     text-align: center;
+    line-height: 1.2;
 }
 
 .section-subtitle {
     text-align: center;
-    color: var(--silver);
+    color: var(--silver-soft);
     max-width: 640px;
     margin: 0 auto 2.5rem;
-    font-size: 1rem;
+    font-size: 1.02rem;
 }
 
 /* Header and navigation */
@@ -77,9 +89,16 @@ img {
     inset-block-start: 0;
     inset-inline: 0;
     z-index: 1000;
-    background: linear-gradient(to bottom, rgba(5,6,8,0.96), rgba(5,6,8,0.3));
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    background: rgba(15, 17, 18, 0.94);
+    border-bottom: 1px solid var(--panel-border);
     backdrop-filter: blur(16px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+/* Barra puente (dp-bridge) + header: sin solapamiento */
+body.has-dp-bridge .site-header {
+    top: var(--bridge-h);
+    inset-block-start: var(--bridge-h);
 }
 
 .site-header-inner {
@@ -121,16 +140,19 @@ img {
 }
 
 .brand-text span:first-child {
-    font-size: 0.95rem;
+    font-family: var(--font-nav);
+    font-size: 0.88rem;
+    font-weight: 600;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--gold-soft);
 }
 
 .brand-text span:last-child {
-    font-size: 0.78rem;
-    color: var(--silver);
-    opacity: 0.9;
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    color: var(--silver-soft);
+    opacity: 0.92;
 }
 
 .nav {
@@ -140,13 +162,23 @@ img {
 }
 
 .nav a {
-    font-size: 0.85rem;
-    color: var(--silver);
+    font-family: var(--font-nav);
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--silver-soft);
     text-decoration: none;
     text-transform: uppercase;
     letter-spacing: 0.16em;
     position: relative;
     padding-bottom: 0.25rem;
+    opacity: 0.88;
+    transition: color 0.25s ease, opacity 0.25s ease;
+}
+
+.nav a:hover,
+.nav a.is-active {
+    color: var(--gold);
+    opacity: 1;
 }
 
 .nav a::after {
@@ -183,7 +215,7 @@ img {
         position: fixed;
         inset-inline: 0;
         top: 64px;
-        background: rgba(5,6,8,0.98);
+        background: rgba(15, 17, 18, 0.98);
         flex-direction: column;
         padding: 1.5rem 1.25rem 2rem;
         transform: translateY(-120%);
@@ -196,6 +228,11 @@ img {
         opacity: 1;
         pointer-events: auto;
     }
+
+    body.has-dp-bridge .nav {
+        top: calc(var(--bridge-h) + 64px);
+    }
+
     .menu-toggle {
         display: inline-flex;
         align-items: center;
@@ -210,9 +247,22 @@ img {
     padding-top: 96px;
     display: flex;
     align-items: center;
+    position: relative;
+    isolation: isolate;
     background:
-        linear-gradient(135deg, rgba(5,6,8,0.9), rgba(8,8,12,0.5)),
+        linear-gradient(180deg, rgba(5, 6, 8, 0.45) 0%, rgba(11, 13, 15, 0.72) 45%, rgba(11, 13, 15, 0.96) 100%),
         url('../images/hero-dubai.jpg') center/cover no-repeat;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+        radial-gradient(circle at center top, rgba(240, 201, 107, 0.14), rgba(240, 201, 107, 0) 32%),
+        linear-gradient(180deg, rgba(15, 17, 18, 0.1), rgba(15, 17, 18, 0.55));
+    pointer-events: none;
 }
 
 .hero-content {
@@ -220,19 +270,23 @@ img {
 }
 
 .hero-kicker {
+    font-family: var(--font-nav);
     text-transform: uppercase;
-    letter-spacing: 0.24em;
+    letter-spacing: 0.2em;
     color: var(--gold-soft);
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     margin-bottom: 0.85rem;
 }
 
 .hero-title {
-    font-size: clamp(2.6rem, 4vw + 1rem, 3.8rem);
-    line-height: 1.1;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw + 1rem, 3.25rem);
+    line-height: 1.12;
     text-transform: uppercase;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.16em;
     margin-bottom: 0.9rem;
+    color: #fff;
+    text-shadow: 0 18px 50px rgba(0, 0, 0, 0.65);
 }
 
 .hero-subtitle {
@@ -267,25 +321,27 @@ img {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #f6e7b3, #d4af37);
-    color: #151515;
-    box-shadow: 0 12px 30px rgba(212,175,55,0.35);
+    background: linear-gradient(135deg, #f6d77d 0%, var(--gold-soft) 38%, var(--gold) 100%);
+    color: #111;
+    font-weight: 700;
+    box-shadow: 0 14px 38px rgba(212, 175, 55, 0.28);
+    border: 1px solid transparent;
 }
 
 .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 18px 40px rgba(212,175,55,0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 20px 44px rgba(240, 201, 107, 0.32);
 }
 
 .btn-outline {
-    border: 1px solid rgba(255,255,255,0.4);
-    color: var(--silver);
+    border: 1px solid var(--gold);
+    color: var(--gold);
     background: transparent;
 }
 
 .btn-outline:hover {
-    background: rgba(255,255,255,0.06);
-    border-color: var(--gold);
+    background: rgba(212, 175, 55, 0.1);
+    border-color: var(--gold-soft);
     color: var(--gold-soft);
 }
 
@@ -298,11 +354,11 @@ img {
 }
 
 .car-card {
-    background: radial-gradient(circle at top, #1a1e2a 0, #05060a 60%);
-    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(26, 29, 33, 0.95), rgba(12, 14, 16, 0.98));
+    border-radius: 22px;
     overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.04);
-    box-shadow: 0 20px 42px rgba(0,0,0,0.7);
+    border: 1px solid var(--panel-border);
+    box-shadow: var(--panel-shadow);
     transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
@@ -323,10 +379,11 @@ img {
 }
 
 .car-name {
-    font-size: 1.2rem;
+    font-family: var(--font-display);
+    font-size: 1.02rem;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: #ffffff;
+    letter-spacing: 0.14em;
+    color: var(--gold-soft);
     margin-bottom: 0.35rem;
 }
 
@@ -383,17 +440,18 @@ img {
 }
 
 .why-item {
-    background: radial-gradient(circle at top, #191c27 0, #05060a 60%);
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.04);
+    background: linear-gradient(180deg, rgba(26, 29, 33, 0.9), rgba(12, 14, 16, 0.95));
+    border-radius: 18px;
+    border: 1px solid var(--panel-border);
     padding: 1.4rem 1.5rem 1.6rem;
-    box-shadow: 0 14px 32px rgba(0,0,0,0.75);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
 }
 
 .why-item h3 {
-    font-size: 0.95rem;
+    font-family: var(--font-display);
+    font-size: 0.82rem;
     text-transform: uppercase;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.14em;
     color: var(--gold-soft);
     margin-bottom: 0.6rem;
 }
@@ -446,11 +504,11 @@ img {
 }
 
 .contact-card {
-    background: rgba(5,6,8,0.93);
-    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(18, 21, 24, 0.92), rgba(10, 12, 14, 0.96));
+    border-radius: 22px;
     padding: 2rem 2rem 2.2rem;
-    border: 1px solid rgba(255,255,255,0.06);
-    box-shadow: 0 18px 40px rgba(0,0,0,0.8);
+    border: 1px solid var(--panel-border);
+    box-shadow: var(--panel-shadow);
 }
 
 .contact-list {
@@ -493,11 +551,12 @@ img {
 /* Footer */
 
 .site-footer {
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--panel-border);
     padding: 1.6rem 0;
-    font-size: 0.8rem;
-    color: var(--silver);
+    font-size: 0.82rem;
+    color: var(--silver-soft);
     text-align: center;
+    background: rgba(8, 9, 10, 0.6);
 }
 
 .site-footer a {
@@ -505,10 +564,23 @@ img {
     text-decoration: none;
 }
 
+/* Offset contenido cuando existe barra puente + header fijo */
+body.has-dp-bridge .hero {
+    padding-top: max(8rem, calc(var(--bridge-h) + 5.75rem));
+}
+
+body.has-dp-bridge main.section {
+    padding-top: max(5.5rem, calc(var(--bridge-h) + 4.75rem));
+}
+
 @media (max-width: 880px) {
     .hero {
         padding-top: 96px;
         padding-bottom: 3rem;
+    }
+
+    body.has-dp-bridge .hero {
+        padding-top: max(7rem, calc(var(--bridge-h) + 5rem));
     }
     .why-grid {
         grid-template-columns: 1fr;

@@ -25,8 +25,11 @@
   <meta property="og:image" content="https://prestigegoalmotion.com/dynasty-prestige/images/hero-dubai.jpg">
 
   <!-- Fonts & CSS -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;600;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="../css/dp-bridge.css">
 
   <!-- Simple organization JSON-LD for Dubai -->
   <script type="application/ld+json">
@@ -52,7 +55,16 @@
 
   <script src="js/main.js" defer></script>
 </head>
-<body>
+<body class="has-dp-bridge">
+
+  <nav class="dp-bridge dp-bridge--fixed-top" aria-label="Main booking site">
+    <span class="dp-bridge__label">Fleet &amp; pay online</span>
+    <a href="../index.html">Main site</a>
+    <a href="../index.html#fleet">Fleet</a>
+    <a href="../app/reserve/page.html">Reserve</a>
+    <a href="tel:+971586122568">Call</a>
+    <a href="https://wa.me/971586122568" target="_blank" rel="noopener">WhatsApp</a>
+  </nav>
 
   <!-- HEADER & NAVIGATION (Home active) -->
   <header class="site-header">
@@ -78,7 +90,7 @@
         <a href="index.html" class="is-active">Home</a>
         <a href="about.html">About</a>
         <a href="fleet.html">Fleet</a>
-        <a href="luxury-car-rental-dubai.html">Luxury Rental</a>
+        <a href="../luxury-car-rental-dubai.html">Luxury Rental</a>
         <a href="contact.html">Contact</a>
       </nav>
     </div>
@@ -91,7 +103,7 @@
       <h1 class="hero-title">Luxury &amp; Supercar Rental Dubai</h1>
       <p class="hero-subtitle">Drive Lamborghini, Ferrari and Mercedes G63 in Dubai with Dynasty Prestige.</p>
       <div class="hero-cta-row">
-        <a href="contact.html" class="btn btn-primary">Book Your Supercar</a>
+        <a href="../app/reserve/page.html" class="btn btn-primary">Book Your Supercar</a>
         <a href="fleet.html" class="btn btn-outline">View Full Fleet</a>
       </div>
     </div>
@@ -335,7 +347,7 @@
     <div class="container">
       <p>© <span id="year"></span> Dynasty Prestige — Luxury &amp; Supercar Rental Dubai. All rights reserved.</p>
       <p>
-        <a href="luxury-car-rental-dubai.html">Luxury Car Rental Dubai</a> ·
+        <a href="../luxury-car-rental-dubai.html">Luxury Car Rental Dubai</a> ·
         <a href="fleet.html">Fleet</a> ·
         <a href="contact.html">Contact</a>
       </p>
