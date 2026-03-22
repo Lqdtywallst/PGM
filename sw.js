@@ -2,8 +2,8 @@
 // Cache static assets for better performance
 
 // Subir versión al desplegar cambios visibles (CSS, logos, index): fuerza borrado de cachés antiguos.
-const CACHE_NAME = 'pgm-v1.0.1';
-const STATIC_CACHE = 'pgm-static-v3';
+const CACHE_NAME = 'pgm-v1.0.2';
+const STATIC_CACHE = 'pgm-static-v4';
 const DYNAMIC_CACHE = 'pgm-dynamic-v3';
 
 // Assets to cache during install
@@ -12,6 +12,10 @@ const STATIC_ASSETS = [
   '/index.html',
   '/logo-pgm.png',
   '/logo-dp-transparent.png',
+  '/favicon.ico',
+  '/icons/icon-512.png',
+  '/icons/icon-192.png',
+  '/icons/icon-180.png',
   '/config.js',
   '/manifest.json',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css',
