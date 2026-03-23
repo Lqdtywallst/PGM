@@ -675,10 +675,6 @@
             border: none;
             box-shadow: none;
         }
-        .brand-slider-viewport:hover .brand-marquee-track,
-        .brand-slider-viewport:focus-within .brand-marquee-track {
-            animation-play-state: paused;
-        }
         .brand-marquee-track {
             display: flex;
             flex-direction: row;
@@ -3470,8 +3466,6 @@
         const brandFilterButtons = document.querySelectorAll('[data-brand-filter]');
         const fleetCards = document.querySelectorAll('.car-card');
         const fleetStatus = document.getElementById('fleetStatus');
-        const brandSliderViewport = document.getElementById('brandSliderViewport');
-        const brandMarqueeTrack = document.getElementById('brandMarqueeTrack');
 
         function updateFleetStatus(visibleCount, brandLabel) {
             if (!fleetStatus) return;
@@ -3505,21 +3499,6 @@
                 filterFleetByBrand(brand);
             });
         });
-
-        /* Pausa el marquee en táctil para poder pulsar un logo con comodidad */
-        if (brandMarqueeTrack && brandSliderViewport) {
-            let touchMarqueeTimer;
-            brandSliderViewport.addEventListener('touchstart', () => {
-                clearTimeout(touchMarqueeTimer);
-                brandMarqueeTrack.style.animationPlayState = 'paused';
-            }, { passive: true });
-            brandSliderViewport.addEventListener('touchend', () => {
-                clearTimeout(touchMarqueeTimer);
-                touchMarqueeTimer = setTimeout(() => {
-                    brandMarqueeTrack.style.animationPlayState = '';
-                }, 1400);
-            }, { passive: true });
-        }
 
         galleryPrev.addEventListener('click', () => {
             galleryIndex = (galleryIndex - 1 + galleryImages.length) % galleryImages.length;
