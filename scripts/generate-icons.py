@@ -2,7 +2,10 @@
 """
 Generate square favicon / PWA icons from the Dynasty Prestige logo (DP).
 
-Source: logo-dp-transparent.png — high fill ratio so the mark reads large at 16–512px.
+The source logo is wide (1536×1024). "Contain" mode leaves large transparent bands,
+so the mark looks tiny in browser tabs. We use cover + center crop so the icon
+fills the square and reads much larger at 16–32px.
+
 Regenerate: python3 scripts/generate-icons.py
 """
 from __future__ import annotations
@@ -13,26 +16,28 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
-# Official DP wordmark (transparent); same aspect as logo-dp.png
 SRC = ROOT / "logo-dp-transparent.png"
 OUT = ROOT / "icons"
 
-# ~0.93 = logo uses ~93% of canvas — maximises visible size while keeping a thin safe margin
-# for rounded masks (Android / iOS). Slightly below 1.0 avoids edge clipping.
-PAD_RATIO = 0.93
+# >1.0 = slight zoom after cover-scale so the wordmark fills more of the square
+# (trades a bit of edge clipping for visibility at favicon size). Tune 1.04–1.12.
+COVER_ZOOM = 1.12
 
 
-def square_icon(src: Image.Image, size: int, pad_ratio: float = PAD_RATIO) -> Image.Image:
-    """Fit logo inside size×size with transparent padding."""
+def square_icon(src: Image.Image, size: int, zoom: float = COVER_ZOOM) -> Image.Image:
+    """Scale logo to cover size×size, center-crop. Transparent edges of source are cropped away."""
     im = src.convert("RGBA")
     w, h = im.size
-    box = max(1, int(size * pad_ratio))
-    scale = min(box / w, box / h)
-    nw, nh = max(1, int(w * scale)), max(1, int(h * scale))
+    base = max(size / w, size / h)
+    scale = base * zoom
+    nw = max(1, int(round(w * scale)))
+    nh = max(1, int(round(h * scale)))
     im = im.resize((nw, nh), Image.Resampling.LANCZOS)
-    canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    canvas.paste(im, ((size - nw) // 2, (size - nh) // 2), im)
-    return canvas
+    left = (nw - size) // 2
+    top = (nh - size) // 2
+    left = max(0, min(left, nw - size))
+    top = max(0, min(top, nh - size))
+    return im.crop((left, top, left + size, top + size))
 
 
 def main() -> None:
@@ -42,7 +47,6 @@ def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     logo = Image.open(SRC)
 
-    # PNGs: include common + HiDPI picks (Chrome / Firefox / Safari use different sizes)
     sizes = {
         "icon-512.png": 512,
         "icon-384.png": 384,
@@ -59,7 +63,6 @@ def main() -> None:
     for name, px in sizes.items():
         square_icon(logo, px).save(OUT / name, optimize=True)
 
-    # Single .ico with many embedded sizes — Windows / legacy browsers pick the largest they support
     ico_sizes = [256, 128, 64, 48, 32, 16]
     ico_images = [square_icon(logo, s) for s in ico_sizes]
     ico_path = OUT / "favicon.ico"
@@ -72,7 +75,7 @@ def main() -> None:
     )
     shutil.copyfile(ico_path, ROOT / "favicon.ico")
 
-    print(f"Wrote icons to {OUT} and {ROOT / 'favicon.ico'} (PAD_RATIO={PAD_RATIO})")
+    print(f"Wrote icons to {OUT} (cover+crop, COVER_ZOOM={COVER_ZOOM})")
 
 
 if __name__ == "__main__":
