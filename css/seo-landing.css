@@ -4,8 +4,8 @@
     --bg-secondary: #181C1F;
     --bg-card: linear-gradient(180deg, rgba(26, 29, 33, 0.95), rgba(12, 14, 16, 0.98));
     --text-main: #fff;
-    --gold: #d4af37;
-    --gold-soft: #f0c96b;
+    --gold: #c4e628;
+    --gold-soft: #e6ff78;
     --silver: #c4c4c4;
     --border: rgba(255, 255, 255, 0.08);
 }
@@ -74,15 +74,15 @@ header.site-header {
 .btn-primary {
     background: linear-gradient(135deg, var(--gold-soft), var(--gold));
     color: #111;
-    box-shadow: 0 8px 24px rgba(212, 175, 55, 0.25);
+    box-shadow: 0 8px 24px rgba(196, 230, 40, 0.25);
 }
 .btn-primary:hover { transform: translateY(-2px); }
 .btn-outline {
     background: transparent;
-    border-color: rgba(212, 175, 55, 0.45);
+    border-color: rgba(196, 230, 40, 0.45);
     color: var(--gold-soft);
 }
-.btn-outline:hover { background: rgba(212, 175, 55, 0.08); }
+.btn-outline:hover { background: rgba(196, 230, 40, 0.08); }
 .btn-ghost {
     background: rgba(255, 255, 255, 0.05);
     border-color: var(--border);
@@ -249,7 +249,7 @@ table.price-table {
     border-bottom: 1px solid var(--border);
 }
 .price-table th {
-    background: rgba(212, 175, 55, 0.08);
+    background: rgba(196, 230, 40, 0.08);
     color: var(--gold-soft);
     font-family: 'Montserrat', sans-serif;
     font-size: 0.78rem;
@@ -308,8 +308,8 @@ table.price-table {
     transition: border-color 0.2s, background 0.2s;
 }
 .related-grid a:hover {
-    border-color: rgba(212, 175, 55, 0.35);
-    background: rgba(212, 175, 55, 0.06);
+    border-color: rgba(196, 230, 40, 0.35);
+    background: rgba(196, 230, 40, 0.06);
     color: #fff;
 }
 .related-grid strong { display: block; color: var(--gold-soft); margin-bottom: 0.25rem; }

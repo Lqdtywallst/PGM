@@ -5,8 +5,8 @@
     --bg-secondary: #181c1f;
     --black: #0b0d0f;
     --black-soft: #12151a;
-    --gold: #d4af37;
-    --gold-soft: #f0c96b;
+    --gold: #c4e628;
+    --gold-soft: #e6ff78;
     --silver: #d8d8d8;
     --silver-soft: #b5b5b5;
     --border: rgba(255, 255, 255, 0.08);
@@ -33,7 +33,7 @@ html {
 body {
     font-family: var(--font-body);
     background:
-        radial-gradient(circle at top, rgba(212, 175, 55, 0.08) 0, rgba(212, 175, 55, 0) 24%),
+        radial-gradient(circle at top, rgba(196, 230, 40, 0.08) 0, rgba(196, 230, 40, 0) 24%),
         radial-gradient(circle at top right, rgba(255, 255, 255, 0.04) 0, rgba(255, 255, 255, 0) 18%),
         linear-gradient(180deg, #171b1d 0%, #0f1112 18%, #0b0d0f 100%);
     color: #ffffff;
@@ -120,7 +120,7 @@ body.has-dp-bridge .site-header {
     height: 52px;
     border-radius: 999px;
     border: 1px solid rgba(212,175,55,0.55);
-    background: radial-gradient(circle at 30% 0, #f6e7b3 0, #c79c2b 40%, #1b1206 100%);
+    background: radial-gradient(circle at 30% 0, #e8ff99 0, #9fc01a 40%, #141a06 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -260,7 +260,7 @@ body.has-dp-bridge .site-header {
     inset: 0;
     z-index: -1;
     background:
-        radial-gradient(circle at center top, rgba(240, 201, 107, 0.14), rgba(240, 201, 107, 0) 32%),
+        radial-gradient(circle at center top, rgba(230, 255, 120, 0.14), rgba(230, 255, 120, 0) 32%),
         linear-gradient(180deg, rgba(15, 17, 18, 0.1), rgba(15, 17, 18, 0.55));
     pointer-events: none;
 }
@@ -321,16 +321,16 @@ body.has-dp-bridge .site-header {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #f6d77d 0%, var(--gold-soft) 38%, var(--gold) 100%);
+    background: linear-gradient(135deg, #e8ff99 0%, var(--gold-soft) 38%, var(--gold) 100%);
     color: #111;
     font-weight: 700;
-    box-shadow: 0 14px 38px rgba(212, 175, 55, 0.28);
+    box-shadow: 0 14px 38px rgba(196, 230, 40, 0.28);
     border: 1px solid transparent;
 }
 
 .btn-primary:hover {
     transform: translateY(-3px);
-    box-shadow: 0 20px 44px rgba(240, 201, 107, 0.32);
+    box-shadow: 0 20px 44px rgba(230, 255, 120, 0.32);
 }
 
 .btn-outline {
@@ -340,7 +340,7 @@ body.has-dp-bridge .site-header {
 }
 
 .btn-outline:hover {
-    background: rgba(212, 175, 55, 0.1);
+    background: rgba(196, 230, 40, 0.1);
     border-color: var(--gold-soft);
     color: var(--gold-soft);
 }
@@ -474,7 +474,7 @@ body.has-dp-bridge .site-header {
     padding: 0.55rem 1.2rem;
     border-radius: 999px;
     border: 1px solid rgba(212,175,55,0.65);
-    background: radial-gradient(circle at 30% 0, #f6e7b3 0, #d4af37 45%, #1a1406 100%);
+    background: radial-gradient(circle at 30% 0, #e8ff99 0, #c4e628 45%, #141a06 100%);
     color: #101010;
     font-size: 0.78rem;
     text-transform: uppercase;
