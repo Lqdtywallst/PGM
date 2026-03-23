@@ -1151,7 +1151,7 @@
 
                     <div class="info-card">
                         <h3 class="info-card-title"><i class="fa-solid fa-location-dot"></i> Billing Address</h3>
-                        <p class="info-card-note">These details are used for payment verification and reservation records.</p>
+                        <p class="info-card-note">These details are used for payment verification and reservation records. In Dubai, addresses usually don’t use a postal code — building, street and area are enough.</p>
                         <div class="info-grid">
                             <div class="form-group span-2">
                                 <label for="address" class="field-label"><i class="fa-solid fa-road"></i>Full Address *</label>
@@ -1162,11 +1162,6 @@
                                 <label for="city" class="field-label"><i class="fa-regular fa-building"></i>City *</label>
                                 <input type="text" id="city" name="city" placeholder="Dubai" class="input" data-label="City" required>
                                 <p class="field-error" id="city-error"></p>
-                            </div>
-                            <div class="form-group">
-                                <label for="postalCode" class="field-label"><i class="fa-solid fa-mailbox"></i>Postal Code *</label>
-                                <input type="text" id="postalCode" name="postalCode" placeholder="00000" class="input" data-label="Postal code" required>
-                                <p class="field-error" id="postalCode-error"></p>
                             </div>
                             <div class="form-group span-2">
                                 <label for="country" class="field-label"><i class="fa-solid fa-earth-asia"></i>Country *</label>
@@ -1626,7 +1621,7 @@
         }
 
         function validateStep1() {
-            const required = ['fullName', 'passport', 'email', 'phone', 'address', 'city', 'postalCode', 'country'];
+            const required = ['fullName', 'passport', 'email', 'phone', 'address', 'city', 'country'];
             const missing = [];
 
             required.forEach((fieldId) => {
@@ -1698,7 +1693,7 @@
         }
 
         function bindRealtimeValidation() {
-            ['fullName', 'passport', 'email', 'phone', 'address', 'city', 'postalCode', 'country'].forEach((fieldId) => {
+            ['fullName', 'passport', 'email', 'phone', 'address', 'city', 'country'].forEach((fieldId) => {
                 const input = document.getElementById(fieldId);
                 if (!input) return;
                 const eventName = input.tagName === 'SELECT' ? 'change' : 'input';
@@ -2162,7 +2157,6 @@
                 phone: document.getElementById('phone').value,
                 address: document.getElementById('address').value,
                 city: document.getElementById('city').value,
-                postalCode: document.getElementById('postalCode').value,
                 country: document.getElementById('country').value,
                 startDate: document.getElementById('startDate').value,
                 endDate: document.getElementById('endDate').value,
@@ -2224,7 +2218,6 @@
                             dni: formData.passport,
                             address: formData.address,
                             city: formData.city,
-                            postalCode: formData.postalCode,
                             country: formData.country,
                         },
                         reservationData: {
@@ -2353,7 +2346,6 @@
                                 address: {
                                     line1: formData.address,
                                     city: formData.city,
-                                    postal_code: formData.postalCode,
                                     country: formData.country,
                                 },
                             },
@@ -2425,7 +2417,6 @@
                                 dni: formData.passport,
                                 address: formData.address,
                                 city: formData.city,
-                                postalCode: formData.postalCode,
                                 country: formData.country,
                             }
                         };

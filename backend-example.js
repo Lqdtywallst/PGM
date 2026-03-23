@@ -126,7 +126,6 @@ app.post('/api/create-payment-intent', async (req, res) => {
                         address: {
                             line1: customerData.address || customer.address?.line1,
                             city: customerData.city || customer.address?.city,
-                            postal_code: customerData.postalCode || customer.address?.postal_code,
                             country: customerData.country || customer.address?.country || 'ES',
                         },
                         metadata: { dni: customerData.dni || customer.metadata?.dni || '' }
@@ -140,7 +139,6 @@ app.post('/api/create-payment-intent', async (req, res) => {
                     address: {
                         line1: customerData.address,
                         city: customerData.city,
-                        postal_code: customerData.postalCode,
                         country: customerData.country || 'ES',
                     },
                     metadata: { dni: customerData.dni || '' }

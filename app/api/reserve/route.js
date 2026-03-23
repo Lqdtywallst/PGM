@@ -161,7 +161,6 @@ async function sendReservationNotificationEmail(reservationData, customerData) {
                     ${customerData.dni || customerData.passport ? `<div class="info-row"><span class="label">DNI/Passport:</span> ${customerData.dni || customerData.passport}</div>` : ''}
                     ${customerData.address ? `<div class="info-row"><span class="label">Address:</span> ${customerData.address}</div>` : ''}
                     ${customerData.city ? `<div class="info-row"><span class="label">City:</span> ${customerData.city}</div>` : ''}
-                    ${customerData.postalCode ? `<div class="info-row"><span class="label">Postal Code:</span> ${customerData.postalCode}</div>` : ''}
                     ${customerData.country ? `<div class="info-row"><span class="label">Country:</span> ${customerData.country}</div>` : ''}
                     <p style="margin-top: 20px; color: #666; font-size: 0.9rem;">This reservation is pending payment. The customer will proceed with payment next.</p>
                 </div>
@@ -228,7 +227,6 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
                     ${customerData.dni || customerData.passport ? `<div class="info-row"><span class="label">DNI/Passport:</span> ${customerData.dni || customerData.passport}</div>` : ''}
                     ${customerData.address ? `<div class="info-row"><span class="label">Address:</span> ${customerData.address}</div>` : ''}
                     ${customerData.city ? `<div class="info-row"><span class="label">City:</span> ${customerData.city}</div>` : ''}
-                    ${customerData.postalCode ? `<div class="info-row"><span class="label">Postal Code:</span> ${customerData.postalCode}</div>` : ''}
                     ${customerData.country ? `<div class="info-row"><span class="label">Country:</span> ${customerData.country}</div>` : ''}
                 </div>
             </div>
@@ -381,7 +379,6 @@ router.post('/', async (req, res) => {
             dni: data.passport || data.dni,
             address: data.address,
             city: data.city,
-            postalCode: data.postalCode,
             country: normalizeCountryCode(data.country), // Convert to ISO code
         };
         const reservationCurrency = (data.currency || data.reservationData?.currency || 'aed').toLowerCase();
@@ -477,7 +474,6 @@ router.post('/', async (req, res) => {
                         address: {
                             line1: customerData.address,
                             city: customerData.city,
-                            postal_code: customerData.postalCode,
                             country: customerData.country,
                         },
                         metadata: {
@@ -496,7 +492,6 @@ router.post('/', async (req, res) => {
                         address: {
                             line1: customerData.address,
                             city: customerData.city,
-                            postal_code: customerData.postalCode,
                             country: customerData.country,
                         },
                         metadata: {
@@ -737,7 +732,6 @@ router.post('/confirm', async (req, res) => {
                         finalCustomerData.phone = customer.phone || '';
                         finalCustomerData.address = customer.address?.line1 || '';
                         finalCustomerData.city = customer.address?.city || '';
-                        finalCustomerData.postalCode = customer.address?.postal_code || '';
                         finalCustomerData.country = customer.address?.country || '';
                         finalCustomerData.dni = customer.metadata?.dni || '';
                     }
