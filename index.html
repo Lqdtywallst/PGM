@@ -192,9 +192,10 @@
     </script>
     <style>
         :root {
-            --bg-primary: #0F1112;
-            --bg-secondary: #181C1F;
-            --bg-accent: #22272B;
+            /* Fondo oscuro neutro (casi negro) — el lima solo en acentos */
+            --bg-primary: #050506;
+            --bg-secondary: #0a0a0c;
+            --bg-accent: #121214;
             --text-main: #FFFFFF;
             /* Accent: electric lime — alto contraste en oscuro, CTAs y reservas */
             --gold: #d6f03c;
@@ -203,24 +204,32 @@
             --silver-soft: #b5b5b5;
             --black: #0a0a0a;
             --darkgray: #1a1a1a;
-            --panel-bg: rgba(18, 21, 24, 0.82);
+            --panel-bg: rgba(10, 10, 12, 0.88);
             --panel-border: rgba(255, 255, 255, 0.08);
             --panel-shadow: 0 28px 90px rgba(0, 0, 0, 0.42);
             --header-scroll-offset: 10rem;
+            /* Sistema de layout / conversión */
+            --section-y: clamp(4.25rem, 9vw, 7rem);
+            --radius-pill: 999px;
+            --surface-card: linear-gradient(180deg, rgba(18, 18, 20, 0.96), rgba(6, 6, 8, 0.99));
+            --border-accent: rgba(214, 240, 60, 0.22);
+            --cta-shadow: 0 14px 40px rgba(214, 240, 60, 0.22);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html {
             scroll-behavior: smooth;
             scroll-padding-top: var(--header-scroll-offset);
+            background: #030303;
         }
         body {
             font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background:
-                radial-gradient(circle at top, rgba(214, 240, 60, 0.08) 0, rgba(214, 240, 60, 0) 24%),
-                radial-gradient(circle at top right, rgba(255,255,255,0.04) 0, rgba(255,255,255,0) 18%),
-                linear-gradient(180deg, #171b1d 0%, #0f1112 18%, #0b0d0f 100%);
+                radial-gradient(ellipse 120% 80% at 50% -20%, rgba(214, 240, 60, 0.04) 0%, transparent 45%),
+                radial-gradient(circle at 100% 0%, rgba(255,255,255,0.02) 0, transparent 22%),
+                linear-gradient(180deg, #0a0a0a 0%, #050505 35%, #030303 100%);
             color: var(--text-main);
             line-height: 1.6;
+            min-height: 100vh;
         }
         header {
             position: fixed;
@@ -237,7 +246,7 @@
             border-bottom: 1px solid transparent;
         }
         header.scrolled { 
-            background: rgba(15, 17, 18, 0.98);
+            background: rgba(5, 5, 6, 0.97);
             backdrop-filter: none;
             -webkit-backdrop-filter: none;
             box-shadow: 0 18px 40px rgba(0,0,0,0.65);
@@ -260,6 +269,39 @@
             list-style: none;
             display: flex;
             gap: 2.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        .nav-cta-item {
+            list-style: none;
+            margin-left: 0.35rem;
+        }
+        .header-cta {
+            font-family: 'Montserrat', system-ui, sans-serif;
+            padding: 0.58rem 1.15rem;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: var(--black) !important;
+            background: linear-gradient(135deg, #f1ff99 0%, var(--gold-soft) 38%, var(--gold) 100%);
+            border-radius: var(--radius-pill);
+            border: 1px solid rgba(214, 240, 60, 0.35);
+            box-shadow: var(--cta-shadow);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            opacity: 1 !important;
+            white-space: nowrap;
+        }
+        .header-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 44px rgba(244, 255, 149, 0.22);
+            color: var(--black) !important;
+        }
+        .header-cta:focus-visible {
+            outline: 2px solid var(--gold-soft);
+            outline-offset: 3px;
         }
         nav a {
             font-family: 'Montserrat', system-ui, sans-serif;
@@ -320,9 +362,9 @@
             padding: 2.4rem 2.3rem 2.2rem;
             border-radius: 30px;
             /* Más opaco y sin blur: evita “doble letra” / reflejo del fondo en el cristal */
-            background: linear-gradient(180deg, rgba(18, 21, 24, 0.96), rgba(10, 12, 14, 0.99));
-            border: 1px solid rgba(255,255,255,0.08);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(180deg, rgba(14, 14, 16, 0.97), rgba(4, 4, 6, 0.99));
+            border: 1px solid rgba(255,255,255,0.07);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
             backdrop-filter: none;
             -webkit-backdrop-filter: none;
         }
@@ -399,7 +441,7 @@
             padding: 0.95rem 2rem;
             text-decoration: none;
             font-weight: 700;
-            border-radius: 999px;
+            border-radius: var(--radius-pill);
             transition: transform 0.28s ease, box-shadow 0.28s ease, background 0.28s ease, color 0.28s ease, border-color 0.28s ease;
             font-size: 0.98rem;
             line-height: 1;
@@ -407,8 +449,8 @@
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            border: 1px solid transparent;
-            box-shadow: 0 16px 38px rgba(214, 240, 60, 0.24);
+            border: 1px solid rgba(214, 240, 60, 0.25);
+            box-shadow: var(--cta-shadow);
         }
         .btn:hover {
             transform: translateY(-4px);
@@ -483,7 +525,7 @@
             min-width: 220px;
             max-width: 260px;
             padding: 1.65rem 1.75rem;
-            background: linear-gradient(180deg, rgba(27, 31, 34, 0.92), rgba(14, 16, 18, 0.96));
+            background: linear-gradient(180deg, rgba(18, 18, 20, 0.95), rgba(6, 6, 8, 0.98));
             border-radius: 20px;
             border: 1px solid var(--panel-border);
             box-shadow: 0 18px 45px rgba(0,0,0,0.28);
@@ -523,25 +565,26 @@
 
         /* Presentation section */
         .presentation {
-            background: linear-gradient(180deg, rgba(11,13,15,0.96) 0%, rgba(24,28,31,0.95) 100%);
+            background: linear-gradient(180deg, #080808 0%, #040404 100%);
             padding: 6rem 5%;
             text-align: center;
         }
         .presentation h2 {
             font-family: 'Orbitron', system-ui, sans-serif;
-            font-size: 2.6rem;
+            font-size: clamp(1.65rem, 3.5vw, 2.35rem);
             color: var(--gold);
-            margin-bottom: 2rem;
-            letter-spacing: 0.3em;
+            margin-bottom: 1rem;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
         }
         .presentation .subtitle {
-            font-size: 1.4rem;
-            color: var(--silver);
-            margin-bottom: 3rem;
-            max-width: 800px;
+            font-size: 1.12rem;
+            color: var(--silver-soft);
+            margin-bottom: 2.25rem;
+            max-width: 36rem;
             margin-left: auto;
             margin-right: auto;
+            line-height: 1.65;
         }
         .presentation .description {
             font-size: 1.1rem;
@@ -551,9 +594,24 @@
             margin: 0 auto;
         }
 
-        /* Secciones */
+        /* Secciones — ritmo vertical unificado */
         section {
-            padding: 8rem 5%;
+            padding: var(--section-y) 5%;
+        }
+        .section--alt {
+            background: var(--bg-secondary);
+        }
+        .section--base {
+            background: var(--bg-primary);
+        }
+        .section-lead {
+            text-align: center;
+            max-width: 42rem;
+            margin: 0 auto 2.5rem;
+            color: var(--silver-soft);
+            font-size: 1.05rem;
+            line-height: 1.75;
+            font-weight: 400;
         }
         section[id],
         div[id],
@@ -563,12 +621,20 @@
         h2 {
             font-family: 'Orbitron', system-ui, sans-serif;
             text-align: center;
-            font-size: clamp(2rem, 4vw, 2.8rem);
-            margin-bottom: 3rem;
+            font-size: clamp(1.65rem, 3.6vw, 2.45rem);
+            margin-bottom: 0.85rem;
             color: var(--gold);
-            letter-spacing: 0.2em;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
-            line-height: 1.18;
+            line-height: 1.2;
+        }
+        h2 + .section-lead {
+            margin-top: -0.25rem;
+        }
+        .about-copy {
+            max-width: 820px;
+            margin-left: auto;
+            margin-right: auto;
         }
         .section-shell {
             max-width: 1100px;
@@ -579,7 +645,7 @@
             margin: 0 auto;
             padding: 2rem 2.1rem;
             border-radius: 28px;
-            background: linear-gradient(180deg, rgba(18,21,24,0.7), rgba(10,12,14,0.82));
+            background: linear-gradient(180deg, rgba(12,12,14,0.82), rgba(4,4,6,0.92));
             border: 1px solid var(--panel-border);
             box-shadow: var(--panel-shadow);
             color: var(--silver);
@@ -598,15 +664,15 @@
             padding: 1.35rem 1.35rem 1.25rem;
             border-radius: 22px;
             border: 1px solid rgba(255,255,255,0.08);
-            background: linear-gradient(180deg, rgba(26,29,33,0.94), rgba(10,12,14,0.98));
+            background: linear-gradient(180deg, rgba(16,16,18,0.96), rgba(5,5,7,0.99));
             color: var(--silver);
             text-decoration: none;
-            box-shadow: 0 22px 55px rgba(0,0,0,0.24);
+            box-shadow: 0 22px 55px rgba(0,0,0,0.35);
             transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease, background 0.28s ease;
         }
         .editorial-card:hover {
             transform: translateY(-6px);
-            border-color: rgba(212,175,55,0.24);
+            border-color: rgba(214, 240, 60, 0.28);
             box-shadow: 0 28px 65px rgba(0,0,0,0.34);
         }
         .editorial-card strong,
@@ -629,7 +695,7 @@
         .editorial-faq-card {
             padding: 1.25rem 1.35rem;
             border-radius: 22px;
-            border: 1px solid rgba(212,175,55,0.18);
+            border: 1px solid var(--border-accent);
             background: linear-gradient(180deg, rgba(26,29,33,0.86), rgba(11,13,15,0.9));
             box-shadow: 0 18px 45px rgba(0,0,0,0.22);
         }
@@ -863,15 +929,15 @@
             opacity: 0.9;
         }
         .fleet-intro {
-            max-width: 760px;
-            margin: 0 auto 1.25rem;
+            max-width: 40rem;
+            margin: 0 auto 2.25rem;
             text-align: center;
-            color: var(--silver);
-            font-size: 1rem;
-            line-height: 1.8;
+            color: var(--silver-soft);
+            font-size: 1.05rem;
+            line-height: 1.75;
         }
         .car-card {
-            background: linear-gradient(180deg, rgba(25, 28, 31, 0.96), rgba(11, 13, 15, 0.98));
+            background: linear-gradient(180deg, rgba(16, 16, 18, 0.98), rgba(5, 5, 7, 0.99));
             border-radius: 26px;
             overflow: hidden;
             transition: transform 0.4s ease, box-shadow 0.4s ease;
@@ -1504,7 +1570,7 @@
             opacity: 1 !important;
             width: 100%;
             transition: all 0.3s ease;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: inherit;
         }
         .form-group input:hover,
         .form-group select:hover {
@@ -1795,10 +1861,114 @@
         #reservation {
             background: var(--bg-secondary);
             text-align: center;
-            min-height: 100vh;
+            min-height: auto;
             display: flex;
             flex-direction: column;
             justify-content: center;
+        }
+        .reservation-heading {
+            color: var(--gold);
+            font-size: clamp(1.65rem, 3.6vw, 2.5rem);
+            margin-bottom: 1rem;
+            letter-spacing: 0.06em;
+            text-transform: none;
+            line-height: 1.18;
+            font-family: 'Orbitron', system-ui, sans-serif;
+            font-weight: 700;
+        }
+        .reservation-desc {
+            color: var(--silver);
+            font-size: 1.08rem;
+            margin-bottom: 0;
+            max-width: 36rem;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.7;
+        }
+        .btn--prominent {
+            font-size: 1.05rem;
+            padding: 1.05rem 2.5rem;
+        }
+        .benefit-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.75rem;
+            justify-content: center;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .benefit-card {
+            flex: 1 1 220px;
+            max-width: 260px;
+            padding: 1.8rem 1.9rem;
+        }
+        .benefit-card h3 {
+            color: var(--gold);
+            font-size: 1.05rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+        .benefit-card p {
+            color: var(--silver-soft);
+            font-size: 0.95rem;
+            line-height: 1.65;
+            margin: 0;
+        }
+        .delivery-cta--outline {
+            background: transparent !important;
+            border: 1px solid var(--gold) !important;
+            color: var(--gold) !important;
+        }
+        .reviews-summary {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        .reviews-summary__stat {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .reviews-summary__actions {
+            margin-left: auto;
+        }
+        .reviews-slider {
+            position: relative;
+            overflow: hidden;
+            min-height: 0;
+        }
+        .reviews-track {
+            display: flex;
+            transition: transform 0.6s ease;
+        }
+        .reviews-average {
+            font-size: 2.4rem;
+            font-weight: 600;
+            color: var(--gold);
+        }
+        .reviews-meta {
+            color: var(--silver-soft);
+            font-size: 0.9rem;
+        }
+        .reviews-stars {
+            color: var(--gold);
+            font-size: 1.4rem;
+            letter-spacing: 0.1em;
+        }
+        .delivery-editorial-grid {
+            max-width: 1100px;
+            margin: 2rem auto 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+        .delivery-editorial-grid .editorial-card strong {
+            display: block;
+            color: var(--gold);
+            margin-bottom: 0.45rem;
         }
         .reservation-panel {
             max-width: 1080px;
@@ -1816,7 +1986,7 @@
             padding: 0.48rem 0.95rem;
             margin-bottom: 1rem;
             border-radius: 999px;
-            border: 1px solid rgba(212,175,55,0.22);
+            border: 1px solid rgba(214,240,60,0.22);
             color: var(--gold-soft);
             background: rgba(255,255,255,0.03);
             font-size: 0.78rem;
@@ -1893,13 +2063,12 @@
             font-size: 0.84rem;
         }
 
-        /* Contact */
+        /* Contact — fondo vía .section--alt para ritmo con el resto de la página */
         #contact {
-            background: var(--bg-primary);
-            min-height: 100vh;
+            min-height: auto;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
         }
         .contact-container {
             max-width: 1200px;
@@ -1977,7 +2146,7 @@
             transform: translateY(0) !important;
         }
         .contact-item:hover {
-            border-color: rgba(240,201,107,0.28);
+            border-color: rgba(214,240,60,0.28);
             background: linear-gradient(180deg, rgba(32,35,39,0.96), rgba(11,11,11,0.99));
             transform: translateY(-6px);
             box-shadow: 0 22px 55px rgba(0,0,0,0.75);
@@ -1993,7 +2162,7 @@
             justify-content: center;
             font-size: 1.6rem;
             flex-shrink: 0;
-            box-shadow: 0 10px 30px rgba(240,201,107,0.45);
+            box-shadow: 0 10px 30px rgba(214,240,60,0.45);
         }
         .contact-details h3 {
             color: var(--gold);
@@ -2023,7 +2192,7 @@
         }
         .contact-form-container:hover {
             transform: translateY(-4px);
-            border-color: rgba(212,175,55,0.22);
+            border-color: rgba(214,240,60,0.22);
         }
         .contact-form {
             display: flex;
@@ -2037,7 +2206,7 @@
             border: 1px solid #444;
             border-radius: 10px;
             font-size: 1rem;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: inherit;
             resize: vertical;
             min-height: 150px;
         }
@@ -2046,20 +2215,22 @@
             border-color: var(--gold);
         }
         .contact-form button {
-            background: var(--gold);
+            background: linear-gradient(135deg, #f1ff99 0%, var(--gold-soft) 38%, var(--gold) 100%);
             color: var(--black);
-            padding: 1.2rem 2.5rem;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: bold;
+            padding: 1.05rem 2.25rem;
+            border: 1px solid rgba(214, 240, 60, 0.3);
+            border-radius: var(--radius-pill);
+            font-size: 1.02rem;
+            font-weight: 700;
+            font-family: inherit;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: transform 0.28s ease, box-shadow 0.28s ease;
             width: 100%;
+            box-shadow: var(--cta-shadow);
         }
         .contact-form button:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(214, 240, 60, 0.4);
+            box-shadow: 0 14px 38px rgba(214, 240, 60, 0.38);
         }
         .social-links-contact {
             display: flex;
@@ -2164,7 +2335,7 @@
 
         /* Footer */
         footer {
-            background: linear-gradient(180deg, #0a0c0d 0%, #070809 100%);
+            background: linear-gradient(180deg, #080808 0%, #020202 100%);
             text-align: center;
             padding: 3.5rem 5%;
             border-top: 1px solid rgba(255,255,255,0.06);
@@ -2261,7 +2432,7 @@
         }
         .delivery-zone-chip:hover {
             color: var(--gold);
-            border-color: rgba(212,175,55,0.7);
+            border-color: rgba(214,240,60,0.7);
         }
         .delivery-zone-chip.active {
             color: #0f1112;
@@ -2274,7 +2445,7 @@
             margin: 1.25rem auto 0;
             border-radius: 24px;
             overflow: hidden;
-            border: 1px solid rgba(212,175,55,0.22);
+            border: 1px solid rgba(214,240,60,0.22);
             box-shadow: var(--panel-shadow);
             background: linear-gradient(180deg, rgba(18,21,24,0.8), rgba(10,12,14,0.96));
         }
@@ -2476,7 +2647,7 @@
                 top: 100%;
                 left: 0;
                 width: 100%;
-                background: rgba(10, 10, 10, 0.99);
+                background: rgba(4, 4, 5, 0.99);
                 backdrop-filter: none;
                 -webkit-backdrop-filter: none;
                 border-top: 2px solid var(--gold);
@@ -2505,6 +2676,18 @@
             nav a:hover {
                 background: rgba(214, 240, 60, 0.1);
                 padding-left: 2.5rem;
+            }
+            .nav-cta-item {
+                margin-left: 0;
+                border-bottom: 1px solid #333;
+            }
+            .nav-cta-item .header-cta {
+                display: flex;
+                width: calc(100% - 2.5rem);
+                margin: 1rem auto 1.15rem;
+                justify-content: center;
+                text-align: center;
+                box-sizing: border-box;
             }
 
             .footer-banner img {
@@ -2573,7 +2756,8 @@
                 padding: 1.25rem 1rem;
                 align-items: flex-start !important;
             }
-            .reviews-summary > div:last-child {
+            .reviews-summary > div:last-child,
+            .reviews-summary__actions {
                 margin-left: 0 !important;
                 width: 100%;
             }
@@ -2652,6 +2836,7 @@
                 <li><a href="#experience" onclick="closeMobileMenu()" aria-label="Luxury experience section" data-i18n="nav.experience">Luxury Experience</a></li>
                 <li><a href="#about" onclick="closeMobileMenu()" aria-label="About Dynasty Prestige" data-i18n="nav.about">About</a></li>
                 <li><a href="#contact" onclick="closeMobileMenu()" aria-label="Contact us" data-i18n="nav.contact">Contact</a></li>
+                <li class="nav-cta-item"><a href="/app/reserve/page.html" class="header-cta" onclick="closeMobileMenu()" aria-label="Book a luxury car now">Book now</a></li>
             </ul>
         </nav>
     </header>
@@ -2661,7 +2846,7 @@
         <div class="hero-panel">
             <div class="hero-kicker">Dubai Luxury Car Rental</div>
             <h1>DYNASTY PRESTIGE</h1>
-            <p class="hero-subtitle">Drive Lamborghini, Ferrari and Mercedes G63 in Dubai with a concierge-led luxury rental experience designed for premium stays.</p>
+            <p class="hero-subtitle">Lamborghini, Ferrari &amp; G63 in Dubai — transparent rates, secure booking and delivery to your hotel, villa or airport.</p>
             
             <div class="hero-points">
                 <div class="hero-point">
@@ -2676,7 +2861,7 @@
             </div>
 
             <div class="hero-actions">
-                <a href="/app/reserve/page.html" class="btn" aria-label="Check availability and reserve now">CHECK AVAILABILITY</a>
+                <a href="/app/reserve/page.html" class="btn" aria-label="Reserve your car online now">Reserve online</a>
                 <a href="https://wa.me/971586122568" data-wa-key="general" class="btn btn-secondary" aria-label="Chat on WhatsApp">
                     <i class="fab fa-whatsapp" aria-hidden="true"></i>
                     WHATSAPP
@@ -2709,7 +2894,7 @@
     <!-- Fleet -->
     <section id="fleet" aria-labelledby="fleet-heading" data-animate="fade">
         <h2 id="fleet-heading" data-i18n="fleet.title">Our Exclusive Fleet</h2>
-        <p class="fleet-intro">Compare our most requested Dubai rentals, check the daily rate instantly and go straight to reservation or WhatsApp for fast availability confirmation.</p>
+        <p class="fleet-intro">Hand-picked supercars with clear daily rates. Tap a brand, pick your car and book in minutes — or message us for same-day availability.</p>
         <div class="brand-filter-wrap">
             <p class="brand-filter-title">Choose Your Brand</p>
             <div class="brand-slider-viewport" id="brandSliderViewport" aria-label="Brand logos, scroll automatically">
@@ -2939,7 +3124,7 @@
 
     <!-- Presentation / Luxury Experience -->
     <section id="experience" class="presentation" data-animate="fade">
-        <h2 data-i18n="presentation.title">LUXURY EXPERIENCE</h2>
+        <h2 data-i18n="presentation.title">Luxury experience</h2>
         <p class="subtitle" data-i18n="presentation.subtitle">
             Luxury car rental in Dubai with premium supercars.
         </p>
@@ -2968,27 +3153,27 @@
     </section>
 
     <!-- Call To Action -->
-    <section id="reservation" style="text-align: center; padding: 6rem 5%; background: var(--bg-secondary);" data-animate="fade">
+    <section id="reservation" data-animate="fade">
         <div class="reservation-panel">
-        <div class="reservation-kicker">Fast Booking Flow</div>
-        <h2 style="color: var(--gold); font-size: 3.2rem; margin-bottom: 1.5rem; letter-spacing:0.3em; text-transform:uppercase;" data-i18n="reservation.title">
-            BOOK YOUR LUXURY CAR
+        <div class="reservation-kicker">Fast booking</div>
+        <h2 class="reservation-heading" data-i18n="reservation.title">
+            Book your luxury car
         </h2>
-        <p style="color: var(--silver); font-size: 1.2rem; margin-bottom: 0; max-width: 720px; margin-left: auto; margin-right: auto;" data-i18n="reservation.subtitle">
-            Choose your supercar, confirm your preferred dates and we deliver your vehicle anywhere in Dubai.
+        <p class="reservation-desc" data-i18n="reservation.subtitle">
+            Choose your model and dates, pay 50% securely online, and we coordinate delivery anywhere in Dubai.
         </p>
         <div class="reservation-inline-trust" aria-label="Reservation trust highlights">
-            <span>Secure online payment</span>
+            <span>Stripe-secure checkout</span>
             <span>50% to confirm</span>
-            <span>Dubai delivery coordination</span>
+            <span>Delivery coordinated for you</span>
         </div>
         <div class="reservation-actions">
-            <a href="/app/reserve/page.html" class="btn" aria-label="Start reservation flow now" style="font-size: 1.1rem; padding: 1.1rem 3rem;" data-i18n="reservation.button">
-                CHECK AVAILABILITY
+            <a href="/app/reserve/page.html" class="btn btn--prominent" aria-label="Start reservation — check availability" data-i18n="reservation.button">
+                Start reservation
             </a>
-            <a href="https://wa.me/971586122568" data-wa-key="general" class="btn btn-secondary" aria-label="Chat on WhatsApp to book" style="font-size: 1.1rem; padding: 1.1rem 3rem;">
+            <a href="https://wa.me/971586122568" data-wa-key="general" class="btn btn-secondary btn--prominent" aria-label="Chat on WhatsApp to book">
                 <i class="fab fa-whatsapp" aria-hidden="true"></i>
-                WHATSAPP
+                WhatsApp
             </a>
         </div>
         <div class="reservation-steps" aria-label="How booking works">
@@ -3012,31 +3197,33 @@
     </section>
 
     <!-- Why Dynasty Prestige -->
-    <section id="why" data-animate="fade" style="background:var(--bg-secondary);padding:7rem 5%;">
-        <h2 style="margin-bottom:3rem;">WHY CHOOSE DYNASTY PRESTIGE</h2>
-        <div class="benefit-grid" style="display:flex;flex-wrap:wrap;gap:1.75rem;justify-content:center;max-width:1100px;margin:0 auto;">
-            <div class="editorial-card" style="flex:1 1 220px;max-width:260px;padding:1.8rem 1.9rem;">
-                <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.5rem;">Transparent Pricing</h3>
-                <p style="color:var(--silver-soft);font-size:0.95rem;">Clear rates and booking conditions before confirmation.</p>
+    <section id="why" class="section--alt" data-animate="fade">
+        <h2>Why choose Dynasty Prestige</h2>
+        <p class="section-lead">The same standards whether you book online or on WhatsApp — clarity first, then the keys.</p>
+        <div class="benefit-grid">
+            <div class="editorial-card benefit-card">
+                <h3>Transparent pricing</h3>
+                <p>Clear rates and conditions before you confirm — no surprise fees at handover.</p>
             </div>
-            <div class="editorial-card" style="flex:1 1 220px;max-width:260px;padding:1.8rem 1.9rem;">
-                <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.5rem;">Free Delivery</h3>
-                <p style="color:var(--silver-soft);font-size:0.95rem;">Complimentary delivery and collection anywhere within Dubai.</p>
+            <div class="editorial-card benefit-card">
+                <h3>Free Dubai delivery</h3>
+                <p>Complimentary delivery and collection across core Dubai areas when your booking is confirmed.</p>
             </div>
-            <div class="editorial-card" style="flex:1 1 220px;max-width:260px;padding:1.8rem 1.9rem;">
-                <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.5rem;">Flexible Payments</h3>
-                <p style="color:var(--silver-soft);font-size:0.95rem;">Pay using bank transfer, cash on delivery or cryptocurrency.</p>
+            <div class="editorial-card benefit-card">
+                <h3>Flexible payments</h3>
+                <p>Bank transfer, card via Stripe, cash on delivery or crypto — you choose what fits.</p>
             </div>
-            <div class="editorial-card" style="flex:1 1 220px;max-width:260px;padding:1.8rem 1.9rem;">
-                <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.5rem;">24/7 Support</h3>
-                <p style="color:var(--silver-soft);font-size:0.95rem;">Round‑the‑clock customer support during your rental in Dubai.</p>
+            <div class="editorial-card benefit-card">
+                <h3>24/7 concierge</h3>
+                <p>One team from enquiry to return: scheduling, documentation and on-trip support.</p>
             </div>
         </div>
     </section>
 
     <!-- Delivery Locations -->
-    <section id="delivery" data-animate="fade" style="background:var(--bg-secondary);padding:7rem 5%;">
-        <h2 style="margin-bottom:3rem;">DELIVERY LOCATIONS</h2>
+    <section id="delivery" class="section--alt" data-animate="fade">
+        <h2>Delivery locations</h2>
+        <p class="section-lead">We deliver to the addresses that matter for luxury stays — select a zone to see ETA and fees.</p>
         <div class="delivery-zone-chips">
             <button class="delivery-zone-chip active" data-zone="palm" type="button">Palm Jumeirah</button>
             <button class="delivery-zone-chip" data-zone="marina" type="button">Dubai Marina</button>
@@ -3060,7 +3247,7 @@
                 <i class="fas fa-map-marked-alt" aria-hidden="true"></i>
                 Open in Google Maps
             </a>
-            <a id="deliveryWhatsappLink" class="delivery-cta" href="https://wa.me/971586122568?text=Hello%2C%20I%20need%20delivery%20in%20Palm%20Jumeirah%2C%20Dubai." target="_blank" rel="noopener noreferrer" style="background:transparent;border:1px solid var(--gold);color:var(--gold);">
+            <a id="deliveryWhatsappLink" class="delivery-cta delivery-cta--outline" href="https://wa.me/971586122568?text=Hello%2C%20I%20need%20delivery%20in%20Palm%20Jumeirah%2C%20Dubai." target="_blank" rel="noopener noreferrer">
                 <i class="fab fa-whatsapp" aria-hidden="true"></i>
                 Quote via WhatsApp
             </a>
@@ -3071,59 +3258,59 @@
             <span class="delivery-legend-item"><strong>Support:</strong> 24/7 coordination</span>
         </div>
         <p class="delivery-note" id="deliveryZoneText">Main delivery point: Palm Jumeirah, Dubai.</p>
-        <div style="max-width:1100px;margin:2rem auto 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;">
+        <div class="delivery-editorial-grid">
             <a href="/palm-jumeirah-luxury-car-rental.html" class="editorial-card" style="display:block;padding:1.2rem 1.3rem;">
-                <strong style="display:block;color:var(--gold);margin-bottom:0.45rem;">Palm Jumeirah Luxury Car Rental</strong>
+                <strong>Palm Jumeirah luxury car rental</strong>
                 Hotel, villa and residence delivery for Palm Jumeirah stays.
             </a>
             <a href="/dubai-marina-luxury-car-rental.html" class="editorial-card" style="display:block;padding:1.2rem 1.3rem;">
-                <strong style="display:block;color:var(--gold);margin-bottom:0.45rem;">Dubai Marina Luxury Car Rental</strong>
+                <strong>Dubai Marina luxury car rental</strong>
                 Premium delivery for hotels, towers and waterfront bookings.
             </a>
             <a href="/downtown-dubai-supercar-rental.html" class="editorial-card" style="display:block;padding:1.2rem 1.3rem;">
-                <strong style="display:block;color:var(--gold);margin-bottom:0.45rem;">Downtown Dubai Supercar Rental</strong>
+                <strong>Downtown Dubai supercar rental</strong>
                 Supercar delivery for central Dubai hotels and business venues.
             </a>
         </div>
     </section>
 
     <!-- Customer Reviews -->
-    <section id="reviews" data-animate="fade" style="background:var(--bg-primary);padding:7rem 5%;">
+    <section id="reviews" class="section--base" data-animate="fade">
         <div class="section-shell">
-            <h2 style="margin-bottom:2rem;">CUSTOMER REVIEWS</h2>
+            <h2>Customer reviews</h2>
+            <p class="section-lead">Real feedback from Google — we’re proud of the experience we deliver on every handover.</p>
 
             <!-- Rating summary -->
-            <div class="reviews-summary" style="display:flex;flex-wrap:wrap;align-items:center;gap:1.5rem;margin-bottom:2.5rem;">
-                <div style="display:flex;flex-direction:column;gap:0.25rem;">
-                    <span id="reviews-average" style="font-size:2.4rem;font-weight:600;color:var(--gold);">5.0</span>
-                    <span style="color:var(--silver-soft);font-size:0.9rem;">Average Google rating</span>
+            <div class="reviews-summary">
+                <div class="reviews-summary__stat">
+                    <span id="reviews-average" class="reviews-average">5.0</span>
+                    <span class="reviews-meta">Average Google rating</span>
                 </div>
                 <div>
-                    <div id="reviews-stars" style="color:var(--gold);font-size:1.4rem;letter-spacing:0.1em;">★★★★★</div>
-                    <div id="reviews-count" style="color:var(--silver-soft);font-size:0.9rem;">Based on Google reviews</div>
+                    <div id="reviews-stars" class="reviews-stars">★★★★★</div>
+                    <div id="reviews-count" class="reviews-meta">Based on Google reviews</div>
                 </div>
-                <div style="margin-left:auto;">
-                    <a id="google-review-link" href="#" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.95rem;padding:0.75rem 1.9rem;">
-                        LEAVE A REVIEW ON GOOGLE
+                <div class="reviews-summary__actions">
+                    <a id="google-review-link" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size:0.9rem;padding:0.72rem 1.6rem;">
+                        Leave a Google review
                     </a>
                 </div>
             </div>
 
             <!-- Reviews slider -->
-            <div class="reviews-slider" style="position:relative;overflow:hidden;">
-                <div id="reviews-track" class="reviews-track" style="display:flex;transition:transform 0.6s ease;">
+            <div class="reviews-slider">
+                <div id="reviews-track" class="reviews-track">
                     <!-- Slides injected dynamically -->
                 </div>
-                <button type="button" id="reviews-prev" aria-label="Previous review" style="position:absolute;left:0.5rem;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:999px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;">‹</button>
-                <button type="button" id="reviews-next" aria-label="Next review" style="position:absolute;right:0.5rem;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:999px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;">›</button>
             </div>
         </div>
     </section>
 
     <!-- About -->
-    <section id="about" data-animate="fade" style="background:var(--bg-primary);padding:7rem 5%;">
-        <h2 style="margin-bottom:2.5rem;">ABOUT DYNASTY PRESTIGE</h2>
-        <div class="editorial-copy" style="max-width:820px;margin:0 auto;color:var(--silver);font-size:1.05rem;line-height:1.9;">
+    <section id="about" class="section--base" data-animate="fade">
+        <h2>About Dynasty Prestige</h2>
+        <p class="section-lead">Dubai specialists in curated supercars — built for guests who expect precision, not paperwork.</p>
+        <div class="editorial-copy about-copy">
             <p style="margin-bottom:1.2rem;">
                 Dynasty Prestige is a luxury car rental company based in Dubai, dedicated to delivering an exceptional driving experience with 
                 some of the most desired supercars in the world.
@@ -3140,8 +3327,9 @@
     </section>
 
     <!-- Contact -->
-    <section id="contact" data-animate="fade">
-        <h2 data-i18n="contact.title">Contact Us</h2>
+    <section id="contact" class="section--alt" data-animate="fade">
+        <h2 data-i18n="contact.title">Contact us</h2>
+        <p class="section-lead">One team for quotes, delivery and support — reach us however you prefer; we aim to reply within minutes.</p>
         <div class="contact-container">
             <!-- Contact Information -->
             <div class="contact-info">
@@ -3589,8 +3777,6 @@
             const avgEl = document.getElementById('reviews-average');
             const starsEl = document.getElementById('reviews-stars');
             const countEl = document.getElementById('reviews-count');
-            const prevBtn = document.getElementById('reviews-prev');
-            const nextBtn = document.getElementById('reviews-next');
             const reviewLink = document.getElementById('google-review-link');
 
             if (!reviewsTrack || !placeId || !apiKey) {
@@ -3636,12 +3822,6 @@
                 updateSliderPosition();
             }
 
-            function prevReview() {
-                if (!reviews.length) return;
-                currentIndex = (currentIndex - 1 + reviews.length) % reviews.length;
-                updateSliderPosition();
-            }
-
             function startAuto() {
                 stopAuto();
                 autoTimer = setInterval(nextReview, 8000);
@@ -3650,18 +3830,6 @@
             function stopAuto() {
                 if (autoTimer) clearInterval(autoTimer);
             }
-
-            prevBtn && prevBtn.addEventListener('click', () => {
-                stopAuto();
-                prevReview();
-                startAuto();
-            });
-
-            nextBtn && nextBtn.addEventListener('click', () => {
-                stopAuto();
-                nextReview();
-                startAuto();
-            });
 
             // Example Places API call (replace with secure backend proxy in production)
             const fields = 'rating,user_ratings_total,reviews';

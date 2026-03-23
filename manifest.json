@@ -4,7 +4,7 @@
   "description": "Luxury car rental in Dubai. Lamborghini, Ferrari, Mercedes G63 AMG and more.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0a0a0a",
+  "background_color": "#030303",
   "theme_color": "#d6f03c",
   "orientation": "portrait-primary",
   "icons": [
