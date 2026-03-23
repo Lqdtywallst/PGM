@@ -130,9 +130,9 @@ async function sendReservationNotificationEmail(reservationData, customerData) {
             <style>
                 body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
                 .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: #0a0a0a; color: #c4e628; padding: 20px; text-align: center; }
+                .header { background: #0a0a0a; color: #d6f03c; padding: 20px; text-align: center; }
                 .content { background: #f9f9f9; padding: 20px; margin-top: 20px; }
-                .info-row { margin: 10px 0; padding: 10px; background: white; border-left: 3px solid #c4e628; }
+                .info-row { margin: 10px 0; padding: 10px; background: white; border-left: 3px solid #d6f03c; }
                 .label { font-weight: bold; color: #0a0a0a; }
                 .status { background: #ff9800; color: white; padding: 10px; text-align: center; font-weight: bold; margin: 20px 0; border-radius: 5px; }
             </style>
@@ -198,9 +198,9 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
             <style>
                 body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
                 .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: #0a0a0a; color: #c4e628; padding: 20px; text-align: center; }
+                .header { background: #0a0a0a; color: #d6f03c; padding: 20px; text-align: center; }
                 .content { background: #f9f9f9; padding: 20px; margin-top: 20px; }
-                .info-row { margin: 10px 0; padding: 10px; background: white; border-left: 3px solid #c4e628; }
+                .info-row { margin: 10px 0; padding: 10px; background: white; border-left: 3px solid #d6f03c; }
                 .label { font-weight: bold; color: #0a0a0a; }
             </style>
         </head>
@@ -245,9 +245,9 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
             <style>
                 body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
                 .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: #0a0a0a; color: #c4e628; padding: 20px; text-align: center; }
+                .header { background: #0a0a0a; color: #d6f03c; padding: 20px; text-align: center; }
                 .content { background: #f9f9f9; padding: 20px; margin-top: 20px; }
-                .info-row { margin: 10px 0; padding: 10px; background: white; border-left: 3px solid #c4e628; }
+                .info-row { margin: 10px 0; padding: 10px; background: white; border-left: 3px solid #d6f03c; }
                 .label { font-weight: bold; color: #0a0a0a; }
             </style>
         </head>

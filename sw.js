@@ -3,7 +3,7 @@
 
 // Subir versión al desplegar cambios visibles (CSS, logos, index): fuerza borrado de cachés antiguos.
 const CACHE_NAME = 'pgm-v1.1.0';
-const STATIC_CACHE = 'pgm-static-v12';
+const STATIC_CACHE = 'pgm-static-v13';
 const DYNAMIC_CACHE = 'pgm-dynamic-v3';
 
 // Assets to cache during install

@@ -258,11 +258,11 @@ async function sendContactEmail(contactData) {
             <style>
                 body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
                 .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: #0a0a0a; color: #c4e628; padding: 20px; text-align: center; }
+                .header { background: #0a0a0a; color: #d6f03c; padding: 20px; text-align: center; }
                 .content { background: #f9f9f9; padding: 20px; margin-top: 20px; }
-                .info-row { margin: 10px 0; padding: 10px; background: white; border-left: 3px solid #c4e628; }
+                .info-row { margin: 10px 0; padding: 10px; background: white; border-left: 3px solid #d6f03c; }
                 .label { font-weight: bold; color: #0a0a0a; }
-                .message-box { background: white; padding: 15px; margin: 20px 0; border-left: 3px solid #c4e628; }
+                .message-box { background: white; padding: 15px; margin: 20px 0; border-left: 3px solid #d6f03c; }
                 .footer { margin-top: 20px; padding: 20px; text-align: center; color: #666; font-size: 12px; }
             </style>
         </head>

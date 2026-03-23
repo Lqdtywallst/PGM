@@ -3,8 +3,8 @@
 :root {
     --black: #050608;
     --black-soft: #0b0d12;
-    --gold: #c4e628;
-    --gold-soft: #e6ff78;
+    --gold: #d6f03c;
+    --gold-soft: #f4ff95;
     --silver: #c0c0c0;
     --border: #242733;
     --font-main: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -259,7 +259,7 @@ img {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #e8ff99, #c4e628);
+    background: linear-gradient(135deg, #f1ff99, #d6f03c);
     color: #151515;
     box-shadow: 0 12px 30px rgba(212,175,55,0.35);
 }
