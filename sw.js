@@ -2,8 +2,8 @@
 // Cache static assets for better performance
 
 // Subir versión al desplegar cambios visibles (CSS, logos, index): fuerza borrado de cachés antiguos.
-const CACHE_NAME = 'pgm-v1.0.5';
-const STATIC_CACHE = 'pgm-static-v7';
+const CACHE_NAME = 'pgm-v1.0.6';
+const STATIC_CACHE = 'pgm-static-v8';
 const DYNAMIC_CACHE = 'pgm-dynamic-v3';
 
 // Assets to cache during install
