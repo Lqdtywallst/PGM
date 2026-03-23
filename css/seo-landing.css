@@ -39,8 +39,9 @@ header.site-header {
     justify-content: space-between;
     gap: 1rem;
     padding: 0.85rem 5%;
-    background: rgba(15, 17, 18, 0.94);
-    backdrop-filter: blur(14px);
+    background: rgba(15, 17, 18, 0.98);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     border-bottom: 1px solid var(--border);
 }
 .header-brand {

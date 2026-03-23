@@ -51,12 +51,13 @@
         .reserve-container {
             width: 100%;
             max-width: 1080px;
-            background: linear-gradient(180deg, rgba(24, 24, 27, 0.96), rgba(11, 11, 13, 0.98));
+            background: linear-gradient(180deg, rgba(24, 24, 27, 0.99), rgba(11, 11, 13, 0.995));
             padding: 2rem;
             border-radius: 24px;
             box-shadow: 0 28px 90px rgba(0, 0, 0, 0.55), 0 20px 60px rgba(196, 230, 40, 0.12);
             border: 1px solid rgba(196, 230, 40, 0.2);
-            backdrop-filter: blur(12px);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
         }
 
         .steps-indicator {
@@ -687,7 +688,7 @@
             font-weight: bold;
             color: #c4e628;
             margin-top: 1rem;
-            text-shadow: 0 8px 24px rgba(196, 230, 40, 0.16);
+            text-shadow: none;
         }
         .price-refresh {
             animation: shimmerPulse 0.42s ease;

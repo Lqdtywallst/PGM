@@ -236,8 +236,9 @@
             border-bottom: 1px solid transparent;
         }
         header.scrolled { 
-            background: rgba(15, 17, 18, 0.94);
-            backdrop-filter: blur(16px);
+            background: rgba(15, 17, 18, 0.98);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
             box-shadow: 0 18px 40px rgba(0,0,0,0.65);
             border-bottom-color: rgba(255,255,255,0.06);
         }
@@ -291,8 +292,9 @@
         /* Hero */
         .hero {
             min-height: 100vh;
+            /* Capas más oscuras sobre la foto: menos brillo / “reflejo” del coche en el fondo */
             background:
-                linear-gradient(180deg, rgba(5, 6, 8, 0.38) 0%, rgba(5, 6, 8, 0.56) 38%, rgba(11,13,15,0.96) 100%),
+                linear-gradient(180deg, rgba(5, 6, 8, 0.62) 0%, rgba(5, 6, 8, 0.72) 35%, rgba(11, 13, 15, 0.94) 100%),
                 url('https://images.unsplash.com/photo-1600510424051-30d592a75353?w=1200&auto=format&fit=crop&q=80&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGxhbWJvcmdoaW5pfGVufDB8fDB8fHww') center/cover no-repeat;
             display: flex;
             flex-direction: column;
@@ -303,23 +305,25 @@
             position: relative;
             isolation: isolate;
         }
+        /* Sin halo claro arriba (el radial lima parecía un reflejo); solo viñeta oscura neutra */
         .hero::before {
             content: "";
             position: absolute;
             inset: 0;
-            background:
-                radial-gradient(circle at center top, rgba(230, 255, 120, 0.18), rgba(230, 255, 120, 0) 34%),
-                linear-gradient(180deg, rgba(15, 17, 18, 0.08), rgba(15, 17, 18, 0.6));
+            background: linear-gradient(180deg, rgba(8, 10, 12, 0.45) 0%, transparent 42%, rgba(8, 10, 12, 0.5) 100%);
             z-index: -1;
+            pointer-events: none;
         }
         .hero-panel {
             width: min(980px, 100%);
             padding: 2.4rem 2.3rem 2.2rem;
             border-radius: 30px;
-            background: linear-gradient(180deg, rgba(18, 21, 24, 0.58), rgba(10, 12, 14, 0.8));
+            /* Más opaco y sin blur: evita “doble letra” / reflejo del fondo en el cristal */
+            background: linear-gradient(180deg, rgba(18, 21, 24, 0.96), rgba(10, 12, 14, 0.99));
             border: 1px solid rgba(255,255,255,0.08);
-            box-shadow: var(--panel-shadow);
-            backdrop-filter: blur(14px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
         }
         .hero-kicker {
             display: inline-flex;
@@ -342,7 +346,7 @@
             height: 8px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--gold-soft), var(--gold));
-            box-shadow: 0 0 18px rgba(230, 255, 120, 0.55);
+            box-shadow: 0 0 10px rgba(230, 255, 120, 0.35);
         }
         .hero h1 {
             font-family: 'Orbitron', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -352,7 +356,7 @@
             margin-bottom: 1.1rem;
             text-transform: uppercase;
             color: #ffffff;
-            text-shadow: 0 20px 45px rgba(0, 0, 0, 0.72);
+            text-shadow: none;
             display: block;
         }
         .hero-subtitle {
@@ -1274,8 +1278,9 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.96);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
             overflow-y: auto;
             animation: fadeIn 0.3s ease;
         }
@@ -1359,7 +1364,7 @@
             font-size: 2rem;
             font-weight: 700;
             text-align: center;
-            text-shadow: 0 2px 10px rgba(196, 230, 40, 0.3);
+            text-shadow: none;
         }
         .modal-header .car-name {
             color: white;
@@ -2474,8 +2479,9 @@
                 top: 100%;
                 left: 0;
                 width: 100%;
-                background: rgba(10, 10, 10, 0.98);
-                backdrop-filter: blur(10px);
+                background: rgba(10, 10, 10, 0.99);
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
                 border-top: 2px solid var(--gold);
                 box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
                 z-index: 1000;
