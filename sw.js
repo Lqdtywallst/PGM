@@ -3,7 +3,7 @@
 
 // Subir versión al desplegar cambios visibles (CSS, logos, index): fuerza borrado de cachés antiguos.
 const CACHE_NAME = 'pgm-v1.1.0';
-const STATIC_CACHE = 'pgm-static-v17';
+const STATIC_CACHE = 'pgm-static-v18';
 const DYNAMIC_CACHE = 'pgm-dynamic-v3';
 
 // Assets to cache during install
@@ -69,6 +69,26 @@ self.addEventListener('fetch', (event) => {
 
   // Do not cache backend API requests
   if (url.pathname.startsWith('/api/')) {
+    return;
+  }
+
+  /* CSS propio: siempre red primero (cache-first dejaba seo-landing.css viejo en landings) */
+  if (
+    request.method === 'GET' &&
+    url.origin === self.location.origin &&
+    url.pathname.endsWith('.css')
+  ) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.status === 200) {
+            const copy = response.clone();
+            caches.open(DYNAMIC_CACHE).then((cache) => cache.put(request, copy));
+          }
+          return response;
+        })
+        .catch(() => caches.match(request))
+    );
     return;
   }
 
