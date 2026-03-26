@@ -914,15 +914,11 @@
             opacity: 1;
             animation: brandActivePulse 2.6s ease-in-out infinite;
         }
-        /* Inactivos: logo más suave para que resalte solo el elegido */
+        /* Inactivos: mismo brillo y color; el activo destaca por escala + pulso (sin apagar el resto) */
         .brand-filter-btn:not(.active) .brand-filter-logo {
-            opacity: 0.72;
-            filter: grayscale(0.12);
+            opacity: 1;
+            filter: none;
             transition: transform 0.32s ease, opacity 0.32s ease, filter 0.32s ease;
-        }
-        .brand-filter-btn:not(.active):hover .brand-filter-logo {
-            opacity: 0.95;
-            filter: grayscale(0);
         }
         .fleet-status {
             margin-top: 1rem;
