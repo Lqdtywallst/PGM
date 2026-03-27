@@ -895,6 +895,14 @@
             max-height: 50px;
             flex: 0 0 50px;
         }
+        /* Rolls-Royce: placa vertical; mismo alto de fila que el resto */
+        .brand-filter-btn[data-brand-filter="rolls-royce"] .brand-filter-logo {
+            width: 52px;
+            height: 72px;
+            max-width: 52px;
+            max-height: 72px;
+            flex: 0 0 52px;
+        }
         .brand-filter-btn:hover {
             transform: none;
         }
@@ -2990,6 +2998,9 @@
                         <button class="brand-filter-btn" type="button" data-brand-filter="porsche" data-brand-label="Porsche" aria-label="Filter Porsche vehicles">
                             <img class="brand-filter-logo" src="/brands/porsche-clean.png" alt="Porsche logo" loading="lazy">
                         </button>
+                        <button class="brand-filter-btn" type="button" data-brand-filter="rolls-royce" data-brand-label="Rolls-Royce" aria-label="Filter Rolls-Royce vehicles">
+                            <img class="brand-filter-logo" src="/brands/rolls-royce-clean.png" alt="Rolls-Royce logo" loading="lazy">
+                        </button>
                     </div>
                     <div class="brand-filter-list" role="presentation" aria-hidden="true">
                         <button class="brand-filter-btn active" type="button" tabindex="-1" data-brand-filter="all" data-brand-label="All Vehicles" aria-hidden="true">
@@ -3007,10 +3018,13 @@
                         <button class="brand-filter-btn" type="button" tabindex="-1" data-brand-filter="porsche" data-brand-label="Porsche" aria-hidden="true">
                             <img class="brand-filter-logo" src="/brands/porsche-clean.png" alt="" loading="lazy">
                         </button>
+                        <button class="brand-filter-btn" type="button" tabindex="-1" data-brand-filter="rolls-royce" data-brand-label="Rolls-Royce" aria-hidden="true">
+                            <img class="brand-filter-logo" src="/brands/rolls-royce-clean.png" alt="" loading="lazy">
+                        </button>
                     </div>
                 </div>
             </div>
-            <p class="fleet-status" id="fleetStatus">Showing all 5 vehicles.</p>
+            <p class="fleet-status" id="fleetStatus">Showing all 6 vehicles.</p>
         </div>
         <div class="fleet-grid">
             <div class="car-card" data-region="ES" data-brand="lamborghini" data-title="Lamborghini Huracán" data-price-eur="1500" data-price-aed="6000" data-gallery='["https://images.unsplash.com/photo-1543854589-fdd815f176e0?q=80&w=1904&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"]'>
@@ -3191,6 +3205,42 @@
                         </a>
                     </div>
                     <a href="/porsche-rental-dubai.html" class="car-detail-link">About Porsche rentals in Dubai</a>
+                </div>
+            </div>
+            <div class="car-card" data-region="AE" data-brand="rolls-royce" data-title="Rolls-Royce Cullinan" data-price-eur="1125" data-price-aed="4500" data-deposit-eur="8000" data-deposit-aed="32000" data-gallery='["https://images.unsplash.com/photo-1632548260651-60888649a4fd?q=80&w=2000&auto=format&fit=crop"]'>
+                <img src="https://images.unsplash.com/photo-1632548260651-60888649a4fd?q=80&w=1200&auto=format&fit=crop" alt="Rolls-Royce Cullinan luxury SUV rental Dubai" loading="lazy" width="350" height="250" decoding="async">
+                <div class="car-info">
+                    <h3>Rolls-Royce Cullinan</h3>
+                    <p class="car-description">Flagship SUV presence — serene cabin, commanding road stance, ideal for arrivals and extended Dubai stays.</p>
+                    <div class="car-price-row">
+                        <div class="price" data-i18n="fleet.price_from" data-price="4500">From 4,500 AED / day</div>
+                        <span class="car-booking-badge">50% to confirm</span>
+                    </div>
+                    <div class="car-quick-trust">
+                        <span>Free Dubai delivery</span>
+                        <span>Fast availability reply</span>
+                        <span>24/7 concierge</span>
+                    </div>
+                    <ul class="car-benefits">
+                        <li>Chauffeur options on request</li>
+                        <li>Airport and hotel handover</li>
+                        <li>Transparent rental terms</li>
+                        <li>Tailored quotes for longer hires</li>
+                    </ul>
+                    <p class="car-reserve-note">The natural choice when presence and comfort matter as much as the drive.</p>
+                    <span class="view-gallery"><i class="fas fa-images"></i> View gallery</span>
+                    <div class="car-actions">
+                        <a href="/app/reserve/page.html?car=Rolls-Royce Cullinan&price=4500" class="btn btn-primary" data-i18n="fleet.book_now">Book Now</a>
+                        <a href="tel:+971586122568" class="btn-contact" aria-label="Call Dynasty Prestige Dubai">
+                            <i class="fas fa-phone"></i>
+                            <span data-i18n="fleet.call">Call</span>
+                        </a>
+                        <a href="https://wa.me/971586122568" data-wa-key="rolls-cullinan" class="btn-contact" aria-label="Contact us on WhatsApp">
+                            <i class="fab fa-whatsapp"></i>
+                            <span data-i18n="fleet.whatsapp">WhatsApp</span>
+                        </a>
+                    </div>
+                    <a href="/rolls-royce-rental-dubai.html" class="car-detail-link">About Rolls-Royce rentals in Dubai</a>
                 </div>
             </div>
 
@@ -3763,6 +3813,7 @@
                 filterFleetByBrand(brand);
             });
         });
+        filterFleetByBrand('all');
 
         galleryPrev.addEventListener('click', () => {
             galleryIndex = (galleryIndex - 1 + galleryImages.length) % galleryImages.length;
