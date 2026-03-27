@@ -851,6 +851,7 @@
         .brand-marquee-track > .brand-filter-list:first-child .brand-filter-btn:nth-child(3) { animation-delay: 0.22s; }
         .brand-marquee-track > .brand-filter-list:first-child .brand-filter-btn:nth-child(4) { animation-delay: 0.32s; }
         .brand-marquee-track > .brand-filter-list:first-child .brand-filter-btn:nth-child(5) { animation-delay: 0.42s; }
+        .brand-marquee-track > .brand-filter-list:first-child .brand-filter-btn:nth-child(6) { animation-delay: 0.52s; }
         .brand-filter-logo {
             width: 72px;
             height: 72px;
@@ -897,11 +898,11 @@
         }
         /* Rolls-Royce: placa vertical; mismo alto de fila que el resto */
         .brand-filter-btn[data-brand-filter="rolls-royce"] .brand-filter-logo {
-            width: 52px;
+            width: 48px;
             height: 72px;
-            max-width: 52px;
+            max-width: 48px;
             max-height: 72px;
-            flex: 0 0 52px;
+            flex: 0 0 48px;
         }
         .brand-filter-btn:hover {
             transform: none;
@@ -1234,6 +1235,13 @@
                 max-width: 40px;
                 max-height: 40px;
                 flex-basis: 40px;
+            }
+            .brand-filter-btn[data-brand-filter="rolls-royce"] .brand-filter-logo {
+                width: 37px;
+                height: 56px;
+                max-width: 37px;
+                max-height: 56px;
+                flex-basis: 37px;
             }
             .car-info {
                 padding: 1.5rem 1.5rem 2rem;
@@ -2999,7 +3007,7 @@
                             <img class="brand-filter-logo" src="/brands/porsche-clean.png" alt="Porsche logo" loading="lazy">
                         </button>
                         <button class="brand-filter-btn" type="button" data-brand-filter="rolls-royce" data-brand-label="Rolls-Royce" aria-label="Filter Rolls-Royce vehicles">
-                            <img class="brand-filter-logo" src="/brands/rolls-royce-clean.png" alt="Rolls-Royce logo" loading="lazy">
+                            <img class="brand-filter-logo" src="/brands/rolls-royce-badge.png" alt="Rolls-Royce logo" loading="lazy">
                         </button>
                     </div>
                     <div class="brand-filter-list" role="presentation" aria-hidden="true">
@@ -3019,7 +3027,7 @@
                             <img class="brand-filter-logo" src="/brands/porsche-clean.png" alt="" loading="lazy">
                         </button>
                         <button class="brand-filter-btn" type="button" tabindex="-1" data-brand-filter="rolls-royce" data-brand-label="Rolls-Royce" aria-hidden="true">
-                            <img class="brand-filter-logo" src="/brands/rolls-royce-clean.png" alt="" loading="lazy">
+                            <img class="brand-filter-logo" src="/brands/rolls-royce-badge.png" alt="" loading="lazy">
                         </button>
                     </div>
                 </div>
