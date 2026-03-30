@@ -1,3 +1,6 @@
+[build]
+  publish = "site"
+
 [[redirects]]
   from = "/reservations"
   to = "/#reserva"

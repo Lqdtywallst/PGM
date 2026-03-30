@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /app/api/
+Disallow: /node_modules/
+Disallow: /server/
+Disallow: /docs/
+Disallow: /scripts/
+
+Host: prestigegoalmotion.com
+Sitemap: https://prestigegoalmotion.com/sitemap.xml
+
+
+
+
+
+
+
+

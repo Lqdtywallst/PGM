@@ -1,4 +1,4 @@
-web: node backend-example.js
+web: node server/backend-example.js
 
 
 

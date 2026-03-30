@@ -3,6 +3,10 @@
 
 require('dotenv').config();
 const express = require('express');
+const {
+    EMAIL_CONFIG,
+    createEmailTransporter
+} = require('../../../server/email-config');
 
 // Verify that STRIPE_SECRET_KEY is configured
 if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('tu_clave')) {
@@ -11,7 +15,6 @@ if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('tu
 }
 
 const stripe = process.env.STRIPE_SECRET_KEY ? require('stripe')(process.env.STRIPE_SECRET_KEY) : null;
-const nodemailer = require('nodemailer');
 
 const router = express.Router();
 
@@ -37,6 +40,88 @@ function normalizeCountryCode(country) {
     }
     // If it's a country name, convert it to a code
     return countryNameToCode[country] || country;
+}
+
+function maskEmail(email) {
+    if (!email || typeof email !== 'string') return null;
+    const [localPart, domain] = email.split('@');
+    if (!localPart || !domain) return '[redacted-email]';
+    const visibleLocal = localPart.slice(0, 2);
+    return `${visibleLocal}${'*'.repeat(Math.max(localPart.length - 2, 1))}@${domain}`;
+}
+
+function summarizeHeaders(headers = {}) {
+    return {
+        origin: headers.origin || null,
+        referer: headers.referer || null,
+        contentType: headers['content-type'] || null,
+        userAgent: headers['user-agent'] || null,
+    };
+}
+
+function summarizeCustomerData(customerData = {}) {
+    return {
+        nameProvided: !!(customerData.name || customerData.fullName),
+        email: maskEmail(customerData.email),
+        hasPhone: !!customerData.phone,
+        hasDocument: !!(customerData.dni || customerData.passport),
+        hasAddress: !!customerData.address,
+        city: customerData.city || null,
+        country: customerData.country || null,
+    };
+}
+
+function summarizeReservationData(reservationData = {}) {
+    return {
+        car: reservationData.car || null,
+        startDate: reservationData.startDate || null,
+        endDate: reservationData.endDate || null,
+        pickupTime: reservationData.pickupTime || null,
+        dropoffTime: reservationData.dropoffTime || null,
+        days: reservationData.days || null,
+        durationHours: reservationData.durationHours || null,
+        totalAmount: reservationData.totalAmount || null,
+        upfrontAmount: reservationData.upfrontAmount || null,
+        remainingAmount: reservationData.remainingAmount || null,
+        currency: reservationData.currency || null,
+        pickupLocationProvided: !!reservationData.pickupLocation,
+    };
+}
+
+function summarizeReservationRequest(data = {}) {
+    const customerData = data.customerData || {
+        fullName: data.fullName,
+        email: data.email,
+        phone: data.phone,
+        passport: data.passport,
+        dni: data.dni,
+        address: data.address,
+        city: data.city,
+        country: data.country,
+    };
+    const reservationData = data.reservationData || {
+        car: data.car,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        pickupTime: data.pickupTime,
+        dropoffTime: data.dropoffTime,
+        days: data.days,
+        durationHours: data.durationHours,
+        totalAmount: data.totalAmount,
+        upfrontAmount: data.upfrontAmount,
+        remainingAmount: data.remainingAmount,
+        pickupLocation: data.pickupLocation,
+        currency: data.currency,
+    };
+
+    return {
+        hasNestedCustomerData: !!data.customerData,
+        hasNestedReservationData: !!data.reservationData,
+        amount: data.amount || null,
+        currency: data.currency || reservationData.currency || null,
+        customer: summarizeCustomerData(customerData),
+        reservation: summarizeReservationData(reservationData),
+    };
 }
 
 function parseMoneyValue(value) {
@@ -96,26 +181,7 @@ function enrichReservationPricing(reservationData, currency = 'aed') {
 }
 
 // Email configuration
-const EMAIL_CONFIG = {
-    service: process.env.EMAIL_SERVICE || 'gmail',
-    user: process.env.EMAIL_USER || 'prestigegoalmotion@gmail.com',
-    password: process.env.EMAIL_PASSWORD || process.env.EMAIL_APP_PASSWORD,
-};
-
-const emailTransporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // true for 465, false for other ports
-    requireTLS: true,
-    auth: {
-        user: EMAIL_CONFIG.user,
-        pass: EMAIL_CONFIG.password,
-    },
-    tls: {
-        // Do not fail on invalid certificates
-        rejectUnauthorized: false
-    }
-});
+const emailTransporter = createEmailTransporter();
 
 // Function to send notification email BEFORE payment
 async function sendReservationNotificationEmail(reservationData, customerData) {
@@ -171,7 +237,7 @@ async function sendReservationNotificationEmail(reservationData, customerData) {
     
     try {
         await emailTransporter.sendMail({
-            from: EMAIL_CONFIG.user,
+            from: EMAIL_CONFIG.from,
             to: companyEmail,
             subject: `New Pending Reservation: ${reservationData.car || 'Vehicle'} - ${customerData.name || customerData.fullName || 'Customer'}`,
             html: notificationEmailHtml,
@@ -277,25 +343,17 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
     try {
         console.log('[EMAIL] ========== STARTING EMAIL DELIVERY ==========');
         console.log('[EMAIL] Configuration:', {
-            from: EMAIL_CONFIG.user,
+            from: EMAIL_CONFIG.from,
             service: EMAIL_CONFIG.service,
             hasPassword: !!EMAIL_CONFIG.password
         });
-        console.log('[EMAIL] Reservation data:', {
-            car: reservationData.car,
-            days: reservationData.days,
-            total: reservationData.total
-        });
-        console.log('[EMAIL] Customer data:', {
-            name: customerData.name || customerData.fullName,
-            email: customerData.email,
-            hasEmail: !!customerData.email
-        });
+        console.log('[EMAIL] Reservation summary:', summarizeReservationData(reservationData));
+        console.log('[EMAIL] Customer summary:', summarizeCustomerData(customerData));
         
         // Send email to the company
         console.log('[EMAIL] Sending email to company:', companyEmail);
         const companyEmailResult = await emailTransporter.sendMail({
-            from: EMAIL_CONFIG.user,
+            from: EMAIL_CONFIG.from,
             to: companyEmail,
             subject: `New Reservation: ${reservationData.car || 'Vehicle'} - ${customerData.name || customerData.fullName || 'Customer'}`,
             html: companyEmailHtml,
@@ -308,9 +366,9 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
         
         // Send email to customer
         if (customerData.email) {
-            console.log('[EMAIL] Sending email to customer:', customerData.email);
+            console.log('[EMAIL] Sending email to customer:', maskEmail(customerData.email));
             const customerEmailResult = await emailTransporter.sendMail({
-                from: EMAIL_CONFIG.user,
+                from: EMAIL_CONFIG.from,
                 to: customerData.email,
                 subject: `Reservation Confirmed - Dynasty Prestige`,
                 html: customerEmailHtml,
@@ -344,11 +402,11 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
 router.post('/', async (req, res) => {
     console.log('[API] ========== NEW RESERVATION REQUEST ==========');
     console.log('[API] Timestamp:', new Date().toISOString());
-    console.log('[API] Headers:', req.headers);
+    console.log('[API] Request summary:', summarizeHeaders(req.headers));
     
     try {
         const data = req.body;
-        console.log('[API] Data received:', JSON.stringify(data, null, 2));
+        console.log('[API] Reservation request summary:', summarizeReservationRequest(data));
         
         // Basic validation (similar to the provided TypeScript code)
         console.log('[API] Validating data...');
@@ -368,8 +426,6 @@ router.post('/', async (req, res) => {
         }
 
         console.log('[API] ✅ Validation passed');
-        console.log('[API] NEW RESERVATION:', data);
-
         // Normalize data (supports both formats: direct or nested)
         console.log('[API] Normalizing data...');
         const customerData = data.customerData || {
@@ -404,9 +460,9 @@ router.post('/', async (req, res) => {
         };
         enrichReservationPricing(reservationData, reservationCurrency);
 
-        console.log('[API] Normalized data:', {
-            customer: customerData,
-            reservation: reservationData
+        console.log('[API] Normalized reservation summary:', {
+            customer: summarizeCustomerData(customerData),
+            reservation: summarizeReservationData(reservationData)
         });
 
         console.log('[API] Pricing summary:', {
@@ -545,7 +601,8 @@ router.post('/', async (req, res) => {
                         customerEmail: customerData.email,
                         pickupLocation: reservationData.pickupLocation || '',
                     },
-                    payment_method_types: ['card', 'apple_pay', 'google_pay', 'link'],
+                    // The current checkout is card-based, so request only the card method.
+                    payment_method_types: ['card'],
                 };
                 
                 console.log('[API] PaymentIntent data:', {
@@ -555,38 +612,14 @@ router.post('/', async (req, res) => {
                     description: paymentIntentData.description
                 });
                 
-                try {
-                    paymentIntent = await stripe.paymentIntents.create(paymentIntentData);
-                    const paymentIntentDuration = Date.now() - paymentIntentStartTime;
-                    console.log('[API] ✅ PaymentIntent created:', {
-                        id: paymentIntent.id,
-                        status: paymentIntent.status,
-                        client_secret: paymentIntent.client_secret ? paymentIntent.client_secret.substring(0, 20) + '...' : null,
-                        duration: `${paymentIntentDuration}ms`
-                    });
-                } catch (paymentError) {
-                    // If the error is due to payment methods not enabled (Apple Pay/Google Pay), try only basic methods
-                    const errorMessage = paymentError.message || paymentError.toString() || '';
-                    const isPaymentMethodError = errorMessage.includes('payment method type') || 
-                                                 errorMessage.includes('invalid') ||
-                                                 errorMessage.includes('apple_pay') ||
-                                                 errorMessage.includes('google_pay');
-                    
-                    if (isPaymentMethodError) {
-                        console.log('[API] ⚠️ Payment methods not available, using only card and link...');
-                        console.log('[API] Error original:', errorMessage);
-                        try {
-                            paymentIntentData.payment_method_types = ['card', 'link'];
-                            paymentIntent = await stripe.paymentIntents.create(paymentIntentData);
-                            console.log('[API] ✅ PaymentIntent created with basic methods');
-                        } catch (retryError) {
-                            console.error('[API] ❌ Error on second attempt:', retryError);
-                            throw retryError;
-                        }
-                    } else {
-                        throw paymentError;
-                    }
-                }
+                paymentIntent = await stripe.paymentIntents.create(paymentIntentData);
+                const paymentIntentDuration = Date.now() - paymentIntentStartTime;
+                console.log('[API] ✅ PaymentIntent created:', {
+                    id: paymentIntent.id,
+                    status: paymentIntent.status,
+                    client_secret: paymentIntent.client_secret ? paymentIntent.client_secret.substring(0, 20) + '...' : null,
+                    duration: `${paymentIntentDuration}ms`
+                });
             } catch (error) {
                 console.error('[API] ❌ Error creating PaymentIntent:', error);
                 console.error('[API] Error details:', {
@@ -743,12 +776,8 @@ router.post('/confirm', async (req, res) => {
             // Send confirmation emails
             console.log('[API CONFIRM] Sending confirmation emails...');
             console.log('[API CONFIRM] Calling sendReservationEmail with data:', {
-                reservationData: finalReservationData,
-                customerData: {
-                    name: finalCustomerData.name || finalCustomerData.fullName,
-                    email: finalCustomerData.email,
-                    hasEmail: !!finalCustomerData.email
-                },
+                reservationData: summarizeReservationData(finalReservationData),
+                customerData: summarizeCustomerData(finalCustomerData),
                 paymentIntentId: paymentIntentId
             });
             

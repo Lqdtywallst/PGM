@@ -1,10 +1,4 @@
 {
-  "rewrites": [
-    {
-      "source": "/((?!app/).*)",
-      "destination": "/index.html"
-    }
-  ],
   "redirects": [
     {
       "source": "/reservations",
@@ -40,6 +34,16 @@
       "source": "/exclusive-collection/",
       "destination": "/#fleet",
       "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/site/index.html"
+    },
+    {
+      "source": "/((?!api/|site/).*)",
+      "destination": "/site/$1"
     }
   ]
 }

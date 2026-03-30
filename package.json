@@ -2,13 +2,13 @@
   "name": "prestige-goal-motion-web",
   "version": "1.0.0",
   "description": "Web oficial de Dynasty Prestige - Alquiler de Coches de Lujo",
-  "main": "backend-example.js",
+  "main": "server/backend-example.js",
   "scripts": {
-    "start": "node backend-example.js",
-    "dev": "node backend-example.js",
-    "verify": "node verificar-stripe.js",
-    "test": "node test-server.js",
-    "http": "node server-http.js"
+    "start": "node server/backend-example.js",
+    "dev": "node server/backend-example.js",
+    "verify": "node server/verificar-stripe.js",
+    "test": "node server/test-server.js",
+    "http": "node server/server-http.js"
   },
   "keywords": [
     "stripe",

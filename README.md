@@ -1,66 +1,67 @@
-# Dynasty Prestige - Official Website
+# Dynasty Prestige Web
 
-Professional website for Dynasty Prestige - Luxury Car Rental
+Website and reservation stack for Dynasty Prestige, focused on luxury car rental in Dubai.
 
-## 🚗 Features
+## Project Areas
 
-- **Professional Design**: Elegant interface with black, gold, and silver palette
-- **Reservation System**: Interactive calendar with vehicle availability
-- **Payment Gateway**: Full Stripe integration (Apple Pay, Google Pay, Cards, Stripe Link)
-- **Contact Form**: Full contact system with validation
-- **Responsive Design**: Adapted for all devices
+- `site/`: public website, home, SEO landings, assets, sitemap, robots, manifest, and legal pages
+- `site/app/reserve/page.html`: reservation and payment flow
+- `server/`: backend entrypoint, local static server, smoke tests, and Stripe verification helpers
+- `app/api/reserve/route.js`: reservation routes mounted by the backend
+- `docs/`: active project documentation, audit work, and target architecture
 
-## 🚙 Vehicle Fleet
+## Structure
 
-- Mercedes GLE 53 AMG
-- Mercedes GLE Coupe 400 D
-- Mercedes GLE 400D
-- Lamborghini Huracán
+- `site/index.html`: main brand website
+- `site/config.js`: frontend runtime environment detection
+- `server/backend-example.js`: backend entrypoint used by `npm start`
+- `server/server-http.js`: local static server for previewing `site/`
+- `server/test-server.js`: smoke test covering syntax, routes, sitemap, and key markup
+- `server/verificar-stripe.js`: Stripe configuration verification helper
 
-## 📋 Technologies Used
+## Commands
 
-- HTML5
-- CSS3
-- JavaScript (Vanilla)
-- Stripe.js
-- Node.js / Express (Backend)
-- Font Awesome
+- `npm install`: install dependencies
+- `npm start`: start the backend
+- `npm run http`: serve the public site locally
+- `npm test`: run repo and site smoke tests
+- `npm run verify`: run Stripe configuration checks
 
-## 🔧 Setup
+## Environment
 
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Configure environment variables in `.env`:
-   - `STRIPE_SECRET_KEY` - Stripe secret key
-   - `STRIPE_WEBHOOK_SECRET` - Webhook secret (optional)
-4. Configure `config.js` with your Stripe publishable key
-5. Start the backend server: `npm start`
-6. Open `index.html` in a browser
+1. Copy `.env.example` to `.env`
+2. Set `STRIPE_SECRET_KEY`
+3. Optionally set `STRIPE_WEBHOOK_SECRET`
+4. Set mail delivery using either `EMAIL_*` or generic `SMTP_*` variables
+5. Optionally extend `ALLOWED_ORIGINS`
+6. Only enable `SMTP_ALLOW_SELF_SIGNED=true` if your mail setup truly needs it
+7. Use `CONTACT_FORM_LOG_ONLY=true` only for local previews where you want contact submissions logged instead of sent
 
-## 💳 Stripe Payments Integration
+## Contact Form Notes
 
-Stripe payments are fully implemented. See `STRIPE-IMPLEMENTACION.md` for full details.
+- `site/index.html` and `site/contact.html` now share the same contact form runtime helper in `site/js/contact-form.js`
+- the backend contact route lives in `server/backend-example.js` at `/api/contact`
+- the backend can now boot without Stripe so the contact flow can still be tested locally
+- production contact delivery still requires valid mail credentials in `.env` or Railway variables
 
-### Available payment methods:
-- ✅ Credit/Debit cards (Stripe Elements)
-- ✅ Apple Pay
-- ✅ Google Pay
-- ✅ Stripe Link
+## Active Documentation
 
-## 📞 Contact
+- [AUDITORIA-INICIAL-2026-03-30.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/audit/AUDITORIA-INICIAL-2026-03-30.md)
+- [CHECKLIST-REMEDIACION-2026-03-30.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/audit/CHECKLIST-REMEDIACION-2026-03-30.md)
+- [ARQUITECTURA-OBJETIVO-SITIO.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/architecture/ARQUITECTURA-OBJETIVO-SITIO.md)
+- [BACKLOG-EVOLUCION-SITIO.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/architecture/BACKLOG-EVOLUCION-SITIO.md)
 
-- **Address (UAE)**: Street Palm Jumeirah, Dubai
-- **Phone**: +971 586122568
-- **Email**: prestigegoalmotion@gmail.com
-- **Instagram**: @prestigegoalmotion
-- **Hours**: 24/7, Monday to Monday
+## Current Focus
 
-## 📝 Notes
+- validate deployed routing so public landings serve their own HTML in production
+- validate Stripe webhook and a full test payment flow
+- keep growing the site from a landing-heavy structure into a more professional brand website without losing SEO traction
 
-- The payment system requires backend configuration with Stripe
-- Images use external URLs (consider hosting your own for production)
-- Availability calendar is simulated (connect to a real database)
+## Notes
 
-## 📄 License
+- `npm test` covers the local technical baseline before SEO work
+- the next product layer lives in `docs/architecture/`, not in ad-hoc Markdown files at the repo root
 
-© 2025 Dynasty Prestige. All rights reserved.
+## License
+
+Copyright 2025 Dynasty Prestige. All rights reserved.
