@@ -36,7 +36,7 @@
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://prestigegoalmotion.com/">
+    <meta property="og:url" content="https://dynastyprestigecarrental.com/">
     <meta property="og:title" content="Luxury Car Rental Dubai | Supercar Hire, Lamborghini, Ferrari & G63">
     <meta property="og:description" content="Luxury car rental in Dubai with Lamborghini, Ferrari, Porsche and Mercedes G63 AMG. Transparent pricing, free delivery across Dubai and 24/7 concierge support.">
     <meta property="og:image" content="https://prestigegoalmotion.com/logo-dp-transparent.png">
@@ -2372,6 +2372,24 @@
             background: linear-gradient(180deg, rgba(14,14,16,0.88), rgba(5,5,7,0.96));
             box-shadow: var(--panel-shadow);
         }
+        .footer-brand-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.4rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.25rem;
+        }
+        .footer-brand-logo {
+            display: block;
+            width: auto;
+            height: 72px;
+            object-fit: contain;
+            filter: drop-shadow(0 12px 28px rgba(0,0,0,0.35));
+        }
+        .footer-brand-logo--car {
+            height: 54px;
+        }
         .footer-legal {
             margin: 1rem 0 1.25rem;
         }
@@ -2882,6 +2900,16 @@
                 padding: 1.5rem 1rem 1.35rem;
                 border-radius: 22px;
             }
+            .footer-brand-row {
+                gap: 1rem;
+                margin-bottom: 1rem;
+            }
+            .footer-brand-logo {
+                height: 56px;
+            }
+            .footer-brand-logo--car {
+                height: 40px;
+            }
             .footer-legal {
                 display: flex;
                 flex-direction: column;
@@ -3035,8 +3063,8 @@
             <p class="fleet-status" id="fleetStatus">Showing all 6 vehicles.</p>
         </div>
         <div class="fleet-grid">
-            <div class="car-card" data-region="ES" data-brand="lamborghini" data-title="Lamborghini Huracan EVO Spyder" data-price-eur="800" data-price-aed="3200" data-gallery='["/images/fleet/lamborghini-huracan/01-exterior-front.png","/images/fleet/lamborghini-huracan/03-exterior-rear.png","/images/fleet/lamborghini-huracan/04-interior-cockpit.png","/images/fleet/lamborghini-huracan/02-center-console.png","/images/fleet/lamborghini-huracan/05-seat-detail.png","/images/fleet/lamborghini-huracan/06-steering-wheel-detail.png"]'>
-                <img src="/images/fleet/lamborghini-huracan/01-exterior-front.png" alt="Lamborghini Huracan EVO Spyder supercar rental Dubai" loading="lazy" width="350" height="250" decoding="async">
+            <div class="car-card" data-region="ES" data-brand="lamborghini" data-title="Lamborghini Huracan EVO Spyder" data-price-eur="800" data-price-aed="3200" data-gallery='["/images/fleet/lamborghini-huracan/01-exterior-front-cover.png","/images/fleet/lamborghini-huracan/03-exterior-rear.png","/images/fleet/lamborghini-huracan/04-interior-cockpit.png","/images/fleet/lamborghini-huracan/02-center-console.png","/images/fleet/lamborghini-huracan/05-seat-detail.png","/images/fleet/lamborghini-huracan/06-steering-wheel-detail.png"]'>
+                <img src="/images/fleet/lamborghini-huracan/01-exterior-front-cover.png" alt="Lamborghini Huracan EVO Spyder supercar rental Dubai" loading="lazy" width="350" height="250" decoding="async">
                 <div class="car-info">
                     <h3>Lamborghini Huracan EVO Spyder</h3>
                     <p class="car-description">V10-powered Lamborghini convertible with open-top drama, sharp handling and the unmistakable EVO Spyder feel for Dubai drives.</p>
@@ -3708,6 +3736,10 @@
     <!-- Footer -->
     <footer>
         <div class="footer-inner">
+        <div class="footer-brand-row" aria-label="Dynasty Prestige footer branding">
+            <img class="footer-brand-logo" src="/logo-dp-transparent.png" alt="Dynasty Prestige logo" loading="lazy" decoding="async">
+            <img class="footer-brand-logo footer-brand-logo--car" src="/images/branding/lamborghini-huracan-evo-footer.png" alt="Lamborghini Huracan EVO logo mark" loading="lazy" decoding="async">
+        </div>
         <p>&copy; 2025 Dynasty Prestige – Luxury Car Rental Dubai. <span data-i18n="footer.rights">All rights reserved.</span></p>
         <div class="footer-legal">
             <a href="terms-and-conditions.html" style="color: var(--silver); text-decoration: none; font-size: 0.9rem; margin: 0 1rem;" data-i18n="footer.terms">Terms and Conditions</a>
