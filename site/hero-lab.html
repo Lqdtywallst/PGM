@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynasty Prestige Hero Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/hero-lab.css">
+    <script src="./js/hero-lab.js" defer></script>
+</head>
+<body>
+    <!-- Header fijo: nos sirve para probar la relación entre marca, navegación y hero. -->
+    <header class="lab-header">
+        <div class="lab-shell lab-header__inner">
+            <a href="/" class="lab-brand" aria-label="Dynasty Prestige home">
+                <span class="lab-brand__crest" aria-hidden="true">
+                    <img src="./images/dp-crest-cropped.png" alt="">
+                </span>
+                <span class="lab-brand__copy">
+                    <strong>Dynasty Prestige</strong>
+                    <span>Dubai luxury car rental</span>
+                </span>
+            </a>
+
+            <div class="lab-header__nav">
+                <nav class="lab-nav" aria-label="Main navigation">
+                    <a href="#" aria-current="page">Home</a>
+                    <a href="#">Fleet</a>
+                    <a href="#">Locations</a>
+                    <a href="#">Services</a>
+                    <a href="#">About</a>
+                    <a href="#">Contact</a>
+                </nav>
+                <a href="#" class="lab-reserve">Reserve</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="lab-main">
+        <!-- Hero aislado:
+             1. video de fondo
+             2. capas oscuras para controlar legibilidad
+             3. contenido editorial a la izquierda
+             4. marca fantasma a la derecha para equilibrar el vacío -->
+        <section class="hero-lab js-hero-lab">
+            <video class="hero-lab__video js-hero-lab-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
+                <source src="./media/hero-sports-road.mp4" type="video/mp4">
+            </video>
+            <div class="hero-lab__overlay" aria-hidden="true"></div>
+            <div class="hero-lab__glow" aria-hidden="true"></div>
+
+            <div class="lab-shell hero-lab__shell">
+                <!-- Marca decorativa de fondo: no es contenido funcional, solo compensa la derecha. -->
+                <div class="hero-lab__mark" aria-hidden="true">
+                    <img src="./logo-dp-transparent.png" alt="">
+                </div>
+
+                <!-- Una sola content box grande alineada a la izquierda.
+                     Dentro de ella, cada pieza usa su propio ancho, pero todas
+                     arrancan desde el mismo borde izquierdo. -->
+                <div class="hero-lab__body">
+                    <div class="hero-lab__content-box">
+                        <div class="hero-lab__body-copy">
+                            <span class="hero-lab__eyebrow">Dubai luxury car rental</span>
+                            <h1>Dubai runs on presence, timing and first impressions. Your arrival should answer all three.</h1>
+                            <p class="hero-lab__lead">Dynasty Prestige is built for guests who want more than a generic rental desk. We curate supercars and premium SUVs around the actual stay, then coordinate availability, confirmation, delivery and handover so the car fits the schedule as cleanly as the city expects.</p>
+                        </div>
+
+                        <!-- Launcher:
+                             este bloque sustituye al booking visible; primero activa la acción
+                             y después ya podríamos desplegar fechas en la home real. -->
+                        <div class="hero-lab__launcher">
+                            <h2>Choose the dates. Then move with intent.</h2>
+                            <p>Start with the rental window and we narrow the right cars for hotel arrivals, villa stays, airport handovers and high-visibility city movement across Dubai.</p>
+                            <div class="hero-lab__actions">
+                                <button
+                                    type="button"
+                                    class="hero-lab__cta hero-lab__cta--primary js-hero-lab-open"
+                                    aria-haspopup="dialog"
+                                    aria-controls="hero-lab-overlay"
+                                    aria-expanded="false"
+                                >
+                                    Choose your dates
+                                </button>
+                                <a href="#" class="hero-lab__cta hero-lab__cta--secondary">View fleet</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Overlay global:
+             replica la lÃ³gica de Prestige: se monta como capa fija, no como
+             formulario incrustado dentro del launcher. -->
+        <div class="hero-lab-overlay" id="hero-lab-overlay" aria-hidden="true">
+            <div class="hero-lab-overlay__scrim" data-overlay-close></div>
+
+            <section
+                class="hero-lab-overlay__sheet"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="hero-lab-overlay-title"
+                aria-describedby="hero-lab-overlay-copy"
+            >
+                <div class="lab-shell hero-lab-overlay__shell">
+                    <div class="hero-lab-overlay__header">
+                        <div class="hero-lab-overlay__intro">
+                            <h2 id="hero-lab-overlay-title">Lock the rental window. Then view the fleet that fits it.</h2>
+                            <p id="hero-lab-overlay-copy">Set pickup and return timing first. The next step is not guessing through inventory, but moving straight into the supercars and premium SUVs that suit the stay, the handover point and the pace of the visit.</p>
+                        </div>
+
+                        <button type="button" class="hero-lab-overlay__close" data-overlay-close aria-label="Close rental search">
+                            Close
+                        </button>
+                    </div>
+
+                    <form class="hero-lab-overlay__form">
+                        <div class="hero-lab-overlay__field-group">
+                            <label class="hero-lab-overlay__label" for="hero-lab-pickup-date">Pickup date</label>
+                            <div class="hero-lab-overlay__input-row">
+                                <input id="hero-lab-pickup-date" class="hero-lab-overlay__input hero-lab-overlay__input--date" type="date" value="2026-04-01">
+                                <select class="hero-lab-overlay__input hero-lab-overlay__input--time" aria-label="Pickup time">
+                                    <option>12:00</option>
+                                    <option>13:00</option>
+                                    <option>14:00</option>
+                                    <option>15:00</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="hero-lab-overlay__field-group">
+                            <label class="hero-lab-overlay__label" for="hero-lab-return-date">Return date</label>
+                            <div class="hero-lab-overlay__input-row">
+                                <input id="hero-lab-return-date" class="hero-lab-overlay__input hero-lab-overlay__input--date" type="date" value="2026-04-02">
+                                <select class="hero-lab-overlay__input hero-lab-overlay__input--time" aria-label="Return time">
+                                    <option>12:00</option>
+                                    <option>13:00</option>
+                                    <option>14:00</option>
+                                    <option>15:00</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="hero-lab-overlay__submit">Search vehicles</button>
+                    </form>
+
+                    <p class="hero-lab-overlay__note">Choose dates in Dubai time (GMT+4).</p>
+                </div>
+            </section>
+        </div>
+    </main>
+</body>
+</html>

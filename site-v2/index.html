@@ -1,0 +1,549 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynasty Prestige Site V2</title>
+    <meta name="description" content="Fresh V2 foundation for Dynasty Prestige, starting from the validated header, editorial hero, staged intro and booking overlay.">
+    <script>document.documentElement.classList.add("js");</script>
+    <style>
+        .js .hero-lab.hero-lab--intro-pending .hero-lab__video {
+            opacity: 0.15;
+            transform: scale(1.085);
+            filter: saturate(0.62) brightness(0.38);
+        }
+
+        .js .hero-lab.hero-lab--intro-pending .hero-lab__overlay {
+            background:
+                linear-gradient(90deg, rgba(4, 4, 6, 0.88) 0%, rgba(4, 4, 6, 0.84) 34%, rgba(4, 4, 6, 0.64) 66%, rgba(4, 4, 6, 0.9) 100%),
+                linear-gradient(180deg, rgba(4, 4, 6, 0.84) 0%, rgba(4, 4, 6, 0.3) 34%, rgba(4, 4, 6, 0.92) 100%);
+        }
+
+        .js .hero-lab.hero-lab--intro-pending .hero-lab__glow {
+            inset: 10% -8% 10% 38%;
+            opacity: 0.16;
+            filter: blur(32px);
+        }
+
+        .js .hero-lab.hero-lab--intro-pending .hero-lab__body-copy {
+            opacity: 0;
+            transform: translateY(2rem) scale(1.04);
+            filter: blur(14px);
+        }
+
+        .js .hero-lab.hero-lab--intro-pending .hero-lab__mark {
+            opacity: 0;
+            transform: translate3d(-50%, -50%, 0) scale(0.84);
+            filter: sepia(1) saturate(2) hue-rotate(338deg) brightness(0.88) contrast(0.9) blur(2px);
+        }
+
+        .js .hero-lab.hero-lab--intro-pending .hero-lab__launcher {
+            opacity: 0;
+            transform: translateY(2.5rem);
+            filter: blur(10px);
+            pointer-events: none;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/site-v2.css?v=20260403b">
+    <script src="./js/site-v2.js?v=20260403b" defer></script>
+    <script type="module" src="./js/site-v2-3d.js?v=20260403b"></script>
+</head>
+<body>
+    <!-- Base nueva de trabajo:
+         esta V2 arranca desde el hero validado, separada de la home antigua. -->
+    <header class="lab-header">
+        <div class="lab-shell lab-header__inner">
+            <a href="./index.html" class="lab-brand" aria-label="Dynasty Prestige home">
+                <span class="lab-brand__crest" aria-hidden="true">
+                    <img src="./images/dp-crest-cropped.png" alt="">
+                </span>
+                <span class="lab-brand__copy">
+                    <strong>Dynasty Prestige</strong>
+                    <span>Dubai luxury car rental</span>
+                </span>
+            </a>
+
+            <div class="lab-header__nav">
+                <nav class="lab-nav" aria-label="Main navigation">
+                    <a href="#" aria-current="page">Home</a>
+                    <a href="#fleet-catalog">Fleet</a>
+                    <a href="#locations-teaser">Locations</a>
+                    <a href="#service-layer">Services</a>
+                    <a href="../site/about.html">About</a>
+                    <a href="#contact">Contact</a>
+                </nav>
+                <button
+                    type="button"
+                    class="lab-reserve js-booking-open"
+                    aria-haspopup="dialog"
+                    aria-controls="hero-lab-overlay"
+                    aria-expanded="false"
+                >
+                    Reserve
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="lab-main">
+        <!-- Hero aislado:
+             1. video de fondo
+             2. capas oscuras para controlar legibilidad
+             3. contenido editorial a la izquierda
+             4. marca fantasma a la derecha para equilibrar el vacÃ­o -->
+        <section class="hero-lab hero-lab--intro-pending js-hero-lab">
+            <video class="hero-lab__video js-hero-lab-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
+                <source src="./media/hero-sports-road.mp4" type="video/mp4">
+            </video>
+            <div class="hero-lab__overlay" aria-hidden="true"></div>
+            <div class="hero-lab__glow" aria-hidden="true"></div>
+
+            <div class="lab-shell hero-lab__shell">
+                <!-- Marca decorativa de fondo: no es contenido funcional, solo compensa la derecha. -->
+                <div class="hero-lab__mark" aria-hidden="true">
+                    <img src="./logo-dp-transparent.png" alt="">
+                </div>
+
+                <!-- Una sola content box grande alineada a la izquierda.
+                     Dentro de ella, cada pieza usa su propio ancho, pero todas
+                     arrancan desde el mismo borde izquierdo. -->
+                <div class="hero-lab__body">
+                    <div class="hero-lab__content-box">
+                        <div class="hero-lab__body-copy">
+                            <span class="hero-lab__eyebrow">Dubai luxury car rental</span>
+                            <h1>Dubai runs on presence, timing and first impressions. Your arrival should answer all three.</h1>
+                            <p class="hero-lab__lead">Dynasty Prestige is built for guests who want more than a generic rental desk. We curate supercars and premium SUVs around the actual stay, then coordinate availability, confirmation, delivery and handover so the car fits the schedule as cleanly as the city expects.</p>
+                        </div>
+
+                        <!-- Launcher:
+                             este bloque sustituye al booking visible; primero activa la acciÃ³n
+                             y despuÃ©s ya podrÃ­amos desplegar fechas en la home real. -->
+                        <div class="hero-lab__launcher">
+                            <h2>Choose the dates. Then move with intent.</h2>
+                            <p>Start with the rental window and we narrow the right cars for hotel arrivals, villa stays, airport handovers and high-visibility city movement across Dubai.</p>
+                            <div class="hero-lab__actions">
+                                <button
+                                    type="button"
+                                    class="hero-lab__cta hero-lab__cta--primary js-booking-open"
+                                    aria-haspopup="dialog"
+                                    aria-controls="hero-lab-overlay"
+                                    aria-expanded="false"
+                                >
+                                    Choose your dates
+                                </button>
+                                <a href="#fleet-catalog" class="hero-lab__cta hero-lab__cta--secondary">View fleet</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="fleet-categories" id="fleet-categories" aria-label="Browse by category">
+            <div class="lab-shell fleet-categories__shell">
+                <div class="fleet-categories__stage" aria-hidden="true">
+                    <canvas class="fleet-categories__master-canvas"></canvas>
+                </div>
+                <a class="fleet-category fleet-category--sports" data-vehicle-type="sports" href="../site/supercar-rental-dubai.html">
+                    <span class="fleet-category__media">
+                        <span class="fleet-category__canvas-shell" aria-hidden="true"></span>
+                    </span>
+                    <span class="fleet-category__copy">
+                        <strong>Sports</strong>
+                        <span>Mid-engine profile</span>
+                    </span>
+                </a>
+                <a class="fleet-category fleet-category--convertible" data-vehicle-type="convertible" href="../site/ferrari-rental-dubai.html">
+                    <span class="fleet-category__media">
+                        <span class="fleet-category__canvas-shell" aria-hidden="true"></span>
+                    </span>
+                    <span class="fleet-category__copy">
+                        <strong>Convertible</strong>
+                        <span>Open-top silhouette</span>
+                    </span>
+                </a>
+                <a class="fleet-category fleet-category--luxury" data-vehicle-type="luxury" href="../site/luxury-car-rental-dubai.html">
+                    <span class="fleet-category__media">
+                        <span class="fleet-category__canvas-shell" aria-hidden="true"></span>
+                    </span>
+                    <span class="fleet-category__copy">
+                        <strong>Luxury</strong>
+                        <span>Executive line</span>
+                    </span>
+                </a>
+                <a class="fleet-category fleet-category--suv" data-vehicle-type="suv" href="../site/lamborghini-rental-dubai.html">
+                    <span class="fleet-category__media">
+                        <span class="fleet-category__canvas-shell" aria-hidden="true"></span>
+                    </span>
+                    <span class="fleet-category__copy">
+                        <strong>SUV</strong>
+                        <span>Elevated stance</span>
+                    </span>
+                </a>
+                <a class="fleet-category fleet-category--electric" data-vehicle-type="electric" href="#contact">
+                    <span class="fleet-category__media">
+                        <span class="fleet-category__canvas-shell" aria-hidden="true"></span>
+                    </span>
+                    <span class="fleet-category__copy">
+                        <strong>Electric</strong>
+                        <span>Silent torque</span>
+                    </span>
+                </a>
+            </div>
+        </section>
+
+        <section class="featured-fleet" id="fleet-catalog">
+            <div class="lab-shell featured-fleet__shell">
+                <div class="featured-fleet__intro">
+                    <span class="hero-lab__eyebrow featured-fleet__eyebrow">Featured fleet</span>
+                    <h2>The first cars on screen should already feel like the right answer.</h2>
+                    <p>These are the models guests tend to ask for first when the brief is simple: arrive well, move cleanly and keep the handover as polished as the rest of the stay.</p>
+                </div>
+
+                <div class="fleet-showcase">
+                    <div class="fleet-showcase__lane">
+                        <div class="fleet-showcase__head">
+                            <h3>Supercars</h3>
+                            <p>High-visibility arrival</p>
+                        </div>
+
+                        <a class="fleet-visual-card" href="../site/lamborghini-rental-dubai.html">
+                            <img src="./images/fleet/lamborghini-huracan/01-exterior-front.png" alt="Lamborghini Huracan EVO Spyder">
+                            <span class="fleet-visual-card__shade" aria-hidden="true"></span>
+                            <div class="fleet-visual-card__content">
+                                <span class="fleet-visual-card__label">Open-top supercar</span>
+                                <strong>Lamborghini Huracan EVO Spyder</strong>
+                                <span>Palm arrivals, marina dinners and weekend theatre.</span>
+                            </div>
+                        </a>
+
+                        <a class="fleet-visual-card" href="../site/ferrari-rental-dubai.html">
+                            <img src="./images/fleet/ferrari-296-gts/01-exterior-front.jpg" alt="Ferrari 296 GTS">
+                            <span class="fleet-visual-card__shade" aria-hidden="true"></span>
+                            <div class="fleet-visual-card__content">
+                                <span class="fleet-visual-card__label">Hybrid supercar</span>
+                                <strong>Ferrari 296 GTS</strong>
+                                <span>Sharper city presence for dinners, hotels and special evenings.</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="fleet-showcase__lane">
+                        <div class="fleet-showcase__head">
+                            <h3>Luxury SUVs</h3>
+                            <p>Comfort, command and handover ease</p>
+                        </div>
+
+                        <a class="fleet-visual-card" href="../site/lamborghini-rental-dubai.html">
+                            <img src="./images/fleet/lamborghini-urus/01-exterior-front.png" alt="Lamborghini Urus Sport">
+                            <span class="fleet-visual-card__shade" aria-hidden="true"></span>
+                            <div class="fleet-visual-card__content">
+                                <span class="fleet-visual-card__label">Performance SUV</span>
+                                <strong>Lamborghini Urus Sport</strong>
+                                <span>Fast comfort for airport movement and resort stays.</span>
+                            </div>
+                        </a>
+
+                        <a class="fleet-visual-card" href="../site/rolls-royce-rental-dubai.html">
+                            <img src="./images/fleet/rolls-royce-cullinan-black-badge/06-exterior-front-open-doors.png" alt="Rolls-Royce Cullinan Black Badge">
+                            <span class="fleet-visual-card__shade" aria-hidden="true"></span>
+                            <div class="fleet-visual-card__content">
+                                <span class="fleet-visual-card__label">Flagship comfort</span>
+                                <strong>Rolls-Royce Cullinan Black Badge</strong>
+                                <span>Executive calm for villas, hotels and discreet arrivals.</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="featured-fleet__footer">
+                    <p>Choose the rental window once, then move into the wider selection with the same timing carried forward into availability, delivery and handover.</p>
+                    <div class="featured-fleet__footer-actions">
+                        <button
+                            type="button"
+                            class="featured-fleet__footer-button js-booking-open"
+                            aria-haspopup="dialog"
+                            aria-controls="hero-lab-overlay"
+                            aria-expanded="false"
+                        >
+                            Open date search
+                        </button>
+                        <a href="../site/fleet.html" class="featured-fleet__link">View full fleet</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+<section class="service-layer" id="service-layer">
+            <div class="lab-shell service-layer__shell">
+                <div class="service-layer__intro">
+                    <span class="hero-lab__eyebrow service-layer__eyebrow">Service layer</span>
+                    <h2>The service should feel visible, calm and already under control.</h2>
+                    <p>Think less "rental process" and more guided arrival. The guest chooses the timing once, then Dynasty carries the booking through confirmation, handover and return without losing the thread.</p>
+                </div>
+
+                <div class="service-story">
+                    <article class="service-scene service-scene--hero">
+                        <img src="./images/service-handover.png" alt="Luxury SUV handover in Dubai">
+                        <span class="service-scene__shade" aria-hidden="true"></span>
+                        <div class="service-scene__content">
+                            <span class="service-feature__label">Hotel / villa / airport handover</span>
+                            <h3>The arrival should already feel expected.</h3>
+                            <p>Delivery should enter the stay cleanly, whether the booking starts at a hotel porte-cochere, a private villa or the airport.</p>
+                        </div>
+                    </article>
+
+                    <div class="service-story__stack">
+                        <article class="service-promise">
+                            <span class="service-feature__label">Concierge standard</span>
+                            <h3>One team carries the booking from first dates to final return.</h3>
+                            <p>That continuity matters. It keeps the process calmer, cuts message drift and makes the whole experience feel coordinated instead of fragmented.</p>
+                            <ul class="service-promise__points">
+                                <li>Secure 50% confirmation to move from interest into a real booking.</li>
+                                <li>Model fit based on the stay, not just on the inventory list.</li>
+                                <li>Delivery and return planning held by the same team.</li>
+                            </ul>
+                        </article>
+
+                        <div class="service-snapshots">
+                            <article class="service-scene service-scene--mini">
+                                <img src="./images/service-cockpit.png" alt="Luxury cockpit detail">
+                                <span class="service-scene__shade" aria-hidden="true"></span>
+                                <div class="service-scene__content">
+                                    <span class="service-feature__label">Single point of contact</span>
+                                    <p>Less handoff, more calm.</p>
+                                </div>
+                            </article>
+
+                            <article class="service-scene service-scene--mini">
+                                <img src="./images/service-detail.png" alt="Luxury seat detail">
+                                <span class="service-scene__shade" aria-hidden="true"></span>
+                                <div class="service-scene__content">
+                                    <span class="service-feature__label">Built around the stay</span>
+                                    <p>From dinner arrivals to villa weekends.</p>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="service-journey">
+                    <div class="service-journey__intro">
+                        <span class="service-process__kicker">How it flows</span>
+                        <h3>Three short steps. Then the stay starts to feel organised.</h3>
+                        <p>Keep the sequence clean: lock the rental window, narrow the right cars, then let one team turn the booking into a precise delivery and return plan built around Dubai.</p>
+                        <button
+                            type="button"
+                            class="service-process__button js-booking-open"
+                            aria-haspopup="dialog"
+                            aria-controls="hero-lab-overlay"
+                            aria-expanded="false"
+                        >
+                            Start with the dates
+                        </button>
+                    </div>
+
+                    <div class="service-journey__steps">
+                        <article class="service-step-card">
+                            <strong>01</strong>
+                            <h4>Choose the rental window</h4>
+                            <p>Dates and timing come first so availability, delivery and every next action are grounded in the real stay.</p>
+                        </article>
+
+                        <article class="service-step-card">
+                            <strong>02</strong>
+                            <h4>Narrow the right cars</h4>
+                            <p>Once the stay is defined, the fleet becomes a better decision: statement supercar, performance SUV or flagship comfort.</p>
+                        </article>
+
+                        <article class="service-step-card">
+                            <strong>03</strong>
+                            <h4>Confirm the handover plan</h4>
+                            <p>Secure the booking, then let the team finalise documents, delivery location, return rhythm and the last-mile sequence around Dubai.</p>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Overlay global:
+             replica la logica de Prestige: se monta como capa fija, no como
+             formulario incrustado dentro del launcher. -->
+        <section class="locations-teaser" id="locations-teaser">
+            <div class="lab-shell locations-teaser__shell">
+                <div class="locations-teaser__intro">
+                    <div class="locations-teaser__copy">
+                        <span class="hero-lab__eyebrow locations-teaser__eyebrow">Locations</span>
+                        <h2>Choose the handover zone before you choose the exact address.</h2>
+                        <p>The best handover plan starts with the area, not the map pin. Palm, Marina, Downtown and airport all suit different stays, rhythms and arrival styles across Dubai.</p>
+                    </div>
+
+                    <div class="locations-teaser__actions">
+                        <a href="../site/locations.html" class="locations-teaser__primary">Open locations guide</a>
+                        <button
+                            type="button"
+                            class="locations-teaser__secondary js-booking-open"
+                            aria-haspopup="dialog"
+                            aria-controls="hero-lab-overlay"
+                            aria-expanded="false"
+                        >
+                            Start with dates
+                        </button>
+                    </div>
+                </div>
+
+                <div class="locations-grid">
+                    <article class="location-card location-card--palm">
+                        <span class="location-card__chip">Palm Jumeirah</span>
+                        <h3>Hotel and villa stays</h3>
+                        <p>Best when the arrival should feel polished, resort-led and slightly more private than central-city delivery.</p>
+                        <div class="location-card__meta">
+                            <span>Usually free</span>
+                            <span>Resort arrivals</span>
+                        </div>
+                    </article>
+
+                    <article class="location-card location-card--marina">
+                        <span class="location-card__chip">Dubai Marina</span>
+                        <h3>Waterfront hotel handovers</h3>
+                        <p>Strong for towers, hotels and shorter leisure stays that want polished access without overcomplicating the route.</p>
+                        <div class="location-card__meta">
+                            <span>Usually free</span>
+                            <span>Towers and hotels</span>
+                        </div>
+                    </article>
+
+                    <article class="location-card location-card--downtown">
+                        <span class="location-card__chip">Downtown Dubai</span>
+                        <h3>Central business and events</h3>
+                        <p>The cleanest match when meetings, events and premium central hotels matter more than a beachfront arrival feel.</p>
+                        <div class="location-card__meta">
+                            <span>Usually free</span>
+                            <span>Business and events</span>
+                        </div>
+                    </article>
+
+                    <article class="location-card location-card--airport">
+                        <span class="location-card__chip">Dubai Airport</span>
+                        <h3>Arrival-focused coordination</h3>
+                        <p>For guests who want the car to be part of the landing itself, with tighter timing and a cleaner handover sequence.</p>
+                        <div class="location-card__meta">
+                            <span>From 150 AED</span>
+                            <span>Flight-window planning</span>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+        <footer class="site-v2-footer" id="contact">
+            <div class="lab-shell site-v2-footer__shell">
+                <div class="site-v2-footer__top">
+                    <div class="site-v2-footer__brand">
+                        <span class="site-v2-footer__crest" aria-hidden="true">
+                            <img src="./images/dp-crest-cropped.png" alt="">
+                        </span>
+                        <p>Dynasty Prestige keeps the experience focused: curated supercars, luxury SUVs, transparent starting rates and one team handling timing, delivery, handover and return.</p>
+                    </div>
+
+                    <div class="site-v2-footer__column">
+                        <h3>Useful links</h3>
+                        <a href="./index.html">Home</a>
+                        <a href="#fleet-catalog">Featured fleet</a>
+                        <a href="#service-layer">Service layer</a>
+                        <a href="#locations-teaser">Locations</a>
+                        <a href="../site/contact.html">Contact us</a>
+                    </div>
+
+                    <div class="site-v2-footer__column">
+                        <h3>Contact us</h3>
+                        <a href="tel:+971586122568">+971 58 612 2568</a>
+                        <a href="https://wa.me/971586122568" target="_blank" rel="noopener">WhatsApp the team</a>
+                        <a href="mailto:prestigegoalmotion@gmail.com">prestigegoalmotion@gmail.com</a>
+                        <p>Palm Jumeirah, Dubai UAE with hotel, villa and airport coordination across the city.</p>
+                    </div>
+                </div>
+
+                <div class="site-v2-footer__middle">
+                    <div class="site-v2-footer__service">
+                        <strong>24/7</strong>
+                        <span>Reservation support</span>
+                    </div>
+                </div>
+
+                <div class="site-v2-footer__bottom">
+                    <div class="site-v2-footer__legal">
+                        <a href="../site/terms-and-conditions.html">Booking T&amp;C</a>
+                        <a href="../site/contact.html">Privacy &amp; contact</a>
+                    </div>
+                    <p>&copy; 2026 Dynasty Prestige. All rights reserved.</p>
+                    <div class="site-v2-footer__socials">
+                        <a href="tel:+971586122568" aria-label="Call Dynasty Prestige">Call</a>
+                        <a href="https://wa.me/971586122568" target="_blank" rel="noopener" aria-label="Open WhatsApp">WA</a>
+                        <a href="mailto:prestigegoalmotion@gmail.com" aria-label="Send email">Mail</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <div class="hero-lab-overlay" id="hero-lab-overlay" aria-hidden="true">
+            <div class="hero-lab-overlay__scrim" data-overlay-close></div>
+
+            <section
+                class="hero-lab-overlay__sheet"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="hero-lab-overlay-title"
+                aria-describedby="hero-lab-overlay-copy"
+            >
+                <div class="lab-shell hero-lab-overlay__shell">
+                    <div class="hero-lab-overlay__header">
+                        <div class="hero-lab-overlay__intro">
+                            <h2 id="hero-lab-overlay-title">Lock the rental window. Then view the fleet that fits it.</h2>
+                            <p id="hero-lab-overlay-copy">Set pickup and return timing first. The next step is not guessing through inventory, but moving straight into the supercars and premium SUVs that suit the stay, the handover point and the pace of the visit.</p>
+                        </div>
+
+                        <button type="button" class="hero-lab-overlay__close" data-overlay-close aria-label="Close rental search">
+                            Close
+                        </button>
+                    </div>
+
+                    <form class="hero-lab-overlay__form">
+                        <div class="hero-lab-overlay__field-group">
+                            <label class="hero-lab-overlay__label" for="hero-lab-pickup-date">Pickup date</label>
+                            <div class="hero-lab-overlay__input-row">
+                                <input id="hero-lab-pickup-date" class="hero-lab-overlay__input hero-lab-overlay__input--date" type="date" value="2026-04-01">
+                                <select class="hero-lab-overlay__input hero-lab-overlay__input--time" aria-label="Pickup time">
+                                    <option>12:00</option>
+                                    <option>13:00</option>
+                                    <option>14:00</option>
+                                    <option>15:00</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="hero-lab-overlay__field-group">
+                            <label class="hero-lab-overlay__label" for="hero-lab-return-date">Return date</label>
+                            <div class="hero-lab-overlay__input-row">
+                                <input id="hero-lab-return-date" class="hero-lab-overlay__input hero-lab-overlay__input--date" type="date" value="2026-04-02">
+                                <select class="hero-lab-overlay__input hero-lab-overlay__input--time" aria-label="Return time">
+                                    <option>12:00</option>
+                                    <option>13:00</option>
+                                    <option>14:00</option>
+                                    <option>15:00</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="hero-lab-overlay__submit">Search vehicles</button>
+                    </form>
+
+                    <p class="hero-lab-overlay__note">Choose dates in Dubai time (GMT+4).</p>
+                </div>
+            </section>
+        </div>
+    </main>
+</body>
+</html>
+

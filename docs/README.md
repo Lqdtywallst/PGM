@@ -17,6 +17,8 @@ This repository keeps only active working documentation under `docs/` so the pro
   - future-state architecture for the professional brand site plus SEO support pages
 - [BACKLOG-EVOLUCION-SITIO.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/architecture/BACKLOG-EVOLUCION-SITIO.md)
   - practical next steps to move from the current site to that target architecture
+- [PRESTIGE-HOME-BLUEPRINT.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/architecture/PRESTIGE-HOME-BLUEPRINT.md)
+  - structural blueprint of the Prestige Dubai home adapted to Dynasty Prestige with a date-first booking dock
 
 ## Cleanup Rules
 

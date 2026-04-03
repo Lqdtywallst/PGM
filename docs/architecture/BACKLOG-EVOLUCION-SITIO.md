@@ -12,6 +12,7 @@ Traducir la arquitectura objetivo del sitio en un backlog corto, ejecutable y or
 ## Estado Actual
 
 - `2026-03-30`: primera iteracion visible aplicada en [index.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/index.html)
+- `2026-03-31`: blueprint estructural de referencia creado en [PRESTIGE-HOME-BLUEPRINT.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/architecture/PRESTIGE-HOME-BLUEPRINT.md) para rehacer la home con ritmo tipo Prestige y selector de fechas como dock principal
 - home reforzada como pagina de marca sin tocar slugs ni landings SEO
 - menu principal alineado con `Home`, `Fleet`, `Locations`, `Services`, `About`, `Contact` y CTA `Reserve`
 - hero, bloque de servicios, locations, about y contact ya reescritos en tono mas premium y mas coherente con la arquitectura objetivo

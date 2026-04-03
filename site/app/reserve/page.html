@@ -1671,6 +1671,7 @@
     <script>
         // Region (Dubai-only site, AED currency)
         const urlParams = new URLSearchParams(window.location.search);
+        const BOOKING_INTENT_KEY = 'dynastyBookingIntent';
         const RESERVE_REGION = 'AE';
         const isAED = true;
         const CURRENCY_SYMBOL = 'AED';
@@ -1798,6 +1799,51 @@
         // Get URL parameters (if coming from index.html)
         const carName = urlParams.get('car');
         const price = urlParams.get('price');
+        const startDateParam = urlParams.get('startDate');
+        const endDateParam = urlParams.get('endDate');
+        const pickupTimeParam = urlParams.get('pickupTime');
+        const dropoffTimeParam = urlParams.get('dropoffTime');
+
+        function getStoredBookingIntent() {
+            try {
+                const raw = window.sessionStorage.getItem(BOOKING_INTENT_KEY);
+                if (!raw) return null;
+                const parsed = JSON.parse(raw);
+                if (!parsed.savedAt || (Date.now() - parsed.savedAt) > (1000 * 60 * 60 * 24 * 7)) {
+                    window.sessionStorage.removeItem(BOOKING_INTENT_KEY);
+                    return null;
+                }
+                return parsed;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function applyPrefilledBookingSchedule() {
+            const storedIntent = getStoredBookingIntent();
+            const prefills = {
+                startDate: startDateParam || storedIntent?.startDate || '',
+                endDate: endDateParam || storedIntent?.endDate || '',
+                pickupTime: pickupTimeParam || storedIntent?.pickupTime || '',
+                dropoffTime: dropoffTimeParam || storedIntent?.dropoffTime || ''
+            };
+
+            if (!prefills.startDate || !prefills.endDate) {
+                return;
+            }
+
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            const pickupTimeInput = document.getElementById('pickupTime');
+            const dropoffTimeInput = document.getElementById('dropoffTime');
+
+            if (startDateInput) startDateInput.value = prefills.startDate;
+            if (endDateInput) endDateInput.value = prefills.endDate;
+            if (pickupTimeInput && prefills.pickupTime) pickupTimeInput.value = prefills.pickupTime;
+            if (dropoffTimeInput && prefills.dropoffTime) dropoffTimeInput.value = prefills.dropoffTime;
+
+            updateCalendarFromInputs();
+        }
         
         console.log('[RESERVE PAGE] Received parameters:', { carName, price, region: RESERVE_REGION });
         
@@ -1834,6 +1880,7 @@
         }
         initializeTimeSelect('pickupTime', '10:00');
         initializeTimeSelect('dropoffTime', '10:00');
+        applyPrefilledBookingSchedule();
         var summaryTotalEl = document.getElementById('summaryTotal');
         var totalAmountEl = document.getElementById('totalAmount');
         if (summaryTotalEl) summaryTotalEl.textContent = CURRENCY_ZERO;

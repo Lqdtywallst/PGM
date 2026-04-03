@@ -27,7 +27,8 @@ const requiredFiles = [
     'site/about.html',
     'site/contact.html',
     'site/css/hub-pages.css',
-    'site/js/contact-form.js'
+    'site/js/contact-form.js',
+    'site/media/hero-dubai-sunset.mp4'
 ];
 
 const syntaxFiles = [
@@ -258,6 +259,12 @@ async function run() {
         'reserve page includes the guided booking primer and selected vehicle summary'
     );
     assert(
+        reservePage.includes("const BOOKING_INTENT_KEY = 'dynastyBookingIntent'") &&
+        reservePage.includes("urlParams.get('startDate')") &&
+        reservePage.includes('applyPrefilledBookingSchedule()'),
+        'reserve page can prefill dates and times from the home booking intent'
+    );
+    assert(
         reservePage.includes('https://js.stripe.com/v3/') && reservePage.includes('config.js'),
         'reserve page loads Stripe.js and runtime config'
     );
@@ -272,6 +279,19 @@ async function run() {
         indexPage.includes('/contact.html') &&
         indexPage.includes('/lamborghini-rental-dubai.html'),
         'home page links to reservation, core trunk pages and key SEO landing pages'
+    );
+    assert(
+        indexPage.includes('id="heroAvailabilityForm"') &&
+        indexPage.includes('id="heroStartDate"') &&
+        indexPage.includes('id="heroEndDate"') &&
+        indexPage.includes('/media/hero-dubai-sunset.mp4'),
+        'home page exposes the date-first hero and local background video asset'
+    );
+    assert(
+        indexPage.includes("const BOOKING_INTENT_KEY = 'dynastyBookingIntent'") &&
+        indexPage.includes('fleetIntentBanner') &&
+        indexPage.includes('Show available cars'),
+        'home page carries hero date selection into fleet browsing and reservation links'
     );
 
     const fleetPage = readFile('site/fleet.html');

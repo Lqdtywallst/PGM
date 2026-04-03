@@ -1,0 +1,701 @@
+:root {
+    /* Variables del laboratorio:
+       aquí fijamos color, contraste y medidas base sin tocar todavía la home real. */
+    --lab-bg: #07080a;
+    --lab-text: #f5f1e8;
+    --lab-muted: rgba(245, 241, 232, 0.76);
+    --lab-muted-soft: rgba(245, 241, 232, 0.6);
+    --lab-border: rgba(255, 255, 255, 0.09);
+    --lab-accent: #e3f655;
+    --lab-accent-soft: #f1ff9d;
+    --lab-champagne: #f1e2bd;
+    --lab-header-offset: 96px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+    background: #050506;
+}
+
+body {
+    color: var(--lab-text);
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+body.hero-lab-overlay-open {
+    overflow: hidden;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+button,
+input,
+select {
+    font: inherit;
+}
+
+.lab-shell {
+    /* Contenedor maestro del prototipo.
+       Reproduce un ancho desktop parecido al de la referencia. */
+    width: min(72rem, calc(100% - 72px));
+    margin: 0 auto;
+}
+
+.lab-header {
+    /* Header fijo con degradado para que no corte bruscamente el fondo del hero. */
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 20;
+    background: linear-gradient(180deg, rgba(4, 4, 6, 0.88) 0%, rgba(4, 4, 6, 0.56) 58%, rgba(4, 4, 6, 0) 100%);
+}
+
+.lab-header::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
+}
+
+.lab-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 1.15rem 0;
+}
+
+.lab-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.95rem;
+}
+
+.lab-brand__crest {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 62px;
+    aspect-ratio: 1;
+    border-radius: 18px;
+    border: 1px solid rgba(214, 188, 134, 0.24);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015));
+    overflow: hidden;
+}
+
+.lab-brand__crest img {
+    width: auto;
+    height: 88%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 12px rgba(214, 188, 134, 0.18));
+}
+
+.lab-brand__copy {
+    display: grid;
+    gap: 0.2rem;
+}
+
+.lab-brand__copy strong {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.lab-brand__copy span {
+    color: var(--lab-muted-soft);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.64rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.lab-header__nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.lab-nav {
+    /* Cápsula principal de navegación. */
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.32rem;
+    border: 1px solid var(--lab-border);
+    border-radius: 999px;
+    background: rgba(9, 10, 13, 0.42);
+    backdrop-filter: blur(14px);
+}
+
+.lab-nav a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.86rem 1.16rem;
+    border-radius: 999px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(245, 241, 232, 0.78);
+}
+
+.lab-nav a[aria-current="page"] {
+    color: var(--lab-champagne);
+    background: rgba(214, 188, 134, 0.1);
+}
+
+.lab-reserve {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+    padding: 0 1.5rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--lab-accent-soft), var(--lab-accent));
+    color: #101010;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    box-shadow: 0 14px 34px rgba(227, 246, 85, 0.18);
+}
+
+.hero-lab {
+    /* Escena principal del hero. Todo lo visual se apila dentro de esta sección. */
+    position: relative;
+    min-height: 100svh;
+    overflow: clip;
+    background: #060708;
+    isolation: isolate;
+}
+
+.hero-lab__video,
+.hero-lab__overlay,
+.hero-lab__glow {
+    /* Estas capas ocupan todo el hero y se superponen una encima de otra. */
+    position: absolute;
+    inset: 0;
+}
+
+.hero-lab__video {
+    /* El video aporta atmósfera, pero se baja mucho para que el texto mande. */
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.32;
+    transform: scale(1.035);
+    filter: saturate(0.92) brightness(0.64);
+    transition:
+        opacity 1400ms ease,
+        transform 2200ms cubic-bezier(0.19, 1, 0.22, 1),
+        filter 1600ms ease;
+}
+
+.hero-lab__overlay {
+    /* Dos degradados:
+       1. oscurecen izquierda y bordes
+       2. ayudan a que el texto sea legible sobre el video */
+    background:
+        linear-gradient(90deg, rgba(4, 4, 6, 0.84) 0%, rgba(4, 4, 6, 0.74) 34%, rgba(4, 4, 6, 0.44) 66%, rgba(4, 4, 6, 0.8) 100%),
+        linear-gradient(180deg, rgba(4, 4, 6, 0.74) 0%, rgba(4, 4, 6, 0.14) 30%, rgba(4, 4, 6, 0.86) 100%);
+    transition: background 1600ms ease, opacity 1000ms ease;
+}
+
+.hero-lab__glow {
+    /* Halo sutil para evitar que la derecha quede completamente vacía. */
+    inset: 7% -6% 8% 32%;
+    background:
+        radial-gradient(circle at 38% 34%, rgba(214, 188, 134, 0.12), transparent 16%),
+        radial-gradient(circle at 53% 39%, rgba(227, 246, 85, 0.1), transparent 22%),
+        radial-gradient(circle at 48% 52%, rgba(255, 255, 255, 0.04), transparent 32%);
+    filter: blur(24px);
+    opacity: 0.72;
+    transition:
+        opacity 1600ms ease,
+        inset 1800ms cubic-bezier(0.19, 1, 0.22, 1),
+        filter 1600ms ease;
+}
+
+.hero-lab.is-intro-enabled:not(.is-body-visible) .hero-lab__video {
+    opacity: 0.15;
+    transform: scale(1.085);
+    filter: saturate(0.62) brightness(0.38);
+}
+
+.hero-lab.is-intro-enabled:not(.is-body-visible) .hero-lab__overlay {
+    background:
+        linear-gradient(90deg, rgba(4, 4, 6, 0.88) 0%, rgba(4, 4, 6, 0.84) 34%, rgba(4, 4, 6, 0.64) 66%, rgba(4, 4, 6, 0.9) 100%),
+        linear-gradient(180deg, rgba(4, 4, 6, 0.84) 0%, rgba(4, 4, 6, 0.3) 34%, rgba(4, 4, 6, 0.92) 100%);
+}
+
+.hero-lab.is-intro-enabled:not(.is-body-visible) .hero-lab__glow {
+    inset: 10% -8% 10% 38%;
+    opacity: 0.16;
+    filter: blur(32px);
+}
+
+.hero-lab.is-intro-enabled.is-body-visible:not(.is-mark-active):not(.is-intro-complete) .hero-lab__video {
+    opacity: 0.24;
+    transform: scale(1.06);
+    filter: saturate(0.78) brightness(0.5);
+}
+
+.hero-lab.is-intro-enabled.is-body-visible:not(.is-mark-active):not(.is-intro-complete) .hero-lab__overlay {
+    background:
+        linear-gradient(90deg, rgba(4, 4, 6, 0.82) 0%, rgba(4, 4, 6, 0.76) 35%, rgba(4, 4, 6, 0.52) 66%, rgba(4, 4, 6, 0.84) 100%),
+        linear-gradient(180deg, rgba(4, 4, 6, 0.76) 0%, rgba(4, 4, 6, 0.18) 32%, rgba(4, 4, 6, 0.88) 100%);
+}
+
+.hero-lab.is-intro-enabled.is-mark-active .hero-lab__video {
+    opacity: 0.34;
+    transform: scale(1.045);
+    filter: saturate(0.96) brightness(0.66);
+}
+
+.hero-lab.is-intro-enabled.is-mark-active .hero-lab__overlay {
+    background:
+        linear-gradient(90deg, rgba(4, 4, 6, 0.74) 0%, rgba(4, 4, 6, 0.68) 35%, rgba(4, 4, 6, 0.38) 66%, rgba(4, 4, 6, 0.72) 100%),
+        linear-gradient(180deg, rgba(4, 4, 6, 0.68) 0%, rgba(4, 4, 6, 0.08) 30%, rgba(4, 4, 6, 0.82) 100%);
+}
+
+.hero-lab__shell {
+    /* Marco interno del hero:
+       separa el contenido del header fijo y da altura útil a toda la composición. */
+    position: relative;
+    z-index: 1;
+    min-height: clamp(46rem, 86svh, 56rem);
+    padding-top: calc(var(--lab-header-offset) + 2.75rem);
+    padding-bottom: 3.5rem;
+}
+
+.hero-lab__body {
+    /* Caja grande principal alineada a la izquierda.
+       No pensamos en dos columnas de texto, sino en un único bloque editorial. */
+    position: relative;
+    width: min(100%, 61rem);
+}
+
+.hero-lab__content-box {
+    /* Dentro de esta caja todas las piezas comparten el mismo arranque izquierdo.
+       Luego cada una usa su propia anchura para crear jerarquía. */
+    width: 100%;
+}
+
+.hero-lab__body-copy {
+    transition:
+        opacity 900ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 900ms cubic-bezier(0.22, 1, 0.36, 1),
+        filter 900ms ease;
+}
+
+.hero-lab.is-intro-enabled .hero-lab__body-copy {
+    opacity: 0;
+    transform: translateY(2rem) scale(1.04);
+    filter: blur(14px);
+}
+
+.hero-lab.is-intro-enabled.is-body-visible .hero-lab__body-copy {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+}
+
+.hero-lab__mark {
+    /* Marca fantasma decorativa.
+       Sirve para equilibrar visualmente la derecha, no para comunicar contenido. */
+    position: absolute;
+    left: 50%;
+    top: 47%;
+    width: 26rem;
+    opacity: 0;
+    filter: sepia(1) saturate(2.6) hue-rotate(336deg) brightness(0.76) contrast(0.9);
+    pointer-events: none;
+    transform-origin: center;
+    transition:
+        opacity 900ms ease,
+        transform 1300ms cubic-bezier(0.19, 1, 0.22, 1),
+        filter 1000ms ease,
+        left 1300ms cubic-bezier(0.19, 1, 0.22, 1),
+        top 1300ms cubic-bezier(0.19, 1, 0.22, 1),
+        width 1300ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.hero-lab.is-intro-enabled .hero-lab__mark {
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale(0.84);
+    filter: sepia(1) saturate(2.8) hue-rotate(336deg) brightness(0.84) contrast(0.9) blur(2px);
+}
+
+.hero-lab.is-intro-enabled.is-mark-active .hero-lab__mark {
+    left: 71%;
+    top: 52%;
+    width: 39rem;
+    opacity: 0.34;
+    transform: translate3d(-50%, -50%, 0) scale(1);
+    filter: sepia(1) saturate(3.4) hue-rotate(336deg) brightness(1) contrast(0.94) blur(0)
+        drop-shadow(0 0 28px rgba(214, 188, 134, 0.12));
+}
+
+.hero-lab.is-intro-enabled.is-intro-complete .hero-lab__mark,
+.hero-lab.is-intro-enabled.is-launcher-visible:not(.is-mark-active) .hero-lab__mark {
+    left: 50%;
+    top: 47%;
+    width: 26rem;
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale(1.06);
+    filter: sepia(1) saturate(2.2) hue-rotate(336deg) brightness(0.82) contrast(0.88) blur(10px);
+}
+
+.hero-lab__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.9rem;
+    color: var(--lab-champagne);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+}
+
+.hero-lab__eyebrow::before {
+    content: "";
+    width: 42px;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(214, 188, 134, 0), rgba(214, 188, 134, 0.9));
+}
+
+.hero-lab h1 {
+    /* El h1 ocupa la mayor parte de la content box.
+       Sigue siendo un bloque controlado, pero ya no parece una columna estrecha. */
+    width: min(100%, 43rem);
+    margin: 0.95rem 0 1.35rem;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(3.4rem, 3.55vw, 4.15rem);
+    line-height: 0.96;
+    letter-spacing: -0.04em;
+    font-weight: 600;
+}
+
+.hero-lab__lead {
+    /* El párrafo sigue naciendo desde el mismo borde izquierdo,
+       pero con menos ancho que el h1 para que se lea como apoyo. */
+    width: min(100%, 39rem);
+    margin: 0;
+    color: var(--lab-muted);
+    font-size: 0.94rem;
+    line-height: 1.52;
+}
+
+.hero-lab__launcher {
+    /* El launcher es el tercer ancho de la misma caja.
+       Más estrecho que el lead para que se lea como activación, no como continuación. */
+    width: min(100%, 31rem);
+    margin-top: 4.6rem;
+    padding-bottom: 1.4rem;
+    transition:
+        opacity 820ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 820ms cubic-bezier(0.22, 1, 0.36, 1),
+        filter 820ms ease;
+}
+
+.hero-lab.is-intro-enabled .hero-lab__launcher {
+    opacity: 0;
+    transform: translateY(2.5rem);
+    filter: blur(10px);
+    pointer-events: none;
+}
+
+.hero-lab.is-intro-enabled.is-launcher-visible .hero-lab__launcher {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+    pointer-events: auto;
+}
+
+.hero-lab__launcher h2 {
+    margin: 0 0 0.7rem;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 2.35rem;
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+    font-weight: 600;
+}
+
+.hero-lab__launcher p {
+    margin: 0;
+    color: var(--lab-muted);
+    width: min(100%, 27rem);
+    font-size: 0.94rem;
+    line-height: 1.54;
+}
+
+.hero-lab__actions {
+    /* Los CTAs se colocan en fila porque aquí estamos trabajando desktop first. */
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 1rem;
+    margin-bottom: 1.1rem;
+}
+
+.hero-lab__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 58px;
+    padding: 0 1.35rem;
+    border: 0;
+    border-radius: 0.9rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.73rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.hero-lab__cta--primary {
+    /* CTA principal: más ancho y con acento visual fuerte. */
+    min-width: 17.5rem;
+    background: linear-gradient(135deg, var(--lab-accent-soft), var(--lab-accent));
+    color: #111;
+}
+
+.hero-lab__cta--secondary {
+    /* CTA secundario: mismo lenguaje formal, menos peso visual. */
+    min-width: 8.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--lab-text);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.hero-lab__cta:focus-visible,
+.hero-lab-overlay__close:focus-visible,
+.hero-lab-overlay__submit:focus-visible,
+.hero-lab-overlay__input:focus-visible {
+    outline: 2px solid rgba(227, 246, 85, 0.92);
+    outline-offset: 3px;
+}
+
+.hero-lab-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: stretch;
+    justify-content: flex-end;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 280ms ease, visibility 280ms ease;
+}
+
+.hero-lab-overlay.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.hero-lab-overlay__scrim {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(180deg, rgba(4, 5, 8, 0.78) 0%, rgba(4, 5, 8, 0.9) 100%),
+        radial-gradient(circle at 56% 46%, rgba(227, 246, 85, 0.06), transparent 24%);
+}
+
+.hero-lab-overlay__sheet {
+    position: relative;
+    z-index: 1;
+    margin-top: auto;
+    width: 100%;
+    transform: translateY(100%);
+    transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero-lab-overlay.is-open .hero-lab-overlay__sheet {
+    transform: translateY(0);
+}
+
+.hero-lab-overlay__shell {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding-left: 3.5rem;
+    padding-right: 3.5rem;
+    padding-top: 2rem;
+    padding-bottom: 2.2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(180deg, rgba(10, 11, 15, 0.98) 0%, rgba(6, 7, 10, 0.985) 100%);
+    box-shadow: 0 -24px 80px rgba(0, 0, 0, 0.34);
+}
+
+.hero-lab-overlay__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 2rem;
+}
+
+.hero-lab-overlay__intro h2 {
+    margin: 0;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 3rem;
+    line-height: 0.96;
+    letter-spacing: -0.03em;
+    font-weight: 600;
+}
+
+.hero-lab-overlay__intro p {
+    max-width: 30rem;
+    margin: 1rem 0 0;
+    color: var(--lab-text);
+    font-size: 1.18rem;
+    line-height: 1.55;
+}
+
+.hero-lab-overlay__close {
+    min-height: 46px;
+    padding: 0 1.1rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.02);
+    color: rgba(245, 241, 232, 0.82);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.hero-lab-overlay__form {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 1rem;
+    align-items: end;
+    margin-top: 2rem;
+}
+
+.hero-lab-overlay__field-group {
+    display: grid;
+    gap: 0.78rem;
+}
+
+.hero-lab-overlay__label {
+    color: #fbf7ef;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+.hero-lab-overlay__input-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 7.5rem;
+    gap: 0.34rem;
+}
+
+.hero-lab-overlay__input {
+    min-height: 62px;
+    padding: 0 1.05rem;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 0.7rem;
+    background: rgba(33, 37, 46, 0.68);
+    color: rgba(245, 241, 232, 0.9);
+    appearance: none;
+}
+
+.hero-lab-overlay__input--time {
+    text-align: center;
+}
+
+.hero-lab-overlay__submit {
+    min-width: 15rem;
+    min-height: 62px;
+    padding: 0 1.4rem;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 0.7rem;
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--lab-text);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.hero-lab-overlay__note {
+    margin: 1rem 0 0;
+    color: var(--lab-muted-soft);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+@media (max-width: 1200px) {
+    .hero-lab-overlay__form {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .hero-lab-overlay__submit {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+}
+
+@media (max-width: 860px) {
+    .hero-lab__actions,
+    .hero-lab-overlay__form,
+    .hero-lab-overlay__input-row {
+        grid-template-columns: 1fr;
+        display: grid;
+    }
+
+    .hero-lab__actions {
+        gap: 0.9rem;
+    }
+
+    .hero-lab__cta--primary,
+    .hero-lab__cta--secondary,
+    .hero-lab-overlay__submit {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .hero-lab-overlay__header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .hero-lab-overlay__close {
+        align-self: flex-start;
+    }
+
+    .hero-lab-overlay__intro h2 {
+        font-size: 2.4rem;
+    }
+
+    .hero-lab-overlay__shell {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+    }
+}
