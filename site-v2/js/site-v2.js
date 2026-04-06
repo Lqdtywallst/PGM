@@ -99,6 +99,96 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    const megaNavItems = Array.from(document.querySelectorAll(".js-nav-mega"));
+    const hoverCapable = window.matchMedia("(hover: hover) and (pointer: fine)");
+
+    if (megaNavItems.length > 0) {
+        let megaMenuCloseTimer = null;
+
+        function setMegaMenuState(openItem = null) {
+            megaNavItems.forEach((item) => {
+                const trigger = item.querySelector(".lab-nav__trigger");
+                const isOpen = item === openItem;
+                item.classList.toggle("is-open", isOpen);
+                if (trigger) {
+                    trigger.setAttribute("aria-expanded", String(isOpen));
+                }
+            });
+        }
+
+        function clearMegaMenuCloseTimer() {
+            if (megaMenuCloseTimer !== null) {
+                window.clearTimeout(megaMenuCloseTimer);
+                megaMenuCloseTimer = null;
+            }
+        }
+
+        function scheduleMegaMenuClose() {
+            clearMegaMenuCloseTimer();
+            megaMenuCloseTimer = window.setTimeout(() => {
+                setMegaMenuState(null);
+            }, 320);
+        }
+
+        megaNavItems.forEach((item) => {
+            const trigger = item.querySelector(".lab-nav__trigger");
+            const panel = item.querySelector(".lab-nav__panel");
+
+            trigger?.addEventListener("click", (event) => {
+                event.preventDefault();
+                if (hoverCapable.matches) {
+                    clearMegaMenuCloseTimer();
+                    setMegaMenuState(item);
+                    trigger.blur();
+                    return;
+                }
+
+                const shouldOpen = !item.classList.contains("is-open");
+                setMegaMenuState(shouldOpen ? item : null);
+            });
+
+            trigger?.addEventListener("mouseenter", () => {
+                if (hoverCapable.matches) {
+                    clearMegaMenuCloseTimer();
+                    setMegaMenuState(item);
+                }
+            });
+
+            trigger?.addEventListener("mouseleave", () => {
+                if (hoverCapable.matches) {
+                    scheduleMegaMenuClose();
+                }
+            });
+
+            panel?.addEventListener("mouseenter", () => {
+                if (hoverCapable.matches) {
+                    clearMegaMenuCloseTimer();
+                    setMegaMenuState(item);
+                }
+            });
+
+            panel?.addEventListener("mouseleave", () => {
+                if (hoverCapable.matches) {
+                    scheduleMegaMenuClose();
+                }
+            });
+        });
+
+        document.addEventListener("click", (event) => {
+            clearMegaMenuCloseTimer();
+            if (!megaNavItems.some((item) => item.contains(event.target))) {
+                setMegaMenuState(null);
+            }
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                clearMegaMenuCloseTimer();
+                setMegaMenuState(null);
+            }
+        });
+    }
+
     if (!overlay || openButtons.length === 0) {
         return;
     }

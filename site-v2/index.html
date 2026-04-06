@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Dynasty Prestige Site V2</title>
     <meta name="description" content="Fresh V2 foundation for Dynasty Prestige, starting from the validated header, editorial hero, staged intro and booking overlay.">
     <script>document.documentElement.classList.add("js");</script>
@@ -47,9 +50,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./css/site-v2.css?v=20260403b">
-    <script src="./js/site-v2.js?v=20260403b" defer></script>
-    <script type="module" src="./js/site-v2-3d.js?v=20260403b"></script>
+    <link rel="stylesheet" href="./css/site-v2.css?v=20260406ah">
+    <script src="./js/site-v2.js?v=20260406ae" defer></script>
 </head>
 <body>
     <!-- Base nueva de trabajo:
@@ -68,22 +70,145 @@
 
             <div class="lab-header__nav">
                 <nav class="lab-nav" aria-label="Main navigation">
-                    <a href="#" aria-current="page">Home</a>
+                    <a href="./index.html" aria-current="page">Home</a>
                     <a href="#fleet-catalog">Fleet</a>
-                    <a href="#locations-teaser">Locations</a>
+
+                    <div class="lab-nav__item lab-nav__item--has-panel js-nav-mega">
+                        <button
+                            type="button"
+                            class="lab-nav__trigger"
+                            aria-expanded="false"
+                            aria-controls="lab-nav-brands-panel"
+                        >
+                            <span>Cars Brands</span>
+                            <span class="lab-nav__chevron" aria-hidden="true"></span>
+                        </button>
+
+                        <div class="lab-nav__panel lab-nav__panel--brands" id="lab-nav-brands-panel">
+                            <div class="lab-nav__panel-grid lab-nav__panel-grid--brands">
+                                <a class="lab-nav__card lab-nav__card--brand" href="../site/lamborghini-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--brand">
+                                        <img src="./images/brands/lamborghini-mark.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Lamborghini</strong>
+                                        <span>Huracan and Urus selection.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--brand" href="../site/ferrari-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--brand">
+                                        <img src="./images/brands/ferrari-mark.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Ferrari</strong>
+                                        <span>Convertible-led flagship moments.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--brand" href="../site/mercedes-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--brand">
+                                        <img src="./images/brands/mercedes-mark.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Mercedes</strong>
+                                        <span>G-Class and executive balance.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--brand" href="../site/porsche-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--brand">
+                                        <img src="./images/brands/porsche-mark.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Porsche</strong>
+                                        <span>Focused driver-first delivery.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--brand" href="../site/rolls-royce-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--brand">
+                                        <img src="./images/brands/rolls-royce-mark.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Rolls-Royce</strong>
+                                        <span>Arrival-first quiet authority.</span>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lab-nav__item lab-nav__item--has-panel js-nav-mega">
+                        <button
+                            type="button"
+                            class="lab-nav__trigger"
+                            aria-expanded="false"
+                            aria-controls="lab-nav-types-panel"
+                        >
+                            <span>Cars Types</span>
+                            <span class="lab-nav__chevron" aria-hidden="true"></span>
+                        </button>
+
+                        <div class="lab-nav__panel lab-nav__panel--types" id="lab-nav-types-panel">
+                            <div class="lab-nav__panel-grid lab-nav__panel-grid--types">
+                                <a class="lab-nav__card lab-nav__card--type" href="../site/luxury-car-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--type">
+                                        <img src="./images/categories/mock-fastpng/luxury-stage.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Luxury Cars</strong>
+                                        <span>Comfort-first arrivals and city stays.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--type" href="../site/ferrari-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--type">
+                                        <img src="./images/categories/mock-fastpng/convertible-stage.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Convertible Cars</strong>
+                                        <span>Open-top Dubai movement with presence.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--type" href="../site/supercar-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--type">
+                                        <img src="./images/categories/mock-fastpng/sports-stage.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Sports Cars</strong>
+                                        <span>Sharper performance-led picks.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--type" href="#fleet-catalog">
+                                    <span class="lab-nav__card-media lab-nav__card-media--type">
+                                        <img src="./images/categories/mock-fastpng/electric-stage.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Electric Cars</strong>
+                                        <span>Quiet torque for cleaner city routes.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--type" href="../site/luxury-car-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--type">
+                                        <img src="./images/categories/mock-fastpng/suv-stage.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>SUV Cars</strong>
+                                        <span>Room, height and hotel-ready comfort.</span>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
                     <a href="#service-layer">Services</a>
-                    <a href="../site/about.html">About</a>
-                    <a href="#contact">Contact</a>
+                    <a href="#locations-teaser">Locations</a>
+                    <a href="../site/about.html">About Us</a>
                 </nav>
-                <button
-                    type="button"
-                    class="lab-reserve js-booking-open"
-                    aria-haspopup="dialog"
-                    aria-controls="hero-lab-overlay"
-                    aria-expanded="false"
-                >
-                    Reserve
-                </button>
             </div>
         </div>
     </header>
@@ -142,54 +267,108 @@
             </div>
         </section>
 
+        <section class="brand-marquee" aria-label="Featured brands">
+            <div class="lab-shell brand-marquee__shell">
+                <div class="brand-marquee__viewport">
+                    <div class="brand-marquee__track">
+                        <div class="brand-marquee__group">
+                            <a class="brand-marquee__item" href="../site/lamborghini-rental-dubai.html" aria-label="Lamborghini">
+                                <img src="./images/brands/lamborghini-mark.png" alt="">
+                            </a>
+                            <a class="brand-marquee__item" href="../site/ferrari-rental-dubai.html" aria-label="Ferrari">
+                                <img src="./images/brands/ferrari-mark.png" alt="">
+                            </a>
+                            <a class="brand-marquee__item" href="../site/mercedes-rental-dubai.html" aria-label="Mercedes">
+                                <img src="./images/brands/mercedes-mark.png" alt="">
+                            </a>
+                            <a class="brand-marquee__item" href="../site/porsche-rental-dubai.html" aria-label="Porsche">
+                                <img src="./images/brands/porsche-mark.png" alt="">
+                            </a>
+                            <a class="brand-marquee__item" href="../site/rolls-royce-rental-dubai.html" aria-label="Rolls-Royce">
+                                <img src="./images/brands/rolls-royce-mark.png" alt="">
+                            </a>
+                        </div>
+
+                        <div class="brand-marquee__group" aria-hidden="true">
+                            <span class="brand-marquee__item">
+                                <img src="./images/brands/lamborghini-mark.png" alt="">
+                            </span>
+                            <span class="brand-marquee__item">
+                                <img src="./images/brands/ferrari-mark.png" alt="">
+                            </span>
+                            <span class="brand-marquee__item">
+                                <img src="./images/brands/mercedes-mark.png" alt="">
+                            </span>
+                            <span class="brand-marquee__item">
+                                <img src="./images/brands/porsche-mark.png" alt="">
+                            </span>
+                            <span class="brand-marquee__item">
+                                <img src="./images/brands/rolls-royce-mark.png" alt="">
+                            </span>
+                        </div>
+
+                        <div class="brand-marquee__group" aria-hidden="true">
+                            <span class="brand-marquee__item">
+                                <img src="./images/brands/lamborghini-mark.png" alt="">
+                            </span>
+                            <span class="brand-marquee__item">
+                                <img src="./images/brands/ferrari-mark.png" alt="">
+                            </span>
+                            <span class="brand-marquee__item">
+                                <img src="./images/brands/mercedes-mark.png" alt="">
+                            </span>
+                            <span class="brand-marquee__item">
+                                <img src="./images/brands/porsche-mark.png" alt="">
+                            </span>
+                            <span class="brand-marquee__item">
+                                <img src="./images/brands/rolls-royce-mark.png" alt="">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="fleet-categories" id="fleet-categories" aria-label="Browse by category">
             <div class="lab-shell fleet-categories__shell">
-                <div class="fleet-categories__stage" aria-hidden="true">
-                    <canvas class="fleet-categories__master-canvas"></canvas>
-                </div>
-                <a class="fleet-category fleet-category--sports" data-vehicle-type="sports" href="../site/supercar-rental-dubai.html">
+                <a class="fleet-category fleet-category--sports" href="../site/supercar-rental-dubai.html">
                     <span class="fleet-category__media">
-                        <span class="fleet-category__canvas-shell" aria-hidden="true"></span>
+                        <img class="fleet-category__image" src="./images/categories/mock-fastpng/sports-stage.png" alt="Sports car category">
                     </span>
                     <span class="fleet-category__copy">
                         <strong>Sports</strong>
-                        <span>Mid-engine profile</span>
                     </span>
                 </a>
-                <a class="fleet-category fleet-category--convertible" data-vehicle-type="convertible" href="../site/ferrari-rental-dubai.html">
+                <a class="fleet-category fleet-category--convertible" href="../site/ferrari-rental-dubai.html">
                     <span class="fleet-category__media">
-                        <span class="fleet-category__canvas-shell" aria-hidden="true"></span>
+                        <img class="fleet-category__image" src="./images/categories/mock-fastpng/convertible-stage.png" alt="Convertible car category">
                     </span>
                     <span class="fleet-category__copy">
                         <strong>Convertible</strong>
-                        <span>Open-top silhouette</span>
                     </span>
                 </a>
-                <a class="fleet-category fleet-category--luxury" data-vehicle-type="luxury" href="../site/luxury-car-rental-dubai.html">
+                <a class="fleet-category fleet-category--luxury" href="../site/luxury-car-rental-dubai.html">
                     <span class="fleet-category__media">
-                        <span class="fleet-category__canvas-shell" aria-hidden="true"></span>
+                        <img class="fleet-category__image" src="./images/categories/mock-fastpng/luxury-stage.png" alt="Luxury car category">
                     </span>
                     <span class="fleet-category__copy">
                         <strong>Luxury</strong>
-                        <span>Executive line</span>
                     </span>
                 </a>
-                <a class="fleet-category fleet-category--suv" data-vehicle-type="suv" href="../site/lamborghini-rental-dubai.html">
+                <a class="fleet-category fleet-category--suv" href="../site/lamborghini-rental-dubai.html">
                     <span class="fleet-category__media">
-                        <span class="fleet-category__canvas-shell" aria-hidden="true"></span>
+                        <img class="fleet-category__image" src="./images/categories/mock-fastpng/suv-stage.png" alt="SUV category">
                     </span>
                     <span class="fleet-category__copy">
                         <strong>SUV</strong>
-                        <span>Elevated stance</span>
                     </span>
                 </a>
-                <a class="fleet-category fleet-category--electric" data-vehicle-type="electric" href="#contact">
+                <a class="fleet-category fleet-category--electric" href="#contact">
                     <span class="fleet-category__media">
-                        <span class="fleet-category__canvas-shell" aria-hidden="true"></span>
+                        <img class="fleet-category__image" src="./images/categories/mock-fastpng/electric-stage.png" alt="Electric car category">
                     </span>
                     <span class="fleet-category__copy">
                         <strong>Electric</strong>
-                        <span>Silent torque</span>
                     </span>
                 </a>
             </div>
@@ -200,7 +379,7 @@
                 <div class="featured-fleet__intro">
                     <span class="hero-lab__eyebrow featured-fleet__eyebrow">Featured fleet</span>
                     <h2>The first cars on screen should already feel like the right answer.</h2>
-                    <p>These are the models guests tend to ask for first when the brief is simple: arrive well, move cleanly and keep the handover as polished as the rest of the stay.</p>
+                    <p>Guest favorites for clean arrivals and polished city movement.</p>
                 </div>
 
                 <div class="fleet-showcase">
@@ -405,21 +584,6 @@
                     </article>
                 </div>
 
-                <div class="featured-fleet__footer">
-                    <p>Choose the rental window once, then move into the wider selection with the same timing carried forward into availability, delivery and handover.</p>
-                    <div class="featured-fleet__footer-actions">
-                        <button
-                            type="button"
-                            class="featured-fleet__footer-button js-booking-open"
-                            aria-haspopup="dialog"
-                            aria-controls="hero-lab-overlay"
-                            aria-expanded="false"
-                        >
-                            Open date search
-                        </button>
-                        <a href="../site/fleet.html" class="featured-fleet__link">View full fleet</a>
-                    </div>
-                </div>
             </div>
         </section>
 <section class="service-layer" id="service-layer">
@@ -576,13 +740,142 @@
                         <h3>Arrival-focused coordination</h3>
                         <p>For guests who want the car to be part of the landing itself, with tighter timing and a cleaner handover sequence.</p>
                         <div class="location-card__meta">
-                            <span>From 150 AED</span>
                             <span>Flight-window planning</span>
+                            <span>Usually free</span>
                         </div>
                     </article>
                 </div>
             </div>
         </section>
+
+        <section class="guest-reviews" id="guest-reviews">
+            <div class="lab-shell guest-reviews__shell">
+                <div class="guest-reviews__intro">
+                    <span class="hero-lab__eyebrow guest-reviews__eyebrow">Google reviews</span>
+                    <h2>What guests say on Google after the handover.</h2>
+                </div>
+
+                <div class="guest-reviews__body">
+                    <div class="guest-reviews__summary">
+                        <a
+                            class="guest-reviews__brand guest-reviews__brand--link"
+                            href="https://www.google.com/maps/place/?q=place_id:ChIJZTglPZZpXz4R2NFpN-mV594"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Open the Google Business listing"
+                        >
+                            Luxury Supercars Rental LLC
+                        </a>
+
+                        <div class="guest-reviews__rating">
+                            <span class="guest-reviews__score">4.9</span>
+                            <span class="guest-reviews__stars" aria-hidden="true">★★★★★</span>
+                        </div>
+
+                        <p class="guest-reviews__count">Based on 377 reviews</p>
+
+                        <p class="guest-reviews__powered">
+                            powered by
+                            <span class="google-wordmark" aria-label="Google">
+                                <span class="google-wordmark__g1">G</span><span class="google-wordmark__o1">o</span><span class="google-wordmark__o2">o</span><span class="google-wordmark__g2">g</span><span class="google-wordmark__l">l</span><span class="google-wordmark__e">e</span>
+                            </span>
+                        </p>
+
+                        <div class="guest-reviews__actions">
+                            <a
+                                class="guest-reviews__google-button"
+                                href="https://search.google.com/local/writereview?placeid=ChIJZTglPZZpXz4R2NFpN-mV594"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Review us on Google
+                            </a>
+
+                            <a
+                                class="guest-reviews__google-link"
+                                href="https://www.google.com/maps/place/?q=place_id:ChIJZTglPZZpXz4R2NFpN-mV594"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                View on Google
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="guest-reviews__grid">
+                        <article class="review-card review-card--google">
+                            <div class="review-card__topline">
+                                <div class="review-card__header">
+                                    <span class="review-card__avatar review-card__avatar--kashif" aria-hidden="true">K</span>
+                                    <div>
+                                        <strong>Kashif Dogar</strong>
+                                        <span>May 9, 2025</span>
+                                    </div>
+                                </div>
+                                <a
+                                    class="review-card__source"
+                                    href="https://www.google.com/maps/place/?q=place_id:ChIJZTglPZZpXz4R2NFpN-mV594"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    aria-label="Open Google reviews"
+                                >
+                                    <span aria-hidden="true">G</span>
+                                </a>
+                            </div>
+                            <span class="review-card__stars" aria-hidden="true">★★★★★</span>
+                            <p>Best car Rental in Dubai I must recommended it.</p>
+                        </article>
+
+                        <article class="review-card review-card--google">
+                            <div class="review-card__topline">
+                                <div class="review-card__header">
+                                    <span class="review-card__avatar review-card__avatar--hassan" aria-hidden="true">H</span>
+                                    <div>
+                                        <strong>Hassan Khreis</strong>
+                                        <span>May 8, 2025</span>
+                                    </div>
+                                </div>
+                                <a
+                                    class="review-card__source"
+                                    href="https://www.google.com/maps/place/?q=place_id:ChIJZTglPZZpXz4R2NFpN-mV594"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    aria-label="Open Google reviews"
+                                >
+                                    <span aria-hidden="true">G</span>
+                                </a>
+                            </div>
+                            <span class="review-card__stars" aria-hidden="true">★★★★★</span>
+                            <p>Really great service! Friendly! Helpful! I will definitely come back and rent a car from Luxury Supercars Rental again! Thank you so much!</p>
+                        </article>
+
+                        <article class="review-card review-card--google">
+                            <div class="review-card__topline">
+                                <div class="review-card__header">
+                                    <span class="review-card__avatar review-card__avatar--roy" aria-hidden="true">r</span>
+                                    <div>
+                                        <strong>roy ashkar</strong>
+                                        <span>May 7, 2025</span>
+                                    </div>
+                                </div>
+                                <a
+                                    class="review-card__source"
+                                    href="https://www.google.com/maps/place/?q=place_id:ChIJZTglPZZpXz4R2NFpN-mV594"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    aria-label="Open Google reviews"
+                                >
+                                    <span aria-hidden="true">G</span>
+                                </a>
+                            </div>
+                            <span class="review-card__stars" aria-hidden="true">★★★★★</span>
+                            <p>Amazing customer service. Recommend for each car enthusiast to get their rental cars from them.</p>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <footer class="site-v2-footer" id="contact">
             <div class="lab-shell site-v2-footer__shell">
                 <div class="site-v2-footer__top">
