@@ -1,0 +1,671 @@
+.local-guide-page {
+    --guide-glow: rgba(227, 246, 85, 0.16);
+    --guide-glow-soft: rgba(151, 178, 209, 0.2);
+    --guide-border: rgba(255, 255, 255, 0.08);
+    --guide-panel:
+        linear-gradient(180deg, rgba(16, 21, 27, 0.9) 0%, rgba(8, 11, 16, 0.94) 100%),
+        linear-gradient(140deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0));
+    --guide-panel-strong:
+        radial-gradient(circle at 84% 16%, rgba(227, 246, 85, 0.08), rgba(227, 246, 85, 0) 26%),
+        linear-gradient(180deg, rgba(18, 23, 30, 0.95) 0%, rgba(8, 11, 16, 0.98) 100%);
+    min-height: 100vh;
+    color: rgba(245, 241, 232, 0.92);
+    background:
+        radial-gradient(circle at 12% 6%, var(--guide-glow), rgba(227, 246, 85, 0) 24%),
+        radial-gradient(circle at 88% 8%, var(--guide-glow-soft), rgba(151, 178, 209, 0) 26%),
+        linear-gradient(180deg, #090b0d 0%, #050608 24%, #040506 100%);
+}
+
+.local-guide-page .lab-header {
+    background: linear-gradient(180deg, rgba(4, 5, 7, 0.96) 0%, rgba(4, 5, 7, 0.78) 58%, rgba(4, 5, 7, 0) 100%);
+}
+
+.local-guide-page--abu-dhabi {
+    --guide-glow: rgba(227, 246, 85, 0.12);
+    --guide-glow-soft: rgba(171, 206, 191, 0.16);
+}
+
+.local-guide-page--airport {
+    --guide-glow: rgba(227, 246, 85, 0.14);
+    --guide-glow-soft: rgba(132, 162, 255, 0.18);
+}
+
+.local-guide-page--palm {
+    --guide-glow: rgba(227, 246, 85, 0.12);
+    --guide-glow-soft: rgba(82, 180, 162, 0.16);
+}
+
+.local-guide-page--marina {
+    --guide-glow: rgba(227, 246, 85, 0.11);
+    --guide-glow-soft: rgba(105, 177, 227, 0.2);
+}
+
+.local-guide-main {
+    position: relative;
+    overflow: clip;
+}
+
+.local-guide-hero {
+    position: relative;
+    padding: calc(var(--lab-header-offset) + 4.1rem) 0 2.1rem;
+}
+
+.local-guide-hero::before,
+.local-guide-hero::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    border-radius: 50%;
+    filter: blur(18px);
+}
+
+.local-guide-hero::before {
+    top: 7rem;
+    left: -8rem;
+    width: 21rem;
+    height: 21rem;
+    background: radial-gradient(circle, rgba(227, 246, 85, 0.14), rgba(227, 246, 85, 0) 72%);
+}
+
+.local-guide-hero::after {
+    top: 2rem;
+    right: -9rem;
+    width: 26rem;
+    height: 26rem;
+    background: radial-gradient(circle, rgba(151, 178, 209, 0.2), rgba(151, 178, 209, 0) 68%);
+}
+
+.local-guide-hero__shell,
+.local-guide-note-grid,
+.local-guide-process-grid,
+.local-guide-car-grid,
+.local-guide-spotlight-grid,
+.local-guide-related-grid {
+    display: grid;
+    gap: 1.2rem;
+}
+
+.local-guide-hero__shell {
+    grid-template-columns: minmax(0, 1.18fr) minmax(18rem, 0.82fr);
+    align-items: stretch;
+}
+
+.local-guide-hero__content,
+.local-guide-hero__aside,
+.local-guide-note-card,
+.local-guide-process-card,
+.local-guide-car-card,
+.local-guide-spotlight-card,
+.local-guide-related-card,
+.local-guide-cta,
+.local-guide-faq-item {
+    position: relative;
+    border: 1px solid var(--guide-border);
+    border-radius: 1.7rem;
+    box-shadow:
+        0 24px 64px rgba(2, 4, 8, 0.36),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+}
+
+.local-guide-hero__content,
+.local-guide-hero__aside,
+.local-guide-note-card,
+.local-guide-car-card,
+.local-guide-spotlight-card,
+.local-guide-related-card,
+.local-guide-cta,
+.local-guide-faq-item {
+    background: var(--guide-panel);
+}
+
+.local-guide-hero__content,
+.local-guide-hero__aside,
+.local-guide-note-card,
+.local-guide-process-card,
+.local-guide-car-card,
+.local-guide-spotlight-card,
+.local-guide-related-card,
+.local-guide-cta {
+    padding: 1.75rem;
+}
+
+.local-guide-hero__content > *,
+.local-guide-hero__aside > *,
+.local-guide-note-card > *,
+.local-guide-process-card > *,
+.local-guide-car-card > *,
+.local-guide-spotlight-card > *,
+.local-guide-related-card > *,
+.local-guide-cta > * {
+    position: relative;
+    z-index: 1;
+}
+
+.local-guide-hero__content::before,
+.local-guide-hero__aside::before,
+.local-guide-note-card::before,
+.local-guide-car-card::before,
+.local-guide-related-card::before,
+.local-guide-cta::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(125deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0) 32%),
+        radial-gradient(circle at 78% 18%, rgba(227, 246, 85, 0.06), rgba(227, 246, 85, 0) 24%);
+}
+
+.local-guide-breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    color: rgba(245, 241, 232, 0.62);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.local-guide-breadcrumb a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.local-guide-breadcrumb a:hover,
+.local-guide-breadcrumb a:focus-visible {
+    color: rgba(245, 241, 232, 0.9);
+}
+
+.local-guide-breadcrumb span {
+    color: rgba(245, 241, 232, 0.82);
+}
+
+.local-guide-hero__mark {
+    position: absolute;
+    inset: 1.6rem 2rem auto auto;
+    width: clamp(10rem, 18vw, 14rem);
+    opacity: 0.06;
+    pointer-events: none;
+}
+
+.local-guide-hero__mark img {
+    width: 100%;
+    height: auto;
+}
+
+.local-guide-hero__content h1,
+.local-guide-section__intro h2,
+.local-guide-cta__copy h2 {
+    margin: 0.7rem 0 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+}
+
+.local-guide-hero__content h1 {
+    max-width: 13ch;
+    font-size: clamp(3rem, 6vw, 4.8rem);
+    line-height: 0.92;
+}
+
+.local-guide-hero__lead,
+.local-guide-section__intro p,
+.local-guide-hero__aside p,
+.local-guide-note-card p,
+.local-guide-process-card p,
+.local-guide-car-card p,
+.local-guide-spotlight-card p,
+.local-guide-related-card p,
+.local-guide-cta__copy p,
+.local-guide-faq-item p {
+    margin: 0;
+    color: rgba(245, 241, 232, 0.72);
+    line-height: 1.74;
+}
+
+.local-guide-hero__lead {
+    max-width: 45rem;
+    margin-top: 1rem;
+}
+
+.local-guide-hero__actions,
+.local-guide-car-card__actions,
+.local-guide-cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+}
+
+.local-guide-hero__actions {
+    margin-top: 1.4rem;
+}
+
+.local-guide-button,
+.local-guide-car-card__actions a,
+.local-guide-related-card__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 1.2rem;
+    border-radius: 999px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition:
+        transform 180ms ease,
+        border-color 180ms ease,
+        background-color 180ms ease,
+        color 180ms ease;
+}
+
+.local-guide-button--primary {
+    background: linear-gradient(135deg, rgba(227, 246, 85, 0.96), rgba(196, 218, 57, 0.92));
+    color: #090b0d;
+    box-shadow: 0 14px 34px rgba(176, 196, 42, 0.22);
+}
+
+.local-guide-button--secondary,
+.local-guide-car-card__actions a,
+.local-guide-related-card__link {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(245, 241, 232, 0.88);
+}
+
+.local-guide-button:hover,
+.local-guide-button:focus-visible,
+.local-guide-car-card__actions a:hover,
+.local-guide-car-card__actions a:focus-visible,
+.local-guide-related-card__link:hover,
+.local-guide-related-card__link:focus-visible {
+    transform: translateY(-1px);
+}
+
+.local-guide-hero__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.45rem;
+}
+
+.local-guide-hero__pill,
+.local-guide-hero__aside-kicker,
+.local-guide-card__tag,
+.local-guide-process-card strong,
+.local-guide-spotlight-card__label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.local-guide-hero__pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 42px;
+    padding: 0 0.95rem;
+    border: 1px solid rgba(214, 188, 134, 0.18);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(245, 241, 232, 0.88);
+}
+
+.local-guide-hero__aside {
+    display: grid;
+    align-content: start;
+    gap: 1rem;
+    background: var(--guide-panel-strong);
+}
+
+.local-guide-hero__aside-kicker,
+.local-guide-card__tag,
+.local-guide-spotlight-card__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: rgba(245, 241, 232, 0.86);
+}
+
+.local-guide-hero__aside-kicker::before,
+.local-guide-card__tag::before,
+.local-guide-spotlight-card__label::before {
+    content: "";
+    width: 0.48rem;
+    height: 0.48rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--lab-accent-soft), var(--lab-accent));
+    box-shadow: 0 0 12px rgba(227, 246, 85, 0.24);
+}
+
+.local-guide-hero__aside h2,
+.local-guide-note-card h3,
+.local-guide-process-card h3,
+.local-guide-car-card h3,
+.local-guide-spotlight-card h3,
+.local-guide-related-card h3 {
+    margin: 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+}
+
+.local-guide-hero__aside h2 {
+    font-size: clamp(2rem, 3vw, 2.7rem);
+}
+
+.local-guide-hero__facts {
+    display: grid;
+    gap: 0.9rem;
+    margin: 0;
+}
+
+.local-guide-hero__facts div {
+    display: grid;
+    gap: 0.35rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.local-guide-hero__facts dt {
+    color: rgba(245, 241, 232, 0.54);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.local-guide-hero__facts dd {
+    margin: 0;
+    color: rgba(245, 241, 232, 0.9);
+    font-size: 1rem;
+    line-height: 1.55;
+}
+
+.local-guide-section {
+    padding: 0 0 2.35rem;
+}
+
+.local-guide-section__shell,
+.local-guide-faq-shell {
+    display: grid;
+    gap: 1.2rem;
+}
+
+.local-guide-section--soft .local-guide-section__shell,
+.local-guide-section--soft .local-guide-faq-shell {
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 1.85rem;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01)),
+        rgba(255, 255, 255, 0.015);
+}
+
+.local-guide-section__intro {
+    display: grid;
+    gap: 0.8rem;
+    max-width: 52rem;
+}
+
+.local-guide-section__intro h2,
+.local-guide-cta__copy h2 {
+    font-size: clamp(2.35rem, 4vw, 3.85rem);
+    line-height: 0.95;
+}
+
+.local-guide-note-grid,
+.local-guide-process-grid,
+.local-guide-car-grid,
+.local-guide-spotlight-grid,
+.local-guide-related-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.local-guide-process-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.local-guide-note-card,
+.local-guide-related-card {
+    display: grid;
+    gap: 0.8rem;
+}
+
+.local-guide-note-card h3,
+.local-guide-process-card h3,
+.local-guide-car-card h3,
+.local-guide-spotlight-card h3,
+.local-guide-related-card h3 {
+    font-size: 1.95rem;
+}
+
+.local-guide-process-card {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    background:
+        linear-gradient(180deg, rgba(13, 16, 21, 0.92), rgba(6, 8, 12, 0.96)),
+        linear-gradient(150deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0));
+}
+
+.local-guide-process-card strong {
+    color: rgba(227, 246, 85, 0.9);
+}
+
+.local-guide-car-card,
+.local-guide-spotlight-card {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.local-guide-car-card__meta {
+    display: grid;
+    gap: 0.6rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.local-guide-car-card__meta div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.local-guide-car-card__meta span {
+    color: rgba(245, 241, 232, 0.54);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.64rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.local-guide-car-card__meta strong {
+    color: rgba(245, 241, 232, 0.9);
+    line-height: 1.55;
+}
+
+.local-guide-spotlight-card {
+    min-height: 100%;
+}
+
+.local-guide-spotlight-card__label {
+    color: rgba(245, 241, 232, 0.82);
+}
+
+.local-guide-related-card__link {
+    justify-self: start;
+}
+
+.local-guide-faq-shell {
+    gap: 1rem;
+}
+
+.local-guide-faq-list {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.local-guide-faq-item {
+    padding: 0;
+}
+
+.local-guide-faq-item summary {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.2rem 1.35rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.55rem;
+    font-weight: 600;
+    line-height: 1.05;
+}
+
+.local-guide-faq-item summary::-webkit-details-marker {
+    display: none;
+}
+
+.local-guide-faq-item summary::after {
+    content: "+";
+    color: rgba(227, 246, 85, 0.88);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.local-guide-faq-item[open] summary::after {
+    content: "-";
+}
+
+.local-guide-faq-item p {
+    padding: 0 1.35rem 1.25rem;
+}
+
+.local-guide-cta {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1.5rem;
+    align-items: center;
+    background:
+        radial-gradient(circle at 82% 18%, rgba(227, 246, 85, 0.09), rgba(227, 246, 85, 0) 28%),
+        var(--guide-panel-strong);
+}
+
+.local-guide-cta__copy {
+    display: grid;
+    gap: 0.8rem;
+    max-width: 42rem;
+}
+
+.local-guide-button:focus-visible,
+.local-guide-faq-item summary:focus-visible,
+.local-guide-car-card__actions a:focus-visible,
+.local-guide-related-card__link:focus-visible,
+.local-guide-breadcrumb a:focus-visible {
+    outline: 2px solid rgba(227, 246, 85, 0.82);
+    outline-offset: 3px;
+}
+
+@media (max-width: 1120px) {
+    .local-guide-hero__shell,
+    .local-guide-note-grid,
+    .local-guide-car-grid,
+    .local-guide-spotlight-grid,
+    .local-guide-related-grid,
+    .local-guide-process-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .local-guide-hero__content h1 {
+        max-width: 14ch;
+        font-size: clamp(2.7rem, 6vw, 4.1rem);
+    }
+
+    .local-guide-cta {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 860px) {
+    .local-guide-hero {
+        padding-top: calc(var(--lab-header-offset) + 3.6rem);
+    }
+
+    .local-guide-hero__content,
+    .local-guide-hero__aside,
+    .local-guide-note-card,
+    .local-guide-process-card,
+    .local-guide-car-card,
+    .local-guide-spotlight-card,
+    .local-guide-related-card,
+    .local-guide-cta {
+        padding: 1.45rem;
+        border-radius: 1.45rem;
+    }
+
+    .local-guide-section--soft .local-guide-section__shell,
+    .local-guide-section--soft .local-guide-faq-shell {
+        padding: 1.1rem;
+        border-radius: 1.45rem;
+    }
+
+    .local-guide-hero__content h1,
+    .local-guide-section__intro h2,
+    .local-guide-cta__copy h2 {
+        max-width: none;
+        font-size: clamp(2.45rem, 9vw, 3.45rem);
+    }
+
+    .local-guide-hero__aside h2,
+    .local-guide-note-card h3,
+    .local-guide-process-card h3,
+    .local-guide-car-card h3,
+    .local-guide-spotlight-card h3,
+    .local-guide-related-card h3,
+    .local-guide-faq-item summary {
+        font-size: 1.55rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .local-guide-hero__shell,
+    .local-guide-note-grid,
+    .local-guide-process-grid,
+    .local-guide-car-grid,
+    .local-guide-spotlight-grid,
+    .local-guide-related-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .local-guide-hero__actions,
+    .local-guide-car-card__actions,
+    .local-guide-cta__actions {
+        flex-direction: column;
+    }
+
+    .local-guide-button,
+    .local-guide-car-card__actions a,
+    .local-guide-related-card__link {
+        width: 100%;
+    }
+
+    .local-guide-faq-item summary {
+        font-size: 1.35rem;
+    }
+}

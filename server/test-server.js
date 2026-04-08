@@ -6,19 +6,22 @@ const { spawn, spawnSync } = require('child_process');
 
 const projectRoot = path.resolve(__dirname, '..');
 const siteRoot = path.join(projectRoot, 'site');
+const legacyRoot = path.join(projectRoot, 'site-legacy');
 const staticServerPort = Number(process.env.TEST_STATIC_PORT || 8091);
 const staticBaseUrl = `http://127.0.0.1:${staticServerPort}`;
 
 const requiredFiles = [
     'server/backend-example.js',
-    'site/config.js',
     'server/email-config.js',
     'server/server-http.js',
     'server/verificar-stripe.js',
     'vercel.json',
+    'app/api/reserve/route.js',
+    'site/config.js',
     'site/robots.txt',
     'site/sitemap.xml',
-    'app/api/reserve/route.js',
+    'site/manifest.json',
+    'site/favicon.ico',
     'site/app/reserve/page.html',
     'site/index.html',
     'site/fleet.html',
@@ -26,18 +29,39 @@ const requiredFiles = [
     'site/services.html',
     'site/about.html',
     'site/contact.html',
+    'site/luxury-car-rental-dubai.html',
+    'site/abu-dhabi-luxury-car-rental.html',
+    'site/dubai-airport-luxury-car-rental.html',
+    'site/palm-jumeirah-luxury-car-rental.html',
+    'site/dubai-marina-luxury-car-rental.html',
+    'site/lamborghini-rental-dubai.html',
+    'site/ferrari-rental-dubai.html',
+    'site/mercedes-rental-dubai.html',
+    'site/porsche-rental-dubai.html',
+    'site/rolls-royce-rental-dubai.html',
+    'site/g63-rental-dubai.html',
+    'site/supercar-rental-dubai.html',
+    'site/css/site-v2.css',
+    'site/css/site-v2-fleet.css',
+    'site/css/site-v2-locations.css',
+    'site/css/site-v2-services.css',
+    'site/css/site-v2-about.css',
+    'site/css/site-v2-local-guide.css',
+    'site/css/site-v2-service-detail.css',
     'site/css/hub-pages.css',
+    'site/js/site-v2.js',
+    'site/js/site-v2-fleet.js',
     'site/js/contact-form.js',
-    'site/media/hero-dubai-sunset.mp4'
+    'site-legacy/index.html'
 ];
 
 const syntaxFiles = [
     'server/backend-example.js',
     'server/email-config.js',
-    'site/config.js',
     'server/server-http.js',
     'server/verificar-stripe.js',
-    'app/api/reserve/route.js'
+    'app/api/reserve/route.js',
+    'site/config.js'
 ];
 
 const keyMarketingPaths = [
@@ -47,9 +71,12 @@ const keyMarketingPaths = [
     '/services.html',
     '/about.html',
     '/contact.html',
-    '/lamborghini-rental-dubai.html',
-    '/ferrari-rental-dubai.html',
-    '/palm-jumeirah-luxury-car-rental.html'
+    '/luxury-car-rental-dubai.html',
+    '/abu-dhabi-luxury-car-rental.html',
+    '/dubai-airport-luxury-car-rental.html',
+    '/palm-jumeirah-luxury-car-rental.html',
+    '/dubai-marina-luxury-car-rental.html',
+    '/lamborghini-rental-dubai.html'
 ];
 
 function report(ok, message) {
@@ -104,11 +131,12 @@ function parseSitemapPaths(xml) {
 }
 
 function siteFileForPath(urlPath) {
-    if (urlPath === '/') {
+    const pathname = String(urlPath).split(/[?#]/)[0] || '/';
+    if (pathname === '/') {
         return path.join(siteRoot, 'index.html');
     }
 
-    return path.join(siteRoot, urlPath.replace(/^\//, ''));
+    return path.join(siteRoot, pathname.replace(/^\//, ''));
 }
 
 function extractTagValue(html, pattern) {
@@ -137,6 +165,81 @@ function createStaticMarkupAssertions(pathname, html) {
         canonical.startsWith('https://prestigegoalmotion.com'),
         `${pathname} has a canonical URL on prestigegoalmotion.com`
     );
+}
+
+function isWithinRoot(targetPath, rootPath) {
+    const resolvedRoot = path.resolve(rootPath);
+    const resolvedTarget = path.resolve(targetPath);
+    return resolvedTarget === resolvedRoot || resolvedTarget.startsWith(`${resolvedRoot}${path.sep}`);
+}
+
+function listFilesRecursive(rootPath, extension) {
+    const results = [];
+
+    function walk(currentPath) {
+        for (const entry of fs.readdirSync(currentPath, { withFileTypes: true })) {
+            const nextPath = path.join(currentPath, entry.name);
+            if (entry.isDirectory()) {
+                walk(nextPath);
+                continue;
+            }
+
+            if (!extension || nextPath.endsWith(extension)) {
+                results.push(nextPath);
+            }
+        }
+    }
+
+    walk(rootPath);
+    return results;
+}
+
+function normalizeReference(reference) {
+    return String(reference || '').trim().split('#')[0].split('?')[0];
+}
+
+function isSkippableReference(reference) {
+    return (
+        !reference ||
+        reference === '#' ||
+        reference.startsWith('http://') ||
+        reference.startsWith('https://') ||
+        reference.startsWith('mailto:') ||
+        reference.startsWith('tel:') ||
+        reference.startsWith('sms:') ||
+        reference.startsWith('javascript:') ||
+        reference.startsWith('data:') ||
+        reference.startsWith('blob:')
+    );
+}
+
+function resolveLocalReference(fromFile, reference) {
+    const cleanReference = normalizeReference(reference);
+    if (isSkippableReference(cleanReference)) {
+        return null;
+    }
+
+    if (cleanReference === '/') {
+        return path.join(siteRoot, 'index.html');
+    }
+
+    if (cleanReference.startsWith('/')) {
+        return siteFileForPath(cleanReference);
+    }
+
+    return path.resolve(path.dirname(fromFile), cleanReference);
+}
+
+function collectLocalReferences(html) {
+    const references = [];
+    const attributePattern = /\b(?:href|src|action)=["']([^"']+)["']/gi;
+    let match;
+
+    while ((match = attributePattern.exec(html)) !== null) {
+        references.push(match[1]);
+    }
+
+    return references;
 }
 
 async function startStaticServer() {
@@ -195,6 +298,9 @@ async function run() {
         const fullPath = path.join(projectRoot, relativePath);
         assert(fs.existsSync(fullPath), `${relativePath} exists`);
     });
+
+    assert(fs.existsSync(legacyRoot), 'site-legacy exists as the archived previous production site');
+    assert(!fs.existsSync(path.join(projectRoot, 'site-v2')), 'site-v2 folder has been promoted and no longer exists');
 
     syntaxFiles.forEach((relativePath) => {
         const fullPath = path.join(projectRoot, relativePath);
@@ -262,7 +368,7 @@ async function run() {
         reservePage.includes("const BOOKING_INTENT_KEY = 'dynastyBookingIntent'") &&
         reservePage.includes("urlParams.get('startDate')") &&
         reservePage.includes('applyPrefilledBookingSchedule()'),
-        'reserve page can prefill dates and times from the home booking intent'
+        'reserve page can prefill dates and times from the booking intent'
     );
     assert(
         reservePage.includes('https://js.stripe.com/v3/') && reservePage.includes('config.js'),
@@ -271,71 +377,73 @@ async function run() {
 
     const indexPage = readFile('site/index.html');
     assert(
-        indexPage.includes('/app/reserve/page.html') &&
-        indexPage.includes('/fleet.html') &&
-        indexPage.includes('/locations.html') &&
-        indexPage.includes('/services.html') &&
-        indexPage.includes('/about.html') &&
-        indexPage.includes('/contact.html') &&
-        indexPage.includes('/lamborghini-rental-dubai.html'),
-        'home page links to reservation, core trunk pages and key SEO landing pages'
+        indexPage.includes('id="hero-lab-overlay"') &&
+        indexPage.includes('id="hero-lab-pickup-date"') &&
+        indexPage.includes('id="hero-lab-return-date"') &&
+        indexPage.includes('js-booking-open'),
+        'home page exposes the date-first hero controls'
     );
     assert(
-        indexPage.includes('id="heroAvailabilityForm"') &&
-        indexPage.includes('id="heroStartDate"') &&
-        indexPage.includes('id="heroEndDate"') &&
-        indexPage.includes('/media/hero-dubai-sunset.mp4'),
-        'home page exposes the date-first hero and local background video asset'
+        indexPage.includes('./fleet.html') &&
+        indexPage.includes('./locations.html') &&
+        indexPage.includes('./services.html') &&
+        indexPage.includes('./about.html') &&
+        indexPage.includes('./contact.html'),
+        'home page links to the core production pages'
     );
     assert(
-        indexPage.includes("const BOOKING_INTENT_KEY = 'dynastyBookingIntent'") &&
-        indexPage.includes('fleetIntentBanner') &&
-        indexPage.includes('Show available cars'),
-        'home page carries hero date selection into fleet browsing and reservation links'
+        indexPage.includes('./luxury-car-rental-dubai.html') &&
+        indexPage.includes('./locations.html') &&
+        indexPage.includes('./monthly-luxury-car-rental-dubai.html'),
+        'home page links into the local SEO and service-guide layer'
     );
 
     const fleetPage = readFile('site/fleet.html');
     assert(
-        fleetPage.includes('/app/reserve/page.html') && fleetPage.includes('/lamborghini-rental-dubai.html'),
-        'fleet page links to reservation and supporting brand landing pages'
+        fleetPage.includes('./luxury-car-rental-dubai.html') &&
+        fleetPage.includes('./dubai-airport-luxury-car-rental.html') &&
+        fleetPage.includes('./palm-jumeirah-luxury-car-rental.html') &&
+        fleetPage.includes('./dubai-marina-luxury-car-rental.html'),
+        'fleet page links into the core local SEO guide pages'
     );
-    assert(
-        fleetPage.includes('/css/hub-pages.css'),
-        'fleet page uses the shared hub stylesheet'
-    );
+
     const locationsPage = readFile('site/locations.html');
     assert(
-        locationsPage.includes('/app/reserve/page.html') &&
-        locationsPage.includes('/palm-jumeirah-luxury-car-rental.html') &&
-        locationsPage.includes('/dubai-marina-luxury-car-rental.html'),
-        'locations page links to reservation and key area guides'
+        locationsPage.includes('./luxury-car-rental-dubai.html') &&
+        locationsPage.includes('./abu-dhabi-luxury-car-rental.html') &&
+        locationsPage.includes('./dubai-airport-luxury-car-rental.html') &&
+        locationsPage.includes('./palm-jumeirah-luxury-car-rental.html') &&
+        locationsPage.includes('./dubai-marina-luxury-car-rental.html'),
+        'locations page links prominently to the five local SEO guides'
     );
     assert(
-        locationsPage.includes('/css/hub-pages.css'),
-        'locations page uses the shared hub stylesheet'
+        locationsPage.includes('./app/reserve/page.html'),
+        'locations page links into the reservation flow'
     );
+
     const servicesPage = readFile('site/services.html');
     assert(
-        servicesPage.includes('/app/reserve/page.html') &&
-        servicesPage.includes('/fleet.html') &&
-        servicesPage.includes('/locations.html'),
-        'services page links to reservation, fleet and locations'
+        servicesPage.includes('./airport-concierge-dubai.html') &&
+        servicesPage.includes('./chauffeur-service-dubai.html') &&
+        servicesPage.includes('./hotel-villa-airport-delivery-dubai.html') &&
+        servicesPage.includes('./monthly-luxury-car-rental-dubai.html'),
+        'services page links into the detailed service landing pages'
     );
     assert(
-        servicesPage.includes('/css/hub-pages.css'),
-        'services page uses the shared hub stylesheet'
+        servicesPage.includes('./locations.html') &&
+        servicesPage.includes('./fleet.html') &&
+        servicesPage.includes('./app/reserve/page.html'),
+        'services page links to locations, fleet and reservation'
     );
+
     const aboutPage = readFile('site/about.html');
     assert(
-        aboutPage.includes('/fleet.html') &&
-        aboutPage.includes('/contact.html') &&
-        aboutPage.includes('/app/reserve/page.html'),
+        aboutPage.includes('./fleet.html') &&
+        aboutPage.includes('./contact.html') &&
+        aboutPage.includes('./app/reserve/page.html'),
         'about page links to fleet, contact and reservation'
     );
-    assert(
-        aboutPage.includes('/css/hub-pages.css'),
-        'about page uses the shared hub stylesheet'
-    );
+
     const contactPage = readFile('site/contact.html');
     assert(
         contactPage.includes('id="contactForm"') &&
@@ -344,25 +452,30 @@ async function run() {
         contactPage.includes('/js/contact-form.js'),
         'contact page includes the contact form, reservation link and runtime config'
     );
-    assert(
-        contactPage.includes('/css/hub-pages.css'),
-        'contact page uses the shared hub stylesheet'
-    );
-    assert(
-        indexPage.includes('js/contact-form.js') &&
-        indexPage.includes('window.DynastyContactForm'),
-        'home page uses the shared contact form helper'
-    );
-    assert(
-        indexPage.includes('GOOGLE_REVIEWS_CONFIG') &&
-        indexPage.includes('Google reviews slider disabled until real Places credentials are configured.'),
-        'home page disables Google reviews fetches until real Places credentials are configured'
-    );
-    assert(
-        indexPage.includes('isLocalPreviewMode') &&
-        indexPage.includes('Local preview detected. Skipping automatic backend healthcheck'),
-        'home page softens backend health warnings during local static previews'
-    );
+
+    const htmlFiles = listFilesRecursive(siteRoot, '.html');
+    htmlFiles.forEach((absolutePath) => {
+        const relativePath = path.relative(projectRoot, absolutePath).replace(/\\/g, '/');
+        const html = fs.readFileSync(absolutePath, 'utf8');
+
+        assert(!html.includes('../site/'), `${relativePath} no longer references ../site legacy paths`);
+
+        collectLocalReferences(html).forEach((reference) => {
+            const resolvedReference = resolveLocalReference(absolutePath, reference);
+            if (!resolvedReference) {
+                return;
+            }
+
+            assert(
+                isWithinRoot(resolvedReference, siteRoot),
+                `${relativePath} keeps local references inside /site`
+            );
+            assert(
+                fs.existsSync(resolvedReference),
+                `${relativePath} points to an existing local reference: ${reference}`
+            );
+        });
+    });
 
     const backendFile = readFile('server/backend-example.js');
     assert(
@@ -394,14 +507,9 @@ async function run() {
         robotsFile.includes('Sitemap: https://prestigegoalmotion.com/sitemap.xml'),
         'robots.txt points to the public sitemap'
     );
-    assert(
-        !robotsFile.includes('Disallow: /index.html') && !robotsFile.includes('Disallow: /lamborghini-rental-dubai.html'),
-        'robots.txt does not block key public pages'
-    );
 
     const sitemapPaths = parseSitemapPaths(readFile('site/sitemap.xml'));
-    assert(sitemapPaths.length >= 10, 'sitemap.xml lists the expected public URLs');
-
+    assert(sitemapPaths.length >= 20, 'sitemap.xml lists the expected public URLs for the new production site');
     sitemapPaths.forEach((pathname) => {
         assert(fs.existsSync(siteFileForPath(pathname)), `${pathname} from sitemap exists in /site`);
     });
@@ -409,7 +517,7 @@ async function run() {
     const { child, logs } = await startStaticServer();
 
     try {
-        const specialPaths = ['/', '/robots.txt', '/sitemap.xml', '/manifest.json'];
+        const specialPaths = ['/', '/robots.txt', '/sitemap.xml', '/manifest.json', '/contact.html', '/app/reserve/page.html'];
         for (const pathname of [...specialPaths, ...sitemapPaths]) {
             const response = await fetchUrl(`${staticBaseUrl}${pathname}`);
             assert(response.statusCode === 200, `${pathname} responds with HTTP 200 on the local static server`);
@@ -425,6 +533,13 @@ async function run() {
         assert(
             reserveResponse.body.includes('id="payButton"') && reserveResponse.body.includes('name="email"'),
             'reserve page renders the checkout structure through the local static server'
+        );
+
+        const contactResponse = await fetchUrl(`${staticBaseUrl}/contact.html`);
+        assert(
+            contactResponse.body.includes('id="contactForm"') &&
+            contactResponse.body.includes('/js/contact-form.js'),
+            'contact page renders the shared contact form through the local static server'
         );
     } catch (error) {
         throw new Error(`${error.message}\n${logs()}`);

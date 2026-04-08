@@ -28,7 +28,7 @@
   <url>
     <loc>https://prestigegoalmotion.com/about.html</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.72</priority>
   </url>
   <url>
     <loc>https://prestigegoalmotion.com/contact.html</loc>
@@ -39,6 +39,56 @@
     <loc>https://prestigegoalmotion.com/luxury-car-rental-dubai.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/abu-dhabi-luxury-car-rental.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.72</priority>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/dubai-airport-luxury-car-rental.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.78</priority>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/palm-jumeirah-luxury-car-rental.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.76</priority>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/dubai-marina-luxury-car-rental.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.74</priority>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/chauffeur-service-dubai.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.82</priority>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/airport-concierge-dubai.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.82</priority>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/hotel-villa-airport-delivery-dubai.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/wedding-event-car-rental-dubai.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.79</priority>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/business-car-rental-dubai.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.79</priority>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/monthly-luxury-car-rental-dubai.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://prestigegoalmotion.com/lamborghini-rental-dubai.html</loc>
@@ -76,19 +126,9 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://prestigegoalmotion.com/dubai-marina-luxury-car-rental.html</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.74</priority>
-  </url>
-  <url>
     <loc>https://prestigegoalmotion.com/mercedes-rental-dubai.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.77</priority>
-  </url>
-  <url>
-    <loc>https://prestigegoalmotion.com/palm-jumeirah-luxury-car-rental.html</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.76</priority>
   </url>
   <url>
     <loc>https://prestigegoalmotion.com/porsche-rental-dubai.html</loc>
@@ -116,11 +156,3 @@
     <priority>0.4</priority>
   </url>
 </urlset>
-
-
-
-
-
-
-
-

@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dubai Luxury Fleet | Lamborghini, Ferrari, G63, Porsche & Rolls-Royce</title>
+    <meta name="description" content="Explore the Dynasty Prestige fleet in Dubai with Lamborghini, Ferrari, Porsche, Mercedes G63 AMG and Rolls-Royce. Compare models and reserve online.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://prestigegoalmotion.com/fleet.html">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Montserrat:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/hub-pages.css">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "Dynasty Prestige Fleet",
+      "url": "https://prestigegoalmotion.com/fleet.html",
+      "description": "Curated luxury and supercar fleet in Dubai with Lamborghini, Ferrari, Porsche, Mercedes G63 AMG and Rolls-Royce models."
+    }
+    </script>
+    <style>
+        .hero-grid,
+        .brand-grid,
+        .vehicle-grid,
+        .use-grid,
+        .decision-grid {
+            display: grid;
+            gap: 1.2rem;
+        }
+
+        .hero-grid {
+            grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
+            align-items: stretch;
+        }
+
+        .heading {
+            max-width: 860px;
+        }
+
+        .hero-side {
+            padding: 2rem;
+            background: linear-gradient(180deg, rgba(17, 18, 22, 0.92), rgba(4, 4, 6, 0.96)), url('/images/fleet/rolls-royce-cullinan-black-badge/02-exterior-front.png') center/cover no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .hero-side h2 {
+            text-align: left;
+            font-size: clamp(1.3rem, 2.4vw, 1.9rem);
+            margin-bottom: 0;
+        }
+
+        .hero-side ul {
+            list-style: none;
+            display: grid;
+            gap: 0.7rem;
+            color: var(--muted);
+        }
+
+        .hero-side li {
+            position: relative;
+            padding-left: 1rem;
+        }
+
+        .hero-side li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.7rem;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--gold);
+        }
+
+        .brand-grid {
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        }
+
+        .brand-card {
+            padding: 1.35rem 1.15rem;
+            text-decoration: none;
+        }
+
+        .brand-card img {
+            width: 82px;
+            height: 82px;
+            object-fit: contain;
+            margin-bottom: 1rem;
+        }
+
+        .brand-card h3,
+        .group-title,
+        .use-card h3,
+        .decision-card h3 {
+            color: var(--gold);
+            font: 1rem 'Montserrat', system-ui, sans-serif;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 0.45rem;
+        }
+
+        .brand-card p,
+        .group-copy,
+        .vehicle-card p,
+        .use-card p,
+        .decision-card p {
+            color: var(--muted);
+        }
+
+        .decision-grid {
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        .decision-label {
+            display: inline-flex;
+            padding: 0.36rem 0.72rem;
+            margin-bottom: 0.9rem;
+            border-radius: 999px;
+            background: rgba(214, 240, 60, 0.08);
+            color: var(--gold-soft);
+            font: 0.74rem 'Montserrat', system-ui, sans-serif;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .decision-meta {
+            display: grid;
+            gap: 0.45rem;
+            margin-top: 1rem;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .decision-meta strong {
+            color: var(--text);
+        }
+
+        .group + .group {
+            margin-top: 3.2rem;
+        }
+
+        .group-copy {
+            max-width: 760px;
+            margin-bottom: 1.2rem;
+            line-height: 1.72;
+        }
+
+        .vehicle-grid {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+
+        .vehicle-card {
+            overflow: hidden;
+        }
+
+        .vehicle-card img {
+            width: 100%;
+            height: 230px;
+            object-fit: cover;
+            background: #0c0c0e;
+        }
+
+        .vehicle-body {
+            padding: 1.35rem;
+        }
+
+        .vehicle-brand {
+            display: inline-flex;
+            padding: 0.38rem 0.7rem;
+            margin-bottom: 0.7rem;
+            border-radius: 999px;
+            background: rgba(214, 240, 60, 0.08);
+            color: var(--gold-soft);
+            font: 0.74rem 'Montserrat', system-ui, sans-serif;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+
+        .vehicle-body h3 {
+            font-size: 1.35rem;
+            margin-bottom: 0.55rem;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.7rem;
+            margin: 1rem 0 0.85rem;
+        }
+
+        .price {
+            color: var(--gold-soft);
+            font-size: 1.12rem;
+            font-weight: 700;
+        }
+
+        .note {
+            padding: 0.38rem 0.66rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--muted);
+            font-size: 0.8rem;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.95rem;
+        }
+
+        .tag {
+            padding: 0.4rem 0.62rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            color: var(--muted);
+            font-size: 0.78rem;
+        }
+
+        .use-grid {
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        @media (max-width: 768px) {
+            .price-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .vehicle-card img {
+                height: 210px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/" class="logo" aria-label="Dynasty Prestige Home"><img src="/logo-dp-transparent.png" alt="Dynasty Prestige"></a>
+        <nav aria-label="Main navigation">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/fleet.html" class="is-active">Fleet</a></li>
+                <li><a href="/locations.html">Locations</a></li>
+                <li><a href="/services.html">Services</a></li>
+                <li><a href="/about.html">About</a></li>
+                <li><a href="/contact.html">Contact</a></li>
+                <li><a href="/app/reserve/page.html" class="header-cta">Reserve</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <div class="shell hero-grid">
+                <div class="hero-card">
+                    <span class="kicker">Fleet Collection</span>
+                    <h1>The Dynasty Prestige Fleet</h1>
+                    <p class="lead">A curated Dubai collection of supercars, luxury SUVs and statement arrivals for guests who want more than a standard rental list.</p>
+                    <p class="sublead">Browse signature models, compare what each one is best for and reserve the right car for city stays, airport arrivals, content plans and high-impact weekends.</p>
+                    <div class="hero-actions">
+                        <a href="/app/reserve/page.html" class="btn">Start reservation</a>
+                        <a href="https://wa.me/971586122568" class="btn btn-secondary">WhatsApp the team</a>
+                    </div>
+                    <div class="hero-pills">
+                        <div class="pill"><strong>Collection</strong>6 signature models across 5 luxury marques.</div>
+                        <div class="pill"><strong>Use Cases</strong>City arrivals, business stays, weekend drives and content shoots.</div>
+                        <div class="pill"><strong>Support</strong>Dubai-wide handover coordination with clear confirmation and timing.</div>
+                    </div>
+                </div>
+                <aside class="hero-side">
+                    <span class="kicker">Fleet Notes</span>
+                    <h2>Built around the stay, not just the car</h2>
+                    <p class="sublead">Each model is chosen for a specific type of Dubai plan: visual impact, premium comfort, airport arrival or a more focused driving experience.</p>
+                    <ul>
+                        <li>Lamborghini and Ferrari for standout city presence.</li>
+                        <li>G63 and Cullinan for comfort, luggage room and arrival value.</li>
+                        <li>Porsche GT3 for guests who want a sharper drive.</li>
+                    </ul>
+                </aside>
+            </div>
+        </section>
+        <section style="background:var(--bg2);">
+            <div class="shell">
+                <div class="heading">
+                    <span class="kicker">By Brand</span>
+                    <h2>Navigate the fleet by marque</h2>
+                    <p class="sublead">Use the brand guides below when you already know the badge you want, or start with the full collection further down the page.</p>
+                </div>
+                <div class="brand-grid">
+                    <a class="brand-card" href="/lamborghini-rental-dubai.html"><img src="/brands/lamborghini-clean.png" alt="Lamborghini logo"><h3>Lamborghini</h3><p>Huracan EVO Spyder and Urus Sport for open-top drama or SUV presence.</p></a>
+                    <a class="brand-card" href="/ferrari-rental-dubai.html"><img src="/brands/ferrari-clean.png" alt="Ferrari logo"><h3>Ferrari</h3><p>Hybrid Ferrari impact for premium stays, arrivals and special plans.</p></a>
+                    <a class="brand-card" href="/mercedes-rental-dubai.html"><img src="/brands/mercedes-clean.png" alt="Mercedes logo"><h3>Mercedes AMG</h3><p>Daily luxury SUV comfort through the G63, with easy Dubai usability.</p></a>
+                    <a class="brand-card" href="/porsche-rental-dubai.html"><img src="/brands/porsche-clean.png" alt="Porsche logo"><h3>Porsche</h3><p>Driver-focused GT3 performance for guests who care about the drive itself.</p></a>
+                    <a class="brand-card" href="/rolls-royce-rental-dubai.html"><img src="/brands/rolls-royce-badge-transparent.png" alt="Rolls-Royce logo"><h3>Rolls-Royce</h3><p>Black Badge comfort, privacy and statement arrival energy in one package.</p></a>
+                </div>
+            </div>
+        </section>
+        <section>
+            <div class="shell">
+                <div class="heading">
+                    <span class="kicker">Quick Choice</span>
+                    <h2>Pick the right car before you scroll every model</h2>
+                    <p class="sublead">The best rental page in this category does not only show badges and photos. It helps the guest decide fast. These four routes cover most Dubai plans.</p>
+                </div>
+                <div class="decision-grid">
+                    <article class="decision-card">
+                        <span class="decision-label">Signature Weekend</span>
+                        <h3>Huracan EVO Spyder</h3>
+                        <p>Best when the car is part of the experience and the trip needs open-top theatre, nightlife energy and a strong visual profile.</p>
+                        <div class="decision-meta">
+                            <span>Best for: <strong>Leisure stays and standout city plans</strong></span>
+                            <span>Starting feel: <strong>From 3,200 AED / day</strong></span>
+                        </div>
+                        <div class="card-actions">
+                            <a href="/app/reserve/page.html?car=Lamborghini Huracan EVO Spyder&amp;price=3200" class="btn">Reserve the Spyder</a>
+                            <a href="/lamborghini-rental-dubai.html" class="text-link">See Lamborghini guide</a>
+                        </div>
+                    </article>
+                    <article class="decision-card">
+                        <span class="decision-label">Best Daily Luxury</span>
+                        <h3>Mercedes G63 AMG</h3>
+                        <p>Best for guests who want everyday comfort, luggage room and recognisable presence without overcomplicating a busy Dubai schedule.</p>
+                        <div class="decision-meta">
+                            <span>Best for: <strong>Business stays and mixed-use trips</strong></span>
+                            <span>Starting feel: <strong>From 1,650 AED / day</strong></span>
+                        </div>
+                        <div class="card-actions">
+                            <a href="/app/reserve/page.html?car=Mercedes G 63 AMG&amp;price=1650" class="btn">Reserve the G63</a>
+                            <a href="/g63-rental-dubai.html" class="text-link">Open G63 guide</a>
+                        </div>
+                    </article>
+                    <article class="decision-card">
+                        <span class="decision-label">VIP Arrival</span>
+                        <h3>Cullinan Black Badge</h3>
+                        <p>Best when hotel arrival, privacy and statement value matter more than outright theatre. This is the cleanest premium arrival piece in the fleet.</p>
+                        <div class="decision-meta">
+                            <span>Best for: <strong>Airport handover and hotel arrivals</strong></span>
+                            <span>Starting feel: <strong>Average 3,750 AED / day</strong></span>
+                        </div>
+                        <div class="card-actions">
+                            <a href="/app/reserve/page.html?car=Rolls-Royce Cullinan Black Badge&amp;price=3750" class="btn">Reserve the Cullinan</a>
+                            <a href="/rolls-royce-rental-dubai.html" class="text-link">See Rolls-Royce guide</a>
+                        </div>
+                    </article>
+                    <article class="decision-card">
+                        <span class="decision-label">Driver's Pick</span>
+                        <h3>Porsche 992 GT3</h3>
+                        <p>Best when the guest cares more about the drive itself than pure showmanship and wants a sharper, more focused performance feel.</p>
+                        <div class="decision-meta">
+                            <span>Best for: <strong>Driving feel and shorter focused runs</strong></span>
+                            <span>Starting feel: <strong>From 2,100 AED / day</strong></span>
+                        </div>
+                        <div class="card-actions">
+                            <a href="/app/reserve/page.html?car=Porsche 992 GT3&amp;price=2100" class="btn">Reserve the GT3</a>
+                            <a href="/porsche-rental-dubai.html" class="text-link">See Porsche guide</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+        <section>
+            <div class="shell">
+                <div class="heading">
+                    <span class="kicker">Main Collection</span>
+                    <h2>Choose the right car for the right Dubai plan</h2>
+                    <p class="sublead">The fleet is grouped by the kind of arrival or experience each model serves best, so decision-making feels clearer than a simple price list.</p>
+                </div>
+                <div class="group">
+                    <h3 class="group-title">Signature supercars</h3>
+                    <p class="group-copy">Built for visual impact, performance and memorable city drives. These are the strongest choices when you want the car itself to be part of the experience.</p>
+                    <div class="vehicle-grid">
+                        <article class="vehicle-card"><img src="/images/fleet/lamborghini-huracan/01-exterior-front.png" alt="Lamborghini Huracan EVO Spyder in Dubai"><div class="vehicle-body"><span class="vehicle-brand">Lamborghini</span><h3>Huracan EVO Spyder</h3><p>Open-top V10 drama for guests who want the loudest statement in the fleet and a stronger leisure feel on Dubai roads.</p><div class="price-row"><span class="price">Average 3,200 AED / day</span><span class="note">50% to confirm</span></div><div class="tags"><span class="tag">Convertible</span><span class="tag">City impact</span><span class="tag">Free Dubai delivery</span></div><div class="card-actions"><a href="/app/reserve/page.html?car=Lamborghini Huracan EVO Spyder&amp;price=3200" class="btn">Reserve this car</a><a href="/lamborghini-rental-dubai.html" class="text-link">Lamborghini guide</a></div></div></article>
+                        <article class="vehicle-card"><img src="https://www.europeanprestige.co.uk/blobs/stock/637/images/ecbeba9b-5a32-4bea-8974-83af94d99597/296-4.jpg?width=2000&amp;height=1333" alt="Ferrari 296 GTS rental in Dubai"><div class="vehicle-body"><span class="vehicle-brand">Ferrari</span><h3>296 GTS</h3><p>Hybrid Ferrari performance with premium convertible appeal for standout arrivals, couples, events and high-visibility plans.</p><div class="price-row"><span class="price">From 3,400 AED / day</span><span class="note">50% to confirm</span></div><div class="tags"><span class="tag">Convertible</span><span class="tag">Special occasions</span><span class="tag">Fast reply</span></div><div class="card-actions"><a href="/app/reserve/page.html?car=Ferrari 296 GTS&amp;price=3400" class="btn">Reserve this car</a><a href="/ferrari-rental-dubai.html" class="text-link">Ferrari guide</a></div></div></article>
+                        <article class="vehicle-card"><img src="https://www.chicagomotorcars.com/imagetag/11513/main/l/Used-2024-Porsche-911-GT3-RS-Weissach!-Full-Body-PPF!-Front-End-Lifter!-Sinister-Spec!-Loaded!-1707950268.jpg" alt="Porsche 992 GT3 rental in Dubai"><div class="vehicle-body"><span class="vehicle-brand">Porsche</span><h3>992 GT3</h3><p>A sharper, more driver-focused option for guests who want precision and a less showy but very serious performance profile.</p><div class="price-row"><span class="price">From 2,100 AED / day</span><span class="note">50% to confirm</span></div><div class="tags"><span class="tag">Driver focused</span><span class="tag">Performance stay</span><span class="tag">Delivery coordinated</span></div><div class="card-actions"><a href="/app/reserve/page.html?car=Porsche 992 GT3&amp;price=2100" class="btn">Reserve this car</a><a href="/porsche-rental-dubai.html" class="text-link">Porsche guide</a></div></div></article>
+                    </div>
+                </div>
+                <div class="group">
+                    <h3 class="group-title">Luxury SUVs and arrival pieces</h3>
+                    <p class="group-copy">These models carry the bulk of airport arrivals, business stays and clients who want comfort, room and presence without giving up premium feel.</p>
+                    <div class="vehicle-grid">
+                        <article class="vehicle-card"><img src="https://toyzrentalme.com/wp-content/uploads/2025/03/URB00168.jpg" alt="Mercedes G63 AMG luxury SUV in Dubai"><div class="vehicle-body"><span class="vehicle-brand">Mercedes AMG</span><h3>G63 AMG</h3><p>The easiest premium daily option in the collection - practical, recognisable and very strong for mixed leisure and business schedules.</p><div class="price-row"><span class="price">From 1,650 AED / day</span><span class="note">50% to confirm</span></div><div class="tags"><span class="tag">Luxury SUV</span><span class="tag">Business stays</span><span class="tag">Family comfort</span></div><div class="card-actions"><a href="/app/reserve/page.html?car=Mercedes G 63 AMG&amp;price=1650" class="btn">Reserve this car</a><a href="/g63-rental-dubai.html" class="text-link">G63 guide</a></div></div></article>
+                        <article class="vehicle-card"><img src="/images/fleet/lamborghini-urus/01-exterior-front.png" alt="Lamborghini Urus Sport in Dubai"><div class="vehicle-body"><span class="vehicle-brand">Lamborghini</span><h3>Urus Sport</h3><p>High-visibility Lamborghini presence with more space and daily comfort, ideal when you want impact but need an SUV format.</p><div class="price-row"><span class="price">From 3,500 AED / day</span><span class="note">50% to confirm</span></div><div class="tags"><span class="tag">Super SUV</span><span class="tag">Premium day plans</span><span class="tag">Dubai handover</span></div><div class="card-actions"><a href="/app/reserve/page.html?car=Lamborghini Urus Sport&amp;price=3500" class="btn">Reserve this car</a><a href="/lamborghini-rental-dubai.html" class="text-link">Lamborghini guide</a></div></div></article>
+                        <article class="vehicle-card"><img src="/images/fleet/rolls-royce-cullinan-black-badge/02-exterior-front.png" alt="Rolls-Royce Cullinan Black Badge in Dubai"><div class="vehicle-body"><span class="vehicle-brand">Rolls-Royce</span><h3>Cullinan Black Badge</h3><p>The fleet choice for VIP arrivals, privacy, visual authority and luxury comfort with Black Badge character.</p><div class="price-row"><span class="price">Average 3,750 AED / day</span><span class="note">50% to confirm</span></div><div class="tags"><span class="tag">VIP arrival</span><span class="tag">Hotel handover</span><span class="tag">Statement SUV</span></div><div class="card-actions"><a href="/app/reserve/page.html?car=Rolls-Royce Cullinan Black Badge&amp;price=3750" class="btn">Reserve this car</a><a href="/rolls-royce-rental-dubai.html" class="text-link">Rolls-Royce guide</a></div></div></article>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section style="background:var(--bg2);">
+            <div class="shell">
+                <div class="heading">
+                    <span class="kicker">How To Choose</span>
+                    <h2>Use the fleet as a planning tool</h2>
+                    <p class="sublead">The right model depends on the role the car plays in your stay. Here is the simplest way to narrow it down before reserving.</p>
+                </div>
+                <div class="use-grid">
+                    <article class="use-card"><h3>For visual impact</h3><p>Choose the Huracan EVO Spyder or Ferrari 296 GTS if the plan is about presence, content or a memorable arrival.</p></article>
+                    <article class="use-card"><h3>For daily comfort</h3><p>Choose the G63 AMG or Urus if the car needs to work across longer Dubai days with more room and easier practicality.</p></article>
+                    <article class="use-card"><h3>For airport arrivals</h3><p>The Cullinan Black Badge and G63 AMG are the cleanest choices when comfort, luggage room and polished handover matter most.</p></article>
+                    <article class="use-card"><h3>For driving feel</h3><p>The Porsche 992 GT3 is the most focused option in the collection when the drive itself is a bigger priority than pure theatre.</p></article>
+                </div>
+            </div>
+        </section>
+        <section>
+            <div class="shell">
+                <div class="cta-card">
+                    <div class="heading" style="margin-bottom:1.6rem;">
+                        <span class="kicker">Ready To Reserve</span>
+                        <h2>Move from browsing to booking</h2>
+                        <p class="sublead">Once you know the model or shortlist, reserve online with a clear confirmation flow or message the team for help choosing the right handover plan.</p>
+                    </div>
+                    <div class="hero-actions" style="margin-top:0;">
+                        <a href="/app/reserve/page.html" class="btn">Open reservation flow</a>
+                        <a href="https://wa.me/971586122568" class="btn btn-secondary">Request advice on WhatsApp</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="footer-shell">
+            <span>Dynasty Prestige fleet page for Dubai luxury and supercar rentals.</span>
+            <div class="footer-links">
+                <a href="/">Home</a>
+                <a href="/app/reserve/page.html">Reserve</a>
+                <a href="/terms-and-conditions.html">Terms</a>
+                <a href="/terms-and-conditions-uae.html">Terms UAE</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

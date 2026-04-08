@@ -1,0 +1,8 @@
+/reservations /#reserva 301
+/reservations/ /#reserva 301
+/blog / 301
+/blog/ / 301
+/available-stock-for-sale /#fleet 301
+/exclusive-collection /#fleet 301
+/exclusive-collection/ /#fleet 301
+

@@ -1,460 +1,530 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dubai Delivery Locations | Palm Jumeirah, Marina, Downtown and Airport Handover</title>
-    <meta name="description" content="Explore Dynasty Prestige delivery locations across Dubai, including Palm Jumeirah, Dubai Marina, Downtown Dubai, JBR and airport handovers with clear timing and support.">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Locations in Dubai and Abu Dhabi | Airport, Hotel and Residence Delivery | Dynasty Prestige</title>
+    <meta name="description" content="Explore Dynasty Prestige locations across Dubai and Abu Dhabi, with luxury car rental delivery to airports, hotels, villas, residences and premium city districts.">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://prestigegoalmotion.com/locations.html">
-    <link rel="manifest" href="/manifest.json">
-    <link rel="icon" href="/favicon.ico">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://prestigegoalmotion.com/locations.html">
+    <meta property="og:title" content="Locations in Dubai and Abu Dhabi | Dynasty Prestige">
+    <meta property="og:description" content="Luxury car rental delivery across Dubai and Abu Dhabi, including airports, hotels, residences and premium districts.">
+    <meta property="og:image" content="https://prestigegoalmotion.com/logo-dp-transparent.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <script>document.documentElement.classList.add("js");</script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Montserrat:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/hub-pages.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/site-v2.css?v=20260406ah">
+    <link rel="stylesheet" href="./css/site-v2-locations.css?v=20260406a">
+    <script src="./js/site-v2.js?v=20260406ae" defer></script>
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      "name": "Dynasty Prestige Locations",
-      "url": "https://prestigegoalmotion.com/locations.html",
-      "description": "Delivery locations and handover coverage for Dubai luxury car rentals.",
-      "about": [
-        "Palm Jumeirah",
-        "Dubai Marina",
-        "Downtown Dubai",
-        "JBR",
-        "Dubai Airport"
-      ]
-    }
+    {"@context":"https://schema.org","@graph":[
+      {"@type":"WebPage","name":"Dynasty Prestige Locations","url":"https://prestigegoalmotion.com/locations.html","description":"Luxury car rental locations across Dubai and Abu Dhabi including airports, hotels, residences and premium districts.","inLanguage":"en-AE"},
+      {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://prestigegoalmotion.com/"},{"@type":"ListItem","position":2,"name":"Locations","item":"https://prestigegoalmotion.com/locations.html"}]}
+    ]}
     </script>
-    <style>
-        .hero-grid,
-        .zone-grid,
-        .ops-grid,
-        .editorial-grid,
-        .trip-grid {
-            display: grid;
-            gap: 1.2rem;
-        }
-
-        .hero-grid {
-            grid-template-columns: minmax(0, 1.06fr) minmax(320px, 0.94fr);
-            align-items: stretch;
-        }
-
-        .hero-side {
-            background:
-                linear-gradient(180deg, rgba(17, 18, 22, 0.94), rgba(4, 4, 6, 0.96)),
-                radial-gradient(circle at top right, rgba(214, 240, 60, 0.18), transparent 38%),
-                radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.08), transparent 34%);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            gap: 1.2rem;
-        }
-
-        .hero-side h2 {
-            text-align: left;
-            font-size: clamp(1.3rem, 2.4vw, 1.9rem);
-            margin-bottom: 0;
-        }
-
-        .hero-side ul {
-            list-style: none;
-            display: grid;
-            gap: 0.75rem;
-            color: var(--muted);
-        }
-
-        .hero-side li {
-            position: relative;
-            padding-left: 1rem;
-        }
-
-        .hero-side li::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0.7rem;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--gold);
-        }
-
-        .zone-grid {
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        }
-
-        .zone-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 1rem;
-            margin-bottom: 0.9rem;
-        }
-
-        .zone-card h3,
-        .ops-card h3,
-        .editorial-card h3,
-        .trip-card h3 {
-            color: var(--gold);
-            font: 1.02rem 'Montserrat', system-ui, sans-serif;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            margin-bottom: 0.45rem;
-        }
-
-        .zone-chip,
-        .meta-chip,
-        .trip-chip {
-            display: inline-flex;
-            padding: 0.36rem 0.72rem;
-            border-radius: 999px;
-            background: rgba(214, 240, 60, 0.08);
-            color: var(--gold-soft);
-            font: 0.74rem 'Montserrat', system-ui, sans-serif;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-        }
-
-        .zone-card p,
-        .ops-card p,
-        .editorial-card p,
-        .trip-card p {
-            color: var(--muted);
-        }
-
-        .zone-meta {
-            display: grid;
-            gap: 0.55rem;
-            margin: 1rem 0 1.1rem;
-        }
-
-        .meta-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 0.7rem;
-            color: var(--muted);
-            font-size: 0.95rem;
-        }
-
-        .meta-row strong {
-            color: var(--text);
-        }
-
-        .ops-grid {
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        }
-
-        .trip-grid,
-        .editorial-grid {
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        }
-
-        .trip-chip {
-            margin-bottom: 0.9rem;
-        }
-
-        @media (max-width: 768px) {
-            .meta-row {
-                flex-direction: column;
-                gap: 0.2rem;
-            }
-        }
-    </style>
 </head>
-<body>
-    <header>
-        <a href="/" class="logo" aria-label="Dynasty Prestige Home"><img src="/logo-dp-transparent.png" alt="Dynasty Prestige"></a>
-        <nav aria-label="Main navigation">
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/fleet.html">Fleet</a></li>
-                <li><a href="/locations.html" class="is-active">Locations</a></li>
-                <li><a href="/services.html">Services</a></li>
-                <li><a href="/about.html">About</a></li>
-                <li><a href="/contact.html">Contact</a></li>
-                <li><a href="/app/reserve/page.html" class="header-cta">Reserve</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <section>
-            <div class="shell hero-grid">
-                <div class="hero-card">
-                    <span class="kicker">Dubai Coverage</span>
-                    <h1>Locations across Dubai</h1>
-                    <p class="lead">Hotel, residence and airport handovers are coordinated around the areas most requested by Dynasty Prestige guests, so the rental plan fits the stay instead of interrupting it.</p>
-                    <p class="sublead">Use this page to understand where we hand over, what timing usually looks like and which area guide to open if you want a more focused view by zone.</p>
-                    <div class="hero-actions">
-                        <a href="/app/reserve/page.html" class="btn">Start reservation</a>
-                        <a href="https://wa.me/971586122568?text=Hello%2C%20I%20need%20help%20planning%20delivery%20in%20Dubai." class="btn btn-secondary">Plan by WhatsApp</a>
+<body class="locations-page">
+    <header class="lab-header">
+        <div class="lab-shell lab-header__inner">
+            <a href="./index.html" class="lab-brand" aria-label="Dynasty Prestige home">
+                <span class="lab-brand__crest" aria-hidden="true">
+                    <img src="./images/dp-crest-cropped.png" alt="">
+                </span>
+                <span class="lab-brand__copy">
+                    <strong>Dynasty Prestige</strong>
+                    <span>Dubai luxury car rental</span>
+                </span>
+            </a>
+
+            <div class="lab-header__nav">
+                <nav class="lab-nav" aria-label="Main navigation">
+                    <a href="./index.html">Home</a>
+                    <a href="./fleet.html">Fleet</a>
+
+                    <div class="lab-nav__item lab-nav__item--has-panel js-nav-mega">
+                        <button
+                            type="button"
+                            class="lab-nav__trigger"
+                            aria-expanded="false"
+                            aria-controls="locations-nav-brands-panel"
+                        >
+                            <span>Cars Brands</span>
+                            <span class="lab-nav__chevron" aria-hidden="true"></span>
+                        </button>
+
+                        <div class="lab-nav__panel lab-nav__panel--brands" id="locations-nav-brands-panel">
+                            <div class="lab-nav__panel-grid lab-nav__panel-grid--brands">
+                                <a class="lab-nav__card lab-nav__card--brand" href="./lamborghini-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--brand">
+                                        <img src="./images/brands/lamborghini-mark.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Lamborghini</strong>
+                                        <span>Huracan and Urus selection.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--brand" href="./ferrari-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--brand">
+                                        <img src="./images/brands/ferrari-mark.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Ferrari</strong>
+                                        <span>Convertible-led flagship moments.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--brand" href="./mercedes-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--brand">
+                                        <img src="./images/brands/mercedes-mark.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Mercedes</strong>
+                                        <span>G-Class and executive balance.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--brand" href="./porsche-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--brand">
+                                        <img src="./images/brands/porsche-mark.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Porsche</strong>
+                                        <span>Focused driver-first delivery.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--brand" href="./rolls-royce-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--brand">
+                                        <img src="./images/brands/rolls-royce-mark.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Rolls-Royce</strong>
+                                        <span>Arrival-first quiet authority.</span>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="hero-pills">
-                        <div class="pill"><strong>Coverage</strong>Palm Jumeirah, Marina, Downtown, JBR and Dubai Airport.</div>
-                        <div class="pill"><strong>Fees</strong>Core Dubai zones are usually free, airport handovers start from 150 AED.</div>
-                        <div class="pill"><strong>Support</strong>One team handles timing, documents and the handover sequence.</div>
+
+                    <div class="lab-nav__item lab-nav__item--has-panel js-nav-mega">
+                        <button
+                            type="button"
+                            class="lab-nav__trigger"
+                            aria-expanded="false"
+                            aria-controls="locations-nav-types-panel"
+                        >
+                            <span>Cars Types</span>
+                            <span class="lab-nav__chevron" aria-hidden="true"></span>
+                        </button>
+
+                        <div class="lab-nav__panel lab-nav__panel--types" id="locations-nav-types-panel">
+                            <div class="lab-nav__panel-grid lab-nav__panel-grid--types">
+                                <a class="lab-nav__card lab-nav__card--type" href="./luxury-car-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--type">
+                                        <img src="./images/categories/mock-fastpng/luxury-stage.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Luxury Cars</strong>
+                                        <span>Comfort-first arrivals and city stays.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--type" href="./ferrari-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--type">
+                                        <img src="./images/categories/mock-fastpng/convertible-stage.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Convertible Cars</strong>
+                                        <span>Open-top Dubai movement with presence.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--type" href="./supercar-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--type">
+                                        <img src="./images/categories/mock-fastpng/sports-stage.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Sports Cars</strong>
+                                        <span>Sharper performance-led picks.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--type" href="./fleet.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--type">
+                                        <img src="./images/categories/mock-fastpng/electric-stage.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Electric Cars</strong>
+                                        <span>Quiet torque and future-ready browsing.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--type" href="./luxury-car-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--type">
+                                        <img src="./images/categories/mock-fastpng/suv-stage.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>SUV Cars</strong>
+                                        <span>Room, height and hotel-ready comfort.</span>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="./services.html">Services</a>
+                    <a href="./locations.html" aria-current="page">Locations</a>
+                    <a href="./about.html">About Us</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="lab-main locations-page-main">
+        <section class="locations-hero">
+            <div class="lab-shell locations-hero__shell">
+                <div class="locations-hero__panel">
+                    <div class="locations-hero__mark" aria-hidden="true">
+                        <img src="./logo-dp-transparent.png" alt="">
+                    </div>
+
+                    <span class="hero-lab__eyebrow">Available across the UAE</span>
+                    <h1>Luxury delivery across Dubai, Abu Dhabi and the UAE's key arrival points.</h1>
+                    <p class="locations-hero__lead">Dynasty Prestige provides luxury car rental and VIP chauffeur services across Dubai and Abu Dhabi, with vehicle delivery available to airports, hotels, residences and exclusive destinations throughout the UAE.</p>
+
+                    <div class="locations-hero__actions">
+                        <a href="./fleet.html" class="locations-hero__primary">View curated fleet</a>
+                        <a href="https://wa.me/971586122568?text=Hi%2C%20I%20need%20help%20choosing%20the%20best%20handover%20location%20in%20Dubai." class="locations-hero__secondary" target="_blank" rel="noopener">Plan by WhatsApp</a>
+                    </div>
+
+                    <div class="locations-hero__pills" aria-label="Location summary">
+                        <span class="locations-hero__pill">Dubai and Abu Dhabi</span>
+                        <span class="locations-hero__pill">DXB and DWC</span>
+                        <span class="locations-hero__pill">Hotels and residences</span>
                     </div>
                 </div>
-                <aside class="hero-side">
-                    <div>
-                        <span class="kicker">Coverage Notes</span>
-                        <h2>Built around how guests actually move through Dubai</h2>
-                    </div>
-                    <p class="sublead">The best handover point depends on luggage, hotel access, arrival timing and how much visibility or convenience matters for the trip.</p>
-                    <ul>
-                        <li>Palm and Marina work well for resort stays and waterfront hotels.</li>
-                        <li>Downtown is strongest for central business and event schedules.</li>
-                        <li>Airport handovers need prior booking and cleaner timing coordination.</li>
-                        <li>JBR remains a practical beach-stay option with fast city access.</li>
+
+                <aside class="locations-hero__aside" aria-label="Coverage notes">
+                    <span class="locations-hero__aside-kicker">Coverage notes</span>
+                    <h2>Built around city stays, airports and premium addresses.</h2>
+                    <p>The right handover point depends on the city, the hotel or residence, the arrival window and whether the booking needs discreet convenience or a more visible arrival.</p>
+                    <ul class="locations-hero__list">
+                        <li>Dubai remains the core market for hotels, residences, business stays and resort arrivals.</li>
+                        <li>Abu Dhabi suits capital schedules, executive movement and inter-city planning.</li>
+                        <li>DXB and DWC handovers need confirmed timing and prior coordination.</li>
+                        <li>Palm, Marina, Downtown, Business Bay and JBR stay central to premium delivery demand.</li>
                     </ul>
                 </aside>
             </div>
         </section>
 
-        <section style="background:var(--bg2);">
-            <div class="shell">
-                <div class="heading">
-                    <span class="kicker">Delivery Areas</span>
-                    <h2>Choose the zone that matches the stay</h2>
-                    <p class="sublead">Each area below gives you the simplest picture of timing, fees and the kind of booking plan it usually suits best.</p>
+        <section class="locations-section" aria-labelledby="locations-guides-title">
+            <div class="lab-shell locations-section__shell">
+                <div class="locations-section__intro">
+                    <span class="hero-lab__eyebrow">Location guides</span>
+                    <h2 id="locations-guides-title">Start with the five local guides that carry the strongest booking intent.</h2>
+                    <p>This is the core local SEO structure: one wider coverage page, then a short set of city, airport and district guides that reflect how guests actually search and book.</p>
                 </div>
-                <div class="zone-grid">
-                    <article class="zone-card">
-                        <div class="zone-top">
+
+                <div class="locations-guide-grid">
+                    <a class="locations-guide-card" href="./luxury-car-rental-dubai.html">
+                        <span class="locations-guide-card__label">Citywide</span>
+                        <h3>Dubai</h3>
+                        <p>The main city guide covering Palm, Marina, Downtown, Business Bay, JBR and wider delivery logic.</p>
+                    </a>
+
+                    <a class="locations-guide-card" href="./abu-dhabi-luxury-car-rental.html">
+                        <span class="locations-guide-card__label">Capital</span>
+                        <h3>Abu Dhabi</h3>
+                        <p>Built for executive schedules, hotel stays, quieter luxury and more deliberate route planning.</p>
+                    </a>
+
+                    <a class="locations-guide-card" href="./dubai-airport-luxury-car-rental.html">
+                        <span class="locations-guide-card__label">Arrival</span>
+                        <h3>DXB and DWC</h3>
+                        <p>The airport guide covering flight timing, handover planning and direct arrival sequences.</p>
+                    </a>
+
+                    <a class="locations-guide-card" href="./palm-jumeirah-luxury-car-rental.html">
+                        <span class="locations-guide-card__label">Resort</span>
+                        <h3>Palm Jumeirah</h3>
+                        <p>Focused on resorts, villas, branded residences and calmer premium handovers.</p>
+                    </a>
+
+                    <a class="locations-guide-card" href="./dubai-marina-luxury-car-rental.html">
+                        <span class="locations-guide-card__label">Waterfront</span>
+                        <h3>Dubai Marina</h3>
+                        <p>For towers, hotels, JBR movement and shorter stays with more agile city routing.</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="locations-section locations-section--soft" aria-labelledby="locations-zones-title">
+            <div class="lab-shell locations-section__shell">
+                <div class="locations-section__intro">
+                    <span class="hero-lab__eyebrow">Service areas</span>
+                    <h2 id="locations-zones-title">Start with the city and the delivery style.</h2>
+                    <p>For most guests, the first useful decision is not the exact pin. It is whether the booking is centered on Dubai, Abu Dhabi, airport arrival or hotel and residence delivery.</p>
+                </div>
+
+                <div class="locations-zone-grid">
+                    <article class="locations-zone-card">
+                        <div class="locations-zone-card__top">
                             <div>
-                                <span class="zone-chip">Palm Jumeirah</span>
-                                <h3>Hotel and villa stays</h3>
+                                <span class="locations-zone-card__chip">Dubai</span>
+                                <h3>Citywide flagship coverage</h3>
                             </div>
-                            <span class="meta-chip">Free</span>
+                            <span class="locations-zone-card__fee">Core coverage</span>
                         </div>
-                        <p>The cleanest option for beachfront stays, villas and premium resort arrivals where delivery presentation matters.</p>
-                        <div class="zone-meta">
-                            <div class="meta-row"><span>ETA</span><strong>20 to 35 min</strong></div>
-                            <div class="meta-row"><span>Best for</span><strong>Resorts, villas, leisure stays</strong></div>
+                        <p>Dubai remains the main Dynasty Prestige market, covering premium hotels, residences, resorts, business districts and high-visibility arrivals across the city.</p>
+                        <div class="locations-zone-card__meta">
+                            <div><span>Focus</span><strong>Daily luxury stays, events, resort arrivals</strong></div>
+                            <div><span>Best for</span><strong>Palm, Marina, Downtown, Business Bay and JBR</strong></div>
                         </div>
-                        <div class="card-actions">
-                            <a href="/palm-jumeirah-luxury-car-rental.html" class="btn">Palm guide</a>
-                            <a href="/app/reserve/page.html" class="text-link">Reserve now</a>
+                        <div class="locations-zone-card__actions">
+                            <a href="./luxury-car-rental-dubai.html">Open Dubai guide</a>
+                            <a href="./app/reserve/page.html">Reserve</a>
                         </div>
                     </article>
-                    <article class="zone-card">
-                        <div class="zone-top">
+
+                    <article class="locations-zone-card">
+                        <div class="locations-zone-card__top">
                             <div>
-                                <span class="zone-chip">Dubai Marina</span>
-                                <h3>Waterfront hotel handovers</h3>
+                                <span class="locations-zone-card__chip">Abu Dhabi</span>
+                                <h3>Capital arrivals and executive schedules</h3>
                             </div>
-                            <span class="meta-chip">Free</span>
+                            <span class="locations-zone-card__fee">By request</span>
                         </div>
-                        <p>Strong for guests staying in towers, hotels and marina-side apartments who want a polished but practical city handover.</p>
-                        <div class="zone-meta">
-                            <div class="meta-row"><span>ETA</span><strong>20 to 35 min</strong></div>
-                            <div class="meta-row"><span>Best for</span><strong>Towers, hotels, weekend stays</strong></div>
+                        <p>Abu Dhabi coverage supports capital stays, business movement, long weekends and guests who need a luxury vehicle or chauffeur plan beyond Dubai city limits.</p>
+                        <div class="locations-zone-card__meta">
+                            <div><span>Focus</span><strong>Inter-city planning and executive mobility</strong></div>
+                            <div><span>Best for</span><strong>Capital stays, events, longer itineraries</strong></div>
                         </div>
-                        <div class="card-actions">
-                            <a href="/dubai-marina-luxury-car-rental.html" class="btn">Marina guide</a>
-                            <a href="/fleet.html" class="text-link">View fleet</a>
+                        <div class="locations-zone-card__actions">
+                            <a href="./abu-dhabi-luxury-car-rental.html">Open Abu Dhabi guide</a>
+                            <a href="./app/reserve/page.html">Request route</a>
                         </div>
                     </article>
-                    <article class="zone-card">
-                        <div class="zone-top">
+
+                    <article class="locations-zone-card">
+                        <div class="locations-zone-card__top">
                             <div>
-                                <span class="zone-chip">Downtown Dubai</span>
-                                <h3>Central business and events</h3>
+                                <span class="locations-zone-card__chip">DXB / DWC</span>
+                                <h3>Airport delivery</h3>
                             </div>
-                            <span class="meta-chip">Free</span>
+                            <span class="locations-zone-card__fee">Prior booking</span>
                         </div>
-                        <p>Best for hotel arrivals, event schedules and central Dubai itineraries where timing and access need to feel efficient.</p>
-                        <div class="zone-meta">
-                            <div class="meta-row"><span>ETA</span><strong>25 to 40 min</strong></div>
-                            <div class="meta-row"><span>Best for</span><strong>Business stays, events, meetings</strong></div>
+                        <p>Airport handovers are available at Dubai International Airport and Al Maktoum International Airport when the arrival window, documents and delivery timing are confirmed in advance.</p>
+                        <div class="locations-zone-card__meta">
+                            <div><span>Airports</span><strong>DXB and DWC</strong></div>
+                            <div><span>Best for</span><strong>Flight arrivals, VIP meets, clean landing sequence</strong></div>
                         </div>
-                        <div class="card-actions">
-                            <a href="/downtown-dubai-supercar-rental.html" class="btn">Downtown guide</a>
-                            <a href="/app/reserve/page.html" class="text-link">Reserve now</a>
+                        <div class="locations-zone-card__actions">
+                            <a href="./dubai-airport-luxury-car-rental.html">Open airport guide</a>
+                            <a href="https://wa.me/971586122568?text=Hi%2C%20I%20need%20airport%20delivery%20at%20DXB%20or%20DWC.%20Please%20share%20availability." target="_blank" rel="noopener">Request timing</a>
                         </div>
                     </article>
-                    <article class="zone-card">
-                        <div class="zone-top">
+
+                    <article class="locations-zone-card">
+                        <div class="locations-zone-card__top">
                             <div>
-                                <span class="zone-chip">JBR</span>
-                                <h3>Beachside city access</h3>
+                                <span class="locations-zone-card__chip">Hotels / residences</span>
+                                <h3>Premium hotel and residence delivery</h3>
                             </div>
-                            <span class="meta-chip">Free</span>
+                            <span class="locations-zone-card__fee">Premium delivery</span>
                         </div>
-                        <p>A practical choice for beachfront stays where you want easy access to Marina and Palm without overcomplicating the handover.</p>
-                        <div class="zone-meta">
-                            <div class="meta-row"><span>ETA</span><strong>20 to 35 min</strong></div>
-                            <div class="meta-row"><span>Best for</span><strong>Beach stays, short leisure trips</strong></div>
+                        <p>Hotel, residence and villa handovers stay central to the offer, especially across Palm Jumeirah, Dubai Marina, Downtown Dubai, Business Bay and Jumeirah Beach Residence.</p>
+                        <div class="locations-zone-card__meta">
+                            <div><span>Focus</span><strong>Resorts, towers, residences, villas, central hotels</strong></div>
+                            <div><span>Best for</span><strong>Guests who want delivery built around the stay</strong></div>
                         </div>
-                        <div class="card-actions">
-                            <a href="/luxury-car-rental-dubai.html" class="btn">Dubai guide</a>
-                            <a href="https://wa.me/971586122568?text=Hello%2C%20I%20need%20delivery%20in%20JBR%2C%20Dubai." class="text-link">Ask on WhatsApp</a>
-                        </div>
-                    </article>
-                    <article class="zone-card">
-                        <div class="zone-top">
-                            <div>
-                                <span class="zone-chip">Dubai Airport</span>
-                                <h3>Arrival-focused coordination</h3>
-                            </div>
-                            <span class="meta-chip">From 150 AED</span>
-                        </div>
-                        <p>Airport handovers are available with prior booking, flight details and a tighter confirmation process than standard city deliveries.</p>
-                        <div class="zone-meta">
-                            <div class="meta-row"><span>ETA</span><strong>Scheduled around arrival</strong></div>
-                            <div class="meta-row"><span>Best for</span><strong>Fast arrivals, premium handovers</strong></div>
-                        </div>
-                        <div class="card-actions">
-                            <a href="/app/reserve/page.html" class="btn">Book airport handover</a>
-                            <a href="https://wa.me/971586122568?text=Hello%2C%20I%20need%20airport%20delivery%20in%20Dubai.%20Please%20share%20availability." class="text-link">Request quote</a>
+                        <div class="locations-zone-card__actions">
+                            <a href="./palm-jumeirah-luxury-car-rental.html">Open Palm guide</a>
+                            <a href="https://wa.me/971586122568?text=Hi%2C%20I%20need%20hotel%20or%20residence%20delivery%20in%20Dubai." target="_blank" rel="noopener">Plan handover</a>
                         </div>
                     </article>
                 </div>
             </div>
         </section>
 
-        <section>
-            <div class="shell">
-                <div class="heading">
-                    <span class="kicker">Handover Process</span>
-                    <h2>How location planning works</h2>
-                    <p class="sublead">The handover becomes much smoother when the team has the stay, timing and model locked in early enough to coordinate the right route.</p>
+        <section class="locations-section" aria-labelledby="locations-network-title">
+            <div class="lab-shell locations-section__shell">
+                <div class="locations-section__intro">
+                    <span class="hero-lab__eyebrow">Our locations</span>
+                    <h2 id="locations-network-title">Premium delivery and collection available in the destinations guests ask for first.</h2>
+                    <p>Dynasty Prestige offers luxury car rental, chauffeur services and VIP delivery in the destinations that drive most booking intent across Dubai, Abu Dhabi and the wider UAE arrival network.</p>
                 </div>
-                <div class="ops-grid">
-                    <article class="ops-card">
-                        <h3>1. Pick the car</h3>
-                        <p>Start from the <a href="/fleet.html" class="text-link">fleet page</a> or go straight to reservation if you already know the model.</p>
-                    </article>
-                    <article class="ops-card">
-                        <h3>2. Confirm the zone</h3>
-                        <p>Share the hotel, residence or airport details so the team can line up the most practical handover point.</p>
-                    </article>
-                    <article class="ops-card">
-                        <h3>3. Align timing</h3>
-                        <p>Arrival windows, building access and luggage needs matter more than a simple map pin in premium handovers.</p>
-                    </article>
-                    <article class="ops-card">
-                        <h3>4. Receive one-team support</h3>
-                        <p>The same team handles confirmation, documents, delivery and return planning so the experience stays consistent.</p>
-                    </article>
-                </div>
-            </div>
-        </section>
 
-        <section style="background:var(--bg2);">
-            <div class="shell">
-                <div class="heading">
-                    <span class="kicker">Stay Type Planner</span>
-                    <h2>Choose the handover style before you choose the exact address</h2>
-                    <p class="sublead">The strongest competitor pages are clear about what each zone is for. This is the short version guests usually need before they open a detailed area guide.</p>
-                </div>
-                <div class="trip-grid">
-                    <article class="trip-card">
-                        <span class="trip-chip">Resort Stay</span>
-                        <h3>Palm Jumeirah first</h3>
-                        <p>Use Palm delivery when villa access, beach resorts and a polished arrival moment matter more than pure speed.</p>
-                        <div class="card-actions">
-                            <a href="/palm-jumeirah-luxury-car-rental.html" class="btn">Open Palm guide</a>
-                            <a href="/app/reserve/page.html" class="text-link">Reserve now</a>
-                        </div>
+                <div class="locations-network-grid">
+                    <article class="locations-network-card">
+                        <span class="locations-network-card__label">City</span>
+                        <h3>Dubai</h3>
+                        <p>Core citywide coverage for hotels, residences, business districts, resorts and premium lifestyle stays.</p>
                     </article>
-                    <article class="trip-card">
-                        <span class="trip-chip">Weekend City Break</span>
-                        <h3>Marina or JBR</h3>
-                        <p>Use Marina or JBR when the stay is built around waterfront hotels, nightlife access and shorter city movement.</p>
-                        <div class="card-actions">
-                            <a href="/dubai-marina-luxury-car-rental.html" class="btn">Open Marina guide</a>
-                            <a href="https://wa.me/971586122568?text=Hello%2C%20I%20am%20staying%20in%20JBR%20or%20Dubai%20Marina.%20Which%20handover%20works%20best%3F" class="text-link">Ask the team</a>
-                        </div>
+
+                    <article class="locations-network-card">
+                        <span class="locations-network-card__label">City</span>
+                        <h3>Abu Dhabi</h3>
+                        <p>Capital delivery for executive arrivals, longer stays, event itineraries and inter-city mobility plans.</p>
                     </article>
-                    <article class="trip-card">
-                        <span class="trip-chip">Business Schedule</span>
+
+                    <article class="locations-network-card">
+                        <span class="locations-network-card__label">District</span>
+                        <h3>Palm Jumeirah</h3>
+                        <p>Best for villas, resorts, beachfront hotels and quieter premium handovers.</p>
+                    </article>
+
+                    <article class="locations-network-card">
+                        <span class="locations-network-card__label">District</span>
+                        <h3>Dubai Marina</h3>
+                        <p>Waterfront access for towers, hotels and shorter city stays with cleaner routing.</p>
+                    </article>
+
+                    <article class="locations-network-card">
+                        <span class="locations-network-card__label">District</span>
                         <h3>Downtown Dubai</h3>
-                        <p>Use Downtown when meetings, events or central hotel access matter more than a beachfront arrival feel.</p>
-                        <div class="card-actions">
-                            <a href="/downtown-dubai-supercar-rental.html" class="btn">Open Downtown guide</a>
-                            <a href="/fleet.html" class="text-link">Compare cars</a>
-                        </div>
+                        <p>Central coverage for flagship hotels, dinners, events and business-led schedules.</p>
                     </article>
-                    <article class="trip-card">
-                        <span class="trip-chip">Flight Arrival</span>
-                        <h3>Airport handover</h3>
-                        <p>Use airport delivery when the car needs to be part of the arrival itself and the schedule is already fixed around a flight window.</p>
-                        <div class="card-actions">
-                            <a href="/app/reserve/page.html" class="btn">Book airport handover</a>
-                            <a href="https://wa.me/971586122568?text=Hello%2C%20I%20need%20airport%20delivery%20in%20Dubai.%20Please%20share%20what%20you%20need%20from%20me." class="text-link">Request details</a>
-                        </div>
+
+                    <article class="locations-network-card">
+                        <span class="locations-network-card__label">District</span>
+                        <h3>Business Bay</h3>
+                        <p>Executive-focused delivery for business hotels, residential towers and premium daily movement.</p>
+                    </article>
+
+                    <article class="locations-network-card">
+                        <span class="locations-network-card__label">District</span>
+                        <h3>Jumeirah Beach Residence</h3>
+                        <p>Beachside access with strong proximity to Marina routes, hotels and short leisure stays.</p>
+                    </article>
+
+                    <article class="locations-network-card">
+                        <span class="locations-network-card__label">Airport</span>
+                        <h3>Dubai International Airport</h3>
+                        <p>Primary airport handovers for guests who want the vehicle ready as part of the arrival itself.</p>
+                    </article>
+
+                    <article class="locations-network-card">
+                        <span class="locations-network-card__label">Airport</span>
+                        <h3>Al Maktoum International Airport</h3>
+                        <p>Alternative airport coordination for scheduled or private arrivals that need advance timing control.</p>
                     </article>
                 </div>
             </div>
         </section>
 
-        <section style="background:var(--bg2);">
-            <div class="shell">
-                <div class="heading">
-                    <span class="kicker">Area Guides</span>
-                    <h2>Open the guide that matches your route</h2>
-                    <p class="sublead">These editorial pages stay useful for guests searching by area, while the new locations page becomes the main overview for the full Dubai network.</p>
+        <section class="locations-section" aria-labelledby="locations-process-title">
+            <div class="lab-shell locations-section__shell">
+                <div class="locations-section__intro">
+                    <span class="hero-lab__eyebrow">How it works</span>
+                    <h2 id="locations-process-title">Once the area is clear, the handover becomes simple.</h2>
+                    <p>Luxury delivery works best when the dates, the city and the handover style are aligned early enough for the team to coordinate the route, documents and arrival timing.</p>
                 </div>
-                <div class="editorial-grid">
-                    <article class="editorial-card">
-                        <h3>Palm Jumeirah stays</h3>
-                        <p>Best for villa handovers, beachfront hotels and a more resort-led arrival feel.</p>
-                        <div class="card-actions">
-                            <a href="/palm-jumeirah-luxury-car-rental.html" class="btn">Open Palm guide</a>
-                            <a href="/fleet.html" class="text-link">Compare cars</a>
-                        </div>
+
+                <div class="locations-process-grid">
+                    <article class="locations-process-card">
+                        <strong>01</strong>
+                        <h3>Choose the dates and city</h3>
+                        <p>Start with the rental window and whether the booking is for Dubai, Abu Dhabi or an airport arrival.</p>
                     </article>
-                    <article class="editorial-card">
-                        <h3>Marina stays</h3>
-                        <p>Useful for towers, waterfront hotels and bookings built around short city movement.</p>
-                        <div class="card-actions">
-                            <a href="/dubai-marina-luxury-car-rental.html" class="btn">Open Marina guide</a>
-                            <a href="/app/reserve/page.html" class="text-link">Reserve now</a>
-                        </div>
+
+                    <article class="locations-process-card">
+                        <strong>02</strong>
+                        <h3>Confirm the exact delivery point</h3>
+                        <p>Share the hotel, residence, villa, office or terminal once the broad area is already defined.</p>
                     </article>
-                    <article class="editorial-card">
-                        <h3>Downtown schedules</h3>
-                        <p>The strongest match when the booking is tied to events, business meetings or central hotels.</p>
-                        <div class="card-actions">
-                            <a href="/downtown-dubai-supercar-rental.html" class="btn">Open Downtown guide</a>
-                            <a href="/fleet.html" class="text-link">View fleet</a>
-                        </div>
+
+                    <article class="locations-process-card">
+                        <strong>03</strong>
+                        <h3>Align documents and arrival timing</h3>
+                        <p>Flight windows, building access and guest pacing matter more than a simple map pin in premium delivery.</p>
+                    </article>
+
+                    <article class="locations-process-card">
+                        <strong>04</strong>
+                        <h3>Receive one-team handover support</h3>
+                        <p>The same team handles confirmation, routing, delivery and return planning so the experience stays calm and consistent.</p>
                     </article>
                 </div>
             </div>
         </section>
 
-        <section>
-            <div class="shell">
-                <div class="cta-card">
-                    <div class="heading" style="margin-bottom:1.6rem;">
-                        <span class="kicker">Ready To Plan</span>
-                        <h2>Lock the model and the handover</h2>
-                        <p class="sublead">Once the stay area is clear, the simplest next step is to choose the vehicle, confirm the handover point and let the team line up the timing.</p>
+        <section class="locations-section" aria-labelledby="locations-cta-title">
+            <div class="lab-shell locations-section__shell">
+                <div class="locations-cta">
+                    <div class="locations-cta__copy">
+                        <span class="hero-lab__eyebrow">Ready to plan</span>
+                        <h2 id="locations-cta-title">Need a car in Dubai, Abu Dhabi or at the airport?</h2>
+                        <p>Choose the model, share the city or arrival point and let the team arrange the right delivery path around the stay.</p>
                     </div>
-                    <div class="hero-actions" style="margin-top:0;">
-                        <a href="/app/reserve/page.html" class="btn">Open reservation flow</a>
-                        <a href="/fleet.html" class="btn btn-secondary">Compare the fleet</a>
+
+                    <div class="locations-cta__actions">
+                        <a href="./fleet.html" class="locations-cta__primary">Browse the fleet</a>
+                        <a href="./app/reserve/page.html" class="locations-cta__secondary">Start reservation</a>
                     </div>
                 </div>
             </div>
         </section>
+
+        <footer class="site-v2-footer" id="contact">
+            <div class="lab-shell site-v2-footer__shell">
+                <div class="site-v2-footer__top">
+                    <div class="site-v2-footer__brand">
+                        <span class="site-v2-footer__crest" aria-hidden="true">
+                            <img src="./images/dp-crest-cropped.png" alt="">
+                        </span>
+                        <p>Dynasty Prestige provides luxury car rental and VIP mobility across Dubai and Abu Dhabi, with one team coordinating the vehicle, the route, the handover and the return rhythm.</p>
+                    </div>
+
+                    <div class="site-v2-footer__column">
+                        <h3>Useful links</h3>
+                        <a href="./index.html">Home</a>
+                        <a href="./fleet.html">Fleet</a>
+                        <a href="./locations.html">Locations</a>
+                        <a href="./services.html">Services</a>
+                        <a href="./about.html">About us</a>
+                    </div>
+
+                    <div class="site-v2-footer__column">
+                        <h3>Contact us</h3>
+                        <a href="tel:+971586122568">+971 58 612 2568</a>
+                        <a href="https://wa.me/971586122568" target="_blank" rel="noopener">WhatsApp the team</a>
+                        <a href="mailto:prestigegoalmotion@gmail.com">prestigegoalmotion@gmail.com</a>
+                        <p>Palm Jumeirah, Dubai UAE with hotel, villa and airport coordination across the city.</p>
+                    </div>
+                </div>
+
+                <div class="site-v2-footer__middle">
+                    <div class="site-v2-footer__service">
+                        <strong>24/7</strong>
+                        <span>Reservation support</span>
+                    </div>
+                </div>
+
+                <div class="site-v2-footer__bottom">
+                    <div class="site-v2-footer__legal">
+                        <a href="./terms-and-conditions.html">Booking T&amp;C</a>
+                        <a href="./contact.html">Privacy &amp; contact</a>
+                    </div>
+                    <p>&copy; 2026 Dynasty Prestige. All rights reserved.</p>
+                    <div class="site-v2-footer__socials">
+                        <a href="tel:+971586122568" aria-label="Call Dynasty Prestige">Call</a>
+                        <a href="https://wa.me/971586122568" target="_blank" rel="noopener" aria-label="Open WhatsApp">WA</a>
+                        <a href="mailto:prestigegoalmotion@gmail.com" aria-label="Send email">Mail</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </main>
-    <footer>
-        <div class="footer-shell">
-            <span>Dynasty Prestige locations page for Dubai handovers, airport arrivals and hotel delivery planning.</span>
-            <div class="footer-links">
-                <a href="/">Home</a>
-                <a href="/fleet.html">Fleet</a>
-                <a href="/app/reserve/page.html">Reserve</a>
-                <a href="/terms-and-conditions.html">Terms</a>
-            </div>
-        </div>
-    </footer>
 </body>
 </html>
+
