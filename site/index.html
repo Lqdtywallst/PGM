@@ -18,21 +18,20 @@
     <script>document.documentElement.classList.add("js");</script>
     <style>
         .js .hero-lab.hero-lab--intro-pending .hero-lab__video {
-            opacity: 0.15;
-            transform: scale(1.085);
-            filter: saturate(0.62) brightness(0.38);
+            opacity: 0.24;
+            transform: scale(1.07);
+            filter: saturate(0.84) brightness(0.54);
         }
 
         .js .hero-lab.hero-lab--intro-pending .hero-lab__overlay {
             background:
-                linear-gradient(90deg, rgba(4, 4, 6, 0.88) 0%, rgba(4, 4, 6, 0.84) 34%, rgba(4, 4, 6, 0.64) 66%, rgba(4, 4, 6, 0.9) 100%),
-                linear-gradient(180deg, rgba(4, 4, 6, 0.84) 0%, rgba(4, 4, 6, 0.3) 34%, rgba(4, 4, 6, 0.92) 100%);
+                linear-gradient(180deg, rgba(4, 4, 6, 0.72) 0%, rgba(4, 4, 6, 0.2) 34%, rgba(4, 4, 6, 0.82) 100%);
         }
 
         .js .hero-lab.hero-lab--intro-pending .hero-lab__glow {
-            inset: 10% -8% 10% 38%;
+            inset: 11% 7% 12% 42%;
             opacity: 0.16;
-            filter: blur(32px);
+            filter: blur(24px);
         }
 
         .js .hero-lab.hero-lab--intro-pending .hero-lab__body-copy {
@@ -56,8 +55,8 @@
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./css/site-v2.css?v=20260406ah">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/site-v2.css?v=20260409o">
     <script src="./js/site-v2.js?v=20260406ae" defer></script>
 </head>
 <body>
@@ -227,7 +226,7 @@
              4. marca fantasma a la derecha para equilibrar el vacÃ­o -->
         <section class="hero-lab hero-lab--intro-pending js-hero-lab">
             <video class="hero-lab__video js-hero-lab-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
-                <source src="./media/hero-sports-road.mp4" type="video/mp4">
+                <source src="./media/hero-dubai-sunset.mp4" type="video/mp4">
             </video>
             <div class="hero-lab__overlay" aria-hidden="true"></div>
             <div class="hero-lab__glow" aria-hidden="true"></div>
@@ -245,16 +244,16 @@
                     <div class="hero-lab__content-box">
                         <div class="hero-lab__body-copy">
                             <span class="hero-lab__eyebrow">Dubai luxury car rental</span>
-                            <h1>Dubai runs on presence, timing and first impressions. Your arrival should answer all three.</h1>
-                            <p class="hero-lab__lead">Curated supercars and premium SUVs, timed to the stay, the delivery and the handover.</p>
+                            <h1>Luxury car rental in Dubai, timed right.</h1>
+                            <p class="hero-lab__lead">Supercars and premium SUVs, delivered when and where the stay needs them.</p>
                         </div>
 
                         <!-- Launcher:
                              este bloque sustituye al booking visible; primero activa la acción
                              y después ya podríamos desplegar fechas en la home real. -->
                         <div class="hero-lab__launcher">
-                            <h2>Choose the dates. Then move with intent.</h2>
-                            <p>Start with the dates and we narrow the right cars for arrivals, stays and city movement in Dubai.</p>
+                            <h2>Set the dates first.</h2>
+                            <p>We narrow the right cars for the stay, the handover and the route.</p>
                             <div class="hero-lab__actions">
                                 <button
                                     type="button"
@@ -267,68 +266,6 @@
                                 </button>
                                 <a href="./fleet.html" class="hero-lab__cta hero-lab__cta--secondary">View fleet</a>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="brand-marquee" aria-label="Featured brands">
-            <div class="lab-shell brand-marquee__shell">
-                <div class="brand-marquee__viewport">
-                    <div class="brand-marquee__track">
-                        <div class="brand-marquee__group">
-                            <a class="brand-marquee__item" href="./lamborghini-rental-dubai.html" aria-label="Lamborghini">
-                                <img src="./images/brands/lamborghini-mark.png" alt="">
-                            </a>
-                            <a class="brand-marquee__item" href="./ferrari-rental-dubai.html" aria-label="Ferrari">
-                                <img src="./images/brands/ferrari-mark.png" alt="">
-                            </a>
-                            <a class="brand-marquee__item" href="./mercedes-rental-dubai.html" aria-label="Mercedes">
-                                <img src="./images/brands/mercedes-mark.png" alt="">
-                            </a>
-                            <a class="brand-marquee__item" href="./porsche-rental-dubai.html" aria-label="Porsche">
-                                <img src="./images/brands/porsche-mark.png" alt="">
-                            </a>
-                            <a class="brand-marquee__item" href="./rolls-royce-rental-dubai.html" aria-label="Rolls-Royce">
-                                <img src="./images/brands/rolls-royce-mark.png" alt="">
-                            </a>
-                        </div>
-
-                        <div class="brand-marquee__group" aria-hidden="true">
-                            <span class="brand-marquee__item">
-                                <img src="./images/brands/lamborghini-mark.png" alt="">
-                            </span>
-                            <span class="brand-marquee__item">
-                                <img src="./images/brands/ferrari-mark.png" alt="">
-                            </span>
-                            <span class="brand-marquee__item">
-                                <img src="./images/brands/mercedes-mark.png" alt="">
-                            </span>
-                            <span class="brand-marquee__item">
-                                <img src="./images/brands/porsche-mark.png" alt="">
-                            </span>
-                            <span class="brand-marquee__item">
-                                <img src="./images/brands/rolls-royce-mark.png" alt="">
-                            </span>
-                        </div>
-
-                        <div class="brand-marquee__group" aria-hidden="true">
-                            <span class="brand-marquee__item">
-                                <img src="./images/brands/lamborghini-mark.png" alt="">
-                            </span>
-                            <span class="brand-marquee__item">
-                                <img src="./images/brands/ferrari-mark.png" alt="">
-                            </span>
-                            <span class="brand-marquee__item">
-                                <img src="./images/brands/mercedes-mark.png" alt="">
-                            </span>
-                            <span class="brand-marquee__item">
-                                <img src="./images/brands/porsche-mark.png" alt="">
-                            </span>
-                            <span class="brand-marquee__item">
-                                <img src="./images/brands/rolls-royce-mark.png" alt="">
-                            </span>
                         </div>
                     </div>
                 </div>
@@ -384,8 +321,7 @@
             <div class="lab-shell featured-fleet__shell">
                 <div class="featured-fleet__intro">
                     <span class="hero-lab__eyebrow featured-fleet__eyebrow">Featured fleet</span>
-                    <h2>The first cars on screen should already feel like the right answer.</h2>
-                    <p>Guest favorites for clean arrivals and polished city movement.</p>
+                    <h2>Guest favorites in Dubai.</h2>
                 </div>
 
                 <div class="fleet-showcase">
@@ -395,11 +331,16 @@
                             <span class="fleet-visual-card__shade" aria-hidden="true"></span>
                         </a>
                         <div class="fleet-visual-card__body">
+                            <div class="fleet-visual-card__utility-row">
+                                <span class="fleet-visual-card__badge">Open-top</span>
+                                <span class="fleet-visual-card__trust">24/7 concierge</span>
+                            </div>
                             <span class="fleet-visual-card__label">Open-top supercar</span>
                             <h3>
                                 <a class="fleet-visual-card__title-link" href="./lamborghini-rental-dubai.html">Lamborghini Huracan EVO Spyder</a>
                             </h3>
-                            <p class="fleet-visual-card__description">Open-air drama for standout arrivals and sharper city plans.</p>
+                            <p class="fleet-visual-card__description">Open-air Lamborghini energy for standout arrivals and city drives.</p>
+                            <p class="fleet-visual-card__sales-line">Dubai delivery available</p>
 
                             <dl class="fleet-visual-card__spec-list">
                                 <div class="fleet-visual-card__spec-item">
@@ -422,20 +363,29 @@
 
                             <div class="fleet-visual-card__price-box">
                                 <div>
-                                    <span class="fleet-visual-card__price-kicker">Average per day</span>
+                                    <span class="fleet-visual-card__price-kicker">From per day</span>
                                     <strong class="fleet-visual-card__price-value">3,200 AED</strong>
                                 </div>
-                                    <span class="fleet-visual-card__price-note">50% confirm</span>
+                                <span class="fleet-visual-card__price-note">50% to confirm</span>
                             </div>
 
                             <div class="fleet-visual-card__actions">
                                 <a class="fleet-visual-card__primary" href="./lamborghini-rental-dubai.html">More information</a>
                             </div>
-
-                            <div class="fleet-visual-card__contact-row">
-                                <a class="fleet-visual-card__contact-link" href="tel:+971586122568">Call</a>
-                                <a class="fleet-visual-card__contact-link fleet-visual-card__contact-link--wa" href="https://wa.me/971586122568?text=Hi%2C%20I%27d%20like%20to%20rent%20the%20Lamborghini%20Huracan%20EVO%20Spyder%20in%20Dubai." target="_blank" rel="noopener">WhatsApp</a>
-                            </div>
+                        </div>
+                        <div class="fleet-visual-card__contact-row">
+                            <a class="fleet-visual-card__contact-link" href="tel:+971586122568">
+                                <svg class="fleet-visual-card__contact-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path fill="currentColor" d="M6.62 10.79a15.466 15.466 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.07 21 3 13.93 3 5c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.24.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2Z"/>
+                                </svg>
+                                <span>Call</span>
+                            </a>
+                            <a class="fleet-visual-card__contact-link fleet-visual-card__contact-link--wa" href="https://wa.me/971586122568?text=Hi%2C%20I%27d%20like%20to%20rent%20the%20Lamborghini%20Huracan%20EVO%20Spyder%20in%20Dubai." target="_blank" rel="noopener">
+                                <svg class="fleet-visual-card__contact-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path fill="currentColor" d="M19.05 4.91A9.82 9.82 0 0 0 12 2a9.94 9.94 0 0 0-8.54 15.02L2 22l5.13-1.35A9.94 9.94 0 1 0 19.05 4.91Zm-7.05 14.1c-1.53 0-3.04-.41-4.36-1.19l-.31-.18-3.04.8.81-2.96-.2-.31a8 8 0 1 1 7.1 3.84Zm4.39-5.91c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.93-1.18-.71-.63-1.2-1.41-1.34-1.65-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.48-.4-.41-.54-.41l-.46-.01c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.09 3.61.57.25 1.01.39 1.36.49.57.18 1.09.15 1.5.09.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"/>
+                                </svg>
+                                <span>WhatsApp</span>
+                            </a>
                         </div>
                     </article>
 
@@ -445,11 +395,16 @@
                             <span class="fleet-visual-card__shade" aria-hidden="true"></span>
                         </a>
                         <div class="fleet-visual-card__body">
+                            <div class="fleet-visual-card__utility-row">
+                                <span class="fleet-visual-card__badge">Sunset arrival</span>
+                                <span class="fleet-visual-card__trust">Hotel handover</span>
+                            </div>
                             <span class="fleet-visual-card__label">Hybrid supercar</span>
                             <h3>
                                 <a class="fleet-visual-card__title-link" href="./ferrari-rental-dubai.html">Ferrari 296 GTS</a>
                             </h3>
-                            <p class="fleet-visual-card__description">Hybrid Ferrari presence for dinners, hotels and special evenings.</p>
+                            <p class="fleet-visual-card__description">Hybrid Ferrari style for dinners, hotels and evening plans.</p>
+                            <p class="fleet-visual-card__sales-line">Monthly rate available</p>
 
                             <dl class="fleet-visual-card__spec-list">
                                 <div class="fleet-visual-card__spec-item">
@@ -475,17 +430,26 @@
                                     <span class="fleet-visual-card__price-kicker">From per day</span>
                                     <strong class="fleet-visual-card__price-value">3,400 AED</strong>
                                 </div>
-                                    <span class="fleet-visual-card__price-note">Delivery</span>
+                                <span class="fleet-visual-card__price-note">Dubai delivery</span>
                             </div>
 
                             <div class="fleet-visual-card__actions">
                                 <a class="fleet-visual-card__primary" href="./ferrari-rental-dubai.html">More information</a>
                             </div>
-
-                            <div class="fleet-visual-card__contact-row">
-                                <a class="fleet-visual-card__contact-link" href="tel:+971586122568">Call</a>
-                                <a class="fleet-visual-card__contact-link fleet-visual-card__contact-link--wa" href="https://wa.me/971586122568?text=Ferrari%20296%20GTS%20rental%20Dubai" target="_blank" rel="noopener">WhatsApp</a>
-                            </div>
+                        </div>
+                        <div class="fleet-visual-card__contact-row">
+                            <a class="fleet-visual-card__contact-link" href="tel:+971586122568">
+                                <svg class="fleet-visual-card__contact-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path fill="currentColor" d="M6.62 10.79a15.466 15.466 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.07 21 3 13.93 3 5c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.24.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2Z"/>
+                                </svg>
+                                <span>Call</span>
+                            </a>
+                            <a class="fleet-visual-card__contact-link fleet-visual-card__contact-link--wa" href="https://wa.me/971586122568?text=Ferrari%20296%20GTS%20rental%20Dubai" target="_blank" rel="noopener">
+                                <svg class="fleet-visual-card__contact-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path fill="currentColor" d="M19.05 4.91A9.82 9.82 0 0 0 12 2a9.94 9.94 0 0 0-8.54 15.02L2 22l5.13-1.35A9.94 9.94 0 1 0 19.05 4.91Zm-7.05 14.1c-1.53 0-3.04-.41-4.36-1.19l-.31-.18-3.04.8.81-2.96-.2-.31a8 8 0 1 1 7.1 3.84Zm4.39-5.91c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.93-1.18-.71-.63-1.2-1.41-1.34-1.65-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.48-.4-.41-.54-.41l-.46-.01c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.09 3.61.57.25 1.01.39 1.36.49.57.18 1.09.15 1.5.09.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"/>
+                                </svg>
+                                <span>WhatsApp</span>
+                            </a>
                         </div>
                     </article>
 
@@ -495,11 +459,16 @@
                             <span class="fleet-visual-card__shade" aria-hidden="true"></span>
                         </a>
                         <div class="fleet-visual-card__body">
+                            <div class="fleet-visual-card__utility-row">
+                                <span class="fleet-visual-card__badge">Airport favorite</span>
+                                <span class="fleet-visual-card__trust">Dubai handover</span>
+                            </div>
                             <span class="fleet-visual-card__label">Performance SUV</span>
                             <h3>
                                 <a class="fleet-visual-card__title-link" href="./lamborghini-rental-dubai.html">Lamborghini Urus Sport</a>
                             </h3>
-                            <p class="fleet-visual-card__description">Lamborghini impact with SUV comfort for airport and resort stays.</p>
+                            <p class="fleet-visual-card__description">Supercar attitude with SUV comfort for airport and resort stays.</p>
+                            <p class="fleet-visual-card__sales-line">Monthly rate available</p>
 
                             <dl class="fleet-visual-card__spec-list">
                                 <div class="fleet-visual-card__spec-item">
@@ -525,17 +494,26 @@
                                     <span class="fleet-visual-card__price-kicker">From per day</span>
                                     <strong class="fleet-visual-card__price-value">3,500 AED</strong>
                                 </div>
-                                    <span class="fleet-visual-card__price-note">SUV</span>
+                                <span class="fleet-visual-card__price-note">Up to 5 guests</span>
                             </div>
 
                             <div class="fleet-visual-card__actions">
                                 <a class="fleet-visual-card__primary" href="./lamborghini-rental-dubai.html">More information</a>
                             </div>
-
-                            <div class="fleet-visual-card__contact-row">
-                                <a class="fleet-visual-card__contact-link" href="tel:+971586122568">Call</a>
-                                <a class="fleet-visual-card__contact-link fleet-visual-card__contact-link--wa" href="https://wa.me/971586122568?text=Hi%2C%20I%27d%20like%20to%20rent%20the%20Lamborghini%20Urus%20in%20Dubai." target="_blank" rel="noopener">WhatsApp</a>
-                            </div>
+                        </div>
+                        <div class="fleet-visual-card__contact-row">
+                            <a class="fleet-visual-card__contact-link" href="tel:+971586122568">
+                                <svg class="fleet-visual-card__contact-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path fill="currentColor" d="M6.62 10.79a15.466 15.466 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.07 21 3 13.93 3 5c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.24.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2Z"/>
+                                </svg>
+                                <span>Call</span>
+                            </a>
+                            <a class="fleet-visual-card__contact-link fleet-visual-card__contact-link--wa" href="https://wa.me/971586122568?text=Hi%2C%20I%27d%20like%20to%20rent%20the%20Lamborghini%20Urus%20in%20Dubai." target="_blank" rel="noopener">
+                                <svg class="fleet-visual-card__contact-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path fill="currentColor" d="M19.05 4.91A9.82 9.82 0 0 0 12 2a9.94 9.94 0 0 0-8.54 15.02L2 22l5.13-1.35A9.94 9.94 0 1 0 19.05 4.91Zm-7.05 14.1c-1.53 0-3.04-.41-4.36-1.19l-.31-.18-3.04.8.81-2.96-.2-.31a8 8 0 1 1 7.1 3.84Zm4.39-5.91c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.93-1.18-.71-.63-1.2-1.41-1.34-1.65-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.48-.4-.41-.54-.41l-.46-.01c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.09 3.61.57.25 1.01.39 1.36.49.57.18 1.09.15 1.5.09.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"/>
+                                </svg>
+                                <span>WhatsApp</span>
+                            </a>
                         </div>
                     </article>
 
@@ -545,11 +523,16 @@
                             <span class="fleet-visual-card__shade" aria-hidden="true"></span>
                         </a>
                         <div class="fleet-visual-card__body">
+                            <div class="fleet-visual-card__utility-row">
+                                <span class="fleet-visual-card__badge">VIP arrival</span>
+                                <span class="fleet-visual-card__trust">Chauffeur on request</span>
+                            </div>
                             <span class="fleet-visual-card__label">Flagship luxury SUV</span>
                             <h3>
                                 <a class="fleet-visual-card__title-link" href="./rolls-royce-rental-dubai.html">Cullinan Black Badge</a>
                             </h3>
-                            <p class="fleet-visual-card__description">VIP arrival comfort for hotels, villas and executive schedules.</p>
+                            <p class="fleet-visual-card__description">Quiet luxury for hotel arrivals, villa transfers and executive plans.</p>
+                            <p class="fleet-visual-card__sales-line">Hotel and villa handover</p>
 
                             <dl class="fleet-visual-card__spec-list">
                                 <div class="fleet-visual-card__spec-item">
@@ -572,112 +555,70 @@
 
                             <div class="fleet-visual-card__price-box">
                                 <div>
-                                    <span class="fleet-visual-card__price-kicker">Average per day</span>
+                                    <span class="fleet-visual-card__price-kicker">From per day</span>
                                     <strong class="fleet-visual-card__price-value">3,750 AED</strong>
                                 </div>
-                                <span class="fleet-visual-card__price-note">VIP</span>
+                                <span class="fleet-visual-card__price-note">Flagship service</span>
                             </div>
 
                             <div class="fleet-visual-card__actions">
                                 <a class="fleet-visual-card__primary" href="./rolls-royce-rental-dubai.html">More information</a>
                             </div>
-
-                            <div class="fleet-visual-card__contact-row">
-                                <a class="fleet-visual-card__contact-link" href="tel:+971586122568">Call</a>
-                                <a class="fleet-visual-card__contact-link fleet-visual-card__contact-link--wa" href="https://wa.me/971586122568?text=Rolls%20Royce%20Cullinan%20Black%20Badge%20rental%20Dubai" target="_blank" rel="noopener">WhatsApp</a>
-                            </div>
+                        </div>
+                        <div class="fleet-visual-card__contact-row">
+                            <a class="fleet-visual-card__contact-link" href="tel:+971586122568">
+                                <svg class="fleet-visual-card__contact-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path fill="currentColor" d="M6.62 10.79a15.466 15.466 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.07 21 3 13.93 3 5c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.24.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2Z"/>
+                                </svg>
+                                <span>Call</span>
+                            </a>
+                            <a class="fleet-visual-card__contact-link fleet-visual-card__contact-link--wa" href="https://wa.me/971586122568?text=Rolls%20Royce%20Cullinan%20Black%20Badge%20rental%20Dubai" target="_blank" rel="noopener">
+                                <svg class="fleet-visual-card__contact-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path fill="currentColor" d="M19.05 4.91A9.82 9.82 0 0 0 12 2a9.94 9.94 0 0 0-8.54 15.02L2 22l5.13-1.35A9.94 9.94 0 1 0 19.05 4.91Zm-7.05 14.1c-1.53 0-3.04-.41-4.36-1.19l-.31-.18-3.04.8.81-2.96-.2-.31a8 8 0 1 1 7.1 3.84Zm4.39-5.91c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.93-1.18-.71-.63-1.2-1.41-1.34-1.65-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.48-.4-.41-.54-.41l-.46-.01c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.09 3.61.57.25 1.01.39 1.36.49.57.18 1.09.15 1.5.09.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"/>
+                                </svg>
+                                <span>WhatsApp</span>
+                            </a>
                         </div>
                     </article>
                 </div>
 
             </div>
         </section>
-<section class="service-layer" id="service-layer">
-            <div class="lab-shell service-layer__shell">
-                <div class="service-layer__intro">
-                    <span class="hero-lab__eyebrow service-layer__eyebrow">Service layer</span>
+        <section class="fleet-editorial fleet-editorial--service" id="service-layer" aria-label="Service layer">
+            <div class="lab-shell fleet-editorial__shell">
+                <div class="fleet-editorial__intro">
+                    <span class="hero-lab__eyebrow fleet-editorial__eyebrow">Service layer</span>
                     <h2>The service should feel visible, calm and already under control.</h2>
-                    <p>Think less "rental process" and more guided arrival. The guest chooses the timing once, then Dynasty carries the booking through confirmation, handover and return without losing the thread.</p>
+                    <p>Think less "rental process" and more guided arrival. The guest chooses the timing once, then one team carries the booking through confirmation, handover and return without losing the thread.</p>
                 </div>
 
-                <div class="service-story">
-                    <article class="service-scene service-scene--hero">
-                        <img src="./images/service-handover.png" alt="Luxury SUV handover in Dubai">
-                        <span class="service-scene__shade" aria-hidden="true"></span>
-                        <div class="service-scene__content">
-                            <span class="service-feature__label">Hotel / villa / airport handover</span>
-                            <h3>The arrival should already feel expected.</h3>
-                            <p>Delivery should enter the stay cleanly, whether the booking starts at a hotel porte-cochere, a private villa or the airport.</p>
+                <div class="fleet-editorial__grid">
+                    <article class="fleet-editorial__panel fleet-editorial__panel--video">
+                        <video class="fleet-editorial__media" autoplay muted loop playsinline preload="metadata">
+                            <source src="./media/hero-sports-road.mp4" type="video/mp4">
+                        </video>
+                        <div class="fleet-editorial__panel-copy">
+                            <span>Booking rhythm</span>
+                            <h3>One team carries the booking from first dates to final return.</h3>
+                            <p>From availability to delivery timing and the return plan, the stay should feel guided instead of fragmented.</p>
                         </div>
                     </article>
 
-                    <div class="service-story__stack">
-                        <article class="service-promise">
-                            <span class="service-feature__label">Concierge standard</span>
-                            <h3>One team carries the booking from first dates to final return.</h3>
-                            <p>That continuity matters. It keeps the process calmer, cuts message drift and makes the whole experience feel coordinated instead of fragmented.</p>
-                            <ul class="service-promise__points">
-                                <li>Secure 50% confirmation to move from interest into a real booking.</li>
-                                <li>Model fit based on the stay, not just on the inventory list.</li>
-                                <li>Delivery and return planning held by the same team.</li>
-                            </ul>
+                    <div class="fleet-editorial__stack">
+                        <article class="fleet-editorial__panel fleet-editorial__panel--photo">
+                            <img src="./images/fleet/rolls-royce-cullinan-black-badge/06-exterior-front-open-doors.png" alt="Rolls-Royce Cullinan prepared for handover in Dubai">
+                            <div class="fleet-editorial__panel-copy">
+                                <span>Hotel / villa / airport handover</span>
+                                <p>The arrival should already feel expected.</p>
+                            </div>
                         </article>
 
-                        <div class="service-snapshots">
-                            <article class="service-scene service-scene--mini">
-                                <img src="./images/service-cockpit.png" alt="Luxury cockpit detail">
-                                <span class="service-scene__shade" aria-hidden="true"></span>
-                                <div class="service-scene__content">
-                                    <span class="service-feature__label">Single point of contact</span>
-                                    <p>Less handoff, more calm.</p>
-                                </div>
-                            </article>
-
-                            <article class="service-scene service-scene--mini">
-                                <img src="./images/service-detail.png" alt="Luxury seat detail">
-                                <span class="service-scene__shade" aria-hidden="true"></span>
-                                <div class="service-scene__content">
-                                    <span class="service-feature__label">Built around the stay</span>
-                                    <p>From dinner arrivals to villa weekends.</p>
-                                </div>
-                            </article>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="service-journey">
-                    <div class="service-journey__intro">
-                        <span class="service-process__kicker">How it flows</span>
-                        <h3>Three short steps. Then the stay starts to feel organised.</h3>
-                        <p>Keep the sequence clean: lock the rental window, narrow the right cars, then let one team turn the booking into a precise delivery and return plan built around Dubai.</p>
-                        <button
-                            type="button"
-                            class="service-process__button js-booking-open"
-                            aria-haspopup="dialog"
-                            aria-controls="hero-lab-overlay"
-                            aria-expanded="false"
-                        >
-                            Start with the dates
-                        </button>
-                    </div>
-
-                    <div class="service-journey__steps">
-                        <article class="service-step-card">
-                            <strong>01</strong>
-                            <h4>Choose the rental window</h4>
-                            <p>Dates and timing come first so availability, delivery and every next action are grounded in the real stay.</p>
-                        </article>
-
-                        <article class="service-step-card">
-                            <strong>02</strong>
-                            <h4>Narrow the right cars</h4>
-                            <p>Once the stay is defined, the fleet becomes a better decision: statement supercar, performance SUV or flagship comfort.</p>
-                        </article>
-
-                        <article class="service-step-card">
-                            <strong>03</strong>
-                            <h4>Confirm the handover plan</h4>
-                            <p>Secure the booking, then let the team finalise documents, delivery location, return rhythm and the last-mile sequence around Dubai.</p>
+                        <article class="fleet-editorial__panel fleet-editorial__panel--detail">
+                            <img src="./images/fleet/lamborghini-huracan/04-interior-cockpit.png" alt="Lamborghini cockpit detail">
+                            <div class="fleet-editorial__panel-copy">
+                                <span>Single point of contact</span>
+                                <p>Less handoff, more calm around the stay.</p>
+                            </div>
                         </article>
                     </div>
                 </div>
@@ -710,6 +651,15 @@
                         </button>
                     </div>
                 </div>
+
+                <article class="locations-teaser__visual" aria-label="Night handover scene">
+                    <img src="./images/service-handover.png" alt="Luxury SUV prepared for a night handover in Dubai">
+                    <span class="locations-teaser__visual-shade" aria-hidden="true"></span>
+                    <div class="locations-teaser__visual-copy">
+                        <span class="hero-lab__eyebrow locations-teaser__visual-eyebrow">After dark</span>
+                        <h3>Night handovers across the city should still feel calm.</h3>
+                    </div>
+                </article>
 
                 <div class="locations-grid">
                     <article class="location-card location-card--palm">
@@ -755,143 +705,151 @@
             </div>
         </section>
 
-        <section class="guest-reviews" id="guest-reviews">
-            <div class="lab-shell guest-reviews__shell">
-                <div class="guest-reviews__intro">
-                    <span class="hero-lab__eyebrow guest-reviews__eyebrow">Google reviews</span>
-                    <h2>What guests say on Google after the handover.</h2>
-                </div>
+        <div class="guest-reviews-band">
+            <div class="guest-reviews__bg" aria-hidden="true">
+                <video class="guest-reviews__bg-video js-ambient-video" autoplay muted loop playsinline preload="metadata">
+                    <source src="./media/hero-sports-road.mp4" type="video/mp4">
+                </video>
+                <span class="guest-reviews__bg-shade"></span>
+            </div>
 
-                <div class="guest-reviews__body">
-                    <div class="guest-reviews__summary">
-                        <a
-                            class="guest-reviews__brand guest-reviews__brand--link"
-                            href="https://www.google.com/maps/place/?q=place_id:ChIJZTglPZZpXz4R2NFpN-mV594"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Open the Google Business listing"
-                        >
-                            Luxury Supercars Rental LLC
-                        </a>
+            <section class="guest-reviews" id="guest-reviews">
+                <div class="lab-shell guest-reviews__shell">
+                    <div class="guest-reviews__intro">
+                        <span class="hero-lab__eyebrow guest-reviews__eyebrow">Google reviews</span>
+                        <h2>What guests say on Google after the handover.</h2>
+                    </div>
 
-                        <div class="guest-reviews__rating">
-                            <span class="guest-reviews__score">4.9</span>
-                            <span class="guest-reviews__stars" aria-hidden="true">★★★★★</span>
-                        </div>
-
-                        <p class="guest-reviews__count">Based on 377 reviews</p>
-
-                        <p class="guest-reviews__powered">
-                            powered by
-                            <span class="google-wordmark" aria-label="Google">
-                                <span class="google-wordmark__g1">G</span><span class="google-wordmark__o1">o</span><span class="google-wordmark__o2">o</span><span class="google-wordmark__g2">g</span><span class="google-wordmark__l">l</span><span class="google-wordmark__e">e</span>
-                            </span>
-                        </p>
-
-                        <div class="guest-reviews__actions">
+                    <div class="guest-reviews__body">
+                        <div class="guest-reviews__summary">
                             <a
-                                class="guest-reviews__google-button"
-                                href="https://search.google.com/local/writereview?placeid=ChIJZTglPZZpXz4R2NFpN-mV594"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                Review us on Google
-                            </a>
-
-                            <a
-                                class="guest-reviews__google-link"
+                                class="guest-reviews__brand guest-reviews__brand--link"
                                 href="https://www.google.com/maps/place/?q=place_id:ChIJZTglPZZpXz4R2NFpN-mV594"
                                 target="_blank"
                                 rel="noopener noreferrer"
+                                aria-label="Open the Google Business listing"
                             >
-                                View on Google
+                                Luxury Supercars Rental LLC
                             </a>
+
+                            <div class="guest-reviews__rating">
+                                <span class="guest-reviews__score">4.9</span>
+                                <span class="guest-reviews__stars" aria-hidden="true">★★★★★</span>
+                            </div>
+
+                            <p class="guest-reviews__count">Based on 377 reviews</p>
+
+                            <p class="guest-reviews__powered">
+                                powered by
+                                <span class="google-wordmark" aria-label="Google">
+                                    <span class="google-wordmark__g1">G</span><span class="google-wordmark__o1">o</span><span class="google-wordmark__o2">o</span><span class="google-wordmark__g2">g</span><span class="google-wordmark__l">l</span><span class="google-wordmark__e">e</span>
+                                </span>
+                            </p>
+
+                            <div class="guest-reviews__actions">
+                                <a
+                                    class="guest-reviews__google-button"
+                                    href="https://search.google.com/local/writereview?placeid=ChIJZTglPZZpXz4R2NFpN-mV594"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    Review us on Google
+                                </a>
+
+                                <a
+                                    class="guest-reviews__google-link"
+                                    href="https://www.google.com/maps/place/?q=place_id:ChIJZTglPZZpXz4R2NFpN-mV594"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    View on Google
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="guest-reviews__grid">
+                            <article class="review-card review-card--google">
+                                <div class="review-card__topline">
+                                    <div class="review-card__header">
+                                        <span class="review-card__avatar review-card__avatar--kashif" aria-hidden="true">K</span>
+                                        <div>
+                                            <strong>Kashif Dogar</strong>
+                                            <span>May 9, 2025</span>
+                                        </div>
+                                    </div>
+                                    <a
+                                        class="review-card__source"
+                                        href="https://www.google.com/maps/place/?q=place_id:ChIJZTglPZZpXz4R2NFpN-mV594"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        aria-label="Open Google reviews"
+                                    >
+                                        <span aria-hidden="true">G</span>
+                                    </a>
+                                </div>
+                                <span class="review-card__stars" aria-hidden="true">★★★★★</span>
+                                <p>Best car Rental in Dubai I must recommended it.</p>
+                            </article>
+
+                            <article class="review-card review-card--google">
+                                <div class="review-card__topline">
+                                    <div class="review-card__header">
+                                        <span class="review-card__avatar review-card__avatar--hassan" aria-hidden="true">H</span>
+                                        <div>
+                                            <strong>Hassan Khreis</strong>
+                                            <span>May 8, 2025</span>
+                                        </div>
+                                    </div>
+                                    <a
+                                        class="review-card__source"
+                                        href="https://www.google.com/maps/place/?q=place_id:ChIJZTglPZZpXz4R2NFpN-mV594"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        aria-label="Open Google reviews"
+                                    >
+                                        <span aria-hidden="true">G</span>
+                                    </a>
+                                </div>
+                                <span class="review-card__stars" aria-hidden="true">★★★★★</span>
+                                <p>Really great service! Friendly! Helpful! I will definitely come back and rent a car from Luxury Supercars Rental again! Thank you so much!</p>
+                            </article>
+
+                            <article class="review-card review-card--google">
+                                <div class="review-card__topline">
+                                    <div class="review-card__header">
+                                        <span class="review-card__avatar review-card__avatar--roy" aria-hidden="true">r</span>
+                                        <div>
+                                            <strong>roy ashkar</strong>
+                                            <span>May 7, 2025</span>
+                                        </div>
+                                    </div>
+                                    <a
+                                        class="review-card__source"
+                                        href="https://www.google.com/maps/place/?q=place_id:ChIJZTglPZZpXz4R2NFpN-mV594"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        aria-label="Open Google reviews"
+                                    >
+                                        <span aria-hidden="true">G</span>
+                                    </a>
+                                </div>
+                                <span class="review-card__stars" aria-hidden="true">★★★★★</span>
+                                <p>Amazing customer service. Recommend for each car enthusiast to get their rental cars from them.</p>
+                            </article>
                         </div>
                     </div>
-
-                    <div class="guest-reviews__grid">
-                        <article class="review-card review-card--google">
-                            <div class="review-card__topline">
-                                <div class="review-card__header">
-                                    <span class="review-card__avatar review-card__avatar--kashif" aria-hidden="true">K</span>
-                                    <div>
-                                        <strong>Kashif Dogar</strong>
-                                        <span>May 9, 2025</span>
-                                    </div>
-                                </div>
-                                <a
-                                    class="review-card__source"
-                                    href="https://www.google.com/maps/place/?q=place_id:ChIJZTglPZZpXz4R2NFpN-mV594"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    aria-label="Open Google reviews"
-                                >
-                                    <span aria-hidden="true">G</span>
-                                </a>
-                            </div>
-                            <span class="review-card__stars" aria-hidden="true">★★★★★</span>
-                            <p>Best car Rental in Dubai I must recommended it.</p>
-                        </article>
-
-                        <article class="review-card review-card--google">
-                            <div class="review-card__topline">
-                                <div class="review-card__header">
-                                    <span class="review-card__avatar review-card__avatar--hassan" aria-hidden="true">H</span>
-                                    <div>
-                                        <strong>Hassan Khreis</strong>
-                                        <span>May 8, 2025</span>
-                                    </div>
-                                </div>
-                                <a
-                                    class="review-card__source"
-                                    href="https://www.google.com/maps/place/?q=place_id:ChIJZTglPZZpXz4R2NFpN-mV594"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    aria-label="Open Google reviews"
-                                >
-                                    <span aria-hidden="true">G</span>
-                                </a>
-                            </div>
-                            <span class="review-card__stars" aria-hidden="true">★★★★★</span>
-                            <p>Really great service! Friendly! Helpful! I will definitely come back and rent a car from Luxury Supercars Rental again! Thank you so much!</p>
-                        </article>
-
-                        <article class="review-card review-card--google">
-                            <div class="review-card__topline">
-                                <div class="review-card__header">
-                                    <span class="review-card__avatar review-card__avatar--roy" aria-hidden="true">r</span>
-                                    <div>
-                                        <strong>roy ashkar</strong>
-                                        <span>May 7, 2025</span>
-                                    </div>
-                                </div>
-                                <a
-                                    class="review-card__source"
-                                    href="https://www.google.com/maps/place/?q=place_id:ChIJZTglPZZpXz4R2NFpN-mV594"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    aria-label="Open Google reviews"
-                                >
-                                    <span aria-hidden="true">G</span>
-                                </a>
-                            </div>
-                            <span class="review-card__stars" aria-hidden="true">★★★★★</span>
-                            <p>Amazing customer service. Recommend for each car enthusiast to get their rental cars from them.</p>
-                        </article>
-                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <footer class="site-v2-footer" id="contact">
-            <div class="lab-shell site-v2-footer__shell">
-                <div class="site-v2-footer__top">
-                    <div class="site-v2-footer__brand">
-                        <span class="site-v2-footer__crest" aria-hidden="true">
-                            <img src="./images/dp-crest-cropped.png" alt="">
-                        </span>
-                        <p>Dynasty Prestige keeps the experience focused: curated supercars, luxury SUVs, transparent starting rates and one team handling timing, delivery, handover and return.</p>
-                    </div>
+            <footer class="site-v2-footer site-v2-footer--over-video" id="contact">
+                <div class="lab-shell site-v2-footer__shell">
+                    <div class="site-v2-footer__top">
+                        <div class="site-v2-footer__brand">
+                            <span class="site-v2-footer__crest" aria-hidden="true">
+                                <img src="./images/dp-crest-cropped.png" alt="">
+                            </span>
+                            <p>Curated supercars and luxury SUVs with one team handling timing, delivery, handover and return across Dubai.</p>
+                        </div>
 
                     <div class="site-v2-footer__column">
                         <h3>Useful links</h3>
@@ -908,7 +866,7 @@
                         <a href="tel:+971586122568">+971 58 612 2568</a>
                         <a href="https://wa.me/971586122568" target="_blank" rel="noopener">WhatsApp the team</a>
                         <a href="mailto:prestigegoalmotion@gmail.com">prestigegoalmotion@gmail.com</a>
-                        <p>Palm Jumeirah, Dubai UAE with hotel, villa and airport coordination across the city.</p>
+                        <p>Palm Jumeirah based, with hotel, villa and airport handovers across Dubai.</p>
                     </div>
                 </div>
 
@@ -933,6 +891,7 @@
                 </div>
             </div>
         </footer>
+        </div>
 
         <div class="hero-lab-overlay" id="hero-lab-overlay" aria-hidden="true">
             <div class="hero-lab-overlay__scrim" data-overlay-close></div>

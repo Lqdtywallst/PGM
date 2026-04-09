@@ -412,8 +412,53 @@
 
 .fleet-card__content {
     display: grid;
-    gap: 1.15rem;
-    padding: 1.45rem 1.5rem 1.5rem;
+    gap: 1rem;
+    padding: 1.45rem 1.5rem 1.3rem;
+}
+
+.fleet-card__utility-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+}
+
+.fleet-card__badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0 0.76rem;
+    border: 1px solid rgba(205, 163, 83, 0.22);
+    border-radius: 999px;
+    background: rgba(214, 188, 134, 0.1);
+    color: #dfbe7f;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.fleet-card__trust {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: rgba(245, 241, 232, 0.74);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.55rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.fleet-card__trust::before {
+    content: "";
+    width: 0.38rem;
+    height: 0.38rem;
+    border-radius: 999px;
+    background: #c99e48;
+    box-shadow: 0 0 0 3px rgba(214, 188, 134, 0.08);
 }
 
 .fleet-card__heading {
@@ -475,6 +520,16 @@
     line-height: 1.76;
 }
 
+.fleet-card__sales-line {
+    margin: 0.82rem 0 0;
+    color: #dfbe7f;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
 .fleet-card__specs {
     display: flex;
     flex-wrap: wrap;
@@ -502,9 +557,9 @@
     display: grid;
     gap: 0.85rem;
     padding: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(205, 163, 83, 0.16);
     border-radius: 1.25rem;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.025);
 }
 
 .fleet-card__price-row {
@@ -512,6 +567,10 @@
     align-items: end;
     justify-content: space-between;
     gap: 1rem;
+    padding: 0.8rem 0.88rem;
+    border: 1px solid rgba(205, 163, 83, 0.32);
+    border-radius: 1rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.015) 100%);
 }
 
 .fleet-card__price-kicker {
@@ -528,18 +587,28 @@
     display: block;
     margin-top: 0.2rem;
     font-family: 'Montserrat', sans-serif;
-    font-size: 1.12rem;
+    font-size: 1.32rem;
     font-weight: 700;
-    letter-spacing: 0.03em;
+    letter-spacing: -0.02em;
 }
 
 .fleet-card__price-note {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.8rem;
+    max-width: 8rem;
+    padding: 0.22rem 0.58rem;
+    border: 1px solid rgba(205, 163, 83, 0.24);
+    border-radius: 999px;
+    background: rgba(214, 188, 134, 0.08);
     color: var(--lab-champagne);
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.62rem;
+    font-size: 0.56rem;
     font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-align: center;
+    text-transform: none;
 }
 
 .fleet-card__primary,
@@ -563,23 +632,34 @@
 }
 
 .fleet-card__primary {
-    border: 1px solid rgba(227, 246, 85, 0.42);
-    background: linear-gradient(135deg, rgba(241, 255, 157, 0.96), rgba(227, 246, 85, 0.92));
-    color: #101010;
-    box-shadow: 0 14px 32px rgba(227, 246, 85, 0.14);
+    justify-self: center;
+    width: fit-content;
+    padding: 0 1.3rem;
+    border: 1px solid rgba(205, 163, 83, 0.28);
+    background: linear-gradient(135deg, rgba(220, 183, 104, 0.96), rgba(198, 151, 66, 0.92));
+    color: #fff;
+    box-shadow: none;
+    letter-spacing: 0;
+    text-transform: none;
 }
 
 .fleet-card__contact-row {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.7rem;
+    gap: 0;
+    overflow: hidden;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .fleet-card__secondary {
     gap: 0.48rem;
-    border: 1px solid rgba(255, 255, 255, 0.09);
-    background: rgba(255, 255, 255, 0.03);
-    color: rgba(245, 241, 232, 0.88);
+    min-height: 3.45rem;
+    border: 0;
+    border-radius: 0;
+    background: #cfad61;
+    color: #fffdf8;
+    letter-spacing: 0;
+    text-transform: none;
 }
 
 .fleet-card__secondary::before {
@@ -602,8 +682,8 @@
 }
 
 .fleet-card__secondary--wa {
-    border-color: rgba(120, 201, 117, 0.24);
-    color: #b4f7b1;
+    background: #4c8f2f;
+    color: #fff;
 }
 
 .fleet-card__secondary--wa::before {
@@ -613,7 +693,8 @@
 
 .fleet-card__primary:hover,
 .fleet-card__secondary:hover {
-    transform: translateY(-1px);
+    transform: none;
+    filter: brightness(0.98);
 }
 
 .fleet-sidebar {

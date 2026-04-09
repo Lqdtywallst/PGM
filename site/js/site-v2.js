@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const hero = document.querySelector(".js-hero-lab");
     const heroVideo = hero?.querySelector(".js-hero-lab-video");
+    const ambientVideos = Array.from(document.querySelectorAll(".js-ambient-video"));
     const overlay = document.querySelector(".hero-lab-overlay");
     const openButtons = Array.from(document.querySelectorAll(".js-booking-open"));
     const closeButtons = overlay ? overlay.querySelectorAll("[data-overlay-close]") : [];
@@ -19,6 +20,23 @@ document.addEventListener("DOMContentLoaded", () => {
     let introStarted = false;
     let introComplete = false;
     let lastFocusedElement = null;
+
+    function tryPlayVideo(video) {
+        if (!(video instanceof HTMLVideoElement)) {
+            return;
+        }
+
+        video.muted = true;
+        video.defaultMuted = true;
+        video.playsInline = true;
+
+        const playAttempt = video.play();
+        if (playAttempt && typeof playAttempt.catch === "function") {
+            playAttempt.catch(() => {
+                // No hacemos ruido si el navegador retrasa el autoplay.
+            });
+        }
+    }
 
     function clearIntroTimers() {
         introTimers.forEach((timerId) => {
@@ -96,6 +114,46 @@ document.addEventListener("DOMContentLoaded", () => {
             document.addEventListener("scroll", maybeSkipIntro, { once: true, passive: true });
             hero.addEventListener("pointerdown", maybeSkipIntro, { once: true });
         }
+    }
+
+    if (!prefersReducedMotion.matches && ambientVideos.length > 0) {
+        ambientVideos.forEach((video) => {
+            tryPlayVideo(video);
+            video.addEventListener("canplay", () => {
+                tryPlayVideo(video);
+            }, { once: true });
+        });
+
+        if ("IntersectionObserver" in window) {
+            const ambientVideoObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (!(entry.target instanceof HTMLVideoElement)) {
+                        return;
+                    }
+
+                    if (entry.isIntersecting) {
+                        tryPlayVideo(entry.target);
+                        return;
+                    }
+
+                    entry.target.pause();
+                });
+            }, {
+                threshold: 0.2
+            });
+
+            ambientVideos.forEach((video) => {
+                ambientVideoObserver.observe(video);
+            });
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") {
+                ambientVideos.forEach((video) => {
+                    tryPlayVideo(video);
+                });
+            }
+        });
     }
 
     const megaNavItems = Array.from(document.querySelectorAll(".js-nav-mega"));
