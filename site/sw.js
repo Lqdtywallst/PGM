@@ -1,9 +1,9 @@
-// Service Worker for Dynasty Prestige
+﻿// Service Worker for Dynasty Prestige
 // Cache static assets for better performance
 
-// Subir versión al desplegar cambios visibles (CSS, logos, index): fuerza borrado de cachés antiguos.
+// Bump the cache version when visible assets change so old caches are discarded.
 const CACHE_NAME = 'pgm-v1.1.1';
-const STATIC_CACHE = 'pgm-static-v19';
+const STATIC_CACHE = 'pgm-static-v20';
 const DYNAMIC_CACHE = 'pgm-dynamic-v3';
 
 // Assets to cache during install
@@ -23,8 +23,6 @@ const STATIC_ASSETS = [
   '/icons/icon-16.png',
   '/config.js',
   '/manifest.json',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css',
-  'https://js.stripe.com/v3/'
 ];
 
 // Service Worker install
@@ -71,7 +69,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  /* CSS propio: siempre red primero (cache-first dejaba seo-landing.css viejo en landings) */
+  /* Own CSS stays network-first so refreshed landing styles do not stick in stale cache. */
   if (
     request.method === 'GET' &&
     url.origin === self.location.origin &&
@@ -146,6 +144,7 @@ self.addEventListener('message', (event) => {
     self.skipWaiting();
   }
 });
+
 
 
 
