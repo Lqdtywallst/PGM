@@ -53,8 +53,12 @@ function detectEnvironment() {
             return browserOverride;
         }
 
-        if (window.location && (window.location.protocol === 'file:' || isLocalHostname(window.location.hostname))) {
-            return 'development';
+        if (window.location) {
+            if (window.location.protocol === 'file:' || isLocalHostname(window.location.hostname)) {
+                return 'development';
+            }
+
+            return 'production';
         }
     }
 

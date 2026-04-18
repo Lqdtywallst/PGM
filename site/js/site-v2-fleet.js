@@ -21,8 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const resetButtons = Array.from(browser.querySelectorAll(".js-fleet-reset"));
     const dateInputs = Array.from(browser.querySelectorAll(".js-fleet-date"));
     const fieldInputs = Array.from(browser.querySelectorAll(".js-fleet-field-input"));
-    const sidebarScroll = browser.querySelector(".fleet-sidebar__scroll");
-    const sidebarModules = Array.from(browser.querySelectorAll(".fleet-sidebar__module"));
     if (!resultsList || !priceMinInput || !priceMaxInput) {
         return;
     }
@@ -121,52 +119,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (display) {
                 display.textContent = formatFieldValue(input);
             }
-        });
-    }
-
-    function isCompactSidebar() {
-        const isStackedLayout = window.matchMedia("(max-width: 1180px)").matches;
-        const isShortDesktopViewport = window.innerWidth > 1180 && window.innerHeight <= 860;
-        return isStackedLayout || isShortDesktopViewport;
-    }
-
-    function revealSidebarModule(module) {
-        if (!module || !module.open || !sidebarScroll || window.innerWidth <= 1180) {
-            return;
-        }
-
-        requestAnimationFrame(() => {
-            const scrollRect = sidebarScroll.getBoundingClientRect();
-            const moduleRect = module.getBoundingClientRect();
-            const topDelta = moduleRect.top - scrollRect.top;
-            const bottomDelta = moduleRect.bottom - scrollRect.bottom;
-
-            if (topDelta < 10) {
-                sidebarScroll.scrollBy({
-                    top: topDelta - 12,
-                    behavior: "smooth"
-                });
-                return;
-            }
-
-            if (bottomDelta > -10) {
-                sidebarScroll.scrollBy({
-                    top: bottomDelta + 12,
-                    behavior: "smooth"
-                });
-            }
-        });
-    }
-
-    function syncSidebarAccordion(activeModule) {
-        if (!sidebarModules.length || !isCompactSidebar()) {
-            return;
-        }
-
-        const target = activeModule && activeModule.open ? activeModule : sidebarModules.find((module) => module.open) || sidebarModules[0];
-
-        sidebarModules.forEach((module) => {
-            module.open = module === target;
         });
     }
 
@@ -312,19 +264,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    sidebarModules.forEach((module) => {
-        module.addEventListener("toggle", () => {
-            if (module.open) {
-                syncSidebarAccordion(module);
-                revealSidebarModule(module);
-            }
-        });
-    });
-
-    window.addEventListener("resize", () => {
-        syncSidebarAccordion();
-    });
-
     fieldInputs.forEach((input) => {
         const sync = () => {
             syncFieldDisplays();
@@ -336,6 +275,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
     syncDateDefaults();
     syncFieldDisplays();
-    syncSidebarAccordion();
     render();
 });

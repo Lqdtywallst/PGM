@@ -17,11 +17,13 @@
   </url>
   <url>
     <loc>https://prestigegoalmotion.com/locations.html</loc>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.86</priority>
   </url>
   <url>
     <loc>https://prestigegoalmotion.com/services.html</loc>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
@@ -62,31 +64,37 @@
   </url>
   <url>
     <loc>https://prestigegoalmotion.com/chauffeur-service-dubai.html</loc>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.82</priority>
   </url>
   <url>
     <loc>https://prestigegoalmotion.com/airport-concierge-dubai.html</loc>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.82</priority>
   </url>
   <url>
     <loc>https://prestigegoalmotion.com/hotel-villa-airport-delivery-dubai.html</loc>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://prestigegoalmotion.com/wedding-event-car-rental-dubai.html</loc>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.79</priority>
   </url>
   <url>
     <loc>https://prestigegoalmotion.com/business-car-rental-dubai.html</loc>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.79</priority>
   </url>
   <url>
     <loc>https://prestigegoalmotion.com/monthly-luxury-car-rental-dubai.html</loc>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -96,6 +104,16 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://prestigegoalmotion.com/lamborghini-huracan-evo-spyder-rental-dubai.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.77</priority>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/lamborghini-urus-rental-dubai.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.77</priority>
+  </url>
+  <url>
     <loc>https://prestigegoalmotion.com/lamborghini-rental-palm-jumeirah.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.73</priority>
@@ -103,17 +121,33 @@
   <url>
     <loc>https://prestigegoalmotion.com/ferrari-rental-dubai.html</loc>
     <changefreq>weekly</changefreq>
+    <priority>0.79</priority>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/ferrari-296-gts-rental-dubai.html</loc>
+    <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://prestigegoalmotion.com/ferrari-rental-downtown-dubai.html</loc>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.73</priority>
   </url>
   <url>
-    <loc>https://prestigegoalmotion.com/g63-rental-dubai.html</loc>
+    <loc>https://prestigegoalmotion.com/mercedes-g63-amg-rental-dubai.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.78</priority>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/mercedes-rental-dubai.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.76</priority>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/g63-rental-dubai.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.76</priority>
   </url>
   <url>
     <loc>https://prestigegoalmotion.com/g63-rental-dubai-marina.html</loc>
@@ -126,14 +160,14 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://prestigegoalmotion.com/mercedes-rental-dubai.html</loc>
+    <loc>https://prestigegoalmotion.com/porsche-992-gt3-rental-dubai.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.77</priority>
   </url>
   <url>
     <loc>https://prestigegoalmotion.com/porsche-rental-dubai.html</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.77</priority>
+    <priority>0.76</priority>
   </url>
   <url>
     <loc>https://prestigegoalmotion.com/rolls-royce-rental-dubai.html</loc>
@@ -141,7 +175,13 @@
     <priority>0.78</priority>
   </url>
   <url>
+    <loc>https://prestigegoalmotion.com/rolls-royce-cullinan-black-badge-rental-dubai.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.77</priority>
+  </url>
+  <url>
     <loc>https://prestigegoalmotion.com/supercar-rental-dubai.html</loc>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.82</priority>
   </url>

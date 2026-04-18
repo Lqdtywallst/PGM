@@ -1,35 +1,33 @@
-# Site V2
+# Public Site
 
-Base nueva para reconstruir la home de Dynasty Prestige sin seguir parcheando `site/`.
+`site/` is the production boundary for Dynasty Prestige.
 
-## Que hay aqui
+## Rules
 
-- `index.html`
-  Punto de arranque de la nueva home.
-- `css/site-v2.css`
-  Estilos base trasladados desde el hero validado.
-- `js/site-v2.js`
-  Intro por capas + overlay de fechas.
-- `images/`
-  Assets propios de esta V2.
-- `media/`
-  Video base del hero.
+- Keep only public pages, public assets, and deploy metadata under `site/`
+- Do not place previews, labs, templates, or archived experiments under `site/`
+- Keep canonical assets in one place only:
+  - brand marks in `site/images/brands/`
+  - icons in `site/icons/`
+  - shared CSS in `site/css/`
+  - shared JS in `site/js/`
+- Treat `site/app/reserve/page.html` as a public page, not as scratch space
+- Keep sitemap, robots, manifest, service worker, and root favicon aligned with production
 
-## Filosofia
+## What Lives Here
 
-- Empezar desde una base limpia
-- Aprobar bloques aislados antes de integrarlos
-- Reutilizar solo los assets y logica que de verdad merecen la pena
-- Evitar ensuciar la home antigua mientras se construye la nueva
+- HTML pages that are intended to be public
+- Shared CSS and JS used by those pages
+- Images, videos, icons, and other assets referenced by public URLs
+- Deploy metadata such as `robots.txt`, `sitemap.xml`, `manifest.json`, `sw.js`, and `_redirects`
 
-## Orden recomendado
+## What Does Not Live Here
 
-1. cerrar `header + hero + intro + overlay`
-2. construir `featured fleet`
-3. construir `trust / service layer`
-4. construir `locations teaser`
-5. decidir integracion con la reserva real
+- Component previews
+- Template sandboxes
+- Design labs
+- Temporary screenshots
+- Runtime logs
+- Output folders from audits or tests
 
-## Regla importante
-
-Mientras `site-v2` no este cerrada, la home antigua de `site/` no deberia recibir mas cambios visuales grandes.
+When a file is useful but not public, move it to `docs/previews/` or `docs/archive/` instead of keeping it under `site/`.

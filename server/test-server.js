@@ -1,13 +1,19 @@
 const fs = require('fs');
 const path = require('path');
-const http = require('http');
-const { URL } = require('url');
-const { spawn, spawnSync } = require('child_process');
+const { spawnSync } = require('child_process');
+const {
+    countMatches,
+    extractTagValue,
+    fetchUrl,
+    parseSitemapPaths,
+    siteFileForPath: resolveSiteFileForPath,
+    startStaticServer: launchStaticServer,
+    stopProcess
+} = require('./site-audit-utils');
 
 const projectRoot = path.resolve(__dirname, '..');
 const siteRoot = path.join(projectRoot, 'site');
-const legacyRoot = path.join(projectRoot, 'site-legacy');
-const staticServerPort = Number(process.env.TEST_STATIC_PORT || 8091);
+const staticServerPort = Number(process.env.TEST_STATIC_PORT || (8400 + Math.floor(Math.random() * 200)));
 const staticBaseUrl = `http://127.0.0.1:${staticServerPort}`;
 
 const requiredFiles = [
@@ -27,6 +33,12 @@ const requiredFiles = [
     'site/fleet.html',
     'site/locations.html',
     'site/services.html',
+    'site/chauffeur-service-dubai.html',
+    'site/airport-concierge-dubai.html',
+    'site/hotel-villa-airport-delivery-dubai.html',
+    'site/wedding-event-car-rental-dubai.html',
+    'site/business-car-rental-dubai.html',
+    'site/monthly-luxury-car-rental-dubai.html',
     'site/about.html',
     'site/contact.html',
     'site/luxury-car-rental-dubai.html',
@@ -51,8 +63,7 @@ const requiredFiles = [
     'site/css/hub-pages.css',
     'site/js/site-v2.js',
     'site/js/site-v2-fleet.js',
-    'site/js/contact-form.js',
-    'site-legacy/index.html'
+    'site/js/contact-form.js'
 ];
 
 const syntaxFiles = [
@@ -79,6 +90,43 @@ const keyMarketingPaths = [
     '/lamborghini-rental-dubai.html'
 ];
 
+const officialServiceClusterPaths = [
+    '/services.html',
+    '/chauffeur-service-dubai.html',
+    '/airport-concierge-dubai.html',
+    '/hotel-villa-airport-delivery-dubai.html',
+    '/wedding-event-car-rental-dubai.html',
+    '/business-car-rental-dubai.html',
+    '/monthly-luxury-car-rental-dubai.html'
+];
+
+const serviceLocationGuidePaths = [
+    './luxury-car-rental-dubai.html',
+    './abu-dhabi-luxury-car-rental.html',
+    './dubai-airport-luxury-car-rental.html',
+    './palm-jumeirah-luxury-car-rental.html',
+    './dubai-marina-luxury-car-rental.html'
+];
+
+const pathsOutsideOfficialServicesCluster = [
+    '/luxury-car-rental-dubai.html',
+    '/supercar-rental-dubai.html',
+    '/lamborghini-rental-dubai.html',
+    '/ferrari-rental-dubai.html',
+    '/mercedes-rental-dubai.html',
+    '/porsche-rental-dubai.html',
+    '/rolls-royce-rental-dubai.html',
+    '/g63-rental-dubai.html',
+    '/abu-dhabi-luxury-car-rental.html',
+    '/dubai-airport-luxury-car-rental.html',
+    '/palm-jumeirah-luxury-car-rental.html',
+    '/dubai-marina-luxury-car-rental.html',
+    '/ferrari-rental-downtown-dubai.html',
+    '/downtown-dubai-supercar-rental.html',
+    '/g63-rental-dubai-marina.html',
+    '/lamborghini-rental-palm-jumeirah.html'
+];
+
 function report(ok, message) {
     const prefix = ok ? '[PASS]' : '[FAIL]';
     console.log(`${prefix} ${message}`);
@@ -95,57 +143,22 @@ function readFile(relativePath) {
     return fs.readFileSync(path.join(projectRoot, relativePath), 'utf8');
 }
 
-function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function fetchUrl(url) {
-    return new Promise((resolve, reject) => {
-        const req = http.get(url, (res) => {
-            let body = '';
-            res.setEncoding('utf8');
-            res.on('data', (chunk) => {
-                body += chunk;
-            });
-            res.on('end', () => {
-                resolve({
-                    statusCode: res.statusCode || 0,
-                    headers: res.headers,
-                    body
-                });
-            });
-        });
-
-        req.on('error', reject);
-        req.setTimeout(5000, () => {
-            req.destroy(new Error(`Timeout requesting ${url}`));
-        });
-    });
-}
-
-function parseSitemapPaths(xml) {
-    return [...xml.matchAll(/<loc>([^<]+)<\/loc>/gi)].map((match) => {
-        const parsed = new URL(match[1].trim());
-        return parsed.pathname || '/';
-    });
-}
-
 function siteFileForPath(urlPath) {
-    const pathname = String(urlPath).split(/[?#]/)[0] || '/';
-    if (pathname === '/') {
-        return path.join(siteRoot, 'index.html');
-    }
-
-    return path.join(siteRoot, pathname.replace(/^\//, ''));
+    return resolveSiteFileForPath(siteRoot, urlPath);
 }
 
-function extractTagValue(html, pattern) {
-    const match = html.match(pattern);
-    return match ? match[1].trim() : '';
+function escapeRegExp(value) {
+    return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function countMatches(html, pattern) {
-    return (html.match(pattern) || []).length;
+function hasMetaTagContent(html, attributeName, attributeValue) {
+    const escapedAttribute = escapeRegExp(attributeValue);
+    const patterns = [
+        new RegExp(`<meta[^>]+${attributeName}=["']${escapedAttribute}["'][^>]+content=["'][^"']+["'][^>]*>`, 'i'),
+        new RegExp(`<meta[^>]+content=["'][^"']+["'][^>]+${attributeName}=["']${escapedAttribute}["'][^>]*>`, 'i')
+    ];
+
+    return patterns.some((pattern) => pattern.test(html));
 }
 
 function createStaticMarkupAssertions(pathname, html) {
@@ -164,6 +177,49 @@ function createStaticMarkupAssertions(pathname, html) {
     assert(
         canonical.startsWith('https://prestigegoalmotion.com'),
         `${pathname} has a canonical URL on prestigegoalmotion.com`
+    );
+}
+
+function createServiceClusterAssertions(pathname, html) {
+    const canonical = extractTagValue(
+        html,
+        /<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["'][^>]*>/i
+    );
+
+    createStaticMarkupAssertions(pathname, html);
+
+    assert(hasMetaTagContent(html, 'property', 'og:title'), `${pathname} exposes og:title`);
+    assert(hasMetaTagContent(html, 'property', 'og:description'), `${pathname} exposes og:description`);
+    assert(hasMetaTagContent(html, 'property', 'og:image'), `${pathname} exposes og:image`);
+    assert(hasMetaTagContent(html, 'name', 'twitter:card'), `${pathname} exposes twitter:card`);
+    assert(hasMetaTagContent(html, 'name', 'twitter:title'), `${pathname} exposes twitter:title`);
+    assert(hasMetaTagContent(html, 'name', 'twitter:description'), `${pathname} exposes twitter:description`);
+    assert(hasMetaTagContent(html, 'name', 'twitter:image'), `${pathname} exposes twitter:image`);
+    assert(/aria-label=["']Breadcrumb["']/i.test(html), `${pathname} exposes visible breadcrumbs`);
+    assert(/"@type"\s*:\s*"BreadcrumbList"/.test(html), `${pathname} includes BreadcrumbList JSON-LD`);
+    assert(
+        /data-analytics-event=["']service_whatsapp_click["']/i.test(html),
+        `${pathname} exposes a tracked WhatsApp CTA`
+    );
+    assert(
+        /data-analytics-event=["']service_reservation_click["']/i.test(html),
+        `${pathname} exposes a tracked reservation CTA`
+    );
+
+    if (pathname === '/services.html') {
+        return;
+    }
+
+    assert(/"@type"\s*:\s*"Service"/.test(html), `${pathname} includes Service JSON-LD`);
+    assert(
+        new RegExp(`"url"\\s*:\\s*"${escapeRegExp(canonical)}"`).test(html),
+        `${pathname} aligns Service JSON-LD with the canonical URL`
+    );
+    assert(html.includes('href="./app/reserve/page.html"'), `${pathname} links to the reservation flow`);
+    assert(html.includes('href="./services.html"'), `${pathname} links back to the services hub`);
+    assert(
+        serviceLocationGuidePaths.some((link) => html.includes(`href="${link}"`) || html.includes(`href='${link}'`)),
+        `${pathname} links to at least one relevant location guide`
     );
 }
 
@@ -243,51 +299,36 @@ function collectLocalReferences(html) {
 }
 
 async function startStaticServer() {
-    const child = spawn(process.execPath, [path.join(projectRoot, 'server/server-http.js')], {
-        cwd: projectRoot,
-        env: {
-            ...process.env,
-            PORT: String(staticServerPort)
-        },
-        stdio: ['ignore', 'pipe', 'pipe']
+    return launchStaticServer({
+        projectRoot,
+        port: staticServerPort,
+        baseUrl: staticBaseUrl,
+        label: 'Static server'
     });
-
-    let logs = '';
-    child.stdout.on('data', (chunk) => {
-        logs += chunk.toString();
-    });
-    child.stderr.on('data', (chunk) => {
-        logs += chunk.toString();
-    });
-
-    for (let attempt = 0; attempt < 20; attempt += 1) {
-        if (child.exitCode !== null) {
-            throw new Error(`Static server exited early.\n${logs}`);
-        }
-
-        try {
-            const response = await fetchUrl(`${staticBaseUrl}/`);
-            if (response.statusCode === 200) {
-                return { child, logs: () => logs };
-            }
-        } catch (error) {
-            await sleep(250);
-        }
-    }
-
-    stopProcess(child);
-    throw new Error(`Static server did not start in time.\n${logs}`);
 }
 
-function stopProcess(child) {
-    if (!child || child.exitCode !== null) {
-        return;
-    }
+function loadConfigModuleForWindow(windowValue) {
+    const configPath = path.join(projectRoot, 'site/config.js');
+    const previousWindow = global.window;
+    const hadWindow = Object.prototype.hasOwnProperty.call(global, 'window');
 
-    if (process.platform === 'win32') {
-        spawnSync('taskkill', ['/pid', String(child.pid), '/t', '/f'], { stdio: 'ignore' });
-    } else {
-        child.kill('SIGTERM');
+    try {
+        if (typeof windowValue === 'undefined') {
+            delete global.window;
+        } else {
+            global.window = windowValue;
+        }
+
+        delete require.cache[require.resolve(configPath)];
+        return require(configPath);
+    } finally {
+        delete require.cache[require.resolve(configPath)];
+
+        if (hadWindow) {
+            global.window = previousWindow;
+        } else {
+            delete global.window;
+        }
     }
 }
 
@@ -299,7 +340,6 @@ async function run() {
         assert(fs.existsSync(fullPath), `${relativePath} exists`);
     });
 
-    assert(fs.existsSync(legacyRoot), 'site-legacy exists as the archived previous production site');
     assert(!fs.existsSync(path.join(projectRoot, 'site-v2')), 'site-v2 folder has been promoted and no longer exists');
 
     syntaxFiles.forEach((relativePath) => {
@@ -321,7 +361,7 @@ async function run() {
         vercelConfig.rewrites.some((rule) => String(rule.destination || '').startsWith('/site/'));
     assert(hasSiteRewrite, 'vercel.json rewrites public requests into /site');
 
-    const configModule = require(path.join(projectRoot, 'site/config.js'));
+    const configModule = loadConfigModuleForWindow();
     assert(
         configModule.STRIPE_CONFIG && configModule.STRIPE_CONFIG.isDevelopment === true,
         'config.js defaults to development in local Node runtime'
@@ -329,6 +369,21 @@ async function run() {
     assert(
         configModule.DEV_CONFIG_DUBAI.backendUrl === 'http://localhost:3000',
         'development backend points to localhost:3000'
+    );
+
+    const remoteBrowserConfig = loadConfigModuleForWindow({
+        location: {
+            protocol: 'https:',
+            hostname: 'prestigegoalmotion.com'
+        }
+    });
+    assert(
+        remoteBrowserConfig.STRIPE_CONFIG && remoteBrowserConfig.STRIPE_CONFIG.isDevelopment === false,
+        'config.js switches to production on a remote browser hostname'
+    );
+    assert(
+        remoteBrowserConfig.STRIPE_CONFIG.backendUrl === remoteBrowserConfig.PROD_CONFIG_DUBAI.backendUrl,
+        'remote browser runtime points to the production backend'
     );
 
     const reserveRoute = readFile('app/api/reserve/route.js');
@@ -394,8 +449,11 @@ async function run() {
     assert(
         indexPage.includes('./luxury-car-rental-dubai.html') &&
         indexPage.includes('./locations.html') &&
+        indexPage.includes('./palm-jumeirah-luxury-car-rental.html') &&
+        indexPage.includes('./dubai-marina-luxury-car-rental.html') &&
+        indexPage.includes('./dubai-airport-luxury-car-rental.html') &&
         indexPage.includes('./monthly-luxury-car-rental-dubai.html'),
-        'home page links into the local SEO and service-guide layer'
+        'home page links into the locations hub, priority guides and service-guide layer'
     );
 
     const fleetPage = readFile('site/fleet.html');
@@ -405,6 +463,13 @@ async function run() {
         fleetPage.includes('./palm-jumeirah-luxury-car-rental.html') &&
         fleetPage.includes('./dubai-marina-luxury-car-rental.html'),
         'fleet page links into the core local SEO guide pages'
+    );
+    assert(
+        fleetPage.includes('./chauffeur-service-dubai.html') &&
+        fleetPage.includes('./airport-concierge-dubai.html') &&
+        fleetPage.includes('./hotel-villa-airport-delivery-dubai.html') &&
+        fleetPage.includes('./monthly-luxury-car-rental-dubai.html'),
+        'fleet page links contextually into the core service detail pages'
     );
 
     const locationsPage = readFile('site/locations.html');
@@ -420,6 +485,46 @@ async function run() {
         locationsPage.includes('./app/reserve/page.html'),
         'locations page links into the reservation flow'
     );
+    assert(
+        locationsPage.includes('./airport-concierge-dubai.html') &&
+        locationsPage.includes('./hotel-villa-airport-delivery-dubai.html') &&
+        locationsPage.includes('./chauffeur-service-dubai.html') &&
+        locationsPage.includes('./business-car-rental-dubai.html'),
+        'locations page links contextually into the service detail pages'
+    );
+    assert(
+        locationsPage.includes('./fleet.html') &&
+        locationsPage.includes('./contact.html') &&
+        locationsPage.includes('Palm Jumeirah, Dubai UAE') &&
+        locationsPage.includes('Service-area model') &&
+        locationsPage.includes('locations-faq-list') &&
+        locationsPage.includes('FAQPage'),
+        'locations page exposes the operating model, navigation paths and visible FAQ content'
+    );
+    assert(
+        /data-analytics-event=["']location_whatsapp_click["']/i.test(locationsPage) &&
+        /data-analytics-event=["']location_reservation_click["']/i.test(locationsPage) &&
+        /data-analytics-event=["']location_call_click["']/i.test(locationsPage) &&
+        locationsPage.includes('data-analytics-location="locations_hub"'),
+        'locations hub exposes tracked WhatsApp, reservation and call CTAs'
+    );
+
+    [
+        ['site/luxury-car-rental-dubai.html', 'dubai_guide'],
+        ['site/abu-dhabi-luxury-car-rental.html', 'abu_dhabi_guide'],
+        ['site/dubai-airport-luxury-car-rental.html', 'dubai_airport_guide'],
+        ['site/palm-jumeirah-luxury-car-rental.html', 'palm_jumeirah_guide'],
+        ['site/dubai-marina-luxury-car-rental.html', 'dubai_marina_guide']
+    ].forEach(([pathname, locationKey]) => {
+        const html = readFile(pathname);
+        assert(
+            /data-analytics-event=["']location_reservation_click["']/i.test(html) &&
+            /data-analytics-event=["']location_whatsapp_click["']/i.test(html) &&
+            /data-analytics-event=["']location_call_click["']/i.test(html) &&
+            html.includes(`data-analytics-location="${locationKey}"`),
+            `${pathname} exposes tracked local reservation, WhatsApp and call CTAs`
+        );
+    });
 
     const servicesPage = readFile('site/services.html');
     assert(
@@ -434,6 +539,17 @@ async function run() {
         servicesPage.includes('./fleet.html') &&
         servicesPage.includes('./app/reserve/page.html'),
         'services page links to locations, fleet and reservation'
+    );
+
+    const siteV2Script = readFile('site/js/site-v2.js');
+    assert(
+        siteV2Script.includes('a[data-analytics-event]') &&
+        siteV2Script.includes('emitAnalyticsEvent') &&
+        siteV2Script.includes('dynastyReservationAttribution') &&
+        siteV2Script.includes('analyticsCluster') &&
+        siteV2Script.includes('location_name') &&
+        siteV2Script.includes('eventName.endsWith("_reservation_click")'),
+        'site-v2.js exposes the shared services and locations CTA analytics bridge'
     );
 
     const aboutPage = readFile('site/about.html');
@@ -458,7 +574,7 @@ async function run() {
         const relativePath = path.relative(projectRoot, absolutePath).replace(/\\/g, '/');
         const html = fs.readFileSync(absolutePath, 'utf8');
 
-        assert(!html.includes('../site/'), `${relativePath} no longer references ../site legacy paths`);
+        assert(!html.includes('../site/'), `${relativePath} no longer references ../site path patterns`);
 
         collectLocalReferences(html).forEach((reference) => {
             const resolvedReference = resolveLocalReference(absolutePath, reference);
@@ -514,6 +630,24 @@ async function run() {
         assert(fs.existsSync(siteFileForPath(pathname)), `${pathname} from sitemap exists in /site`);
     });
 
+    const officialServiceClusterSet = new Set(officialServiceClusterPaths);
+    assert(
+        officialServiceClusterSet.size === officialServiceClusterPaths.length &&
+            officialServiceClusterPaths.length === 7,
+        'services cluster keeps a single official scope made of the hub plus six detail pages'
+    );
+    pathsOutsideOfficialServicesCluster.forEach((pathname) => {
+        assert(
+            !officialServiceClusterSet.has(pathname),
+            `${pathname} stays outside the official services cluster`
+        );
+        const html = readFile(`site${pathname}`);
+        assert(
+            !/data-analytics-event=["']service_(?:whatsapp|reservation)_click["']/i.test(html),
+            `${pathname} does not emit services-cluster CTA analytics`
+        );
+    });
+
     const { child, logs } = await startStaticServer();
 
     try {
@@ -526,6 +660,12 @@ async function run() {
         for (const pathname of keyMarketingPaths) {
             const response = await fetchUrl(`${staticBaseUrl}${pathname}`);
             createStaticMarkupAssertions(pathname, response.body);
+            assert(countMatches(response.body, /<h1\b/gi) === 1, `${pathname} exposes a single <h1>`);
+        }
+
+        for (const pathname of officialServiceClusterPaths) {
+            const response = await fetchUrl(`${staticBaseUrl}${pathname}`);
+            createServiceClusterAssertions(pathname, response.body);
             assert(countMatches(response.body, /<h1\b/gi) === 1, `${pathname} exposes a single <h1>`);
         }
 

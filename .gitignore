@@ -18,6 +18,12 @@ npm-debug.log*
 *.tmp
 *.temp
 
+# Artefactos locales de auditoria y pruebas
+output/
+temp/
+test-results/
+playwright-report/
+
 # Variables de entorno (NO subir al repositorio)
 .env
 .env.local
@@ -28,6 +34,9 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Datos runtime locales
+output/runtime-reservations/
 
 
 

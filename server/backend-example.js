@@ -18,8 +18,8 @@ const stripeConfigured = Boolean(
 
 // Verify Stripe configuration
 if (!stripeConfigured) {
-    console.error('\n❌ ERROR: STRIPE_SECRET_KEY is not configured');
-    console.error('   Configure your secret key in Railway → Variables');
+    console.error('\n[ERROR] STRIPE_SECRET_KEY is not configured');
+    console.error('   Configure your secret key in Railway > Variables');
     console.error('   Get your key at: https://dashboard.stripe.com/apikeys\n');
     console.warn('[BACKEND] Stripe-dependent routes will return 503 until configured.');
 }
@@ -38,9 +38,9 @@ const app = express();
 let reserveRoutes;
 try {
     reserveRoutes = require('../app/api/reserve/route');
-    console.log('✅ Reservation routes loaded');
+    console.log('[OK] Reservation routes loaded');
 } catch (error) {
-    console.error('⚠️ Error loading routes:', error.message);
+    console.error('[WARN] Error loading routes:', error.message);
     reserveRoutes = express.Router();
 }
 
@@ -51,9 +51,9 @@ const emailTransporter = createEmailTransporter();
 if (isEmailConfigured()) {
     emailTransporter.verify((error) => {
         if (error) {
-            console.warn('⚠️ Email no configurado correctamente');
+            console.warn('[WARN] Email no configurado correctamente');
         } else {
-            console.log('✅ Email configurado:', EMAIL_CONFIG.user);
+            console.log('[OK] Email configurado:', EMAIL_CONFIG.user);
         }
     });
 }
@@ -109,7 +109,7 @@ async function handleStripeWebhook(req, res) {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
     if (!webhookSecret) {
-        console.warn('âš ï¸ STRIPE_WEBHOOK_SECRET no configurado');
+        console.warn('[WARN] STRIPE_WEBHOOK_SECRET no configurado');
         return res.status(500).send('Webhook secret no configurado');
     }
 
@@ -124,7 +124,7 @@ async function handleStripeWebhook(req, res) {
     switch (event.type) {
         case 'payment_intent.succeeded': {
             const paymentIntent = event.data.object;
-            console.log('âœ… Pago exitoso:', paymentIntent.id);
+            console.log('[OK] Pago exitoso:', paymentIntent.id);
             console.log('   Cliente:', maskEmail(paymentIntent.metadata.customerEmail));
             console.log('   Vehicle:', paymentIntent.metadata.car);
             console.log('   Monto:', paymentIntent.amount / 100, paymentIntent.currency.toUpperCase());
@@ -132,18 +132,18 @@ async function handleStripeWebhook(req, res) {
         }
         case 'payment_intent.payment_failed': {
             const failedPayment = event.data.object;
-            console.log('âŒ Pago fallido:', failedPayment.id);
+            console.log('[ERROR] Pago fallido:', failedPayment.id);
             console.log('   Reason:', failedPayment.last_payment_error?.message || 'Unknown');
             break;
         }
         case 'payment_intent.canceled':
-            console.log('ðŸš« Pago cancelado:', event.data.object.id);
+            console.log('[INFO] Pago cancelado:', event.data.object.id);
             break;
         case 'payment_intent.requires_action':
-            console.log('âš ï¸ Payment requires action:', event.data.object.id);
+            console.log('[WARN] Payment requires action:', event.data.object.id);
             break;
         default:
-            console.log(`â„¹ï¸ Evento no manejado: ${event.type}`);
+            console.log(`[INFO] Evento no manejado: ${event.type}`);
     }
 
     return res.json({ received: true });
@@ -378,7 +378,7 @@ async function sendContactEmail(contactData) {
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>📧 New Contact Message</h1>
+                    <h1>New Contact Message</h1>
                 </div>
                 <div class="content">
                     <h2>Contact Information</h2>
@@ -406,14 +406,14 @@ async function sendContactEmail(contactData) {
             from: `"Dynasty Prestige Web" <${EMAIL_CONFIG.from}>`,
             to: companyEmail,
             replyTo: contactData.email,
-            subject: `📧 ${subjectLabel} - ${contactData.name}`,
+            subject: `[Dynasty Prestige] ${subjectLabel} - ${contactData.name}`,
             html: emailHtml,
         });
         
-        console.log('✅ Contact email sent:', info.messageId);
+        console.log('[OK] Contact email sent:', info.messageId);
         return { loggedOnly: false };
     } catch (error) {
-        console.error('❌ Error sending email:', error.message);
+        console.error('[ERROR] Error sending email:', error.message);
         throw error;
     }
 }
@@ -464,59 +464,12 @@ app.post('/api/contact', async (req, res) => {
     }
 });
 
-// Legacy webhook handler kept disabled after moving the real route above the JSON parser.
-app.post('/api/webhook-legacy-disabled', express.raw({ type: 'application/json' }), async (req, res) => {
-    const sig = req.headers['stripe-signature'];
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-    if (!webhookSecret) {
-        console.warn('⚠️ STRIPE_WEBHOOK_SECRET no configurado');
-        return res.status(500).send('Webhook secret no configurado');
-    }
-
-    let event;
-    try {
-        event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
-    } catch (err) {
-        console.error('Error de webhook:', err.message);
-        return res.status(400).send(`Webhook Error: ${err.message}`);
-    }
-
-    switch (event.type) {
-        case 'payment_intent.succeeded':
-            const paymentIntent = event.data.object;
-            console.log('✅ Pago exitoso:', paymentIntent.id);
-            console.log('   Cliente:', paymentIntent.metadata.customerEmail);
-            console.log('   Vehicle:', paymentIntent.metadata.car);
-            console.log('   Monto:', paymentIntent.amount / 100, paymentIntent.currency.toUpperCase());
-            break;
-
-        case 'payment_intent.payment_failed':
-            const failedPayment = event.data.object;
-            console.log('❌ Pago fallido:', failedPayment.id);
-            console.log('   Reason:', failedPayment.last_payment_error?.message || 'Unknown');
-            break;
-
-        case 'payment_intent.canceled':
-            console.log('🚫 Pago cancelado:', event.data.object.id);
-            break;
-
-        case 'payment_intent.requires_action':
-            console.log('⚠️ Payment requires action:', event.data.object.id);
-            break;
-
-        default:
-            console.log(`ℹ️ Evento no manejado: ${event.type}`);
-    }
-
-    res.json({ received: true });
-});
 
 // Endpoints informativos
 app.get('/', (req, res) => {
     res.json({
         status: 'ok',
-        message: '🚗 Dynasty Prestige - API Server',
+        message: 'Dynasty Prestige - API Server',
         version: '1.0.0',
         endpoints: {
             health: '/health',
@@ -554,36 +507,36 @@ const PORT = process.env.PORT || 3000;
 
 const server = app.listen(PORT, '0.0.0.0', () => {
     console.log('\n' + '='.repeat(60));
-    console.log('🚀 SERVIDOR DYNASTY PRESTIGE');
+    console.log('DYNASTY PRESTIGE SERVER');
     console.log('='.repeat(60));
-    console.log(`✅ Server running on port ${PORT}`);
-    console.log(`🔧 Modo: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🌐 URL: http://0.0.0.0:${PORT}`);
+    console.log(`[OK] Server running on port ${PORT}`);
+    console.log(`[INFO] Mode: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`[INFO] URL: http://0.0.0.0:${PORT}`);
     console.log('='.repeat(60));
-    console.log('✅ Server ready to receive requests');
-    console.log(`✅ PID: ${process.pid}`);
-    console.log(`✅ Node.js version: ${process.version}`);
+    console.log('[OK] Server ready to receive requests');
+    console.log(`[INFO] PID: ${process.pid}`);
+    console.log(`[INFO] Node.js version: ${process.version}`);
     console.log('='.repeat(60) + '\n');
 });
 
 server.on('error', (err) => {
-    console.error('❌ Server error:', err);
+    console.error('[ERROR] Server error:', err);
     process.exit(1);
 });
 
 // Signal handling
 process.on('SIGTERM', () => {
-    console.log('⚠️ SIGTERM received, shutting down server...');
+    console.log('[WARN] SIGTERM received, shutting down server...');
     process.exit(0);
 });
 
 process.on('SIGINT', () => {
-    console.log('⚠️ SIGINT received, shutting down server...');
+    console.log('[WARN] SIGINT received, shutting down server...');
     process.exit(0);
 });
 process.on('uncaughtException', (err) => {
-    console.error('❌ Uncaught error:', err);
+    console.error('[ERROR] Uncaught error:', err);
 });
 process.on('unhandledRejection', (reason) => {
-    console.error('❌ Unhandled promise rejection:', reason);
+    console.error('[ERROR] Unhandled promise rejection:', reason);
 });

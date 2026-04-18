@@ -1,0 +1,184 @@
+# Inventario relacional 2026-04-18
+
+- Archivos escaneados: 368
+- Archivos fisicos actuales: 241
+- Archivos trackeados ya borrados en el worktree: 127
+
+## Conteo por estado
+
+- candidato a borrar: 39
+- legacy: 108
+- preview: 4
+- produccion: 110
+- soporte: 107
+
+## Conteo por accion recomendada
+
+- se elimina: 127
+- se mueve/archiva: 24
+- se queda: 217
+
+## Archivos con impacto SEO alto
+
+- site/about.html
+- site/abu-dhabi-luxury-car-rental.html
+- site/airport-concierge-dubai.html
+- site/app/reserve/page.html
+- site/business-car-rental-dubai.html
+- site/chauffeur-service-dubai.html
+- site/contact.html
+- site/downtown-dubai-supercar-rental.html
+- site/dubai-airport-luxury-car-rental.html
+- site/dubai-marina-luxury-car-rental.html
+- site/ferrari-296-gts-rental-dubai.html
+- site/ferrari-rental-downtown-dubai.html
+- site/fleet.html
+- site/g63-rental-dubai-marina.html
+- site/hotel-villa-airport-delivery-dubai.html
+- site/index.html
+- site/lamborghini-rental-dubai.html
+- site/lamborghini-rental-palm-jumeirah.html
+- site/locations.html
+- site/luxury-car-rental-dubai.html
+- site/mercedes-g63-amg-rental-dubai.html
+- site/monthly-luxury-car-rental-dubai.html
+- site/palm-jumeirah-luxury-car-rental.html
+- site/porsche-992-gt3-rental-dubai.html
+- site/robots.txt
+- site/rolls-royce-rental-dubai.html
+- site/services.html
+- site/sitemap.xml
+- site/supercar-rental-dubai.html
+- site/terms-and-conditions-uae.html
+- site/terms-and-conditions.html
+- site/wedding-event-car-rental-dubai.html
+
+## Candidatos directos a eliminar
+
+- site-legacy/_redirects
+- site-legacy/.htaccess
+- site-legacy/about.html
+- site-legacy/app/reserve/page.html
+- site-legacy/brands/ferrari-clean.png
+- site-legacy/brands/lamborghini-clean.png
+- site-legacy/brands/mercedes-clean.png
+- site-legacy/brands/porsche-clean.png
+- site-legacy/brands/rolls-royce-badge-transparent.png
+- site-legacy/config.js
+- site-legacy/contact.html
+- site-legacy/css/dp-bridge.css
+- site-legacy/css/hero-lab.css
+- site-legacy/css/home.css
+- site-legacy/css/home/00-foundation.css
+- site-legacy/css/home/10-header-hero.css
+- site-legacy/css/home/20-booking.css
+- site-legacy/css/home/30-sections.css
+- site-legacy/css/home/40-contact-footer.css
+- site-legacy/css/home/90-responsive.css
+- site-legacy/css/hub-pages.css
+- site-legacy/css/seo-landing.css
+- site-legacy/downtown-dubai-supercar-rental.html
+- site-legacy/dubai-marina-luxury-car-rental.html
+- site-legacy/favicon.ico
+- site-legacy/ferrari-rental-downtown-dubai.html
+- site-legacy/ferrari-rental-dubai.html
+- site-legacy/fleet.html
+- site-legacy/g63-rental-dubai-marina.html
+- site-legacy/g63-rental-dubai.html
+- site-legacy/hero-lab-layout.svg
+- site-legacy/hero-lab.html
+- site-legacy/icons/favicon.ico
+- site-legacy/icons/icon-128.png
+- site-legacy/icons/icon-16.png
+- site-legacy/icons/icon-180.png
+- site-legacy/icons/icon-192.png
+- site-legacy/icons/icon-256.png
+- site-legacy/icons/icon-32.png
+- site-legacy/icons/icon-384.png
+- site-legacy/icons/icon-48.png
+- site-legacy/icons/icon-512.png
+- site-legacy/icons/icon-64.png
+- site-legacy/icons/icon-96.png
+- site-legacy/images/dp-crest-cropped.png
+- site-legacy/images/dynasty-prestige-logo.png
+- site-legacy/images/fleet/lamborghini-huracan/01-exterior-front.png
+- site-legacy/images/fleet/lamborghini-huracan/02-center-console.png
+- site-legacy/images/fleet/lamborghini-huracan/03-exterior-rear.png
+- site-legacy/images/fleet/lamborghini-huracan/04-interior-cockpit.png
+- site-legacy/images/fleet/lamborghini-huracan/05-seat-detail.png
+- site-legacy/images/fleet/lamborghini-huracan/06-steering-wheel-detail.png
+- site-legacy/images/fleet/lamborghini-urus/01-exterior-front.png
+- site-legacy/images/fleet/lamborghini-urus/02-interior-cockpit.png
+- site-legacy/images/fleet/lamborghini-urus/03-interior-dashboard.png
+- site-legacy/images/fleet/lamborghini-urus/04-interior-front-seats.png
+- site-legacy/images/fleet/lamborghini-urus/05-interior-rear-seats.png
+- site-legacy/images/fleet/lamborghini-urus/06-exterior-rear.png
+- site-legacy/images/fleet/rolls-royce-cullinan-black-badge/01-exterior-rear.png
+- site-legacy/images/fleet/rolls-royce-cullinan-black-badge/02-exterior-front.png
+- site-legacy/images/fleet/rolls-royce-cullinan-black-badge/03-interior-front-seats.png
+- site-legacy/images/fleet/rolls-royce-cullinan-black-badge/04-interior-cockpit.png
+- site-legacy/images/fleet/rolls-royce-cullinan-black-badge/05-interior-rear-seats.png
+- site-legacy/images/fleet/rolls-royce-cullinan-black-badge/06-exterior-front-open-doors.png
+- site-legacy/index.html
+- site-legacy/js/contact-form.js
+- site-legacy/js/hero-lab.js
+- site-legacy/js/home-booking.js
+- site-legacy/js/home.js
+- site-legacy/lamborghini-rental-dubai.html
+- site-legacy/lamborghini-rental-palm-jumeirah.html
+- site-legacy/locations.html
+- site-legacy/logo-dp-transparent.png
+- site-legacy/luxury-car-rental-dubai.html
+- site-legacy/manifest.json
+- site-legacy/media/hero-dubai-sunset.mp4
+- site-legacy/media/hero-sports-road.mp4
+- site-legacy/mercedes-rental-dubai.html
+- site-legacy/palm-jumeirah-luxury-car-rental.html
+- site-legacy/porsche-rental-dubai.html
+- site-legacy/robots.txt
+- site-legacy/rolls-royce-rental-dubai.html
+- site-legacy/services.html
+- site-legacy/sitemap.xml
+- site-legacy/supercar-rental-dubai.html
+- site-legacy/sw.js
+- site-legacy/terms-and-conditions-uae.html
+- site-legacy/terms-and-conditions.html
+- site/brands/ferrari-clean.png
+- site/brands/lamborghini-clean.png
+- site/brands/mercedes-clean.png
+- site/brands/porsche-clean.png
+- site/brands/rolls-royce-badge-transparent.png
+- site/css/home.css
+- site/css/home/00-foundation.css
+- site/css/home/10-header-hero.css
+- site/css/home/20-booking.css
+- site/css/home/30-sections.css
+- site/css/home/40-contact-footer.css
+- site/css/home/90-responsive.css
+- site/icons/favicon.ico
+- site/icons/icon-48.png
+- site/icons/icon-96.png
+- site/js/home-booking.js
+- site/js/home.js
+- site/README.md
+- test-results/.last-run.json
+- test-results/public-site-Public-site-qu-02d2e-dubai-guide-renders-cleanly-desktop-chromium/dubai-guide.png
+- test-results/public-site-Public-site-qu-02d2e-dubai-guide-renders-cleanly-mobile-chromium/dubai-guide.png
+- test-results/public-site-Public-site-qu-418cc-vice-detail-renders-cleanly-desktop-chromium/service-detail.png
+- test-results/public-site-Public-site-qu-418cc-vice-detail-renders-cleanly-mobile-chromium/service-detail.png
+- test-results/public-site-Public-site-qu-4b8e4-te-services-renders-cleanly-desktop-chromium/services.png
+- test-results/public-site-Public-site-qu-4b8e4-te-services-renders-cleanly-mobile-chromium/services.png
+- test-results/public-site-Public-site-qu-4d2e7-seo-landing-renders-cleanly-desktop-chromium/seo-landing.png
+- test-results/public-site-Public-site-qu-4d2e7-seo-landing-renders-cleanly-mobile-chromium/seo-landing.png
+- test-results/public-site-Public-site-qu-5a0b3-e-locations-renders-cleanly-desktop-chromium/locations.png
+- test-results/public-site-Public-site-qu-5a0b3-e-locations-renders-cleanly-mobile-chromium/locations.png
+- test-results/public-site-Public-site-qu-b19d8-vehicle-pdp-renders-cleanly-desktop-chromium/vehicle-pdp.png
+- test-results/public-site-Public-site-qu-b19d8-vehicle-pdp-renders-cleanly-mobile-chromium/vehicle-pdp.png
+- test-results/public-site-Public-site-quality-gate-contact-renders-cleanly-desktop-chromium/contact.png
+- test-results/public-site-Public-site-quality-gate-contact-renders-cleanly-mobile-chromium/contact.png
+- test-results/public-site-Public-site-quality-gate-fleet-renders-cleanly-desktop-chromium/fleet.png
+- test-results/public-site-Public-site-quality-gate-fleet-renders-cleanly-mobile-chromium/fleet.png
+- test-results/public-site-Public-site-quality-gate-home-renders-cleanly-desktop-chromium/home.png
+- test-results/public-site-Public-site-quality-gate-home-renders-cleanly-mobile-chromium/home.png
+- test-results/public-site-Public-site-quality-gate-reserve-renders-cleanly-desktop-chromium/reserve.png
+- test-results/public-site-Public-site-quality-gate-reserve-renders-cleanly-mobile-chromium/reserve.png

@@ -246,6 +246,115 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    const analyticsLinks = Array.from(document.querySelectorAll("a[data-analytics-event]"));
+    const analyticsDebugEnabled = window.location.search.includes("analyticsDebug=1") ||
+        window.__ANALYTICS_DEBUG__ === true;
+
+    function normalizeAnalyticsValue(value) {
+        return String(value || "").trim();
+    }
+
+    function getLinkDestination(link) {
+        const rawHref = normalizeAnalyticsValue(link.getAttribute("href"));
+
+        if (!rawHref) {
+            return {
+                destinationPath: "",
+                destinationHost: ""
+            };
+        }
+
+        try {
+            const destination = new URL(rawHref, window.location.href);
+            return {
+                destinationPath: normalizeAnalyticsValue(destination.pathname),
+                destinationHost: normalizeAnalyticsValue(destination.host)
+            };
+        } catch (error) {
+            return {
+                destinationPath: rawHref,
+                destinationHost: ""
+            };
+        }
+    }
+
+    function emitAnalyticsEvent(eventName, payload) {
+        const safePayload = { ...payload };
+        const dataLayerPayload = { event: eventName, ...safePayload };
+
+        if (window.google_tag_manager) {
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push(dataLayerPayload);
+        } else if (typeof window.gtag === "function") {
+            window.gtag("event", eventName, safePayload);
+        } else {
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push(dataLayerPayload);
+        }
+
+        document.dispatchEvent(new CustomEvent("dynasty:analytics", {
+            detail: {
+                event: eventName,
+                payload: safePayload
+            }
+        }));
+
+        if (analyticsDebugEnabled && typeof console !== "undefined" && typeof console.info === "function") {
+            console.info("[dynasty-analytics]", eventName, safePayload);
+        }
+    }
+
+    function storeReservationAttribution(payload) {
+        try {
+            window.sessionStorage.setItem("dynastyReservationAttribution", JSON.stringify({
+                ...payload,
+                captured_at: new Date().toISOString()
+            }));
+        } catch (error) {
+            // Ignore sessionStorage failures in private browsing or restricted contexts.
+        }
+    }
+
+    if (analyticsLinks.length > 0) {
+        analyticsLinks.forEach((link) => {
+            link.addEventListener("click", () => {
+                const eventName = normalizeAnalyticsValue(link.dataset.analyticsEvent);
+                if (!eventName) {
+                    return;
+                }
+
+                const { destinationPath, destinationHost } = getLinkDestination(link);
+                const clusterName = normalizeAnalyticsValue(link.dataset.analyticsCluster) || "services";
+                const payload = {
+                    cluster_name: clusterName,
+                    service_name: normalizeAnalyticsValue(link.dataset.analyticsService),
+                    location_name: normalizeAnalyticsValue(link.dataset.analyticsLocation),
+                    cta_placement: normalizeAnalyticsValue(link.dataset.analyticsPlacement),
+                    cta_channel: normalizeAnalyticsValue(link.dataset.analyticsChannel),
+                    cta_label: normalizeAnalyticsValue(link.textContent),
+                    page_path: normalizeAnalyticsValue(window.location.pathname),
+                    page_title: normalizeAnalyticsValue(document.title),
+                    destination_path: destinationPath,
+                    destination_host: destinationHost
+                };
+
+                if (!payload.service_name) {
+                    delete payload.service_name;
+                }
+
+                if (!payload.location_name) {
+                    delete payload.location_name;
+                }
+
+                if (eventName.endsWith("_reservation_click")) {
+                    storeReservationAttribution(payload);
+                }
+
+                emitAnalyticsEvent(eventName, payload);
+            });
+        });
+    }
+
     if (!overlay || openButtons.length === 0) {
         return;
     }

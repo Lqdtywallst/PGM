@@ -403,7 +403,8 @@ select {
 }
 
 .lab-nav__panel--brands {
-    --lab-nav-panel-width: 32.4rem;
+    width: max-content;
+    max-width: calc(100vw - 4rem);
 }
 
 .lab-nav__panel--types {
@@ -458,9 +459,9 @@ select {
 }
 
 .lab-nav__panel-grid--brands {
-    grid-template-columns: repeat(3, minmax(8.25rem, max-content));
-    column-gap: 0.98rem;
-    row-gap: 0.68rem;
+    grid-template-columns: repeat(2, minmax(9.6rem, max-content));
+    column-gap: 0.95rem;
+    row-gap: 0.64rem;
 }
 
 .lab-nav__panel-grid--brands::before {
@@ -564,11 +565,12 @@ select {
 .lab-nav__card--brand {
     min-height: auto;
     padding: 0;
+    width: 100%;
     border: none;
     border-radius: 0;
     background: none;
     box-shadow: none;
-    gap: 0.5rem;
+    gap: 0.56rem;
     opacity: 0.94;
 }
 
@@ -583,9 +585,9 @@ select {
 }
 
 .lab-nav__card--brand .lab-nav__card-media--brand {
-    width: 1.8rem;
-    min-width: 1.8rem;
-    height: 1.42rem;
+    width: 2.04rem;
+    min-width: 2.04rem;
+    height: 1.48rem;
 }
 
 .lab-nav__card--brand .lab-nav__card-media--brand img {
@@ -600,7 +602,7 @@ select {
     font-family: var(--lab-font-sans);
     font-size: 0.9rem;
     font-weight: 600;
-    line-height: 1.02;
+    line-height: 1.05;
     letter-spacing: -0.01em;
 }
 
@@ -3780,6 +3782,21 @@ a.brand-marquee__item:focus-visible img {
         linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(11, 12, 16, 0.96) 100%);
     box-shadow: 0 22px 54px rgba(0, 0, 0, 0.2);
     overflow: hidden;
+    color: inherit;
+    text-decoration: none;
+    transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+}
+
+.location-card:hover,
+.location-card:focus-visible {
+    transform: translateY(-2px);
+    border-color: rgba(227, 246, 85, 0.22);
+    box-shadow: 0 24px 58px rgba(0, 0, 0, 0.24);
+}
+
+.location-card:focus-visible {
+    outline: 2px solid rgba(227, 246, 85, 0.56);
+    outline-offset: 3px;
 }
 
 .location-card::before {
@@ -4774,7 +4791,7 @@ a.brand-marquee__item:focus-visible img {
     }
 
     .lab-nav__panel--brands {
-        --lab-nav-panel-width: 31.2rem;
+        --lab-nav-panel-width: 29.4rem;
     }
 
     .lab-nav__card-copy strong {
