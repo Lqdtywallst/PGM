@@ -452,7 +452,11 @@ document.addEventListener("DOMContentLoaded", () => {
         toggle.setAttribute("aria-expanded", "false");
         toggle.setAttribute("aria-controls", "lab-mobile-drawer");
         toggle.setAttribute("aria-label", "Open navigation");
-        toggle.innerHTML = "<span></span><span></span><span></span>";
+        toggle.innerHTML = `
+            <span class="lab-mobile-toggle__line"></span>
+            <span class="lab-mobile-toggle__line"></span>
+            <span class="lab-mobile-toggle__line"></span>
+        `;
         headerInner.insertBefore(toggle, headerNav);
 
         const drawer = document.createElement("div");

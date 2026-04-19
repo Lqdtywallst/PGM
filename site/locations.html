@@ -24,8 +24,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./css/site-v2.css?v=20260410s">
-    <link rel="stylesheet" href="./css/site-v2-locations.css?v=20260418g">
-    <script src="./js/site-v2.js?v=20260406ae" defer></script>
+    <link rel="stylesheet" href="./css/site-v2-locations.css?v=20260419c">
+    <script src="./js/site-v2.js?v=20260419af" defer></script>
     <script type="application/ld+json">
     {"@context":"https://schema.org","@graph":[
       {"@type":"WebPage","name":"Dynasty Prestige Locations","url":"https://prestigegoalmotion.com/locations.html","description":"Luxury car rental coverage from a Palm Jumeirah coordination base across Dubai, Abu Dhabi, DXB, DWC, hotels, residences and premium districts.","inLanguage":"en-AE"},
@@ -133,19 +133,49 @@
     <main class="lab-main locations-page-main">
         <section class="locations-hero">
             <div class="lab-shell locations-hero__shell">
-                <div class="locations-hero__copy">
-                    <nav class="locations-breadcrumb" aria-label="Breadcrumb">
-                        <a href="./index.html">Home</a>
-                        <span aria-current="page">Locations</span>
-                    </nav>
-                    <span class="locations-kicker locations-kicker--dark">Map and guides</span>
-                    <h1>Luxury car rental locations across Dubai, Abu Dhabi, Palm and airport arrivals.</h1>
-                    <p class="locations-hero__lead">Start with the real Palm Jumeirah base, then choose the guide that matches the stay, city route or arrival point.</p>
+                <div class="locations-hero__summary">
+                    <div class="locations-hero__copy">
+                        <nav class="locations-breadcrumb" aria-label="Breadcrumb">
+                            <a href="./index.html">Home</a>
+                            <span aria-current="page">Locations</span>
+                        </nav>
+                        <span class="locations-kicker locations-kicker--dark">Map and guides</span>
+                        <h1>Luxury car rental locations across Dubai, Abu Dhabi, Palm and airport arrivals.</h1>
+                        <p class="locations-hero__lead">Start with the real Palm Jumeirah base, then choose the guide that matches the stay, city route or arrival point.</p>
 
-                    <div class="locations-hero__actions">
-                        <a href="./app/reserve/page.html" class="locations-button locations-button--primary" data-analytics-event="location_reservation_click" data-analytics-cluster="locations" data-analytics-location="locations_hub" data-analytics-placement="hero_map" data-analytics-channel="reservation">Start reservation</a>
-                        <a href="https://www.google.com/maps/search/?api=1&amp;query=Palm+Jumeirah+Dubai" class="locations-button locations-button--ghost" target="_blank" rel="noopener noreferrer">Open in Google Maps</a>
+                        <div class="locations-hero__actions">
+                            <a href="./app/reserve/page.html" class="locations-button locations-button--primary" data-analytics-event="location_reservation_click" data-analytics-cluster="locations" data-analytics-location="locations_hub" data-analytics-placement="hero_map" data-analytics-channel="reservation">Start reservation</a>
+                            <a href="https://www.google.com/maps/search/?api=1&amp;query=Palm+Jumeirah+Dubai" class="locations-button locations-button--ghost" target="_blank" rel="noopener noreferrer">Open in Google Maps</a>
+                        </div>
                     </div>
+
+                    <nav class="locations-hero__zone-list" aria-label="Priority location guides">
+                        <a class="locations-hero__zone" href="./luxury-car-rental-dubai.html">
+                            <span>Dubai</span>
+                            <strong>Citywide flagship</strong>
+                            <p>Downtown, Business Bay, Palm, Marina and JBR stays.</p>
+                        </a>
+                        <a class="locations-hero__zone" href="./abu-dhabi-luxury-car-rental.html">
+                            <span>Abu Dhabi</span>
+                            <strong>Capital and resort routes</strong>
+                            <p>Corniche, Yas, Saadiyat and longer intercity planning.</p>
+                        </a>
+                        <a class="locations-hero__zone" href="./dubai-airport-luxury-car-rental.html">
+                            <span>Dubai Airport</span>
+                            <strong>DXB and DWC arrivals</strong>
+                            <p>Flight timing, terminal access and onward hotel delivery.</p>
+                        </a>
+                        <a class="locations-hero__zone" href="./palm-jumeirah-luxury-car-rental.html">
+                            <span>Palm Jumeirah</span>
+                            <strong>Resorts and villas</strong>
+                            <p>Branded residences, beach hotels and calmer premium handovers.</p>
+                        </a>
+                        <a class="locations-hero__zone" href="./dubai-marina-luxury-car-rental.html">
+                            <span>Dubai Marina</span>
+                            <strong>Waterfront stays</strong>
+                            <p>Towers, hotels, JBR and faster city-waterfront movement.</p>
+                        </a>
+                    </nav>
                 </div>
 
                 <div class="locations-map-card">
@@ -164,7 +194,7 @@
                         </div>
                     </div>
 
-                    <div class="locations-map-card__foot" aria-label="Coverage essentials">
+                    <section class="locations-map-card__foot" aria-label="Coverage essentials">
                         <div>
                             <span>Base</span>
                             <strong>Palm Jumeirah, Dubai UAE</strong>
@@ -177,35 +207,7 @@
                             <span>Service-area model</span>
                             <strong>One real base. District guides explain delivery logic, not separate offices.</strong>
                         </div>
-                    </div>
-                </div>
-
-                <div class="locations-hero__zone-list" aria-label="Priority location guides">
-                    <a class="locations-hero__zone" href="./luxury-car-rental-dubai.html">
-                        <span>Dubai</span>
-                        <strong>Citywide flagship</strong>
-                        <p>Downtown, Business Bay, Palm, Marina and JBR stays.</p>
-                    </a>
-                    <a class="locations-hero__zone" href="./abu-dhabi-luxury-car-rental.html">
-                        <span>Abu Dhabi</span>
-                        <strong>Capital and resort routes</strong>
-                        <p>Corniche, Yas, Saadiyat and longer intercity planning.</p>
-                    </a>
-                    <a class="locations-hero__zone" href="./dubai-airport-luxury-car-rental.html">
-                        <span>Dubai Airport</span>
-                        <strong>DXB and DWC arrivals</strong>
-                        <p>Flight timing, terminal access and onward hotel delivery.</p>
-                    </a>
-                    <a class="locations-hero__zone" href="./palm-jumeirah-luxury-car-rental.html">
-                        <span>Palm Jumeirah</span>
-                        <strong>Resorts and villas</strong>
-                        <p>Branded residences, beach hotels and calmer premium handovers.</p>
-                    </a>
-                    <a class="locations-hero__zone" href="./dubai-marina-luxury-car-rental.html">
-                        <span>Dubai Marina</span>
-                        <strong>Waterfront stays</strong>
-                        <p>Towers, hotels, JBR and faster city-waterfront movement.</p>
-                    </a>
+                    </section>
                 </div>
             </div>
         </section>
@@ -422,7 +424,7 @@
 
                     <div class="site-v2-footer__column">
                         <h3>Contact us</h3>
-                        <a href="tel:+971586122568" data-analytics-event="location_call_click" data-analytics-cluster="locations" data-analytics-location="locations_hub" data-analytics-placement="footer_contact" data-analytics-channel="call">+971 58 612 2568</a>
+                        <a href="tel:+971586122568" data-analytics-event="location_call_click" data-analytics-cluster="locations" data-analytics-location="locations_hub" data-analytics-placement="footer_contact" data-analytics-channel="call">+971&nbsp;58&nbsp;612&nbsp;2568</a>
                         <a href="https://wa.me/971586122568" target="_blank" rel="noopener">WhatsApp the team</a>
                         <a href="mailto:prestigegoalmotion@gmail.com">prestigegoalmotion@gmail.com</a>
                         <p>Palm Jumeirah, Dubai UAE with hotel, villa and airport coordination across the city.</p>

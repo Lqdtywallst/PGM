@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -32,7 +32,7 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./css/site-v2.css?v=20260410s">
     <link rel="stylesheet" href="./css/site-v2-about.css?v=20260406b">
     <script src="./js/site-v2.js?v=20260406ae" defer></script>
@@ -197,226 +197,223 @@
 
     <main class="lab-main about-page-main">
         <section class="about-hero">
+            <div class="about-hero__image" aria-hidden="true"></div>
+            <div class="about-hero__shade" aria-hidden="true"></div>
+
             <div class="lab-shell about-hero__shell">
-                <div class="about-hero__panel">
-                    <div class="about-hero__mark" aria-hidden="true">
-                        <img src="./logo-dp-transparent.png" alt="">
-                    </div>
+                <nav class="about-breadcrumb" aria-label="Breadcrumb">
+                    <a href="./index.html">Home</a>
+                    <span>About us</span>
+                </nav>
 
-                    <span class="hero-lab__eyebrow">About Dynasty Prestige</span>
-                    <h1>A trusted luxury mobility partner in Dubai.</h1>
-                    <p class="about-hero__lead">For stays that need more than transport, Dynasty Prestige pairs curated premium vehicles with discreet coordination, direct communication and cleaner execution from enquiry to return.</p>
+                <span class="about-kicker">About Dynasty Prestige</span>
+                <h1>Luxury mobility in Dubai, handled with more calm and more care.</h1>
+                <p class="about-hero__lead">Dynasty Prestige combines a curated premium fleet with direct coordination, discreet delivery and cleaner execution across Dubai and the UAE.</p>
 
-                    <div class="about-hero__actions">
-                        <a href="./fleet.html" class="about-hero__primary">View curated fleet</a>
-                        <a href="./app/reserve/page.html" class="about-hero__secondary">Start reservation</a>
-                    </div>
-
-                    <div class="about-hero__pills" aria-label="Brand summary">
-                        <span class="about-hero__pill">Dubai and UAE coverage</span>
-                        <span class="about-hero__pill">Curated premium vehicles</span>
-                        <span class="about-hero__pill">VIP and chauffeur coordination</span>
-                    </div>
+                <div class="about-hero__actions">
+                    <a href="./fleet.html" class="about-button about-button--primary">View curated fleet</a>
+                    <a href="./app/reserve/page.html" class="about-button about-button--secondary">Start reservation</a>
                 </div>
-
-                <aside class="about-hero__aside" aria-label="Trust signals">
-                    <span class="about-hero__aside-kicker">Why the page matters</span>
-                    <h2>Execution matters more than the brochure.</h2>
-                    <p>Premium mobility is judged by trust, handover quality and the calm behind the booking, not only by the fleet itself.</p>
-                    <ul class="about-hero__list">
-                        <li>One team handles the enquiry, the handover plan and the return rhythm.</li>
-                        <li>Flexible delivery is built around hotels, villas, airports, meetings and events.</li>
-                        <li>The vehicle is matched to the stay, not pushed as a generic inventory choice.</li>
-                        <li>Support stays discreet, responsive and direct throughout the rental window.</li>
-                    </ul>
-                </aside>
             </div>
         </section>
 
-        <section class="about-section about-section--proof" aria-labelledby="about-proof-title">
-            <div class="lab-shell about-section__shell">
-                <div class="about-section__intro">
-                    <span class="hero-lab__eyebrow">Trust layer</span>
-                    <h2 id="about-proof-title">Proof that the experience is built to run cleanly.</h2>
-                    <p>The strongest About pages in this category earn trust quickly. They make the operational standard visible before the guest has to ask for it.</p>
+        <section class="about-proof-strip" aria-labelledby="about-proof-title">
+            <div class="lab-shell">
+                <div class="about-proof-strip__head">
+                    <span class="about-kicker about-kicker--dark">Trust layer</span>
+                    <h2 id="about-proof-title">The premium promise only works when the operation behind it is sharp.</h2>
                 </div>
 
-                <div class="about-proof-grid">
-                    <article class="about-proof-card">
-                        <span class="about-proof-card__kicker">Coverage</span>
-                        <h3>Dubai and UAE handover planning.</h3>
-                        <p>Hotel, villa, airport and residence coordination are part of the booking logic, not an afterthought.</p>
+                <div class="about-proof-strip__grid">
+                    <article class="about-proof">
+                        <span>Coverage</span>
+                        <strong>Dubai, Abu Dhabi, airports, hotels and villas.</strong>
                     </article>
 
-                    <article class="about-proof-card">
-                        <span class="about-proof-card__kicker">Support</span>
-                        <h3>24/7 reservation responsiveness.</h3>
-                        <p>Guests should know who is handling the booking and how quickly the next step can be confirmed.</p>
+                    <article class="about-proof">
+                        <span>Communication</span>
+                        <strong>Direct replies and cleaner alignment from the first message.</strong>
                     </article>
 
-                    <article class="about-proof-card">
-                        <span class="about-proof-card__kicker">Selection</span>
-                        <h3>A curated premium line-up.</h3>
-                        <p>The fleet is kept intentional so the shortlist feels sharper, more premium and easier to trust.</p>
+                    <article class="about-proof">
+                        <span>Selection</span>
+                        <strong>A tighter premium fleet built around real guest use cases.</strong>
                     </article>
 
-                    <article class="about-proof-card">
-                        <span class="about-proof-card__kicker">Mobility</span>
-                        <h3>VIP and chauffeur coordination.</h3>
-                        <p>Some stays need more than self-drive. The service layer expands around the guest when the trip requires it.</p>
+                    <article class="about-proof">
+                        <span>Support</span>
+                        <strong>Self-drive, chauffeur and VIP movement when the stay needs more.</strong>
                     </article>
                 </div>
             </div>
         </section>
 
-        <section class="about-section about-section--soft" aria-labelledby="about-story-title">
-            <div class="lab-shell about-section__shell">
-                <div class="about-section__intro">
-                    <span class="hero-lab__eyebrow">Who we are</span>
+        <section class="about-band" aria-labelledby="about-story-title">
+            <div class="lab-shell about-story__shell">
+                <div class="about-section-head">
+                    <span class="about-kicker about-kicker--dark">Who we are</span>
                     <h2 id="about-story-title">Built for guests who value time, image and discretion.</h2>
-                    <p>Dynasty Prestige operates as a luxury mobility partner for business stays, leisure travel, special events and VIP schedules across Dubai and the UAE.</p>
+                    <p>Dynasty Prestige operates as a luxury mobility partner for business travel, leisure stays, special occasions and VIP schedules across Dubai and the UAE.</p>
                 </div>
 
-                <div class="about-story">
-                    <div class="about-story__body">
-                        <p>Based in the UAE, Dynasty Prestige was built around a simple idea: premium mobility should feel seamless. That means a tighter selection of high-end and exotic vehicles, faster communication, flexible delivery and a standard of presentation that respects the client's time and expectations.</p>
-                        <p>We understand that our clients value image, reliability and discretion. Every stage of the experience is shaped around that reality, from choosing the right model to coordinating the handover, confirming details cleanly and making sure the final result feels polished rather than improvised.</p>
-                        <p>More than a car rental company, Dynasty Prestige is a luxury lifestyle partner for clients who appreciate prestige, performance and convenience in equal measure.</p>
-                    </div>
+                <div class="about-story__layout">
+                    <figure class="about-media about-story__media">
+                        <img src="./images/locations-hero-temp.jpg" alt="Luxury vehicle waiting at a hotel entrance in Dubai">
+                    </figure>
 
-                    <div class="about-story__aside">
-                        <article class="about-note-card">
-                            <span class="about-note-card__kicker">What we offer</span>
-                            <h3>Curated vehicles with a wider service layer around them.</h3>
-                            <p>From supercars and luxury SUVs to chauffeur-led and VIP coordination, the offer is designed to match the rhythm of the stay.</p>
+                    <div class="about-story__content">
+                        <p>Dynasty Prestige was built around a simple idea: premium mobility should feel seamless. That means a curated vehicle selection, faster communication, flexible delivery and a handover standard that respects the guest's time and tone.</p>
+                        <p>Some trips need quiet arrivals, some need presence, and some need a wider service layer around the vehicle. The role of the team is to understand the stay and make the final setup feel confidently handled rather than improvised.</p>
+
+                        <ul class="about-checklist">
+                            <li>One team handling the enquiry, delivery logic and return rhythm</li>
+                            <li>Vehicle choice matched to the stay, not pushed as generic stock</li>
+                            <li>Support that stays calm, direct and discreet throughout the rental</li>
+                        </ul>
+
+                        <div class="about-inline-actions">
+                            <a href="./locations.html">See locations</a>
+                            <a href="./services.html">See services</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-band about-band--soft" aria-labelledby="about-operations-title">
+            <div class="lab-shell about-operations__shell">
+                <div class="about-section-head">
+                    <span class="about-kicker about-kicker--dark">How we work</span>
+                    <h2 id="about-operations-title">The booking is designed to move from interest to arrival without noise.</h2>
+                    <p>The strongest brands in premium service make the operating model easy to understand. Dynasty Prestige keeps it personal, direct and practical.</p>
+                </div>
+
+                <div class="about-operations__layout">
+                    <div class="about-steps">
+                        <article class="about-step">
+                            <span>01</span>
+                            <h3>Match the stay</h3>
+                            <p>Resort weekend, airport arrival, business schedule or event entry: the right vehicle depends on context as much as badge.</p>
                         </article>
 
-                        <article class="about-note-card">
-                            <span class="about-note-card__kicker">How we operate</span>
-                            <h3>Direct communication, calm execution and cleaner handovers.</h3>
-                            <p>The goal is not to overwhelm the guest with process. It is to remove friction and make the booking feel confidently handled.</p>
+                        <article class="about-step">
+                            <span>02</span>
+                            <h3>Coordinate the handover</h3>
+                            <p>Hotel access, villa timing, airport pickup flow and return logistics are planned early so the arrival feels polished.</p>
+                        </article>
+
+                        <article class="about-step">
+                            <span>03</span>
+                            <h3>Support the rental window</h3>
+                            <p>Communication stays clean through the stay, with the same premium standard carried into updates, timing and return.</p>
+                        </article>
+                    </div>
+
+                    <div class="about-media-stack about-operations__media-stack">
+                        <figure class="about-media about-operations__media">
+                            <img src="./images/service-detail.png" alt="Luxury sports car interior detail">
+                        </figure>
+
+                        <figure class="about-media about-operations__media about-operations__media--support">
+                            <img src="./images/fleet/rolls-royce-cullinan-black-badge/04-interior-cockpit.png" alt="Luxury vehicle cockpit prepared for guest delivery">
+                        </figure>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-band" aria-labelledby="about-value-title">
+            <div class="lab-shell about-value__shell">
+                <div class="about-section-head">
+                    <span class="about-kicker about-kicker--dark">Where the value shows up</span>
+                    <h2 id="about-value-title">Clients do not remember process. They remember how confidently the whole moment was handled.</h2>
+                    <p>The value is visible in the shortlist, the delivery, the tone of communication and the way the vehicle lands in real life.</p>
+                </div>
+
+                <div class="about-value__layout">
+                    <figure class="about-media about-value__media">
+                        <img src="./images/fleet/rolls-royce-cullinan-black-badge/05-interior-rear-seats.png" alt="Premium rear cabin in a Rolls-Royce">
+                    </figure>
+
+                    <div class="about-value__grid">
+                        <article class="about-point">
+                            <h3>Curated premium line-up</h3>
+                            <p>The fleet is kept intentional so guests can decide faster and trust the shortlist sooner.</p>
+                        </article>
+
+                        <article class="about-point">
+                            <h3>Arrival-first execution</h3>
+                            <p>Luxury mobility is judged by how the vehicle arrives and how effortless the first minutes feel.</p>
+                        </article>
+
+                        <article class="about-point">
+                            <h3>Discreet support</h3>
+                            <p>Some guests want strong presence, others want quiet handling. The service adjusts without making the trip feel managed.</p>
+                        </article>
+
+                        <article class="about-point">
+                            <h3>Wider mobility layer</h3>
+                            <p>Chauffeur, concierge and VIP movement sit around the fleet when the schedule asks for more than self-drive.</p>
                         </article>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section class="about-section" aria-labelledby="about-choose-title">
-            <div class="lab-shell about-section__shell">
-                <div class="about-section__intro">
-                    <span class="hero-lab__eyebrow">Why choose us</span>
-                    <h2 id="about-choose-title">Why clients choose Dynasty Prestige over a generic rental desk.</h2>
-                    <p>The booking should feel tailored, premium and operationally reliable from the first message onward. That is where the brand differentiates itself.</p>
+        <section class="about-band about-band--soft" aria-labelledby="about-standards-title">
+            <div class="lab-shell about-standards__shell">
+                <div class="about-section-head">
+                    <span class="about-kicker about-kicker--dark">Standards</span>
+                    <h2 id="about-standards-title">The premium standard is protected in practical ways.</h2>
+                    <p>What separates a generic rental desk from a stronger luxury operator is rarely the brochure. It is the discipline behind the guest journey.</p>
                 </div>
 
-                <div class="about-choose-grid">
-                    <article class="about-choose-card">
-                        <span class="about-choose-card__chip">Stay fit</span>
-                        <h3>The vehicle is matched to the stay.</h3>
-                        <p>Resort weekend, airport arrival, business schedule or event entry: the right car depends on context, not only on the badge.</p>
-                    </article>
+                <div class="about-standards__layout">
+                    <div class="about-standards__grid">
+                        <article class="about-standard">
+                            <h3>Direct response</h3>
+                            <p>Enquiries should move quickly from interest to clarity, with fewer loops between the guest and the final plan.</p>
+                        </article>
 
-                    <article class="about-choose-card">
-                        <span class="about-choose-card__chip">Handover</span>
-                        <h3>Delivery is planned as part of the experience.</h3>
-                        <p>Hotel access, villa timing, airport coordination and return logistics are handled with the same care as the vehicle choice.</p>
-                    </article>
+                        <article class="about-standard">
+                            <h3>Arrival-ready handovers</h3>
+                            <p>Pickup timing, location access and route logic are handled early enough to protect the arrival moment.</p>
+                        </article>
 
-                    <article class="about-choose-card">
-                        <span class="about-choose-card__chip">Communication</span>
-                        <h3>Fewer loops, clearer answers and faster alignment.</h3>
-                        <p>Clients want direct communication, quick confirmation and a team that understands the tone of the trip without overcomplicating it.</p>
-                    </article>
+                        <article class="about-standard">
+                            <h3>Vehicle presentation</h3>
+                            <p>The vehicle should look and feel like part of a premium stay, not like a last-minute dispatch.</p>
+                        </article>
 
-                    <article class="about-choose-card">
-                        <span class="about-choose-card__chip">Presentation</span>
-                        <h3>The result should feel polished on arrival.</h3>
-                        <p>Premium mobility is measured by how the vehicle arrives, how the guest is handled and how effortless the full moment feels.</p>
-                    </article>
-                </div>
-            </div>
-        </section>
-
-        <section class="about-section" aria-labelledby="about-values-title">
-            <div class="lab-shell about-section__shell">
-                <div class="about-section__intro">
-                    <span class="hero-lab__eyebrow">Brand values</span>
-                    <h2 id="about-values-title">Three standards that define the brand.</h2>
-                    <p>The fleet matters, but the brand is really judged by how each detail is handled before, during and after the booking.</p>
-                </div>
-
-                <div class="about-values-grid">
-                    <article class="about-value-card">
-                        <span class="about-value-card__chip">Excellence</span>
-                        <h3>Premium quality in every detail.</h3>
-                        <p>We aim for consistency in the vehicle, the handover, the communication and the small decisions that build trust.</p>
-                    </article>
-
-                    <article class="about-value-card">
-                        <span class="about-value-card__chip">Discretion</span>
-                        <h3>Privacy and professionalism stay central.</h3>
-                        <p>Clients expect calm, responsive service that protects their time, their schedule and the tone of the trip.</p>
-                    </article>
-
-                    <article class="about-value-card">
-                        <span class="about-value-card__chip">Prestige</span>
-                        <h3>Experiences should reflect status and style.</h3>
-                        <p>We create premium arrivals and polished mobility moments that feel confident without becoming noisy or overstated.</p>
-                    </article>
-                </div>
-            </div>
-        </section>
-
-        <section class="about-section" aria-labelledby="about-standards-title">
-            <div class="lab-shell about-section__shell">
-                <div class="about-section__intro">
-                    <span class="hero-lab__eyebrow">Service standards</span>
-                    <h2 id="about-standards-title">How the premium standard is protected through the booking.</h2>
-                    <p>The strongest About pages in this market show what sits behind the image. These are the operating standards Dynasty Prestige is built around.</p>
-                </div>
-
-                <div class="about-standards-grid">
-                    <article class="about-standard-card">
-                        <span class="about-standard-card__index">01</span>
-                        <h3>Direct response</h3>
-                        <p>Enquiries should move quickly from interest to clarity, with fewer unnecessary steps between the guest and the plan.</p>
-                    </article>
-
-                    <article class="about-standard-card">
-                        <span class="about-standard-card__index">02</span>
-                        <h3>Arrival-ready handovers</h3>
-                        <p>Pickup timing, location access and the feel of the arrival are planned to support the trip instead of slowing it down.</p>
-                    </article>
-
-                    <article class="about-standard-card">
-                        <span class="about-standard-card__index">03</span>
-                        <h3>Vehicle presentation</h3>
-                        <p>The car should look, feel and arrive like part of a premium guest experience, not like a generic dispatch.</p>
-                    </article>
-
-                    <article class="about-standard-card">
-                        <span class="about-standard-card__index">04</span>
-                        <h3>Support through return</h3>
-                        <p>Service quality does not end at delivery. It is carried through the stay, the timing updates and the final handover back.</p>
-                    </article>
-                </div>
-            </div>
-        </section>
-
-        <section class="about-section" aria-labelledby="about-cta-title">
-            <div class="lab-shell about-section__shell">
-                <div class="about-cta">
-                    <div class="about-cta__copy">
-                        <span class="hero-lab__eyebrow">Ready to move</span>
-                        <h2 id="about-cta-title">Choose the vehicle. We will coordinate the rest.</h2>
-                        <p>Browse the fleet, lock the rental window and let the team align the delivery, the handover and the pace of the stay.</p>
+                        <article class="about-standard">
+                            <h3>Support through return</h3>
+                            <p>The standard continues through the stay and closes cleanly at return, not only at delivery.</p>
+                        </article>
                     </div>
+
+                    <figure class="about-media about-standards__media">
+                        <img src="./images/fleet/mercedes-g63-amg/01-exterior-front.jpg" alt="Mercedes G63 prepared for a premium handover">
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-cta" aria-labelledby="about-cta-title">
+            <div class="lab-shell about-cta__shell">
+                <div class="about-cta__copy">
+                    <span class="about-kicker about-kicker--dark">Ready to move</span>
+                    <h2 id="about-cta-title">Choose the vehicle. We will coordinate the rest.</h2>
+                    <p>Browse the fleet, lock the rental window and let the team align the delivery, the handover and the pace of the stay.</p>
 
                     <div class="about-cta__actions">
-                        <a href="./fleet.html" class="about-cta__primary">Browse the fleet</a>
-                        <a href="https://wa.me/971586122568?text=Hi%2C%20I%20would%20like%20help%20choosing%20the%20right%20Dynasty%20Prestige%20vehicle%20for%20my%20stay." class="about-cta__secondary" target="_blank" rel="noopener">Plan by WhatsApp</a>
+                        <a href="./fleet.html" class="about-button about-button--primary">Browse the fleet</a>
+                        <a href="https://wa.me/971586122568?text=Hi%2C%20I%20would%20like%20help%20choosing%20the%20right%20Dynasty%20Prestige%20vehicle%20for%20my%20stay." class="about-button about-button--secondary" target="_blank" rel="noopener">Plan by WhatsApp</a>
                     </div>
                 </div>
+
+                <figure class="about-media about-cta__media">
+                    <img src="./images/fleet/ferrari-296-gts/07-hero-dubai.jpeg" alt="Ferrari in Dubai">
+                </figure>
             </div>
         </section>
 
@@ -441,7 +438,7 @@
 
                     <div class="site-v2-footer__column">
                         <h3>Contact us</h3>
-                        <a href="tel:+971586122568">+971 58 612 2568</a>
+                        <a href="tel:+971586122568">+971&nbsp;58&nbsp;612&nbsp;2568</a>
                         <a href="https://wa.me/971586122568" target="_blank" rel="noopener">WhatsApp the team</a>
                         <a href="mailto:prestigegoalmotion@gmail.com">prestigegoalmotion@gmail.com</a>
                         <p>Palm Jumeirah, Dubai UAE with hotel, villa and airport coordination across the city.</p>

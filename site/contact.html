@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Dynasty Prestige | Dubai Reservations, WhatsApp and Concierge Support</title>
+    <title>Contact Dynasty Prestige | Dubai Reservations and Concierge</title>
     <meta name="description" content="Contact Dynasty Prestige for Dubai luxury car reservations, WhatsApp support, fleet advice, airport handover planning and longer-stay requests.">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://prestigegoalmotion.com/contact.html">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://prestigegoalmotion.com/contact.html">
-    <meta property="og:title" content="Contact Dynasty Prestige | Dubai Reservations, WhatsApp and Concierge Support">
+    <meta property="og:title" content="Contact Dynasty Prestige | Dubai Reservations and Concierge">
     <meta property="og:description" content="Contact Dynasty Prestige for Dubai luxury car reservations, WhatsApp support, fleet advice, airport handover planning and longer-stay requests.">
     <meta property="og:image" content="https://prestigegoalmotion.com/logo-dp-transparent.png">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Contact Dynasty Prestige | Dubai Reservations, WhatsApp and Concierge Support">
+    <meta name="twitter:title" content="Contact Dynasty Prestige | Dubai Reservations and Concierge">
     <meta name="twitter:description" content="Contact Dynasty Prestige for Dubai luxury car reservations, WhatsApp support, fleet advice, airport handover planning and longer-stay requests.">
     <meta name="twitter:image" content="https://prestigegoalmotion.com/logo-dp-transparent.png">
 <link rel="manifest" href="/manifest.json">
@@ -172,6 +172,19 @@
             color: var(--success);
         }
 
+        .section-soft {
+            background: var(--bg2);
+        }
+
+        .contact-form__lead {
+            margin-bottom: 1.2rem;
+        }
+
+        .contact-side-stack {
+            display: grid;
+            gap: 1.2rem;
+        }
+
         .map-frame {
             margin-top: 1rem;
             border-radius: 20px;
@@ -223,7 +236,7 @@
                         <a href="/app/reserve/page.html" class="btn btn-secondary">Reserve online</a>
                     </div>
                     <div class="hero-pills">
-                        <div class="pill"><strong>Phone</strong>+971 586122568 with 24 hour availability.</div>
+                        <div class="pill"><strong>Phone</strong>+971&nbsp;58&nbsp;612&nbsp;2568 with 24 hour availability.</div>
                         <div class="pill"><strong>Email</strong>prestigegoalmotion@gmail.com for detailed requests.</div>
                         <div class="pill"><strong>Base</strong>Palm Jumeirah, Dubai UAE with city-wide coordination.</div>
                     </div>
@@ -241,7 +254,7 @@
                 </aside>
             </div>
         </section>
-        <section style="background:var(--bg2);">
+        <section class="section-soft">
             <div class="shell">
                 <div class="heading">
                     <span class="kicker">Direct Lines</span>
@@ -251,7 +264,7 @@
                 <div class="card-grid">
                     <article class="info-card"><span class="tag">WhatsApp</span><h3>Fastest path</h3><p>Best for quick availability checks, pricing guidance and narrowing the right model.</p><div class="card-actions"><a href="https://wa.me/971586122568" class="btn">Open WhatsApp</a></div></article>
                     <article class="info-card"><span class="tag">Reservation</span><h3>Secure booking flow</h3><p>Best when you already know the vehicle and want to lock the booking with a clearer confirmation path.</p><div class="card-actions"><a href="/app/reserve/page.html" class="btn">Open reservation</a></div></article>
-                    <article class="info-card"><span class="tag">Phone</span><h3>Direct call</h3><p>Best for guests who prefer immediate verbal confirmation or fast coordination around arrivals.</p><div class="card-actions"><a href="tel:+971586122568" class="btn">Call now</a></div></article>
+                    <article class="info-card"><span class="tag">Phone</span><h3>Direct call</h3><p>Best for guests who prefer immediate verbal confirmation or fast coordination around arrivals.</p><div class="card-actions"><a href="tel:+971586122568" class="btn">Call&nbsp;now</a></div></article>
                     <article class="info-card"><span class="tag">Email</span><h3>Detailed requests</h3><p>Best for events, longer stays, brand requests and multi-part planning that needs more context.</p><div class="card-actions"><a href="mailto:prestigegoalmotion@gmail.com" class="btn">Send email</a></div></article>
                 </div>
             </div>
@@ -261,7 +274,7 @@
                 <div class="form-card">
                     <span class="kicker">Send A Message</span>
                     <h3>Contact form</h3>
-                    <p class="sublead" style="margin-bottom:1.2rem;">Use this form when the request needs more detail than a quick chat.</p>
+                    <p class="sublead contact-form__lead">Use this form when the request needs more detail than a quick chat.</p>
                     <form id="contactForm" class="form-layout" onsubmit="handleContactSubmit(event)" novalidate>
                         <div class="form-grid">
                             <div class="form-group"><label for="contactName">Full name *</label><input type="text" id="contactName" name="name" required autocomplete="name"></div>
@@ -276,7 +289,7 @@
                         <div id="contactFormStatus" class="status" role="status" aria-live="polite"></div>
                     </form>
                 </div>
-                <div style="display:grid;gap:1.2rem;">
+                <div class="contact-side-stack">
                     <div class="map-card">
                         <span class="kicker">Dubai Office</span>
                         <h3>Base and coverage</h3>

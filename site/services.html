@@ -13,18 +13,19 @@
     <meta property="og:url" content="https://prestigegoalmotion.com/services.html">
     <meta property="og:title" content="Luxury Mobility and Concierge Services in Dubai | Dynasty Prestige">
     <meta property="og:description" content="Explore Dynasty Prestige chauffeur, airport concierge, tailored delivery, event rental, business mobility and monthly luxury rental services in Dubai.">
-    <meta property="og:image" content="https://prestigegoalmotion.com/images/service-handover.png">
+    <meta property="og:image" content="https://prestigegoalmotion.com/images/fleet/rolls-royce-cullinan-black-badge/02-exterior-front.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Luxury Mobility and Concierge Services in Dubai | Dynasty Prestige">
     <meta name="twitter:description" content="Explore Dynasty Prestige chauffeur, airport concierge, tailored delivery, event rental, business mobility and monthly luxury rental services in Dubai.">
-    <meta name="twitter:image" content="https://prestigegoalmotion.com/images/service-handover.png">
+    <meta name="twitter:image" content="https://prestigegoalmotion.com/images/fleet/rolls-royce-cullinan-black-badge/02-exterior-front.png">
 <script>document.documentElement.classList.add("js");</script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./css/site-v2.css?v=20260410s">
-    <link rel="stylesheet" href="./css/site-v2-services.css?v=20260418b">
+    <link rel="stylesheet" href="./css/site-v2-services.css?v=20260420a">
     <script src="./js/site-v2.js?v=20260406ae" defer></script>
+    <script src="./js/services-selector.js?v=20260419a" defer></script>
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -177,307 +178,209 @@
     <main class="lab-main services-page-main">
         <section class="services-hero">
             <div class="services-hero__media" aria-hidden="true">
-                <img src="./images/service-handover.png" alt="">
+                <img src="./images/fleet/rolls-royce-cullinan-black-badge/02-exterior-front.png" alt="">
                 <span class="services-hero__shade"></span>
             </div>
 
             <div class="lab-shell services-hero__shell">
-                <nav class="services-breadcrumb" aria-label="Breadcrumb">
-                    <a href="./index.html">Home</a>
-                    <span aria-current="page">Services</span>
-                </nav>
-                <span class="services-kicker">Dynasty Prestige services</span>
-                <h1>Luxury mobility and concierge services in Dubai, built around the stay.</h1>
-                <p class="services-hero__lead">Airport arrival, chauffeur movement, tailored delivery and longer-stay support planned as one cleaner booking path.</p>
-
-                <div class="services-hero__actions">
-                    <a class="services-button services-button--primary" href="./app/reserve/page.html" data-analytics-event="service_reservation_click" data-analytics-service="services_hub" data-analytics-placement="hero" data-analytics-channel="reservation">Open reservation flow</a>
-                    <a class="services-button services-button--ghost" href="https://wa.me/971586122568?text=Hi%2C%20I%20want%20help%20choosing%20the%20right%20Dynasty%20Prestige%20service%20in%20Dubai." target="_blank" rel="noopener" data-analytics-event="service_whatsapp_click" data-analytics-service="services_hub" data-analytics-placement="hero" data-analytics-channel="whatsapp">Talk to the concierge</a>
-                </div>
-
-                <div class="services-hero__routes" aria-label="Primary service lanes">
-                    <a class="services-route-card" href="./airport-concierge-dubai.html">
-                        <span>Arrival-first</span>
-                        <strong>Airport concierge</strong>
-                        <p>Meet, timing and onward routing from DXB or DWC.</p>
-                    </a>
-                    <a class="services-route-card" href="./chauffeur-service-dubai.html">
-                        <span>Movement</span>
-                        <strong>VIP chauffeur</strong>
-                        <p>Private transfers, meetings and city plans without driving.</p>
-                    </a>
-                    <a class="services-route-card" href="./hotel-villa-airport-delivery-dubai.html">
-                        <span>Handover</span>
-                        <strong>Tailored delivery</strong>
-                        <p>Hotel, villa and airport-led handovers with cleaner timing.</p>
-                    </a>
-                    <a class="services-route-card" href="./monthly-luxury-car-rental-dubai.html">
-                        <span>Longer stay</span>
-                        <strong>Monthly luxury rental</strong>
-                        <p>Flexible longer-term support for relocation and extended visits.</p>
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <section class="services-core" id="core-services" aria-labelledby="core-services-title">
-            <div class="lab-shell services-core__shell">
-                <div class="services-section__head services-section__head--center">
-                    <span class="services-kicker services-kicker--dark">Core services</span>
-                    <h2 id="core-services-title">Choose the service lane first, then shape the car and handover.</h2>
-                    <p>Less copy, more clarity: each lane below answers a different guest situation and points to the right next step.</p>
-                </div>
-
-                <div class="services-lane-grid">
-                    <article class="services-lane-card">
-                        <a class="services-lane-card__media" href="./chauffeur-service-dubai.html">
-                            <img src="./images/fleet/rolls-royce-cullinan-black-badge/02-exterior-front.png" alt="Rolls-Royce chauffeur service in Dubai">
-                            <span class="services-lane-card__shade" aria-hidden="true"></span>
+                <div class="services-hero__planner" data-services-selector>
+                    <div class="services-hero__selector" role="tablist" aria-label="Primary service lanes">
+                        <a
+                            id="services-lane-tab-airport"
+                            class="services-lane-orb is-active"
+                            href="./airport-concierge-dubai.html"
+                            role="tab"
+                            aria-selected="true"
+                            aria-controls="services-lane-panel"
+                            tabindex="0"
+                            data-service-selector
+                            data-service-kicker="Arrival-first lane"
+                            data-service-title="Airport concierge"
+                            data-service-copy="Meet-and-greet, flight tracking and onward routing from DXB or DWC before the city even starts."
+                            data-service-point-one="Flight tracking before touchdown"
+                            data-service-point-two="Meet-and-greet with onward routing"
+                            data-service-point-three="Hotel, villa or city continuation planned early"
+                            data-service-primary-label="Explore airport concierge"
+                            data-service-primary-href="./airport-concierge-dubai.html"
+                            data-service-analytics-service="airport_concierge">
+                            <span class="services-lane-orb__media" aria-hidden="true">
+                                <img src="./images/service-handover.png" alt="">
+                            </span>
+                            <span class="services-lane-orb__label">Airport</span>
+                            <span class="services-lane-orb__meta">DXB and DWC</span>
                         </a>
-                        <div class="services-lane-card__body">
-                            <div class="services-lane-card__top">
-                                <span class="services-lane-chip">Chauffeur</span>
-                                <span class="services-lane-trust">Airport to city</span>
-                            </div>
-                            <span class="services-lane-card__eyebrow">Private movement</span>
-                            <h3>VIP chauffeur service</h3>
-                            <p>For arrivals, meetings and full-day plans where timing and presence matter.</p>
-                            <ul class="services-lane-card__list">
-                                <li>Hotel transfers and executive schedules</li>
-                                <li>Dubai and Abu Dhabi routing</li>
-                            </ul>
-                            <div class="services-lane-card__actions">
-                                <a href="./chauffeur-service-dubai.html">Explore chauffeur</a>
-                                <a href="./abu-dhabi-luxury-car-rental.html">Abu Dhabi routes</a>
-                            </div>
-                        </div>
-                    </article>
 
-                    <article class="services-lane-card">
-                        <a class="services-lane-card__media" href="./airport-concierge-dubai.html">
-                            <img src="./images/service-handover.png" alt="Airport concierge and luxury handover in Dubai">
-                            <span class="services-lane-card__shade" aria-hidden="true"></span>
+                        <a
+                            id="services-lane-tab-chauffeur"
+                            class="services-lane-orb"
+                            href="./chauffeur-service-dubai.html"
+                            role="tab"
+                            aria-selected="false"
+                            aria-controls="services-lane-panel"
+                            tabindex="-1"
+                            data-service-selector
+                            data-service-kicker="Movement lane"
+                            data-service-title="VIP chauffeur"
+                            data-service-copy="Private driver support for meetings, dinners and city schedules where the guest should not think about parking or routing."
+                            data-service-point-one="Hotel, office and event movement"
+                            data-service-point-two="Half-day and full-day planning"
+                            data-service-point-three="Dubai and Abu Dhabi routes without driving"
+                            data-service-primary-label="Explore chauffeur service"
+                            data-service-primary-href="./chauffeur-service-dubai.html"
+                            data-service-analytics-service="chauffeur_service">
+                            <span class="services-lane-orb__media" aria-hidden="true">
+                                <img src="./images/fleet/rolls-royce-cullinan-black-badge/02-exterior-front.png" alt="">
+                            </span>
+                            <span class="services-lane-orb__label">Chauffeur</span>
+                            <span class="services-lane-orb__meta">Private movement</span>
                         </a>
-                        <div class="services-lane-card__body">
-                            <div class="services-lane-card__top">
-                                <span class="services-lane-chip">Airport</span>
-                                <span class="services-lane-trust">DXB and DWC</span>
-                            </div>
-                            <span class="services-lane-card__eyebrow">Arrival support</span>
-                            <h3>Airport concierge</h3>
-                            <p>Built for guests who want the arrival to feel handled before entering the city.</p>
-                            <ul class="services-lane-card__list">
-                                <li>Meet and greet with onward routing</li>
-                                <li>Flight-led timing coordination</li>
-                            </ul>
-                            <div class="services-lane-card__actions">
-                                <a href="./airport-concierge-dubai.html">Explore concierge</a>
-                                <a href="./dubai-airport-luxury-car-rental.html">DXB / DWC guide</a>
-                            </div>
-                        </div>
-                    </article>
 
-                    <article class="services-lane-card">
-                        <a class="services-lane-card__media" href="./hotel-villa-airport-delivery-dubai.html">
-                            <img src="./images/service-detail.png" alt="Luxury vehicle delivery for hotels and villas in Dubai">
-                            <span class="services-lane-card__shade" aria-hidden="true"></span>
+                        <a
+                            id="services-lane-tab-delivery"
+                            class="services-lane-orb"
+                            href="./hotel-villa-airport-delivery-dubai.html"
+                            role="tab"
+                            aria-selected="false"
+                            aria-controls="services-lane-panel"
+                            tabindex="-1"
+                            data-service-selector
+                            data-service-kicker="Handover lane"
+                            data-service-title="Tailored delivery"
+                            data-service-copy="Timed handover for hotels, villas and residences where the car should appear ready at the property, not after another round of calls."
+                            data-service-point-one="Hotel and villa delivery windows"
+                            data-service-point-two="Property-led handover planning"
+                            data-service-point-three="Cleaner arrival for branded residences"
+                            data-service-primary-label="Explore tailored delivery"
+                            data-service-primary-href="./hotel-villa-airport-delivery-dubai.html"
+                            data-service-analytics-service="tailored_delivery">
+                            <span class="services-lane-orb__media" aria-hidden="true">
+                                <img src="./images/service-detail.png" alt="">
+                            </span>
+                            <span class="services-lane-orb__label">Delivery</span>
+                            <span class="services-lane-orb__meta">Hotel and villa</span>
                         </a>
-                        <div class="services-lane-card__body">
-                            <div class="services-lane-card__top">
-                                <span class="services-lane-chip">Delivery</span>
-                                <span class="services-lane-trust">Hotel and villa</span>
-                            </div>
-                            <span class="services-lane-card__eyebrow">Clean handovers</span>
-                            <h3>Tailored delivery</h3>
-                            <p>Luxury car delivery shaped around hotels, villas, residences and airport arrivals.</p>
-                            <ul class="services-lane-card__list">
-                                <li>Property-led pickup and return plans</li>
-                                <li>Palm and airport handover logic</li>
-                            </ul>
-                            <div class="services-lane-card__actions">
-                                <a href="./hotel-villa-airport-delivery-dubai.html">Explore delivery</a>
-                                <a href="./palm-jumeirah-luxury-car-rental.html">Palm stays</a>
-                            </div>
-                        </div>
-                    </article>
 
-                    <article class="services-lane-card">
-                        <a class="services-lane-card__media" href="./wedding-event-car-rental-dubai.html">
-                            <img src="./images/fleet/ferrari-296-gts/01-exterior-front.jpg" alt="Luxury wedding and event car rental in Dubai">
-                            <span class="services-lane-card__shade" aria-hidden="true"></span>
+                        <a
+                            id="services-lane-tab-monthly"
+                            class="services-lane-orb"
+                            href="./monthly-luxury-car-rental-dubai.html"
+                            role="tab"
+                            aria-selected="false"
+                            aria-controls="services-lane-panel"
+                            tabindex="-1"
+                            data-service-selector
+                            data-service-kicker="Longer-stay lane"
+                            data-service-title="Monthly luxury rental"
+                            data-service-copy="Longer support for relocation, seasonal use and repeat movement where comfort and steadier coordination matter more than a single handover."
+                            data-service-point-one="Cleaner month-by-month planning"
+                            data-service-point-two="Flexible vehicle matching for the stay"
+                            data-service-point-three="Comfort-first support for repeat use"
+                            data-service-primary-label="Explore monthly rental"
+                            data-service-primary-href="./monthly-luxury-car-rental-dubai.html"
+                            data-service-analytics-service="monthly_luxury_rental">
+                            <span class="services-lane-orb__media" aria-hidden="true">
+                                <img src="./images/fleet/rolls-royce-cullinan-black-badge/05-interior-rear-seats.png" alt="">
+                            </span>
+                            <span class="services-lane-orb__label">Monthly</span>
+                            <span class="services-lane-orb__meta">Longer stay</span>
                         </a>
-                        <div class="services-lane-card__body">
-                            <div class="services-lane-card__top">
-                                <span class="services-lane-chip">Event-led</span>
-                                <span class="services-lane-trust">Statement arrival</span>
-                            </div>
-                            <span class="services-lane-card__eyebrow">Image-first bookings</span>
-                            <h3>Wedding and event rental</h3>
-                            <p>For proposals, shoots and private events where the arrival is part of the story.</p>
-                            <ul class="services-lane-card__list">
-                                <li>Visual impact without last-minute chasing</li>
-                                <li>Cars chosen for venue and occasion</li>
-                            </ul>
-                            <div class="services-lane-card__actions">
-                                <a href="./wedding-event-car-rental-dubai.html">Explore events</a>
-                                <a href="./luxury-car-rental-dubai.html">Dubai guide</a>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article class="services-lane-card">
-                        <a class="services-lane-card__media" href="./business-car-rental-dubai.html">
-                            <img src="./images/service-cockpit.png" alt="Business mobility and executive travel in Dubai">
-                            <span class="services-lane-card__shade" aria-hidden="true"></span>
-                        </a>
-                        <div class="services-lane-card__body">
-                            <div class="services-lane-card__top">
-                                <span class="services-lane-chip">Executive</span>
-                                <span class="services-lane-trust">Delegation-ready</span>
-                            </div>
-                            <span class="services-lane-card__eyebrow">Office to hotel</span>
-                            <h3>Business mobility</h3>
-                            <p>Executive movement for meetings, delegations and private office guests.</p>
-                            <ul class="services-lane-card__list">
-                                <li>Clean timing between office, hotel and city</li>
-                                <li>Self-drive or chauffeur-led setup</li>
-                            </ul>
-                            <div class="services-lane-card__actions">
-                                <a href="./business-car-rental-dubai.html">Explore business</a>
-                                <a href="./fleet.html">View fleet</a>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article class="services-lane-card">
-                        <a class="services-lane-card__media" href="./monthly-luxury-car-rental-dubai.html">
-                            <img src="./images/fleet/rolls-royce-cullinan-black-badge/05-interior-rear-seats.png" alt="Monthly luxury rental and longer stays in Dubai">
-                            <span class="services-lane-card__shade" aria-hidden="true"></span>
-                        </a>
-                        <div class="services-lane-card__body">
-                            <div class="services-lane-card__top">
-                                <span class="services-lane-chip">Long stay</span>
-                                <span class="services-lane-trust">Flexible cadence</span>
-                            </div>
-                            <span class="services-lane-card__eyebrow">Month-by-month support</span>
-                            <h3>Monthly luxury rental</h3>
-                            <p>Cleaner planning for relocation, seasonal stays and guests staying beyond a short visit.</p>
-                            <ul class="services-lane-card__list">
-                                <li>Steadier support over several weeks</li>
-                                <li>Comfort-first options for ongoing use</li>
-                            </ul>
-                            <div class="services-lane-card__actions">
-                                <a href="./monthly-luxury-car-rental-dubai.html">Explore monthly</a>
-                                <a href="./abu-dhabi-luxury-car-rental.html">Long-stay routes</a>
-                            </div>
-                        </div>
-                    </article>
-                </div>
-            </div>
-        </section>
-
-        <section class="services-editorial" id="built-around-the-stay" aria-labelledby="built-around-the-stay-title">
-            <div class="lab-shell services-editorial__shell">
-                <div class="services-section__head">
-                    <span class="services-kicker services-kicker--dark">Built around the stay</span>
-                    <h2 id="built-around-the-stay-title">The service should look as polished as the car itself.</h2>
-                    <p>What reads as premium is continuity: the arrival, the property, the route and the vehicle all feeling part of one plan.</p>
-                </div>
-
-                <div class="services-editorial__layout">
-                    <article class="services-editorial__feature">
-                        <img src="./images/fleet/rolls-royce-cullinan-black-badge/06-exterior-front-open-doors.png" alt="Rolls-Royce handover prepared for a Dubai stay">
-                        <div class="services-editorial__overlay"></div>
-                        <div class="services-editorial__copy">
-                            <span>Arrival continuity</span>
-                            <h3>One team should carry the booking from airport message to final handover.</h3>
-                            <p>That is what makes the service feel expensive in the right way: less friction, less repetition and a calmer guest experience.</p>
-                        </div>
-                    </article>
-
-                    <div class="services-editorial__stack">
-                        <article class="services-editorial__card">
-                            <img src="./images/fleet/lamborghini-huracan/04-interior-cockpit.png" alt="Luxury cockpit detail for executive and event travel in Dubai">
-                            <div class="services-editorial__card-copy">
-                                <span>Property and route</span>
-                                <h3>Hotels, villas and airport-led stays all change the handover logic.</h3>
-                                <p>Palm, Marina and airport arrivals should not be handled as if they were the same booking.</p>
-                            </div>
-                        </article>
-
-                        <article class="services-editorial__card services-editorial__card--text">
-                            <span>Decision path</span>
-                            <h3>Start with the reason for the trip. Then narrow the exact vehicle.</h3>
-                            <p>The best bookings rarely begin with a random model. They begin with arrival style, visibility and guest rhythm.</p>
-                        </article>
                     </div>
+
+                    <article class="services-hero__feature" id="services-lane-panel" role="tabpanel" aria-labelledby="services-lane-tab-airport" data-service-panel>
+                        <div class="services-hero__feature-main">
+                            <div class="services-hero__feature-copy">
+                                <nav class="services-breadcrumb" aria-label="Breadcrumb">
+                                    <a href="./index.html">Home</a>
+                                    <span aria-current="page">Services</span>
+                                </nav>
+                                <span class="services-hero__feature-kicker" data-service-kicker>Arrival-first lane</span>
+                                <h1 data-service-title>Airport concierge</h1>
+                                <p data-service-copy>Meet-and-greet, flight tracking and onward routing from DXB or DWC before the city even starts.</p>
+                            </div>
+
+                            <ul class="services-hero__feature-list">
+                                <li data-service-point="one">Flight tracking before touchdown</li>
+                                <li data-service-point="two">Meet-and-greet with onward routing</li>
+                                <li data-service-point="three">Hotel, villa or city continuation planned early</li>
+                            </ul>
+                        </div>
+
+                        <div class="services-hero__feature-side">
+                            <div class="services-hero__feature-actions">
+                                <a
+                                    class="services-button services-button--primary"
+                                    href="./airport-concierge-dubai.html"
+                                    data-service-primary
+                                    data-analytics-event="service_reservation_click"
+                                    data-analytics-service="airport_concierge"
+                                    data-analytics-placement="hero_lane"
+                                    data-analytics-channel="service_page">Explore airport concierge</a>
+                                <a class="services-button services-button--ghost" href="./app/reserve/page.html" data-analytics-event="service_reservation_click" data-analytics-service="services_hub" data-analytics-placement="hero" data-analytics-channel="reservation">Open reservation flow</a>
+                            </div>
+
+                            <p class="services-hero__note">Need a quieter request? <a href="https://wa.me/971586122568?text=Hi%2C%20I%20want%20help%20choosing%20the%20right%20Dynasty%20Prestige%20service%20in%20Dubai." target="_blank" rel="noopener" data-analytics-event="service_whatsapp_click" data-analytics-service="services_hub" data-analytics-placement="hero" data-analytics-channel="whatsapp">Talk to the concierge</a>.</p>
+                        </div>
+                    </article>
                 </div>
             </div>
         </section>
 
-        <section class="services-local" aria-labelledby="services-local-title">
-            <div class="lab-shell services-local__shell">
-                <div class="services-section__head">
-                    <span class="services-kicker services-kicker--dark">Local service guides</span>
-                    <h2 id="services-local-title">The same service changes depending on where the stay starts.</h2>
-                    <p>Use the local guides when the booking is really about an airport arrival, a resort stay, a waterfront schedule or a capital route.</p>
+        <section class="services-directory" id="service-directory" aria-labelledby="service-directory-title">
+            <div class="lab-shell services-directory__shell">
+                <div class="services-section__head services-section__head--center">
+                    <span class="services-kicker services-kicker--dark">Other routes</span>
+                    <h2 id="service-directory-title">Keep the extra pages useful, not noisy.</h2>
+                    <p>Once the main lane is clear, use the narrower pages for events, business mobility and location-led starting points.</p>
                 </div>
 
-                <div class="services-local__grid">
-                    <a class="services-local-card" href="./dubai-airport-luxury-car-rental.html">
-                        <span>Airport handover</span>
-                        <h3>DXB and DWC arrival guide</h3>
-                        <p>Flight timing, premium pickup and the onward route into the city.</p>
-                    </a>
-                    <a class="services-local-card" href="./palm-jumeirah-luxury-car-rental.html">
-                        <span>Hotel and villa</span>
-                        <h3>Palm Jumeirah guide</h3>
-                        <p>Resort stays, villas and branded residences where handover quality leads.</p>
-                    </a>
-                    <a class="services-local-card" href="./dubai-marina-luxury-car-rental.html">
-                        <span>Waterfront stay</span>
-                        <h3>Dubai Marina guide</h3>
-                        <p>Hotel towers, JBR movement and shorter plans needing agile routing.</p>
-                    </a>
-                    <a class="services-local-card" href="./abu-dhabi-luxury-car-rental.html">
-                        <span>Executive route</span>
-                        <h3>Abu Dhabi guide</h3>
-                        <p>Capital visits, meetings and bookings that need more deliberate timing.</p>
-                    </a>
-                </div>
-            </div>
-        </section>
+                <div class="services-directory__layout">
+                    <section class="services-directory__group" aria-labelledby="services-directory-services">
+                        <h3 class="services-directory__group-title" id="services-directory-services">Additional service routes</h3>
 
-        <section class="services-private" id="private-requests" aria-labelledby="private-requests-title">
-            <div class="services-private__media" aria-hidden="true">
-                <img src="./images/fleet/rolls-royce-cullinan-black-badge/05-interior-rear-seats.png" alt="">
-                <span class="services-private__shade"></span>
-            </div>
+                        <div class="services-directory__list">
+                            <a class="services-directory__item" href="./wedding-event-car-rental-dubai.html">
+                                <span class="services-directory__eyebrow">Event-led</span>
+                                <strong class="services-directory__title">Wedding and event rental</strong>
+                                <p class="services-directory__copy">Statement arrivals for proposals, shoots and private occasions where the car is part of the scene.</p>
+                            </a>
 
-            <div class="lab-shell services-private__shell">
-                <div class="services-private__intro">
-                    <span class="services-kicker">Private requests</span>
-                    <h2 id="private-requests-title">Some requests should feel discreet from the first click.</h2>
-                    <p>Higher-profile movement, sourcing support and owner-side services belong in a quieter, concierge-led path rather than the public booking story.</p>
-                    <a class="services-button services-button--primary" href="https://wa.me/971586122568?text=Hi%2C%20I%20have%20a%20private%20service%20request%20for%20Dynasty%20Prestige%20in%20Dubai." target="_blank" rel="noopener" data-analytics-event="service_whatsapp_click" data-analytics-service="services_hub" data-analytics-placement="private_request" data-analytics-channel="whatsapp">Send a private request</a>
-                </div>
+                            <a class="services-directory__item" href="./business-car-rental-dubai.html">
+                                <span class="services-directory__eyebrow">Executive</span>
+                                <strong class="services-directory__title">Business mobility</strong>
+                                <p class="services-directory__copy">Office, hotel and delegation-led movement when the schedule matters more than browsing every model.</p>
+                            </a>
+                        </div>
+                    </section>
 
-                <div class="services-private__grid">
-                    <article class="services-private-card">
-                        <span>Security and discretion</span>
-                        <h3>Protected movement for higher-profile guests.</h3>
-                        <p>Lower-visibility transfers and coordination where privacy matters more than theatre.</p>
-                    </article>
-                    <article class="services-private-card">
-                        <span>Vehicle sourcing</span>
-                        <h3>Buy-side search and exclusive model support.</h3>
-                        <p>Useful for guests moving from rental into sourcing, buying or advisory support.</p>
-                    </article>
-                    <article class="services-private-card">
-                        <span>Owner management</span>
-                        <h3>Full-service handling for third-party vehicle placement.</h3>
-                        <p>Marketing, bookings, maintenance coordination and guest delivery for owners.</p>
-                    </article>
+                    <section class="services-directory__group" aria-labelledby="services-directory-guides">
+                        <h3 class="services-directory__group-title" id="services-directory-guides">Location-led guides</h3>
+
+                        <div class="services-directory__list">
+                            <a class="services-directory__item" href="./dubai-airport-luxury-car-rental.html">
+                                <span class="services-directory__eyebrow">Airport handover</span>
+                                <strong class="services-directory__title">DXB and DWC arrival guide</strong>
+                                <p class="services-directory__copy">Flight timing, premium pickup logic and the route into the city.</p>
+                            </a>
+
+                            <a class="services-directory__item" href="./palm-jumeirah-luxury-car-rental.html">
+                                <span class="services-directory__eyebrow">Hotel and villa</span>
+                                <strong class="services-directory__title">Palm Jumeirah guide</strong>
+                                <p class="services-directory__copy">Resort stays, villas and branded residences where handover quality leads.</p>
+                            </a>
+
+                            <a class="services-directory__item" href="./dubai-marina-luxury-car-rental.html">
+                                <span class="services-directory__eyebrow">Waterfront stay</span>
+                                <strong class="services-directory__title">Dubai Marina guide</strong>
+                                <p class="services-directory__copy">Hotel towers, JBR movement and shorter plans needing lighter routing.</p>
+                            </a>
+
+                            <a class="services-directory__item" href="./abu-dhabi-luxury-car-rental.html">
+                                <span class="services-directory__eyebrow">Executive route</span>
+                                <strong class="services-directory__title">Abu Dhabi guide</strong>
+                                <p class="services-directory__copy">Capital visits, meetings and longer routes needing steadier timing.</p>
+                            </a>
+                        </div>
+                    </section>
                 </div>
             </div>
         </section>
@@ -487,29 +390,24 @@
                 <div class="services-section__head">
                     <span class="services-kicker services-kicker--dark">How it works</span>
                     <h2 id="service-flow-title">Keep the booking path premium by keeping it short.</h2>
-                    <p>The guest should only need to explain the stay once. After that, the routing, the vehicle and the handover should already feel under control.</p>
+                    <p>The guest should explain the stay once. After that, the route, the vehicle and the handover should already feel aligned.</p>
                 </div>
 
                 <ol class="services-flow__list">
                     <li class="services-flow__item">
                         <strong>01</strong>
                         <h3>Tell us the stay</h3>
-                        <p>Dates, property area, guest profile and whether the plan is leisure, event-led or executive.</p>
+                        <p>Dates, property area and whether the plan is arrival-led, executive, event-led or longer stay.</p>
                     </li>
                     <li class="services-flow__item">
                         <strong>02</strong>
                         <h3>Match the lane</h3>
-                        <p>Rental, chauffeur, airport concierge, delivery timing or a wider concierge route.</p>
+                        <p>Airport concierge, chauffeur, delivery timing, monthly support or a narrower secondary route.</p>
                     </li>
                     <li class="services-flow__item">
                         <strong>03</strong>
                         <h3>Confirm the handover</h3>
-                        <p>Lock the right car, delivery point and timing rhythm for the stay.</p>
-                    </li>
-                    <li class="services-flow__item">
-                        <strong>04</strong>
-                        <h3>Let one team run it</h3>
-                        <p>Fewer handoffs, cleaner execution and a more polished guest experience.</p>
+                        <p>Lock the vehicle, property or airport point and the timing rhythm so one team can run the booking cleanly.</p>
                     </li>
                 </ol>
             </div>
@@ -534,24 +432,19 @@
                             <p>Start with the stay and the arrival style. That usually makes the right vehicle choice clearer and faster.</p>
                         </details>
                         <details class="services-faq__item">
-                            <summary>Is monthly rental only for business guests?</summary>
-                            <p>No. It also suits longer leisure stays, relocation periods and guests who want steadier support over several weeks.</p>
-                        </details>
-                        <details class="services-faq__item">
-                            <summary>Can the team handle private or more discreet requests?</summary>
-                            <p>Yes. Security-led movement, sourcing and owner-side requests are better handled through direct concierge contact.</p>
+                            <summary>Can the team handle monthly, executive or more discreet requests?</summary>
+                            <p>Yes. Longer stays, business movement and quieter requests can all be shaped through the concierge path instead of a standard rental-only flow.</p>
                         </details>
                     </div>
                 </div>
 
                 <aside class="services-faq__cta">
                     <span class="services-kicker">Next step</span>
-                    <h3>Choose the service path first, then let Dynasty Prestige shape the booking around it.</h3>
-                    <p>Open the reservation flow, browse the fleet or move straight into a concierge conversation depending on how much of the stay is already clear.</p>
+                    <h3>Choose the lane, then move the booking forward.</h3>
+                    <p>Open the reservation flow when the basics are clear, or move straight into WhatsApp when the stay needs a quieter hand.</p>
                     <div class="services-faq__cta-actions">
                         <a class="services-button services-button--primary" href="./app/reserve/page.html" data-analytics-event="service_reservation_click" data-analytics-service="services_hub" data-analytics-placement="final_cta" data-analytics-channel="reservation">Open reservation flow</a>
                         <a class="services-button services-button--ghost" href="./fleet.html">View fleet</a>
-                        <a class="services-button services-button--ghost" href="./about.html">About Dynasty Prestige</a>
                         <a class="services-button services-button--ghost" href="https://wa.me/971586122568?text=Hi%2C%20I%20want%20to%20book%20a%20Dynasty%20Prestige%20service%20in%20Dubai." target="_blank" rel="noopener" data-analytics-event="service_whatsapp_click" data-analytics-service="services_hub" data-analytics-placement="final_cta" data-analytics-channel="whatsapp">WhatsApp the team</a>
                     </div>
                 </aside>
@@ -579,7 +472,7 @@
 
                     <div class="site-v2-footer__column">
                         <h3>Contact us</h3>
-                        <a href="tel:+971586122568">+971 58 612 2568</a>
+                        <a href="tel:+971586122568">+971&nbsp;58&nbsp;612&nbsp;2568</a>
                         <a href="https://wa.me/971586122568" target="_blank" rel="noopener">WhatsApp the team</a>
                         <a href="mailto:prestigegoalmotion@gmail.com">prestigegoalmotion@gmail.com</a>
                         <p>Palm Jumeirah, Dubai UAE with airport, hotel, villa and executive coordination across the city.</p>
