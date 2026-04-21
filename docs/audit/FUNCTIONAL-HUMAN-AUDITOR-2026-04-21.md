@@ -141,6 +141,34 @@ Esto no prueba infinitas combinaciones posibles, porque eso no existe en una web
 
 Lo que si hace es una exploracion exhaustiva acotada: todo lo que el DOM declara como interactivo en las rutas publicas y viewports funcionales conocidos.
 
+## Pasada profunda por tandas
+
+El modo profundo completo puede ser demasiado largo si se ejecuta como un unico proceso. Para evitar timeouts y mantener informes completos, el 2026-04-21 se valido por tandas:
+
+- base: home, about, contact, fleet, locations y services
+- guias SEO/locales
+- paginas detalle de servicios
+- landings de marcas
+- paginas de vehiculos
+- legales y reserve
+
+Resultado agregado de las tandas limpias:
+
+- rutas publicas: 32/32
+- acciones funcionales ejecutadas: 2718
+- fallos de accion: 0
+- hard fails: 0
+- targets truncados: 0
+
+Los reportes individuales quedan en `review` aunque no fallen, porque cada tanda solo cubre parte del mapa total. La lectura correcta es: cobertura agregada completa por tandas, sin fallos observados; no una promesa de "100% imposible".
+
+Aprendizajes incorporados al auditor:
+
+- enlaces dentro de `details`/FAQ se prueban abriendo el contenedor antes de validar visibilidad
+- enlaces que actuan como tabs, por ejemplo `data-service-selector`, se validan como cambio de estado y no como navegacion rota
+- navegacion interna espera la URL esperada antes de juzgar el destino
+- handoff home -> fleet espera la inicializacion JS de Fleet antes de comprobar fechas
+
 ## Capas de uso
 
 ```bash

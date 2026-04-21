@@ -4,8 +4,17 @@ const test = require('node:test');
 const {
     buildAuditMemory,
     canApproveAuditMemory,
-    compareAuditMemory
+    compareAuditMemory,
+    writeApprovedAuditMemory
 } = require('../../server/audit-memory-core');
+const {
+    summarizeVisualChangeGuard
+} = require('../../server/change-guard-core');
+const {
+    parseArgs: parseChangeGuardArgs,
+    resolveGuardRoutes,
+    resolveGuardViewports
+} = require('../../scripts/run-change-guard-audit');
 
 function navigationReportWithLocalExit(status = 'passed') {
     return {
@@ -126,4 +135,82 @@ test('audit memory approval rejects dirty navigation runs unless forced by calle
 
     assert.equal(approval.canApprove, false);
     assert.ok(approval.reasons.some((reason) => reason.includes('navigationStatus=')));
+});
+
+test('visual change guard requires approved memory before accepting a clean run', () => {
+    const report = {
+        generatedAt: '2026-04-21T00:00:00.000Z',
+        summary: { byStatus: { good: 1, review: 0, bad: 0 }, hardFailCount: 0 },
+        pages: [
+            {
+                route: '/fleet.html',
+                viewport: 'mobile-modern',
+                assessment: { status: 'good', score: 100, hardFails: [] },
+                baselineDiff: { status: 'pass', message: 'Viewport baseline passed.' }
+            }
+        ]
+    };
+    const guard = summarizeVisualChangeGuard(report, {
+        memoryRoot: require('node:os').tmpdir(),
+        requireMemory: true,
+        requireApprovedBaselines: true,
+        strictReview: true
+    });
+
+    assert.equal(guard.failed, true);
+    assert.equal(guard.missingMemory, true);
+});
+
+test('visual change guard catches a previously approved visual page that moves to review', () => {
+    const fs = require('node:fs');
+    const os = require('node:os');
+    const path = require('node:path');
+    const memoryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'visual-change-memory-'));
+    const approvedReport = {
+        generatedAt: '2026-04-21T00:00:00.000Z',
+        summary: { byStatus: { good: 1, review: 0, bad: 0 }, hardFailCount: 0 },
+        pages: [
+            {
+                route: '/fleet.html',
+                viewport: 'mobile-modern',
+                assessment: { status: 'good', score: 100 },
+                baselineDiff: { status: 'pass', message: 'Viewport baseline passed.' }
+            }
+        ]
+    };
+    const currentReport = {
+        generatedAt: '2026-04-21T00:01:00.000Z',
+        summary: { byStatus: { good: 0, review: 1, bad: 0 }, hardFailCount: 0 },
+        pages: [
+            {
+                route: '/fleet.html',
+                viewport: 'mobile-modern',
+                assessment: { status: 'review', score: 88, hardFails: [], reviewGates: ['baseline_diff_review'] },
+                baselineDiff: { status: 'review', message: 'Mismatch ratio 0.02.' }
+            }
+        ]
+    };
+
+    writeApprovedAuditMemory(buildAuditMemory(approvedReport, { kind: 'visual' }), memoryRoot);
+    const guard = summarizeVisualChangeGuard(currentReport, {
+        memoryRoot,
+        requireMemory: true,
+        requireApprovedBaselines: true,
+        strictReview: true
+    });
+
+    assert.equal(guard.failed, true);
+    assert.ok(guard.memoryRegressions.some((regression) => regression.family === 'visual.page-health'));
+    assert.equal(guard.reviewPages.length, 1);
+    assert.equal(guard.baselineDiffPages.length, 1);
+});
+
+test('change guard args resolve responsive and full visual memory scopes', () => {
+    const args = parseChangeGuardArgs(['--full', '--route', '/fleet.html', '--viewport', 'mobile-modern', '--allow-review']);
+
+    assert.equal(args.scope, 'full');
+    assert.equal(args.strictReview, false);
+    assert.deepEqual(resolveGuardRoutes(args), ['/fleet.html']);
+    assert.ok(resolveGuardViewports(args).includes('mobile-modern'));
+    assert.ok(resolveGuardViewports(parseChangeGuardArgs(['--responsive'])).includes('desktop-wide'));
 });

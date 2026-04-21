@@ -1454,11 +1454,26 @@ async function collectMobileNavDrawerState(page, pageDir, viewport) {
                 .filter((child) => child instanceof HTMLElement && isVisible(child))
                 .map((child) => {
                     const rect = rectData(child);
+                    const visualIcon = Array.from(child.querySelectorAll('svg, img, [class*="icon"]'))
+                        .find((icon) => icon instanceof HTMLElement || icon instanceof SVGElement);
+                    const iconRect = visualIcon?.getBoundingClientRect?.();
+                    const hasVisualIcon = Boolean(
+                        iconRect &&
+                        iconRect.width >= 12 &&
+                        iconRect.height >= 12 &&
+                        iconRect.bottom > 0 &&
+                        iconRect.top < viewportHeight &&
+                        iconRect.right > 0 &&
+                        iconRect.left < viewportWidth
+                    );
                     return {
                         text: textFor(child),
                         rect,
                         width: rect?.width || 0,
                         height: rect?.height || 0,
+                        hasVisualIcon,
+                        iconWidth: iconRect ? Number(iconRect.width.toFixed(2)) : 0,
+                        iconHeight: iconRect ? Number(iconRect.height.toFixed(2)) : 0,
                         viewportClipPx: rect ? Number(Math.max(
                             0,
                             -rect.top,
@@ -1489,6 +1504,7 @@ async function collectMobileNavDrawerState(page, pageDir, viewport) {
                 widthSpreadPx: widths.length ? Number((Math.max(...widths) - Math.min(...widths)).toFixed(2)) : 0,
                 heightSpreadPx: heights.length ? Number((Math.max(...heights) - Math.min(...heights)).toFixed(2)) : 0,
                 minChildHeight: heights.length ? Number(Math.min(...heights).toFixed(2)) : 0,
+                visualIconCount: children.filter((child) => child.hasVisualIcon).length,
                 partiallyVisibleChildren: children.filter((child) => child.partiallyVisible)
             };
         }
@@ -1517,15 +1533,53 @@ async function collectMobileNavDrawerState(page, pageDir, viewport) {
             };
         }
 
+        function disclosureData(key) {
+            const disclosure = document.querySelector(`[data-mobile-drawer-disclosure="${key}"]`);
+
+            if (!(disclosure instanceof HTMLElement)) {
+                return {
+                    key,
+                    available: false,
+                    linkCount: 0,
+                    visibleLinkCount: 0
+                };
+            }
+
+            const summary = disclosure.querySelector('summary');
+            const links = disclosure.querySelector('.lab-mobile-drawer__links');
+            const anchors = Array.from(links?.querySelectorAll('a[href]') || [])
+                .filter((link) => link instanceof HTMLElement);
+            const visibleAnchors = anchors.filter((link) => isVisible(link));
+            const leakedClosedAnchors = !disclosure.open
+                ? visibleAnchors.filter((link) => !link.closest('details:not([open])'))
+                : [];
+            const summaryRect = summary instanceof HTMLElement ? rectData(summary) : null;
+
+            return {
+                key,
+                available: true,
+                isOpen: Boolean(disclosure.open),
+                summaryText: textFor(summary),
+                summaryRect,
+                summaryHeight: summaryRect?.height || 0,
+                linkCount: anchors.length,
+                visibleLinkCount: disclosure.open ? visibleAnchors.length : 0,
+                visibleWhileClosed: Boolean(leakedClosedAnchors.length > 0),
+                contentDisplay: links instanceof HTMLElement ? window.getComputedStyle(links).display : '',
+                contentGridTemplateColumns: links instanceof HTMLElement ? window.getComputedStyle(links).gridTemplateColumns : ''
+            };
+        }
+
         const drawer = document.querySelector('.lab-mobile-drawer');
         const panel = document.querySelector('.lab-mobile-drawer__panel');
-        const sections = Array.from(document.querySelectorAll('.lab-mobile-drawer__section'));
         const groups = [
             groupData('.lab-mobile-drawer__quick', 'quick'),
             groupData('.lab-mobile-drawer__links--nav', 'nav'),
-            groupData(sections[1]?.querySelector('.lab-mobile-drawer__links--compact'), 'brands'),
-            groupData(sections[2]?.querySelector('.lab-mobile-drawer__links--compact'), 'browse'),
             groupData('.lab-mobile-drawer__actions', 'actions')
+        ];
+        const disclosures = [
+            disclosureData('brands'),
+            disclosureData('browse')
         ];
         const actions = Array.from(document.querySelectorAll('.lab-mobile-drawer__action'))
             .filter((action) => action instanceof HTMLElement && isVisible(action))
@@ -1548,6 +1602,7 @@ async function collectMobileNavDrawerState(page, pageDir, viewport) {
             visibleSecondaryActionCount: actions.filter((action) => action.isSecondary).length,
             visiblePrimaryActionCount: actions.filter((action) => action.isPrimary).length,
             groups,
+            disclosures,
             actions
         };
     });
@@ -1671,6 +1726,94 @@ function buildMobileNavDrawerFindings({ route, viewportName, viewportWidth, stat
             message: 'The mobile navigation drawer is missing expected link groups.',
             evidence: `missingGroups=${missingGroups.join(', ')}`,
             likelyCause: 'The shared drawer builder did not collect one of the navigation, brand, browse, or action groups.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    const missingDisclosures = (contract.requiredDisclosures || [])
+        .filter((key) => !(state.disclosures || []).some((disclosure) => (
+            disclosure.key === key &&
+            disclosure.available &&
+            Number(disclosure.linkCount || 0) >= Number(contract.minDisclosureLinkCount || 1)
+        )));
+
+    if (missingDisclosures.length > 0) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'interaction_state',
+            message: 'The mobile navigation drawer is missing scalable dropdowns for brands or car types.',
+            evidence: `missingDisclosures=${missingDisclosures.join(', ')}`,
+            likelyCause: 'Brands and car-type links are rendered as fixed button grids or are missing instead of living inside drawer disclosures.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    const openDisclosures = (state.disclosures || [])
+        .filter((disclosure) => disclosure.available && disclosure.isOpen);
+
+    if (openDisclosures.length > Number(contract.maxDefaultOpenDisclosureCount || 0)) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'layout_homogeneity',
+            message: 'The mobile navigation drawer expands brand or car-type lists by default.',
+            evidence: `openDisclosures=${openDisclosures.map((disclosure) => disclosure.key).join(', ')}; max=${contract.maxDefaultOpenDisclosureCount}`,
+            likelyCause: 'The drawer is exposing scalable link lists before the customer asks for them, making future brands or types bloat the mobile menu.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    const weakDisclosures = (state.disclosures || [])
+        .filter((disclosure) => disclosure.available)
+        .filter((disclosure) => (
+            Number(disclosure.summaryHeight || 0) < Number(contract.minDisclosureSummaryHeightPx || 0) ||
+            disclosure.visibleWhileClosed
+        ));
+
+    if (weakDisclosures.length > 0) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'form_visibility',
+            message: 'The mobile navigation dropdown controls are not behaving like useful collapsed tap targets.',
+            evidence: weakDisclosures.map((disclosure) => `${disclosure.key}:summaryHeight=${disclosure.summaryHeight},visibleWhileClosed=${Boolean(disclosure.visibleWhileClosed)}`).join('; '),
+            likelyCause: 'A disclosure summary is too small to tap or its links remain visible while the accordion is closed.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    const quickGroup = (state.groups || []).find((group) => group.key === 'quick');
+    if (
+        quickGroup?.available &&
+        Number.isFinite(Number(contract.minQuickActionVisualIconCount)) &&
+        Number(quickGroup.visualIconCount || 0) < Number(contract.minQuickActionVisualIconCount)
+    ) {
+        const missingIconLabels = (quickGroup.children || [])
+            .filter((child) => !child.hasVisualIcon)
+            .map((child) => child.text || 'unlabelled')
+            .slice(0, 4)
+            .join(', ');
+
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'visual_affordance',
+            message: 'The mobile navigation quick actions need visible icons, not plain text buttons.',
+            evidence: `quickVisualIconCount=${quickGroup.visualIconCount || 0}; min=${contract.minQuickActionVisualIconCount}; missing=${missingIconLabels || 'none'}`,
+            likelyCause: 'The drawer quick actions regressed to text-only controls, making Call, Email and WhatsApp harder to scan on mobile.',
             hardFail: true,
             screenshotPath: stateScreenshotPath,
             source: 'interaction'
@@ -3169,6 +3312,99 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                 return selected.map(({ element, ...metric }) => metric);
             }
 
+            function collectActionGroupWidthMetrics() {
+                const selectors = [
+                    '.hero-lab__actions',
+                    '.about-hero__actions',
+                    '.services-hero__feature-actions',
+                    '.locations-hero__actions',
+                    '.local-guide-hero__actions',
+                    '.service-detail-actions',
+                    '.vehicle-hero__actions',
+                    '.contact-hero__actions',
+                    'main [class*="actions"]'
+                ];
+                const groups = [];
+                const seenGroups = new Set();
+
+                function rowCountFor(rects) {
+                    const rows = [];
+
+                    for (const rect of rects) {
+                        const top = Math.round(Number(rect?.top || 0));
+                        if (!rows.some((known) => Math.abs(known - top) <= 4)) {
+                            rows.push(top);
+                        }
+                    }
+
+                    return rows.length;
+                }
+
+                for (const group of Array.from(document.querySelectorAll(selectors.join(',')))) {
+                    if (!(group instanceof HTMLElement) || seenGroups.has(group) || !isVisible(group)) {
+                        continue;
+                    }
+
+                    seenGroups.add(group);
+
+                    if (group.closest('header, nav, footer, form, .lab-nav__panel, .lab-mobile-drawer, [aria-hidden="true"]')) {
+                        continue;
+                    }
+
+                    if (group.closest('.fleet-card, .vehicle-card, .model-card, .service-card, .location-card, .guide-card, article[class*="card"], .card')) {
+                        continue;
+                    }
+
+                    const children = Array.from(group.querySelectorAll('a[href], button, [role="button"]'))
+                        .filter((child) => child instanceof HTMLElement && isVisible(child))
+                        .filter((child) => !child.closest('.lab-mobile-drawer, header, nav, footer, form, .lab-nav__panel'));
+
+                    if (children.length < 2) {
+                        continue;
+                    }
+
+                    const childMetrics = children.map((child) => {
+                        const rect = rectData(child);
+                        return {
+                            selector: selectorLabel(child),
+                            label: textFor(child).slice(0, 60),
+                            className: String(child.className || ''),
+                            rect,
+                            widthRatio: Number((rect.width / Math.max(1, viewportWidth)).toFixed(3)),
+                            inlinePaddingPx: Number(Math.min(
+                                Math.max(0, rect.left),
+                                Math.max(0, viewportWidth - rect.right)
+                            ).toFixed(2))
+                        };
+                    });
+                    const widths = childMetrics.map((child) => Number(child.rect?.width || 0));
+                    const widthRatios = childMetrics.map((child) => Number(child.widthRatio || 0));
+                    const paddings = childMetrics.map((child) => Number(child.inlinePaddingPx || 0));
+                    const groupRect = rectData(group);
+
+                    groups.push({
+                        selector: selectorLabel(group),
+                        className: String(group.className || ''),
+                        label: textFor(group).slice(0, 90),
+                        rect: groupRect,
+                        groupWidthRatio: Number((groupRect.width / Math.max(1, viewportWidth)).toFixed(3)),
+                        childCount: childMetrics.length,
+                        rowCount: rowCountFor(childMetrics.map((child) => child.rect)),
+                        minChildWidthRatio: Number(Math.min(...widthRatios).toFixed(3)),
+                        maxChildWidthRatio: Number(Math.max(...widthRatios).toFixed(3)),
+                        widthDriftRatio: Number(((Math.max(...widths) - Math.min(...widths)) / Math.max(1, viewportWidth)).toFixed(3)),
+                        sidePaddingDriftPx: Number((Math.max(...paddings) - Math.min(...paddings)).toFixed(2)),
+                        children: childMetrics.slice(0, 6)
+                    });
+
+                    if (groups.length >= 12) {
+                        break;
+                    }
+                }
+
+                return groups;
+            }
+
             function labelForDateElement(element) {
                 if (!(element instanceof HTMLElement)) {
                     return '';
@@ -3312,6 +3548,7 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                 largestBlankGapRatio: Number((largestBlankGapPx / Math.max(1, viewportHeight)).toFixed(3)),
                 actionMetrics: actionMetrics.slice(0, 40),
                 surfaceWidthMetrics: collectSurfaceWidthMetrics(),
+                actionGroupWidthMetrics: collectActionGroupWidthMetrics(),
                 dateControlMetrics,
                 formBorderStyleMetrics: collectFormBorderStyleMetrics(),
                 textEncodingIssues: collectVisibleTextEncodingIssues()
@@ -3806,15 +4043,44 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
                         findings.push(createVisualFinding({
                             route,
                             viewport: viewportName,
-                            severity: 'medium',
+                            severity: 'high',
                             category: 'layout_homogeneity',
                             message: 'Mobile sections and primary surfaces do not keep a consistent readable width.',
                             evidence: `${frameEvidence}; widthDriftRatio=${widthDriftRatio.toFixed(3)}; max=${scanContract.maxSurfaceWidthDriftRatio}; sidePaddingDriftPx=${sidePaddingDriftPx.toFixed(2)}; examples=${examples}`,
                             likelyCause: 'Adjacent mobile blocks are using unrelated width, max-width, or padding rules instead of the shared page rhythm.',
+                            hardFail: true,
                             screenshotPath: frameScreenshotPath,
                             source: 'page_depth_scan'
                         }));
                     }
+                }
+
+                const inconsistentActionGroups = (frameMetric.actionGroupWidthMetrics || [])
+                    .filter((metric) => (
+                        Number(metric.childCount || 0) >= 2 &&
+                        Number(metric.maxChildWidthRatio || 0) >= Number(scanContract.minWideActionWidthRatio || 0.55) &&
+                        Number(metric.widthDriftRatio || 0) > Number(scanContract.maxActionGroupWidthDriftRatio || 0.08)
+                    ));
+
+                for (const metric of inconsistentActionGroups.slice(0, 4)) {
+                    const examples = (metric.children || [])
+                        .slice(0, 4)
+                        .map((child) => `${child.label || child.selector}:w=${child.widthRatio},pad=${child.inlinePaddingPx}`)
+                        .join('; ');
+
+                    findings.push(createVisualFinding({
+                        route,
+                        viewport: viewportName,
+                        severity: 'high',
+                        category: 'layout_homogeneity',
+                        selector: metric.selector,
+                        message: 'A mobile action group mixes unrelated button widths inside the same section.',
+                        evidence: `${frameEvidence}; group=${metric.selector}; widthDriftRatio=${metric.widthDriftRatio}; max=${scanContract.maxActionGroupWidthDriftRatio}; rowCount=${metric.rowCount}; examples=${examples}`,
+                        likelyCause: 'Primary and secondary actions are using different mobile width rules instead of sharing a stable grid or stacked full-width rhythm.',
+                        hardFail: true,
+                        screenshotPath: frameScreenshotPath,
+                        source: 'page_depth_scan'
+                    }));
                 }
             }
 

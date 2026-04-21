@@ -5931,18 +5931,70 @@ a.brand-marquee__item:focus-visible img {
 }
 
 .lab-mobile-drawer__quick-link {
+    position: relative;
+    isolation: isolate;
     display: inline-flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 42px;
+    gap: 0.34rem;
+    min-height: 58px;
+    padding: 0.46rem 0.42rem 0.42rem;
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.03);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(11, 12, 16, 0.96));
     color: rgba(245, 241, 232, 0.92);
     font-size: 0.73rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.02em;
+    line-height: 1;
     text-transform: uppercase;
+    overflow: hidden;
+    transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease, color 180ms ease;
+}
+
+.lab-mobile-drawer__quick-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.62rem;
+    height: 1.62rem;
+    border: 1px solid rgba(245, 241, 232, 0.1);
+    border-radius: 8px;
+    background: rgba(245, 241, 232, 0.06);
+    color: #f8fbd4;
+}
+
+.lab-mobile-drawer__quick-icon svg {
+    width: 1rem;
+    height: 1rem;
+    display: block;
+}
+
+.lab-mobile-drawer__quick-text {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.lab-mobile-drawer__quick-link--wa .lab-mobile-drawer__quick-icon {
+    background: rgba(76, 143, 47, 0.24);
+    color: #dff6d2;
+}
+
+.lab-mobile-drawer__quick-link--call .lab-mobile-drawer__quick-icon {
+    background: rgba(214, 188, 134, 0.14);
+    color: #f6df9e;
+}
+
+.lab-mobile-drawer__quick-link:hover,
+.lab-mobile-drawer__quick-link:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(227, 246, 85, 0.24);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(11, 12, 16, 0.92));
+    color: #ffffff;
 }
 
 .lab-mobile-drawer__section {
@@ -5956,6 +6008,59 @@ a.brand-marquee__item:focus-visible img {
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
+}
+
+.lab-mobile-drawer__section--disclosure {
+    display: block;
+}
+
+.lab-mobile-drawer__summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 0.7rem;
+    min-height: 46px;
+    padding: 0 0.82rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(11, 12, 16, 0.96));
+    color: rgba(245, 241, 232, 0.92);
+    cursor: pointer;
+    list-style: none;
+}
+
+.lab-mobile-drawer__summary::-webkit-details-marker {
+    display: none;
+}
+
+.lab-mobile-drawer__summary .lab-mobile-drawer__label {
+    color: rgba(245, 241, 232, 0.82);
+}
+
+.lab-mobile-drawer__summary-meta {
+    color: rgba(245, 241, 232, 0.5);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.lab-mobile-drawer__summary-icon {
+    width: 0.54rem;
+    height: 0.54rem;
+    border-right: 2px solid rgba(245, 241, 232, 0.74);
+    border-bottom: 2px solid rgba(245, 241, 232, 0.74);
+    transform: rotate(45deg) translateY(-2px);
+    transition: transform 180ms ease;
+}
+
+.lab-mobile-drawer__section--disclosure[open] .lab-mobile-drawer__summary-icon {
+    transform: rotate(225deg) translate(-2px, -1px);
+}
+
+.lab-mobile-drawer__section--disclosure[open] .lab-mobile-drawer__links {
+    margin-top: 0.55rem;
 }
 
 .lab-mobile-drawer__links {
@@ -6132,7 +6237,6 @@ body.lab-mobile-nav-open {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .lab-mobile-drawer__quick-link,
     .lab-mobile-drawer__links a {
         justify-content: center;
         min-width: 0;
@@ -6140,6 +6244,23 @@ body.lab-mobile-nav-open {
         padding: 0 0.58rem;
         text-align: center;
         line-height: 1.12;
+    }
+
+    .lab-mobile-drawer__quick-link {
+        min-width: 0;
+        min-height: 54px;
+        padding: 0.42rem 0.38rem 0.38rem;
+        text-align: center;
+    }
+
+    .lab-mobile-drawer__quick-icon {
+        width: 1.46rem;
+        height: 1.46rem;
+    }
+
+    .lab-mobile-drawer__quick-icon svg {
+        width: 0.92rem;
+        height: 0.92rem;
     }
 
     .lab-mobile-drawer__links--compact a {

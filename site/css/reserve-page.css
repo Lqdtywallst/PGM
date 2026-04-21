@@ -1652,12 +1652,16 @@
         }
 
         .reserve-page .lab-mobile-toggle {
-            border-color: rgba(50, 39, 27, 0.16);
-            background: rgba(255, 255, 255, 0.72);
+            border-color: rgba(224, 198, 148, 0.24);
+            background: linear-gradient(180deg, rgba(17, 20, 24, 0.72) 0%, rgba(8, 10, 12, 0.94) 100%);
         }
 
         .reserve-page .lab-mobile-toggle__line {
-            background: #17120d;
+            background: currentColor;
+        }
+
+        .reserve-page .lab-mobile-toggle__line:nth-child(2) {
+            background: rgba(230, 196, 111, 0.94);
         }
 
         .reserve-page .lab-brand__copy strong,

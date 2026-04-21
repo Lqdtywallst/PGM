@@ -136,7 +136,8 @@ test('getMobileInteractionContract locks mobile navigation drawer rhythm', () =>
     assert.equal(contract.maxVisibleSecondaryActionCount, 0);
     assert.ok(contract.maxButtonWidthSpreadPx <= 12);
     assert.ok(contract.requiredGroups.includes('nav'));
-    assert.ok(contract.requiredGroups.includes('browse'));
+    assert.ok(contract.requiredDisclosures.includes('browse'));
+    assert.equal(contract.maxDefaultOpenDisclosureCount, 0);
 });
 
 test('human-state contracts cover contact and reserve filled forms', () => {
@@ -1905,6 +1906,12 @@ test('buildMobileNavDrawerFindings flags uneven wrapped mobile menu buttons', ()
                     widthSpreadPx: 45.77,
                     heightSpreadPx: 0,
                     minChildHeight: 44,
+                    visualIconCount: 0,
+                    children: [
+                        { text: 'Call', hasVisualIcon: false },
+                        { text: 'Email', hasVisualIcon: false },
+                        { text: 'WhatsApp', hasVisualIcon: false }
+                    ],
                     partiallyVisibleChildren: []
                 },
                 {
@@ -1960,6 +1967,8 @@ test('buildMobileNavDrawerFindings flags uneven wrapped mobile menu buttons', ()
     });
 
     assert.ok(findings.some((finding) => finding.category === 'layout_homogeneity' && /uneven button rows/i.test(finding.message)));
+    assert.ok(findings.some((finding) => finding.category === 'interaction_state' && /scalable dropdowns/i.test(finding.message)));
+    assert.ok(findings.some((finding) => finding.category === 'visual_affordance' && /visible icons/i.test(finding.message)));
     assert.ok(findings.some((finding) => finding.category === 'cta_hierarchy' && /duplicate secondary CTAs/i.test(finding.message)));
     assert.ok(findings.some((finding) => finding.category === 'clipping' && /partially visible/i.test(finding.message)));
     assert.ok(findings.some((finding) => finding.hardFail === true));
@@ -1969,8 +1978,6 @@ test('buildMobileNavDrawerFindings accepts stable compact mobile menu grids', ()
     const groups = [
         ['quick', 3, 107],
         ['nav', 7, 107],
-        ['brands', 5, 164.5],
-        ['browse', 5, 164.5],
         ['actions', 1, 337]
     ].map(([key, count, width]) => ({
         key,
@@ -1981,6 +1988,7 @@ test('buildMobileNavDrawerFindings accepts stable compact mobile menu grids', ()
         widthSpreadPx: 0,
         heightSpreadPx: 0,
         minChildHeight: key === 'actions' ? 48.8 : 40,
+        visualIconCount: key === 'quick' ? 3 : 0,
         partiallyVisibleChildren: []
     }));
 
@@ -1996,12 +2004,63 @@ test('buildMobileNavDrawerFindings accepts stable compact mobile menu grids', ()
             visiblePrimaryActionCount: 1,
             visibleSecondaryActionCount: 0,
             groups,
+            disclosures: [
+                {
+                    key: 'brands',
+                    available: true,
+                    isOpen: false,
+                    summaryHeight: 46,
+                    linkCount: 5,
+                    visibleLinkCount: 0,
+                    visibleWhileClosed: false
+                },
+                {
+                    key: 'browse',
+                    available: true,
+                    isOpen: false,
+                    summaryHeight: 46,
+                    linkCount: 5,
+                    visibleLinkCount: 0,
+                    visibleWhileClosed: false
+                }
+            ],
             screenshotPath: '/tmp/mobile-nav-drawer-good.png'
         },
         screenshotPath: '/tmp/page.png'
     });
 
     assert.equal(findings.length, 0);
+});
+
+test('buildMobileNavDrawerFindings flags expanded mobile brand/type dropdowns', () => {
+    const findings = buildMobileNavDrawerFindings({
+        route: '/',
+        viewportName: 'mobile-modern',
+        viewportWidth: 393,
+        state: {
+            available: true,
+            isOpen: true,
+            panelHorizontalOverflowPx: 0,
+            panelInitialScrollOverflowPx: 0,
+            visiblePrimaryActionCount: 1,
+            visibleSecondaryActionCount: 0,
+            groups: [
+                { key: 'quick', available: true, display: 'grid', visibleChildCount: 3, widthSpreadPx: 0, heightSpreadPx: 0, minChildHeight: 58, visualIconCount: 3, partiallyVisibleChildren: [] },
+                { key: 'nav', available: true, display: 'grid', visibleChildCount: 7, widthSpreadPx: 0, heightSpreadPx: 0, minChildHeight: 40, partiallyVisibleChildren: [] },
+                { key: 'actions', available: true, display: 'grid', visibleChildCount: 1, widthSpreadPx: 0, heightSpreadPx: 0, minChildHeight: 48, partiallyVisibleChildren: [] }
+            ],
+            disclosures: [
+                { key: 'brands', available: true, isOpen: true, summaryHeight: 46, linkCount: 9, visibleLinkCount: 9, visibleWhileClosed: false },
+                { key: 'browse', available: true, isOpen: false, summaryHeight: 34, linkCount: 8, visibleLinkCount: 2, visibleWhileClosed: true }
+            ],
+            screenshotPath: '/tmp/mobile-nav-drawer-expanded.png'
+        },
+        screenshotPath: '/tmp/page.png'
+    });
+
+    assert.ok(findings.some((finding) => finding.category === 'layout_homogeneity' && /expands brand or car-type lists/i.test(finding.message)));
+    assert.ok(findings.some((finding) => finding.category === 'form_visibility' && /collapsed tap targets/i.test(finding.message)));
+    assert.ok(findings.some((finding) => finding.hardFail === true));
 });
 
 test('buildPageDepthScanFindings flags mobile card action groups that dominate the card', () => {
@@ -2227,6 +2286,79 @@ test('buildPageDepthScanFindings flags mobile section width drift', () => {
         finding.category === 'layout_homogeneity' &&
         /consistent readable width/i.test(finding.message) &&
         finding.screenshotPath === '/tmp/home-mobile-width-drift.png'
+    )));
+});
+
+test('buildPageDepthScanFindings flags mobile action groups with mismatched button widths', () => {
+    const findings = buildPageDepthScanFindings({
+        route: '/',
+        viewportName: 'mobile-modern',
+        viewportWidth: 400,
+        state: {
+            available: true,
+            frames: [
+                {
+                    index: 1,
+                    scrollY: 0,
+                    viewportTop: 0,
+                    viewportBottom: 803,
+                    screenshotPath: '/tmp/home-mobile-action-width-drift.png',
+                    metric: {
+                        visibleMajorElementCount: 7,
+                        largestBlankGapRatio: 0.18,
+                        actionMetrics: [],
+                        dateControlMetrics: [],
+                        surfaceWidthMetrics: [
+                            {
+                                selector: '.hero-lab__cta--primary',
+                                label: 'Rent a luxury car',
+                                widthRatio: 0.8,
+                                inlinePaddingPx: 16
+                            },
+                            {
+                                selector: '.hero-lab-overlay',
+                                label: 'Choose your dates',
+                                widthRatio: 0.88,
+                                inlinePaddingPx: 16
+                            }
+                        ],
+                        actionGroupWidthMetrics: [
+                            {
+                                selector: '.hero-lab__actions',
+                                childCount: 2,
+                                rowCount: 2,
+                                minChildWidthRatio: 0.265,
+                                maxChildWidthRatio: 0.8,
+                                widthDriftRatio: 0.535,
+                                sidePaddingDriftPx: 214,
+                                children: [
+                                    {
+                                        selector: '.hero-lab__cta--primary',
+                                        label: 'Rent a luxury car',
+                                        widthRatio: 0.8,
+                                        inlinePaddingPx: 16
+                                    },
+                                    {
+                                        selector: '.hero-lab__cta--secondary',
+                                        label: 'View fleet',
+                                        widthRatio: 0.265,
+                                        inlinePaddingPx: 229
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            cardActionMetrics: []
+        },
+        screenshotPath: '/tmp/home.png'
+    });
+
+    assert.ok(findings.some((finding) => (
+        finding.category === 'layout_homogeneity' &&
+        /action group mixes unrelated button widths/i.test(finding.message) &&
+        finding.hardFail === true
     )));
 });
 

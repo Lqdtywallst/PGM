@@ -586,9 +586,25 @@ function initSiteV2() {
             });
         }
 
-        const buildSectionLinks = (selector) => Array.from(nav.querySelectorAll(selector))
+        const sectionLinks = (selector) => Array.from(nav.querySelectorAll(selector));
+        const buildSectionLinks = (selector) => sectionLinks(selector)
             .map((link) => `<a href="${link.getAttribute("href") || "#"}">${normalizeBookingValue(link.querySelector("strong")?.textContent || link.textContent)}</a>`)
             .join("");
+        const buildDisclosureSection = ({ key, label, selector }) => {
+            const count = sectionLinks(selector).length;
+            const countLabel = count === 1 ? "1 option" : `${count} options`;
+
+            return `
+                <details class="lab-mobile-drawer__section lab-mobile-drawer__section--disclosure" data-mobile-drawer-disclosure="${key}">
+                    <summary class="lab-mobile-drawer__summary">
+                        <span class="lab-mobile-drawer__label">${label}</span>
+                        <span class="lab-mobile-drawer__summary-meta">${countLabel}</span>
+                        <span class="lab-mobile-drawer__summary-icon" aria-hidden="true"></span>
+                    </summary>
+                    <div class="lab-mobile-drawer__links lab-mobile-drawer__links--compact">${buildSectionLinks(selector)}</div>
+                </details>
+            `;
+        };
 
         const toggle = document.createElement("button");
         toggle.type = "button";
@@ -625,9 +641,30 @@ function initSiteV2() {
                 <div class="lab-mobile-drawer__intro">
                     <p>Pick the route that fits the stay, then move straight into the right fleet and reserve flow.</p>
                     <div class="lab-mobile-drawer__quick">
-                        <a class="lab-mobile-drawer__quick-link" href="tel:+971586122568">Call</a>
-                        <a class="lab-mobile-drawer__quick-link" href="mailto:prestigegoalmotion@gmail.com">Email</a>
-                        <a class="lab-mobile-drawer__quick-link" href="https://wa.me/971586122568" target="_blank" rel="noopener">WhatsApp</a>
+                        <a class="lab-mobile-drawer__quick-link lab-mobile-drawer__quick-link--call" href="tel:+971586122568" aria-label="Call Dynasty Prestige">
+                            <span class="lab-mobile-drawer__quick-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" focusable="false">
+                                    <path fill="currentColor" d="M6.62 10.79a15.5 15.5 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.07 21 3 13.93 3 5c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.24.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2Z"/>
+                                </svg>
+                            </span>
+                            <span class="lab-mobile-drawer__quick-text">Call</span>
+                        </a>
+                        <a class="lab-mobile-drawer__quick-link lab-mobile-drawer__quick-link--email" href="mailto:prestigegoalmotion@gmail.com" aria-label="Email Dynasty Prestige">
+                            <span class="lab-mobile-drawer__quick-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" focusable="false">
+                                    <path fill="currentColor" d="M4 5h16c.55 0 1 .45 1 1v12c0 .55-.45 1-1 1H4c-.55 0-1-.45-1-1V6c0-.55.45-1 1-1Zm8 7.35L5.4 7H5v.55l7 5.7 7-5.7V7h-.4L12 12.35Z"/>
+                                </svg>
+                            </span>
+                            <span class="lab-mobile-drawer__quick-text">Email</span>
+                        </a>
+                        <a class="lab-mobile-drawer__quick-link lab-mobile-drawer__quick-link--wa" href="https://wa.me/971586122568" target="_blank" rel="noopener" aria-label="Open WhatsApp Dynasty Prestige">
+                            <span class="lab-mobile-drawer__quick-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" focusable="false">
+                                    <path fill="currentColor" d="M19.05 4.91A9.82 9.82 0 0 0 12 2a9.94 9.94 0 0 0-8.54 15.02L2 22l5.13-1.35A9.94 9.94 0 1 0 19.05 4.91ZM12 19.01c-1.53 0-3.04-.41-4.36-1.19l-.31-.18-3.04.8.81-2.96-.2-.31a8 8 0 1 1 7.1 3.84Zm4.39-5.91c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.93-1.18-.71-.63-1.2-1.41-1.34-1.65-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.48-.4-.41-.54-.41l-.46-.01c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.09 3.61.57.25 1.01.39 1.36.49.57.18 1.09.15 1.5.09.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"/>
+                                </svg>
+                            </span>
+                            <span class="lab-mobile-drawer__quick-text">WhatsApp</span>
+                        </a>
                     </div>
                 </div>
                 <div class="lab-mobile-drawer__section">
@@ -636,18 +673,10 @@ function initSiteV2() {
                         ${mainLinks.map((link) => `<a href="${link.href}"${link.current ? " aria-current=\"page\"" : ""}>${link.label}</a>`).join("")}
                     </div>
                 </div>
-                <div class="lab-mobile-drawer__section">
-                    <span class="lab-mobile-drawer__label">Brands</span>
-                    <div class="lab-mobile-drawer__links lab-mobile-drawer__links--compact">${buildSectionLinks(".lab-nav__panel--brands .lab-nav__card")}</div>
-                </div>
-                <div class="lab-mobile-drawer__section">
-                    <span class="lab-mobile-drawer__label">Browse</span>
-                    <div class="lab-mobile-drawer__links lab-mobile-drawer__links--compact">${buildSectionLinks(".lab-nav__panel--types .lab-nav__card")}</div>
-                </div>
+                ${buildDisclosureSection({ key: "brands", label: "Brands", selector: ".lab-nav__panel--brands .lab-nav__card" })}
+                ${buildDisclosureSection({ key: "browse", label: "Browse", selector: ".lab-nav__panel--types .lab-nav__card" })}
                 <div class="lab-mobile-drawer__actions">
                     <a class="lab-mobile-drawer__action lab-mobile-drawer__action--primary" href="${reserveLink?.getAttribute("href") || HEADER_RESERVE_HREF}">Reserve</a>
-                    <a class="lab-mobile-drawer__action lab-mobile-drawer__action--secondary" href="https://wa.me/971586122568" target="_blank" rel="noopener">WhatsApp now</a>
-                    <a class="lab-mobile-drawer__action lab-mobile-drawer__action--secondary" href="tel:+971586122568">Call</a>
                 </div>
             </div>
         `;

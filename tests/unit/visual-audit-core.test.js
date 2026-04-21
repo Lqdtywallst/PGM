@@ -26,7 +26,7 @@ test('classifyRouteProfile maps key public routes to explicit visual profiles', 
 });
 
 test('visual finding categories include current regression checks emitted by the visual agent', () => {
-    for (const category of ['date_currentness', 'text_encoding', 'border_weight_drift', 'spacing', 'layout_homogeneity']) {
+    for (const category of ['date_currentness', 'text_encoding', 'border_weight_drift', 'spacing', 'layout_homogeneity', 'visual_affordance']) {
         assert.ok(VISUAL_FINDING_CATEGORIES.includes(category), `${category} should be accepted by visual tooling`);
     }
 });

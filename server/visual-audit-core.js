@@ -52,7 +52,8 @@ const VISUAL_FINDING_CATEGORIES = Object.freeze([
     'text_encoding',
     'border_weight_drift',
     'spacing',
-    'layout_homogeneity'
+    'layout_homogeneity',
+    'visual_affordance'
 ]);
 
 const PROFILE_CONFIG = Object.freeze({
@@ -120,6 +121,7 @@ const FINDING_BUCKETS = Object.freeze({
     border_weight_drift: 'layoutIntegrity',
     spacing: 'layoutIntegrity',
     layout_homogeneity: 'layoutIntegrity',
+    visual_affordance: 'layoutIntegrity',
     heading: 'firstViewportHierarchy',
     primary_cta: 'firstViewportHierarchy',
     cta_hierarchy: 'firstViewportHierarchy',
