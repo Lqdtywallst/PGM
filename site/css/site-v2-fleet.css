@@ -1828,20 +1828,21 @@
     }
 
     .fleet-card__secondary {
-        min-height: 44px;
-        border: 1px solid rgba(126, 96, 60, 0.18);
+        min-height: 48px;
+        border: 1px solid rgba(154, 117, 57, 0.18);
         border-radius: 8px;
-        background: rgba(255, 251, 245, 0.82);
-        color: #4d3a25;
+        background: linear-gradient(135deg, rgba(212, 178, 95, 0.98), rgba(196, 151, 72, 0.98));
+        color: #171412;
         box-shadow: none;
-        font-size: 0.68rem;
+        font-size: 0.72rem;
+        font-weight: 800;
         letter-spacing: 0;
     }
 
     .fleet-card__secondary--wa {
-        border-color: rgba(76, 143, 47, 0.24);
-        background: rgba(76, 143, 47, 0.1);
-        color: #315f21;
+        border-color: rgba(39, 111, 31, 0.22);
+        background: linear-gradient(135deg, #3e8b2d, #2f7324);
+        color: #fff;
     }
 }
 
