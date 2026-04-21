@@ -2339,6 +2339,93 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                 return `${element.tagName.toLowerCase()}${id}${className}`;
             }
 
+            function parseCssColor(value) {
+                const text = String(value || '').trim();
+                const rgbaMatch = text.match(/rgba?\(([^)]+)\)/i);
+
+                if (!rgbaMatch) {
+                    return { alpha: 1, luminance: 0 };
+                }
+
+                const parts = rgbaMatch[1]
+                    .split(',')
+                    .map((part) => Number.parseFloat(part.trim()))
+                    .filter((part) => Number.isFinite(part));
+                const red = parts[0] || 0;
+                const green = parts[1] || 0;
+                const blue = parts[2] || 0;
+                const alpha = parts.length >= 4 ? Math.max(0, Math.min(1, parts[3])) : 1;
+                const normalize = (channel) => {
+                    const normalized = Math.max(0, Math.min(255, channel)) / 255;
+                    return normalized <= 0.03928
+                        ? normalized / 12.92
+                        : ((normalized + 0.055) / 1.055) ** 2.4;
+                };
+                const luminance = (0.2126 * normalize(red)) + (0.7152 * normalize(green)) + (0.0722 * normalize(blue));
+
+                return {
+                    alpha: Number(alpha.toFixed(3)),
+                    luminance: Number(luminance.toFixed(3))
+                };
+            }
+
+            function collectFormBorderStyleMetrics() {
+                const groups = [
+                    {
+                        role: 'panel',
+                        selector: '#step1 .schedule-card, #step1 .delivery-card, #step1 .reservation-summary, #step2 .info-card, #step2 .selected-plan-card, #step2 .summary-section, #step3 .payment-side-card, #step3 .payment-breakdown'
+                    },
+                    {
+                        role: 'field_container',
+                        selector: '#step1 .schedule-grid .form-group, #step1 .delivery-card .form-group, #step2 .info-grid .form-group, #step2 .billing-grid .form-group'
+                    },
+                    {
+                        role: 'control',
+                        selector: '#step1 input.input, #step1 select.input, #step1 textarea.input, #step2 input.input, #step2 select.input, #step2 textarea.input, #step3 input.input, #step3 select.input, #step3 textarea.input'
+                    }
+                ];
+                const metrics = [];
+
+                for (const group of groups) {
+                    for (const element of Array.from(document.querySelectorAll(group.selector))) {
+                        if (!(element instanceof HTMLElement) || !isVisible(element)) {
+                            continue;
+                        }
+
+                        const style = window.getComputedStyle(element);
+                        const borderWidths = [
+                            style.borderTopWidth,
+                            style.borderRightWidth,
+                            style.borderBottomWidth,
+                            style.borderLeftWidth
+                        ].map((value) => Number.parseFloat(value) || 0);
+                        const maxBorderWidthPx = Math.max(...borderWidths);
+                        const minBorderWidthPx = Math.min(...borderWidths);
+                        const color = parseCssColor(style.borderTopColor);
+                        const visualWeight = maxBorderWidthPx * color.alpha * Math.max(0.18, 1 - color.luminance);
+                        const label = element.id
+                            ? element.id
+                            : textFor(element.querySelector('label, h2, h3, .summary-title, .schedule-card-title, .delivery-card-title, .summary-kicker')) || selectorLabel(element);
+
+                        metrics.push({
+                            role: group.role,
+                            selector: selectorLabel(element),
+                            label: String(label || '').slice(0, 80),
+                            rect: rectData(element),
+                            borderWidthPx: Number(maxBorderWidthPx.toFixed(2)),
+                            borderSideSpreadPx: Number((maxBorderWidthPx - minBorderWidthPx).toFixed(2)),
+                            borderAlpha: color.alpha,
+                            borderLuminance: color.luminance,
+                            borderVisualWeight: Number(visualWeight.toFixed(3)),
+                            borderColor: style.borderTopColor,
+                            focused: element === document.activeElement
+                        });
+                    }
+                }
+
+                return metrics.slice(0, 40);
+            }
+
             function collectVisibleTextEncodingIssues() {
                 const brokenEncodingPattern = /[\u00c2\u00c3\u00e2\ufffd]/;
                 const selectors = [
@@ -2602,6 +2689,7 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                 largestBlankGapRatio: Number((largestBlankGapPx / Math.max(1, viewportHeight)).toFixed(3)),
                 actionMetrics: actionMetrics.slice(0, 40),
                 dateControlMetrics,
+                formBorderStyleMetrics: collectFormBorderStyleMetrics(),
                 textEncodingIssues: collectVisibleTextEncodingIssues()
             };
         });
@@ -3034,6 +3122,61 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
                     screenshotPath: frameScreenshotPath,
                     source: 'page_depth_scan'
                 }));
+            }
+
+            if (
+                Number(viewportWidth || 0) >= 900 &&
+                Number.isFinite(Number(scanContract.maxFormBorderWidthSpreadPx))
+            ) {
+                const groupedBorderMetrics = new Map();
+
+                for (const metric of frameMetric.formBorderStyleMetrics || []) {
+                    const role = metric.role || 'unknown';
+                    if (!groupedBorderMetrics.has(role)) {
+                        groupedBorderMetrics.set(role, []);
+                    }
+                    groupedBorderMetrics.get(role).push(metric);
+                }
+
+                for (const [role, metrics] of groupedBorderMetrics.entries()) {
+                    if (metrics.length < 2) {
+                        continue;
+                    }
+
+                    const borderWidthValues = metrics.map((metric) => Number(metric.borderWidthPx || 0));
+                    const borderAlphaValues = metrics.map((metric) => Number(metric.borderAlpha || 0));
+                    const visualWeightValues = metrics.map((metric) => Number(metric.borderVisualWeight || 0));
+                    const widthSpreadPx = Math.max(...borderWidthValues) - Math.min(...borderWidthValues);
+                    const alphaSpread = Math.max(...borderAlphaValues) - Math.min(...borderAlphaValues);
+                    const visualWeightSpread = Math.max(...visualWeightValues) - Math.min(...visualWeightValues);
+                    const unevenMetric = metrics
+                        .slice()
+                        .sort((left, right) => Number(right.borderVisualWeight || 0) - Number(left.borderVisualWeight || 0))[0];
+                    const examples = metrics
+                        .slice(0, 5)
+                        .map((metric) => `${metric.label || metric.selector}:w=${metric.borderWidthPx},a=${metric.borderAlpha},vw=${metric.borderVisualWeight}`)
+                        .join('; ');
+
+                    if (
+                        widthSpreadPx > Number(scanContract.maxFormBorderWidthSpreadPx) ||
+                        alphaSpread > Number(scanContract.maxFormBorderAlphaSpread || 1) ||
+                        visualWeightSpread > Number(scanContract.maxFormBorderVisualWeightSpread || 1)
+                    ) {
+                        findings.push(createVisualFinding({
+                            route,
+                            viewport: viewportName,
+                            severity: widthSpreadPx > Number(scanContract.maxFormBorderWidthSpreadPx) ? 'high' : 'medium',
+                            category: 'border_weight_drift',
+                            selector: unevenMetric?.selector || '',
+                            message: 'Desktop form boxes do not share a consistent border weight.',
+                            evidence: `${frameEvidence}; role=${role}; borderWidthSpreadPx=${widthSpreadPx.toFixed(2)}; maxWidth=${scanContract.maxFormBorderWidthSpreadPx}; borderAlphaSpread=${alphaSpread.toFixed(3)}; maxAlpha=${scanContract.maxFormBorderAlphaSpread}; visualWeightSpread=${visualWeightSpread.toFixed(3)}; maxVisualWeight=${scanContract.maxFormBorderVisualWeightSpread}; ${examples}`,
+                            likelyCause: 'One form panel, field wrapper, or input is using a darker/thicker border than its sibling controls, so the desktop layout feels uneven.',
+                            hardFail: widthSpreadPx > Number(scanContract.maxFormBorderWidthSpreadPx),
+                            screenshotPath: frameScreenshotPath,
+                            source: 'page_depth_scan'
+                        }));
+                    }
+                }
             }
 
             for (const action of frameMetric.actionMetrics || []) {

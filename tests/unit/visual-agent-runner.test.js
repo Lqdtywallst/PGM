@@ -1814,6 +1814,60 @@ test('buildPageDepthScanFindings flags broken text encoding while scrolling', ()
     )));
 });
 
+test('buildPageDepthScanFindings flags desktop border weight drift between form boxes', () => {
+    const findings = buildPageDepthScanFindings({
+        route: '/app/reserve/page.html',
+        viewportName: 'laptop',
+        viewportWidth: 1366,
+        state: {
+            available: true,
+            frames: [
+                {
+                    index: 2,
+                    scrollY: 768,
+                    viewportTop: 768,
+                    viewportBottom: 1536,
+                    screenshotPath: '/tmp/reserve-desktop-border.png',
+                    metric: {
+                        visibleMajorElementCount: 8,
+                        largestBlankGapRatio: 0.2,
+                        actionMetrics: [],
+                        dateControlMetrics: [],
+                        textEncodingIssues: [],
+                        formBorderStyleMetrics: [
+                            {
+                                role: 'panel',
+                                selector: '.schedule-card',
+                                label: 'Trip schedule',
+                                borderWidthPx: 1,
+                                borderAlpha: 0.18,
+                                borderVisualWeight: 0.09
+                            },
+                            {
+                                role: 'panel',
+                                selector: '.delivery-card',
+                                label: 'Delivery address',
+                                borderWidthPx: 2,
+                                borderAlpha: 1,
+                                borderVisualWeight: 0.82
+                            }
+                        ]
+                    }
+                }
+            ],
+            cardActionMetrics: []
+        },
+        screenshotPath: '/tmp/reserve.png'
+    });
+
+    assert.ok(findings.some((finding) => (
+        finding.category === 'border_weight_drift' &&
+        /consistent border weight/i.test(finding.message) &&
+        finding.hardFail === true &&
+        finding.screenshotPath === '/tmp/reserve-desktop-border.png'
+    )));
+});
+
 test('buildPageDepthScanFindings flags booking date controls prefilled before today', () => {
     const findings = buildPageDepthScanFindings({
         route: '/app/reserve/page.html',

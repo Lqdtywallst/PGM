@@ -1955,6 +1955,12 @@
             padding: 1.35rem;
         }
 
+        .schedule-card,
+        .reservation-summary,
+        .delivery-card {
+            border-color: rgba(221, 183, 90, 0.18);
+        }
+
         .info-card--optional {
             padding: 1rem 1.1rem;
         }

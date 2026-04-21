@@ -271,14 +271,10 @@ textarea {
 .reserve-page .reservation-summary,
 .reserve-page .delivery-card {
     padding: 1.15rem;
-    border: 1px solid rgba(92, 72, 49, 0.12);
+    border: 1px solid rgba(221, 183, 90, 0.18);
     border-radius: 12px;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(251, 248, 243, 0.94) 100%);
     box-shadow: 0 18px 48px rgba(71, 50, 26, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.82);
-}
-
-.reserve-page .schedule-card {
-    border-color: rgba(221, 183, 90, 0.22);
 }
 
 .reserve-page .reservation-summary {
