@@ -6,6 +6,50 @@ const {
     settlePage
 } = require('./support/site-helpers');
 
+async function clickVisibleFilterScrim(page) {
+    const point = await page.evaluate(() => {
+        const scrim = document.querySelector('.fleet-filter-scrim');
+        const sheet = document.querySelector('.fleet-sidebar');
+
+        if (!(scrim instanceof HTMLElement)) {
+            return null;
+        }
+
+        const sheetRect = sheet instanceof HTMLElement
+            ? sheet.getBoundingClientRect()
+            : null;
+        const candidates = [];
+
+        if (sheetRect && sheetRect.top > 8) {
+            candidates.push({ x: window.innerWidth / 2, y: sheetRect.top / 2 });
+        }
+
+        if (sheetRect && sheetRect.bottom < window.innerHeight - 8) {
+            candidates.push({
+                x: window.innerWidth / 2,
+                y: sheetRect.bottom + ((window.innerHeight - sheetRect.bottom) / 2)
+            });
+        }
+
+        candidates.push({ x: 16, y: 16 });
+
+        for (const candidate of candidates) {
+            const x = Math.min(window.innerWidth - 4, Math.max(4, candidate.x));
+            const y = Math.min(window.innerHeight - 4, Math.max(4, candidate.y));
+            const target = document.elementFromPoint(x, y);
+
+            if (target === scrim || target?.closest?.('.fleet-filter-scrim')) {
+                return { x, y };
+            }
+        }
+
+        return null;
+    });
+
+    expect(point).toBeTruthy();
+    await page.mouse.click(point.x, point.y);
+}
+
 test.describe('Mobile friction points', () => {
     test.beforeEach(({}, testInfo) => {
         test.skip(
@@ -26,9 +70,12 @@ test.describe('Mobile friction points', () => {
         await page.locator('#fleet-return-time').fill('13:00');
 
         await page.locator('.fleet-mobile-filter-toggle').click();
+        await expect(page.locator('.fleet-filter-close--top')).toBeVisible();
+        await expect(page.locator('.fleet-filter-close--top')).toContainText(/Back to cars/i);
         await page.locator('.js-fleet-brand-select').selectOption('lamborghini');
         await page.locator('.js-fleet-type-select').selectOption('convertible');
         await expect(page.locator('.fleet-sidebar')).toBeVisible();
+        await expect(page.locator('.fleet-filter-apply')).toContainText(/Show 1 car/i);
         await expect(page.locator('.fleet-sidebar__field-display')).toContainText([
             '20/12/2026',
             '12:00',
@@ -84,7 +131,9 @@ test.describe('Mobile friction points', () => {
         }
 
         await expect(page.locator('.js-fleet-results-count')).toContainText('1 model visible');
-        await page.locator('.fleet-filter-close').click();
+        await page.locator('.fleet-filter-apply').click();
+        await expect(page.locator('.fleet-browser')).not.toHaveClass(/fleet-filters-open/);
+        await expect(page.locator('.js-fleet-card:not([hidden])').first()).toBeVisible();
 
         await page.locator('.js-fleet-card:not([hidden]) .fleet-card__reserve').first().click();
 
@@ -95,6 +144,66 @@ test.describe('Mobile friction points', () => {
         await expect(page.locator('#pickupTime')).toHaveValue('12:00');
         await expect(page.locator('#dropoffTime')).toHaveValue('13:00');
         await expectNoConsoleErrors(consoleErrors, 'mobile fleet filter sheet handoff');
+    });
+
+    test('mobile filter sheet has obvious exits back to fleet results', async ({ page }) => {
+        const consoleErrors = createConsoleTracker(page);
+
+        await page.goto('/fleet.html', { waitUntil: 'domcontentloaded' });
+        await settlePage(page);
+
+        await page.locator('.fleet-mobile-filter-toggle').click();
+        await expect(page.locator('.fleet-browser')).toHaveClass(/fleet-filters-open/);
+        await expect(page.locator('.fleet-filter-close--top')).toContainText(/Back to cars/i);
+        await expect(page.locator('.fleet-filter-apply')).toContainText(/Show 6 cars/i);
+        await page.locator('.fleet-filter-close--top').click();
+        await expect(page.locator('.fleet-browser')).not.toHaveClass(/fleet-filters-open/);
+        await expect(page.locator('.fleet-mobile-filter-toggle')).toBeFocused();
+
+        await page.locator('.fleet-mobile-filter-toggle').click();
+        await page.keyboard.press('Escape');
+        await expect(page.locator('.fleet-browser')).not.toHaveClass(/fleet-filters-open/);
+
+        await page.locator('.fleet-mobile-filter-toggle').click();
+        await expect(page.locator('.fleet-browser')).toHaveClass(/fleet-filters-open/);
+        await clickVisibleFilterScrim(page);
+        await expect(page.locator('.fleet-browser')).not.toHaveClass(/fleet-filters-open/);
+        await expect(page.locator('.js-fleet-card:not([hidden])').first()).toBeVisible();
+
+        await expectNoConsoleErrors(consoleErrors, 'mobile fleet filter exits');
+    });
+
+    test('mobile vehicle pages expose a prominent return to fleet', async ({ page }) => {
+        const consoleErrors = createConsoleTracker(page);
+
+        await page.goto('/lamborghini-huracan-evo-spyder-rental-dubai.html', { waitUntil: 'domcontentloaded' });
+        await settlePage(page);
+
+        const returnLink = page.locator('.vehicle-return-link').first();
+        await expect(returnLink).toBeVisible();
+        await expect(returnLink).toContainText(/Back to fleet/i);
+        await expect(returnLink).toContainText(/View all cars/i);
+
+        const metrics = await returnLink.evaluate((link) => {
+            const rect = link.getBoundingClientRect();
+            return {
+                top: rect.top,
+                width: rect.width,
+                height: rect.height,
+                viewportWidth: window.innerWidth,
+                viewportHeight: window.innerHeight
+            };
+        });
+
+        expect(metrics.top).toBeGreaterThanOrEqual(0);
+        expect(metrics.top).toBeLessThan(metrics.viewportHeight * 0.42);
+        expect(metrics.width).toBeGreaterThan(metrics.viewportWidth * 0.84);
+        expect(metrics.height).toBeGreaterThanOrEqual(40);
+
+        await returnLink.click();
+        await expect(page).toHaveURL(/\/fleet\.html$/i);
+        await expect(page.locator('.js-fleet-card').first()).toBeVisible();
+        await expectNoConsoleErrors(consoleErrors, 'mobile vehicle return to fleet');
     });
 
     test('short mobile filter sheet keeps filled date controls readable', async ({ page }) => {
@@ -142,13 +251,18 @@ test.describe('Mobile friction points', () => {
                     const visibleHeight = Math.max(0, Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0));
                     const visibleWidth = Math.max(0, Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0));
                     const isVisible = visibleHeight > 8 && visibleWidth > 8;
+                    const controlText = control instanceof HTMLSelectElement
+                        ? String(control.selectedOptions[0]?.textContent || control.value || '').replace(/\s+/g, ' ').trim()
+                        : String(control.textContent || control.value || '').replace(/\s+/g, ' ').trim();
 
                     return {
                         className: String(control.className || ''),
-                        text: String(control.textContent || control.value || '').replace(/\s+/g, ' ').trim(),
+                        text: controlText,
                         isVisible,
                         isBodyControl: control.matches('.fleet-sidebar__field-shell, .js-fleet-brand-select, .js-fleet-type-select'),
                         isFullyVisible: rect.top >= 0 && rect.bottom <= viewportHeight,
+                        visibleHeight,
+                        viewportClipPx: Math.max(0, -rect.top, rect.bottom - viewportHeight),
                         widthRatio: rect.width / Math.max(1, sheetRect.width),
                         height: rect.height,
                         clipX: Math.max(0, control.scrollWidth - control.clientWidth),
@@ -159,14 +273,28 @@ test.describe('Mobile friction points', () => {
             return {
                 sheetTop: sheetRect.top,
                 sheetBottom: sheetRect.bottom,
+                sheetHeightRatio: sheetRect.height / Math.max(1, viewportHeight),
                 displays,
                 criticalControls,
+                visibleSelectedFilters: criticalControls
+                    .filter((control) => control.isBodyControl && control.isFullyVisible && /js-fleet-(brand|type)-select/.test(control.className))
+                    .map((control) => control.text),
+                peekingControls: criticalControls
+                    .filter((control) => control.visibleHeight > 0 && !control.isFullyVisible)
+                    .map((control) => ({
+                        className: control.className,
+                        text: control.text,
+                        visibleHeight: control.visibleHeight,
+                        height: control.height,
+                        viewportClipPx: control.viewportClipPx
+                    })),
                 overflowPx: Math.max(0, sidebar.scrollWidth - sidebar.clientWidth)
             };
         });
 
         expect(shortSheetMetrics.sheetTop).toBeLessThanOrEqual(1);
         expect(shortSheetMetrics.sheetBottom).toBeLessThanOrEqual(609);
+        expect(shortSheetMetrics.sheetHeightRatio).toBeLessThanOrEqual(0.94);
         expect(shortSheetMetrics.overflowPx).toBeLessThanOrEqual(4);
         expect(shortSheetMetrics.displays).toEqual(expect.arrayContaining([
             '20/04/2026',
@@ -174,6 +302,11 @@ test.describe('Mobile friction points', () => {
             '22/04/2026',
             '18:00'
         ]));
+        expect(shortSheetMetrics.visibleSelectedFilters).toEqual(expect.arrayContaining([
+            'Lamborghini',
+            'Convertible'
+        ]));
+        expect(shortSheetMetrics.peekingControls).toEqual([]);
 
         for (const control of shortSheetMetrics.criticalControls.filter((entry) => entry.isVisible)) {
             expect(control.isFullyVisible).toBe(true);
@@ -186,6 +319,59 @@ test.describe('Mobile friction points', () => {
         }
 
         await expectNoConsoleErrors(consoleErrors, 'short mobile fleet filter sheet');
+    });
+
+    test('fleet mobile card contact bar spans the full card width as a 50/50 split', async ({ page }) => {
+        const consoleErrors = createConsoleTracker(page);
+
+        await page.setViewportSize({ width: 390, height: 844 });
+        await page.goto('/fleet.html', { waitUntil: 'domcontentloaded' });
+        await settlePage(page);
+
+        const card = page.locator('.js-fleet-card:not([hidden])').first();
+        await card.scrollIntoViewIfNeeded();
+        await settlePage(page, 120);
+
+        const contactBarMetrics = await card.evaluate((element) => {
+            const cardRect = element.getBoundingClientRect();
+            const row = element.querySelector('.fleet-card__contact-row');
+            const rowRect = row?.getBoundingClientRect();
+            const buttons = Array.from(row?.querySelectorAll('.fleet-card__secondary') || [])
+                .map((button) => {
+                    const rect = button.getBoundingClientRect();
+
+                    return {
+                        text: String(button.textContent || '').trim(),
+                        left: rect.left,
+                        right: rect.right,
+                        top: rect.top,
+                        width: rect.width,
+                        height: rect.height
+                    };
+                });
+
+            return {
+                cardWidth: cardRect.width,
+                rowWidth: rowRect?.width || 0,
+                rowLeftGapPx: rowRect ? rowRect.left - cardRect.left : 999,
+                rowRightGapPx: rowRect ? cardRect.right - rowRect.right : 999,
+                buttons
+            };
+        });
+
+        expect(contactBarMetrics.buttons.map((button) => button.text)).toEqual(['Call', 'WhatsApp']);
+        expect(Math.abs(contactBarMetrics.rowLeftGapPx)).toBeLessThanOrEqual(2);
+        expect(Math.abs(contactBarMetrics.rowRightGapPx)).toBeLessThanOrEqual(2);
+        expect(contactBarMetrics.rowWidth / contactBarMetrics.cardWidth).toBeGreaterThanOrEqual(0.985);
+        expect(Math.abs(contactBarMetrics.buttons[0].top - contactBarMetrics.buttons[1].top)).toBeLessThanOrEqual(1);
+
+        for (const button of contactBarMetrics.buttons) {
+            expect(button.width / contactBarMetrics.rowWidth).toBeGreaterThanOrEqual(0.49);
+            expect(button.width / contactBarMetrics.rowWidth).toBeLessThanOrEqual(0.51);
+            expect(button.height).toBeGreaterThanOrEqual(44);
+        }
+
+        await expectNoConsoleErrors(consoleErrors, 'fleet mobile card contact bar');
     });
 
     test('mobile reserve preserves guest progress after reload in step two and still reaches payment', async ({ page }) => {

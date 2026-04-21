@@ -32,6 +32,10 @@ const {
     contactLead,
     reservationGuest
 } = require(path.join(__dirname, '..', 'test-data', 'users.json'));
+const {
+    compareReportToApprovedMemory,
+    formatAuditMemoryRegression
+} = require(path.join(__dirname, '..', 'server', 'audit-memory-core.js'));
 
 const repoRoot = path.resolve(__dirname, '..');
 const artifactsRoot = path.join(repoRoot, 'artifacts', 'functional-agent');
@@ -783,6 +787,9 @@ async function discoverInteractiveTargets(page, currentRoute, options) {
                 absoluteHref: absolute.href,
                 targetPath: `${normalizedPath}${absolute.search}${absolute.hash}`,
                 kind,
+                behavior: link.matches('[role="tab"], [data-service-selector]') ? 'tab' : 'navigation',
+                controlsId: firstText(link.getAttribute('aria-controls')),
+                detailsSelector: link.closest('details') ? buildSelector(link.closest('details')) : '',
                 selector: buildSelector(link)
             }, maxLinks);
         }
@@ -948,7 +955,7 @@ function createLinkAction(descriptor) {
     return {
         id: `link-${slugify(descriptor.label)}-${slugify(descriptor.href)}`,
         label: `Link: ${descriptor.label}`,
-        kind: `link:${descriptor.kind}`,
+        kind: descriptor.behavior === 'tab' ? 'tab-link' : `link:${descriptor.kind}`,
         async run(page) {
             if (descriptor.kind === 'external') {
                 const isValidExternal = /^(tel:|mailto:|https?:\/\/|\/\/)/i.test(descriptor.absoluteHref);
@@ -971,11 +978,42 @@ function createLinkAction(descriptor) {
                 locator = page.locator(descriptor.selector).first();
             }
 
+            if (descriptor.detailsSelector) {
+                await page.evaluate((selector) => {
+                    const details = document.querySelector(selector);
+                    if (details instanceof HTMLDetailsElement) {
+                        details.open = true;
+                    }
+                }, descriptor.detailsSelector).catch(() => null);
+                await page.waitForTimeout(80);
+            }
+
             await expect(locator).toBeVisible();
-            await locator.scrollIntoViewIfNeeded();
+            await locator.evaluate((element) => element.scrollIntoView({ block: 'center', inline: 'center' }));
+            await page.waitForTimeout(80);
+
+            if (descriptor.behavior === 'tab') {
+                const beforeSelected = await locator.getAttribute('aria-selected').catch(() => null);
+                await locator.click();
+                await settlePage(page, 250);
+                const afterSelected = await locator.getAttribute('aria-selected').catch(() => null);
+                const isActive = await locator.evaluate((element) => element.classList.contains('is-active')).catch(() => false);
+                const controlledPanelIsLinked = descriptor.controlsId
+                    ? await page.locator(`#${descriptor.controlsId}`).evaluate((panel, id) => panel.getAttribute('aria-labelledby') === id, await locator.getAttribute('id')).catch(() => false)
+                    : false;
+
+                if (afterSelected !== 'true' && !isActive && !controlledPanelIsLinked && beforeSelected === afterSelected) {
+                    throw new Error(`Tab-like link did not activate its controlled state: ${descriptor.label}.`);
+                }
+
+                return {
+                    message: `${descriptor.label} activated its tab state.`,
+                    observedUrl: page.url()
+                };
+            }
 
             if (descriptor.kind === 'hash') {
-                await locator.click({ force: true });
+                await locator.click();
                 await page.waitForTimeout(250);
 
                 const currentUrl = new URL(page.url());
@@ -989,14 +1027,20 @@ function createLinkAction(descriptor) {
                 };
             }
 
-            await locator.click({ force: true });
+            const expected = new URL(descriptor.absoluteHref);
+            const expectedPath = `${normalizeRoute(expected.pathname)}${expected.search}${expected.hash}`;
+            const reachedExpectedUrl = page.waitForURL((url) => {
+                const observedPath = `${normalizeRoute(url.pathname)}${url.search}${url.hash}`;
+                return observedPath === expectedPath;
+            }, { timeout: 5000 }).catch(() => null);
+
+            await locator.click();
+            await reachedExpectedUrl;
             await page.waitForLoadState('domcontentloaded').catch(() => null);
             await settlePage(page, 250);
 
             const observed = new URL(page.url());
-            const expected = new URL(descriptor.absoluteHref);
             const observedPath = `${normalizeRoute(observed.pathname)}${observed.search}${observed.hash}`;
-            const expectedPath = `${normalizeRoute(expected.pathname)}${expected.search}${expected.hash}`;
 
             if (observedPath !== expectedPath) {
                 throw new Error(`Expected ${expectedPath} but landed on ${observedPath}`);
@@ -1178,6 +1222,8 @@ function createHomeOverlaySearchAction() {
             await page.locator('.hero-lab-overlay__submit').click();
 
             await expect(page).toHaveURL(/\/fleet\.html\?/i);
+            await page.waitForLoadState('domcontentloaded').catch(() => null);
+            await settlePage(page, 350);
             await expect(page.locator('#fleet-pickup-date')).toHaveValue('2026-08-03');
             await expect(page.locator('#fleet-return-date')).toHaveValue('2026-08-05');
 
@@ -1630,6 +1676,7 @@ async function runFunctionalAgent(options = {}) {
             functionalReview,
             pages: enrichedPages
         };
+        report.auditMemory = compareReportToApprovedMemory(report, { kind: 'functional' });
 
         fs.writeFileSync(path.join(runDir, 'report.json'), `${JSON.stringify(report, null, 2)}\n`);
         fs.writeFileSync(path.join(runDir, 'report.md'), buildMarkdownReport(report));
@@ -1656,6 +1703,14 @@ async function main() {
     console.log(`functionalStatus=${report.functionalReview.status} findings=${report.functionalReview.summary.total} hardFails=${report.functionalReview.summary.hardFails} mode=${report.summary.coverageMode} truncatedTargets=${report.summary.truncatedTargets}`);
 
     if (report.functionalReview.status === 'bad') {
+        process.exitCode = 1;
+    }
+
+    if (report.auditMemory?.status === 'bad') {
+        console.error(`Audit memory regression failed: ${report.auditMemory.message}`);
+        for (const regression of report.auditMemory.regressions.slice(0, 10)) {
+            console.error(`- ${formatAuditMemoryRegression(regression)}`);
+        }
         process.exitCode = 1;
     }
 }

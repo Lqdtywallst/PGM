@@ -492,6 +492,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let mobileControls = null;
     let topDatePrompt = null;
+    let lastFilterTrigger = null;
 
     function setFilterSheetState(isOpen) {
         if (!mobileControls?.scrim) {
@@ -499,9 +500,16 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         browser.classList.toggle("fleet-filters-open", isOpen);
+        document.body.classList.toggle("fleet-filter-sheet-open", isOpen);
         mobileControls.scrim.hidden = !isOpen;
+        sidebar?.setAttribute("aria-modal", String(isOpen));
+        sidebar?.setAttribute("role", isOpen ? "dialog" : "complementary");
 
         if (isOpen) {
+            lastFilterTrigger = document.activeElement instanceof HTMLElement
+                ? document.activeElement
+                : mobileControls.toggle;
+
             const scrollArea = sidebar?.querySelector(".fleet-sidebar__scroll");
             if (scrollArea) {
                 scrollArea.scrollTop = 0;
@@ -509,6 +517,46 @@ document.addEventListener("DOMContentLoaded", () => {
                     scrollArea.scrollTop = 0;
                 });
             }
+            window.requestAnimationFrame(() => {
+                mobileControls.closeTop?.focus({ preventScroll: true });
+            });
+            return;
+        }
+
+        window.requestAnimationFrame(() => {
+            const target = lastFilterTrigger && document.contains(lastFilterTrigger)
+                ? lastFilterTrigger
+                : mobileControls.toggle;
+            target?.focus?.({ preventScroll: true });
+            lastFilterTrigger = null;
+        });
+    }
+
+    function visibleFleetCount() {
+        return cards.filter((card) => !card.hidden).length;
+    }
+
+    function formatShowCarsLabel(count) {
+        if (count === 1) {
+            return "Show 1 car";
+        }
+
+        return `Show ${count} cars`;
+    }
+
+    function updateFilterSheetExit(count = visibleFleetCount()) {
+        if (!mobileControls) {
+            return;
+        }
+
+        const label = formatShowCarsLabel(count);
+
+        if (mobileControls.closeInline) {
+            mobileControls.closeInline.textContent = label;
+        }
+
+        if (mobileControls.apply) {
+            mobileControls.apply.textContent = label;
         }
     }
 
@@ -597,18 +645,48 @@ document.addEventListener("DOMContentLoaded", () => {
         results.insertBefore(toolbar, resultsHeader?.nextSibling || results.firstChild);
         browser.appendChild(scrim);
 
+        const sheetHeader = document.createElement("div");
+        sheetHeader.className = "fleet-filter-sheet-head";
+        sheetHeader.innerHTML = `
+            <div class="fleet-filter-sheet-head__copy">
+                <span>Filters</span>
+                <strong>Refine the fleet</strong>
+            </div>
+        `;
+
+        const closeTopButton = document.createElement("button");
+        closeTopButton.type = "button";
+        closeTopButton.className = "fleet-filter-close fleet-filter-close--top";
+        closeTopButton.textContent = "Back to cars";
+        closeTopButton.setAttribute("aria-label", "Back to car results");
+        sheetHeader.appendChild(closeTopButton);
+        sidebar.insertBefore(sheetHeader, sidebar.firstChild);
+
         const closeButton = document.createElement("button");
         closeButton.type = "button";
-        closeButton.className = "fleet-filter-close";
-        closeButton.textContent = "Close";
+        closeButton.className = "fleet-filter-close fleet-filter-close--inline";
+        closeButton.textContent = "Show cars";
+        closeButton.setAttribute("aria-label", "Show car results");
         sidebarTopbar?.appendChild(closeButton);
+
+        const sheetFooter = document.createElement("div");
+        sheetFooter.className = "fleet-filter-sheet-footer";
+        const applyButton = document.createElement("button");
+        applyButton.type = "button";
+        applyButton.className = "fleet-filter-close fleet-filter-apply";
+        applyButton.textContent = "Show cars";
+        applyButton.setAttribute("aria-label", "Show car results");
+        sheetFooter.appendChild(applyButton);
+        sidebar.appendChild(sheetFooter);
 
         mobileControls = {
             toolbar,
             scrim,
             dates: toolbar.querySelector(".js-fleet-mobile-dates"),
             toggle: toolbar.querySelector(".fleet-mobile-filter-toggle"),
-            close: closeButton
+            closeTop: closeTopButton,
+            closeInline: closeButton,
+            apply: applyButton
         };
 
         const openSheet = () => {
@@ -620,8 +698,10 @@ document.addEventListener("DOMContentLoaded", () => {
             openSheet();
             pickupDateInput?.focus();
         });
-        mobileControls.close?.addEventListener("click", () => {
-            setFilterSheetState(false);
+        [mobileControls.closeTop, mobileControls.closeInline, mobileControls.apply].forEach((button) => {
+            button?.addEventListener("click", () => {
+                setFilterSheetState(false);
+            });
         });
         scrim.addEventListener("click", () => {
             setFilterSheetState(false);
@@ -637,6 +717,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         updateFilterChips();
+        updateFilterSheetExit();
     }
 
     function initDatePrompts() {
@@ -677,6 +758,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         updateDatePrompts();
+        updateFilterSheetExit(visibleCount);
     }
 
     if (brandSelect) {

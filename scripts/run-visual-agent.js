@@ -37,6 +37,10 @@ const {
     getSectionRhythmContract,
     getViewportCoverageMatrix
 } = require(path.join(__dirname, '..', 'server', 'design-system-contract.js'));
+const {
+    compareReportToApprovedMemory,
+    formatAuditMemoryRegression
+} = require(path.join(__dirname, '..', 'server', 'audit-memory-core.js'));
 
 const repoRoot = path.resolve(__dirname, '..');
 const artifactsRoot = path.join(repoRoot, 'artifacts', 'visual-agent');
@@ -44,6 +48,7 @@ const baselineRoot = path.join(repoRoot, 'tests', 'visual-baselines');
 const baselineManifestPath = path.join(baselineRoot, 'manifest.json');
 const pixelmatch = pixelmatchModule.default || pixelmatchModule;
 
+const SELECTABLE_VIEWPORTS = Object.freeze(getViewportCoverageMatrix('all'));
 const VIEWPORTS = Object.freeze(getViewportCoverageMatrix('visualAgent'));
 
 const SNAPSHOT_THRESHOLDS = Object.freeze({
@@ -404,7 +409,7 @@ function resolveSelectedViewports(requestedNames) {
     }
 
     const normalizedNames = requestedNames.map((value) => String(value || '').trim().toLowerCase());
-    const selected = VIEWPORTS.filter((viewport) => normalizedNames.includes(viewport.name.toLowerCase()));
+    const selected = SELECTABLE_VIEWPORTS.filter((viewport) => normalizedNames.includes(viewport.name.toLowerCase()));
 
     if (selected.length === 0) {
         throw new Error(`Unknown viewport selection: ${requestedNames.join(', ')}`);
@@ -1125,7 +1130,7 @@ async function collectFleetMobileFilterState(page, pageDir, viewport) {
         };
     }
 
-    await page.evaluate(() => {
+    await page.evaluate(({ pickupDate, returnDate }) => {
         const setControlValue = (selector, value) => {
             const element = document.querySelector(selector);
 
@@ -1138,12 +1143,15 @@ async function collectFleetMobileFilterState(page, pageDir, viewport) {
             element.dispatchEvent(new Event('change', { bubbles: true }));
         };
 
-        setControlValue('#fleet-pickup-date', '2026-04-20');
-        setControlValue('#fleet-return-date', '2026-04-22');
+        setControlValue('#fleet-pickup-date', pickupDate);
+        setControlValue('#fleet-return-date', returnDate);
         setControlValue('#fleet-pickup-time', '10:00');
         setControlValue('#fleet-return-time', '18:00');
         setControlValue('.js-fleet-brand-select', 'lamborghini');
         setControlValue('.js-fleet-type-select', 'convertible');
+    }, {
+        pickupDate: formatLocalDateIso(),
+        returnDate: addLocalDaysIso(2)
     });
 
     await toggle.click();
@@ -1215,11 +1223,65 @@ async function collectFleetMobileFilterState(page, pageDir, viewport) {
             };
         }
 
+        function paintedRectData(element) {
+            const rect = rectData(element);
+
+            if (!(element instanceof HTMLElement) || !rect) {
+                return {
+                    width: 0,
+                    height: 0,
+                    clipPx: 0,
+                    ratio: 0
+                };
+            }
+
+            let top = Math.max(rect.top, 0);
+            let right = Math.min(rect.right, viewportWidth);
+            let bottom = Math.min(rect.bottom, viewportHeight);
+            let left = Math.max(rect.left, 0);
+
+            let current = element.parentElement;
+            while (current && current !== document.documentElement) {
+                const style = window.getComputedStyle(current);
+                const clipsX = /(auto|scroll|hidden|clip)/.test(`${style.overflowX} ${style.overflow}`);
+                const clipsY = /(auto|scroll|hidden|clip)/.test(`${style.overflowY} ${style.overflow}`);
+
+                if (clipsX || clipsY) {
+                    const currentRect = current.getBoundingClientRect();
+
+                    if (clipsY) {
+                        top = Math.max(top, currentRect.top);
+                        bottom = Math.min(bottom, currentRect.bottom);
+                    }
+
+                    if (clipsX) {
+                        left = Math.max(left, currentRect.left);
+                        right = Math.min(right, currentRect.right);
+                    }
+                }
+
+                current = current.parentElement;
+            }
+
+            const width = Math.max(0, right - left);
+            const height = Math.max(0, bottom - top);
+            const area = Math.max(1, rect.width * rect.height);
+            const paintedArea = width * height;
+
+            return {
+                width: Number(width.toFixed(2)),
+                height: Number(height.toFixed(2)),
+                clipPx: Number(Math.max(0, rect.height - height, rect.width - width).toFixed(2)),
+                ratio: Number((paintedArea / area).toFixed(3))
+            };
+        }
+
         function controlData(element, key, kind, textElement = element) {
             const rect = rectData(element);
             const sheetRect = rectData(sidebar);
             const text = textFor(textElement);
             const clip = clipData(textElement instanceof HTMLElement ? textElement : element);
+            const paintedRect = paintedRectData(element);
             const visibleIntersectionHeight = rect
                 ? Math.max(0, Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0))
                 : 0;
@@ -1233,8 +1295,15 @@ async function collectFleetMobileFilterState(page, pageDir, viewport) {
                 text,
                 rect,
                 visible: isVisible(element),
+                visibleIntersectionHeight: Number(visibleIntersectionHeight.toFixed(2)),
+                visibleIntersectionWidth: Number(visibleIntersectionWidth.toFixed(2)),
+                paintedVisibleHeight: paintedRect.height,
+                paintedVisibleWidth: paintedRect.width,
+                paintedVisibilityRatio: paintedRect.ratio,
+                paintClipPx: paintedRect.clipPx,
                 visibleInViewport: Boolean(visibleIntersectionHeight > 8 && visibleIntersectionWidth > 8),
                 fullyVisibleInViewport: Boolean(rect && rect.top >= 0 && rect.left >= 0 && rect.bottom <= viewportHeight && rect.right <= viewportWidth),
+                fullyPaintedInViewport: Boolean(rect && paintedRect.height >= rect.height - 2 && paintedRect.width >= rect.width - 2),
                 viewportClipPx: rect ? Number(Math.max(
                     0,
                     -rect.top,
@@ -1271,8 +1340,16 @@ async function collectFleetMobileFilterState(page, pageDir, viewport) {
         const rangeInputs = Array.from(document.querySelectorAll('.fleet-price-range__input'))
             .map((input) => controlData(input, input.className || input.getAttribute('aria-label') || 'range', 'range', input));
         const selectedFilterLabels = selects.map((select) => select.text).filter(Boolean);
+        const visibleSelectedFilterLabels = selects
+            .filter((select) => select.visibleInViewport && select.fullyVisibleInViewport && select.fullyPaintedInViewport)
+            .map((select) => select.text)
+            .filter(Boolean);
         const displayTexts = dateTimeFields.map((field) => field.displayText).filter(Boolean);
         const visibleFilledFieldCount = dateTimeFields.filter((field) => field.displayText && field.visibleInViewport).length;
+        const visibleFilterSelectCount = selects.filter((select) => select.visibleInViewport && select.fullyVisibleInViewport && select.fullyPaintedInViewport).length;
+        const visibleInlineApplyButtonCount = buttons
+            .filter((button) => String(button.key || '').includes('fleet-filter-close--inline') && button.visibleInViewport)
+            .length;
         const sheetRect = rectData(sidebar);
 
         return {
@@ -1283,9 +1360,13 @@ async function collectFleetMobileFilterState(page, pageDir, viewport) {
             sheetRect,
             sheetHeightRatio: Number((sheetRect?.height ? sheetRect.height / Math.max(1, viewportHeight) : 0).toFixed(3)),
             sheetHorizontalOverflowPx: sidebar ? Number(Math.max(0, sidebar.scrollWidth - sidebar.clientWidth).toFixed(2)) : 0,
+            sheetScrollOverflowPx: sidebar ? Number(Math.max(0, sidebar.scrollHeight - sidebar.clientHeight).toFixed(2)) : 0,
             displayTexts,
             selectedFilterLabels,
+            visibleSelectedFilterLabels,
             visibleFilledFieldCount,
+            visibleFilterSelectCount,
+            visibleInlineApplyButtonCount,
             dateTimeFields,
             controls: [...dateTimeFields, ...selects, ...buttons, ...rangeInputs]
         };
@@ -1308,6 +1389,375 @@ async function collectFleetMobileFilterState(page, pageDir, viewport) {
     };
 }
 
+async function collectMobileNavDrawerState(page, pageDir, viewport) {
+    if (Number(viewport?.width || 0) > 860) {
+        return null;
+    }
+
+    const toggle = page.locator('.lab-mobile-toggle').first();
+    const toggleCount = await toggle.count().catch(() => 0);
+
+    if (toggleCount === 0 || !(await toggle.isVisible().catch(() => false))) {
+        return {
+            available: false,
+            reason: 'toggle_missing'
+        };
+    }
+
+    await toggle.click();
+    await page.waitForTimeout(260);
+
+    const state = await page.evaluate(() => {
+        const viewportWidth = window.innerWidth || 1;
+        const viewportHeight = window.innerHeight || 1;
+
+        function rectData(element) {
+            if (!(element instanceof HTMLElement)) {
+                return null;
+            }
+
+            const rect = element.getBoundingClientRect();
+            return {
+                top: Number(rect.top.toFixed(2)),
+                right: Number(rect.right.toFixed(2)),
+                bottom: Number(rect.bottom.toFixed(2)),
+                left: Number(rect.left.toFixed(2)),
+                width: Number(rect.width.toFixed(2)),
+                height: Number(rect.height.toFixed(2))
+            };
+        }
+
+        function textFor(element) {
+            return String(element?.textContent || '').replace(/\s+/g, ' ').trim();
+        }
+
+        function isVisible(element) {
+            if (!(element instanceof HTMLElement)) {
+                return false;
+            }
+
+            const style = window.getComputedStyle(element);
+            const rect = element.getBoundingClientRect();
+            return style.display !== 'none' &&
+                style.visibility !== 'hidden' &&
+                Number(style.opacity || 1) > 0.01 &&
+                rect.width > 1 &&
+                rect.height > 1;
+        }
+
+        function rowKey(rect) {
+            return String(Math.round(Number(rect?.top || 0) / 2) * 2);
+        }
+
+        function childMetrics(group) {
+            const children = Array.from(group.children)
+                .filter((child) => child instanceof HTMLElement && isVisible(child))
+                .map((child) => {
+                    const rect = rectData(child);
+                    return {
+                        text: textFor(child),
+                        rect,
+                        width: rect?.width || 0,
+                        height: rect?.height || 0,
+                        viewportClipPx: rect ? Number(Math.max(
+                            0,
+                            -rect.top,
+                            -rect.left,
+                            rect.right - viewportWidth,
+                            rect.bottom - viewportHeight
+                        ).toFixed(2)) : 0,
+                        partiallyVisible: Boolean(rect && rect.bottom > 0 && rect.top < viewportHeight && (
+                            rect.top < 0 ||
+                            rect.left < 0 ||
+                            rect.right > viewportWidth ||
+                            rect.bottom > viewportHeight
+                        ))
+                    };
+                });
+            const widths = children.map((child) => Number(child.width || 0)).filter((value) => value > 0);
+            const heights = children.map((child) => Number(child.height || 0)).filter((value) => value > 0);
+            const rowCounts = children.reduce((counts, child) => {
+                const key = rowKey(child.rect);
+                counts[key] = (counts[key] || 0) + 1;
+                return counts;
+            }, {});
+
+            return {
+                children,
+                visibleChildCount: children.length,
+                rowCounts: Object.values(rowCounts),
+                widthSpreadPx: widths.length ? Number((Math.max(...widths) - Math.min(...widths)).toFixed(2)) : 0,
+                heightSpreadPx: heights.length ? Number((Math.max(...heights) - Math.min(...heights)).toFixed(2)) : 0,
+                minChildHeight: heights.length ? Number(Math.min(...heights).toFixed(2)) : 0,
+                partiallyVisibleChildren: children.filter((child) => child.partiallyVisible)
+            };
+        }
+
+        function groupData(target, key) {
+            const group = typeof target === 'string' ? document.querySelector(target) : target;
+
+            if (!(group instanceof HTMLElement)) {
+                return {
+                    key,
+                    available: false,
+                    children: [],
+                    partiallyVisibleChildren: []
+                };
+            }
+
+            const style = window.getComputedStyle(group);
+            return {
+                key,
+                available: true,
+                selector: typeof target === 'string' ? target : `.${Array.from(group.classList || []).join('.')}`,
+                display: style.display,
+                gridTemplateColumns: style.gridTemplateColumns,
+                rect: rectData(group),
+                ...childMetrics(group)
+            };
+        }
+
+        const drawer = document.querySelector('.lab-mobile-drawer');
+        const panel = document.querySelector('.lab-mobile-drawer__panel');
+        const sections = Array.from(document.querySelectorAll('.lab-mobile-drawer__section'));
+        const groups = [
+            groupData('.lab-mobile-drawer__quick', 'quick'),
+            groupData('.lab-mobile-drawer__links--nav', 'nav'),
+            groupData(sections[1]?.querySelector('.lab-mobile-drawer__links--compact'), 'brands'),
+            groupData(sections[2]?.querySelector('.lab-mobile-drawer__links--compact'), 'browse'),
+            groupData('.lab-mobile-drawer__actions', 'actions')
+        ];
+        const actions = Array.from(document.querySelectorAll('.lab-mobile-drawer__action'))
+            .filter((action) => action instanceof HTMLElement && isVisible(action))
+            .map((action) => ({
+                text: textFor(action),
+                isPrimary: action.classList.contains('lab-mobile-drawer__action--primary'),
+                isSecondary: action.classList.contains('lab-mobile-drawer__action--secondary'),
+                rect: rectData(action)
+            }));
+        const panelRect = rectData(panel);
+
+        return {
+            available: Boolean(drawer && panel),
+            isOpen: Boolean(drawer?.classList.contains('is-open')),
+            viewportWidth,
+            viewportHeight,
+            panelRect,
+            panelHorizontalOverflowPx: panel ? Number(Math.max(0, panel.scrollWidth - panel.clientWidth).toFixed(2)) : 0,
+            panelInitialScrollOverflowPx: panel ? Number(Math.max(0, panel.scrollHeight - panel.clientHeight).toFixed(2)) : 0,
+            visibleSecondaryActionCount: actions.filter((action) => action.isSecondary).length,
+            visiblePrimaryActionCount: actions.filter((action) => action.isPrimary).length,
+            groups,
+            actions
+        };
+    });
+
+    const screenshotPath = path.join(pageDir, 'mobile-nav-drawer-open.png');
+    await page.screenshot({
+        path: screenshotPath,
+        fullPage: false,
+        animations: 'disabled',
+        caret: 'hide'
+    });
+
+    await page.keyboard.press('Escape').catch(() => {});
+    await page.evaluate(() => {
+        const drawer = document.querySelector('.lab-mobile-drawer');
+        const toggle = document.querySelector('.lab-mobile-toggle');
+
+        document.body.classList.remove('lab-mobile-nav-open');
+        drawer?.classList.remove('is-open');
+        drawer?.setAttribute('aria-hidden', 'true');
+        drawer?.setAttribute('inert', '');
+        toggle?.classList.remove('is-open');
+        toggle?.setAttribute('aria-expanded', 'false');
+    }).catch(() => {});
+    await page.waitForTimeout(80);
+
+    return {
+        ...state,
+        screenshotPath
+    };
+}
+
+function buildMobileNavDrawerFindings({ route, viewportName, viewportWidth, state, screenshotPath }) {
+    const findings = [];
+    const contract = getMobileInteractionContract({
+        interaction: 'mobile_nav_drawer',
+        viewportName,
+        viewportWidth
+    });
+    const stateScreenshotPath = state?.screenshotPath || screenshotPath;
+
+    if (!contract || Number(viewportWidth || 0) > 860) {
+        return findings;
+    }
+
+    if (!state?.available) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'interaction_state',
+            message: 'The mobile navigation drawer is not available from the header.',
+            evidence: `state=${state?.reason || 'missing'}`,
+            likelyCause: 'The mobile menu toggle or drawer shell is missing in this viewport.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+        return findings;
+    }
+
+    if (!state.isOpen) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'interaction_state',
+            message: 'The mobile navigation toggle did not open the drawer.',
+            evidence: 'lab-mobile-drawer.is-open=false',
+            likelyCause: 'The mobile menu button is no longer wired to the drawer state.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    if (Number(state.panelHorizontalOverflowPx || 0) > Number(contract.maxHorizontalOverflowPx || 0)) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'overflow',
+            message: 'The mobile navigation drawer creates horizontal overflow.',
+            evidence: `panelHorizontalOverflowPx=${state.panelHorizontalOverflowPx}; max=${contract.maxHorizontalOverflowPx}`,
+            likelyCause: 'A drawer button or panel width is escaping the mobile viewport.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    const shouldFitInitialDrawerViewport = Number(state.viewportHeight || 0) >= 760;
+
+    if (
+        shouldFitInitialDrawerViewport &&
+        Number(state.panelInitialScrollOverflowPx || 0) > Number(contract.maxInitialScrollOverflowPx || 0)
+    ) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'medium',
+            category: 'spacing',
+            message: 'The opened mobile navigation drawer pushes key actions below the initial viewport.',
+            evidence: `panelInitialScrollOverflowPx=${state.panelInitialScrollOverflowPx}; max=${contract.maxInitialScrollOverflowPx}`,
+            likelyCause: 'The drawer is carrying duplicate CTAs or loose spacing, so the menu no longer fits cleanly when opened.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    const missingGroups = (contract.requiredGroups || [])
+        .filter((key) => !(state.groups || []).some((group) => group.key === key && group.available && group.visibleChildCount > 0));
+
+    if (missingGroups.length > 0) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'interaction_state',
+            message: 'The mobile navigation drawer is missing expected link groups.',
+            evidence: `missingGroups=${missingGroups.join(', ')}`,
+            likelyCause: 'The shared drawer builder did not collect one of the navigation, brand, browse, or action groups.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    const unstableGroups = (state.groups || [])
+        .filter((group) => group.available && group.visibleChildCount > 1)
+        .filter((group) => (
+            group.display !== 'grid' ||
+            Number(group.widthSpreadPx || 0) > Number(contract.maxButtonWidthSpreadPx || 0) ||
+            Number(group.heightSpreadPx || 0) > Number(contract.maxButtonHeightSpreadPx || 0)
+        ));
+
+    if (unstableGroups.length > 0) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'layout_homogeneity',
+            message: 'The mobile navigation drawer uses uneven button rows.',
+            evidence: unstableGroups.map((group) => `${group.key}:display=${group.display},widthSpreadPx=${group.widthSpreadPx},heightSpreadPx=${group.heightSpreadPx},columns=${group.gridTemplateColumns || 'none'}`).join('; '),
+            likelyCause: 'The drawer link groups are wrapping by intrinsic text width instead of using stable mobile grid tracks.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    const undersizedGroups = (state.groups || [])
+        .filter((group) => group.available && Number(group.minChildHeight || 0) > 0 && Number(group.minChildHeight || 0) < Number(contract.minTapTargetPx || 0));
+
+    if (undersizedGroups.length > 0) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'form_visibility',
+            message: 'The mobile navigation drawer has tap targets below the locked minimum size.',
+            evidence: undersizedGroups.map((group) => `${group.key}:minChildHeight=${group.minChildHeight}; min=${contract.minTapTargetPx}`).join('; '),
+            likelyCause: 'A compact drawer style reduced button height below a reliable touch target.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    if (Number(state.visibleSecondaryActionCount || 0) > Number(contract.maxVisibleSecondaryActionCount || 0)) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'cta_hierarchy',
+            message: 'The mobile navigation drawer shows duplicate secondary CTAs below the link groups.',
+            evidence: `visibleSecondaryActionCount=${state.visibleSecondaryActionCount}; max=${contract.maxVisibleSecondaryActionCount}`,
+            likelyCause: 'Call and WhatsApp are already available as quick actions, so repeating them at the bottom pushes the primary Reserve action area out of balance.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    const partiallyVisibleChildren = (state.groups || [])
+        .flatMap((group) => (group.partiallyVisibleChildren || []).map((child) => ({ ...child, group: group.key })))
+        .filter((child) => (
+            shouldFitInitialDrawerViewport &&
+            Number(child.viewportClipPx || 0) > Number(contract.maxPartiallyVisibleButtonClipPx || 0)
+        ));
+
+    if (partiallyVisibleChildren.length > 0) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'clipping',
+            message: 'The mobile navigation drawer leaves buttons partially visible at the viewport edge.',
+            evidence: partiallyVisibleChildren.slice(0, 5).map((child) => `${child.group}:"${child.text}" clip=${child.viewportClipPx}`).join('; '),
+            likelyCause: 'Drawer spacing or duplicate bottom actions are making buttons peek out instead of appearing as complete controls.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    return findings;
+}
+
 function buildFleetMobileFilterFindings({ route, viewportName, viewportWidth, state, screenshotPath }) {
     const findings = [];
     const normalizedRoute = normalizeRoute(route);
@@ -1317,6 +1767,12 @@ function buildFleetMobileFilterFindings({ route, viewportName, viewportWidth, st
         viewportWidth
     });
     const stateScreenshotPath = state?.screenshotPath || screenshotPath;
+    const isShortHeightViewport = String(viewportName || '').includes('short');
+    const isCompactFullscreenViewport = isShortHeightViewport || (
+        Number(state?.viewportHeight || 0) > 0 &&
+        Number(state.viewportHeight) <= 860 &&
+        Number(state.sheetHeightRatio || 0) >= 0.98
+    );
 
     if (normalizedRoute !== '/fleet.html' || !contract) {
         return findings;
@@ -1369,6 +1825,7 @@ function buildFleetMobileFilterFindings({ route, viewportName, viewportWidth, st
     }
 
     if (
+        !isCompactFullscreenViewport &&
         Number.isFinite(contract.maxSheetHeightRatio) &&
         Number(state.sheetHeightRatio || 0) > contract.maxSheetHeightRatio
     ) {
@@ -1385,12 +1842,33 @@ function buildFleetMobileFilterFindings({ route, viewportName, viewportWidth, st
         }));
     }
 
+    if (
+        Number.isFinite(Number(contract.maxInlineApplyButtonCount)) &&
+        Number(state.visibleInlineApplyButtonCount || 0) > Number(contract.maxInlineApplyButtonCount)
+    ) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'cta_hierarchy',
+            message: 'The mobile fleet filter sheet shows a duplicate apply CTA inside the filter body.',
+            evidence: `visibleInlineApplyButtonCount=${state.visibleInlineApplyButtonCount}; max=${contract.maxInlineApplyButtonCount}`,
+            likelyCause: 'An intermediate Show cars button is visible between sorting and rental-period controls, pushing the date and select fields down.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
     const displayTexts = state.displayTexts || [];
     const selectedFilterLabels = state.selectedFilterLabels || [];
+    const visibleSelectedFilterLabels = state.visibleSelectedFilterLabels || [];
     const missingFilledValues = (contract.requiredFilledValues || [])
         .filter((value) => !displayTexts.includes(value));
     const missingFilterLabels = (contract.requiredFilterLabels || [])
         .filter((label) => !selectedFilterLabels.includes(label));
+    const missingVisibleFilterLabels = (contract.requiredFilterLabels || [])
+        .filter((label) => !visibleSelectedFilterLabels.includes(label));
 
     if (missingFilledValues.length > 0) {
         findings.push(createVisualFinding({
@@ -1416,6 +1894,24 @@ function buildFleetMobileFilterFindings({ route, viewportName, viewportWidth, st
             message: 'Selected mobile fleet filters are not visibly reflected after interaction.',
             evidence: `missingFilters=${missingFilterLabels.join(', ')}; selectedFilters=${selectedFilterLabels.join(' | ') || 'none'}`,
             likelyCause: 'The brand/type select state is not updating, or the selected option is not readable in the mobile sheet.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    if (
+        Number(state.visibleFilterSelectCount || 0) < Number(contract.minVisibleFilterSelectCount || 0) ||
+        missingVisibleFilterLabels.length > 0
+    ) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'form_visibility',
+            message: 'Selected mobile fleet filters are not fully visible in the opened sheet.',
+            evidence: `visibleFilterSelectCount=${state.visibleFilterSelectCount}; min=${contract.minVisibleFilterSelectCount}; missingVisibleFilters=${missingVisibleFilterLabels.join(', ') || 'none'}; visibleFilters=${visibleSelectedFilterLabels.join(' | ') || 'none'}`,
+            likelyCause: 'The filter sheet opens with brand/type controls pushed too low or clipped, so the customer cannot clearly confirm the active filters.',
             hardFail: true,
             screenshotPath: stateScreenshotPath,
             source: 'interaction'
@@ -1456,8 +1952,13 @@ function buildFleetMobileFilterFindings({ route, viewportName, viewportWidth, st
     }
 
     const smallTargets = (state.controls || [])
+        .filter((control) => control.visible !== false)
         .filter((control) => {
             const rect = control.rect || {};
+
+            if (Number(rect.width || 0) < 6 || Number(rect.height || 0) < 6) {
+                return false;
+            }
 
             if (control.kind === 'range') {
                 return Number(rect.width || 0) < contract.minUsefulControlWidthPx;
@@ -1487,6 +1988,7 @@ function buildFleetMobileFilterFindings({ route, viewportName, viewportWidth, st
     }
 
     const clippedControls = (state.controls || [])
+        .filter((control) => control.visible !== false)
         .filter((control) => (
             Number(control.clipX || 0) > contract.maxTextClipPx ||
             Number(control.clipY || 0) > contract.maxTextClipPx
@@ -1508,8 +2010,13 @@ function buildFleetMobileFilterFindings({ route, viewportName, viewportWidth, st
     }
 
     const viewportClippedControls = (state.controls || [])
+        .filter((control) => control.visible !== false)
         .filter((control) => (
-            control.visibleInViewport &&
+            (
+                control.visibleInViewport ||
+                Number(control.visibleIntersectionHeight || 0) > 0 ||
+                Number(control.visibleIntersectionWidth || 0) > 0
+            ) &&
             !control.fullyVisibleInViewport &&
             Number(control.viewportClipPx || 0) > Number(contract.maxViewportClipPx || 2)
         ));
@@ -1523,6 +2030,38 @@ function buildFleetMobileFilterFindings({ route, viewportName, viewportWidth, st
             message: 'Mobile fleet filter controls are partially cut by the short viewport after the sheet opens.',
             evidence: viewportClippedControls.slice(0, 5).map((control) => `${control.key}:viewportClipPx=${control.viewportClipPx},text="${control.text || control.displayText || ''}"`).join('; '),
             likelyCause: 'The bottom sheet is too tall or the internal scroll position is not reset for short mobile screens.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    const peekingControls = (state.controls || [])
+        .filter((control) => control.visible !== false)
+        .filter((control) => (
+            (
+                (
+                    Number(control.visibleIntersectionHeight || 0) > 0 &&
+                    Number(control.visibleIntersectionHeight || 0) < Number(control.rect?.height || 0) &&
+                    Number(control.viewportClipPx || 0) > Number(contract.maxPartiallyVisibleControlClipPx || contract.maxViewportClipPx || 2)
+                ) ||
+                (
+                    Number(control.paintedVisibleHeight || 0) > 0 &&
+                    Number(control.paintedVisibleHeight || 0) < Number(control.rect?.height || 0) &&
+                    Number(control.paintClipPx || 0) > Number(contract.maxPartiallyVisibleControlClipPx || contract.maxViewportClipPx || 2)
+                )
+            )
+        ));
+
+    if (peekingControls.length > 0) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'clipping',
+            message: 'Mobile fleet filter controls are only partially visible at the viewport edge.',
+            evidence: peekingControls.slice(0, 5).map((control) => `${control.key}:visibleHeight=${control.visibleIntersectionHeight}/${control.rect?.height},paintedHeight=${control.paintedVisibleHeight}/${control.rect?.height},viewportClipPx=${control.viewportClipPx},paintClipPx=${control.paintClipPx},text="${control.text || control.displayText || ''}"`).join('; '),
+            likelyCause: 'The filter sheet content or an overflow-hidden parent is leaving active controls half-cut instead of cleanly visible or cleanly below the fold.',
             hardFail: true,
             screenshotPath: stateScreenshotPath,
             source: 'interaction'
@@ -2546,6 +3085,90 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                     insideCard: Boolean(element.closest('.fleet-card, .vehicle-card, .model-card, .service-card, .location-card, .guide-card, article[class*="card"], .card'))
                 };
             });
+
+            function collectSurfaceWidthMetrics() {
+                const selectors = [
+                    'main > section',
+                    'main > div',
+                    'main section > .lab-shell',
+                    'main section > [class*="shell"]',
+                    'main section > [class*="container"]',
+                    'main section > [class*="panel"]',
+                    'main section > [class*="card"]',
+                    'main a[class*="primary"]',
+                    'main button[class*="primary"]',
+                    'main a[class*="cta"]',
+                    'main button[class*="cta"]',
+                    '.hero-lab__content',
+                    '.hero-lab__actions',
+                    '.hero-lab-overlay',
+                    '.reserve-container',
+                    '.fleet-mobile-toolbar'
+                ];
+                const selected = [];
+
+                for (const element of Array.from(document.querySelectorAll(selectors.join(',')))) {
+                    if (!(element instanceof HTMLElement) || !isVisible(element)) {
+                        continue;
+                    }
+
+                    if (element.closest('header, nav, footer, .lab-nav__panel, [aria-hidden="true"]')) {
+                        continue;
+                    }
+
+                    if (element.closest('form, fieldset, label, [class*="field"], [class*="input"], [class*="filter"]')) {
+                        continue;
+                    }
+
+                    const enclosingCard = element.closest('.fleet-card, .vehicle-card, .model-card, .service-card, .location-card, .guide-card, article[class*="card"], .card');
+
+                    if (enclosingCard && enclosingCard !== element) {
+                        continue;
+                    }
+
+                    const rect = rectData(element);
+                    const className = String(element.className || '');
+                    const widthRatio = rect.width / Math.max(1, viewportWidth);
+                    const inlinePaddingPx = Math.min(
+                        Math.max(0, rect.left),
+                        Math.max(0, viewportWidth - rect.right)
+                    );
+
+                    if (rect.height < 42 || widthRatio < 0.52 || widthRatio > 0.985) {
+                        continue;
+                    }
+
+                    if (/\b(secondary|ghost|outline)\b/i.test(className)) {
+                        continue;
+                    }
+
+                    const nestedInsideSelected = selected.some((item) => (
+                        item.element.contains(element) &&
+                        Math.abs(Number(item.rect.width || 0) - rect.width) <= 18
+                    ));
+
+                    if (nestedInsideSelected) {
+                        continue;
+                    }
+
+                    selected.push({
+                        element,
+                        rect,
+                        selector: selectorLabel(element),
+                        label: textFor(element).slice(0, 80),
+                        className,
+                        widthRatio: Number(widthRatio.toFixed(3)),
+                        inlinePaddingPx: Number(inlinePaddingPx.toFixed(2))
+                    });
+
+                    if (selected.length >= 18) {
+                        break;
+                    }
+                }
+
+                return selected.map(({ element, ...metric }) => metric);
+            }
+
             function labelForDateElement(element) {
                 if (!(element instanceof HTMLElement)) {
                     return '';
@@ -2688,6 +3311,7 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                 largestBlankGapPx: Number(largestBlankGapPx.toFixed(2)),
                 largestBlankGapRatio: Number((largestBlankGapPx / Math.max(1, viewportHeight)).toFixed(3)),
                 actionMetrics: actionMetrics.slice(0, 40),
+                surfaceWidthMetrics: collectSurfaceWidthMetrics(),
                 dateControlMetrics,
                 formBorderStyleMetrics: collectFormBorderStyleMetrics(),
                 textEncodingIssues: collectVisibleTextEncodingIssues()
@@ -2860,6 +3484,10 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                 const actionGroupRect = unionRects(actionElements.map(rectData));
                 const secondaryGroupRect = unionRects(secondaryRects);
                 const coreRect = unionRects([titleRect, priceRect]);
+                const contactRow = secondaryActions
+                    .map((element) => element.closest('.fleet-card__contact-row, .vehicle-card__contact-row, .model-card__contact-row, [class*="contact-row"], [class*="action-row"], [class*="actions"]'))
+                    .find((element) => element instanceof HTMLElement && card.contains(element) && isVisible(element));
+                const contactRowRect = rectData(contactRow);
                 const cardClass = String(card.className || '');
                 const isVehicleActionCard = Boolean(price) || card.matches('.fleet-card, .vehicle-card, .model-card, .vehicle-booking') || /\b(fleet|vehicle|model)-/.test(cardClass);
                 const cardWidth = Math.max(1, cardRect.width);
@@ -2879,6 +3507,25 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                 const secondaryMaxButtonWidth = secondaryRects.length
                     ? Math.max(...secondaryRects.map((rect) => Number(rect?.width || 0)))
                     : 0;
+                const secondaryGroupWidth = Number(secondaryGroupRect?.width || 0);
+                const contactRowWidth = Number(contactRowRect?.width || 0);
+                const splitContactGroupWidth = Math.max(secondaryGroupWidth, contactRowWidth);
+                const secondaryLeftGapPx = secondaryGroupRect
+                    ? Math.max(0, Number((secondaryGroupRect.left - cardRect.left).toFixed(2)))
+                    : 0;
+                const secondaryRightGapPx = secondaryGroupRect
+                    ? Math.max(0, Number((cardRect.right - secondaryGroupRect.right).toFixed(2)))
+                    : 0;
+                const contactRowLeftGapPx = contactRowRect
+                    ? Math.max(0, Number((contactRowRect.left - cardRect.left).toFixed(2)))
+                    : secondaryLeftGapPx;
+                const contactRowRightGapPx = contactRowRect
+                    ? Math.max(0, Number((cardRect.right - contactRowRect.right).toFixed(2)))
+                    : secondaryRightGapPx;
+                const splitContactSideGapPx = Math.max(
+                    Math.min(secondaryLeftGapPx, contactRowLeftGapPx),
+                    Math.min(secondaryRightGapPx, contactRowRightGapPx)
+                );
                 const primaryMaxHeight = primaryRects.length
                     ? Math.max(...primaryRects.map((rect) => Number(rect?.height || 0)))
                     : 0;
@@ -2909,6 +3556,12 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                     secondaryActionHeightRatio: Number((Number(secondaryGroupRect?.height || 0) / cardHeight).toFixed(3)),
                     secondaryDominanceRatio: Number((Number(secondaryGroupRect?.height || 0) / coreHeight).toFixed(3)),
                     secondaryMaxButtonWidthRatio: Number((secondaryMaxButtonWidth / cardWidth).toFixed(3)),
+                    splitContactGroupWidthRatio: Number((splitContactGroupWidth / cardWidth).toFixed(3)),
+                    splitContactSideGapPx: Number(splitContactSideGapPx.toFixed(2)),
+                    secondaryLeftGapPx: Number(secondaryLeftGapPx.toFixed(2)),
+                    secondaryRightGapPx: Number(secondaryRightGapPx.toFixed(2)),
+                    contactRowLeftGapPx: Number(contactRowLeftGapPx.toFixed(2)),
+                    contactRowRightGapPx: Number(contactRowRightGapPx.toFixed(2)),
                     secondaryBottomGapPx: secondaryGroupRect
                         ? Number(Math.max(0, cardRect.bottom - secondaryGroupRect.bottom).toFixed(2))
                         : 0,
@@ -3125,6 +3778,47 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
             }
 
             if (
+                Number(viewportWidth || 0) < 760 &&
+                Number.isFinite(Number(scanContract.maxSurfaceWidthDriftRatio))
+            ) {
+                const surfaceMetrics = (frameMetric.surfaceWidthMetrics || [])
+                    .filter((metric) => (
+                        Number(metric.widthRatio || 0) >= 0.52 &&
+                        Number(metric.widthRatio || 0) <= 0.985 &&
+                        !/\b(form|fieldset|field|input|filter)\b/i.test(`${metric.selector || ''} ${metric.className || ''}`)
+                    ));
+
+                if (surfaceMetrics.length >= 2) {
+                    const widthRatios = surfaceMetrics.map((metric) => Number(metric.widthRatio || 0));
+                    const sidePaddings = surfaceMetrics.map((metric) => Number(metric.inlinePaddingPx || 0));
+                    const widthDriftRatio = Math.max(...widthRatios) - Math.min(...widthRatios);
+                    const sidePaddingDriftPx = Math.max(...sidePaddings) - Math.min(...sidePaddings);
+
+                    if (
+                        widthDriftRatio > Number(scanContract.maxSurfaceWidthDriftRatio) ||
+                        sidePaddingDriftPx > Number(scanContract.maxSurfaceSidePaddingDriftPx || 999)
+                    ) {
+                        const examples = surfaceMetrics
+                            .slice(0, 4)
+                            .map((metric) => `${metric.label || metric.selector}:w=${metric.widthRatio},pad=${metric.inlinePaddingPx}`)
+                            .join('; ');
+
+                        findings.push(createVisualFinding({
+                            route,
+                            viewport: viewportName,
+                            severity: 'medium',
+                            category: 'layout_homogeneity',
+                            message: 'Mobile sections and primary surfaces do not keep a consistent readable width.',
+                            evidence: `${frameEvidence}; widthDriftRatio=${widthDriftRatio.toFixed(3)}; max=${scanContract.maxSurfaceWidthDriftRatio}; sidePaddingDriftPx=${sidePaddingDriftPx.toFixed(2)}; examples=${examples}`,
+                            likelyCause: 'Adjacent mobile blocks are using unrelated width, max-width, or padding rules instead of the shared page rhythm.',
+                            screenshotPath: frameScreenshotPath,
+                            source: 'page_depth_scan'
+                        }));
+                    }
+                }
+            }
+
+            if (
                 Number(viewportWidth || 0) >= 900 &&
                 Number.isFinite(Number(scanContract.maxFormBorderWidthSpreadPx))
             ) {
@@ -3283,12 +3977,18 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
             .slice(0, 4);
         return `affectedCards=${metrics.length}; examples=${labels.join(', ')}`;
     };
+    const isSingleRowSplitContact = (metric) => (
+        metric.isVehicleActionCard !== false &&
+        Number(metric.secondaryCount || 0) >= 2 &&
+        Number(metric.secondaryRowCount || 0) === 1
+    );
     const stackedFullWidthCards = cardMetrics.filter((metric) => (
         Number(metric.secondaryRowCount || 0) > 1 &&
         Number(metric.secondaryMaxButtonWidthRatio || 0) > Number(cardContract.maxSecondaryButtonWidthRatio || 1)
     ));
     const edgeTouchingCards = cardMetrics.filter((metric) => (
         Number(metric.secondaryCount || 0) > 0 &&
+        !isSingleRowSplitContact(metric) &&
         Number(metric.secondaryInlinePaddingPx || 0) < Number(cardContract.minCardInlinePaddingPx || 0)
     ));
     const dominantActionCards = cardMetrics.filter((metric) => (
@@ -3300,10 +4000,15 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
         Number(metric.secondaryRowCount || 0) > 1
     ));
     const thinContactStripCards = cardMetrics.filter((metric) => (
-        metric.isVehicleActionCard !== false &&
-        Number(metric.secondaryCount || 0) >= 2 &&
-        Number(metric.secondaryRowCount || 0) === 1 &&
+        isSingleRowSplitContact(metric) &&
         Number(metric.secondaryActionHeightRatio || 0) < Number(cardContract.minSplitContactStripHeightRatio || 0)
+    ));
+    const narrowSplitContactCards = cardMetrics.filter((metric) => (
+        isSingleRowSplitContact(metric) &&
+        (
+            Number(metric.splitContactGroupWidthRatio || 0) < Number(cardContract.minSplitContactGroupWidthRatio || 0) ||
+            Number(metric.splitContactSideGapPx || 0) > Number(cardContract.maxSplitContactSideGapPx || 0)
+        )
     ));
     const inconsistentButtonShapeCards = cardMetrics.filter((metric) => (
         metric.isVehicleActionCard !== false &&
@@ -3385,6 +4090,21 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
             evidence: `${summarizeCardLabels(thinContactStripCards)}; minSecondaryActionHeightRatio=${Math.min(...thinContactStripCards.map((metric) => Number(metric.secondaryActionHeightRatio || 0))).toFixed(3)}; min=${cardContract.minSplitContactStripHeightRatio}`,
             likelyCause: 'Call and WhatsApp are present, but the bottom contact strip reads like a cramped afterthought rather than a useful mobile control.',
             screenshotPath: screenshotForScanMetric(state, thinContactStripCards[0], screenshotPath),
+            source: 'page_depth_scan'
+        }));
+    }
+
+    if (narrowSplitContactCards.length > 1) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'spacing',
+            message: 'A repeated mobile card pattern leaves side gutters around the split Call and WhatsApp bar.',
+            evidence: `${summarizeCardLabels(narrowSplitContactCards)}; minSplitContactGroupWidthRatio=${Math.min(...narrowSplitContactCards.map((metric) => Number(metric.splitContactGroupWidthRatio || 0))).toFixed(3)}; min=${cardContract.minSplitContactGroupWidthRatio}; maxSideGapPx=${Math.max(...narrowSplitContactCards.map((metric) => Number(metric.splitContactSideGapPx || 0))).toFixed(2)}; max=${cardContract.maxSplitContactSideGapPx}`,
+            likelyCause: 'The contact row is still constrained by the card content padding instead of spanning the full bottom edge of the vehicle card.',
+            hardFail: true,
+            screenshotPath: screenshotForScanMetric(state, narrowSplitContactCards[0], screenshotPath),
             source: 'page_depth_scan'
         }));
     }
@@ -3500,8 +4220,7 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
 
         if (
             isVehicleActionCard &&
-            Number(metric.secondaryCount || 0) >= 2 &&
-            Number(metric.secondaryRowCount || 0) === 1 &&
+            isSingleRowSplitContact(metric) &&
             Number(metric.secondaryActionHeightRatio || 0) < Number(cardContract.minSplitContactStripHeightRatio || 0)
         ) {
             findings.push(createVisualFinding({
@@ -3518,7 +4237,29 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
         }
 
         if (
+            isSingleRowSplitContact(metric) &&
+            (
+                Number(metric.splitContactGroupWidthRatio || 0) < Number(cardContract.minSplitContactGroupWidthRatio || 0) ||
+                Number(metric.splitContactSideGapPx || 0) > Number(cardContract.maxSplitContactSideGapPx || 0)
+            )
+        ) {
+            findings.push(createVisualFinding({
+                route,
+                viewport: viewportName,
+                severity: 'high',
+                category: 'spacing',
+                message: 'The split Call and WhatsApp bar does not occupy the full mobile card width.',
+                evidence: `${labelEvidence}; splitContactGroupWidthRatio=${metric.splitContactGroupWidthRatio}; min=${cardContract.minSplitContactGroupWidthRatio}; splitContactSideGapPx=${metric.splitContactSideGapPx}; max=${cardContract.maxSplitContactSideGapPx}`,
+                likelyCause: 'The bottom contact row is still inside the card content padding instead of running edge-to-edge across the card.',
+                hardFail: true,
+                screenshotPath: metricScreenshotPath,
+                source: 'page_depth_scan'
+            }));
+        }
+
+        if (
             Number(metric.secondaryCount || 0) > 0 &&
+            !isSingleRowSplitContact(metric) &&
             Number(metric.secondaryInlinePaddingPx || 0) < Number(cardContract.minCardInlinePaddingPx || 0)
         ) {
             findings.push(createVisualFinding({
@@ -6068,6 +6809,11 @@ function mergeBaselineResults(results) {
         return actionableResults.find((entry) => entry.status === 'review');
     }
 
+    const missing = results.find((entry) => entry && entry.status === 'missing');
+    if (missing) {
+        return missing;
+    }
+
     if (actionableResults.some((entry) => entry.status === 'pass')) {
         return actionableResults.find((entry) => entry.status === 'pass');
     }
@@ -6077,7 +6823,7 @@ function mergeBaselineResults(results) {
         return updated;
     }
 
-    return results.find((entry) => entry && entry.status === 'missing') || null;
+    return null;
 }
 
 function mimeTypeForImage(filePath) {
@@ -6426,6 +7172,21 @@ function average(values = []) {
 
 function uniqueValues(values = []) {
     return [...new Set(values.filter(Boolean))];
+}
+
+function resolveVisualRoutes(args = {}) {
+    const hasExplicitRoutes = Array.isArray(args.routes) && args.routes.length > 0;
+    const baseRoutes = hasExplicitRoutes
+        ? args.routes
+        : getDefaultVisualRoutes(args.scope || 'landings');
+    const fleetClickRoutes = !hasExplicitRoutes && (args.includeFleetClicks ?? true)
+        ? getVehicleVisualRoutes()
+        : [];
+
+    return uniqueValues([
+        ...baseRoutes,
+        ...fleetClickRoutes
+    ].map((route) => normalizeRoute(route)));
 }
 
 function normalizeServiceStateHref(value = '') {
@@ -7866,6 +8627,7 @@ async function runPageAudit({ browser, baseUrl, route, viewport, runDir, updateB
         await page.goto(`${baseUrl}${route}`, { waitUntil: 'domcontentloaded' });
         await settlePage(page, 500);
         const metrics = await collectVisualMetrics(page, profile);
+        const mobileNavDrawerState = await collectMobileNavDrawerState(page, pageDir, viewport);
         const pageDepthScanState = await collectPageDepthScanState(page, pageDir, viewport);
         const surfaceMetrics = await collectInteractiveSurfaceMetrics(page, profile, viewport);
         const serviceSelectorStates = route === '/services.html'
@@ -7886,6 +8648,7 @@ async function runPageAudit({ browser, baseUrl, route, viewport, runDir, updateB
         const interactionChangedPage = Boolean(
             serviceSelectorStates ||
             fleetMobileFilterState ||
+            mobileNavDrawerState ||
             contactFormState ||
             reserveBookingIntentState ||
             staleBookingDateProbeState
@@ -7942,6 +8705,13 @@ async function runPageAudit({ browser, baseUrl, route, viewport, runDir, updateB
             viewportName: viewport.name,
             viewportWidth: viewport.width,
             state: fleetMobileFilterState,
+            screenshotPath: artifacts.viewportScreenshot
+        }));
+        findings = findings.concat(buildMobileNavDrawerFindings({
+            route,
+            viewportName: viewport.name,
+            viewportWidth: viewport.width,
+            state: mobileNavDrawerState,
             screenshotPath: artifacts.viewportScreenshot
         }));
         findings = findings.concat(buildContactFormStateFindings({
@@ -8096,12 +8866,7 @@ async function runVisualAgent(options = {}) {
         };
     }
 
-    const selectedRoutes = uniqueValues(
-        [
-            ...((args.routes && args.routes.length > 0) ? args.routes : getDefaultVisualRoutes(args.scope || 'landings')),
-            ...((args.includeFleetClicks ?? true) ? getVehicleVisualRoutes() : [])
-        ].map((route) => normalizeRoute(route))
-    );
+    const selectedRoutes = resolveVisualRoutes(args);
     const selectedViewports = resolveSelectedViewports(args.viewports);
     const generatedAt = new Date().toISOString();
     const runDir = args.outputDir || path.join(artifactsRoot, timestampSlug(new Date(generatedAt)));
@@ -8167,6 +8932,7 @@ async function runVisualAgent(options = {}) {
             cohorts: summarizeCohorts(enrichedPages),
             pages: enrichedPages
         };
+        report.auditMemory = compareReportToApprovedMemory(report, { kind: 'visual' });
 
         fs.writeFileSync(path.join(runDir, 'report.json'), `${JSON.stringify(report, null, 2)}\n`);
         fs.writeFileSync(path.join(runDir, 'report.md'), buildMarkdownReport(report));
@@ -8195,6 +8961,14 @@ async function main() {
 
     console.log(`Visual agent completed: ${runDir}`);
     console.log(`good=${report.summary.byStatus.good} review=${report.summary.byStatus.review} bad=${report.summary.byStatus.bad}`);
+
+    if (report.auditMemory?.status === 'bad') {
+        console.error(`Audit memory regression failed: ${report.auditMemory.message}`);
+        for (const regression of report.auditMemory.regressions.slice(0, 10)) {
+            console.error(`- ${formatAuditMemoryRegression(regression)}`);
+        }
+        process.exitCode = 1;
+    }
 }
 
 if (require.main === module) {
@@ -8215,6 +8989,7 @@ module.exports = {
     buildDesignSystemFindings,
     buildDeterministicFindings,
     buildFleetMobileFilterFindings,
+    buildMobileNavDrawerFindings,
     buildPageDepthScanFindings,
     buildReserveBookingIntentFindings,
     buildServiceInteractionFindings,
@@ -8223,7 +8998,9 @@ module.exports = {
     buildSurfaceFindings,
     buildTemplateFamilyFindings,
     comparePngFiles,
+    mergeBaselineResults,
     parseArgs,
+    resolveVisualRoutes,
     routeFileStem,
     summarizeCohorts,
     runVisualAgent

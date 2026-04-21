@@ -372,6 +372,96 @@ function buildGraphFindings(graph = [], publicRoutes = []) {
     return findings;
 }
 
+function viewportName(viewport = '') {
+    if (typeof viewport === 'string') {
+        return viewport;
+    }
+
+    return String(viewport?.name || '');
+}
+
+function buildRouteViewportCoverage({ pages = [], publicRoutes = [], viewports = [] } = {}) {
+    const expectedRoutes = uniqueValues((publicRoutes || []).map(normalizeRoute)).sort();
+    const expectedViewports = uniqueValues((viewports || []).map(viewportName).filter(Boolean)).sort();
+    const auditedPairs = new Set();
+
+    for (const page of pages || []) {
+        const route = normalizeRoute(page.route || '/');
+        const viewport = viewportName(page.viewport || '');
+
+        if (route && viewport) {
+            auditedPairs.add(`${route}@@${viewport}`);
+        }
+    }
+
+    const routes = expectedRoutes.map((route) => {
+        const auditedViewports = expectedViewports
+            .filter((viewport) => auditedPairs.has(`${route}@@${viewport}`));
+        const missingViewports = expectedViewports
+            .filter((viewport) => !auditedPairs.has(`${route}@@${viewport}`));
+
+        return {
+            route,
+            auditedViewports,
+            missingViewports,
+            complete: missingViewports.length === 0
+        };
+    });
+    const missingRouteViewports = routes.flatMap((entry) => (
+        entry.missingViewports.map((viewport) => ({
+            route: entry.route,
+            viewport
+        }))
+    ));
+    const expectedPairSet = new Set(
+        expectedRoutes.flatMap((route) => expectedViewports.map((viewport) => `${route}@@${viewport}`))
+    );
+    const auditedExpectedPageRuns = [...auditedPairs].filter((pair) => expectedPairSet.has(pair)).length;
+
+    return {
+        complete: missingRouteViewports.length === 0,
+        expectedRoutes,
+        expectedViewports,
+        expectedRouteCount: expectedRoutes.length,
+        expectedViewportCount: expectedViewports.length,
+        expectedPageRuns: expectedRoutes.length * expectedViewports.length,
+        auditedExpectedPageRuns,
+        auditedPageRuns: auditedPairs.size,
+        missingRouteViewports,
+        missingRoutes: routes
+            .filter((entry) => entry.auditedViewports.length === 0)
+            .map((entry) => entry.route),
+        routes
+    };
+}
+
+function buildCoverageFindings(coverageProfile = {}) {
+    if (!coverageProfile || coverageProfile.expectedPageRuns === 0) {
+        return [];
+    }
+
+    const findings = [];
+
+    for (const entry of coverageProfile.routes || []) {
+        if (entry.complete) {
+            continue;
+        }
+
+        findings.push(createNavigationFinding({
+            route: entry.route,
+            viewport: entry.missingViewports.join(', '),
+            severity: 'high',
+            category: 'navigation_coverage_gap',
+            message: 'This route was not audited in every required viewport.',
+            evidence: `missingViewports=${entry.missingViewports.join(', ')}; auditedViewports=${entry.auditedViewports.join(', ') || 'none'}`,
+            recommendation: 'Make the route reachable from the crawl seeds or include it explicitly in the navigation audit matrix.',
+            hardFail: true
+        }));
+    }
+
+    return findings;
+}
+
 function hasRecoveryRoute(page = {}, key = '') {
     const targetRoute = RECOVERY_ROUTES[key];
     if (!targetRoute) {
@@ -386,7 +476,7 @@ function buildPageFindings(page = {}, destinationsByRoute = {}) {
     const findings = [];
     const route = normalizeRoute(page.route || '/');
     const viewport = page.viewport || '';
-    const isMobile = /^mobile/i.test(viewport);
+    const isCompactNav = /^(mobile|tablet-portrait)/i.test(viewport);
     const navigation = page.navigation || {};
     const handoffs = page.handoffs || [];
     const failedHandoffs = handoffs.filter((handoff) => handoff.status === 'failed');
@@ -419,7 +509,7 @@ function buildPageFindings(page = {}, destinationsByRoute = {}) {
         }));
     }
 
-    if (isMobile) {
+    if (isCompactNav) {
         const drawer = navigation.mobileDrawer || {};
 
         if (!drawer.toggleFound || !drawer.opened || !drawer.closed) {
@@ -527,6 +617,24 @@ function buildPageFindings(page = {}, destinationsByRoute = {}) {
         }));
     }
 
+    for (const escapeCheck of navigation.localEscapes || []) {
+        if (escapeCheck.status === 'passed') {
+            continue;
+        }
+
+        findings.push(createNavigationFinding({
+            route,
+            viewport,
+            severity: 'high',
+            category: 'local_navigation_trap',
+            message: 'An in-page navigation surface can trap users or lacks an obvious return path.',
+            evidence: `${escapeCheck.label || escapeCheck.id || 'interaction'}; ${escapeCheck.message || ''}`,
+            recommendation: 'Add a visible return action, support Escape/scrim close, and verify the user lands back on the main content.',
+            hardFail: true,
+            screenshotPath: escapeCheck.screenshotPath || page.screenshotPath || ''
+        }));
+    }
+
     for (const link of page.links || []) {
         const targetRoute = normalizeRoute(link.targetRoute || link.href);
         const linkFindings = assessLinkLabel(link, destinationsByRoute[targetRoute] || {});
@@ -578,10 +686,11 @@ function summarizeNavigationFindings(findings = []) {
     };
 }
 
-function buildNavigationReview({ pages = [], graph = [], publicRoutes = [], destinationsByRoute = {} } = {}) {
+function buildNavigationReview({ pages = [], graph = [], publicRoutes = [], destinationsByRoute = {}, coverageProfile = null } = {}) {
     const pageFindings = pages.flatMap((page) => buildPageFindings(page, destinationsByRoute));
     const graphFindings = buildGraphFindings(graph, publicRoutes);
-    const findings = [...pageFindings, ...graphFindings].sort((left, right) => (
+    const coverageFindings = buildCoverageFindings(coverageProfile);
+    const findings = [...pageFindings, ...graphFindings, ...coverageFindings].sort((left, right) => (
         severityRank(right.severity) - severityRank(left.severity) ||
         left.route.localeCompare(right.route) ||
         left.category.localeCompare(right.category)
@@ -603,6 +712,14 @@ function buildNavigationReview({ pages = [], graph = [], publicRoutes = [], dest
 
     if ((summary.byCategory.unreachable_from_home || 0) > 0 || (summary.byCategory.orphan_navigation_route || 0) > 0) {
         reviewGates.push('route_reachability_gap');
+    }
+
+    if ((summary.byCategory.navigation_coverage_gap || 0) > 0) {
+        reviewGates.push('navigation_coverage_gap');
+    }
+
+    if ((summary.byCategory.local_navigation_trap || 0) > 0) {
+        reviewGates.push('local_navigation_trap');
     }
 
     const status = summary.hardFails > 0 || summary.bySeverity.high > 0
@@ -638,7 +755,7 @@ function evaluateNavigationGate(summary = {}, strict = false) {
         reasons.push(`high=${summary.bySeverity.high}`);
     }
 
-    for (const category of ['nav_handoff_failure', 'mobile_drawer_blocked', 'desktop_menu_blocked', 'trapped_route', 'route_load_failure']) {
+    for (const category of ['nav_handoff_failure', 'mobile_drawer_blocked', 'desktop_menu_blocked', 'trapped_route', 'route_load_failure', 'navigation_coverage_gap', 'local_navigation_trap']) {
         if (Number(byCategory[category] || 0) > 0) {
             reasons.push(`${category}=${byCategory[category]}`);
         }
@@ -691,10 +808,12 @@ module.exports = {
     GENERIC_LINK_LABELS,
     RECOVERY_ROUTES,
     assessLinkLabel,
+    buildCoverageFindings,
     buildGraphFindings,
     buildNavigationReview,
     buildNavigationReviewMarkdownSection,
     buildPageFindings,
+    buildRouteViewportCoverage,
     buildStaticNavigationGraph,
     createNavigationFinding,
     destinationTokensForRoute,

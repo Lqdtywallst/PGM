@@ -41,6 +41,8 @@ Si el auditor no puede copiar una captura, el manifest lo marca como `screenshot
 | BUG-004 | Corregido y verificado | Fleet movil | Alta | Las CTAs Call/WhatsApp dominan las cards y se repite en 6 vehiculos. |
 | BUG-005 | Corregido y verificado | Fleet movil | Alta | El auditor detecta contraste debil en textos clave del primer scroll. |
 | BUG-006 | Corregido funcionalmente, pulido parcial | Reserve movil | Alta original | El hamburger no abria visualmente el drawer; ahora pasa y el icono ya contrasta en header claro. |
+| BUG-007 | Detectado por auditor, pendiente | Fleet movil | Alta | La barra partida Call/WhatsApp queda con gutters laterales y no ocupa todo el ancho inferior de la card. |
+| BUG-008 | Detectado por auditor, pendiente | Fleet filtros movil | Alta | El sheet de filtros abre con controles parcialmente cortados y filtros activos no totalmente visibles. |
 
 ## BUG-001: fecha de reserva pasada
 
@@ -253,11 +255,113 @@ Criterio de salida estetico:
 - Reserve principal puede destacar, pero no debe romper el equilibrio visual.
 - El menu debe sentirse parte del header canonico, no un bloque legacy.
 
+## BUG-007: barra Call/WhatsApp no ocupa todo el ancho de la card
+
+Estado: detectado por auditor, pendiente de arreglo visual.
+
+Captura:
+
+![BUG-007 fleet contact bar gutters](screenshots/visual-bugs-2026-04-21/BUG-007-fleet-mobile-contact-bar-gutters.png)
+
+Evidencia del auditor:
+
+`affectedCards=6; examples=Huracan EVO Spyder, 296 GTS, 992 GT3, Urus Sport; minSplitContactGroupWidthRatio=0.910; min=0.985; maxSideGapPx=15.39; max=2`
+
+`card="Huracan EVO Spyder"; splitContactGroupWidthRatio=0.91; min=0.985; splitContactSideGapPx=15.39; max=2`
+
+Lectura humana:
+
+- Call y WhatsApp si estan en una sola fila, pero la barra esta encajada dentro del padding de contenido.
+- Visualmente se ve como un bloque separado, no como el cierre inferior de la card.
+- El problema es de componente compartido: afecta a las cards de Fleet, no solo a un vehiculo.
+
+Criterio de salida:
+
+- En movil, la barra `Call`/`WhatsApp` debe ocupar el ancho visual completo inferior de la card.
+- La barra debe seguir partida 50/50 en una sola fila.
+- `splitContactGroupWidthRatio >= 0.985`
+- `splitContactSideGapPx <= 2`
+- Sin findings `spacing` para `split Call and WhatsApp bar`.
+
+Validacion actual:
+
+```bash
+node scripts/run-visual-agent.js --route /fleet.html --viewport mobile-modern --no-fleet-clicks --output-dir artifacts/visual-agent/mobile-contact-bar-check
+```
+
+Guardarrail e2e:
+
+```bash
+npx playwright test tests/e2e/mobile-friction-points.spec.js --project=mobile-chromium --grep "fleet mobile card contact bar"
+```
+
+Resultado actual:
+
+El auditor visual conserva el fallo en el run documentado. El guardarrail e2e pasa con la barra actual y fallara si vuelve a aparecer gutter lateral.
+
+## BUG-008: filter sheet movil con controles cortados
+
+Estado: detectado por auditor, pendiente de arreglo visual.
+
+Captura:
+
+![BUG-008 fleet mobile filter sheet clipped](screenshots/visual-bugs-2026-04-21/BUG-008-fleet-mobile-filter-sheet-clipped.png)
+
+Evidencia del auditor:
+
+`Mobile fleet filter controls are only partially visible at the viewport edge.`
+
+`fleet-sidebar__select js-fleet-brand-select:visibleHeight=40.48/50,viewportClipPx=9.52,text="Lamborghini"`
+
+`fleet-sidebar__select js-fleet-type-select:viewportClipPx=106,text="Convertible"`
+
+`visibleFilterSelectCount=1; min=2; missingVisibleFilters=Lamborghini, Convertible; visibleFilters=Featured`
+
+`sheetHeightRatio=1; max=0.94`
+
+Lectura humana:
+
+- El sheet ocupa practicamente toda la altura en mobile-short.
+- Los filtros activos de marca/tipo quedan demasiado bajos o cortados.
+- El usuario no puede confirmar claramente el estado activo sin pelearse con el scroll.
+- El problema no es solo funcional: el control existe en DOM, pero visualmente se ve mal.
+
+Criterio de salida:
+
+- Al abrir filtros en movil, los valores activos principales deben verse completos.
+- Al menos los selects requeridos de marca y tipo deben estar totalmente visibles cuando el auditor abre el sheet con valores cargados.
+- Ningun control debe quedar medio asomando en el borde del viewport.
+- `sheetHeightRatio <= 0.94` para `mobile-short`.
+- `visibleFilterSelectCount >= 2`
+- Sin findings `Mobile fleet filter controls are only partially visible` ni `Selected mobile fleet filters are not fully visible`.
+
+Validacion actual:
+
+```bash
+node scripts/run-visual-agent.js --route /fleet.html --viewport mobile-short --no-fleet-clicks --output-dir artifacts/visual-agent/mobile-filter-sheet-check-v2
+```
+
+Guardarrail e2e:
+
+```bash
+npx playwright test tests/e2e/mobile-friction-points.spec.js --project=mobile-chromium --grep "short mobile filter sheet"
+```
+
+Resultado actual:
+
+`bad=1` en auditor visual.
+
+El guardarrail e2e tambien falla mientras este bug siga pendiente:
+
+`Expected sheetHeightRatio <= 0.94; received 1`
+
 ## Orden recomendado de arreglo
 
-1. Backlog visual-smoke global: Home, Contact, Services mobile-short/tablet y PDPs siguen generando hallazgos en `npm run audit`.
-2. BUG-006: pulido estetico completo del drawer movil, ya que funcionalmente pasa.
-3. Revisar y aprobar baselines restantes solo despues de arreglar cada superficie.
+1. BUG-008: arreglar filter sheet movil porque bloquea lectura/confirmacion de filtros.
+2. BUG-007: ajustar barra inferior de cards Fleet movil.
+3. Backlog visual-smoke global: Home, Contact, Services mobile-short/tablet y PDPs siguen generando hallazgos en `npm run audit`.
+4. BUG-006: pulido estetico completo del drawer movil, ya que funcionalmente pasa.
+5. Revisar y aprobar baselines restantes solo despues de arreglar cada superficie.
 
 ## Comandos de validacion
 
@@ -277,6 +381,12 @@ Fleet movil:
 
 ```bash
 node scripts/run-visual-agent.js --route /fleet.html --viewport mobile-modern --no-fleet-clicks
+```
+
+Fleet filtros movil corto:
+
+```bash
+node scripts/run-visual-agent.js --route /fleet.html --viewport mobile-short --no-fleet-clicks
 ```
 
 Journey movil de reserva:

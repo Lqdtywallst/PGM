@@ -19,6 +19,7 @@ const {
     buildDesignSystemFindings,
     buildDeterministicFindings,
     buildFleetMobileFilterFindings,
+    buildMobileNavDrawerFindings,
     buildPageDepthScanFindings,
     buildReserveBookingIntentFindings,
     buildServiceInteractionFindings,
@@ -28,14 +29,22 @@ const {
     buildTemplateFamilyFindings,
     VIEWPORTS,
     comparePngFiles,
+    mergeBaselineResults,
     parseArgs,
+    resolveVisualRoutes,
     routeFileStem
 } = require('../../scripts/run-visual-agent');
 const {
     DEFAULT_ROUTES: VISUAL_SMOKE_ROUTES,
     DEFAULT_VIEWPORTS: VISUAL_SMOKE_VIEWPORTS,
+    VISUAL_SMOKE_VIEWPORT_GROUPS,
+    parseArgs: parseVisualSmokeArgs,
+    resolveSmokeViewports,
     summarizeSmokeFailures
 } = require('../../scripts/run-visual-smoke-audit');
+const {
+    summarizeRobustFailures
+} = require('../../scripts/run-visual-robust-audit');
 
 test('resolveViewportTier separates mobile, laptop and desktop policies', () => {
     assert.equal(resolveViewportTier('mobile-modern', 390), 'mobile');
@@ -64,6 +73,7 @@ test('viewport coverage matrix defines the canonical responsive device bands', (
             'mobile-short',
             'mobile-small',
             'mobile-modern',
+            'mobile-wide-short',
             'mobile-large',
             'tablet-portrait',
             'tablet-landscape',
@@ -73,7 +83,7 @@ test('viewport coverage matrix defines the canonical responsive device bands', (
             'desktop-wide'
         ]
     );
-    assert.equal(responsiveViewports.length, 10);
+    assert.equal(responsiveViewports.length, 11);
     assert.ok(firstViewportNames.includes('mobile-short'));
     assert.ok(firstViewportNames.includes('laptop-compact'));
     assert.ok(firstViewportNames.includes('desktop-wide'));
@@ -108,8 +118,25 @@ test('getMobileInteractionContract locks mobile fleet filter usability', () => {
 
     assert.equal(contract.policy, 'locked');
     assert.equal(contract.minTapTargetPx, 44);
-    assert.ok(contract.requiredFilledValues.includes('20/04/2026'));
+    assert.ok(contract.maxSheetHeightRatio < 1);
+    assert.equal(contract.minVisibleFilterSelectCount, 2);
+    assert.equal(contract.maxInlineApplyButtonCount, 0);
+    assert.ok(contract.requiredFilledValues.includes('21/04/2026'));
     assert.ok(contract.requiredFilterLabels.includes('Lamborghini'));
+});
+
+test('getMobileInteractionContract locks mobile navigation drawer rhythm', () => {
+    const contract = getMobileInteractionContract({
+        interaction: 'mobile_nav_drawer',
+        viewportName: 'mobile-modern',
+        viewportWidth: 390
+    });
+
+    assert.equal(contract.policy, 'locked');
+    assert.equal(contract.maxVisibleSecondaryActionCount, 0);
+    assert.ok(contract.maxButtonWidthSpreadPx <= 12);
+    assert.ok(contract.requiredGroups.includes('nav'));
+    assert.ok(contract.requiredGroups.includes('browse'));
 });
 
 test('human-state contracts cover contact and reserve filled forms', () => {
@@ -142,6 +169,9 @@ test('mobile card action contract locks hierarchy and edge padding', () => {
     assert.equal(contract.maxSecondaryContactActions, 2);
     assert.equal(contract.requireSingleRowContactSplit, true);
     assert.ok(contract.maxActionGroupHeightRatio < 0.4);
+    assert.ok(contract.minSplitContactGroupWidthRatio >= 0.985);
+    assert.ok(contract.maxSplitContactSideGapPx <= 2);
+    assert.equal(contract.allowFullBleedContactStrip, true);
     assert.ok(contract.minCardInlinePaddingPx >= 12);
     assert.ok(contract.minSplitContactStripHeightRatio >= 0.065);
 });
@@ -154,6 +184,57 @@ test('visual smoke gate covers human routes and responsive device bands', () => 
     assert.ok(VISUAL_SMOKE_VIEWPORTS.includes('tablet-portrait'));
     assert.ok(VISUAL_SMOKE_VIEWPORTS.includes('laptop'));
     assert.ok(VISUAL_SMOKE_VIEWPORTS.includes('desktop-wide'));
+});
+
+test('visual smoke viewport groups keep mobile, tablet and desktop audits separate', () => {
+    assert.deepEqual(
+        VISUAL_SMOKE_VIEWPORT_GROUPS.mobile,
+        ['mobile-short', 'mobile-small', 'mobile-modern', 'mobile-wide-short', 'mobile-large']
+    );
+    assert.deepEqual(
+        VISUAL_SMOKE_VIEWPORT_GROUPS.tablet,
+        ['tablet-portrait', 'tablet-landscape']
+    );
+    assert.deepEqual(
+        VISUAL_SMOKE_VIEWPORT_GROUPS.desktop,
+        ['laptop-compact', 'laptop', 'desktop-standard', 'desktop-wide']
+    );
+    assert.deepEqual(
+        VISUAL_SMOKE_VIEWPORT_GROUPS.responsive,
+        [
+            'mobile-short',
+            'mobile-small',
+            'mobile-modern',
+            'mobile-wide-short',
+            'mobile-large',
+            'tablet-portrait',
+            'tablet-landscape',
+            'laptop-compact',
+            'laptop',
+            'desktop-standard',
+            'desktop-wide'
+        ]
+    );
+});
+
+test('visual smoke args resolve viewport groups and explicit viewport additions', () => {
+    const args = parseVisualSmokeArgs([
+        '--viewport-group',
+        'mobile',
+        '--viewport',
+        'tablet-portrait',
+        '--strict-review'
+    ]);
+
+    assert.deepEqual(resolveSmokeViewports(args), [
+        'mobile-short',
+        'mobile-small',
+        'mobile-modern',
+        'mobile-wide-short',
+        'mobile-large',
+        'tablet-portrait'
+    ]);
+    assert.equal(args.strictReview, true);
 });
 
 test('getFirstViewportContract resolves split rules for brand landings on desktop', () => {
@@ -216,6 +297,23 @@ test('parseArgs reads route, base URL, and baseline update flags', () => {
     assert.deepEqual(args.approveViewports, ['desktop-wide']);
 });
 
+test('resolveVisualRoutes keeps explicit route audits scoped to the requested routes', () => {
+    assert.deepEqual(
+        resolveVisualRoutes({
+            routes: ['/fleet.html'],
+            scope: 'landings',
+            includeFleetClicks: true
+        }),
+        ['/fleet.html']
+    );
+
+    assert.ok(resolveVisualRoutes({
+        routes: [],
+        scope: 'landings',
+        includeFleetClicks: true
+    }).includes('/ferrari-296-gts-rental-dubai.html'));
+});
+
 test('routeFileStem creates stable filesystem-safe names', () => {
     assert.equal(routeFileStem('/'), 'home');
     assert.equal(routeFileStem('/app/reserve/page.html'), 'app-reserve-page-html');
@@ -252,6 +350,72 @@ test('comparePngFiles passes identical images and flags meaningful diffs', () =>
     assert.equal(failing.status, 'bad');
     assert.ok(failing.ratio > 0.015);
     assert.equal(fs.existsSync(diffPath), true);
+});
+
+test('mergeBaselineResults keeps missing region baselines visible even when viewport passes', () => {
+    const result = mergeBaselineResults([
+        {
+            kind: 'viewport',
+            status: 'pass',
+            ratio: 0,
+            threshold: 0.015,
+            message: 'Viewport baseline passed.'
+        },
+        {
+            kind: 'region',
+            status: 'missing',
+            ratio: null,
+            threshold: 0.008,
+            message: 'Baseline not found.'
+        }
+    ]);
+
+    assert.equal(result.status, 'missing');
+    assert.equal(result.kind, 'region');
+});
+
+test('robust visual gate fails on review pages, missing baselines and first viewport failures', () => {
+    const gate = summarizeRobustFailures({
+        visual: {
+            issues: [
+                {
+                    route: '/fleet.html',
+                    viewport: 'mobile-modern',
+                    status: 'review',
+                    score: 82,
+                    findings: [{ severity: 'medium', message: 'CTA drift' }]
+                }
+            ]
+        },
+        baselines: {
+            missing: [
+                {
+                    route: '/fleet.html',
+                    viewport: 'mobile-short'
+                }
+            ]
+        },
+        firstViewport: {
+            ok: false,
+            errors: [],
+            byProject: {
+                'desktop-chromium': {
+                    failedTests: [
+                        {
+                            title: 'fleet keeps first section above fold',
+                            file: 'tests/e2e/visual-route-entrypoints.spec.js',
+                            line: 1
+                        }
+                    ]
+                }
+            }
+        }
+    });
+
+    assert.equal(gate.failed, true);
+    assert.equal(gate.reviewPages.length, 1);
+    assert.equal(gate.missingBaselines.length, 1);
+    assert.equal(gate.firstViewportFailedTests.length, 1);
 });
 
 test('buildMarkdownReport renders the key run summary and per-page sections', () => {
@@ -1546,9 +1710,11 @@ test('buildFleetMobileFilterFindings accepts readable filled mobile filter contr
             isOpen: true,
             sheetHeightRatio: 0.82,
             sheetHorizontalOverflowPx: 0,
-            displayTexts: ['20/04/2026', '10:00', '22/04/2026', '18:00'],
+            displayTexts: ['21/04/2026', '10:00', '23/04/2026', '18:00'],
             selectedFilterLabels: ['Featured', 'Lamborghini', 'Convertible'],
+            visibleSelectedFilterLabels: ['Featured', 'Lamborghini', 'Convertible'],
             visibleFilledFieldCount: 4,
+            visibleFilterSelectCount: 3,
             dateTimeFields: [
                 { key: 'fleet-pickup-date', widthRatio: 0.86, rect: { width: 326, height: 56 }, clipX: 0, clipY: 0 },
                 { key: 'fleet-pickup-time', widthRatio: 0.86, rect: { width: 326, height: 56 }, clipX: 0, clipY: 0 },
@@ -1569,6 +1735,41 @@ test('buildFleetMobileFilterFindings accepts readable filled mobile filter contr
     assert.equal(findings.length, 0);
 });
 
+test('buildFleetMobileFilterFindings accepts intentional compact fullscreen filter sheets', () => {
+    const findings = buildFleetMobileFilterFindings({
+        route: '/fleet.html',
+        viewportName: 'mobile-modern',
+        viewportWidth: 390,
+        state: {
+            available: true,
+            isOpen: true,
+            viewportHeight: 844,
+            sheetHeightRatio: 1,
+            sheetHorizontalOverflowPx: 0,
+            displayTexts: ['21/04/2026', '10:00', '23/04/2026', '18:00'],
+            selectedFilterLabels: ['Featured', 'Lamborghini', 'Convertible'],
+            visibleSelectedFilterLabels: ['Featured', 'Lamborghini', 'Convertible'],
+            visibleFilledFieldCount: 4,
+            visibleFilterSelectCount: 3,
+            dateTimeFields: [
+                { key: 'fleet-pickup-date', widthRatio: 0.93, rect: { width: 362, height: 44 }, clipX: 0, clipY: 0 },
+                { key: 'fleet-pickup-time', widthRatio: 0.93, rect: { width: 362, height: 44 }, clipX: 0, clipY: 0 },
+                { key: 'fleet-return-date', widthRatio: 0.93, rect: { width: 362, height: 44 }, clipX: 0, clipY: 0 },
+                { key: 'fleet-return-time', widthRatio: 0.93, rect: { width: 362, height: 44 }, clipX: 0, clipY: 0 }
+            ],
+            controls: [
+                { key: 'fleet-pickup-date', kind: 'date_time_field', rect: { width: 362, height: 44 }, clipX: 0, clipY: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 },
+                { key: 'fleet-sidebar__select js-fleet-brand-select', kind: 'select', text: 'Lamborghini', rect: { width: 362, height: 44 }, clipX: 0, clipY: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 },
+                { key: 'fleet-sidebar__select js-fleet-type-select', kind: 'select', text: 'Convertible', rect: { width: 362, height: 44 }, clipX: 0, clipY: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 }
+            ],
+            screenshotPath: '/tmp/fleet-mobile-compact-fullscreen.png'
+        },
+        screenshotPath: '/tmp/fleet.png'
+    });
+
+    assert.equal(findings.length, 0);
+});
+
 test('buildFleetMobileFilterFindings flags cramped mobile filter date and filter states', () => {
     const findings = buildFleetMobileFilterFindings({
         route: '/fleet.html',
@@ -1581,7 +1782,9 @@ test('buildFleetMobileFilterFindings flags cramped mobile filter date and filter
             sheetHorizontalOverflowPx: 12,
             displayTexts: ['20/04/2026'],
             selectedFilterLabels: ['Featured'],
+            visibleSelectedFilterLabels: ['Featured'],
             visibleFilledFieldCount: 1,
+            visibleFilterSelectCount: 1,
             dateTimeFields: [
                 { key: 'fleet-pickup-date', widthRatio: 0.58, rect: { width: 210, height: 42 }, clipX: 8, clipY: 0, text: '20/04/2026' },
                 { key: 'fleet-pickup-time', widthRatio: 0.34, rect: { width: 124, height: 42 }, clipX: 16, clipY: 0, text: '10:00' }
@@ -1599,9 +1802,206 @@ test('buildFleetMobileFilterFindings flags cramped mobile filter date and filter
     assert.ok(findings.some((finding) => finding.category === 'overflow'));
     assert.ok(findings.some((finding) => finding.category === 'form_visibility' && /date and time values/i.test(finding.message)));
     assert.ok(findings.some((finding) => finding.category === 'form_visibility' && /too narrow/i.test(finding.message)));
+    assert.ok(findings.some((finding) => finding.category === 'form_visibility' && /not fully visible/i.test(finding.message)));
     assert.ok(findings.some((finding) => finding.category === 'clipping'));
     assert.ok(findings.some((finding) => /short viewport/i.test(finding.message)));
     assert.ok(findings.some((finding) => finding.hardFail === true));
+});
+
+test('buildFleetMobileFilterFindings flags controls peeking out of the mobile filter viewport', () => {
+    const findings = buildFleetMobileFilterFindings({
+        route: '/fleet.html',
+        viewportName: 'mobile-short',
+        viewportWidth: 400,
+        state: {
+            available: true,
+            isOpen: true,
+            sheetHeightRatio: 1,
+            sheetHorizontalOverflowPx: 0,
+            displayTexts: ['20/04/2026', '10:00', '22/04/2026', '18:00'],
+            selectedFilterLabels: ['Featured', 'Lamborghini', 'Convertible'],
+            visibleSelectedFilterLabels: ['Featured', 'Lamborghini'],
+            visibleFilledFieldCount: 4,
+            visibleFilterSelectCount: 2,
+            dateTimeFields: [
+                { key: 'fleet-pickup-date', widthRatio: 0.93, rect: { width: 372, height: 52 }, clipX: 0, clipY: 0 },
+                { key: 'fleet-pickup-time', widthRatio: 0.93, rect: { width: 372, height: 52 }, clipX: 0, clipY: 0 },
+                { key: 'fleet-return-date', widthRatio: 0.93, rect: { width: 372, height: 52 }, clipX: 0, clipY: 0 },
+                { key: 'fleet-return-time', widthRatio: 0.93, rect: { width: 372, height: 52 }, clipX: 0, clipY: 0 }
+            ],
+            controls: [
+                { key: 'fleet-sidebar__select js-fleet-brand-select', kind: 'select', text: 'Lamborghini', rect: { top: 508, bottom: 558, width: 372, height: 50 }, clipX: 0, clipY: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0, visibleIntersectionHeight: 50 },
+                { key: 'fleet-sidebar__select js-fleet-type-select', kind: 'select', text: 'Convertible', rect: { top: 605, bottom: 655, width: 372, height: 50 }, clipX: 0, clipY: 0, visibleInViewport: false, fullyVisibleInViewport: false, viewportClipPx: 47, visibleIntersectionHeight: 3 }
+            ],
+            screenshotPath: '/tmp/fleet-mobile-filter-peeking.png'
+        },
+        screenshotPath: '/tmp/fleet.png'
+    });
+
+    assert.ok(findings.some((finding) => finding.category === 'form_visibility' && /not fully visible/i.test(finding.message)));
+    assert.ok(findings.some((finding) => finding.category === 'clipping' && /partially visible/i.test(finding.message)));
+    assert.ok(findings.some((finding) => finding.hardFail === true));
+});
+
+test('buildFleetMobileFilterFindings flags duplicate mobile filter apply CTAs above the schedule controls', () => {
+    const findings = buildFleetMobileFilterFindings({
+        route: '/fleet.html',
+        viewportName: 'mobile-wide-short',
+        viewportWidth: 432,
+        state: {
+            available: true,
+            isOpen: true,
+            sheetHeightRatio: 0.86,
+            sheetHorizontalOverflowPx: 0,
+            visibleInlineApplyButtonCount: 1,
+            displayTexts: ['21/04/2026', '10:00', '23/04/2026', '18:00'],
+            selectedFilterLabels: ['Featured', 'Lamborghini', 'Convertible'],
+            visibleSelectedFilterLabels: ['Featured', 'Lamborghini', 'Convertible'],
+            visibleFilledFieldCount: 4,
+            visibleFilterSelectCount: 3,
+            dateTimeFields: [
+                { key: 'fleet-pickup-date', widthRatio: 0.93, rect: { width: 380, height: 56 }, clipX: 0, clipY: 0 },
+                { key: 'fleet-pickup-time', widthRatio: 0.93, rect: { width: 380, height: 56 }, clipX: 0, clipY: 0 },
+                { key: 'fleet-return-date', widthRatio: 0.93, rect: { width: 380, height: 56 }, clipX: 0, clipY: 0 },
+                { key: 'fleet-return-time', widthRatio: 0.93, rect: { width: 380, height: 56 }, clipX: 0, clipY: 0 }
+            ],
+            controls: [
+                { key: 'fleet-filter-close fleet-filter-close--inline', kind: 'button', text: 'Show 6 cars', rect: { width: 400, height: 48 }, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 },
+                { key: 'fleet-sidebar__select js-fleet-brand-select', kind: 'select', text: 'Lamborghini', rect: { width: 400, height: 50 }, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 },
+                { key: 'fleet-sidebar__select js-fleet-type-select', kind: 'select', text: 'Convertible', rect: { width: 400, height: 50 }, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 }
+            ],
+            screenshotPath: '/tmp/fleet-mobile-duplicate-apply.png'
+        },
+        screenshotPath: '/tmp/fleet.png'
+    });
+
+    assert.ok(findings.some((finding) => (
+        finding.category === 'cta_hierarchy' &&
+        /duplicate apply CTA/i.test(finding.message) &&
+        finding.hardFail === true
+    )));
+});
+
+test('buildMobileNavDrawerFindings flags uneven wrapped mobile menu buttons', () => {
+    const findings = buildMobileNavDrawerFindings({
+        route: '/app/reserve/page.html',
+        viewportName: 'mobile-modern',
+        viewportWidth: 393,
+        state: {
+            available: true,
+            isOpen: true,
+            viewportHeight: 803,
+            panelHorizontalOverflowPx: 0,
+            panelInitialScrollOverflowPx: 115,
+            visiblePrimaryActionCount: 1,
+            visibleSecondaryActionCount: 2,
+            groups: [
+                {
+                    key: 'quick',
+                    available: true,
+                    display: 'flex',
+                    gridTemplateColumns: 'none',
+                    visibleChildCount: 3,
+                    widthSpreadPx: 45.77,
+                    heightSpreadPx: 0,
+                    minChildHeight: 44,
+                    partiallyVisibleChildren: []
+                },
+                {
+                    key: 'nav',
+                    available: true,
+                    display: 'flex',
+                    gridTemplateColumns: 'none',
+                    visibleChildCount: 7,
+                    widthSpreadPx: 33.88,
+                    heightSpreadPx: 0,
+                    minChildHeight: 44,
+                    partiallyVisibleChildren: []
+                },
+                {
+                    key: 'brands',
+                    available: true,
+                    display: 'flex',
+                    gridTemplateColumns: 'none',
+                    visibleChildCount: 5,
+                    widthSpreadPx: 41.73,
+                    heightSpreadPx: 0,
+                    minChildHeight: 44,
+                    partiallyVisibleChildren: []
+                },
+                {
+                    key: 'browse',
+                    available: true,
+                    display: 'flex',
+                    gridTemplateColumns: 'none',
+                    visibleChildCount: 5,
+                    widthSpreadPx: 53.44,
+                    heightSpreadPx: 0,
+                    minChildHeight: 44,
+                    partiallyVisibleChildren: []
+                },
+                {
+                    key: 'actions',
+                    available: true,
+                    display: 'grid',
+                    gridTemplateColumns: '337px',
+                    visibleChildCount: 3,
+                    widthSpreadPx: 0,
+                    heightSpreadPx: 0,
+                    minChildHeight: 48.8,
+                    partiallyVisibleChildren: [
+                        { text: 'WhatsApp now', viewportClipPx: 38.69 }
+                    ]
+                }
+            ],
+            screenshotPath: '/tmp/mobile-nav-drawer-bad.png'
+        },
+        screenshotPath: '/tmp/page.png'
+    });
+
+    assert.ok(findings.some((finding) => finding.category === 'layout_homogeneity' && /uneven button rows/i.test(finding.message)));
+    assert.ok(findings.some((finding) => finding.category === 'cta_hierarchy' && /duplicate secondary CTAs/i.test(finding.message)));
+    assert.ok(findings.some((finding) => finding.category === 'clipping' && /partially visible/i.test(finding.message)));
+    assert.ok(findings.some((finding) => finding.hardFail === true));
+});
+
+test('buildMobileNavDrawerFindings accepts stable compact mobile menu grids', () => {
+    const groups = [
+        ['quick', 3, 107],
+        ['nav', 7, 107],
+        ['brands', 5, 164.5],
+        ['browse', 5, 164.5],
+        ['actions', 1, 337]
+    ].map(([key, count, width]) => ({
+        key,
+        available: true,
+        display: 'grid',
+        gridTemplateColumns: key === 'actions' ? '337px' : `${width}px ${width}px`,
+        visibleChildCount: count,
+        widthSpreadPx: 0,
+        heightSpreadPx: 0,
+        minChildHeight: key === 'actions' ? 48.8 : 40,
+        partiallyVisibleChildren: []
+    }));
+
+    const findings = buildMobileNavDrawerFindings({
+        route: '/app/reserve/page.html',
+        viewportName: 'mobile-modern',
+        viewportWidth: 393,
+        state: {
+            available: true,
+            isOpen: true,
+            panelHorizontalOverflowPx: 0,
+            panelInitialScrollOverflowPx: 0,
+            visiblePrimaryActionCount: 1,
+            visibleSecondaryActionCount: 0,
+            groups,
+            screenshotPath: '/tmp/mobile-nav-drawer-good.png'
+        },
+        screenshotPath: '/tmp/page.png'
+    });
+
+    assert.equal(findings.length, 0);
 });
 
 test('buildPageDepthScanFindings flags mobile card action groups that dominate the card', () => {
@@ -1714,7 +2114,9 @@ test('buildPageDepthScanFindings accepts contained mobile card actions', () => {
                     secondaryActionHeightRatio: 0.17,
                     secondaryDominanceRatio: 0.9,
                     secondaryMaxButtonWidthRatio: 0.42,
-                    secondaryInlinePaddingPx: 16,
+                    splitContactGroupWidthRatio: 0.997,
+                    splitContactSideGapPx: 1,
+                    secondaryInlinePaddingPx: 0,
                     primaryMaxHeight: 52,
                     secondaryMaxHeight: 48,
                     secondaryCount: 2,
@@ -1728,6 +2130,155 @@ test('buildPageDepthScanFindings accepts contained mobile card actions', () => {
     });
 
     assert.equal(findings.length, 0);
+});
+
+test('buildPageDepthScanFindings flags split mobile contact bars that do not fill the card width', () => {
+    const findings = buildPageDepthScanFindings({
+        route: '/fleet.html',
+        viewportName: 'mobile-modern',
+        viewportWidth: 390,
+        state: {
+            available: true,
+            frames: [
+                {
+                    viewportTop: 0,
+                    viewportBottom: 844,
+                    screenshotPath: '/tmp/fleet-depth-narrow-contact-bar.png'
+                }
+            ],
+            cardActionMetrics: [
+                {
+                    label: 'Huracan EVO Spyder',
+                    cardRect: { top: 0, bottom: 540, left: 16, right: 374, width: 358, height: 540 },
+                    actionGroupHeightRatio: 0.26,
+                    secondaryActionHeightRatio: 0.12,
+                    secondaryDominanceRatio: 0.9,
+                    secondaryMaxButtonWidthRatio: 0.41,
+                    splitContactGroupWidthRatio: 0.86,
+                    splitContactSideGapPx: 25,
+                    secondaryInlinePaddingPx: 25,
+                    primaryMaxHeight: 52,
+                    secondaryMaxHeight: 64,
+                    secondaryCount: 2,
+                    secondaryRowCount: 1,
+                    buttonMaxRadiusPx: 8,
+                    buttonRadiusSpreadPx: 0
+                }
+            ]
+        },
+        screenshotPath: '/tmp/fleet.png'
+    });
+
+    assert.ok(findings.some((finding) => (
+        finding.category === 'spacing' &&
+        /does not occupy the full mobile card width/i.test(finding.message) &&
+        finding.hardFail === true
+    )));
+});
+
+test('buildPageDepthScanFindings flags mobile section width drift', () => {
+    const findings = buildPageDepthScanFindings({
+        route: '/',
+        viewportName: 'mobile-modern',
+        viewportWidth: 390,
+        state: {
+            available: true,
+            frames: [
+                {
+                    index: 1,
+                    scrollY: 0,
+                    viewportTop: 0,
+                    viewportBottom: 844,
+                    screenshotPath: '/tmp/home-mobile-width-drift.png',
+                    metric: {
+                        visibleMajorElementCount: 7,
+                        largestBlankGapRatio: 0.18,
+                        actionMetrics: [],
+                        dateControlMetrics: [],
+                        surfaceWidthMetrics: [
+                            {
+                                selector: '.hero-lab__cta--primary',
+                                label: 'Rent a luxury car',
+                                widthRatio: 0.82,
+                                inlinePaddingPx: 24
+                            },
+                            {
+                                selector: '.hero-lab-overlay',
+                                label: 'Choose your dates',
+                                widthRatio: 0.94,
+                                inlinePaddingPx: 12
+                            },
+                            {
+                                selector: '.home-section__shell',
+                                label: 'Featured fleet',
+                                widthRatio: 0.93,
+                                inlinePaddingPx: 13
+                            }
+                        ]
+                    }
+                }
+            ],
+            cardActionMetrics: []
+        },
+        screenshotPath: '/tmp/home.png'
+    });
+
+    assert.ok(findings.some((finding) => (
+        finding.category === 'layout_homogeneity' &&
+        /consistent readable width/i.test(finding.message) &&
+        finding.screenshotPath === '/tmp/home-mobile-width-drift.png'
+    )));
+});
+
+test('buildPageDepthScanFindings ignores inner form controls for mobile section width rhythm', () => {
+    const findings = buildPageDepthScanFindings({
+        route: '/',
+        viewportName: 'mobile-modern',
+        viewportWidth: 390,
+        state: {
+            available: true,
+            frames: [
+                {
+                    index: 2,
+                    scrollY: 692,
+                    viewportTop: 692,
+                    viewportBottom: 1536,
+                    screenshotPath: '/tmp/home-mobile-form-inner-width.png',
+                    metric: {
+                        visibleMajorElementCount: 8,
+                        largestBlankGapRatio: 0.18,
+                        actionMetrics: [],
+                        dateControlMetrics: [],
+                        surfaceWidthMetrics: [
+                            {
+                                selector: 'div.hero-lab__content-box',
+                                label: 'Dubai luxury car rental',
+                                widthRatio: 0.877,
+                                inlinePaddingPx: 24
+                            },
+                            {
+                                selector: 'section.hero-lab-overlay',
+                                label: 'Choose your dates',
+                                widthRatio: 0.877,
+                                inlinePaddingPx: 24
+                            },
+                            {
+                                selector: 'form.hero-lab-overlay__form',
+                                label: 'Pickup date Return date Pickup time',
+                                className: 'hero-lab-overlay__form',
+                                widthRatio: 0.79,
+                                inlinePaddingPx: 41
+                            }
+                        ]
+                    }
+                }
+            ],
+            cardActionMetrics: []
+        },
+        screenshotPath: '/tmp/home.png'
+    });
+
+    assert.equal(findings.some((finding) => finding.category === 'layout_homogeneity'), false);
 });
 
 test('buildPageDepthScanFindings flags generic visual scan outliers beyond known cards', () => {

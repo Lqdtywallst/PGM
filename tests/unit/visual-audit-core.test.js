@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 
 const {
     BRAND_REFERENCE_ROUTE,
+    VISUAL_FINDING_CATEGORIES,
     classifyRouteCohort,
     classifyRouteProfile,
     createVisualFinding,
@@ -22,6 +23,12 @@ test('classifyRouteProfile maps key public routes to explicit visual profiles', 
     assert.equal(classifyRouteProfile('/ferrari-296-gts-rental-dubai.html'), 'vehicle_pdp');
     assert.equal(classifyRouteProfile('/services.html'), 'hub_marketing');
     assert.equal(classifyRouteProfile('/porsche-rental-dubai.html'), 'hub_marketing');
+});
+
+test('visual finding categories include current regression checks emitted by the visual agent', () => {
+    for (const category of ['date_currentness', 'text_encoding', 'border_weight_drift', 'spacing', 'layout_homogeneity']) {
+        assert.ok(VISUAL_FINDING_CATEGORIES.includes(category), `${category} should be accepted by visual tooling`);
+    }
 });
 
 test('classifyRouteCohort distinguishes landings, brands, services and vehicle PDPs', () => {

@@ -24,11 +24,16 @@ const {
     RECOVERY_ROUTES,
     buildNavigationReview,
     buildNavigationReviewMarkdownSection,
+    buildRouteViewportCoverage,
     buildStaticNavigationGraph,
     evaluateNavigationGate,
     normalizeRoute,
     normalizeText
 } = require(path.join(__dirname, '..', 'server', 'navigation-audit-core.js'));
+const {
+    compareReportToApprovedMemory,
+    formatAuditMemoryRegression
+} = require(path.join(__dirname, '..', 'server', 'audit-memory-core.js'));
 
 const repoRoot = path.resolve(__dirname, '..');
 const siteRoot = path.join(repoRoot, 'site');
@@ -36,7 +41,18 @@ const artifactsRoot = path.join(repoRoot, 'artifacts', 'navigation-agent');
 const SITE_ORIGIN = 'https://prestigegoalmotion.com';
 const ALL_VIEWPORTS = Object.freeze(getViewportCoverageMatrix('all'));
 const DEFAULT_VIEWPORTS = Object.freeze(['mobile-modern', 'laptop']);
+const FULL_NAVIGATION_VIEWPORTS = Object.freeze([
+    'mobile-small',
+    'mobile-modern',
+    'tablet-portrait',
+    'laptop',
+    'desktop-wide'
+]);
 const DEFAULT_DEEP_CRAWL_DEPTH = 6;
+const FULL_DEEP_CRAWL_DEPTH = 10;
+const DEFAULT_HANDOFF_CONCURRENCY = 4;
+const FULL_HANDOFF_CONCURRENCY = 6;
+const CLICK_TARGET_MODES = Object.freeze(['all-actions', 'route-surfaces', 'route-edges']);
 const DEFAULT_ROUTES = Object.freeze([
     '/',
     '/fleet.html',
@@ -87,11 +103,17 @@ function parseArgs(argv = []) {
         scope: 'all-public',
         maxClicksPerPage: 5,
         maxCrawlDepth: DEFAULT_DEEP_CRAWL_DEPTH,
+        handoffConcurrency: DEFAULT_HANDOFF_CONCURRENCY,
+        clickTargets: 'all-actions',
         deep: false,
+        full: false,
         strict: false
     };
     let scopeExplicit = false;
     let maxClicksExplicit = false;
+    let maxDepthExplicit = false;
+    let handoffConcurrencyExplicit = false;
+    let viewportsExplicit = false;
 
     for (let index = 0; index < argv.length; index += 1) {
         const value = argv[index];
@@ -104,6 +126,7 @@ function parseArgs(argv = []) {
 
         if (value === '--viewport' && argv[index + 1]) {
             args.viewports.push(String(argv[index + 1]).trim());
+            viewportsExplicit = true;
             index += 1;
             continue;
         }
@@ -141,6 +164,26 @@ function parseArgs(argv = []) {
             const parsed = Number.parseInt(argv[index + 1], 10);
             if (Number.isFinite(parsed) && parsed >= 0) {
                 args.maxCrawlDepth = parsed;
+                maxDepthExplicit = true;
+            }
+            index += 1;
+            continue;
+        }
+
+        if (value === '--handoff-concurrency' && argv[index + 1]) {
+            const parsed = Number.parseInt(argv[index + 1], 10);
+            if (Number.isFinite(parsed) && parsed >= 1) {
+                args.handoffConcurrency = parsed;
+                handoffConcurrencyExplicit = true;
+            }
+            index += 1;
+            continue;
+        }
+
+        if (value === '--click-targets' && argv[index + 1]) {
+            const mode = String(argv[index + 1]).trim();
+            if (CLICK_TARGET_MODES.includes(mode)) {
+                args.clickTargets = mode;
             }
             index += 1;
             continue;
@@ -151,8 +194,33 @@ function parseArgs(argv = []) {
             continue;
         }
 
+        if (value === '--full') {
+            args.full = true;
+            args.deep = true;
+            args.strict = true;
+            continue;
+        }
+
         if (value === '--strict') {
             args.strict = true;
+        }
+    }
+
+    if (args.full) {
+        if (!scopeExplicit && args.routes.length === 0) {
+            args.scope = 'crawl';
+        }
+
+        if (!viewportsExplicit) {
+            args.viewports = [...FULL_NAVIGATION_VIEWPORTS];
+        }
+
+        if (!maxDepthExplicit) {
+            args.maxCrawlDepth = FULL_DEEP_CRAWL_DEPTH;
+        }
+
+        if (!handoffConcurrencyExplicit) {
+            args.handoffConcurrency = FULL_HANDOFF_CONCURRENCY;
         }
     }
 
@@ -490,6 +558,7 @@ async function collectVisibleInternalLinks(page, knownRoutes) {
                 element.getAttribute('data-href') ||
                 element.getAttribute('data-url') ||
                 element.getAttribute('data-route') ||
+                element.getAttribute('data-service-primary-href') ||
                 element.getAttribute('formaction') ||
                 '';
 
@@ -512,7 +581,10 @@ async function collectVisibleInternalLinks(page, knownRoutes) {
         const anchors = Array.from(document.querySelectorAll('a[href]'))
             .filter((link) => isVisible(link))
             .map((link) => {
-                const href = link.getAttribute('href') || '';
+                const isServiceSelector = link.hasAttribute('data-service-selector') && Boolean(link.getAttribute('data-service-primary-href'));
+                const href = isServiceSelector
+                    ? link.getAttribute('data-service-primary-href') || ''
+                    : link.getAttribute('href') || '';
                 const targetRoute = resolveTargetRoute(href);
                 const text = normalizeText(link.textContent);
                 const ariaLabel = normalizeText(link.getAttribute('aria-label'));
@@ -520,7 +592,7 @@ async function collectVisibleInternalLinks(page, knownRoutes) {
                 const imageAlt = normalizeText(link.querySelector('img[alt]')?.getAttribute('alt'));
 
                 return {
-                    kind: 'link',
+                    kind: isServiceSelector ? 'state-control' : 'link',
                     href,
                     targetRoute,
                     text,
@@ -528,7 +600,9 @@ async function collectVisibleInternalLinks(page, knownRoutes) {
                     accessibleName: ariaLabel || text || title || imageAlt,
                     ariaLabel,
                     title,
-                    area: elementArea(link)
+                    area: elementArea(link),
+                    setupKind: isServiceSelector ? 'service-selector' : '',
+                    setupControls: isServiceSelector ? link.id || '' : ''
                 };
             })
             .filter((link) => link.targetRoute);
@@ -690,6 +764,23 @@ async function exerciseMobileDrawer(page, routeDir, knownRoutes) {
 
     try {
         await toggle.click({ timeout: 5000 });
+        await page.waitForFunction(() => {
+            const drawer = document.querySelector('#lab-mobile-drawer, .lab-mobile-drawer');
+            if (!(drawer instanceof HTMLElement)) {
+                return false;
+            }
+
+            const toggleElement = document.querySelector('.lab-mobile-toggle, button[aria-controls="lab-mobile-drawer"]');
+            const style = window.getComputedStyle(drawer);
+            const rect = drawer.getBoundingClientRect();
+
+            return (
+                drawer.classList.contains('is-open') ||
+                drawer.getAttribute('aria-hidden') === 'false' ||
+                toggleElement?.getAttribute('aria-expanded') === 'true' ||
+                (style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0)
+            );
+        }, null, { timeout: 5000 }).catch(() => null);
         await page.waitForTimeout(180);
 
         const drawerOpen = await page.evaluate(() => {
@@ -829,6 +920,301 @@ async function exerciseDesktopMegaMenus(page, routeDir, knownRoutes) {
     return checks;
 }
 
+async function clickVisibleFleetFilterScrim(page) {
+    const point = await page.evaluate(() => {
+        const scrim = document.querySelector('.fleet-filter-scrim');
+        const sheet = document.querySelector('.fleet-sidebar');
+
+        if (!(scrim instanceof HTMLElement)) {
+            return null;
+        }
+
+        const sheetRect = sheet instanceof HTMLElement
+            ? sheet.getBoundingClientRect()
+            : null;
+        const candidates = [];
+
+        if (sheetRect && sheetRect.top > 8) {
+            candidates.push({ x: window.innerWidth / 2, y: sheetRect.top / 2 });
+        }
+
+        if (sheetRect && sheetRect.bottom < window.innerHeight - 8) {
+            candidates.push({
+                x: window.innerWidth / 2,
+                y: sheetRect.bottom + ((window.innerHeight - sheetRect.bottom) / 2)
+            });
+        }
+
+        candidates.push({ x: 16, y: 16 });
+
+        for (const candidate of candidates) {
+            const x = Math.min(window.innerWidth - 4, Math.max(4, candidate.x));
+            const y = Math.min(window.innerHeight - 4, Math.max(4, candidate.y));
+            const target = document.elementFromPoint(x, y);
+
+            if (target === scrim || target?.closest?.('.fleet-filter-scrim')) {
+                return { x, y };
+            }
+        }
+
+        return null;
+    });
+
+    if (!point) {
+        return false;
+    }
+
+    await page.mouse.click(point.x, point.y);
+    return true;
+}
+
+async function exerciseFleetFilterSheet(page, routeDir) {
+    const toggle = page.locator('.fleet-mobile-filter-toggle').first();
+
+    if (await toggle.count() === 0 || !(await toggle.isVisible().catch(() => false))) {
+        return null;
+    }
+
+    const screenshotPath = path.join(routeDir, 'fleet-filter-sheet-trap.png');
+    const state = {
+        id: 'fleet-filter-sheet',
+        label: 'Fleet mobile filter sheet',
+        status: 'failed',
+        message: '',
+        screenshotPath: ''
+    };
+
+    async function isOpen() {
+        return page.locator('.fleet-browser.fleet-filters-open').count().then((count) => count > 0).catch(() => false);
+    }
+
+    async function openSheet() {
+        await toggle.click({ timeout: 5000 });
+        await page.waitForFunction(() => (
+            document.querySelector('.fleet-browser')?.classList.contains('fleet-filters-open')
+        ), null, { timeout: 5000 });
+    }
+
+    async function visibleExitLabels() {
+        return page.locator('.fleet-filter-close:visible').evaluateAll((buttons) => (
+            buttons.map((button) => String(button.textContent || button.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim())
+        ));
+    }
+
+    try {
+        await openSheet();
+        const labels = await visibleExitLabels();
+        const hasObviousExit = labels.some((label) => /\b(back to cars|show\s+\d+\s+cars?|show cars|car results)\b/i.test(label));
+
+        if (!hasObviousExit) {
+            throw new Error(`Filter sheet opened but no obvious return action was visible. labels=${labels.join(' | ') || 'none'}`);
+        }
+
+        await page.locator('.fleet-filter-close:visible').first().click({ timeout: 5000 });
+        await page.waitForFunction(() => (
+            !document.querySelector('.fleet-browser')?.classList.contains('fleet-filters-open')
+        ), null, { timeout: 5000 });
+
+        if (await isOpen()) {
+            throw new Error('Filter sheet stayed open after tapping the visible return action.');
+        }
+
+        await openSheet();
+        await page.keyboard.press('Escape');
+        await page.waitForFunction(() => (
+            !document.querySelector('.fleet-browser')?.classList.contains('fleet-filters-open')
+        ), null, { timeout: 5000 });
+
+        await openSheet();
+        const scrimClicked = await clickVisibleFleetFilterScrim(page);
+
+        if (scrimClicked) {
+            await page.waitForFunction(() => (
+                !document.querySelector('.fleet-browser')?.classList.contains('fleet-filters-open')
+            ), null, { timeout: 5000 });
+        } else {
+            const fullScreenSheetWithExit = await page.evaluate(() => {
+                const sheet = document.querySelector('.fleet-sidebar');
+                const visibleClose = Array.from(document.querySelectorAll('.fleet-filter-close'))
+                    .some((button) => {
+                        if (!(button instanceof HTMLElement)) {
+                            return false;
+                        }
+
+                        const rect = button.getBoundingClientRect();
+                        const style = window.getComputedStyle(button);
+                        const label = String(button.textContent || button.getAttribute('aria-label') || '').trim();
+
+                        return style.display !== 'none' &&
+                            style.visibility !== 'hidden' &&
+                            rect.width >= 44 &&
+                            rect.height >= 40 &&
+                            /\b(back to cars|show\s+\d+\s+cars?|show cars|car results)\b/i.test(label);
+                    });
+
+                if (!(sheet instanceof HTMLElement)) {
+                    return false;
+                }
+
+                const rect = sheet.getBoundingClientRect();
+                const heightRatio = rect.height / Math.max(1, window.innerHeight);
+                return heightRatio >= 0.92 && visibleClose;
+            });
+
+            if (!fullScreenSheetWithExit) {
+                throw new Error('Filter sheet scrim had no tappable exposed point and the sheet did not present a valid fullscreen exit state.');
+            }
+
+            await page.locator('.fleet-filter-close:visible').first().click({ timeout: 5000 });
+            await page.waitForFunction(() => (
+                !document.querySelector('.fleet-browser')?.classList.contains('fleet-filters-open')
+            ), null, { timeout: 5000 });
+        }
+
+        const resultVisible = await page.locator('.js-fleet-card:not([hidden])').first().isVisible({ timeout: 3000 }).catch(() => false);
+        if (!resultVisible) {
+            throw new Error('Filter sheet closed but no fleet result was visible afterwards.');
+        }
+
+        return {
+            ...state,
+            status: 'passed',
+            message: `Opened and escaped with visible labels: ${labels.join(' | ')}.`,
+            screenshotPath: ''
+        };
+    } catch (error) {
+        await page.screenshot({
+            path: screenshotPath,
+            fullPage: false,
+            animations: 'disabled',
+            caret: 'hide'
+        }).catch(() => {});
+
+        return {
+            ...state,
+            status: 'failed',
+            message: error.message || String(error),
+            screenshotPath
+        };
+    }
+}
+
+async function assessVehicleReturnAffordance(page, routeDir) {
+    const isVehiclePage = await page.evaluate(() => {
+        const body = document.body;
+        const isVehicleShell = body?.classList.contains('vehicle-page');
+        const isBrandLanding = Boolean(document.querySelector('.vehicle-main--brand-landing'));
+        const hasPdpStructure = Boolean(document.querySelector(
+            '.vehicle-pdp-hero-shell, .vehicle-pdp-summary-primary, .vehicle-pdp-intro'
+        ));
+
+        return Boolean(isVehicleShell && hasPdpStructure && !isBrandLanding);
+    }).catch(() => false);
+
+    if (!isVehiclePage) {
+        return null;
+    }
+
+    const screenshotPath = path.join(routeDir, 'vehicle-return-affordance-failure.png');
+    const metrics = await page.evaluate(() => {
+        function normalizeRouteToken(route = '/') {
+            let pathname = String(route || '/').split(/[?#]/)[0] || '/';
+            if (pathname === '/index.html') {
+                return '/';
+            }
+            if (pathname.length > 1 && pathname.endsWith('/')) {
+                pathname = pathname.slice(0, -1);
+            }
+            return pathname || '/';
+        }
+
+        function normalizeText(value = '') {
+            return String(value || '').replace(/\s+/g, ' ').trim();
+        }
+
+        function isVisible(element) {
+            if (!(element instanceof HTMLElement)) {
+                return false;
+            }
+
+            if (element.closest('[hidden], [inert], [aria-hidden="true"]')) {
+                return false;
+            }
+
+            const style = window.getComputedStyle(element);
+            const rect = element.getBoundingClientRect();
+            return style.display !== 'none' &&
+                style.visibility !== 'hidden' &&
+                Number(style.opacity || 1) > 0 &&
+                rect.width > 0 &&
+                rect.height > 0;
+        }
+
+        const links = Array.from(document.querySelectorAll('a[href]'))
+            .filter((link) => isVisible(link))
+            .map((link) => {
+                const rect = link.getBoundingClientRect();
+                let targetRoute = '';
+
+                try {
+                    targetRoute = normalizeRouteToken(new URL(link.getAttribute('href') || '', window.location.href).pathname);
+                } catch (error) {
+                    targetRoute = '';
+                }
+
+                return {
+                    targetRoute,
+                    label: normalizeText(link.textContent || link.getAttribute('aria-label') || ''),
+                    className: String(link.className || ''),
+                    inBreadcrumb: Boolean(link.closest('.breadcrumb, [aria-label="Breadcrumb"], [aria-label="breadcrumb"]')),
+                    top: rect.top,
+                    width: rect.width,
+                    height: rect.height
+                };
+            })
+            .filter((link) => link.targetRoute === '/fleet.html');
+        const prominent = links.filter((link) => (
+            !link.inBreadcrumb &&
+            link.top >= 0 &&
+            link.top <= window.innerHeight * 0.92 &&
+            link.width >= Math.min(160, window.innerWidth * 0.42) &&
+            link.height >= 40 &&
+            /\b(back|fleet|cars|all)\b/i.test(link.label)
+        ));
+
+        return {
+            fleetLinks: links,
+            prominent,
+            viewportHeight: window.innerHeight
+        };
+    });
+
+    if (metrics.prominent.length > 0) {
+        return {
+            id: 'vehicle-return-to-fleet',
+            label: 'Vehicle return to fleet',
+            status: 'passed',
+            message: `Prominent fleet return visible: ${metrics.prominent.map((link) => link.label).join(' | ')}.`,
+            screenshotPath: ''
+        };
+    }
+
+    await page.screenshot({
+        path: screenshotPath,
+        fullPage: false,
+        animations: 'disabled',
+        caret: 'hide'
+    }).catch(() => {});
+
+    return {
+        id: 'vehicle-return-to-fleet',
+        label: 'Vehicle return to fleet',
+        status: 'failed',
+        message: `Only weak fleet return affordances found: ${metrics.fleetLinks.map((link) => `${link.label || 'unnamed'} (${link.width}x${link.height}, breadcrumb=${link.inBreadcrumb})`).join(' | ') || 'none'}`,
+        screenshotPath
+    };
+}
+
 async function collectRenderedNavigationState(page, route, viewport, routeDir, knownRoutes) {
     const mobileDrawer = viewport.isMobile
         ? await exerciseMobileDrawer(page, routeDir, knownRoutes)
@@ -836,6 +1222,10 @@ async function collectRenderedNavigationState(page, route, viewport, routeDir, k
     const megaMenus = viewport.isMobile
         ? []
         : await exerciseDesktopMegaMenus(page, routeDir, knownRoutes);
+    const localEscapes = [
+        viewport.isMobile ? await exerciseFleetFilterSheet(page, routeDir) : null,
+        await assessVehicleReturnAffordance(page, routeDir)
+    ].filter(Boolean);
     const basic = await collectBasicPageState(page, knownRoutes);
     const visibleLinks = await collectVisibleInternalLinks(page, knownRoutes);
     const menuLinks = megaMenus.flatMap((menu) => menu.links || []);
@@ -862,7 +1252,8 @@ async function collectRenderedNavigationState(page, route, viewport, routeDir, k
             ...basic.navigation,
             visibleInternalLinkCount: Math.max(Number(basic.navigation.visibleInternalLinkCount || 0), targetCount),
             mobileDrawer,
-            megaMenus
+            megaMenus,
+            localEscapes
         }
     };
 }
@@ -894,14 +1285,32 @@ function candidatePriority(link) {
     return 6;
 }
 
-function buildClickCandidates(pageState, maxClicksPerPage) {
+function candidateDedupeKey(link, targetRoute, label, clickTargets = 'all-actions') {
+    const edgeBase = [
+        link.kind || 'link',
+        link.setupKind || 'direct',
+        link.setupControls || '',
+        targetRoute
+    ];
+
+    if (clickTargets === 'route-edges') {
+        return targetRoute;
+    }
+
+    if (clickTargets === 'route-surfaces') {
+        return [...edgeBase, link.area || ''].join('|');
+    }
+
+    return [...edgeBase, link.area || '', label.toLowerCase()].join('|');
+}
+
+function buildClickCandidates(pageState, maxClicksPerPage, clickTargets = 'all-actions') {
     if (Number(maxClicksPerPage) <= 0) {
         return [];
     }
 
     const route = normalizeRoute(pageState.route);
-    const seen = new Set();
-    const candidates = [];
+    const rawCandidates = [];
 
     for (const link of pageState.links || []) {
         const targetRoute = normalizeRoute(link.targetRoute || link.href);
@@ -915,21 +1324,7 @@ function buildClickCandidates(pageState, maxClicksPerPage) {
         }
 
         const label = normalizeText(link.accessibleName || link.label || link.text);
-        const key = [
-            link.kind || 'link',
-            link.setupKind || 'direct',
-            link.setupControls || '',
-            targetRoute,
-            label.toLowerCase(),
-            link.area || ''
-        ].join('|');
-
-        if (seen.has(key)) {
-            continue;
-        }
-
-        seen.add(key);
-        candidates.push({
+        rawCandidates.push({
             ...link,
             label: label || targetRoute,
             targetRoute,
@@ -937,13 +1332,26 @@ function buildClickCandidates(pageState, maxClicksPerPage) {
         });
     }
 
-    return candidates
+    const seen = new Set();
+    const deduped = [];
+
+    for (const candidate of rawCandidates
         .sort((left, right) => (
             left.priority - right.priority ||
             String(left.area || '').localeCompare(String(right.area || '')) ||
             String(left.label || '').localeCompare(String(right.label || ''))
-        ))
-        .slice(0, maxClicksPerPage);
+        ))) {
+        const key = candidateDedupeKey(candidate, candidate.targetRoute, candidate.label, clickTargets);
+
+        if (seen.has(key)) {
+            continue;
+        }
+
+        seen.add(key);
+        deduped.push(candidate);
+    }
+
+    return deduped.slice(0, maxClicksPerPage);
 }
 
 async function setupClickTarget(page, target) {
@@ -955,7 +1363,61 @@ async function setupClickTarget(page, target) {
         }
 
         await toggle.click({ timeout: 5000 });
+        await page.waitForFunction(() => {
+            const drawer = document.querySelector('#lab-mobile-drawer, .lab-mobile-drawer');
+            if (!(drawer instanceof HTMLElement)) {
+                return false;
+            }
+
+            const style = window.getComputedStyle(drawer);
+            return (
+                drawer.classList.contains('is-open') &&
+                drawer.getAttribute('aria-hidden') !== 'true' &&
+                !drawer.hasAttribute('inert') &&
+                style.display !== 'none' &&
+                style.visibility !== 'hidden' &&
+                drawer.querySelectorAll('a[href]').length > 0
+            );
+        }, null, { timeout: 5000 }).catch(() => null);
         await page.waitForTimeout(150);
+        return;
+    }
+
+    if (target.setupKind === 'service-selector') {
+        const selector = target.setupControls
+            ? page.locator(`[id="${cssAttributeValue(target.setupControls)}"]`).first()
+            : page.locator(`[data-service-selector][data-service-primary-href]`).filter({ hasText: target.label || '' }).first();
+
+        if (await selector.count() === 0) {
+            throw new Error(`Service selector was not found: ${target.setupControls || target.label || target.targetRoute}`);
+        }
+
+        await selector.click({ timeout: 5000 });
+        await page.waitForFunction((expectedRoute) => {
+            function normalizeRouteToken(route = '/') {
+                let pathname = String(route || '/').split(/[?#]/)[0] || '/';
+                if (pathname === '/index.html') {
+                    return '/';
+                }
+                if (pathname.length > 1 && pathname.endsWith('/')) {
+                    pathname = pathname.slice(0, -1);
+                }
+                return pathname || '/';
+            }
+
+            const primary = document.querySelector('[data-service-primary]');
+            if (!(primary instanceof HTMLAnchorElement)) {
+                return false;
+            }
+
+            try {
+                const url = new URL(primary.getAttribute('href') || '', window.location.href);
+                return normalizeRouteToken(url.pathname) === normalizeRouteToken(expectedRoute);
+            } catch (error) {
+                return false;
+            }
+        }, target.targetRoute, { timeout: 3000 }).catch(() => null);
+        await page.waitForTimeout(120);
         return;
     }
 
@@ -1048,6 +1510,7 @@ async function clickMatchingLink(page, target) {
                 element.getAttribute('data-href') ||
                 element.getAttribute('data-url') ||
                 element.getAttribute('data-route') ||
+                element.getAttribute('data-service-primary-href') ||
                 element.getAttribute('formaction') ||
                 '';
 
@@ -1095,6 +1558,10 @@ async function clickMatchingLink(page, target) {
         }
 
         function labelsMatch(element) {
+            if (candidate.setupKind === 'service-selector') {
+                return true;
+            }
+
             const elementLabel = targetLabel(element);
             return !label || elementLabel === label || elementLabel.includes(label) || label.includes(elementLabel);
         }
@@ -1104,6 +1571,10 @@ async function clickMatchingLink(page, target) {
             .filter((link) => isVisible(link))
             .filter((link) => targetRouteFor(link) === candidate.targetRoute)
             .filter((link) => {
+                if (candidate.setupKind === 'service-selector' && link.hasAttribute('data-service-selector')) {
+                    return false;
+                }
+
                 if (candidate.area && linkArea(link) !== candidate.area) {
                     return false;
                 }
@@ -1236,7 +1707,23 @@ async function runClickProbe(browser, baseUrl, sourceRoute, viewport, target, ro
     }
 }
 
-async function auditRouteViewport({ browser, baseUrl, route, viewport, runDir, knownRoutes, maxClicksPerPage }) {
+async function mapWithConcurrency(items, concurrency, mapper) {
+    const results = new Array(items.length);
+    let nextIndex = 0;
+    const workerCount = Math.max(1, Math.min(Number(concurrency || 1), items.length));
+
+    await Promise.all(Array.from({ length: workerCount }, async () => {
+        while (nextIndex < items.length) {
+            const currentIndex = nextIndex;
+            nextIndex += 1;
+            results[currentIndex] = await mapper(items[currentIndex], currentIndex);
+        }
+    }));
+
+    return results;
+}
+
+async function auditRouteViewport({ browser, baseUrl, route, viewport, runDir, knownRoutes, maxClicksPerPage, clickTargets, handoffConcurrency }) {
     const routeDir = path.join(runDir, routeFileStem(route), viewport.name);
     const context = await browser.newContext(buildContextOptions(viewport));
     const page = await context.newPage();
@@ -1303,15 +1790,19 @@ async function auditRouteViewport({ browser, baseUrl, route, viewport, runDir, k
     }
 
     if (pageState.loadStatus === 'ok') {
-        const clickCandidates = buildClickCandidates(pageState, maxClicksPerPage);
-        const handoffs = [];
-
-        for (const target of clickCandidates) {
-            handoffs.push(await runClickProbe(browser, baseUrl, route, viewport, target, routeDir));
-        }
+        const allClickCandidates = buildClickCandidates(pageState, Number.MAX_SAFE_INTEGER, clickTargets);
+        const clickCandidates = allClickCandidates.slice(0, Number(maxClicksPerPage || 0));
+        const handoffs = await mapWithConcurrency(
+            clickCandidates,
+            handoffConcurrency || DEFAULT_HANDOFF_CONCURRENCY,
+            (target) => runClickProbe(browser, baseUrl, route, viewport, target, routeDir)
+        );
 
         pageState.handoffs = handoffs;
         pageState.navigation.clickCandidateCount = clickCandidates.length;
+        pageState.navigation.clickableRouteActionCount = allClickCandidates.length;
+        pageState.navigation.clickCoverageComplete = clickCandidates.length === allClickCandidates.length;
+        pageState.navigation.clickTargetMode = clickTargets || 'all-actions';
     }
 
     return pageState;
@@ -1339,7 +1830,7 @@ function buildRenderedRouteLinks(pages = []) {
     return [...byRoute.values()].sort((left, right) => left.route.localeCompare(right.route));
 }
 
-async function auditStaticRouteSet({ browser, baseUrl, selectedRoutes, selectedViewports, runDir, knownRoutes, maxClicksPerPage }) {
+async function auditStaticRouteSet({ browser, baseUrl, selectedRoutes, selectedViewports, runDir, knownRoutes, maxClicksPerPage, clickTargets, handoffConcurrency }) {
     const pages = [];
 
     for (const route of selectedRoutes) {
@@ -1351,7 +1842,9 @@ async function auditStaticRouteSet({ browser, baseUrl, selectedRoutes, selectedV
                 viewport,
                 runDir,
                 knownRoutes,
-                maxClicksPerPage: Number(maxClicksPerPage || 0)
+                maxClicksPerPage: Number(maxClicksPerPage || 0),
+                clickTargets,
+                handoffConcurrency
             }));
         }
     }
@@ -1369,7 +1862,7 @@ async function auditStaticRouteSet({ browser, baseUrl, selectedRoutes, selectedV
     };
 }
 
-async function auditDeepRouteGraph({ browser, baseUrl, seedRoutes, selectedViewports, runDir, knownRoutes, maxClicksPerPage, maxCrawlDepth }) {
+async function auditDeepRouteGraph({ browser, baseUrl, seedRoutes, selectedViewports, runDir, knownRoutes, maxClicksPerPage, maxCrawlDepth, clickTargets, handoffConcurrency }) {
     const pages = [];
     const discoveredRoutesByViewport = {};
 
@@ -1401,7 +1894,9 @@ async function auditDeepRouteGraph({ browser, baseUrl, seedRoutes, selectedViewp
                 viewport,
                 runDir,
                 knownRoutes,
-                maxClicksPerPage: Number(maxClicksPerPage || 0)
+                maxClicksPerPage: Number(maxClicksPerPage || 0),
+                clickTargets,
+                handoffConcurrency
             });
 
             pageState.crawl = {
@@ -1444,10 +1939,13 @@ async function auditDeepRouteGraph({ browser, baseUrl, seedRoutes, selectedViewp
     };
 }
 
-function summarizeReport(pages, navigationReview, renderedGraph = [], crawl = null) {
+function summarizeReport(pages, navigationReview, renderedGraph = [], crawl = null, coverageProfile = null) {
     const handoffs = pages.flatMap((page) => page.handoffs || []);
     const navigationTargets = pages.flatMap((page) => page.links || []);
     const graphEdges = renderedGraph.reduce((count, entry) => count + (entry.outgoingRoutes || []).length, 0);
+    const clickableRouteActions = pages.reduce((count, page) => (
+        count + Number(page.navigation?.clickableRouteActionCount || 0)
+    ), 0);
 
     return {
         totalRoutes: new Set(pages.map((page) => page.route)).size,
@@ -1455,9 +1953,15 @@ function summarizeReport(pages, navigationReview, renderedGraph = [], crawl = nu
         totalViewports: new Set(pages.map((page) => page.viewport)).size,
         totalNavigationTargets: navigationTargets.length,
         totalRouteEdges: graphEdges,
+        totalClickableRouteActions: clickableRouteActions,
         totalHandoffs: handoffs.length,
         passedHandoffs: handoffs.filter((handoff) => handoff.status === 'passed').length,
         failedHandoffs: handoffs.filter((handoff) => handoff.status === 'failed').length,
+        handoffCoverageComplete: clickableRouteActions === handoffs.length,
+        routeViewportCoverageComplete: Boolean(coverageProfile?.complete),
+        expectedPageRuns: Number(coverageProfile?.expectedPageRuns || 0),
+        auditedExpectedPageRuns: Number(coverageProfile?.auditedExpectedPageRuns || 0),
+        missingRouteViewportPairs: Number(coverageProfile?.missingRouteViewports?.length || 0),
         deepCrawl: crawl?.mode === 'deep-dynamic-crawl',
         maxCrawlDepth: crawl?.maxDepth || 0,
         navigationStatus: navigationReview.status,
@@ -1475,16 +1979,23 @@ function buildMarkdownReport(report) {
         `Deep crawl: ${report.summary.deepCrawl ? 'enabled' : 'disabled'}`,
         `Max crawl depth: ${report.summary.maxCrawlDepth}`,
         `Max clicks per page: ${report.maxClicksPerPage}`,
+        `Click target mode: ${report.clickTargets || 'all-actions'}`,
+        `Handoff concurrency: ${report.handoffConcurrency || DEFAULT_HANDOFF_CONCURRENCY}`,
         '',
         '## Summary',
         '',
         `- status: ${report.summary.navigationStatus}`,
         `- routes checked: ${report.summary.totalRoutes}`,
         `- page runs: ${report.summary.totalPageRuns}`,
+        `- expected route x viewport runs: ${report.summary.auditedExpectedPageRuns}/${report.summary.expectedPageRuns}`,
+        `- route x viewport coverage: ${report.summary.routeViewportCoverageComplete ? 'complete' : 'missing'}`,
+        `- missing route x viewport pairs: ${report.summary.missingRouteViewportPairs}`,
         `- viewports: ${report.summary.totalViewports}`,
         `- navigation targets discovered: ${report.summary.totalNavigationTargets}`,
         `- rendered route edges: ${report.summary.totalRouteEdges}`,
+        `- clickable route actions selected: ${report.summary.totalClickableRouteActions}`,
         `- handoffs: ${report.summary.totalHandoffs}`,
+        `- handoff coverage: ${report.summary.handoffCoverageComplete ? 'complete' : 'sampled'}`,
         `- passed handoffs: ${report.summary.passedHandoffs}`,
         `- failed handoffs: ${report.summary.failedHandoffs}`,
         ''
@@ -1520,7 +2031,11 @@ function buildMarkdownReport(report) {
         if (drawer) {
             lines.push(`- mobile drawer: toggle=${drawer.toggleFound} opened=${drawer.opened} closed=${drawer.closed} links=${drawer.internalLinkCount}`);
         }
+        if ((page.navigation.localEscapes || []).length > 0) {
+            lines.push(`- in-page exits: ${page.navigation.localEscapes.map((entry) => `${entry.id || entry.label}:${entry.status}`).join(', ')}`);
+        }
         lines.push(`- discovered targets: ${targetSummary.join(', ') || 'none'}`);
+        lines.push(`- click targets: ${page.navigation.clickCandidateCount || 0}/${page.navigation.clickableRouteActionCount || 0} (${page.navigation.clickCoverageComplete ? 'complete' : 'sampled'})`);
         lines.push(`- handoffs: ${(page.handoffs || []).length} (${failedHandoffs.length} failed)`);
 
         if (failedHandoffs.length > 0) {
@@ -1569,7 +2084,9 @@ async function runNavigationAgent(options = {}) {
                 runDir,
                 knownRoutes,
                 maxClicksPerPage: Number(args.maxClicksPerPage || 0),
-                maxCrawlDepth: Number(args.maxCrawlDepth ?? DEFAULT_DEEP_CRAWL_DEPTH)
+                maxCrawlDepth: Number(args.maxCrawlDepth ?? DEFAULT_DEEP_CRAWL_DEPTH),
+                clickTargets: args.clickTargets || 'all-actions',
+                handoffConcurrency: Number(args.handoffConcurrency || DEFAULT_HANDOFF_CONCURRENCY)
             })
             : await auditStaticRouteSet({
                 browser,
@@ -1578,35 +2095,49 @@ async function runNavigationAgent(options = {}) {
                 selectedViewports,
                 runDir,
                 knownRoutes,
-                maxClicksPerPage: Number(args.maxClicksPerPage || 0)
+                maxClicksPerPage: Number(args.maxClicksPerPage || 0),
+                clickTargets: args.clickTargets || 'all-actions',
+                handoffConcurrency: Number(args.handoffConcurrency || DEFAULT_HANDOFF_CONCURRENCY)
             });
         const pages = auditResult.pages;
         const renderedRouteLinks = buildRenderedRouteLinks(pages);
         const renderedGraph = buildStaticNavigationGraph(renderedRouteLinks);
+        const expectedRoutes = args.deep ? knownRoutes : seedRoutes;
+        const coverageProfile = buildRouteViewportCoverage({
+            pages,
+            publicRoutes: expectedRoutes,
+            viewports: selectedViewports
+        });
 
         const navigationReview = buildNavigationReview({
             pages,
             graph: renderedGraph,
-            publicRoutes: args.deep ? knownRoutes : seedRoutes,
-            destinationsByRoute
+            publicRoutes: expectedRoutes,
+            destinationsByRoute,
+            coverageProfile
         });
         const report = {
             generatedAt,
             baseUrl,
             scope: args.scope || 'all-public',
             maxClicksPerPage: Number(args.maxClicksPerPage || 0),
+            clickTargets: args.clickTargets || 'all-actions',
+            handoffConcurrency: Number(args.handoffConcurrency || DEFAULT_HANDOFF_CONCURRENCY),
             maxCrawlDepth: Number(args.maxCrawlDepth ?? DEFAULT_DEEP_CRAWL_DEPTH),
             deep: Boolean(args.deep),
+            full: Boolean(args.full),
             seedRoutes,
             selectedRoutes: [...new Set(pages.map((page) => page.route))].sort(),
             selectedViewports: selectedViewports.map((viewport) => viewport.name),
-            summary: summarizeReport(pages, navigationReview, renderedGraph, auditResult.crawl),
+            summary: summarizeReport(pages, navigationReview, renderedGraph, auditResult.crawl, coverageProfile),
             navigationReview,
+            coverageProfile,
             crawl: auditResult.crawl,
             renderedGraph,
             staticGraph,
             pages
         };
+        report.auditMemory = compareReportToApprovedMemory(report, { kind: 'navigation' });
 
         fs.writeFileSync(path.join(runDir, 'report.json'), `${JSON.stringify(report, null, 2)}\n`);
         fs.writeFileSync(path.join(runDir, 'report.md'), buildMarkdownReport(report));
@@ -1631,10 +2162,19 @@ async function main() {
 
     console.log(`Navigation agent completed: ${runDir}`);
     console.log(`status=${report.summary.navigationStatus} routes=${report.summary.totalRoutes} viewports=${report.summary.totalViewports} handoffs=${report.summary.totalHandoffs} failed=${report.summary.failedHandoffs}`);
+    console.log(`coverage=${report.summary.auditedExpectedPageRuns}/${report.summary.expectedPageRuns} missingRouteViewportPairs=${report.summary.missingRouteViewportPairs} clickTargets=${report.clickTargets}`);
     console.log(`findings=${report.navigationReview.summary.total} high=${report.navigationReview.summary.bySeverity.high} medium=${report.navigationReview.summary.bySeverity.medium} hardFails=${report.navigationReview.summary.hardFails}`);
 
     if (gate.shouldFail) {
         console.error(`Strict navigation gate failed: ${gate.reasons.join(', ')}`);
+        process.exit(1);
+    }
+
+    if (report.auditMemory?.status === 'bad') {
+        console.error(`Audit memory regression failed: ${report.auditMemory.message}`);
+        for (const regression of report.auditMemory.regressions.slice(0, 10)) {
+            console.error(`- ${formatAuditMemoryRegression(regression)}`);
+        }
         process.exit(1);
     }
 }
@@ -1650,6 +2190,7 @@ if (require.main === module) {
 module.exports = {
     DEFAULT_ROUTES,
     DEFAULT_VIEWPORTS,
+    FULL_NAVIGATION_VIEWPORTS,
     buildClickCandidates,
     buildDestinationCatalog,
     buildMarkdownReport,

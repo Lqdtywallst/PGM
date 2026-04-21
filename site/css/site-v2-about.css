@@ -143,6 +143,11 @@
     gap: 0.8rem;
 }
 
+.about-hero__actions {
+    position: relative;
+    z-index: 3;
+}
+
 .about-button {
     display: inline-flex;
     align-items: center;
@@ -184,6 +189,7 @@
     z-index: 2;
     margin-top: -4.3rem;
     padding-bottom: 4.8rem;
+    pointer-events: none;
 }
 
 .about-proof-strip__head,

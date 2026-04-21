@@ -2,6 +2,12 @@ const fs = require('fs');
 const path = require('path');
 
 const { runVisualAgent } = require(path.join(__dirname, 'run-visual-agent.js'));
+const {
+    getViewportCoverageMatrix
+} = require(path.join(__dirname, '..', 'server', 'design-system-contract.js'));
+const {
+    formatAuditMemoryRegression
+} = require(path.join(__dirname, '..', 'server', 'audit-memory-core.js'));
 
 const repoRoot = path.resolve(__dirname, '..');
 const artifactsRoot = path.join(repoRoot, 'artifacts', 'visual-smoke-audit');
@@ -25,6 +31,17 @@ const DEFAULT_VIEWPORTS = Object.freeze([
     'desktop-wide'
 ]);
 
+function viewportNamesForCoverage(scope) {
+    return getViewportCoverageMatrix(scope).map((viewport) => viewport.name);
+}
+
+const VISUAL_SMOKE_VIEWPORT_GROUPS = Object.freeze({
+    mobile: Object.freeze(viewportNamesForCoverage('mobile')),
+    tablet: Object.freeze(viewportNamesForCoverage('tablet')),
+    desktop: Object.freeze(viewportNamesForCoverage('desktop')),
+    responsive: Object.freeze(viewportNamesForCoverage('responsive'))
+});
+
 function timestampSlug(date = new Date()) {
     return date.toISOString().replace(/[:.]/g, '-');
 }
@@ -33,6 +50,7 @@ function parseArgs(argv = []) {
     const args = {
         routes: [],
         viewports: [],
+        viewportGroups: [],
         baseUrl: process.env.PLAYWRIGHT_BASE_URL || '',
         outputDir: '',
         strictReview: false
@@ -50,6 +68,32 @@ function parseArgs(argv = []) {
         if (value === '--viewport' && argv[index + 1]) {
             args.viewports.push(argv[index + 1]);
             index += 1;
+            continue;
+        }
+
+        if (value === '--viewport-group' && argv[index + 1]) {
+            args.viewportGroups.push(argv[index + 1]);
+            index += 1;
+            continue;
+        }
+
+        if (value === '--mobile') {
+            args.viewportGroups.push('mobile');
+            continue;
+        }
+
+        if (value === '--tablet') {
+            args.viewportGroups.push('tablet');
+            continue;
+        }
+
+        if (value === '--desktop') {
+            args.viewportGroups.push('desktop');
+            continue;
+        }
+
+        if (value === '--responsive') {
+            args.viewportGroups.push('responsive');
             continue;
         }
 
@@ -71,6 +115,32 @@ function parseArgs(argv = []) {
     }
 
     return args;
+}
+
+function uniqueValues(values) {
+    return [...new Set(values.filter(Boolean))];
+}
+
+function resolveSmokeViewports(args = {}) {
+    const requestedGroups = args.viewportGroups || [];
+    const requestedViewports = args.viewports || [];
+
+    if (requestedGroups.length === 0 && requestedViewports.length === 0) {
+        return [...DEFAULT_VIEWPORTS];
+    }
+
+    const groupViewports = requestedGroups.flatMap((groupName) => {
+        const normalizedGroupName = String(groupName || '').trim().toLowerCase();
+        const group = VISUAL_SMOKE_VIEWPORT_GROUPS[normalizedGroupName];
+
+        if (!group) {
+            throw new Error(`Unknown visual viewport group: ${groupName}`);
+        }
+
+        return group;
+    });
+
+    return uniqueValues([...groupViewports, ...requestedViewports]);
 }
 
 function summarizeSmokeFailures(report, strictReview = false) {
@@ -108,7 +178,7 @@ function buildFailureLine(page) {
 async function runVisualSmokeAudit(options = {}) {
     const args = options.argv ? parseArgs(options.argv) : options;
     const routes = args.routes && args.routes.length > 0 ? args.routes : [...DEFAULT_ROUTES];
-    const viewports = args.viewports && args.viewports.length > 0 ? args.viewports : [...DEFAULT_VIEWPORTS];
+    const viewports = resolveSmokeViewports(args);
     const outputDir = args.outputDir || path.join(artifactsRoot, timestampSlug());
     const visualRun = await runVisualAgent({
         baseUrl: args.baseUrl || '',
@@ -154,7 +224,14 @@ async function main() {
         }
     }
 
-    if (failures.failed) {
+    if (report.auditMemory?.status === 'bad') {
+        console.error(`Audit memory regression failed: ${report.auditMemory.message}`);
+        for (const regression of report.auditMemory.regressions.slice(0, 10)) {
+            console.error(`- ${formatAuditMemoryRegression(regression)}`);
+        }
+    }
+
+    if (failures.failed || report.auditMemory?.status === 'bad') {
         process.exitCode = 1;
     }
 }
@@ -170,7 +247,9 @@ if (require.main === module) {
 module.exports = {
     DEFAULT_ROUTES,
     DEFAULT_VIEWPORTS,
+    VISUAL_SMOKE_VIEWPORT_GROUPS,
     parseArgs,
+    resolveSmokeViewports,
     runVisualSmokeAudit,
     summarizeSmokeFailures
 };

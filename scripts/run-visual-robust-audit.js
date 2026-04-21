@@ -242,6 +242,50 @@ function summarizeVisualIssues(report) {
         .sort((left, right) => left.score - right.score);
 }
 
+function summarizeFirstViewportFailures(firstViewport) {
+    if (!firstViewport) {
+        return {
+            failedTests: [],
+            errors: []
+        };
+    }
+
+    const failedTests = Object.entries(firstViewport.byProject || {})
+        .flatMap(([projectName, summary]) => (summary.failedTests || []).map((failure) => ({
+            ...failure,
+            projectName
+        })));
+
+    return {
+        failedTests,
+        errors: firstViewport.errors || []
+    };
+}
+
+function summarizeRobustFailures(report) {
+    const visualIssues = report.visual?.issues || [];
+    const firstViewportFailures = summarizeFirstViewportFailures(report.firstViewport);
+    const missingBaselines = report.baselines?.missing || [];
+    const badPages = visualIssues.filter((issue) => issue.status === 'bad');
+    const reviewPages = visualIssues.filter((issue) => issue.status === 'review');
+    const findingPages = visualIssues.filter((issue) => issue.status === 'good' && (issue.findings || []).length > 0);
+
+    return {
+        failed: visualIssues.length > 0 ||
+            missingBaselines.length > 0 ||
+            firstViewportFailures.failedTests.length > 0 ||
+            firstViewportFailures.errors.length > 0 ||
+            report.firstViewport?.ok === false,
+        visualIssuePages: visualIssues,
+        badPages,
+        reviewPages,
+        findingPages,
+        missingBaselines,
+        firstViewportFailedTests: firstViewportFailures.failedTests,
+        firstViewportErrors: firstViewportFailures.errors
+    };
+}
+
 function runFirstViewportSpecs(baseUrl, runDir) {
     const outputPath = path.join(runDir, 'first-viewport-playwright.json');
     const result = runNpx(
@@ -354,6 +398,12 @@ function buildMarkdownReport(report) {
         }
     }
 
+    lines.push('', '## Robust Gate', '');
+    lines.push(`- status: ${report.gate?.failed ? 'failed' : 'passed'}`);
+    lines.push(`- visual issue pages: ${report.gate?.visualIssuePages?.length || 0}`);
+    lines.push(`- missing baselines: ${report.gate?.missingBaselines?.length || 0}`);
+    lines.push(`- first viewport failures: ${report.gate?.firstViewportFailedTests?.length || 0}`);
+
     return `${lines.join('\n')}\n`;
 }
 
@@ -394,6 +444,7 @@ async function runVisualRobustAudit(options = {}) {
             firstViewport,
             baselines
         };
+        report.gate = summarizeRobustFailures(report);
 
         fs.writeFileSync(path.join(runDir, 'report.json'), `${JSON.stringify(report, null, 2)}\n`);
         fs.writeFileSync(path.join(runDir, 'report.md'), buildMarkdownReport(report));
@@ -410,6 +461,24 @@ async function main() {
     const { runDir, report } = await runVisualRobustAudit({ argv: process.argv.slice(2) });
     console.log(`Visual robust audit completed: ${runDir}`);
     console.log(`routes=${report.routes.length} viewports=${report.viewports.length} missingBaselines=${report.baselines.missingCount}`);
+
+    if (report.gate?.failed) {
+        console.error(`Visual robust gate failed: visualIssues=${report.gate.visualIssuePages.length} missingBaselines=${report.gate.missingBaselines.length} firstViewportFailures=${report.gate.firstViewportFailedTests.length}`);
+
+        for (const issue of report.gate.visualIssuePages.slice(0, 8)) {
+            console.error(`- ${issue.route} [${issue.viewport}] status=${issue.status} score=${issue.score}`);
+        }
+
+        for (const baseline of report.gate.missingBaselines.slice(0, 8)) {
+            console.error(`- missing baseline: ${baseline.route} [${baseline.viewport}]`);
+        }
+
+        for (const failure of report.gate.firstViewportFailedTests.slice(0, 8)) {
+            console.error(`- first viewport: ${failure.projectName} ${failure.title}`);
+        }
+
+        process.exitCode = 1;
+    }
 }
 
 if (require.main === module) {
@@ -425,5 +494,6 @@ module.exports = {
     parseArgs,
     runVisualRobustAudit,
     summarizeBaselineCoverage,
+    summarizeRobustFailures,
     summarizeVisualByViewport
 };

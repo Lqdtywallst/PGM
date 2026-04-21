@@ -1419,6 +1419,64 @@ body.lab-mobile-nav-open {
         display: flex;
     }
 
+    .lab-mobile-drawer__panel {
+        gap: 0.82rem;
+        padding: 0.85rem 1rem calc(0.85rem + env(safe-area-inset-bottom));
+    }
+
+    .lab-mobile-drawer__intro,
+    .lab-mobile-drawer__section {
+        margin-top: 0;
+    }
+
+    .lab-mobile-drawer__intro {
+        gap: 0.62rem;
+    }
+
+    .lab-mobile-drawer__intro p {
+        font-size: 0.88rem;
+        line-height: 1.42;
+    }
+
+    .lab-mobile-drawer__quick,
+    .lab-mobile-drawer__links {
+        display: grid;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+
+    .lab-mobile-drawer__quick,
+    .lab-mobile-drawer__links--nav {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .lab-mobile-drawer__links--compact {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .lab-mobile-drawer__quick-link,
+    .lab-mobile-drawer__links a {
+        justify-content: center;
+        min-width: 0;
+        min-height: 40px;
+        padding: 0 0.58rem;
+        text-align: center;
+        line-height: 1.12;
+    }
+
+    .lab-mobile-drawer__links--compact a {
+        min-height: 40px;
+    }
+
+    .lab-mobile-drawer__actions {
+        gap: 0;
+        margin-top: 0.1rem;
+    }
+
+    .lab-mobile-drawer__action--secondary {
+        display: none;
+    }
+
     .site-v2-footer {
         padding-bottom: 1.2rem;
     }

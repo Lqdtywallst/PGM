@@ -625,7 +625,8 @@
     }
 
     .home-page .hero-lab__content-box {
-        width: calc(100% - 32px);
+        width: 100%;
+        max-width: 100%;
         min-height: calc(84svh - var(--lab-header-offset));
         justify-content: flex-end;
         gap: 2.4rem;
@@ -703,7 +704,7 @@
     }
 
     .home-page .hero-lab__cta--secondary {
-        width: fit-content;
+        width: 100%;
         min-height: 46px;
         padding: 0 1.2rem;
         border: 1px solid rgba(255, 255, 255, 0.08);
@@ -714,7 +715,7 @@
         letter-spacing: 0;
         box-shadow: none;
         justify-content: center;
-        justify-self: end;
+        justify-self: stretch;
     }
 
     .home-trust-strip {
@@ -742,8 +743,8 @@
     }
 
     .home-page .hero-lab__content-box {
-        width: calc(100% - 32px);
-        max-width: calc(100% - 32px);
+        width: 100%;
+        max-width: 100%;
     }
 
     .home-page .hero-lab__actions {
@@ -5463,6 +5464,8 @@ a.brand-marquee__item:focus-visible img {
     .fleet-visual-card__contact-row {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 1px;
+        margin: 0.72rem -0.72rem -0.72rem;
+        border-radius: 0 0 8px 8px;
     }
 
     .fleet-visual-card__primary,
@@ -6094,8 +6097,61 @@ body.lab-mobile-nav-open {
         display: flex;
     }
 
+    .lab-mobile-drawer__panel {
+        gap: 0.82rem;
+        padding: 0.85rem 1rem calc(0.85rem + env(safe-area-inset-bottom));
+    }
+
+    .lab-mobile-drawer__intro {
+        gap: 0.62rem;
+        padding: 0;
+    }
+
+    .lab-mobile-drawer__intro p {
+        font-size: 0.88rem;
+        line-height: 1.42;
+    }
+
+    .lab-mobile-drawer__section {
+        gap: 0.52rem;
+    }
+
+    .lab-mobile-drawer__quick,
+    .lab-mobile-drawer__links {
+        display: grid;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+
+    .lab-mobile-drawer__quick,
     .lab-mobile-drawer__links--nav {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .lab-mobile-drawer__links--compact {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .lab-mobile-drawer__quick-link,
+    .lab-mobile-drawer__links a {
+        justify-content: center;
+        min-width: 0;
+        min-height: 40px;
+        padding: 0 0.58rem;
+        text-align: center;
+        line-height: 1.12;
+    }
+
+    .lab-mobile-drawer__links--compact a {
+        min-height: 40px;
+    }
+
+    .lab-mobile-drawer__actions {
+        gap: 0;
+    }
+
+    .lab-mobile-drawer__action--secondary {
+        display: none;
     }
 
     .hero-lab {

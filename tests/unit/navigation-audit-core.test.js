@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const {
     assessLinkLabel,
     buildNavigationReview,
+    buildRouteViewportCoverage,
     buildStaticNavigationGraph,
     evaluateNavigationGate,
     labelDestinationAlignment,
@@ -13,6 +14,7 @@ const {
 const {
     DEFAULT_ROUTES,
     DEFAULT_VIEWPORTS,
+    FULL_NAVIGATION_VIEWPORTS,
     buildClickCandidates,
     buildRenderedRouteLinks,
     parseArgs,
@@ -28,6 +30,8 @@ test('navigation agent args support scoped routes, viewports, strict mode and cl
         '--output-dir', 'artifacts/navigation-custom',
         '--scope', 'critical',
         '--max-clicks-per-page', '2',
+        '--handoff-concurrency', '7',
+        '--click-targets', 'route-edges',
         '--strict'
     ]);
 
@@ -37,6 +41,8 @@ test('navigation agent args support scoped routes, viewports, strict mode and cl
     assert.equal(args.outputDir, 'artifacts/navigation-custom');
     assert.equal(args.scope, 'critical');
     assert.equal(args.maxClicksPerPage, 2);
+    assert.equal(args.handoffConcurrency, 7);
+    assert.equal(args.clickTargets, 'route-edges');
     assert.equal(args.strict, true);
 });
 
@@ -59,6 +65,21 @@ test('deep navigation args switch to crawl scope and exhaustive page clicks by d
     assert.equal(args.scope, 'crawl');
     assert.equal(args.maxClicksPerPage, Number.MAX_SAFE_INTEGER);
     assert.equal(args.maxCrawlDepth, 6);
+    assert.equal(args.handoffConcurrency, 4);
+    assert.equal(args.clickTargets, 'all-actions');
+});
+
+test('full navigation args enforce crawl, strict gate and broad viewport coverage', () => {
+    const args = parseArgs(['--full']);
+
+    assert.equal(args.deep, true);
+    assert.equal(args.full, true);
+    assert.equal(args.strict, true);
+    assert.equal(args.scope, 'crawl');
+    assert.deepEqual(args.viewports, FULL_NAVIGATION_VIEWPORTS);
+    assert.equal(args.maxClicksPerPage, Number.MAX_SAFE_INTEGER);
+    assert.equal(args.maxCrawlDepth, 10);
+    assert.equal(args.handoffConcurrency, 6);
 });
 
 test('resolveReferenceToPublicRoute keeps only known internal routes', () => {
@@ -190,6 +211,126 @@ test('navigation review turns blocked drawers and failed handoffs into hard fail
     assert.ok(review.summary.hardFails >= 2);
 });
 
+test('navigation review treats tablet portrait as compact drawer navigation', () => {
+    const review = buildNavigationReview({
+        publicRoutes: ['/'],
+        graph: buildStaticNavigationGraph([
+            { route: '/', outgoingRoutes: ['/fleet.html', '/contact.html', '/app/reserve/page.html'] },
+            { route: '/fleet.html', outgoingRoutes: ['/'] },
+            { route: '/contact.html', outgoingRoutes: ['/'] },
+            { route: '/app/reserve/page.html', outgoingRoutes: ['/'] }
+        ]),
+        pages: [
+            {
+                route: '/',
+                viewport: 'tablet-portrait',
+                loadStatus: 'ok',
+                title: 'Home',
+                heading: { text: 'Home', visible: true },
+                navigation: {
+                    hasHeaderNav: false,
+                    visibleInternalLinkCount: 4,
+                    mobileDrawer: {
+                        toggleFound: true,
+                        opened: true,
+                        closed: true,
+                        internalLinkCount: 4
+                    },
+                    megaMenus: []
+                },
+                recoveryRoutes: { home: true, fleet: true, contact: true, reserve: true },
+                links: [
+                    { sourceRoute: '/', targetRoute: '/fleet.html', text: 'Fleet', area: 'mobile-drawer' },
+                    { sourceRoute: '/', targetRoute: '/contact.html', text: 'Contact', area: 'mobile-drawer' },
+                    { sourceRoute: '/', targetRoute: '/app/reserve/page.html', text: 'Reserve', area: 'mobile-drawer' }
+                ],
+                handoffs: [],
+                consoleErrors: []
+            }
+        ]
+    });
+
+    assert.equal(review.summary.byCategory.desktop_nav_missing || 0, 0);
+    assert.equal(review.summary.byCategory.mobile_drawer_blocked || 0, 0);
+});
+
+test('navigation review treats missing route viewport coverage as a hard failure', () => {
+    const coverageProfile = buildRouteViewportCoverage({
+        publicRoutes: ['/', '/fleet.html'],
+        viewports: ['mobile-modern', 'laptop'],
+        pages: [
+            { route: '/', viewport: 'mobile-modern' },
+            { route: '/', viewport: 'laptop' },
+            { route: '/fleet.html', viewport: 'mobile-modern' }
+        ]
+    });
+    const review = buildNavigationReview({
+        publicRoutes: ['/', '/fleet.html'],
+        graph: buildStaticNavigationGraph([
+            { route: '/', outgoingRoutes: ['/fleet.html'] },
+            { route: '/fleet.html', outgoingRoutes: ['/'] }
+        ]),
+        pages: [],
+        coverageProfile
+    });
+
+    assert.equal(coverageProfile.complete, false);
+    assert.deepEqual(coverageProfile.missingRouteViewports, [
+        { route: '/fleet.html', viewport: 'laptop' }
+    ]);
+    assert.equal(review.status, 'bad');
+    assert.ok(review.reviewGates.includes('navigation_coverage_gap'));
+    assert.equal(review.summary.byCategory.navigation_coverage_gap, 1);
+});
+
+test('navigation review fails in-page traps such as filter sheets without an obvious exit', () => {
+    const review = buildNavigationReview({
+        publicRoutes: ['/fleet.html'],
+        graph: buildStaticNavigationGraph([
+            { route: '/', outgoingRoutes: ['/fleet.html'] },
+            { route: '/fleet.html', outgoingRoutes: ['/'] }
+        ]),
+        pages: [
+            {
+                route: '/fleet.html',
+                viewport: 'mobile-modern',
+                loadStatus: 'ok',
+                title: 'Fleet',
+                heading: { text: 'Fleet', visible: true },
+                navigation: {
+                    visibleInternalLinkCount: 4,
+                    mobileDrawer: {
+                        toggleFound: true,
+                        opened: true,
+                        closed: true,
+                        internalLinkCount: 4
+                    },
+                    localEscapes: [
+                        {
+                            id: 'fleet-filter-sheet',
+                            label: 'Fleet mobile filter sheet',
+                            status: 'failed',
+                            message: 'no obvious return action'
+                        }
+                    ]
+                },
+                recoveryRoutes: { home: true, fleet: true, contact: true, reserve: true },
+                links: [
+                    { sourceRoute: '/fleet.html', targetRoute: '/', text: 'Home', area: 'mobile-drawer' },
+                    { sourceRoute: '/fleet.html', targetRoute: '/contact.html', text: 'Contact', area: 'mobile-drawer' },
+                    { sourceRoute: '/fleet.html', targetRoute: '/app/reserve/page.html', text: 'Reserve', area: 'mobile-drawer' }
+                ],
+                handoffs: [],
+                consoleErrors: []
+            }
+        ]
+    });
+
+    assert.equal(review.status, 'bad');
+    assert.ok(review.reviewGates.includes('local_navigation_trap'));
+    assert.equal(review.summary.byCategory.local_navigation_trap, 1);
+});
+
 test('strict navigation gate fails only when strict mode is enabled', () => {
     const summary = {
         hardFails: 1,
@@ -238,6 +379,37 @@ test('click candidate selection includes route-backed buttons', () => {
     assert.deepEqual(candidates.map((candidate) => `${candidate.kind}:${candidate.targetRoute}`).sort(), [
         'button:/fleet.html',
         'link:/contact.html'
+    ]);
+});
+
+test('route-edge click mode dedupes repeated labels to one target per route edge', () => {
+    const candidates = buildClickCandidates({
+        route: '/services.html',
+        links: [
+            { kind: 'link', targetRoute: '/fleet.html', text: 'Sports', area: 'main' },
+            { kind: 'link', targetRoute: '/fleet.html', text: 'Supercars', area: 'main' },
+            { kind: 'link', targetRoute: '/fleet.html', text: 'Fleet', area: 'footer' }
+        ]
+    }, Number.MAX_SAFE_INTEGER, 'route-edges');
+
+    assert.deepEqual(candidates.map((candidate) => `${candidate.area}:${candidate.targetRoute}`), [
+        'footer:/fleet.html'
+    ]);
+});
+
+test('route-surface click mode keeps one target per rendered surface', () => {
+    const candidates = buildClickCandidates({
+        route: '/services.html',
+        links: [
+            { kind: 'link', targetRoute: '/fleet.html', text: 'Sports', area: 'main' },
+            { kind: 'link', targetRoute: '/fleet.html', text: 'Supercars', area: 'main' },
+            { kind: 'link', targetRoute: '/fleet.html', text: 'Fleet', area: 'footer' }
+        ]
+    }, Number.MAX_SAFE_INTEGER, 'route-surfaces');
+
+    assert.deepEqual(candidates.map((candidate) => `${candidate.area}:${candidate.targetRoute}`), [
+        'footer:/fleet.html',
+        'main:/fleet.html'
     ]);
 });
 
