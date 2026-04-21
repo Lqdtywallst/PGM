@@ -457,6 +457,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         browser.classList.toggle("fleet-filters-open", isOpen);
         mobileControls.scrim.hidden = !isOpen;
+
+        if (isOpen) {
+            const scrollArea = sidebar?.querySelector(".fleet-sidebar__scroll");
+            if (scrollArea) {
+                scrollArea.scrollTop = 0;
+                window.requestAnimationFrame(() => {
+                    scrollArea.scrollTop = 0;
+                });
+            }
+        }
     }
 
     function createPromptButton(placement) {

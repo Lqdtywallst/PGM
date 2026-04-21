@@ -26,7 +26,9 @@ const VISUAL_FINDING_CATEGORIES = Object.freeze([
     'media_load',
     'header_occlusion',
     'clipping',
+    'contrast',
     'first_viewport_layout',
+    'layout_gap',
     'section_rhythm',
     'family_layout_drift',
     'console_error',
@@ -44,7 +46,8 @@ const VISUAL_FINDING_CATEGORIES = Object.freeze([
     'font_drift',
     'surface_drift',
     'shape_drift',
-    'button_variant_sprawl'
+    'button_variant_sprawl',
+    'header_consistency'
 ]);
 
 const PROFILE_CONFIG = Object.freeze({
@@ -106,6 +109,7 @@ const FINDING_BUCKETS = Object.freeze({
     surface_drift: 'layoutIntegrity',
     shape_drift: 'layoutIntegrity',
     button_variant_sprawl: 'layoutIntegrity',
+    header_consistency: 'layoutIntegrity',
     heading: 'firstViewportHierarchy',
     primary_cta: 'firstViewportHierarchy',
     cta_hierarchy: 'firstViewportHierarchy',
@@ -114,6 +118,8 @@ const FINDING_BUCKETS = Object.freeze({
     section_rhythm: 'layoutIntegrity',
     family_layout_drift: 'firstViewportHierarchy',
     font_drift: 'readability',
+    contrast: 'readability',
+    layout_gap: 'layoutIntegrity',
     media_load: 'mediaComposition',
     console_error: 'stabilityInteraction',
     request_failure: 'stabilityInteraction',
@@ -529,7 +535,7 @@ function shouldEscalateToVision({
     const hasPremiumContractDrift = config.premiumCritical && uniqueFindings.some((finding) => isDesignContractDrift(finding));
     const hasAmbiguousMediumFinding = uniqueFindings.some((finding) => (
         finding.severity === 'medium' &&
-        ['cta_hierarchy', 'clipping', 'grid_stability', 'layout_instability'].includes(finding.category)
+        ['cta_hierarchy', 'clipping', 'contrast', 'grid_stability', 'layout_gap', 'layout_instability'].includes(finding.category)
     ));
 
     if (hasHardFail) {

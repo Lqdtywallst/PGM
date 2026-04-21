@@ -202,7 +202,7 @@ function inferVisualIntentFromSource(html) {
     const source = String(html || '');
     const hasOrbitron = /orbitron/i.test(source);
     const hasLegacyShell = /class=["'][^"']*site-header[^"']*["']/i.test(source) || /hub-pages\.css/i.test(source);
-    const hasModernBase = /site-v2\.css/i.test(source);
+    const hasModernBase = /(?:site-v2|reserve-shell)\.css/i.test(source);
     const hasVehicleOrLandingShell = /(vehicle-pdp-summary-primary|vehicle-booking|local-guide-hero|service-detail-hero|about-hero|services-hero|locations-hero|hero-lab|reserve-container)/i.test(source);
     const hasLegalShell = /(dp-legal-hero|dp-bridge|site-v2-legal\.css)/i.test(source);
 
@@ -277,6 +277,74 @@ function determineRouteFormatStatus({ route, cohort, visualIntent = '', template
     };
 }
 
+function normalizeHeaderSignature(value = '') {
+    return String(value || '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toLowerCase();
+}
+
+function normalizeHeaderFontToken(value = '') {
+    return String(value || '')
+        .split(',')[0]
+        .replace(/["']/g, '')
+        .trim()
+        .toLowerCase();
+}
+
+function compareHeaderSystems(sourceRouteSummary, destinationRouteSummary) {
+    const mismatches = [];
+
+    if (
+        sourceRouteSummary?.headerVariant &&
+        destinationRouteSummary?.headerVariant &&
+        sourceRouteSummary.headerVariant !== destinationRouteSummary.headerVariant
+    ) {
+        mismatches.push(`headerVariant=${sourceRouteSummary.headerVariant}->${destinationRouteSummary.headerVariant}`);
+    }
+
+    if (
+        sourceRouteSummary?.headerBrandFontFamily &&
+        destinationRouteSummary?.headerBrandFontFamily &&
+        normalizeHeaderFontToken(sourceRouteSummary.headerBrandFontFamily) !==
+            normalizeHeaderFontToken(destinationRouteSummary.headerBrandFontFamily)
+    ) {
+        mismatches.push(
+            `headerBrandFontFamily=${normalizeHeaderFontToken(sourceRouteSummary.headerBrandFontFamily)}->${normalizeHeaderFontToken(destinationRouteSummary.headerBrandFontFamily)}`
+        );
+    }
+
+    if (
+        sourceRouteSummary?.headerPrimaryNavSignature &&
+        destinationRouteSummary?.headerPrimaryNavSignature &&
+        normalizeHeaderSignature(sourceRouteSummary.headerPrimaryNavSignature) !==
+            normalizeHeaderSignature(destinationRouteSummary.headerPrimaryNavSignature)
+    ) {
+        mismatches.push(
+            `headerPrimaryNavSignature=${sourceRouteSummary.headerPrimaryNavSignature}->${destinationRouteSummary.headerPrimaryNavSignature}`
+        );
+    }
+
+    if (
+        Number.isFinite(sourceRouteSummary?.headerNavRowCount) &&
+        Number.isFinite(destinationRouteSummary?.headerNavRowCount) &&
+        sourceRouteSummary.headerNavRowCount > 0 &&
+        destinationRouteSummary.headerNavRowCount > 0 &&
+        sourceRouteSummary.headerNavRowCount !== destinationRouteSummary.headerNavRowCount
+    ) {
+        mismatches.push(`headerNavRowCount=${sourceRouteSummary.headerNavRowCount}->${destinationRouteSummary.headerNavRowCount}`);
+    }
+
+    return {
+        mismatches,
+        severity: mismatches.some((entry) => (
+            entry.includes('headerVariant=') ||
+            entry.includes('headerBrandFontFamily=') ||
+            entry.includes('headerPrimaryNavSignature=')
+        )) ? 'high' : 'medium'
+    };
+}
+
 function buildRouteSummary(route, html, visualPage) {
     const cohort = classifyRouteCohort(route);
     const profile = classifyRouteProfile(route);
@@ -301,6 +369,11 @@ function buildRouteSummary(route, html, visualPage) {
         visualIntent: visualPage?.metrics?.visualIntent || '',
         sourceVisualIntent,
         templateFamily: visualPage?.metrics?.templateFamily || '',
+        headerVariant: visualPage?.metrics?.headerVariant || '',
+        headerBrandFontFamily: visualPage?.metrics?.headerBrandFontFamily || '',
+        headerPrimaryNavFontFamily: visualPage?.metrics?.headerPrimaryNavFontFamily || '',
+        headerPrimaryNavSignature: visualPage?.metrics?.headerPrimaryNavSignature || '',
+        headerNavRowCount: Number(visualPage?.metrics?.headerNavRowCount || 0),
         headingFontFamily: visualPage?.metrics?.headingFontFamily || '',
         formatStatus: format.status,
         effectiveVisualIntent: format.effectiveIntent,
@@ -406,6 +479,31 @@ function applyConnectivityFindings(routeSummariesByRoute) {
             }
         }
 
+        for (const destinationRoute of routeSummary.outgoingRoutes) {
+            const destination = routeSummariesByRoute.get(destinationRoute);
+
+            if (
+                !destination ||
+                !PRIMARY_ROUTES.has(routeSummary.route) ||
+                routeSummary.formatStatus !== 'approved' ||
+                destination.formatStatus !== 'approved'
+            ) {
+                continue;
+            }
+
+            const headerComparison = compareHeaderSystems(routeSummary, destination);
+
+            if (headerComparison.mismatches.length > 0) {
+                pushFinding(routeSummary, {
+                    severity: headerComparison.severity,
+                    type: 'header_handoff_drift',
+                    message: 'Esta navegacion cambia el sistema de header entre la vista origen y la vista destino.',
+                    evidence: `${routeSummary.route} -> ${destinationRoute}; ${headerComparison.mismatches.join('; ')}`,
+                    recommendation: 'Unificar variante, tipografia de marca y orden principal de navegacion entre estas vistas conectadas.'
+                });
+            }
+        }
+
         routeSummary.findings.sort((left, right) => severityRank(right.severity) - severityRank(left.severity) || left.type.localeCompare(right.type));
     }
 }
@@ -433,6 +531,7 @@ function summarizeAudit(routeSummaries) {
         legacyConnections: allFindings.filter((finding) => finding.type === 'legacy_connection').length,
         brokenPublicLinks: allFindings.filter((finding) => finding.type === 'broken_public_links').length,
         orphanRoutes: allFindings.filter((finding) => finding.type === 'orphan_route').length,
+        headerHandoffDrift: allFindings.filter((finding) => finding.type === 'header_handoff_drift').length,
         totalFindings: allFindings.length,
         bySeverity: {
             high: allFindings.filter((finding) => finding.severity === 'high').length,
@@ -493,6 +592,7 @@ function buildMarkdownReport(report) {
         `- legacy connections: ${report.summary.legacyConnections}`,
         `- broken public links: ${report.summary.brokenPublicLinks}`,
         `- orphan routes: ${report.summary.orphanRoutes}`,
+        `- header handoff drift: ${report.summary.headerHandoffDrift}`,
         `- findings: ${report.summary.totalFindings} (high=${report.summary.bySeverity.high}, medium=${report.summary.bySeverity.medium}, low=${report.summary.bySeverity.low})`,
         '',
         '## Routes',
@@ -508,6 +608,7 @@ function buildMarkdownReport(report) {
         lines.push(`- effective intent: ${routeSummary.effectiveVisualIntent || 'unknown'}`);
         lines.push(`- expected intents: ${routeSummary.expectedVisualIntents.join(', ') || 'n/a'}`);
         lines.push(`- template: ${routeSummary.templateFamily || 'unknown'}`);
+        lines.push(`- header: ${routeSummary.headerVariant || 'unknown'}`);
         lines.push(`- incoming: ${routeSummary.incomingRoutes.length}`);
         lines.push(`- outgoing: ${routeSummary.outgoingRoutes.length}`);
 
@@ -587,6 +688,10 @@ async function collectVisualPagesFallback({ baseUrl, viewport, fallbackReason = 
                             .join(', ');
                     }
 
+                    function normalizeText(value) {
+                        return String(value || '').replace(/\s+/g, ' ').trim();
+                    }
+
                     function parseColorChannels(value) {
                         const match = String(value || '').match(/rgba?\(([^)]+)\)/i);
 
@@ -663,12 +768,73 @@ async function collectVisualPagesFallback({ baseUrl, viewport, fallbackReason = 
                         return 'generic';
                     }
 
+                    function topLevelNavTargets(navElement) {
+                        if (!(navElement instanceof HTMLElement)) {
+                            return [];
+                        }
+
+                        return Array.from(navElement.children)
+                            .map((child) => {
+                                if (!(child instanceof HTMLElement)) {
+                                    return null;
+                                }
+
+                                if (child.matches('a, button')) {
+                                    return child;
+                                }
+
+                                return child.querySelector(':scope > .lab-nav__trigger, :scope > a, :scope > button');
+                            })
+                            .filter((element) => element instanceof HTMLElement);
+                    }
+
+                    function navLabelSignature(labels) {
+                        return (labels || []).map((entry) => normalizeText(entry)).filter(Boolean).join('|');
+                    }
+
+                    function inferHeaderVariant(headerElement) {
+                        if (!(headerElement instanceof HTMLElement)) {
+                            return document.querySelector('.site-header')
+                                ? 'site_header'
+                                : document.querySelector('header')
+                                    ? 'generic_header'
+                                    : 'none';
+                        }
+
+                        const hasMegaNav = Boolean(document.querySelector('.lab-nav__panel'));
+                        const utilityCount = headerElement.querySelectorAll('.lab-header__utility-link').length;
+
+                        if (headerElement.classList.contains('lab-header--vehicle') && hasMegaNav) {
+                            return 'lab_vehicle_mega';
+                        }
+
+                        if (hasMegaNav && utilityCount > 0) {
+                            return 'lab_mega_utility';
+                        }
+
+                        if (hasMegaNav) {
+                            return 'lab_mega';
+                        }
+
+                        if (utilityCount > 0) {
+                            return 'lab_simple_utility';
+                        }
+
+                        return 'lab_simple';
+                    }
+
                     const body = document.body;
                     const heading = document.querySelector('h1');
                     const bookingCard = document.querySelector('.vehicle-booking');
+                    const header = document.querySelector('.lab-header, .site-header, header');
+                    const headerBrand = document.querySelector('.lab-brand, .header-brand');
+                    const mainNav = document.querySelector('nav[aria-label="Main navigation"], .lab-header .lab-nav');
+                    const headerPrimaryNavTargets = topLevelNavTargets(mainNav);
+                    const headerPrimaryNavLabels = headerPrimaryNavTargets.map((element) => normalizeText(element.textContent)).filter(Boolean);
                     const bodyStyle = window.getComputedStyle(body);
                     const headingStyle = heading ? window.getComputedStyle(heading) : null;
                     const bookingStyle = bookingCard ? window.getComputedStyle(bookingCard) : null;
+                    const headerBrandStyle = headerBrand ? window.getComputedStyle(headerBrand) : null;
                     const templateFamily = inferTemplateFamily();
                     const headingFontFamily = normalizedFontFamily(headingStyle?.fontFamily || '');
                     const bodyBackgroundLuminance = relativeLuminance(parseColorChannels(bodyStyle.backgroundColor || ''));
@@ -700,6 +866,12 @@ async function collectVisualPagesFallback({ baseUrl, viewport, fallbackReason = 
                         visualIntent,
                         templateFamily,
                         headingFontFamily,
+                        headerVariant: inferHeaderVariant(header),
+                        headerBrandFontFamily: normalizedFontFamily(headerBrandStyle?.fontFamily || ''),
+                        headerPrimaryNavSignature: navLabelSignature(headerPrimaryNavLabels),
+                        headerNavRowCount: headerPrimaryNavTargets.length > 0
+                            ? [...new Set(headerPrimaryNavTargets.map((element) => Math.round(element.getBoundingClientRect().top)))].length
+                            : 0,
                         bodyBackgroundLuminance,
                         bookingBackgroundLuminance
                     };
@@ -875,6 +1047,7 @@ if (require.main === module) {
 module.exports = {
     DEFAULT_VIEWPORT,
     buildRouteSummary,
+    compareHeaderSystems,
     determineRouteFormatStatus,
     extractPublicRouteLinks,
     evaluateAuditGate,

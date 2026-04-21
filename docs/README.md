@@ -11,6 +11,10 @@ This repository keeps only active working documentation under `docs/` so the pro
 
 ## Active Documents
 
+- [ALCANCE-AUDITORIA-FRONTEND-2026-04-21.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/audit/ALCANCE-AUDITORIA-FRONTEND-2026-04-21.md)
+  - documented scope for the frontend cleanup pass: HTML, unused CSS pruning, JS optimization, and validation rules before edits
+- [MAPA-AUDITORIA-FRONTEND-ASSETS-2026-04-21.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/audit/MAPA-AUDITORIA-FRONTEND-ASSETS-2026-04-21.md)
+  - route-to-asset map, CSS pruning candidates, JS optimization targets, and safe validation order
 - [ESTRUCTURA-OBJETIVO-2026-04-18.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/audit/ESTRUCTURA-OBJETIVO-2026-04-18.md)
   - target repository structure, ownership rules, and public boundary for `site/`
 - [MANIFIESTO-LIMPIEZA-2026-04-18.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/audit/MANIFIESTO-LIMPIEZA-2026-04-18.md)

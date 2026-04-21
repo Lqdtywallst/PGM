@@ -1,19 +1,19 @@
 # Inventario relacional 2026-04-21
 
-- Archivos escaneados: 8647
-- Archivos fisicos actuales: 8617
-- Archivos trackeados ya borrados en el worktree: 30
+- Archivos escaneados: 9057
+- Archivos fisicos actuales: 9057
+- Archivos trackeados ya borrados en el worktree: 0
 
 ## Conteo por estado
 
-- candidato a borrar: 16
+- candidato a borrar: 11
 - produccion: 114
-- soporte: 8517
+- soporte: 8932
 
 ## Conteo por accion recomendada
 
-- se elimina: 16
-- se queda: 8631
+- se elimina: 11
+- se queda: 9046
 
 ## Archivos con impacto SEO alto
 
@@ -56,17 +56,12 @@
 
 - artifacts/audit-server-4173.err.log
 - artifacts/audit-server-4173.log
+- artifacts/reserve-audit-server.pid
 - site/css/dp-bridge.css
 - site/css/hub-pages.css
 - site/css/site-v2-legal.css
 - site/css/site-v2-local-guide.css
 - site/css/site-v2-service-detail.css
-- site/downtown-dubai-supercar-rental.html
-- site/ferrari-rental-downtown-dubai.html
-- site/g63-rental-dubai-marina.html
-- site/g63-rental-dubai.html
 - site/icons/icon-48.png
 - site/icons/icon-96.png
-- site/lamborghini-rental-palm-jumeirah.html
 - site/README.md
-- site/terms-and-conditions-uae.html

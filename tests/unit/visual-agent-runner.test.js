@@ -7,28 +7,76 @@ const assert = require('node:assert/strict');
 const { PNG } = require('pngjs');
 const {
     getFirstViewportContract,
+    getMobileInteractionContract,
+    getViewportCoverageMatrix,
     resolveViewportTier
 } = require('../../server/design-system-contract');
 
 const {
     approveBaselinesFromRun,
+    buildContactFormStateFindings,
     buildCohortFindings,
     buildDesignSystemFindings,
     buildDeterministicFindings,
+    buildFleetMobileFilterFindings,
+    buildPageDepthScanFindings,
+    buildReserveBookingIntentFindings,
     buildServiceInteractionFindings,
     buildMarkdownReport,
     buildProfileReferenceFindings,
     buildSurfaceFindings,
     buildTemplateFamilyFindings,
+    VIEWPORTS,
     comparePngFiles,
     parseArgs,
     routeFileStem
 } = require('../../scripts/run-visual-agent');
+const {
+    DEFAULT_ROUTES: VISUAL_SMOKE_ROUTES,
+    DEFAULT_VIEWPORTS: VISUAL_SMOKE_VIEWPORTS,
+    summarizeSmokeFailures
+} = require('../../scripts/run-visual-smoke-audit');
 
 test('resolveViewportTier separates mobile, laptop and desktop policies', () => {
     assert.equal(resolveViewportTier('mobile-modern', 390), 'mobile');
+    assert.equal(resolveViewportTier('mobile-short', 400), 'mobile');
     assert.equal(resolveViewportTier('laptop', 1366), 'laptop');
     assert.equal(resolveViewportTier('desktop-wide', 1707), 'desktop');
+});
+
+test('visual agent includes a short mobile viewport for cramped bottom sheets', () => {
+    const mobileShort = VIEWPORTS.find((viewport) => viewport.name === 'mobile-short');
+
+    assert.deepEqual(
+        { width: mobileShort.width, height: mobileShort.height },
+        { width: 400, height: 608 }
+    );
+});
+
+test('viewport coverage matrix defines the canonical responsive device bands', () => {
+    const allViewports = getViewportCoverageMatrix('all');
+    const responsiveViewports = getViewportCoverageMatrix('responsive');
+    const firstViewportNames = getViewportCoverageMatrix('firstViewport').map((viewport) => viewport.name);
+
+    assert.deepEqual(
+        allViewports.map((viewport) => viewport.name),
+        [
+            'mobile-short',
+            'mobile-small',
+            'mobile-modern',
+            'mobile-large',
+            'tablet-portrait',
+            'tablet-landscape',
+            'laptop-compact',
+            'laptop',
+            'desktop-standard',
+            'desktop-wide'
+        ]
+    );
+    assert.equal(responsiveViewports.length, 10);
+    assert.ok(firstViewportNames.includes('mobile-short'));
+    assert.ok(firstViewportNames.includes('laptop-compact'));
+    assert.ok(firstViewportNames.includes('desktop-wide'));
 });
 
 test('getFirstViewportContract keeps desktop locked while mobile stays in research mode', () => {
@@ -49,6 +97,61 @@ test('getFirstViewportContract keeps desktop locked while mobile stays in resear
     assert.equal(servicesDesktop.check, 'service_tabs_split');
     assert.equal(servicesMobile.policy, 'research');
     assert.equal('check' in servicesMobile, false);
+});
+
+test('getMobileInteractionContract locks mobile fleet filter usability', () => {
+    const contract = getMobileInteractionContract({
+        interaction: 'fleet_filter_sheet',
+        viewportName: 'mobile-modern',
+        viewportWidth: 390
+    });
+
+    assert.equal(contract.policy, 'locked');
+    assert.equal(contract.minTapTargetPx, 44);
+    assert.ok(contract.requiredFilledValues.includes('20/04/2026'));
+    assert.ok(contract.requiredFilterLabels.includes('Lamborghini'));
+});
+
+test('human-state contracts cover contact and reserve filled forms', () => {
+    const contactContract = getMobileInteractionContract({
+        interaction: 'contact_form_filled',
+        viewportName: 'mobile-short',
+        viewportWidth: 400
+    });
+    const reserveContract = getMobileInteractionContract({
+        interaction: 'reserve_booking_intent',
+        viewportName: 'laptop',
+        viewportWidth: 1366
+    });
+
+    assert.equal(contactContract.policy, 'locked');
+    assert.ok(contactContract.requiredFieldKeys.includes('contactMessage'));
+    assert.equal(reserveContract.policy, 'locked');
+    assert.ok(reserveContract.requiredScheduleFieldKeys.includes('pickupLocation'));
+    assert.ok(reserveContract.requiredGuestFieldKeys.includes('passport'));
+});
+
+test('mobile card action contract locks hierarchy and edge padding', () => {
+    const contract = getMobileInteractionContract({
+        interaction: 'mobile_card_actions',
+        viewportName: 'mobile-modern',
+        viewportWidth: 390
+    });
+
+    assert.equal(contract.policy, 'locked');
+    assert.equal(contract.maxSecondaryContactActions, 2);
+    assert.ok(contract.maxActionGroupHeightRatio < 0.4);
+    assert.ok(contract.minCardInlinePaddingPx >= 12);
+});
+
+test('visual smoke gate covers human routes and responsive device bands', () => {
+    assert.ok(VISUAL_SMOKE_ROUTES.includes('/fleet.html'));
+    assert.ok(VISUAL_SMOKE_ROUTES.includes('/contact.html'));
+    assert.ok(VISUAL_SMOKE_ROUTES.includes('/app/reserve/page.html'));
+    assert.ok(VISUAL_SMOKE_VIEWPORTS.includes('mobile-short'));
+    assert.ok(VISUAL_SMOKE_VIEWPORTS.includes('tablet-portrait'));
+    assert.ok(VISUAL_SMOKE_VIEWPORTS.includes('laptop'));
+    assert.ok(VISUAL_SMOKE_VIEWPORTS.includes('desktop-wide'));
 });
 
 test('getFirstViewportContract resolves split rules for brand landings on desktop', () => {
@@ -424,6 +527,38 @@ test('buildDesignSystemFindings respects the explicit brand landing contract', (
     assert.equal(findings.filter((finding) => finding.route === '/ferrari-rental-dubai.html').length, 0);
 });
 
+test('buildDesignSystemFindings flags header drift against the explicit cohort contract', () => {
+    const findings = buildDesignSystemFindings([
+        {
+            route: '/airport-concierge-dubai.html',
+            viewport: 'desktop-wide',
+            metrics: {
+                headingFontFamily: 'cormorant garamond',
+                bodyFontFamily: 'manrope',
+                visualIntent: 'modern_light_system',
+                bodyFontSizePx: 15,
+                bodyLineHeightPx: 24,
+                primaryCtaRadiusPx: 8,
+                cardRadiusPx: 8,
+                buttonFamilyCount: 4,
+                headerVariant: 'lab_mega',
+                headerBrandFontFamily: 'inter',
+                headerPrimaryNavSignature: 'Home|Fleet|Cars Brands|Cars Types|Services|Locations|About Us|Contact',
+                headerNavRowCount: 1,
+                usesSharedLabHeader: true
+            },
+            artifacts: {
+                viewportScreenshot: '/tmp/airport-header-contract.png'
+            }
+        }
+    ]);
+
+    assert.ok(findings.some((finding) => (
+        finding.route === '/airport-concierge-dubai.html' &&
+        finding.category === 'header_consistency'
+    )));
+});
+
 test('buildSurfaceFindings flags mixed Cars Brands destination families', () => {
     const findings = buildSurfaceFindings([
         {
@@ -596,6 +731,102 @@ test('buildDeterministicFindings flags dark hero headings on dark visual shells'
     });
 
     assert.ok(findings.some((finding) => finding.category === 'contrast' && finding.hardFail === true));
+});
+
+test('buildDeterministicFindings flags weak visible text contrast on light panels', () => {
+    const findings = buildDeterministicFindings({
+        route: '/app/reserve/page.html',
+        viewport: { name: 'laptop' },
+        profile: 'reserve',
+        metrics: {
+            horizontalOverflowPx: 0,
+            visibleH1Count: 1,
+            headingRect: { top: 24 },
+            viewportWidth: 1366,
+            viewportHeight: 768,
+            heroActionCount: 1,
+            primaryCtaRect: { top: 706 },
+            hasVisualMedia: true,
+            hasNav: true,
+            headerOcclusionPx: 0,
+            clippedElements: [],
+            textContrastIssues: [
+                {
+                    selectorLabel: 'p.reserve-page-panel__copy :: Choose delivery and return.',
+                    text: 'Choose delivery and return. The quote recalculates automatically.',
+                    contrastRatio: 1.52,
+                    requiredRatio: 4.5,
+                    color: 'rgb(204, 207, 215)',
+                    effectiveBackground: 'rgb(255, 254, 249)'
+                }
+            ],
+            internalGapIssues: [],
+            overlaps: [],
+            brokenMedia: []
+        },
+        consoleErrors: [],
+        networkErrors: {
+            requestFailures: [],
+            criticalResponses: [],
+            pageErrors: []
+        },
+        artifacts: {
+            viewportScreenshot: '/tmp/reserve-weak-contrast.png'
+        }
+    });
+
+    assert.ok(findings.some((finding) => (
+        finding.category === 'contrast' &&
+        /not have enough contrast/i.test(finding.message) &&
+        finding.hardFail === true
+    )));
+});
+
+test('buildDeterministicFindings flags large internal gaps in first-viewport panels', () => {
+    const findings = buildDeterministicFindings({
+        route: '/app/reserve/page.html',
+        viewport: { name: 'laptop' },
+        profile: 'reserve',
+        metrics: {
+            horizontalOverflowPx: 0,
+            visibleH1Count: 1,
+            headingRect: { top: 24 },
+            viewportWidth: 1366,
+            viewportHeight: 768,
+            heroActionCount: 1,
+            primaryCtaRect: { top: 706 },
+            hasVisualMedia: true,
+            hasNav: true,
+            headerOcclusionPx: 0,
+            clippedElements: [],
+            textContrastIssues: [],
+            internalGapIssues: [
+                {
+                    selectorLabel: 'aside.step2-side :: Live quote',
+                    largestGapPx: 184,
+                    largestGapRatio: 0.31,
+                    trailingGapPx: 184,
+                    childCount: 1
+                }
+            ],
+            overlaps: [],
+            brokenMedia: []
+        },
+        consoleErrors: [],
+        networkErrors: {
+            requestFailures: [],
+            criticalResponses: [],
+            pageErrors: []
+        },
+        artifacts: {
+            viewportScreenshot: '/tmp/reserve-layout-gap.png'
+        }
+    });
+
+    assert.ok(findings.some((finding) => (
+        finding.category === 'layout_gap' &&
+        /large empty internal gap/i.test(finding.message)
+    )));
 });
 
 test('buildDeterministicFindings accepts the services desktop split when circles stay above the lower panel', () => {
@@ -1255,6 +1486,409 @@ test('buildDeterministicFindings flags fleet first row underfill', () => {
     });
 
     assert.ok(findings.some((finding) => finding.category === 'first_viewport_layout'));
+});
+
+test('buildFleetMobileFilterFindings accepts readable filled mobile filter controls', () => {
+    const findings = buildFleetMobileFilterFindings({
+        route: '/fleet.html',
+        viewportName: 'mobile-modern',
+        viewportWidth: 390,
+        state: {
+            available: true,
+            isOpen: true,
+            sheetHeightRatio: 0.82,
+            sheetHorizontalOverflowPx: 0,
+            displayTexts: ['20/04/2026', '10:00', '22/04/2026', '18:00'],
+            selectedFilterLabels: ['Featured', 'Lamborghini', 'Convertible'],
+            visibleFilledFieldCount: 4,
+            dateTimeFields: [
+                { key: 'fleet-pickup-date', widthRatio: 0.86, rect: { width: 326, height: 56 }, clipX: 0, clipY: 0 },
+                { key: 'fleet-pickup-time', widthRatio: 0.86, rect: { width: 326, height: 56 }, clipX: 0, clipY: 0 },
+                { key: 'fleet-return-date', widthRatio: 0.86, rect: { width: 326, height: 56 }, clipX: 0, clipY: 0 },
+                { key: 'fleet-return-time', widthRatio: 0.86, rect: { width: 326, height: 56 }, clipX: 0, clipY: 0 }
+            ],
+            controls: [
+                { key: 'fleet-pickup-date', kind: 'date_time_field', rect: { width: 326, height: 56 }, clipX: 0, clipY: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 },
+                { key: 'brand', kind: 'select', rect: { width: 326, height: 50 }, clipX: 0, clipY: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 },
+                { key: 'close', kind: 'button', rect: { width: 326, height: 48 }, clipX: 0, clipY: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 },
+                { key: 'price', kind: 'range', rect: { width: 326, height: 44 }, clipX: 0, clipY: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 }
+            ],
+            screenshotPath: '/tmp/fleet-mobile-filters-filled.png'
+        },
+        screenshotPath: '/tmp/fleet.png'
+    });
+
+    assert.equal(findings.length, 0);
+});
+
+test('buildFleetMobileFilterFindings flags cramped mobile filter date and filter states', () => {
+    const findings = buildFleetMobileFilterFindings({
+        route: '/fleet.html',
+        viewportName: 'mobile-modern',
+        viewportWidth: 390,
+        state: {
+            available: true,
+            isOpen: true,
+            sheetHeightRatio: 0.94,
+            sheetHorizontalOverflowPx: 12,
+            displayTexts: ['20/04/2026'],
+            selectedFilterLabels: ['Featured'],
+            visibleFilledFieldCount: 1,
+            dateTimeFields: [
+                { key: 'fleet-pickup-date', widthRatio: 0.58, rect: { width: 210, height: 42 }, clipX: 8, clipY: 0, text: '20/04/2026' },
+                { key: 'fleet-pickup-time', widthRatio: 0.34, rect: { width: 124, height: 42 }, clipX: 16, clipY: 0, text: '10:00' }
+            ],
+            controls: [
+                { key: 'fleet-pickup-date', kind: 'date_time_field', rect: { width: 210, height: 42 }, clipX: 8, clipY: 0, text: '20/04/2026', visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 },
+                { key: 'fleet-pickup-time', kind: 'date_time_field', rect: { width: 124, height: 42 }, clipX: 16, clipY: 0, text: '10:00', visibleInViewport: true, fullyVisibleInViewport: false, viewportClipPx: 18 },
+                { key: 'brand', kind: 'select', rect: { width: 106, height: 40 }, clipX: 10, clipY: 0, text: 'Lamborghini', visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 }
+            ],
+            screenshotPath: '/tmp/fleet-mobile-bad.png'
+        },
+        screenshotPath: '/tmp/fleet.png'
+    });
+
+    assert.ok(findings.some((finding) => finding.category === 'overflow'));
+    assert.ok(findings.some((finding) => finding.category === 'form_visibility' && /date and time values/i.test(finding.message)));
+    assert.ok(findings.some((finding) => finding.category === 'form_visibility' && /too narrow/i.test(finding.message)));
+    assert.ok(findings.some((finding) => finding.category === 'clipping'));
+    assert.ok(findings.some((finding) => /short viewport/i.test(finding.message)));
+    assert.ok(findings.some((finding) => finding.hardFail === true));
+});
+
+test('buildPageDepthScanFindings flags mobile card action groups that dominate the card', () => {
+    const findings = buildPageDepthScanFindings({
+        route: '/fleet.html',
+        viewportName: 'mobile-modern',
+        viewportWidth: 390,
+        state: {
+            available: true,
+            frames: [
+                {
+                    viewportTop: 0,
+                    viewportBottom: 844,
+                    screenshotPath: '/tmp/fleet-depth-1.png'
+                }
+            ],
+            cardActionMetrics: [
+                {
+                    label: 'Huracan EVO Spyder',
+                    cardRect: { top: 0, bottom: 520, left: 0, right: 390, width: 390, height: 520 },
+                    actionGroupHeightRatio: 0.42,
+                    secondaryActionHeightRatio: 0.24,
+                    secondaryDominanceRatio: 2.1,
+                    secondaryMaxButtonWidthRatio: 0.99,
+                    secondaryInlinePaddingPx: 0,
+                    primaryMaxHeight: 60,
+                    secondaryMaxHeight: 60,
+                    secondaryCount: 2,
+                    secondaryRowCount: 2
+                }
+            ]
+        },
+        screenshotPath: '/tmp/fleet.png'
+    });
+
+    assert.ok(findings.some((finding) => finding.category === 'cta_hierarchy' && /dominates/i.test(finding.message)));
+    assert.ok(findings.some((finding) => finding.category === 'cta_hierarchy' && /overpowering/i.test(finding.message)));
+    assert.ok(findings.some((finding) => finding.category === 'spacing' && /touch the card edge/i.test(finding.message)));
+    assert.ok(findings.some((finding) => finding.hardFail === true));
+});
+
+test('buildPageDepthScanFindings reports repeated mobile card patterns instead of only the first card', () => {
+    const repeatedCard = (label) => ({
+        label,
+        cardRect: { top: 0, bottom: 520, left: 0, right: 390, width: 390, height: 520 },
+        actionGroupHeightRatio: 0.38,
+        secondaryActionHeightRatio: 0.24,
+        secondaryDominanceRatio: 1,
+        secondaryMaxButtonWidthRatio: 0.99,
+        secondaryInlinePaddingPx: 1,
+        primaryMaxHeight: 52,
+        secondaryMaxHeight: 48,
+        secondaryCount: 2,
+        secondaryRowCount: 2
+    });
+    const findings = buildPageDepthScanFindings({
+        route: '/fleet.html',
+        viewportName: 'mobile-modern',
+        viewportWidth: 390,
+        state: {
+            available: true,
+            frames: [
+                {
+                    viewportTop: 0,
+                    viewportBottom: 844,
+                    screenshotPath: '/tmp/fleet-depth-1.png'
+                }
+            ],
+            cardActionMetrics: [
+                repeatedCard('Huracan EVO Spyder'),
+                repeatedCard('296 GTS'),
+                repeatedCard('992 GT3')
+            ]
+        },
+        screenshotPath: '/tmp/fleet.png'
+    });
+
+    assert.ok(findings.some((finding) => (
+        /repeated mobile card pattern/i.test(finding.message) &&
+        /affectedCards=3/.test(finding.evidence)
+    )));
+});
+
+test('buildPageDepthScanFindings accepts contained mobile card actions', () => {
+    const findings = buildPageDepthScanFindings({
+        route: '/fleet.html',
+        viewportName: 'mobile-modern',
+        viewportWidth: 390,
+        state: {
+            available: true,
+            frames: [
+                {
+                    viewportTop: 0,
+                    viewportBottom: 844,
+                    screenshotPath: '/tmp/fleet-depth-clean.png'
+                }
+            ],
+            cardActionMetrics: [
+                {
+                    label: 'G63 AMG',
+                    cardRect: { top: 0, bottom: 540, left: 16, right: 374, width: 358, height: 540 },
+                    actionGroupHeightRatio: 0.26,
+                    secondaryActionHeightRatio: 0.17,
+                    secondaryDominanceRatio: 0.9,
+                    secondaryMaxButtonWidthRatio: 0.42,
+                    secondaryInlinePaddingPx: 16,
+                    primaryMaxHeight: 52,
+                    secondaryMaxHeight: 48,
+                    secondaryCount: 2,
+                    secondaryRowCount: 1
+                }
+            ]
+        },
+        screenshotPath: '/tmp/fleet.png'
+    });
+
+    assert.equal(findings.length, 0);
+});
+
+test('buildPageDepthScanFindings flags generic visual scan outliers beyond known cards', () => {
+    const findings = buildPageDepthScanFindings({
+        route: '/contact.html',
+        viewportName: 'mobile-modern',
+        viewportWidth: 390,
+        state: {
+            available: true,
+            frames: [
+                {
+                    index: 2,
+                    scrollY: 640,
+                    viewportTop: 640,
+                    viewportBottom: 1484,
+                    screenshotPath: '/tmp/contact-depth-2.png',
+                    metric: {
+                        visibleMajorElementCount: 6,
+                        largestBlankGapRatio: 0.51,
+                        actionMetrics: [
+                            {
+                                label: 'WhatsApp',
+                                selector: 'a.contact-whatsapp',
+                                rect: { width: 384, height: 70 },
+                                widthRatio: 0.985,
+                                areaRatio: 0.082,
+                                edgePaddingPx: 3,
+                                isContactAction: true,
+                                isSecondaryAction: true,
+                                insideCard: false
+                            }
+                        ]
+                    }
+                }
+            ],
+            cardActionMetrics: []
+        },
+        screenshotPath: '/tmp/contact.png'
+    });
+
+    assert.ok(findings.some((finding) => finding.category === 'layout_gap'));
+    assert.ok(findings.some((finding) => finding.category === 'cta_hierarchy' && /contact action/i.test(finding.message)));
+    assert.ok(findings.some((finding) => finding.category === 'spacing' && /viewport edge/i.test(finding.message)));
+});
+
+test('buildPageDepthScanFindings flags booking date controls prefilled before today', () => {
+    const findings = buildPageDepthScanFindings({
+        route: '/app/reserve/page.html',
+        viewportName: 'mobile-modern',
+        viewportWidth: 390,
+        auditDateIso: '2026-04-21',
+        state: {
+            available: true,
+            frames: [
+                {
+                    index: 1,
+                    scrollY: 0,
+                    viewportTop: 0,
+                    viewportBottom: 844,
+                    screenshotPath: '/tmp/reserve-depth-1.png',
+                    metric: {
+                        visibleMajorElementCount: 8,
+                        largestBlankGapRatio: 0.2,
+                        actionMetrics: [],
+                        dateControlMetrics: [
+                            {
+                                key: 'startDate',
+                                selector: 'input#startDate.input',
+                                label: 'Delivery Date',
+                                value: '2026-04-20',
+                                displayText: 'Delivery Date * 20/04/2026',
+                                min: '2026-04-01',
+                                rect: { width: 340, height: 60 }
+                            }
+                        ]
+                    }
+                }
+            ],
+            cardActionMetrics: []
+        },
+        screenshotPath: '/tmp/reserve.png'
+    });
+
+    assert.ok(findings.some((finding) => (
+        finding.category === 'date_currentness' &&
+        /past date/i.test(finding.message) &&
+        /today=2026-04-21/.test(finding.evidence) &&
+        finding.hardFail === true
+    )));
+    assert.ok(findings.some((finding) => (
+        finding.category === 'date_currentness' &&
+        /allows dates before today/i.test(finding.message)
+    )));
+});
+
+test('buildPageDepthScanFindings accepts booking date controls set to today or future', () => {
+    const findings = buildPageDepthScanFindings({
+        route: '/app/reserve/page.html',
+        viewportName: 'mobile-modern',
+        viewportWidth: 390,
+        auditDateIso: '2026-04-21',
+        state: {
+            available: true,
+            frames: [
+                {
+                    index: 1,
+                    scrollY: 0,
+                    viewportTop: 0,
+                    viewportBottom: 844,
+                    screenshotPath: '/tmp/reserve-depth-clean.png',
+                    metric: {
+                        visibleMajorElementCount: 8,
+                        largestBlankGapRatio: 0.2,
+                        actionMetrics: [],
+                        dateControlMetrics: [
+                            {
+                                key: 'startDate',
+                                selector: 'input#startDate.input',
+                                label: 'Delivery Date',
+                                value: '2026-04-21',
+                                displayText: 'Delivery Date * 21/04/2026',
+                                min: '2026-04-21',
+                                rect: { width: 340, height: 60 }
+                            },
+                            {
+                                key: 'endDate',
+                                selector: 'input#endDate.input',
+                                label: 'Return Date',
+                                value: '2026-04-23',
+                                displayText: 'Return Date * 23/04/2026',
+                                min: '2026-04-21',
+                                rect: { width: 340, height: 60 }
+                            }
+                        ]
+                    }
+                }
+            ],
+            cardActionMetrics: []
+        },
+        screenshotPath: '/tmp/reserve.png'
+    });
+
+    assert.equal(findings.filter((finding) => finding.category === 'date_currentness').length, 0);
+});
+
+test('buildContactFormStateFindings accepts filled contact controls', () => {
+    const findings = buildContactFormStateFindings({
+        route: '/contact.html',
+        viewportName: 'mobile-short',
+        viewportWidth: 400,
+        state: {
+            available: true,
+            horizontalOverflowPx: 0,
+            controls: [
+                { key: 'contactName', text: 'Alex Morgan', value: 'Alex Morgan', expectedText: 'Alex Morgan', visible: true, rect: { width: 340, height: 48 }, clipX: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 },
+                { key: 'contactEmail', text: 'alex.morgan@example.com', value: 'alex.morgan@example.com', expectedText: 'alex.morgan@example.com', visible: true, rect: { width: 340, height: 48 }, clipX: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 },
+                { key: 'contactSubject', text: 'Reservation', value: 'reservation', expectedText: 'reservation', visible: true, rect: { width: 340, height: 48 }, clipX: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 },
+                { key: 'contactMessage', text: 'I need a two-day Dubai rental.', value: 'I need a two-day Dubai rental.', expectedText: 'I need a two-day Dubai rental.', visible: true, rect: { width: 340, height: 120 }, clipX: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 },
+                { key: 'contactSubmitButton', text: 'Send message', value: 'Send message', expectedText: '', visible: true, rect: { width: 340, height: 48 }, clipX: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 }
+            ],
+            screenshotPath: '/tmp/contact-filled.png'
+        },
+        screenshotPath: '/tmp/contact.png'
+    });
+
+    assert.equal(findings.length, 0);
+});
+
+test('buildReserveBookingIntentFindings flags a broken realistic reserve handoff', () => {
+    const findings = buildReserveBookingIntentFindings({
+        route: '/app/reserve/page.html',
+        viewportName: 'mobile-short',
+        viewportWidth: 400,
+        state: {
+            available: true,
+            horizontalOverflowPx: 0,
+            canAdvanceFromSchedule: false,
+            step2Visible: false,
+            activeStepId: 'step1',
+            scheduleControls: [
+                { key: 'startDate', text: '2026-08-20', value: '2026-08-20', expectedText: '2026-08-20', visible: true, rect: { width: 340, height: 48 }, clipX: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 },
+                { key: 'endDate', text: '', value: '', expectedText: '2026-08-22', visible: true, rect: { width: 160, height: 40 }, clipX: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 },
+                { key: 'pickupTime', text: '10:00', value: '10:00', expectedText: '10:00', visible: true, rect: { width: 160, height: 40 }, clipX: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 },
+                { key: 'dropoffTime', text: '10:00', value: '10:00', expectedText: '18:00', visible: true, rect: { width: 160, height: 40 }, clipX: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 },
+                { key: 'pickupLocation', text: 'Atlantis The Royal, Palm Jumeirah', value: 'Atlantis The Royal, Palm Jumeirah', expectedText: 'Atlantis The Royal, Palm Jumeirah', visible: true, rect: { width: 340, height: 48 }, clipX: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 }
+            ],
+            guestControls: [
+                { key: 'fullName', text: '', value: '', expectedText: 'Sofia Bennett', visible: false, rect: { width: 0, height: 0 }, clipX: 0, visibleInViewport: false, fullyVisibleInViewport: false, viewportClipPx: 0 },
+                { key: 'passport', text: '', value: '', expectedText: 'XK938271', visible: false, rect: { width: 0, height: 0 }, clipX: 0, visibleInViewport: false, fullyVisibleInViewport: false, viewportClipPx: 0 },
+                { key: 'phone', text: '', value: '', expectedText: '+971501234567', visible: false, rect: { width: 0, height: 0 }, clipX: 0, visibleInViewport: false, fullyVisibleInViewport: false, viewportClipPx: 0 },
+                { key: 'email', text: '', value: '', expectedText: 'sofia.bennett@example.com', visible: false, rect: { width: 0, height: 0 }, clipX: 0, visibleInViewport: false, fullyVisibleInViewport: false, viewportClipPx: 0 }
+            ],
+            screenshotPath: '/tmp/reserve-broken.png'
+        },
+        screenshotPath: '/tmp/reserve.png'
+    });
+
+    assert.ok(findings.some((finding) => finding.category === 'interaction_state'));
+    assert.ok(findings.some((finding) => finding.category === 'form_visibility'));
+    assert.ok(findings.some((finding) => finding.hardFail === true));
+});
+
+test('summarizeSmokeFailures fails bad pages and missing screenshots but allows review by default', () => {
+    const report = {
+        pages: [
+            { route: '/', viewport: 'mobile-short', assessment: { status: 'review', hardFails: [] }, artifacts: { viewportScreenshot: __filename } },
+            { route: '/fleet.html', viewport: 'mobile-short', assessment: { status: 'bad', hardFails: [{ message: 'overflow' }] }, artifacts: { viewportScreenshot: __filename } },
+            { route: '/contact.html', viewport: 'mobile-short', assessment: { status: 'good', hardFails: [] }, artifacts: { viewportScreenshot: 'missing.png' } }
+        ]
+    };
+    const soft = summarizeSmokeFailures(report, false);
+    const strict = summarizeSmokeFailures(report, true);
+
+    assert.equal(soft.reviewPages.length, 0);
+    assert.equal(strict.reviewPages.length, 1);
+    assert.equal(soft.failed, true);
+    assert.equal(soft.badPages.length, 1);
+    assert.equal(soft.missingScreenshots.length, 1);
 });
 
 test('buildDeterministicFindings flags reserve when branded intro is gone and the first date field falls below the fold', () => {

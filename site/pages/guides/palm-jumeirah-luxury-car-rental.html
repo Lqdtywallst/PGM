@@ -20,7 +20,7 @@
 <script>document.documentElement.classList.add("js");</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=El+Messiri:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./css/site-v2.css?v=20260420e">
   <link rel="stylesheet" href="./css/site-v2-local-guide.css?v=20260406a">
   <script src="./js/site-v2.js?v=20260406ae" defer></script>
@@ -38,7 +38,185 @@
   </script>
 </head>
 <body class="local-guide-page local-guide-page--palm">
-  <header class="lab-header"><div class="lab-shell lab-header__inner"><a href="./index.html" class="lab-brand" aria-label="Dynasty Prestige home"><span class="lab-brand__crest" aria-hidden="true"><img src="./images/dp-crest-cropped.png" alt=""></span><span class="lab-brand__copy"><strong>Dynasty Prestige</strong><span>Dubai luxury car rental</span></span></a><div class="lab-header__nav"><nav class="lab-nav" aria-label="Main navigation"><a href="./index.html">Home</a><a href="./fleet.html">Fleet</a><a href="./services.html">Services</a><a href="./locations.html" aria-current="page">Locations</a><a href="./about.html">About Us</a></nav></div></div></header>
+  <header class="lab-header">
+        <div class="lab-shell lab-header__inner">
+            <a href="/index.html" class="lab-brand" aria-label="Dynasty Prestige home">
+                <span class="lab-brand__crest" aria-hidden="true">
+                    <img src="/images/dp-crest-cropped.png" alt="">
+                </span>
+                <span class="lab-brand__copy">
+                    <strong>Dynasty Prestige</strong>
+                    <span>Dubai luxury car rental</span>
+                </span>
+            </a>
+
+            <nav class="lab-header__utility" aria-label="Quick contact">
+                <a class="lab-header__utility-link" href="tel:+971586122568" aria-label="Call Dynasty Prestige">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill="currentColor" d="M6.62 10.79a15.47 15.47 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.07 21 3 13.93 3 5c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.24.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2Z"/>
+                    </svg>
+                    <span>Call</span>
+                </a>
+                <a class="lab-header__utility-link" href="mailto:prestigegoalmotion@gmail.com" aria-label="Email Dynasty Prestige">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill="currentColor" d="M20 5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm-.4 2-6.54 5.23a1.7 1.7 0 0 1-2.12 0L4.4 7h15.2ZM4 17V9.05l5.69 4.56a3.7 3.7 0 0 0 4.62 0L20 9.05V17H4Z"/>
+                    </svg>
+                    <span>Email</span>
+                </a>
+                <a class="lab-header__utility-link" href="https://wa.me/971586122568" target="_blank" rel="noopener" aria-label="Open WhatsApp">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill="currentColor" d="M19.05 4.91A9.82 9.82 0 0 0 12 2a9.94 9.94 0 0 0-8.54 15.02L2 22l5.13-1.35A9.94 9.94 0 1 0 19.05 4.91Zm-7.05 14.1c-1.53 0-3.04-.41-4.36-1.19l-.31-.18-3.04.8.81-2.96-.2-.31a8 8 0 1 1 7.1 3.84Zm4.39-5.91c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.93-1.18-.71-.63-1.2-1.41-1.34-1.65-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.48-.4-.41-.54-.41l-.46-.01c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.09 3.61.57.25 1.01.39 1.36.49.57.18 1.09.15 1.5.09.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"/>
+                    </svg>
+                    <span>WhatsApp</span>
+                </a>
+            </nav>
+
+            <div class="lab-header__nav">
+                <nav class="lab-nav" aria-label="Main navigation">
+                    <a href="/index.html">Home</a>
+                    <a href="/fleet.html">Fleet</a>
+
+                    <div class="lab-nav__item lab-nav__item--has-panel js-nav-mega">
+                        <button
+                            type="button"
+                            class="lab-nav__trigger"
+                            aria-expanded="false"
+                            aria-controls="lab-nav-brands-panel"
+                        >
+                            <span>Cars Brands</span>
+                            <span class="lab-nav__chevron" aria-hidden="true"></span>
+                        </button>
+
+                        <div class="lab-nav__panel lab-nav__panel--brands" id="lab-nav-brands-panel">
+                            <div class="lab-nav__panel-grid lab-nav__panel-grid--brands">
+                                <a class="lab-nav__card lab-nav__card--brand" href="/lamborghini-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--brand">
+                                        <img src="/images/brands/lamborghini-mark.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Lamborghini</strong>
+                                        <span>Huracan and Urus selection.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--brand" href="/ferrari-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--brand">
+                                        <img src="/images/brands/ferrari-mark.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Ferrari</strong>
+                                        <span>Convertible-led flagship moments.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--brand" href="/mercedes-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--brand">
+                                        <img src="/images/brands/mercedes-mark.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Mercedes</strong>
+                                        <span>G-Class and executive balance.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--brand" href="/porsche-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--brand">
+                                        <img src="/images/brands/porsche-mark.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Porsche</strong>
+                                        <span>Focused driver-first delivery.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--brand" href="/rolls-royce-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--brand">
+                                        <img src="/images/brands/rolls-royce-mark.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Rolls-Royce</strong>
+                                        <span>Arrival-first quiet authority.</span>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lab-nav__item lab-nav__item--has-panel js-nav-mega">
+                        <button
+                            type="button"
+                            class="lab-nav__trigger"
+                            aria-expanded="false"
+                            aria-controls="lab-nav-types-panel"
+                        >
+                            <span>Cars Types</span>
+                            <span class="lab-nav__chevron" aria-hidden="true"></span>
+                        </button>
+
+                        <div class="lab-nav__panel lab-nav__panel--types" id="lab-nav-types-panel">
+                            <div class="lab-nav__panel-grid lab-nav__panel-grid--types">
+                                <a class="lab-nav__card lab-nav__card--type" href="/luxury-car-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--type">
+                                        <img src="/images/categories/mock-fastpng/luxury-stage.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Luxury Cars</strong>
+                                        <span>Comfort-first arrivals and city stays.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--type" href="/ferrari-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--type">
+                                        <img src="/images/categories/mock-fastpng/convertible-stage.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Convertible Cars</strong>
+                                        <span>Open-top Dubai movement with presence.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--type" href="/supercar-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--type">
+                                        <img src="/images/categories/mock-fastpng/sports-stage.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Sports Cars</strong>
+                                        <span>Sharper performance-led picks.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--type" href="/fleet.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--type">
+                                        <img src="/images/categories/mock-fastpng/electric-stage.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>Electric Cars</strong>
+                                        <span>Quiet torque for cleaner city routes.</span>
+                                    </span>
+                                </a>
+
+                                <a class="lab-nav__card lab-nav__card--type" href="/luxury-car-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--type">
+                                        <img src="/images/categories/mock-fastpng/suv-stage.png" alt="">
+                                    </span>
+                                    <span class="lab-nav__card-copy">
+                                        <strong>SUV Cars</strong>
+                                        <span>Room, height and hotel-ready comfort.</span>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="/services.html">Services</a>
+                    <a href="/locations.html" aria-current="page">Locations</a>
+                    <a href="/about.html">About Us</a>
+                    <a href="/contact.html">Contact</a>
+                </nav>
+            <a href="/app/reserve/page.html" class="lab-reserve">Reserve</a>
+            </div>
+        </div>
+    </header>
   <main class="lab-main local-guide-main">
     <section class="local-guide-hero"><div class="lab-shell local-guide-hero__shell">
       <div class="local-guide-hero__content"><div class="local-guide-hero__mark" aria-hidden="true"><img src="./logo-dp-transparent.png" alt=""></div><nav class="local-guide-breadcrumb" aria-label="Breadcrumb"><a href="./index.html">Home</a><a href="./locations.html">Locations</a><span aria-current="page">Palm Jumeirah</span></nav><span class="hero-lab__eyebrow">Palm Jumeirah luxury car rental</span><h1>Luxury car rental on Palm Jumeirah, shaped around resorts, villas and branded residences.</h1><p class="local-guide-hero__lead">Palm Jumeirah bookings are less about generic city movement and more about the stay itself: beach resorts, villa access, branded residences, luggage, guests and a handover style that feels clean and premium from the first minute.</p><div class="local-guide-hero__actions"><a href="./app/reserve/page.html" class="local-guide-button local-guide-button--primary" data-analytics-event="location_reservation_click" data-analytics-cluster="locations" data-analytics-location="palm_jumeirah_guide" data-analytics-placement="hero" data-analytics-channel="reservation">Book Palm delivery</a><a href="./fleet.html" class="local-guide-button local-guide-button--secondary">Browse fleet</a></div><div class="local-guide-hero__pills"><span class="local-guide-hero__pill">Resorts, villas and residences</span><span class="local-guide-hero__pill">Quiet premium handovers</span><span class="local-guide-hero__pill">Beachfront stay patterns</span></div></div>

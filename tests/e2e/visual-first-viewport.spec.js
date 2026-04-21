@@ -132,8 +132,8 @@ const seoLandingViewportCases = [
     { path: '/ferrari-rental-dubai.html', title: 'Ferrari 296 GTS', expectedHeading: 'Ferrari 296 GTS', requireBookingPanel: true },
     { path: '/porsche-rental-dubai.html', title: 'Porsche 992 GT3', expectedHeading: 'Porsche 992 GT3', requireBookingPanel: true },
     { path: '/rolls-royce-rental-dubai.html', title: 'Cullinan Black Badge', expectedHeading: 'Cullinan Black Badge', requireBookingPanel: true },
-    { path: '/lamborghini-rental-dubai.html', title: 'Rent a Lamborghini in Dubai', expectedHeading: 'Huracan EVO Spyder', requireBookingPanel: false },
-    { path: '/mercedes-rental-dubai.html', title: 'Mercedes G63 AMG rental Dubai', expectedHeading: 'Mercedes G63 AMG', requireBookingPanel: false }
+    { path: '/lamborghini-rental-dubai.html', title: 'Rent a Lamborghini in Dubai', expectedHeading: 'Rent a Lamborghini in Dubai', requireBookingPanel: false },
+    { path: '/mercedes-rental-dubai.html', title: 'Mercedes G63 AMG rental Dubai', expectedHeading: 'Mercedes G63 AMG rental Dubai', requireBookingPanel: false }
 ];
 
 for (const landing of seoLandingViewportCases) {

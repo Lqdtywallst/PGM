@@ -12,6 +12,17 @@ const {
     stopProcess
 } = require(path.join(__dirname, '..', 'server', 'site-audit-utils.js'));
 const {
+    getViewportCoverageMatrix
+} = require(path.join(__dirname, '..', 'server', 'design-system-contract.js'));
+const {
+    buildCustomerJourneyCoverage,
+    buildCustomerJourneyMarkdownSection
+} = require(path.join(__dirname, '..', 'server', 'customer-journey-contract.js'));
+const {
+    buildFunctionalHumanReview,
+    buildFunctionalReviewMarkdownSection
+} = require(path.join(__dirname, '..', 'server', 'functional-audit-core.js'));
+const {
     createConsoleTracker,
     normalizeConsoleErrors,
     primeHomeAnimations,
@@ -24,11 +35,21 @@ const {
 
 const repoRoot = path.resolve(__dirname, '..');
 const artifactsRoot = path.join(repoRoot, 'artifacts', 'functional-agent');
-const VIEWPORTS = Object.freeze([
-    { name: 'mobile-modern', width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 3 },
-    { name: 'tablet-portrait', width: 768, height: 1024, isMobile: true, hasTouch: true, deviceScaleFactor: 2 },
-    { name: 'desktop-wide', width: 1366, height: 900, isMobile: false, hasTouch: false, deviceScaleFactor: 1 }
-]);
+const VIEWPORTS = Object.freeze(getViewportCoverageMatrix('functional'));
+const DEFAULT_ACTION_LIMITS = Object.freeze({
+    maxLinksPerPage: 8,
+    maxButtonsPerPage: 6,
+    maxSummariesPerPage: 4,
+    maxSelectsPerPage: 4,
+    maxOptionsPerSelect: 8
+});
+const DEEP_ACTION_LIMITS = Object.freeze({
+    maxLinksPerPage: Number.MAX_SAFE_INTEGER,
+    maxButtonsPerPage: Number.MAX_SAFE_INTEGER,
+    maxSummariesPerPage: Number.MAX_SAFE_INTEGER,
+    maxSelectsPerPage: Number.MAX_SAFE_INTEGER,
+    maxOptionsPerSelect: Number.MAX_SAFE_INTEGER
+});
 
 function normalizeRoute(route) {
     const pathname = String(route || '/').trim().split(/[?#]/)[0] || '/';
@@ -50,12 +71,94 @@ function slugify(value) {
         .slice(0, 72) || 'action';
 }
 
+function escapeCssAttribute(value) {
+    return String(value || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
 function timestampSlug(date = new Date()) {
     return date.toISOString().replace(/[:.]/g, '-');
 }
 
 function ensureDir(targetPath) {
     fs.mkdirSync(targetPath, { recursive: true });
+}
+
+function copyFileIfPresent(sourcePath, destinationPath) {
+    if (!sourcePath || !fs.existsSync(sourcePath)) {
+        return false;
+    }
+
+    ensureDir(path.dirname(destinationPath));
+    fs.copyFileSync(sourcePath, destinationPath);
+    return true;
+}
+
+function extensionForScreenshot(sourcePath) {
+    const extension = path.extname(sourcePath || '').toLowerCase();
+    return ['.png', '.jpg', '.jpeg', '.webp'].includes(extension) ? extension : '.png';
+}
+
+function buildFunctionalHumanReviewArtifacts(pages, runDir) {
+    const reviewDir = path.join(runDir, 'human-review', 'functional-failures');
+    const entries = [];
+    let index = 0;
+
+    const enrichedPages = pages.map((page) => {
+        const actions = (page.actions || []).map((action) => {
+            if (action.status !== 'failed') {
+                return action;
+            }
+
+            index += 1;
+            const filename = `${String(index).padStart(3, '0')}-${slugify(page.route)}-${slugify(page.viewport)}-${slugify(action.id || action.label)}${extensionForScreenshot(action.screenshotPath)}`;
+            const reviewScreenshotPath = path.join(reviewDir, filename);
+            const copied = copyFileIfPresent(action.screenshotPath, reviewScreenshotPath);
+            const entry = {
+                id: `functional-${String(index).padStart(3, '0')}`,
+                route: page.route,
+                viewport: page.viewport,
+                actionId: action.id,
+                label: action.label,
+                kind: action.kind,
+                message: action.message,
+                observedUrl: action.observedUrl || '',
+                sourceScreenshotPath: action.screenshotPath || '',
+                reviewScreenshotPath: copied ? reviewScreenshotPath : '',
+                screenshotMissing: !copied
+            };
+
+            entries.push(entry);
+
+            return {
+                ...action,
+                humanReviewScreenshotPath: entry.reviewScreenshotPath,
+                humanReviewId: entry.id
+            };
+        });
+
+        return {
+            ...page,
+            actions
+        };
+    });
+
+    const manifest = {
+        generatedAt: new Date().toISOString(),
+        kind: 'functional',
+        totalFailures: entries.length,
+        screenshots: entries.filter((entry) => entry.reviewScreenshotPath).length,
+        missingScreenshots: entries.filter((entry) => entry.screenshotMissing).length,
+        directory: reviewDir,
+        entries
+    };
+
+    ensureDir(reviewDir);
+    fs.writeFileSync(path.join(reviewDir, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
+
+    return {
+        pages: enrichedPages,
+        manifest
+    };
 }
 
 function formatError(error) {
@@ -100,10 +203,9 @@ function parseArgs(argv) {
         viewports: [],
         baseUrl: process.env.PLAYWRIGHT_BASE_URL || '',
         outputDir: '',
-        maxLinksPerPage: 8,
-        maxButtonsPerPage: 6,
-        maxSummariesPerPage: 4,
-        maxSelectsPerPage: 4
+        coverageMode: 'bounded',
+        deep: false,
+        ...DEFAULT_ACTION_LIMITS
     };
 
     for (let index = 0; index < argv.length; index += 1) {
@@ -129,6 +231,20 @@ function parseArgs(argv) {
 
         if (value === '--output-dir' && argv[index + 1]) {
             args.outputDir = argv[index + 1];
+            index += 1;
+            continue;
+        }
+
+        if (value === '--deep' || value === '--exhaustive') {
+            args.deep = true;
+            args.coverageMode = 'deep';
+            Object.assign(args, DEEP_ACTION_LIMITS);
+            continue;
+        }
+
+        if (value === '--coverage-mode' && argv[index + 1]) {
+            args.coverageMode = String(argv[index + 1]).trim() || args.coverageMode;
+            args.deep = args.coverageMode === 'deep';
             index += 1;
             continue;
         }
@@ -166,13 +282,22 @@ function parseArgs(argv) {
                 args.maxSelectsPerPage = parsed;
             }
             index += 1;
+            continue;
+        }
+
+        if (value === '--max-options-per-select' && argv[index + 1]) {
+            const parsed = Number.parseInt(argv[index + 1], 10);
+            if (Number.isFinite(parsed) && parsed > 0) {
+                args.maxOptionsPerSelect = parsed;
+            }
+            index += 1;
         }
     }
 
     return args;
 }
 
-function buildReportSummary(pages) {
+function buildReportSummary(pages, functionalReview = null) {
     const actions = pages.flatMap((page) => page.actions);
     const failedActions = actions.filter((action) => action.status === 'failed');
     const passedActions = actions.filter((action) => action.status === 'passed');
@@ -183,7 +308,7 @@ function buildReportSummary(pages) {
         page.actions.some((action) => action.status === 'failed')
     ));
 
-    return {
+    const summary = {
         totalRoutes: new Set(pages.map((page) => page.route)).size,
         totalPageRuns: pages.length,
         totalViewports: new Set(pages.map((page) => page.viewport)).size,
@@ -192,6 +317,72 @@ function buildReportSummary(pages) {
         failedActions: failedActions.length,
         skippedActions: skippedActions.length,
         pagesWithFailures: pagesWithFailures.length
+    };
+
+    if (functionalReview) {
+        summary.functionalStatus = functionalReview.status;
+        summary.functionalFindings = functionalReview.summary.total;
+        summary.functionalHardFails = functionalReview.summary.hardFails;
+        summary.coverageMode = functionalReview.coverageProfile?.mode || 'unknown';
+        summary.truncatedTargets = functionalReview.coverageProfile?.truncatedTargetCount || 0;
+    }
+
+    return summary;
+}
+
+function normalizeLimit(value) {
+    return Number.isFinite(value) && value > 0 ? value : Number.MAX_SAFE_INTEGER;
+}
+
+function sumDiscoveredStats(stats = {}) {
+    return Number(stats.truncatedLinks || 0) +
+        Number(stats.truncatedToggleButtons || 0) +
+        Number(stats.truncatedSummaries || 0) +
+        Number(stats.truncatedSelects || 0) +
+        Number(stats.truncatedSelectOptions || 0);
+}
+
+function buildCoverageProfile({ pages, selectedRoutes, selectedViewports, options }) {
+    const publicRoutes = Object.keys(PUBLIC_PAGE_FILE_MAP).map((route) => normalizeRoute(route));
+    const checkedRoutes = [...new Set((selectedRoutes || []).map((route) => normalizeRoute(route)))];
+    const checkedViewports = [...new Set((selectedViewports || []).map((viewport) => viewport.name))];
+    const functionalViewports = VIEWPORTS.map((viewport) => viewport.name);
+    const missingRoutes = publicRoutes.filter((route) => !checkedRoutes.includes(route));
+    const missingViewports = functionalViewports.filter((viewport) => !checkedViewports.includes(viewport));
+    const truncatedPages = [];
+    let truncatedTargetCount = 0;
+
+    for (const page of pages || []) {
+        const truncatedTargets = sumDiscoveredStats(page.coverage?.discoveredStats || {});
+        if (truncatedTargets > 0) {
+            truncatedTargetCount += truncatedTargets;
+            truncatedPages.push({
+                route: page.route,
+                viewport: page.viewport,
+                truncatedTargets
+            });
+        }
+    }
+
+    return {
+        mode: options.coverageMode || (options.deep ? 'deep' : 'bounded'),
+        totalPublicRoutes: publicRoutes.length,
+        checkedRouteCount: checkedRoutes.length,
+        allPublicRoutesChecked: missingRoutes.length === 0,
+        missingRoutes,
+        totalFunctionalViewports: functionalViewports.length,
+        checkedViewportCount: checkedViewports.length,
+        allFunctionalViewportsChecked: missingViewports.length === 0,
+        missingViewports,
+        truncatedTargetCount,
+        truncatedPages,
+        actionCaps: {
+            maxLinksPerPage: normalizeLimit(options.maxLinksPerPage),
+            maxButtonsPerPage: normalizeLimit(options.maxButtonsPerPage),
+            maxSummariesPerPage: normalizeLimit(options.maxSummariesPerPage),
+            maxSelectsPerPage: normalizeLimit(options.maxSelectsPerPage),
+            maxOptionsPerSelect: normalizeLimit(options.maxOptionsPerSelect)
+        }
     };
 }
 
@@ -212,9 +403,20 @@ function buildMarkdownReport(report) {
         `- failed actions: ${report.summary.failedActions}`,
         `- skipped actions: ${report.summary.skippedActions}`,
         `- pages with failures: ${report.summary.pagesWithFailures}`,
-        '',
-        '## Pages'
+        `- human review screenshots: ${report.humanReview?.screenshots || 0}/${report.humanReview?.totalFailures || 0}`,
+        ''
     ];
+
+    lines.push('## Human Review Screenshots');
+    lines.push('');
+    lines.push(`- directory: ${report.humanReview?.directory || 'n/a'}`);
+    lines.push(`- screenshots: ${report.humanReview?.screenshots || 0}`);
+    lines.push(`- missing screenshots: ${report.humanReview?.missingScreenshots || 0}`);
+    lines.push('');
+
+    lines.push(...buildCustomerJourneyMarkdownSection(report.customerJourneys));
+    lines.push('', ...buildFunctionalReviewMarkdownSection(report.functionalReview));
+    lines.push('', '## Pages');
 
     for (const page of report.pages) {
         const pageFailures = page.actions.filter((action) => action.status === 'failed');
@@ -249,6 +451,9 @@ function buildMarkdownReport(report) {
                 }
                 if (action.screenshotPath) {
                     lines.push(`    - screenshot: ${action.screenshotPath}`);
+                }
+                if (action.humanReviewScreenshotPath) {
+                    lines.push(`    - human review screenshot: ${action.humanReviewScreenshotPath}`);
                 }
             });
         }
@@ -442,7 +647,7 @@ async function collectPageMeta(page) {
 }
 
 async function discoverInteractiveTargets(page, currentRoute, options) {
-    return page.evaluate(({ route, maxLinks, maxButtons, maxSummaries, maxSelects }) => {
+    return page.evaluate(({ route, maxLinks, maxButtons, maxSummaries, maxSelects, maxOptions }) => {
         function isVisible(element) {
             if (!(element instanceof HTMLElement)) {
                 return false;
@@ -521,7 +726,24 @@ async function discoverInteractiveTargets(page, currentRoute, options) {
             links: [],
             toggleButtons: [],
             summaries: [],
-            selects: []
+            selects: [],
+            stats: {
+                visibleLinks: 0,
+                visibleToggleButtons: 0,
+                visibleSummaries: 0,
+                visibleSelects: 0,
+                visibleSelectOptions: 0,
+                collectedLinks: 0,
+                collectedToggleButtons: 0,
+                collectedSummaries: 0,
+                collectedSelects: 0,
+                collectedSelectOptions: 0,
+                truncatedLinks: 0,
+                truncatedToggleButtons: 0,
+                truncatedSummaries: 0,
+                truncatedSelects: 0,
+                truncatedSelectOptions: 0
+            }
         };
 
         for (const link of document.querySelectorAll('header a[href], main a[href], footer a[href]')) {
@@ -554,6 +776,7 @@ async function discoverInteractiveTargets(page, currentRoute, options) {
                 continue;
             }
 
+            output.stats.visibleLinks += 1;
             limitedPush(output.links, {
                 label,
                 href,
@@ -578,6 +801,7 @@ async function discoverInteractiveTargets(page, currentRoute, options) {
             }
 
             dedupe.buttons.add(dedupeKey);
+            output.stats.visibleToggleButtons += 1;
             limitedPush(output.toggleButtons, {
                 label,
                 selector: buildSelector(button),
@@ -599,6 +823,7 @@ async function discoverInteractiveTargets(page, currentRoute, options) {
             }
 
             dedupe.summaries.add(dedupeKey);
+            output.stats.visibleSummaries += 1;
             limitedPush(output.summaries, {
                 label,
                 selector: buildSelector(summary),
@@ -635,13 +860,26 @@ async function discoverInteractiveTargets(page, currentRoute, options) {
             }
 
             dedupe.selects.add(dedupeKey);
+            output.stats.visibleSelects += 1;
+            output.stats.visibleSelectOptions += selectableOptions.length;
             limitedPush(output.selects, {
                 label,
                 selector: buildSelector(select),
                 currentValue: select.value,
-                options: selectableOptions.slice(0, 8)
+                options: selectableOptions.slice(0, maxOptions)
             }, maxSelects);
         }
+
+        output.stats.collectedLinks = output.links.length;
+        output.stats.collectedToggleButtons = output.toggleButtons.length;
+        output.stats.collectedSummaries = output.summaries.length;
+        output.stats.collectedSelects = output.selects.length;
+        output.stats.collectedSelectOptions = output.selects.reduce((total, select) => total + select.options.length, 0);
+        output.stats.truncatedLinks = Math.max(0, output.stats.visibleLinks - output.links.length);
+        output.stats.truncatedToggleButtons = Math.max(0, output.stats.visibleToggleButtons - output.toggleButtons.length);
+        output.stats.truncatedSummaries = Math.max(0, output.stats.visibleSummaries - output.summaries.length);
+        output.stats.truncatedSelects = Math.max(0, output.stats.visibleSelects - output.selects.length);
+        output.stats.truncatedSelectOptions = Math.max(0, output.stats.visibleSelectOptions - output.stats.collectedSelectOptions);
 
         return output;
     }, {
@@ -649,7 +887,8 @@ async function discoverInteractiveTargets(page, currentRoute, options) {
         maxLinks: options.maxLinksPerPage,
         maxButtons: options.maxButtonsPerPage,
         maxSummaries: options.maxSummariesPerPage,
-        maxSelects: options.maxSelectsPerPage
+        maxSelects: options.maxSelectsPerPage,
+        maxOptions: options.maxOptionsPerSelect
     });
 }
 
@@ -723,7 +962,15 @@ function createLinkAction(descriptor) {
                 };
             }
 
-            const locator = page.locator(descriptor.selector).first();
+            let locator = page
+                .locator(`a[href="${escapeCssAttribute(descriptor.href)}"]:visible`)
+                .filter({ hasText: descriptor.label })
+                .first();
+
+            if (await locator.count() === 0) {
+                locator = page.locator(descriptor.selector).first();
+            }
+
             await expect(locator).toBeVisible();
             await locator.scrollIntoViewIfNeeded();
 
@@ -831,17 +1078,14 @@ function createSummaryToggleAction(descriptor) {
     };
 }
 
-function createSelectCycleAction(descriptor) {
+function createSelectOptionAction(descriptor, targetOption) {
     return {
-        id: `select-${slugify(descriptor.label)}`,
-        label: `Select: ${descriptor.label}`,
+        id: `select-${slugify(descriptor.label)}-${slugify(targetOption?.value || targetOption?.label)}`,
+        label: `Select: ${descriptor.label} -> ${targetOption?.label || targetOption?.value}`,
         kind: 'select',
         async run(page) {
             const locator = page.locator(descriptor.selector).first();
             await expect(locator).toBeVisible();
-
-            const targetOption = descriptor.options.find((option) => option.value !== descriptor.currentValue && option.value !== '')
-                || descriptor.options.find((option) => option.value !== descriptor.currentValue);
 
             if (!targetOption) {
                 throw new Error(`No alternative option found for select "${descriptor.label}".`);
@@ -856,6 +1100,13 @@ function createSelectCycleAction(descriptor) {
             };
         }
     };
+}
+
+function createSelectCycleAction(descriptor) {
+    const targetOption = descriptor.options.find((option) => option.value !== descriptor.currentValue && option.value !== '')
+        || descriptor.options.find((option) => option.value !== descriptor.currentValue);
+
+    return createSelectOptionAction(descriptor, targetOption);
 }
 
 function createHomeNavigationAction() {
@@ -1282,10 +1533,19 @@ async function buildRouteActions(route, page, options, viewport) {
     actions.push(...discovered.links.map(createLinkAction));
     actions.push(...discovered.toggleButtons.map(createToggleButtonAction));
     actions.push(...discovered.summaries.map(createSummaryToggleAction));
-    actions.push(...discovered.selects.map(createSelectCycleAction));
+    if (options.deep) {
+        for (const select of discovered.selects) {
+            select.options
+                .filter((option) => option.value !== select.currentValue)
+                .forEach((option) => actions.push(createSelectOptionAction(select, option)));
+        }
+    } else {
+        actions.push(...discovered.selects.map(createSelectCycleAction));
+    }
 
     return {
         meta,
+        discoveredStats: discovered.stats || {},
         actions: dedupeActions(actions)
     };
 }
@@ -1296,7 +1556,7 @@ async function auditRoute(browser, baseUrl, route, viewport, runDir, options) {
     ensureDir(routeDir);
 
     try {
-        const { meta, actions } = await buildRouteActions(route, session.page, options, viewport);
+        const { meta, discoveredStats, actions } = await buildRouteActions(route, session.page, options, viewport);
         const title = meta.title || '';
         const actionsReport = [];
 
@@ -1310,7 +1570,10 @@ async function auditRoute(browser, baseUrl, route, viewport, runDir, options) {
             title,
             actions: actionsReport,
             consoleErrors: extractConsoleErrors(session.consoleErrors),
-            requestFailures: session.requestFailures.slice(0, 10)
+            requestFailures: session.requestFailures.slice(0, 10),
+            coverage: {
+                discoveredStats
+            }
         };
     } finally {
         await session.context.close();
@@ -1341,11 +1604,31 @@ async function runFunctionalAgent(options = {}) {
             }
         }
 
+        const humanReviewArtifacts = buildFunctionalHumanReviewArtifacts(pages, runDir);
+        const enrichedPages = humanReviewArtifacts.pages;
+        const customerJourneys = buildCustomerJourneyCoverage(enrichedPages);
+        const coverageProfile = buildCoverageProfile({
+            pages: enrichedPages,
+            selectedRoutes,
+            selectedViewports,
+            options: args
+        });
+        const functionalReview = buildFunctionalHumanReview({ pages: enrichedPages, customerJourneys, coverageProfile });
         const report = {
             generatedAt,
             baseUrl,
-            summary: buildReportSummary(pages),
-            pages
+            summary: buildReportSummary(enrichedPages, functionalReview),
+            humanReview: {
+                kind: humanReviewArtifacts.manifest.kind,
+                directory: humanReviewArtifacts.manifest.directory,
+                totalFailures: humanReviewArtifacts.manifest.totalFailures,
+                screenshots: humanReviewArtifacts.manifest.screenshots,
+                missingScreenshots: humanReviewArtifacts.manifest.missingScreenshots,
+                manifestPath: path.join(humanReviewArtifacts.manifest.directory, 'manifest.json')
+            },
+            customerJourneys,
+            functionalReview,
+            pages: enrichedPages
         };
 
         fs.writeFileSync(path.join(runDir, 'report.json'), `${JSON.stringify(report, null, 2)}\n`);
@@ -1369,6 +1652,12 @@ async function main() {
 
     console.log(`Functional agent completed: ${runDir}`);
     console.log(`routes=${report.summary.totalRoutes} actions=${report.summary.totalActions} failed=${report.summary.failedActions}`);
+    console.log(`customerScenarios=${report.customerJourneys.summary.totalScenarios} covered=${report.customerJourneys.summary.covered} partial=${report.customerJourneys.summary.partial} failed=${report.customerJourneys.summary.failed}`);
+    console.log(`functionalStatus=${report.functionalReview.status} findings=${report.functionalReview.summary.total} hardFails=${report.functionalReview.summary.hardFails} mode=${report.summary.coverageMode} truncatedTargets=${report.summary.truncatedTargets}`);
+
+    if (report.functionalReview.status === 'bad') {
+        process.exitCode = 1;
+    }
 }
 
 if (require.main === module) {
@@ -1380,6 +1669,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+    buildCoverageProfile,
     buildMarkdownReport,
     buildReportSummary,
     parseArgs,

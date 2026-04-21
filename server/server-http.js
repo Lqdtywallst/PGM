@@ -4,6 +4,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const zlib = require('zlib');
 const { siteFileForPublicPath } = require('./public-page-map');
 
 const PORT = Number(process.env.PORT || 8080);
@@ -47,6 +48,13 @@ const MIME_TYPES = {
     '.woff': 'font/woff',
     '.woff2': 'font/woff2'
 };
+const COMPRESSIBLE_TYPES = new Set([
+    'application/javascript',
+    'application/json',
+    'image/svg+xml',
+    'text/css',
+    'text/html'
+]);
 
 function buildCacheHeaders(filePath) {
     const normalizedPath = String(filePath || '').toLowerCase();
@@ -77,6 +85,42 @@ function buildSecurityHeaders() {
         'X-Content-Type-Options': 'nosniff',
         'X-Frame-Options': 'DENY'
     };
+}
+
+function getPreferredCompression(requestHeaders = {}, contentType = '', contentLength = 0) {
+    const acceptEncoding = String(requestHeaders['accept-encoding'] || '');
+
+    if (!COMPRESSIBLE_TYPES.has(contentType) || contentLength < 1024) {
+        return null;
+    }
+
+    if (/\bbr\b/i.test(acceptEncoding)) {
+        return 'br';
+    }
+
+    if (/\bgzip\b/i.test(acceptEncoding)) {
+        return 'gzip';
+    }
+
+    return null;
+}
+
+function compressContent(content, encoding, callback) {
+    if (encoding === 'br') {
+        zlib.brotliCompress(content, {
+            params: {
+                [zlib.constants.BROTLI_PARAM_QUALITY]: 5
+            }
+        }, callback);
+        return;
+    }
+
+    if (encoding === 'gzip') {
+        zlib.gzip(content, callback);
+        return;
+    }
+
+    callback(null, content);
 }
 
 function sanitizeRequestPath(rawUrl) {
@@ -143,15 +187,37 @@ const server = http.createServer((req, res) => {
             }
         } else {
             console.log(`File served: ${filePath}`);
-            res.writeHead(200, {
+            const compression = getPreferredCompression(req.headers, contentType, content.length);
+            const baseHeaders = {
                 'Content-Type': contentType,
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
                 'Access-Control-Allow-Headers': 'Content-Type',
                 ...buildCacheHeaders(filePath),
                 ...buildSecurityHeaders()
+            };
+
+            if (!compression) {
+                res.writeHead(200, baseHeaders);
+                res.end(content);
+                return;
+            }
+
+            compressContent(content, compression, (compressionError, compressedContent) => {
+                if (compressionError) {
+                    console.error(`Compression failed for ${filePath}: ${compressionError.code || compressionError.message}`);
+                    res.writeHead(200, baseHeaders);
+                    res.end(content);
+                    return;
+                }
+
+                res.writeHead(200, {
+                    ...baseHeaders,
+                    'Content-Encoding': compression,
+                    Vary: 'Accept-Encoding'
+                });
+                res.end(compressedContent);
             });
-            res.end(content, 'utf-8');
         }
     });
 });

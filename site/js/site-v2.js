@@ -460,7 +460,23 @@ function initSiteV2() {
     if (megaNavItems.length > 0) {
         let megaMenuCloseTimer = null;
 
+        function hydrateMegaMenuImages(item) {
+            item?.querySelectorAll("img[data-src]").forEach((image) => {
+                const source = image.getAttribute("data-src");
+                if (!source) {
+                    return;
+                }
+
+                image.src = source;
+                image.removeAttribute("data-src");
+            });
+        }
+
         function setMegaMenuState(openItem = null) {
+            if (openItem) {
+                hydrateMegaMenuImages(openItem);
+            }
+
             megaNavItems.forEach((item) => {
                 const trigger = item.querySelector(".lab-nav__trigger");
                 const isOpen = item === openItem;
@@ -597,7 +613,7 @@ function initSiteV2() {
                 <div class="lab-mobile-drawer__header">
                     <div class="lab-mobile-drawer__brand">
                         <span class="lab-mobile-drawer__crest" aria-hidden="true">
-                            <img src="/images/dp-crest-cropped.png" alt="">
+                            <img src="/icons/icon-192.png" width="192" height="192" loading="lazy" decoding="async" alt="">
                         </span>
                         <div class="lab-mobile-drawer__brand-copy">
                             <strong>Dynasty Prestige</strong>
@@ -637,6 +653,7 @@ function initSiteV2() {
         `;
 
         document.body.appendChild(drawer);
+        drawer.setAttribute("inert", "");
 
         function setDrawerState(isOpen) {
             document.body.classList.toggle("lab-mobile-nav-open", isOpen);
@@ -644,6 +661,12 @@ function initSiteV2() {
             toggle.classList.toggle("is-open", isOpen);
             drawer.setAttribute("aria-hidden", String(!isOpen));
             toggle.setAttribute("aria-expanded", String(isOpen));
+
+            if (isOpen) {
+                drawer.removeAttribute("inert");
+            } else {
+                drawer.setAttribute("inert", "");
+            }
 
             if (isOpen) {
                 emitAnalyticsEvent("mobile_menu_open", {

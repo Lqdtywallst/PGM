@@ -4,6 +4,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 
 const { PUBLIC_PAGE_FILE_MAP } = require(path.join(__dirname, '..', 'server', 'public-page-map.js'));
+const { getViewportCoverageMatrix } = require(path.join(__dirname, '..', 'server', 'design-system-contract.js'));
 const { startStaticServer, stopProcess } = require(path.join(__dirname, '..', 'server', 'site-audit-utils.js'));
 const { runVisualAgent } = require(path.join(__dirname, 'run-visual-agent.js'));
 const { runFunctionalAgent } = require(path.join(__dirname, 'run-functional-agent.js'));
@@ -11,6 +12,7 @@ const { runFunctionalAgent } = require(path.join(__dirname, 'run-functional-agen
 const repoRoot = path.resolve(__dirname, '..');
 const artifactsRoot = path.join(repoRoot, 'artifacts', 'mobile-pro-audit');
 const responsiveSpecPath = 'tests/e2e/responsive-audit.spec.js';
+const MOBILE_VIEWPORT_NAMES = new Set(getViewportCoverageMatrix('mobile').map((viewport) => viewport.name));
 
 const CORE_ROUTES = Object.freeze([
     '/',
@@ -317,7 +319,9 @@ function runResponsiveMobileSweep(baseUrl, runDir) {
     }
 
     const tests = flattenPlaywrightSpecs(parsed.suites || []);
-    const mobileTests = tests.filter((test) => /mobile-small|mobile-modern/i.test(test.title));
+    const mobileTests = tests.filter((test) => (
+        [...MOBILE_VIEWPORT_NAMES].some((viewportName) => test.title.includes(viewportName))
+    ));
     const failed = mobileTests.filter((test) => test.status !== 'passed');
     const passed = mobileTests.filter((test) => test.status === 'passed');
 
@@ -423,7 +427,7 @@ function runLighthouseAudit(baseUrl, routes, runDir) {
 }
 
 function buildVisualSummary(report) {
-    const mobilePages = (report.pages || []).filter((page) => page.viewport === 'mobile-modern');
+    const mobilePages = (report.pages || []).filter((page) => MOBILE_VIEWPORT_NAMES.has(page.viewport));
     const summary = {
         total: mobilePages.length,
         good: mobilePages.filter((page) => page.assessment?.status === 'good').length,
@@ -449,7 +453,7 @@ function buildVisualSummary(report) {
 }
 
 function buildFunctionalSummary(report) {
-    const mobilePages = (report.pages || []).filter((page) => page.viewport === 'mobile-modern');
+    const mobilePages = (report.pages || []).filter((page) => MOBILE_VIEWPORT_NAMES.has(page.viewport));
     const totalActions = mobilePages.reduce((sum, page) => sum + (page.actions || []).length, 0);
     const failedActions = mobilePages.reduce((sum, page) => (
         sum + (page.actions || []).filter((action) => action.status === 'failed').length
@@ -687,14 +691,14 @@ async function runMobileProAudit(options = {}) {
         const responsive = args.skipResponsive ? null : runResponsiveMobileSweep(baseUrl, runDir);
         const visualRun = args.skipVisual ? null : await runVisualAgent({
             routes,
-            viewports: ['mobile-modern'],
+            viewports: [...MOBILE_VIEWPORT_NAMES],
             baseUrl,
             outputDir: path.join(runDir, 'visual-agent'),
             includeFleetClicks: false
         });
         const functionalRun = args.skipFunctional ? null : await runFunctionalAgent({
             routes,
-            viewports: ['mobile-modern'],
+            viewports: [...MOBILE_VIEWPORT_NAMES].filter((viewportName) => viewportName !== 'mobile-large'),
             baseUrl,
             outputDir: path.join(runDir, 'functional-agent')
         });

@@ -4,6 +4,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 
 const { PUBLIC_PAGE_FILE_MAP } = require(path.join(__dirname, '..', 'server', 'public-page-map.js'));
+const { getViewportCoverageMatrix } = require(path.join(__dirname, '..', 'server', 'design-system-contract.js'));
 const { getDefaultVisualRoutes, normalizeRoute } = require(path.join(__dirname, '..', 'server', 'visual-audit-core.js'));
 const { startStaticServer, stopProcess } = require(path.join(__dirname, '..', 'server', 'site-audit-utils.js'));
 const { runVisualAgent } = require(path.join(__dirname, 'run-visual-agent.js'));
@@ -15,13 +16,7 @@ const FIRST_VIEWPORT_SPECS = Object.freeze([
     'tests/e2e/visual-first-viewport.spec.js',
     'tests/e2e/visual-route-entrypoints.spec.js'
 ]);
-const DEFAULT_VIEWPORTS = Object.freeze([
-    'mobile-small',
-    'mobile-modern',
-    'tablet-portrait',
-    'laptop',
-    'desktop-wide'
-]);
+const DEFAULT_VIEWPORTS = Object.freeze(getViewportCoverageMatrix('visualAgent').map((viewport) => viewport.name));
 
 function timestampSlug(date = new Date()) {
     return date.toISOString().replace(/[:.]/g, '-');

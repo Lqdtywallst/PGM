@@ -4,12 +4,11 @@ const {
     expectNoConsoleErrors,
     settlePage
 } = require('./support/site-helpers');
+const { getViewportCoverageMatrix } = require('../../server/design-system-contract');
 
-const serviceViewports = [
-    { name: 'mobile-modern', width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 3 },
-    { name: 'tablet-portrait', width: 768, height: 1024, isMobile: true, hasTouch: true, deviceScaleFactor: 2 },
-    { name: 'desktop-wide', width: 1366, height: 900, isMobile: false, hasTouch: false, deviceScaleFactor: 1 }
-];
+const serviceViewports = ['mobile-modern', 'tablet-portrait', 'laptop']
+    .map((name) => getViewportCoverageMatrix('functional').find((viewport) => viewport.name === name))
+    .filter(Boolean);
 
 const serviceDetails = [
     '/airport-concierge-dubai.html',

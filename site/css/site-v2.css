@@ -857,6 +857,7 @@ select {
     display: inline-flex;
     align-items: center;
     gap: 0.95rem;
+    font-family: var(--lab-font-sans);
 }
 
 .lab-brand__crest {

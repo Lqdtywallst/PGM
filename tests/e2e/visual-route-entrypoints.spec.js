@@ -4,14 +4,9 @@ const {
     expectNoConsoleErrors,
     settlePage
 } = require('./support/site-helpers');
+const { getViewportCoverageMatrix } = require('../../server/design-system-contract');
 
-const firstViewportMatrix = [
-    { name: 'mobile-small', width: 360, height: 640, isMobile: true, hasTouch: true, deviceScaleFactor: 2 },
-    { name: 'mobile-modern', width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 3 },
-    { name: 'tablet-portrait', width: 768, height: 1024, isMobile: true, hasTouch: true, deviceScaleFactor: 2 },
-    { name: 'laptop', width: 1366, height: 768, isMobile: false, hasTouch: false, deviceScaleFactor: 1 },
-    { name: 'desktop-wide', width: 1707, height: 893, isMobile: false, hasTouch: false, deviceScaleFactor: 1 }
-];
+const firstViewportMatrix = getViewportCoverageMatrix('firstViewport');
 
 const firstViewportPages = [
     {

@@ -1,18 +1,163 @@
-function normalizeRouteToken(route = '') {
+﻿function normalizeRouteToken(route = '') {
   const pathname = String(route || '/').split(/[?#]/)[0] || '/';
   return pathname === '/index.html' ? '/' : pathname;
 }
 
+const VIEWPORT_COVERAGE_MATRIX = Object.freeze([
+  Object.freeze({
+    name: 'mobile-short',
+    tier: 'mobile',
+    width: 400,
+    height: 608,
+    isMobile: true,
+    hasTouch: true,
+    deviceScaleFactor: 2,
+    coverage: Object.freeze(['critical', 'responsive', 'firstViewport', 'visualAgent', 'mobile', 'shortHeight']),
+    intent: 'Short mobile viewport used by browser device mode and older/smaller Android screens.',
+  }),
+  Object.freeze({
+    name: 'mobile-small',
+    tier: 'mobile',
+    width: 360,
+    height: 640,
+    isMobile: true,
+    hasTouch: true,
+    deviceScaleFactor: 2,
+    coverage: Object.freeze(['critical', 'responsive', 'firstViewport', 'visualAgent', 'mobile']),
+    intent: 'Narrow baseline phone width where cards, forms and CTAs are most likely to squeeze.',
+  }),
+  Object.freeze({
+    name: 'mobile-modern',
+    tier: 'mobile',
+    width: 390,
+    height: 844,
+    isMobile: true,
+    hasTouch: true,
+    deviceScaleFactor: 3,
+    coverage: Object.freeze(['critical', 'responsive', 'firstViewport', 'visualAgent', 'mobile', 'functional']),
+    intent: 'Main modern phone viewport for everyday iOS/Android checks.',
+  }),
+  Object.freeze({
+    name: 'mobile-large',
+    tier: 'mobile',
+    width: 430,
+    height: 932,
+    isMobile: true,
+    hasTouch: true,
+    deviceScaleFactor: 3,
+    coverage: Object.freeze(['responsive', 'mobile']),
+    intent: 'Large phone viewport to catch over-expanded mobile spacing and sticky controls.',
+  }),
+  Object.freeze({
+    name: 'tablet-portrait',
+    tier: 'tablet',
+    width: 768,
+    height: 1024,
+    isMobile: true,
+    hasTouch: true,
+    deviceScaleFactor: 2,
+    coverage: Object.freeze(['critical', 'responsive', 'firstViewport', 'visualAgent', 'tablet', 'functional']),
+    intent: 'Portrait tablet and iPad-like layout bridge between mobile and desktop.',
+  }),
+  Object.freeze({
+    name: 'tablet-landscape',
+    tier: 'tablet',
+    width: 1024,
+    height: 768,
+    isMobile: false,
+    hasTouch: true,
+    deviceScaleFactor: 2,
+    coverage: Object.freeze(['responsive', 'tablet']),
+    intent: 'Landscape tablet where desktop grids often activate with touch constraints.',
+  }),
+  Object.freeze({
+    name: 'laptop-compact',
+    tier: 'laptop',
+    width: 1280,
+    height: 720,
+    isMobile: false,
+    hasTouch: false,
+    deviceScaleFactor: 1,
+    coverage: Object.freeze(['responsive', 'firstViewport', 'visualAgent', 'desktop', 'shortHeight']),
+    intent: 'Short laptop viewport where first-fold hierarchy and sticky headers are fragile.',
+  }),
+  Object.freeze({
+    name: 'laptop',
+    tier: 'laptop',
+    width: 1366,
+    height: 768,
+    isMobile: false,
+    hasTouch: false,
+    deviceScaleFactor: 1,
+    coverage: Object.freeze(['critical', 'responsive', 'firstViewport', 'visualAgent', 'desktop', 'functional']),
+    intent: 'Common laptop baseline.',
+  }),
+  Object.freeze({
+    name: 'desktop-standard',
+    tier: 'desktop',
+    width: 1440,
+    height: 900,
+    isMobile: false,
+    hasTouch: false,
+    deviceScaleFactor: 1,
+    coverage: Object.freeze(['responsive', 'desktop']),
+    intent: 'Standard desktop viewport for ordinary external displays.',
+  }),
+  Object.freeze({
+    name: 'desktop-wide',
+    tier: 'desktop',
+    width: 1707,
+    height: 893,
+    isMobile: false,
+    hasTouch: false,
+    deviceScaleFactor: 1,
+    coverage: Object.freeze(['critical', 'responsive', 'firstViewport', 'visualAgent', 'desktop']),
+    intent: 'Wide desktop viewport used for premium composition and nav/header checks.',
+  }),
+]);
+
+function cloneViewport(viewport) {
+  return {
+    name: viewport.name,
+    width: viewport.width,
+    height: viewport.height,
+    isMobile: viewport.isMobile,
+    hasTouch: viewport.hasTouch,
+    deviceScaleFactor: viewport.deviceScaleFactor,
+    tier: viewport.tier,
+    coverage: [...viewport.coverage],
+    intent: viewport.intent,
+  };
+}
+
+function getViewportCoverageMatrix(scope = 'critical') {
+  const normalizedScope = String(scope || 'critical').trim();
+
+  if (normalizedScope === 'all') {
+    return VIEWPORT_COVERAGE_MATRIX.map(cloneViewport);
+  }
+
+  return VIEWPORT_COVERAGE_MATRIX
+    .filter((viewport) => viewport.coverage.includes(normalizedScope))
+    .map(cloneViewport);
+}
+
 function resolveViewportTier(viewportName = '', viewportWidth = 0) {
-  if (viewportName === 'mobile-modern' || viewportWidth < 760) {
+  const knownViewport = VIEWPORT_COVERAGE_MATRIX.find((viewport) => viewport.name === viewportName);
+
+  if (knownViewport?.tier) {
+    return knownViewport.tier;
+  }
+
+  if (viewportWidth < 760) {
     return 'mobile';
   }
 
-  if (viewportName === 'desktop-wide' || viewportWidth >= 1500) {
+  if (viewportWidth >= 1400) {
     return 'desktop';
   }
 
-  if (viewportName === 'laptop' || viewportWidth >= 1024) {
+  if (viewportWidth >= 1180) {
     return 'laptop';
   }
 
@@ -31,9 +176,231 @@ function mergeContracts(baseContract = null, overrideContract = null) {
 }
 
 const DESIGN_SYSTEM_CONTRACT = Object.freeze({
-  version: '2026-04-20',
+  version: '2026-04-21',
   global: Object.freeze({
     forbiddenFonts: Object.freeze(['orbitron']),
+    minTextContrastRatio: 4.5,
+    minLargeTextContrastRatio: 3,
+    maxInternalPanelGapRatio: 0.28,
+    maxInternalPanelGapPx: 160,
+  }),
+  mobileInteractionPolicies: Object.freeze({
+    fleet_filter_sheet: Object.freeze({
+      tiers: Object.freeze({
+        mobile: Object.freeze({
+          policy: 'locked',
+          minTapTargetPx: 44,
+          minFilledFieldWidthRatio: 0.72,
+          minUsefulControlWidthPx: 120,
+          maxTextClipPx: 2,
+          maxViewportClipPx: 2,
+          maxHorizontalOverflowPx: 4,
+          maxSheetHeightRatio: 1,
+          minVisibleFilledFieldCount: 2,
+          requiredFilledValues: Object.freeze(['20/04/2026', '22/04/2026', '10:00', '18:00']),
+          requiredFilterLabels: Object.freeze(['Lamborghini', 'Convertible']),
+        }),
+        tablet: Object.freeze({
+          policy: 'research',
+          minTapTargetPx: 44,
+          minFilledFieldWidthRatio: 0.48,
+          minUsefulControlWidthPx: 110,
+          maxTextClipPx: 2,
+          maxViewportClipPx: 2,
+          maxHorizontalOverflowPx: 4,
+          maxSheetHeightRatio: 0.86,
+          minVisibleFilledFieldCount: 2,
+          requiredFilledValues: Object.freeze(['20/04/2026', '22/04/2026', '10:00', '18:00']),
+          requiredFilterLabels: Object.freeze(['Lamborghini', 'Convertible']),
+        }),
+      }),
+    }),
+    contact_form_filled: Object.freeze({
+      tiers: Object.freeze({
+        mobile: Object.freeze({
+          policy: 'locked',
+          minTapTargetPx: 44,
+          minUsefulControlWidthPx: 220,
+          maxHorizontalOverflowPx: 4,
+          maxViewportClipPx: 2,
+          maxTextClipPx: 2,
+          requiredFieldKeys: Object.freeze(['contactName', 'contactEmail', 'contactSubject', 'contactMessage', 'contactSubmitButton']),
+        }),
+        tablet: Object.freeze({
+          policy: 'locked',
+          minTapTargetPx: 44,
+          minUsefulControlWidthPx: 240,
+          maxHorizontalOverflowPx: 4,
+          maxViewportClipPx: 2,
+          maxTextClipPx: 2,
+          requiredFieldKeys: Object.freeze(['contactName', 'contactEmail', 'contactSubject', 'contactMessage', 'contactSubmitButton']),
+        }),
+        laptop: Object.freeze({
+          policy: 'locked',
+          minTapTargetPx: 40,
+          minUsefulControlWidthPx: 260,
+          maxHorizontalOverflowPx: 4,
+          maxViewportClipPx: 2,
+          maxTextClipPx: 2,
+          requiredFieldKeys: Object.freeze(['contactName', 'contactEmail', 'contactSubject', 'contactMessage', 'contactSubmitButton']),
+        }),
+        desktop: Object.freeze({
+          policy: 'locked',
+          minTapTargetPx: 40,
+          minUsefulControlWidthPx: 280,
+          maxHorizontalOverflowPx: 4,
+          maxViewportClipPx: 2,
+          maxTextClipPx: 2,
+          requiredFieldKeys: Object.freeze(['contactName', 'contactEmail', 'contactSubject', 'contactMessage', 'contactSubmitButton']),
+        }),
+      }),
+    }),
+    reserve_booking_intent: Object.freeze({
+      tiers: Object.freeze({
+        mobile: Object.freeze({
+          policy: 'locked',
+          minTapTargetPx: 44,
+          minUsefulControlWidthPx: 220,
+          maxHorizontalOverflowPx: 4,
+          maxViewportClipPx: 2,
+          maxTextClipPx: 2,
+          requiredScheduleFieldKeys: Object.freeze(['startDate', 'endDate', 'pickupTime', 'dropoffTime', 'pickupLocation']),
+          requiredGuestFieldKeys: Object.freeze(['fullName', 'passport', 'phone', 'email']),
+        }),
+        tablet: Object.freeze({
+          policy: 'locked',
+          minTapTargetPx: 44,
+          minUsefulControlWidthPx: 240,
+          maxHorizontalOverflowPx: 4,
+          maxViewportClipPx: 2,
+          maxTextClipPx: 2,
+          requiredScheduleFieldKeys: Object.freeze(['startDate', 'endDate', 'pickupTime', 'dropoffTime', 'pickupLocation']),
+          requiredGuestFieldKeys: Object.freeze(['fullName', 'passport', 'phone', 'email']),
+        }),
+        laptop: Object.freeze({
+          policy: 'locked',
+          minTapTargetPx: 40,
+          minUsefulControlWidthPx: 260,
+          maxHorizontalOverflowPx: 4,
+          maxViewportClipPx: 2,
+          maxTextClipPx: 2,
+          requiredScheduleFieldKeys: Object.freeze(['startDate', 'endDate', 'pickupTime', 'dropoffTime', 'pickupLocation']),
+          requiredGuestFieldKeys: Object.freeze(['fullName', 'passport', 'phone', 'email']),
+        }),
+        desktop: Object.freeze({
+          policy: 'locked',
+          minTapTargetPx: 40,
+          minUsefulControlWidthPx: 280,
+          maxHorizontalOverflowPx: 4,
+          maxViewportClipPx: 2,
+          maxTextClipPx: 2,
+          requiredScheduleFieldKeys: Object.freeze(['startDate', 'endDate', 'pickupTime', 'dropoffTime', 'pickupLocation']),
+          requiredGuestFieldKeys: Object.freeze(['fullName', 'passport', 'phone', 'email']),
+        }),
+      }),
+    }),
+    mobile_card_actions: Object.freeze({
+      tiers: Object.freeze({
+        mobile: Object.freeze({
+          policy: 'locked',
+          maxActionGroupHeightRatio: 0.34,
+          maxSecondaryActionHeightRatio: 0.26,
+          maxSecondaryButtonWidthRatio: 0.94,
+          maxSecondaryDominanceRatio: 1.15,
+          minCardInlinePaddingPx: 12,
+          minPrimaryActionHeightPx: 44,
+          maxPrimaryActionHeightPx: 64,
+          maxSecondaryActionHeightPx: 58,
+          maxSecondaryContactActions: 2,
+          maxButtonRadiusPx: 8,
+        }),
+        tablet: Object.freeze({
+          policy: 'research',
+          maxActionGroupHeightRatio: 0.3,
+          maxSecondaryActionHeightRatio: 0.22,
+          maxSecondaryButtonWidthRatio: 0.98,
+          maxSecondaryDominanceRatio: 1.05,
+          minCardInlinePaddingPx: 12,
+          minPrimaryActionHeightPx: 40,
+          maxPrimaryActionHeightPx: 62,
+          maxSecondaryActionHeightPx: 56,
+          maxSecondaryContactActions: 2,
+          maxButtonRadiusPx: 8,
+        }),
+      }),
+    }),
+    page_depth_scan: Object.freeze({
+      tiers: Object.freeze({
+        mobile: Object.freeze({
+          policy: 'locked',
+          maxContactActionWidthRatio: 0.92,
+          maxContactActionHeightPx: 62,
+          maxContactActionAreaRatio: 0.075,
+          maxSecondaryActionWidthRatio: 0.94,
+          maxEdgeToEdgeActionWidthRatio: 0.96,
+          minViewportActionSidePaddingPx: 10,
+          maxBlankGapRatio: 0.46,
+          minVisibleElementsForGapAudit: 4,
+        }),
+        tablet: Object.freeze({
+          policy: 'research',
+          maxContactActionWidthRatio: 0.72,
+          maxContactActionHeightPx: 60,
+          maxContactActionAreaRatio: 0.055,
+          maxSecondaryActionWidthRatio: 0.8,
+          maxEdgeToEdgeActionWidthRatio: 0.9,
+          minViewportActionSidePaddingPx: 14,
+          maxBlankGapRatio: 0.5,
+          minVisibleElementsForGapAudit: 4,
+        }),
+        laptop: Object.freeze({
+          policy: 'research',
+          maxContactActionWidthRatio: 0.5,
+          maxContactActionHeightPx: 58,
+          maxContactActionAreaRatio: 0.04,
+          maxSecondaryActionWidthRatio: 0.56,
+          maxEdgeToEdgeActionWidthRatio: 0.86,
+          minViewportActionSidePaddingPx: 18,
+          maxBlankGapRatio: 0.52,
+          minVisibleElementsForGapAudit: 5,
+        }),
+        desktop: Object.freeze({
+          policy: 'research',
+          maxContactActionWidthRatio: 0.42,
+          maxContactActionHeightPx: 58,
+          maxContactActionAreaRatio: 0.032,
+          maxSecondaryActionWidthRatio: 0.5,
+          maxEdgeToEdgeActionWidthRatio: 0.82,
+          minViewportActionSidePaddingPx: 20,
+          maxBlankGapRatio: 0.54,
+          minVisibleElementsForGapAudit: 5,
+        }),
+      }),
+    }),
+    booking_date_defaults: Object.freeze({
+      tiers: Object.freeze({
+        mobile: Object.freeze({
+          policy: 'locked',
+          maxPastDays: 0,
+          requireMinDateAtLeastToday: true,
+        }),
+        tablet: Object.freeze({
+          policy: 'locked',
+          maxPastDays: 0,
+          requireMinDateAtLeastToday: true,
+        }),
+        laptop: Object.freeze({
+          policy: 'locked',
+          maxPastDays: 0,
+          requireMinDateAtLeastToday: true,
+        }),
+        desktop: Object.freeze({
+          policy: 'locked',
+          maxPastDays: 0,
+          requireMinDateAtLeastToday: true,
+        }),
+      }),
+    }),
   }),
   firstViewportPolicies: Object.freeze({
     home: Object.freeze({
@@ -309,6 +676,10 @@ const DESIGN_SYSTEM_CONTRACT = Object.freeze({
       headingFontFamilies: Object.freeze(['manrope']),
       bodyFontFamilies: Object.freeze(['manrope']),
       visualIntents: Object.freeze(['modern_dark_system']),
+      headerVariants: Object.freeze(['lab_mega_utility']),
+      headerBrandFontFamilies: Object.freeze(['manrope']),
+      headerPrimaryNavSignatures: Object.freeze(['Home|Fleet|Cars Brands|Cars Types|Services|Locations|About Us|Contact']),
+      headerNavRowCount: Object.freeze({ min: 1, max: 1 }),
       bodyFontSizePx: Object.freeze({ min: 14, max: 18.5 }),
       bodyLineHeightPx: Object.freeze({ min: 20, max: 28.5 }),
       primaryCtaRadiusPx: Object.freeze([
@@ -322,6 +693,10 @@ const DESIGN_SYSTEM_CONTRACT = Object.freeze({
       headingFontFamilies: Object.freeze(['cormorant garamond']),
       bodyFontFamilies: Object.freeze(['manrope']),
       visualIntents: Object.freeze(['modern_dark_system']),
+      headerVariants: Object.freeze(['lab_mega_utility']),
+      headerBrandFontFamilies: Object.freeze(['manrope']),
+      headerPrimaryNavSignatures: Object.freeze(['Home|Fleet|Cars Brands|Cars Types|Services|Locations|About Us|Contact']),
+      headerNavRowCount: Object.freeze({ min: 1, max: 1 }),
       bodyFontSizePx: Object.freeze({ min: 13, max: 18.5 }),
       bodyLineHeightPx: Object.freeze({ min: 19, max: 31 }),
       primaryCtaRadiusPx: Object.freeze({ min: 0, max: 12 }),
@@ -332,6 +707,10 @@ const DESIGN_SYSTEM_CONTRACT = Object.freeze({
       headingFontFamilies: Object.freeze(['cormorant garamond']),
       bodyFontFamilies: Object.freeze(['manrope']),
       visualIntents: Object.freeze(['modern_light_system']),
+      headerVariants: Object.freeze(['lab_mega_utility']),
+      headerBrandFontFamilies: Object.freeze(['manrope']),
+      headerPrimaryNavSignatures: Object.freeze(['Home|Fleet|Cars Brands|Cars Types|Services|Locations|About Us|Contact']),
+      headerNavRowCount: Object.freeze({ min: 1, max: 1 }),
       bodyFontSizePx: Object.freeze({ min: 14, max: 18.5 }),
       bodyLineHeightPx: Object.freeze({ min: 22, max: 30.5 }),
       primaryCtaRadiusPx: Object.freeze({ min: 0, max: 12 }),
@@ -343,6 +722,10 @@ const DESIGN_SYSTEM_CONTRACT = Object.freeze({
       headingFontFamilies: Object.freeze(['cormorant garamond']),
       bodyFontFamilies: Object.freeze(['manrope']),
       visualIntents: Object.freeze(['modern_light_system']),
+      headerVariants: Object.freeze(['lab_mega_utility']),
+      headerBrandFontFamilies: Object.freeze(['manrope']),
+      headerPrimaryNavSignatures: Object.freeze(['Home|Fleet|Cars Brands|Cars Types|Services|Locations|About Us|Contact']),
+      headerNavRowCount: Object.freeze({ min: 1, max: 1 }),
       bodyFontSizePx: Object.freeze({ min: 14, max: 18.5 }),
       bodyLineHeightPx: Object.freeze({ min: 22, max: 31 }),
       primaryCtaRadiusPx: Object.freeze([
@@ -356,6 +739,10 @@ const DESIGN_SYSTEM_CONTRACT = Object.freeze({
       headingFontFamilies: Object.freeze(['cormorant garamond']),
       bodyFontFamilies: Object.freeze(['manrope']),
       visualIntents: Object.freeze(['modern_light_system']),
+      headerVariants: Object.freeze(['lab_mega_utility']),
+      headerBrandFontFamilies: Object.freeze(['manrope']),
+      headerPrimaryNavSignatures: Object.freeze(['Home|Fleet|Cars Brands|Cars Types|Services|Locations|About Us|Contact']),
+      headerNavRowCount: Object.freeze({ min: 1, max: 1 }),
       bodyFontSizePx: Object.freeze({ min: 14, max: 18.5 }),
       bodyLineHeightPx: Object.freeze({ min: 22, max: 31 }),
       primaryCtaRadiusPx: Object.freeze([
@@ -369,6 +756,10 @@ const DESIGN_SYSTEM_CONTRACT = Object.freeze({
       headingFontFamilies: Object.freeze(['montserrat']),
       bodyFontFamilies: Object.freeze(['inter']),
       visualIntents: Object.freeze(['modern_light_system']),
+      headerVariants: Object.freeze(['lab_mega_utility']),
+      headerBrandFontFamilies: Object.freeze(['manrope']),
+      headerPrimaryNavSignatures: Object.freeze(['Home|Fleet|Cars Brands|Cars Types|Services|Locations|About Us|Contact']),
+      headerNavRowCount: Object.freeze({ min: 1, max: 1 }),
       bodyFontSizePx: Object.freeze({ min: 13, max: 17.5 }),
       bodyLineHeightPx: Object.freeze({ min: 21, max: 27.5 }),
       primaryCtaRadiusPx: Object.freeze({ min: 6, max: 12 }),
@@ -380,6 +771,10 @@ const DESIGN_SYSTEM_CONTRACT = Object.freeze({
       headingFontFamilies: Object.freeze(['montserrat']),
       bodyFontFamilies: Object.freeze(['inter']),
       visualIntents: Object.freeze(['modern_light_system']),
+      headerVariants: Object.freeze(['lab_mega_utility']),
+      headerBrandFontFamilies: Object.freeze(['manrope']),
+      headerPrimaryNavSignatures: Object.freeze(['Home|Fleet|Cars Brands|Cars Types|Services|Locations|About Us|Contact']),
+      headerNavRowCount: Object.freeze({ min: 1, max: 1 }),
       bodyFontSizePx: Object.freeze({ min: 13, max: 17.5 }),
       bodyLineHeightPx: Object.freeze({ min: 21, max: 27.5 }),
       primaryCtaRadiusPx: Object.freeze({ min: 6, max: 12 }),
@@ -391,6 +786,10 @@ const DESIGN_SYSTEM_CONTRACT = Object.freeze({
       headingFontFamilies: Object.freeze(['inter', 'cormorant garamond']),
       bodyFontFamilies: Object.freeze(['inter']),
       visualIntents: Object.freeze(['modern_dark_system']),
+      headerVariants: Object.freeze(['lab_mega_utility']),
+      headerBrandFontFamilies: Object.freeze(['manrope']),
+      headerPrimaryNavSignatures: Object.freeze(['Home|Fleet|Cars Brands|Cars Types|Services|Locations|About Us|Contact']),
+      headerNavRowCount: Object.freeze({ min: 1, max: 1 }),
       bodyFontSizePx: Object.freeze({ min: 13, max: 17.5 }),
       primaryCtaRadiusPx: Object.freeze([
         Object.freeze({ min: 0, max: 12 }),
@@ -401,10 +800,21 @@ const DESIGN_SYSTEM_CONTRACT = Object.freeze({
     }),
     reserve: Object.freeze({
       visualIntents: Object.freeze(['modern_light_system']),
+      headerVariants: Object.freeze(['lab_mega_utility']),
+      headerBrandFontFamilies: Object.freeze(['manrope']),
+      headerPrimaryNavSignatures: Object.freeze(['Home|Fleet|Cars Brands|Cars Types|Services|Locations|About Us|Contact']),
+      headerNavRowCount: Object.freeze({ min: 1, max: 1 }),
       primaryCtaRadiusPx: Object.freeze({ min: 6, max: 16 }),
       inputRadiusPx: Object.freeze({ min: 8, max: 16 }),
       cardRadiusPx: Object.freeze({ min: 12, max: 22 }),
       maxButtonFamilyCount: 6,
+    }),
+    legal: Object.freeze({
+      visualIntents: Object.freeze(['modern_light_system', 'modern_dark_system']),
+      headerVariants: Object.freeze(['lab_mega_utility']),
+      headerBrandFontFamilies: Object.freeze(['manrope']),
+      headerPrimaryNavSignatures: Object.freeze(['Home|Fleet|Cars Brands|Cars Types|Services|Locations|About Us|Contact']),
+      headerNavRowCount: Object.freeze({ min: 1, max: 1 }),
     }),
   }),
 });
@@ -426,9 +836,18 @@ function getSectionRhythmContract({ route = '', viewportName = '', viewportWidth
   return pageContract?.tiers?.[viewportTier] || null;
 }
 
+function getMobileInteractionContract({ interaction = '', viewportName = '', viewportWidth = 0 } = {}) {
+  const viewportTier = resolveViewportTier(viewportName, viewportWidth);
+  const interactionContract = DESIGN_SYSTEM_CONTRACT.mobileInteractionPolicies?.[interaction] || null;
+  return interactionContract?.tiers?.[viewportTier] || null;
+}
+
 module.exports = {
   DESIGN_SYSTEM_CONTRACT,
+  VIEWPORT_COVERAGE_MATRIX,
   getFirstViewportContract,
+  getMobileInteractionContract,
   getSectionRhythmContract,
+  getViewportCoverageMatrix,
   resolveViewportTier,
 };

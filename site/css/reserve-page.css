@@ -1,0 +1,2681 @@
+﻿        :root {
+            --reserve-shell-max-width: 1180px;
+        }
+
+        @font-face {
+            font-family: 'Cormorant Garamond';
+            font-style: normal;
+            font-weight: 600 700;
+            font-display: swap;
+            src: url('https://fonts.gstatic.com/s/cormorantgaramond/v21/co3bmX5slCNuHLi8bLeY9MK7whWMhyjYqXtKky2F7g.woff2') format('woff2');
+        }
+
+        @font-face {
+            font-family: 'Manrope';
+            font-style: normal;
+            font-weight: 400 800;
+            font-display: swap;
+            src: url('https://fonts.gstatic.com/s/manrope/v20/xn7gYHE41ni1AdIRggexSvfedN4.woff2') format('woff2');
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            background: #050505;
+        }
+
+        body.reserve-page {
+            min-height: 100vh;
+            background: #050506;
+            color: white;
+            font-family: 'Manrope', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: block;
+            padding: 0;
+        }
+
+        .reserve-page-main {
+            position: relative;
+            padding: calc(var(--lab-header-offset) + 1.75rem) 0 0;
+            background:
+                radial-gradient(circle at 18% 14%, rgba(214, 188, 134, 0.08), transparent 20%),
+                radial-gradient(circle at 84% 22%, rgba(227, 246, 85, 0.05), transparent 24%),
+                linear-gradient(180deg, #050506 0%, #07090d 42%, #050506 100%);
+        }
+
+        .reserve-page-shell {
+            padding: 0 1.25rem 5.5rem;
+        }
+
+        .reserve-page-intro {
+            max-width: var(--reserve-shell-max-width);
+            margin: 0 auto 1.35rem;
+            display: grid;
+            gap: 1rem;
+        }
+
+        .reserve-page-intro__grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+            gap: 1.25rem;
+            align-items: end;
+        }
+
+        .reserve-page-breadcrumb {
+            display: inline-flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.55rem;
+            margin-bottom: 0.8rem;
+            color: rgba(245, 241, 232, 0.72);
+            font-size: 0.8rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .reserve-page-breadcrumb a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .reserve-page-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+            color: #f3d58c;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .reserve-page-heading {
+            margin: 0;
+            color: #fff8e7;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2.2rem, 4vw, 4rem);
+            line-height: 0.94;
+        }
+
+        .reserve-page-lead {
+            max-width: 720px;
+            margin: 0.85rem 0 0;
+            color: rgba(245, 241, 232, 0.78);
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .reserve-page-panel {
+            padding: 1.2rem 1.25rem;
+            border-radius: 18px;
+            border: 1px solid rgba(214, 240, 60, 0.18);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(10, 10, 11, 0.88));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        }
+
+        .reserve-page-panel__eyebrow {
+            display: block;
+            margin-bottom: 0.45rem;
+            color: #f3d58c;
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .reserve-page-panel__title {
+            margin: 0;
+            color: #fff;
+            font-size: 1.15rem;
+            line-height: 1.35;
+        }
+
+        .reserve-page-panel__copy {
+            margin: 0.55rem 0 0;
+            color: #b9b9c1;
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+
+        .reserve-page-panel__facts {
+            display: grid;
+            gap: 0.7rem;
+            margin-top: 1rem;
+        }
+
+        .reserve-page-panel__facts div {
+            display: grid;
+            gap: 0.12rem;
+            padding: 0.8rem 0.9rem;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .reserve-page-panel__facts strong {
+            color: #fff8e7;
+            font-size: 0.9rem;
+        }
+
+        .reserve-page-panel__facts span {
+            color: #b9b9c1;
+            font-size: 0.84rem;
+            line-height: 1.5;
+        }
+
+        .reserve-page-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .reserve-page-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            padding: 0 1.1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .reserve-page-action--primary {
+            background: linear-gradient(135deg, var(--lab-accent-soft), var(--lab-accent));
+            color: #101010;
+            box-shadow: 0 14px 34px rgba(227, 246, 85, 0.16);
+        }
+
+        .reserve-page-action--secondary {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.03);
+            color: #fff8e7;
+        }
+
+        .reserve-container {
+            width: 100%;
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 2rem 0 0;
+            border-radius: 0;
+            box-shadow: none;
+            border: 0;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        .steps-indicator {
+            display: flex;
+            gap: 0.9rem;
+            margin-bottom: 2rem;
+            color: #71717a;
+        }
+        .step-pill {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            padding: 0.9rem 1rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.025);
+            transition: all 0.28s ease;
+        }
+        .step-pill:hover {
+            transform: translateY(-2px);
+            border-color: rgba(214, 240, 60, 0.2);
+        }
+        .step-pill-index {
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #d4d4d8;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.03);
+            flex: 0 0 auto;
+        }
+        .step-pill-copy {
+            display: grid;
+            gap: 0.12rem;
+            min-width: 0;
+        }
+        .step-pill-label {
+            color: #f4f4f5;
+            font-size: 0.94rem;
+            font-weight: 600;
+        }
+        .step-pill-meta {
+            color: #8f8f96;
+            font-size: 0.78rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+        .step-pill.active {
+            border-color: rgba(214, 240, 60, 0.4);
+            background: linear-gradient(180deg, rgba(214, 240, 60, 0.14), rgba(255, 255, 255, 0.03));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        }
+        .step-pill.active .step-pill-index {
+            border-color: rgba(214, 240, 60, 0.5);
+            background: linear-gradient(135deg, #d6f03c, rgba(214, 240, 60, 0.78));
+            color: #111;
+        }
+        .step-pill.active .step-pill-label,
+        .step-pill.active .step-pill-meta {
+            color: #f5deb0;
+        }
+        .step-pill.completed {
+            border-color: rgba(214, 240, 60, 0.22);
+            background: rgba(214, 240, 60, 0.05);
+        }
+        .step-pill.completed .step-pill-index {
+            color: #111;
+            border-color: rgba(214, 240, 60, 0.4);
+            background: rgba(214, 240, 60, 0.85);
+        }
+        .step-pill.completed .step-pill-index::before {
+            content: "\2713";
+            font-family: 'Manrope', system-ui, sans-serif;
+            font-weight: 900;
+            font-size: 0.82rem;
+        }
+        .step-pill.completed .step-pill-index {
+            font-size: 0;
+        }
+
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+            animation: fadeIn 0.42s ease;
+        }
+
+        .booking-primer {
+            margin-bottom: 1.6rem;
+            padding: 1rem;
+            border-radius: 18px;
+            border: 1px solid rgba(214, 240, 60, 0.16);
+            background: linear-gradient(180deg, rgba(214, 240, 60, 0.08), rgba(255, 255, 255, 0.02));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+        }
+
+        .primer-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.9rem;
+        }
+
+        .primer-card {
+            padding: 1rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+            display: grid;
+            gap: 0.32rem;
+        }
+
+        .primer-label {
+            color: #f3d58c;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .primer-title {
+            color: #fff8e7;
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+
+        .primer-copy {
+            color: #b9b9c1;
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        .primer-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            margin-top: 0.2rem;
+            color: #d6f03c;
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        .selected-plan-card,
+        .route-guide-card {
+            padding: 1.35rem;
+            border-radius: 18px;
+            border: 1px solid rgba(214, 240, 60, 0.2);
+            background: rgba(255, 255, 255, 0.025);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+        }
+
+        .selected-plan-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.8rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .selected-plan-badge,
+        .route-guide-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.4rem 0.7rem;
+            border-radius: 999px;
+            background: rgba(214, 240, 60, 0.12);
+            color: #f3d58c;
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .selected-plan-rate {
+            color: #d6f03c;
+            font-size: 0.92rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .selected-plan-title,
+        .route-guide-title {
+            margin: 0 0 0.45rem;
+            color: #fff8e7;
+            font-size: 1.14rem;
+        }
+
+        .selected-plan-copy,
+        .route-guide-copy {
+            margin: 0;
+            color: #b9b9c1;
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+
+        .selected-plan-points,
+        .route-guide-list {
+            display: grid;
+            gap: 0.7rem;
+            margin-top: 1rem;
+        }
+
+        .selected-plan-points div,
+        .route-guide-item {
+            display: flex;
+            gap: 0.7rem;
+            align-items: flex-start;
+            padding: 0.8rem 0.9rem;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .selected-plan-points i,
+        .route-guide-item i {
+            margin-top: 0.16rem;
+            color: #f3d58c;
+        }
+
+        .selected-plan-points strong,
+        .route-guide-item strong {
+            display: block;
+            color: #fff;
+            margin-bottom: 0.15rem;
+            font-size: 0.92rem;
+        }
+
+        .selected-plan-points span,
+        .route-guide-item span {
+            color: #b8b8be;
+            line-height: 1.45;
+            font-size: 0.86rem;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes riseIn {
+            from {
+                opacity: 0;
+                transform: translateY(18px) scale(0.985);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        @keyframes shimmerPulse {
+            0% {
+                box-shadow: 0 0 0 rgba(214, 240, 60, 0);
+                transform: translateY(0);
+            }
+            50% {
+                box-shadow: 0 0 0 1px rgba(214, 240, 60, 0.15), 0 12px 28px rgba(214, 240, 60, 0.12);
+                transform: translateY(-1px);
+            }
+            100% {
+                box-shadow: 0 0 0 rgba(214, 240, 60, 0);
+                transform: translateY(0);
+            }
+        }
+        @keyframes textPulse {
+            0% {
+                opacity: 0.65;
+                transform: translateY(2px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .step-heading {
+            color: #f5deb0;
+            margin-bottom: 1.25rem;
+            font-size: clamp(1.8rem, 2.6vw, 2.35rem);
+            letter-spacing: 0.03em;
+        }
+        .step-heading-sub {
+            margin: -0.4rem 0 1.5rem;
+            color: #b3b3b9;
+            font-size: 0.96rem;
+            line-height: 1.6;
+            max-width: 760px;
+        }
+        .step2-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+            gap: 1.25rem;
+            align-items: start;
+        }
+        .step2-main,
+        .step2-side {
+            display: grid;
+            gap: 1.25rem;
+        }
+        .step1-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+            gap: 1.25rem;
+            align-items: start;
+        }
+        .step1-main,
+        .step1-side {
+            display: grid;
+            gap: 1.25rem;
+        }
+        .info-card {
+            padding: 1.35rem;
+            border-radius: 18px;
+            border: 1px solid rgba(214, 240, 60, 0.18);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(10, 10, 11, 0.9));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+        }
+        .info-card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            margin: 0 0 0.35rem;
+            color: #f5deb0;
+            font-size: 1.02rem;
+        }
+        .info-card-note {
+            margin: 0 0 1rem;
+            color: #a1a1aa;
+            font-size: 0.92rem;
+            line-height: 1.55;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+        }
+        .info-grid .form-group {
+            margin: 0;
+            padding: 1rem;
+            border-radius: 14px;
+            border: 1px solid rgba(214, 240, 60, 0.1);
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .info-grid .form-group.span-2 {
+            grid-column: span 2;
+        }
+        .assurance-card {
+            padding: 1.35rem;
+            border-radius: 18px;
+            border: 1px solid rgba(214, 240, 60, 0.2);
+            background: linear-gradient(180deg, rgba(214, 240, 60, 0.08), rgba(255, 255, 255, 0.02));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+        }
+        .assurance-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            margin-bottom: 0.8rem;
+            padding: 0.4rem 0.7rem;
+            border-radius: 999px;
+            background: rgba(214, 240, 60, 0.12);
+            color: #f3d58c;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .assurance-title {
+            margin: 0 0 0.45rem;
+            color: #fff8e7;
+            font-size: 1.28rem;
+        }
+        .assurance-note {
+            margin: 0 0 1rem;
+            color: #d4d4d8;
+            font-size: 0.93rem;
+            line-height: 1.6;
+        }
+        .assurance-list {
+            display: grid;
+            gap: 0.85rem;
+        }
+        .assurance-item {
+            display: flex;
+            gap: 0.8rem;
+            align-items: flex-start;
+            padding: 0.9rem;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .assurance-item i {
+            margin-top: 0.15rem;
+            color: #f3d58c;
+        }
+        .assurance-item strong {
+            display: block;
+            margin-bottom: 0.2rem;
+            color: #fff;
+            font-size: 0.95rem;
+        }
+        .assurance-item span {
+            color: #b8b8be;
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+        .contact-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 0.7rem 0.95rem;
+            border-radius: 999px;
+            border: 1px solid rgba(214, 240, 60, 0.2);
+            color: #f0d58e;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .contact-chip:hover {
+            border-color: rgba(214, 240, 60, 0.5);
+            color: #fff0c5;
+        }
+        .schedule-card {
+            padding: 1.35rem;
+            border-radius: 18px;
+            border: 1px solid rgba(214, 240, 60, 0.24);
+            background: linear-gradient(180deg, rgba(214, 240, 60, 0.08), rgba(255, 255, 255, 0.02));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+        }
+        .schedule-card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            margin: 0 0 0.35rem;
+            color: #d6f03c;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .schedule-card-note {
+            margin: 0 0 1rem;
+            color: #d4d4d8;
+            font-size: 0.92rem;
+        }
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+        }
+        .schedule-grid .form-group {
+            margin: 0;
+            padding: 1rem;
+            border-radius: 14px;
+            border: 1px solid rgba(214, 240, 60, 0.12);
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .field-label {
+            display: block;
+            margin-bottom: 0.45rem;
+            color: #d6f03c;
+            font-weight: 600;
+            font-size: 0.92rem;
+        }
+        .field-label i {
+            margin-right: 0.4rem;
+            opacity: 0.85;
+        }
+
+        .input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: rgba(8, 8, 10, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        select.input:hover,
+        input.input:hover {
+            border-color: rgba(214, 240, 60, 0.24);
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: #d6f03c;
+            box-shadow: 0 0 0 3px rgba(214, 240, 60, 0.1);
+        }
+
+        .input::placeholder {
+            color: #71717a;
+        }
+        .input.invalid {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+        }
+        .field-error {
+            margin-top: 0.4rem;
+            color: #fca5a5;
+            font-size: 0.82rem;
+            min-height: 1rem;
+        }
+        .form-feedback {
+            display: none;
+            margin: 0 0 1rem;
+            padding: 0.75rem 0.9rem;
+            border-radius: 8px;
+            border: 1px solid rgba(239, 68, 68, 0.45);
+            background: rgba(239, 68, 68, 0.12);
+            color: #fecaca;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px 18px;
+            background: linear-gradient(135deg, #d6f03c, rgba(214, 240, 60, 0.8));
+            color: #000;
+            border: none;
+            border-radius: 14px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(214, 240, 60, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .confirm-pay-btn {
+            width: 100%;
+            padding: 16px 18px;
+            background: linear-gradient(135deg, #d6f03c, rgba(214, 240, 60, 0.8));
+            color: #000;
+            border: none;
+            border-radius: 14px;
+            font-weight: bold;
+            font-size: 1.02rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+            box-shadow: 0 16px 36px rgba(214, 240, 60, 0.18);
+        }
+
+        .confirm-pay-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(214, 240, 60, 0.3);
+        }
+
+        .confirm-pay-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            padding: 12px 24px;
+            background: transparent;
+            border: 1px solid #444;
+            border-radius: 14px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            border-color: #d6f03c;
+            color: #d6f03c;
+        }
+
+        .step-navigation {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .step-navigation .btn {
+            margin-top: 0;
+        }
+
+        .step-navigation .btn-secondary {
+            flex: 1;
+        }
+
+        .step-navigation .btn {
+            flex: 2;
+        }
+
+        .delivery-map-wrapper {
+            margin-top: 0.9rem;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(214, 240, 60, 0.25);
+            background: #0f0f10;
+        }
+
+        .delivery-map-wrapper iframe {
+            width: 100%;
+            height: 280px;
+            border: 0;
+            display: block;
+        }
+
+        .delivery-map-hint {
+            margin-top: 0.6rem;
+            font-size: 0.85rem;
+            color: #a1a1aa;
+            line-height: 1.45;
+        }
+
+        .delivery-map-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            margin-top: 0.65rem;
+            color: #d6f03c;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .delivery-map-link:hover {
+            color: #f4ff95;
+        }
+
+        .summary-section {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(180deg, rgba(214, 240, 60, 0.08), rgba(255, 255, 255, 0.02));
+            border-radius: 18px;
+            border: 1px solid rgba(214, 240, 60, 0.2);
+            margin-bottom: 2rem;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+        }
+        .payment-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(280px, 0.72fr);
+            gap: 1.25rem;
+            align-items: start;
+        }
+        .payment-main,
+        .payment-side {
+            display: grid;
+            gap: 1.1rem;
+        }
+        .payment-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            margin-bottom: 0.8rem;
+            padding: 0.42rem 0.72rem;
+            border-radius: 999px;
+            background: rgba(214, 240, 60, 0.12);
+            color: #f3d58c;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .payment-caption {
+            margin: 0.55rem auto 0;
+            max-width: 520px;
+            color: #bcbcc4;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .payment-breakdown {
+            display: grid;
+            gap: 0.85rem;
+            padding-top: 1rem;
+            margin-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .payment-breakdown-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            color: #d4d4d8;
+        }
+        .payment-breakdown-row strong {
+            color: #fff;
+            font-size: 1.02rem;
+        }
+        .payment-side-card {
+            padding: 1.35rem;
+            border-radius: 18px;
+            border: 1px solid rgba(214, 240, 60, 0.18);
+            background: rgba(255, 255, 255, 0.025);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+        }
+        .payment-side-title {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            margin: 0 0 0.45rem;
+            color: #f5deb0;
+            font-size: 1.02rem;
+        }
+        .payment-side-copy {
+            margin: 0 0 1rem;
+            color: #b4b4bb;
+            line-height: 1.55;
+            font-size: 0.92rem;
+        }
+        .payment-perks {
+            display: grid;
+            gap: 0.75rem;
+        }
+        .payment-perk {
+            display: flex;
+            gap: 0.7rem;
+            align-items: flex-start;
+            padding: 0.8rem 0.9rem;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .payment-perk i {
+            margin-top: 0.15rem;
+            color: #f3d58c;
+        }
+        .payment-perk strong {
+            display: block;
+            color: #fff;
+            margin-bottom: 0.15rem;
+            font-size: 0.92rem;
+        }
+        .payment-perk span {
+            color: #b8b8be;
+            line-height: 1.45;
+            font-size: 0.86rem;
+        }
+
+        .summary-section h3 {
+            color: #d6f03c;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .summary-section .total {
+            font-size: 2.35rem;
+            font-weight: bold;
+            color: #d6f03c;
+            margin-top: 1rem;
+            text-shadow: none;
+        }
+        .price-refresh {
+            animation: shimmerPulse 0.42s ease;
+        }
+        .price-text-refresh {
+            animation: textPulse 0.34s ease;
+        }
+
+        .error-message {
+            color: #ef4444;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .success-message {
+            color: #10b981;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .payment-trust {
+            margin-top: 1rem;
+            padding: 1rem 1.1rem;
+            border-radius: 14px;
+            border: 1px solid rgba(214, 240, 60, 0.28);
+            background: rgba(214, 240, 60, 0.08);
+            color: #d6d3d1;
+            font-size: 0.9rem;
+            transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+        }
+        .payment-trust strong {
+            color: #d6f03c;
+        }
+
+        /* Calendar Styles */
+        .calendar-container {
+            padding: 1.3rem;
+            border-radius: 18px;
+            border: 1px solid rgba(214, 240, 60, 0.18);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(10, 10, 11, 0.86));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .calendar-nav {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .calendar-nav:hover {
+            border-color: #d6f03c;
+            color: #d6f03c;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            background: rgba(10, 10, 12, 0.85);
+            padding: 1rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            color: #a1a1aa;
+        }
+
+        .calendar-day.header {
+            color: #d6f03c;
+            font-weight: 600;
+            cursor: default;
+            font-size: 0.85rem;
+        }
+
+        .calendar-day.past {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .calendar-day.available {
+            color: white;
+        }
+
+        .calendar-day.available:hover {
+            background: rgba(214, 240, 60, 0.2);
+            color: #d6f03c;
+        }
+
+        .calendar-day.today {
+            background: rgba(214, 240, 60, 0.1);
+            border: 1px solid #d6f03c;
+            color: #d6f03c;
+            font-weight: 600;
+        }
+
+        .calendar-day.selected {
+            background: #d6f03c;
+            color: #000;
+            font-weight: 600;
+        }
+
+        .calendar-day.start-date {
+            background: linear-gradient(135deg, #d6f03c, rgba(214, 240, 60, 0.8));
+            color: #000;
+        }
+
+        .calendar-day.end-date {
+            background: linear-gradient(135deg, #d6f03c, rgba(214, 240, 60, 0.8));
+            color: #000;
+        }
+
+        .calendar-day.in-range {
+            background: rgba(214, 240, 60, 0.2);
+            color: #d6f03c;
+        }
+
+        .calendar-day.unavailable {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .reservation-summary {
+            padding: 1.35rem;
+            border-radius: 18px;
+            border: 1px solid rgba(214, 240, 60, 0.2);
+            background: linear-gradient(180deg, rgba(214, 240, 60, 0.08), rgba(255, 255, 255, 0.02));
+            font-size: 0.95rem;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+        }
+        .summary-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            margin-bottom: 0.75rem;
+            padding: 0.4rem 0.7rem;
+            border-radius: 999px;
+            background: rgba(214, 240, 60, 0.12);
+            color: #f3d58c;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .summary-title {
+            margin: 0 0 0.35rem;
+            color: #f7f7f8;
+            font-size: 1.25rem;
+        }
+        .summary-caption {
+            margin: 0 0 1rem;
+            color: #a1a1aa;
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .summary-row:last-child {
+            border-bottom: 0;
+            padding-bottom: 0;
+        }
+        .summary-row span:first-child {
+            color: #d4d4d8;
+        }
+        .summary-value {
+            color: #fff;
+            font-weight: 600;
+        }
+        .summary-value.gold {
+            color: #f3d58c;
+        }
+        .summary-row.highlight {
+            margin-top: 0.25rem;
+            padding-top: 1rem;
+        }
+        .summary-row.highlight .summary-value {
+            font-size: 1.15rem;
+        }
+        .summary-row.primary-payment {
+            margin-top: 0.85rem;
+            padding: 1rem;
+            border-radius: 14px;
+            border: 1px solid rgba(214, 240, 60, 0.22);
+            background: rgba(214, 240, 60, 0.08);
+        }
+        .summary-row.primary-payment .summary-value {
+            font-size: 1.2rem;
+            color: #f7d88f;
+        }
+        .delivery-card {
+            padding: 1.35rem;
+            border-radius: 18px;
+            border: 1px solid rgba(214, 240, 60, 0.18);
+            background: rgba(255, 255, 255, 0.02);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+        }
+        .delivery-card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            margin: 0 0 0.35rem;
+            color: #f5deb0;
+            font-size: 1.05rem;
+        }
+        .delivery-card-note {
+            margin: 0 0 1rem;
+            color: #a1a1aa;
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+        .info-card:hover,
+        .assurance-card:hover,
+        .schedule-card:hover,
+        .calendar-container:hover,
+        .reservation-summary:hover,
+        .delivery-card:hover,
+        .summary-section:hover,
+        .payment-side-card:hover,
+        .payment-trust:hover {
+            transform: translateY(-2px);
+            border-color: rgba(214, 240, 60, 0.28);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 18px 40px rgba(0, 0, 0, 0.18);
+        }
+        .step-content.active .info-card,
+        .step-content.active .assurance-card,
+        .step-content.active .calendar-container,
+        .step-content.active .schedule-card,
+        .step-content.active .reservation-summary,
+        .step-content.active .delivery-card,
+        .step-content.active .summary-section,
+        .step-content.active .payment-side-card,
+        .step-content.active .payment-trust {
+            animation: riseIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .step-content.active .assurance-card,
+        .step-content.active .schedule-card,
+        .step-content.active .reservation-summary,
+        .step-content.active .payment-side-card {
+            animation-delay: 0.06s;
+        }
+        .step-content.active .delivery-card,
+        .step-content.active .payment-trust {
+            animation-delay: 0.12s;
+        }
+
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #d6f03c;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid rgba(214, 240, 60, 0.3);
+        }
+
+        .btn-home:hover {
+            background: rgba(214, 240, 60, 0.1);
+            border-color: #d6f03c;
+            transform: translateX(-3px);
+        }
+
+        .btn-home i {
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            .reserve-page-shell {
+                padding: 0 0.95rem 5rem;
+            }
+
+            .reserve-page-intro__grid {
+                grid-template-columns: 1fr;
+            }
+
+            .reserve-page-actions {
+                display: grid;
+                grid-template-columns: 1fr;
+            }
+
+            .reserve-page-action {
+                width: 100%;
+            }
+
+            .primer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            /* Avoid vertically centering the whole flow on mobile â€” it breaks scroll order and feels â€œout of sequenceâ€ */
+            body.reserve-page {
+                min-height: 100%;
+            }
+
+            .reserve-container {
+                padding: 1.25rem 0 2rem;
+                border-radius: 0;
+                max-width: 100%;
+            }
+
+            .steps-indicator {
+                flex-direction: column;
+            }
+            .step1-layout,
+            .step2-layout {
+                grid-template-columns: 1fr;
+            }
+            /* Step 2: keep reading order logical on small screens â€” main (calendar + times) first, then delivery, then live quote */
+            .step2-layout {
+                display: flex;
+                flex-direction: column;
+                gap: 1.25rem;
+            }
+            .step2-main {
+                order: 1;
+            }
+            .step2-side {
+                order: 2;
+                display: flex;
+                flex-direction: column;
+                gap: 1.25rem;
+            }
+            .step2-side .delivery-card {
+                order: 1;
+            }
+            .step2-side .reservation-summary {
+                order: 2;
+            }
+            .payment-layout {
+                grid-template-columns: 1fr;
+                display: flex;
+                flex-direction: column;
+                gap: 1.25rem;
+            }
+            .payment-main {
+                order: 1;
+            }
+            .payment-side {
+                order: 2;
+            }
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            .info-grid .form-group.span-2 {
+                grid-column: auto;
+            }
+            .step-pill:hover,
+            .info-card:hover,
+            .assurance-card:hover,
+            .schedule-card:hover,
+            .calendar-container:hover,
+            .reservation-summary:hover,
+            .delivery-card:hover,
+            .summary-section:hover,
+            .payment-side-card:hover,
+            .payment-trust:hover {
+                transform: none;
+            }
+
+            .step-navigation {
+                flex-direction: column;
+            }
+
+            .step-navigation .btn,
+            .step-navigation .btn-secondary {
+                width: 100%;
+            }
+
+            .calendar-grid {
+                gap: 2px;
+                padding: 0.5rem;
+            }
+
+            .calendar-day {
+                font-size: 0.75rem;
+            }
+            .schedule-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .reserve-mobile-summary,
+        .reserve-mobile-bar {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body.reserve-page {
+                padding: 0;
+            }
+
+            .reserve-container {
+                min-height: 100vh;
+                padding: 1rem 0 6.5rem;
+                border-radius: 0;
+            }
+
+            .reserve-mobile-summary {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 0.75rem;
+                margin-bottom: 1rem;
+                padding: 0.9rem 1rem;
+                border: 1px solid rgba(214, 240, 60, 0.16);
+                border-radius: 12px;
+                background: linear-gradient(180deg, rgba(214, 240, 60, 0.08), rgba(255, 255, 255, 0.02));
+            }
+
+            .reserve-mobile-summary__copy {
+                display: grid;
+                gap: 0.22rem;
+                min-width: 0;
+            }
+
+            .reserve-mobile-summary__step {
+                color: #d6f03c;
+                font-size: 0.72rem;
+                font-weight: 700;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+            }
+
+            .reserve-mobile-summary__car {
+                color: #fff;
+                font-size: 1rem;
+                font-weight: 700;
+                line-height: 1.2;
+            }
+
+            .reserve-mobile-summary__rate {
+                color: #b9b9c1;
+                font-size: 0.84rem;
+                line-height: 1.4;
+            }
+
+            .reserve-mobile-summary__whatsapp {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 42px;
+                padding: 0 0.85rem;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 12px;
+                background: rgba(255, 255, 255, 0.04);
+                color: #fff;
+                font-size: 0.74rem;
+                font-weight: 700;
+                white-space: nowrap;
+            }
+
+            .steps-indicator {
+                flex-direction: row;
+                gap: 0.55rem;
+                margin-bottom: 1rem;
+            }
+
+            .step-pill {
+                justify-content: center;
+                padding: 0.75rem;
+                border-radius: 12px;
+            }
+
+            .step-pill-copy,
+            .booking-primer,
+            .step1-side,
+            .payment-side {
+                display: none;
+            }
+
+            .step1-layout,
+            .step2-layout,
+            .payment-layout {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .step2-side {
+                display: contents;
+            }
+
+            .reservation-summary {
+                order: 1;
+                position: sticky;
+                top: 0.2rem;
+                z-index: 3;
+            }
+
+            .step2-main {
+                display: flex;
+                flex-direction: column;
+                order: 2;
+            }
+
+            .schedule-card {
+                order: 2;
+            }
+
+            .calendar-container {
+                order: 2;
+            }
+
+            .delivery-card {
+                order: 1;
+            }
+
+            .route-guide-card {
+                order: 4;
+            }
+
+            .delivery-map-wrapper,
+            .delivery-map-link,
+            .delivery-map-hint {
+                display: none;
+            }
+
+            .info-card,
+            .reservation-summary,
+            .delivery-card,
+            .route-guide-card,
+            .summary-section {
+                border-radius: 12px;
+                padding: 1rem;
+            }
+
+            .step-heading {
+                font-size: 1.85rem;
+                line-height: 1;
+            }
+
+            .step-heading-sub,
+            .payment-trust {
+                font-size: 0.88rem;
+                line-height: 1.5;
+            }
+
+            .reserve-mobile-bar {
+                position: fixed;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 120;
+                display: grid;
+                gap: 0.7rem;
+                padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+                background: linear-gradient(180deg, rgba(11, 11, 13, 0.94), rgba(11, 11, 13, 0.99));
+                border-top: 1px solid rgba(255, 255, 255, 0.08);
+                box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.28);
+            }
+
+            .reserve-mobile-bar__meta {
+                display: grid;
+                gap: 0.08rem;
+                min-width: 0;
+            }
+
+            .reserve-mobile-bar__step {
+                color: #d6f03c;
+                font-size: 0.68rem;
+                font-weight: 700;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+            }
+
+            .reserve-mobile-bar__car {
+                color: #fff;
+                font-size: 0.82rem;
+                font-weight: 700;
+                line-height: 1.25;
+            }
+
+            .reserve-mobile-bar__actions {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto;
+                gap: 0.65rem;
+            }
+
+            .reserve-mobile-bar__primary,
+            .reserve-mobile-bar__secondary {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 48px;
+                border-radius: 12px;
+                font-size: 0.8rem;
+                font-weight: 700;
+                line-height: 1;
+                text-align: center;
+            }
+
+            .reserve-mobile-bar__primary {
+                border: 0;
+                background: linear-gradient(135deg, #d6f03c, rgba(214, 240, 60, 0.82));
+                color: #111;
+            }
+
+            .reserve-mobile-bar__primary[disabled] {
+                opacity: 0.5;
+            }
+
+            .reserve-mobile-bar__secondary {
+                min-width: 116px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                background: rgba(255, 255, 255, 0.04);
+                color: #fff;
+            }
+        }
+        /* 2026 reserve refresh: cleaner, lighter and less text-heavy */
+        html {
+            background: #f4efe6;
+        }
+
+        body.reserve-page {
+            background: #f4efe6;
+            color: #181512;
+        }
+
+        .reserve-page .lab-header {
+            background: linear-gradient(180deg, rgba(246, 243, 238, 0.94) 0%, rgba(246, 243, 238, 0.82) 60%, rgba(246, 243, 238, 0) 100%);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 1px 0 rgba(50, 39, 27, 0.06);
+        }
+
+        .reserve-page .lab-header::after {
+            background: linear-gradient(90deg, rgba(23, 23, 23, 0), rgba(23, 23, 23, 0.08), rgba(23, 23, 23, 0));
+        }
+
+        .reserve-page .lab-brand__copy strong,
+        .reserve-page .lab-brand__copy span,
+        .reserve-page .lab-nav a,
+        .reserve-page .lab-nav__trigger {
+            color: #17120d;
+        }
+
+        .reserve-page .lab-nav a:hover,
+        .reserve-page .lab-nav__trigger:hover {
+            color: #5a4630;
+        }
+
+        .reserve-page .lab-header__utility-link {
+            border-color: rgba(98, 77, 50, 0.18);
+            background: rgba(255, 255, 255, 0.74);
+            color: #5c4831;
+            box-shadow: 0 8px 24px rgba(64, 45, 20, 0.06);
+        }
+
+        .reserve-page .lab-header__utility-link:hover,
+        .reserve-page .lab-header__utility-link:focus-visible {
+            border-color: rgba(221, 183, 90, 0.45);
+            background: #fff;
+            color: #17120d;
+        }
+
+        .reserve-page-main {
+            padding: calc(var(--lab-header-offset) + 0.72rem) 0 0;
+            background:
+                radial-gradient(circle at top left, rgba(221, 183, 90, 0.12), transparent 24%),
+                radial-gradient(circle at 88% 10%, rgba(199, 168, 119, 0.14), transparent 18%),
+                linear-gradient(180deg, #f6f3ee 0%, #f2ece2 30%, #efe7da 100%);
+        }
+
+        .reserve-page-shell {
+            padding: 0 1.25rem 4rem;
+        }
+
+        .reserve-page-intro {
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .reserve-page-intro__grid {
+            grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .reserve-container {
+            max-width: 1180px;
+            padding-top: 0.4rem;
+        }
+
+        .reserve-page-intro__copy,
+        .reserve-page-panel,
+        .step-pill,
+        .info-card,
+        .selected-plan-card,
+        .schedule-card,
+        .calendar-container,
+        .reservation-summary,
+        .route-guide-card,
+        .delivery-card,
+        .summary-section,
+        .payment-side-card,
+        .payment-trust,
+        .btn-home {
+            border: 1px solid rgba(92, 72, 49, 0.12);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(251, 248, 243, 0.94) 100%);
+            box-shadow: 0 18px 48px rgba(71, 50, 26, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.82);
+        }
+
+        .reserve-page-intro__copy,
+        .reserve-page-panel {
+            position: relative;
+            overflow: hidden;
+            padding: 1.2rem 1.35rem;
+            border-radius: 1.25rem;
+        }
+
+        .reserve-page-intro__copy::before,
+        .reserve-page-panel::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .reserve-page-intro__copy::before {
+            background: radial-gradient(circle at 14% 14%, rgba(221, 183, 90, 0.16) 0%, rgba(221, 183, 90, 0) 34%), linear-gradient(120deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 30%);
+        }
+
+        .reserve-page-panel::before {
+            background: radial-gradient(circle at 82% 12%, rgba(227, 246, 85, 0.12) 0%, rgba(227, 246, 85, 0) 36%), linear-gradient(180deg, rgba(255, 255, 255, 0.44), rgba(255, 255, 255, 0) 36%);
+        }
+
+        .reserve-page-intro__copy > *,
+        .reserve-page-panel > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .reserve-page-breadcrumb {
+            margin-bottom: 0.75rem;
+            color: rgba(64, 48, 31, 0.58);
+        }
+
+        .reserve-page-kicker,
+        .reserve-page-panel__eyebrow {
+            color: #8f6c42;
+            font-size: 0.74rem;
+            letter-spacing: 0.16em;
+        }
+
+        .reserve-page-heading {
+            color: #17120d;
+            font-size: clamp(2.15rem, 3.5vw, 3.35rem);
+            line-height: 0.94;
+            text-wrap: balance;
+        }
+
+        .reserve-page-lead {
+            max-width: 38rem;
+            margin-top: 0.55rem;
+            font-size: 0.96rem;
+            line-height: 1.55;
+        }
+
+        .reserve-page-lead,
+        .reserve-page-panel__copy,
+        .step-heading-sub,
+        .info-card-note,
+        .summary-caption,
+        .route-guide-copy,
+        .delivery-card-note,
+        .payment-caption,
+        .payment-side-copy,
+        .payment-trust,
+        .primer-copy {
+            color: rgba(52, 43, 32, 0.74);
+        }
+
+        .reserve-page-panel__title,
+        .summary-title,
+        .route-guide-title,
+        .assurance-title,
+        .selected-plan-title {
+            color: #17120d;
+        }
+
+        .reserve-page-panel__facts {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.65rem;
+        }
+
+        .reserve-page-panel__facts div,
+        .selected-plan-points div,
+        .route-guide-item,
+        .payment-perk,
+        .assurance-item {
+            border-color: rgba(92, 72, 49, 0.08);
+            background: rgba(255, 255, 255, 0.66);
+        }
+
+        .reserve-page-panel__facts strong,
+        .selected-plan-points strong,
+        .route-guide-item strong,
+        .payment-perk strong,
+        .assurance-item strong,
+        .info-card-title,
+        .payment-side-title,
+        .delivery-card-title {
+            color: #17120d;
+        }
+
+        .reserve-page-panel__facts span,
+        .selected-plan-points span,
+        .route-guide-item span,
+        .payment-perk span,
+        .assurance-item span,
+        .selected-plan-copy,
+        .assurance-note,
+        .delivery-map-hint,
+        .reserve-mobile-summary__rate {
+            color: rgba(52, 43, 32, 0.68);
+        }
+
+        .reserve-page-action,
+        .btn,
+        .confirm-pay-btn,
+        .btn-secondary,
+        .reserve-mobile-bar__primary {
+            border-radius: 999px;
+            font-family: var(--lab-font-sans);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .reserve-page-action--primary,
+        .btn,
+        .confirm-pay-btn,
+        .reserve-mobile-bar__primary {
+            background: linear-gradient(135deg, #efd793, #ddb75a);
+            color: #17120d;
+            box-shadow: 0 14px 32px rgba(221, 183, 90, 0.18);
+        }
+
+        .reserve-page-action--secondary,
+        .btn-secondary {
+            border: 1px solid rgba(92, 72, 49, 0.14);
+            background: rgba(255, 255, 255, 0.72);
+            color: #17120d;
+        }
+
+        .steps-indicator {
+            margin-bottom: 1.25rem;
+        }
+
+        .step-pill {
+            border-radius: 1.25rem;
+            color: #6f5a42;
+        }
+
+        .step-pill-label {
+            color: #17120d;
+        }
+
+        .step-pill-meta {
+            color: rgba(84, 66, 43, 0.56);
+        }
+
+        .step-pill-index {
+            border-color: rgba(92, 72, 49, 0.12);
+            background: rgba(255, 255, 255, 0.72);
+            color: #5d4831;
+        }
+
+        .step-pill.active {
+            border-color: rgba(221, 183, 90, 0.34);
+            background: linear-gradient(180deg, rgba(255, 248, 224, 0.96), rgba(248, 241, 229, 0.94));
+        }
+
+        .step-pill.active .step-pill-index,
+        .step-pill.completed .step-pill-index {
+            border-color: rgba(221, 183, 90, 0.3);
+            background: linear-gradient(135deg, #efd793, #ddb75a);
+            color: #17120d;
+        }
+
+        .step-pill.active .step-pill-label,
+        .step-pill.active .step-pill-meta {
+            color: #5d4831;
+        }
+
+        .booking-primer,
+        .step1-side .assurance-card,
+        .route-guide-card,
+        .btn-home {
+            display: none;
+        }
+
+        .step-heading {
+            margin-bottom: 0.55rem;
+            color: #17120d;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2.2rem, 4vw, 3.2rem);
+            font-weight: 600;
+            line-height: 0.96;
+            letter-spacing: -0.03em;
+        }
+
+        .step-heading-sub {
+            margin: 0 0 1.2rem;
+            max-width: 42rem;
+            font-size: 0.98rem;
+        }
+
+        .step1-layout {
+            grid-template-columns: minmax(0, 1fr) minmax(260px, 0.5fr);
+        }
+
+        .info-card,
+        .selected-plan-card,
+        .schedule-card,
+        .calendar-container,
+        .reservation-summary,
+        .route-guide-card,
+        .delivery-card,
+        .summary-section,
+        .payment-side-card {
+            border-radius: 1.35rem;
+            padding: 1.35rem;
+        }
+
+        .info-card--optional {
+            padding: 1rem 1.1rem;
+        }
+
+        .reserve-optional-panel {
+            display: grid;
+            gap: 0.9rem;
+        }
+
+        .reserve-optional-summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            cursor: pointer;
+            list-style: none;
+        }
+
+        .reserve-optional-summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .reserve-optional-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            color: #17120d;
+            font-weight: 700;
+        }
+
+        .reserve-optional-hint {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 32px;
+            padding: 0 0.8rem;
+            border-radius: 999px;
+            background: rgba(221, 183, 90, 0.14);
+            color: #8f6c42;
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .field-label {
+            margin-bottom: 0.42rem;
+            color: #5d4831;
+            font-size: 0.84rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .input {
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid rgba(92, 72, 49, 0.14);
+            color: #17120d;
+        }
+
+        .input::placeholder {
+            color: rgba(92, 72, 49, 0.45);
+        }
+
+        .input:focus {
+            border-color: rgba(221, 183, 90, 0.72);
+            box-shadow: 0 0 0 4px rgba(221, 183, 90, 0.16);
+        }
+
+        .info-grid .form-group,
+        .schedule-grid .form-group {
+            border-color: rgba(92, 72, 49, 0.08);
+            background: rgba(255, 255, 255, 0.42);
+        }
+
+        .summary-kicker,
+        .route-guide-kicker,
+        .payment-kicker,
+        .selected-plan-badge,
+        .assurance-kicker {
+            background: rgba(221, 183, 90, 0.14);
+            color: #8f6c42;
+        }
+
+        .summary-row,
+        .payment-breakdown-row {
+            color: rgba(52, 43, 32, 0.76);
+        }
+
+        .summary-value,
+        .summary-section .total,
+        .selected-plan-rate,
+        .summary-value.gold,
+        .summary-section h3,
+        .schedule-card-title,
+        .reserve-mobile-summary__step,
+        .reserve-mobile-bar__step {
+            color: #8f6c42;
+        }
+
+        .reservation-summary,
+        .summary-section {
+            background: linear-gradient(180deg, rgba(255, 251, 240, 0.96), rgba(250, 244, 232, 0.96));
+        }
+
+        .payment-trust {
+            margin-top: 0;
+            padding: 1rem 1.1rem;
+            border-radius: 1rem;
+        }
+
+        #card-element {
+            background: rgba(255, 255, 255, 0.94) !important;
+            border: 1px solid rgba(92, 72, 49, 0.14) !important;
+        }
+
+        .reserve-mobile-summary {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 0.95rem 1.1rem;
+            border-radius: 1rem;
+            border-color: rgba(92, 72, 49, 0.12);
+            background: rgba(255, 255, 255, 0.84);
+            box-shadow: 0 16px 36px rgba(71, 50, 26, 0.08);
+        }
+
+        .reserve-mobile-summary__copy {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 0.4rem 0.75rem;
+        }
+
+        .reserve-mobile-summary__step {
+            color: #8f6c42;
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .reserve-mobile-summary__car {
+            color: #17120d;
+            font-size: 1.1rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .reserve-mobile-summary__rate {
+            color: rgba(52, 43, 32, 0.7);
+            font-size: 0.98rem;
+        }
+
+        .reserve-mobile-summary__car,
+        .reserve-mobile-bar__car {
+            color: #17120d;
+        }
+
+        .reserve-mobile-summary__whatsapp {
+            display: none;
+        }
+
+        .reserve-mobile-bar {
+            background: #f8f2e8;
+            border-top: 1px solid rgba(92, 72, 49, 0.08);
+            box-shadow: 0 -18px 36px rgba(71, 50, 26, 0.08);
+        }
+
+        .reserve-mobile-bar__actions {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .reserve-mobile-bar__secondary {
+            display: none;
+        }
+
+        @media (max-width: 960px) {
+            .reserve-page-intro__grid,
+            .step1-layout,
+            .step2-layout,
+            .payment-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .reserve-page-panel__facts {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .reserve-page-main {
+                padding-top: calc(var(--lab-header-offset) + 0.6rem);
+            }
+
+            .reserve-page-intro {
+                display: block;
+                margin-bottom: 0.75rem;
+            }
+
+            .reserve-page-intro__grid {
+                grid-template-columns: 1fr;
+                gap: 0.7rem;
+            }
+
+            .reserve-mobile-summary {
+                display: flex;
+            }
+
+            .reserve-page-actions {
+                display: none;
+            }
+
+            .reserve-page-intro__copy,
+            .reserve-page-panel,
+            .step-pill,
+            .info-card,
+            .selected-plan-card,
+            .schedule-card,
+            .calendar-container,
+            .reservation-summary,
+            .route-guide-card,
+            .delivery-card,
+            .summary-section {
+                border-radius: 1.1rem;
+            }
+
+            .reserve-page-intro__copy,
+            .reserve-page-panel {
+                padding: 1rem;
+            }
+
+            .reserve-page-breadcrumb,
+            .reserve-page-panel,
+            .reserve-page-lead {
+                display: none;
+            }
+
+            .reserve-page-heading {
+                max-width: 8ch;
+                font-size: clamp(1.95rem, 11vw, 2.7rem);
+                line-height: 0.95;
+            }
+
+            .reserve-page-kicker {
+                margin-bottom: 0.35rem;
+            }
+
+            .reserve-mobile-summary {
+                margin-bottom: 0.75rem;
+                padding: 0.75rem 0.9rem;
+            }
+
+            .reserve-mobile-summary__copy {
+                gap: 0.2rem 0.55rem;
+            }
+
+            .reserve-mobile-summary__car {
+                font-size: 0.98rem;
+            }
+
+            .reserve-mobile-summary__rate {
+                font-size: 0.86rem;
+            }
+
+            .step-pill {
+                background: rgba(255, 255, 255, 0.84);
+            }
+
+            .calendar-container {
+                display: none;
+            }
+
+            .step2-layout {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .step2-main {
+                order: 1;
+            }
+
+            .step2-side {
+                order: 2;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .schedule-card {
+                order: 1;
+            }
+
+            .delivery-card {
+                order: 2;
+            }
+
+            .reservation-summary {
+                order: 1;
+                position: static;
+            }
+        }
+
+        /* Final reserve cleanup */
+        .reserve-page .lab-header__inner {
+            justify-content: space-between;
+            gap: 1.2rem;
+        }
+
+        .reserve-page-shell {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding-top: 0.2rem;
+        }
+
+        .booking-primer,
+        .calendar-container,
+        .route-guide-card,
+        .delivery-map-wrapper,
+        .delivery-map-link,
+        .delivery-map-hint,
+        .btn-home,
+        .assurance-card {
+            display: none !important;
+        }
+
+        .reserve-page-intro {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .reserve-page-intro__grid {
+            grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+            gap: 0.85rem;
+            align-items: start;
+        }
+
+        .reserve-page-intro__copy {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            min-height: 148px;
+            background:
+                radial-gradient(circle at 92% 18%, rgba(221, 183, 90, 0.22), transparent 30%),
+                radial-gradient(circle at 78% 78%, rgba(121, 87, 51, 0.1), transparent 34%),
+                linear-gradient(102deg, rgba(250, 246, 238, 0.98) 0%, rgba(250, 246, 238, 0.94) 52%, rgba(243, 233, 214, 0.82) 100%);
+        }
+
+        .reserve-page-panel {
+            display: grid;
+            gap: 0.55rem;
+            align-content: start;
+            padding: 0.95rem 1rem;
+        }
+
+        .reserve-page-panel__title {
+            font-size: 1rem;
+            line-height: 1.35;
+        }
+
+        .reserve-page-panel__copy {
+            margin: 0.35rem 0 0;
+            font-size: 0.86rem;
+            line-height: 1.45;
+        }
+
+        .reserve-page-panel__facts {
+            display: none;
+        }
+
+        .reserve-page-actions {
+            margin-top: 0.7rem;
+        }
+
+        .reserve-page-lead {
+            max-width: 28rem;
+            margin-top: 0.55rem;
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        .reserve-page-heading {
+            max-width: 16ch;
+            font-size: clamp(2.15rem, 3.1vw, 3rem);
+        }
+
+        .reserve-container {
+            max-width: 1180px;
+            padding-top: 0.05rem;
+        }
+
+        .reserve-mobile-summary {
+            margin-bottom: 0.85rem;
+        }
+
+        .steps-indicator {
+            margin-bottom: 0.42rem;
+        }
+
+        .step-pill {
+            gap: 0.65rem;
+            padding: 0.6rem 0.8rem;
+        }
+
+        .step-pill-index {
+            width: 30px;
+            height: 30px;
+            font-size: 0.86rem;
+        }
+
+        .step-pill-label {
+            font-size: 0.96rem;
+        }
+
+        .step-pill-meta {
+            font-size: 0.68rem;
+        }
+
+        .step-heading {
+            margin-bottom: 0.25rem;
+        }
+
+        .step-heading-sub {
+            display: none;
+        }
+
+        .step1-layout,
+        .step2-layout {
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .step1-layout {
+            grid-template-columns: minmax(0, 1fr) minmax(300px, 340px);
+        }
+
+        .step2-layout {
+            grid-template-columns: minmax(0, 1fr) minmax(320px, 360px);
+        }
+
+        .step1-main,
+        .step2-main,
+        .step2-side,
+        .payment-main {
+            gap: 1rem;
+        }
+
+        .step1-side {
+            position: sticky;
+            top: calc(var(--lab-header-offset) + 1rem);
+        }
+
+        .info-card,
+        .selected-plan-card,
+        .schedule-card,
+        .reservation-summary,
+        .delivery-card,
+        .summary-section,
+        .payment-trust {
+            padding: 1.15rem;
+        }
+
+        .info-card-note,
+        .schedule-card-note,
+        .delivery-card-note,
+        .summary-caption,
+        .payment-caption,
+        .payment-trust {
+            font-size: 0.92rem;
+        }
+
+        .schedule-grid {
+            gap: 0.85rem;
+        }
+
+        .delivery-card .form-group,
+        .schedule-grid .form-group,
+        .info-grid .form-group {
+            padding: 0.9rem;
+        }
+
+        .reserve-page-kicker,
+        .reserve-page-panel__eyebrow,
+        .summary-kicker,
+        .route-guide-kicker,
+        .schedule-card-title,
+        .summary-value.gold {
+            color: #795733;
+        }
+
+        .reserve-page-lead,
+        .reserve-page-panel__copy,
+        .schedule-card-note,
+        .summary-caption,
+        .delivery-card-note,
+        .route-guide-copy,
+        .summary-row span:first-child {
+            color: #4f402f;
+        }
+
+        .summary-title,
+        .delivery-card-title,
+        .route-guide-title,
+        .field-label {
+            color: #17120d;
+        }
+
+        .summary-row.primary-payment {
+            border-color: rgba(121, 87, 51, 0.24);
+            background: rgba(255, 247, 222, 0.74);
+        }
+
+        .summary-row.primary-payment .summary-value {
+            color: #73512e;
+        }
+
+        .schedule-card {
+            border-color: rgba(221, 183, 90, 0.22);
+        }
+
+        .step2-layout {
+            align-items: stretch;
+        }
+
+        .step2-side {
+            align-self: stretch;
+            grid-template-rows: minmax(0, 1fr);
+        }
+
+        .step2-side .reservation-summary {
+            min-height: 100%;
+            display: grid;
+            align-content: space-between;
+        }
+
+        .step2-side .route-guide-card {
+            display: none !important;
+        }
+
+        .step-content.active,
+        .step-content.active .info-card,
+        .step-content.active .assurance-card,
+        .step-content.active .calendar-container,
+        .step-content.active .schedule-card,
+        .step-content.active .reservation-summary,
+        .step-content.active .delivery-card,
+        .step-content.active .summary-section,
+        .step-content.active .payment-side-card,
+        .step-content.active .payment-trust {
+            animation: none !important;
+        }
+
+        #continueToPaymentBtn[disabled] {
+            opacity: 1 !important;
+            border: 1px solid rgba(121, 87, 51, 0.22);
+            background: linear-gradient(135deg, rgba(230, 206, 151, 0.72), rgba(222, 199, 145, 0.86));
+            color: #604525;
+            box-shadow: none;
+        }
+
+        .reserve-page-intro__copy,
+        .reserve-page-panel,
+        .step-pill,
+        .info-card,
+        .selected-plan-card,
+        .schedule-card,
+        .reservation-summary,
+        .delivery-card,
+        .summary-section,
+        .payment-side-card,
+        .payment-trust,
+        .reserve-mobile-summary,
+        .reserve-mobile-bar {
+            border-radius: 12px;
+        }
+
+        .reserve-page-action,
+        .btn,
+        .btn-secondary,
+        .confirm-pay-btn,
+        .reserve-mobile-bar__primary,
+        .reserve-mobile-bar__secondary,
+        .contact-chip {
+            border-radius: 8px;
+        }
+
+        .delivery-card .form-group,
+        .schedule-grid .form-group,
+        .info-grid .form-group,
+        .payment-breakdown,
+        #card-element {
+            border-radius: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .reserve-page-main {
+                padding-top: calc(var(--lab-header-offset) + 0.18rem);
+            }
+
+            .reserve-mobile-bar:has(.reserve-mobile-bar__primary:disabled) {
+                display: none;
+            }
+
+            .reserve-page-intro {
+                margin-bottom: 0.5rem;
+            }
+
+            .reserve-page-intro__grid {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .reserve-page-panel,
+            .reserve-page-breadcrumb,
+            .reserve-page-lead,
+            .reserve-mobile-summary {
+                display: none;
+            }
+
+            .reserve-page-intro__copy {
+                width: 100%;
+                min-height: 108px;
+                padding: 0.8rem 0.9rem;
+                background-position: center;
+            }
+
+            .reserve-page-kicker {
+                margin-bottom: 0.25rem;
+            }
+
+            .reserve-page-heading {
+                max-width: 13ch;
+                font-size: clamp(1.52rem, 7.6vw, 1.95rem);
+            }
+
+            .steps-indicator {
+                margin-bottom: 0.45rem;
+            }
+
+            .step-pill {
+                padding: 0.58rem 0.65rem;
+            }
+        }
+
+        .step-navigation {
+            justify-content: flex-end;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .step-navigation .btn-secondary,
+        .step-navigation .btn {
+            flex: 0 0 auto;
+            min-width: 180px;
+            width: auto;
+            margin-top: 0;
+        }
+
+        .payment-layout {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .payment-side {
+            display: none;
+        }
+
+        .summary-section {
+            text-align: left;
+        }
+
+        .payment-breakdown {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+        }
+
+        #payment-form-container {
+            margin-top: 0.75rem !important;
+        }
+
+        @media (max-width: 900px) {
+            .step1-layout,
+            .step2-layout,
+            .payment-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .step1-side {
+                position: static;
+            }
+
+            .step2-side .route-guide-card {
+                display: none !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .reserve-page .lab-header__utility-link[href^="mailto:"] {
+                display: none;
+            }
+
+            .reserve-mobile-summary__copy {
+                display: grid;
+                gap: 0.22rem;
+            }
+
+            .steps-indicator {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 0.55rem;
+            }
+
+            .step-pill {
+                min-height: 60px;
+                padding: 0.65rem;
+            }
+
+            .step-pill-copy {
+                display: none;
+            }
+
+            .step-navigation {
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+
+            .step-navigation .btn-secondary,
+            .step-navigation .btn {
+                width: 100%;
+                min-width: 0;
+            }
+        }

@@ -1671,7 +1671,7 @@
     }
 
     .fleet-sidebar__topbar {
-        position: sticky;
+        position: relative;
         top: 0;
         z-index: 1;
         grid-template-columns: minmax(0, 1fr) auto;
@@ -1761,6 +1761,41 @@
         gap: 0.55rem;
     }
 
+    .fleet-sidebar {
+        max-height: min(86svh, 46rem);
+        background:
+            linear-gradient(180deg, #ead8bd 0%, #dfc69f 100%),
+            radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 34%);
+    }
+
+    .fleet-sidebar__field-grid {
+        grid-template-columns: 1fr;
+        gap: 0.72rem;
+    }
+
+    .fleet-sidebar__field-shell,
+    .fleet-sidebar__field-display {
+        min-height: 56px;
+    }
+
+    .fleet-sidebar__field-shell--date .fleet-sidebar__field-display,
+    .fleet-sidebar__field-shell--time .fleet-sidebar__field-display {
+        padding-inline: 1rem;
+        font-size: 0.98rem;
+        letter-spacing: 0.08em;
+    }
+
+    .fleet-sidebar__select,
+    .fleet-filter-reset,
+    .fleet-filter-close {
+        min-height: 48px;
+    }
+
+    .fleet-filter-close {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+
     .fleet-mobile-chip--dates {
         padding-inline: 0.8rem;
         font-size: 0.62rem;
@@ -1772,5 +1807,76 @@
 
     .fleet-card__contact-row {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 560px) and (max-height: 680px) {
+    .fleet-sidebar {
+        top: 0;
+        max-height: 100svh;
+        height: 100svh;
+        padding: 0.7rem 0.8rem calc(0.75rem + env(safe-area-inset-bottom));
+        border-radius: 0;
+    }
+
+    .fleet-sidebar__topbar {
+        gap: 0.55rem;
+        padding-bottom: 0.55rem;
+    }
+
+    .fleet-sidebar__scroll {
+        min-height: 0;
+        padding-top: 0.65rem;
+        padding-bottom: 0.75rem;
+    }
+
+    .fleet-sidebar__body {
+        gap: 0.5rem;
+        padding-top: 0.5rem;
+    }
+
+    .fleet-sidebar__module {
+        overflow: visible;
+    }
+
+    .fleet-sidebar__module + .fleet-sidebar__module {
+        padding-top: 0.65rem;
+    }
+
+    .fleet-sidebar__field-grid {
+        gap: 0.52rem;
+    }
+
+    .fleet-sidebar__field {
+        gap: 0.22rem;
+    }
+
+    .fleet-sidebar__field-shell,
+    .fleet-sidebar__field-display {
+        min-height: 50px;
+    }
+
+    .fleet-sidebar__field-shell--date .fleet-sidebar__field-display,
+    .fleet-sidebar__field-shell--time .fleet-sidebar__field-display {
+        font-size: 0.88rem;
+        letter-spacing: 0.06em;
+    }
+
+    .fleet-sidebar__note {
+        font-size: 0.6rem;
+    }
+
+    .fleet-sidebar__select,
+    .fleet-filter-reset,
+    .fleet-filter-close {
+        min-height: 44px;
+    }
+
+    .fleet-sidebar__select {
+        min-height: 50px;
+        padding-top: 0.55rem;
+        padding-bottom: 0.55rem;
+        font-size: 0.82rem;
+        line-height: 1.15;
     }
 }

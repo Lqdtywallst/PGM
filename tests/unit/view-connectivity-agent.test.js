@@ -2,6 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const {
+    compareHeaderSystems,
     determineRouteFormatStatus,
     evaluateAuditGate,
     extractPublicRouteLinks,
@@ -64,9 +65,14 @@ test('inferVisualIntentFromSource detects legacy orbitron shells and modern serv
         <link rel="stylesheet" href="./css/site-v2-service-detail.css">
         <section class="service-detail-hero"></section>
     `;
+    const reserveShellHtml = `
+        <link rel="stylesheet" href="/css/reserve-shell.css">
+        <main class="reserve-container"></main>
+    `;
 
     assert.equal(inferVisualIntentFromSource(legacyHtml), 'legacy_dark_neon');
     assert.equal(inferVisualIntentFromSource(darkServiceHtml), 'modern_light_system');
+    assert.equal(inferVisualIntentFromSource(reserveShellHtml), 'modern_light_system');
 });
 
 test('determineRouteFormatStatus approves expected intents and flags legacy shells', () => {
@@ -109,7 +115,10 @@ test('summarizeAudit aggregates route status and finding counts', () => {
     const summary = summarizeAudit([
         {
             formatStatus: 'approved',
-            findings: [{ severity: 'high', type: 'legacy_connection' }]
+            findings: [
+                { severity: 'high', type: 'legacy_connection' },
+                { severity: 'medium', type: 'header_handoff_drift' }
+            ]
         },
         {
             formatStatus: 'legacy',
@@ -127,8 +136,33 @@ test('summarizeAudit aggregates route status and finding counts', () => {
     assert.equal(summary.reviewRoutes, 1);
     assert.equal(summary.legacyConnections, 1);
     assert.equal(summary.orphanRoutes, 1);
+    assert.equal(summary.headerHandoffDrift, 1);
     assert.equal(summary.bySeverity.high, 2);
-    assert.equal(summary.bySeverity.medium, 1);
+    assert.equal(summary.bySeverity.medium, 2);
+});
+
+test('compareHeaderSystems flags variant, brand font and nav signature drift', () => {
+    const result = compareHeaderSystems(
+        {
+            headerVariant: 'lab_mega',
+            headerBrandFontFamily: 'manrope',
+            headerPrimaryNavSignature: 'Home|Fleet|Cars Brands|Cars Types|Services|Locations|About Us|Contact',
+            headerNavRowCount: 1
+        },
+        {
+            headerVariant: 'lab_simple',
+            headerBrandFontFamily: 'inter',
+            headerPrimaryNavSignature: 'Home|Fleet|Services|Locations|About Us|Contact',
+            headerNavRowCount: 1
+        }
+    );
+
+    assert.equal(result.severity, 'high');
+    assert.deepEqual(result.mismatches, [
+        'headerVariant=lab_mega->lab_simple',
+        'headerBrandFontFamily=manrope->inter',
+        'headerPrimaryNavSignature=Home|Fleet|Cars Brands|Cars Types|Services|Locations|About Us|Contact->Home|Fleet|Services|Locations|About Us|Contact'
+    ]);
 });
 
 test('evaluateAuditGate stays green by default and fails in strict mode when issues remain', () => {

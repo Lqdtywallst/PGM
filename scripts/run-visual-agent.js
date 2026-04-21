@@ -33,7 +33,9 @@ const {
 const {
     DESIGN_SYSTEM_CONTRACT,
     getFirstViewportContract,
-    getSectionRhythmContract
+    getMobileInteractionContract,
+    getSectionRhythmContract,
+    getViewportCoverageMatrix
 } = require(path.join(__dirname, '..', 'server', 'design-system-contract.js'));
 
 const repoRoot = path.resolve(__dirname, '..');
@@ -42,17 +44,32 @@ const baselineRoot = path.join(repoRoot, 'tests', 'visual-baselines');
 const baselineManifestPath = path.join(baselineRoot, 'manifest.json');
 const pixelmatch = pixelmatchModule.default || pixelmatchModule;
 
-const VIEWPORTS = Object.freeze([
-    { name: 'mobile-small', width: 360, height: 640, isMobile: true, hasTouch: true, deviceScaleFactor: 2 },
-    { name: 'mobile-modern', width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 3 },
-    { name: 'tablet-portrait', width: 768, height: 1024, isMobile: true, hasTouch: true, deviceScaleFactor: 2 },
-    { name: 'laptop', width: 1366, height: 768, isMobile: false, hasTouch: false, deviceScaleFactor: 1 },
-    { name: 'desktop-wide', width: 1707, height: 893, isMobile: false, hasTouch: false, deviceScaleFactor: 1 }
-]);
+const VIEWPORTS = Object.freeze(getViewportCoverageMatrix('visualAgent'));
 
 const SNAPSHOT_THRESHOLDS = Object.freeze({
     viewport: 0.015,
     region: 0.008
+});
+
+const HUMAN_SCENARIO_VALUES = Object.freeze({
+    contact: Object.freeze({
+        contactName: 'Alex Morgan',
+        contactEmail: 'alex.morgan@example.com',
+        contactPhone: '+971500000001',
+        contactSubject: 'reservation',
+        contactMessage: 'I need a two-day Dubai rental with airport delivery and a calm handover.'
+    }),
+    reserve: Object.freeze({
+        startDate: '2026-08-20',
+        endDate: '2026-08-22',
+        pickupTime: '10:00',
+        dropoffTime: '18:00',
+        pickupLocation: 'Atlantis The Royal, Palm Jumeirah',
+        fullName: 'Sofia Bennett',
+        passport: 'XK938271',
+        phone: '+971501234567',
+        email: 'sofia.bennett@example.com'
+    })
 });
 
 const SHARED_LAB_HEADER_PROFILES = new Set([
@@ -403,8 +420,96 @@ function routeFileStem(route) {
         .replace(/^-+/, '') || 'home';
 }
 
+function slugify(value) {
+    return String(value || 'item')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 80) || 'item';
+}
+
 function timestampSlug(date = new Date()) {
     return date.toISOString().replace(/[:.]/g, '-');
+}
+
+function formatLocalDateIso(date = new Date()) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function addLocalDaysIso(offsetDays, baseDate = new Date()) {
+    const date = new Date(baseDate);
+    date.setDate(date.getDate() + offsetDays);
+    return formatLocalDateIso(date);
+}
+
+function normalizeIsoDate(value) {
+    const match = String(value || '').trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+    if (!match) {
+        return '';
+    }
+
+    const [, year, month, day] = match;
+    const parsed = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+
+    if (
+        parsed.getUTCFullYear() !== Number(year) ||
+        parsed.getUTCMonth() + 1 !== Number(month) ||
+        parsed.getUTCDate() !== Number(day)
+    ) {
+        return '';
+    }
+
+    return `${year}-${month}-${day}`;
+}
+
+function dateIsoToDayNumber(value) {
+    const isoDate = normalizeIsoDate(value);
+
+    if (!isoDate) {
+        return NaN;
+    }
+
+    const [year, month, day] = isoDate.split('-').map(Number);
+    return Math.floor(Date.UTC(year, month - 1, day) / 86400000);
+}
+
+function parseVisualDateValue(value) {
+    const text = String(value || '').replace(/\s+/g, ' ').trim();
+
+    if (!text) {
+        return '';
+    }
+
+    const isoMatch = text.match(/\b(\d{4})-(\d{2})-(\d{2})\b/);
+    const isoDate = normalizeIsoDate(isoMatch?.[0]);
+
+    if (isoDate) {
+        return isoDate;
+    }
+
+    const dayFirstMatch = text.match(/\b(\d{1,2})\s*[/. -]\s*(\d{1,2})\s*[/. -]\s*(\d{4})\b/);
+
+    if (!dayFirstMatch) {
+        return '';
+    }
+
+    const day = Number(dayFirstMatch[1]);
+    const month = Number(dayFirstMatch[2]);
+    const year = Number(dayFirstMatch[3]);
+
+    if (day < 1 || day > 31 || month < 1 || month > 12) {
+        return '';
+    }
+
+    if (day <= 12 && month <= 12) {
+        return '';
+    }
+
+    return normalizeIsoDate(`${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
 }
 
 async function findAvailablePort() {
@@ -476,6 +581,82 @@ function copyFileIfPresent(sourcePath, destinationPath) {
     ensureDir(path.dirname(destinationPath));
     fs.copyFileSync(sourcePath, destinationPath);
     return true;
+}
+
+function extensionForScreenshot(sourcePath) {
+    const extension = path.extname(sourcePath || '').toLowerCase();
+    return ['.png', '.jpg', '.jpeg', '.webp'].includes(extension) ? extension : '.png';
+}
+
+function buildVisualHumanReviewArtifacts(pages, runDir) {
+    const reviewDir = path.join(runDir, 'human-review', 'visual-findings');
+    const entries = [];
+    let index = 0;
+
+    const enrichedPages = pages.map((page) => {
+        const findings = (page.findings || []).map((finding) => {
+            index += 1;
+            const sourceScreenshot = finding.screenshotPath ||
+                page.artifacts?.regionScreenshot ||
+                page.artifacts?.viewportScreenshot ||
+                '';
+            const filename = `${String(index).padStart(3, '0')}-${slugify(page.route)}-${slugify(page.viewport)}-${slugify(finding.category)}${extensionForScreenshot(sourceScreenshot)}`;
+            const reviewScreenshotPath = path.join(reviewDir, filename);
+            const copied = copyFileIfPresent(sourceScreenshot, reviewScreenshotPath);
+            const entry = {
+                id: `visual-${String(index).padStart(3, '0')}`,
+                route: page.route,
+                viewport: page.viewport,
+                severity: finding.severity,
+                category: finding.category,
+                message: finding.message,
+                evidence: finding.evidence || '',
+                sourceScreenshotPath: sourceScreenshot,
+                reviewScreenshotPath: copied ? reviewScreenshotPath : '',
+                screenshotMissing: !copied
+            };
+
+            entries.push(entry);
+
+            return {
+                ...finding,
+                humanReviewScreenshotPath: entry.reviewScreenshotPath,
+                humanReviewId: entry.id
+            };
+        });
+        const assessmentFindings = (page.assessment?.findings || []).map((finding, findingIndex) => ({
+            ...finding,
+            humanReviewScreenshotPath: findings[findingIndex]?.humanReviewScreenshotPath || finding.humanReviewScreenshotPath || '',
+            humanReviewId: findings[findingIndex]?.humanReviewId || finding.humanReviewId || ''
+        }));
+
+        return {
+            ...page,
+            findings,
+            assessment: {
+                ...page.assessment,
+                findings: assessmentFindings
+            }
+        };
+    });
+
+    const manifest = {
+        generatedAt: new Date().toISOString(),
+        kind: 'visual',
+        totalFindings: entries.length,
+        screenshots: entries.filter((entry) => entry.reviewScreenshotPath).length,
+        missingScreenshots: entries.filter((entry) => entry.screenshotMissing).length,
+        directory: reviewDir,
+        entries
+    };
+
+    ensureDir(reviewDir);
+    fs.writeFileSync(path.join(reviewDir, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
+
+    return {
+        pages: enrichedPages,
+        manifest
+    };
 }
 
 function isOnlyBaselineBootstrapGate(gate) {
@@ -930,10 +1111,2132 @@ function buildServiceInteractionFindings({ route, viewportName, serviceSelectorS
     return findings;
 }
 
+async function collectFleetMobileFilterState(page, pageDir, viewport) {
+    if (!viewport?.width || viewport.width > 960) {
+        return null;
+    }
+
+    const toggle = page.locator('.fleet-mobile-filter-toggle').first();
+
+    if ((await toggle.count()) === 0 || !(await toggle.isVisible().catch(() => false))) {
+        return {
+            available: false,
+            reason: 'mobileFilterToggleMissing'
+        };
+    }
+
+    await page.evaluate(() => {
+        const setControlValue = (selector, value) => {
+            const element = document.querySelector(selector);
+
+            if (!element) {
+                return;
+            }
+
+            element.value = value;
+            element.dispatchEvent(new Event('input', { bubbles: true }));
+            element.dispatchEvent(new Event('change', { bubbles: true }));
+        };
+
+        setControlValue('#fleet-pickup-date', '2026-04-20');
+        setControlValue('#fleet-return-date', '2026-04-22');
+        setControlValue('#fleet-pickup-time', '10:00');
+        setControlValue('#fleet-return-time', '18:00');
+        setControlValue('.js-fleet-brand-select', 'lamborghini');
+        setControlValue('.js-fleet-type-select', 'convertible');
+    });
+
+    await toggle.click();
+    await page.waitForFunction(() => (
+        document.querySelector('.fleet-browser')?.classList.contains('fleet-filters-open')
+    ), null, { timeout: 1800 }).catch(() => {});
+    await settlePage(page, 160);
+
+    const state = await page.evaluate(() => {
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const sidebar = document.querySelector('.fleet-sidebar');
+        const browser = document.querySelector('.fleet-browser');
+
+        function isVisible(element) {
+            if (!(element instanceof HTMLElement)) {
+                return false;
+            }
+
+            const style = window.getComputedStyle(element);
+            const rect = element.getBoundingClientRect();
+            return style.display !== 'none' &&
+                style.visibility !== 'hidden' &&
+                Number(style.opacity) >= 0.05 &&
+                rect.width >= 4 &&
+                rect.height >= 4;
+        }
+
+        function rectData(element) {
+            if (!(element instanceof HTMLElement)) {
+                return null;
+            }
+
+            const rect = element.getBoundingClientRect();
+            return {
+                top: Number(rect.top.toFixed(2)),
+                right: Number(rect.right.toFixed(2)),
+                bottom: Number(rect.bottom.toFixed(2)),
+                left: Number(rect.left.toFixed(2)),
+                width: Number(rect.width.toFixed(2)),
+                height: Number(rect.height.toFixed(2))
+            };
+        }
+
+        function textFor(element) {
+            if (!element) {
+                return '';
+            }
+
+            if (element instanceof HTMLSelectElement) {
+                return String(element.selectedOptions[0]?.textContent || element.value || '').replace(/\s+/g, ' ').trim();
+            }
+
+            if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
+                return String(element.value || element.placeholder || '').replace(/\s+/g, ' ').trim();
+            }
+
+            return String(element.innerText || element.textContent || '').replace(/\s+/g, ' ').trim();
+        }
+
+        function clipData(element) {
+            if (!(element instanceof HTMLElement)) {
+                return { clipX: 0, clipY: 0 };
+            }
+
+            return {
+                clipX: Number(Math.max(0, element.scrollWidth - element.clientWidth).toFixed(2)),
+                clipY: Number(Math.max(0, element.scrollHeight - element.clientHeight).toFixed(2))
+            };
+        }
+
+        function controlData(element, key, kind, textElement = element) {
+            const rect = rectData(element);
+            const sheetRect = rectData(sidebar);
+            const text = textFor(textElement);
+            const clip = clipData(textElement instanceof HTMLElement ? textElement : element);
+            const visibleIntersectionHeight = rect
+                ? Math.max(0, Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0))
+                : 0;
+            const visibleIntersectionWidth = rect
+                ? Math.max(0, Math.min(rect.right, viewportWidth) - Math.max(rect.left, 0))
+                : 0;
+
+            return {
+                key,
+                kind,
+                text,
+                rect,
+                visible: isVisible(element),
+                visibleInViewport: Boolean(visibleIntersectionHeight > 8 && visibleIntersectionWidth > 8),
+                fullyVisibleInViewport: Boolean(rect && rect.top >= 0 && rect.left >= 0 && rect.bottom <= viewportHeight && rect.right <= viewportWidth),
+                viewportClipPx: rect ? Number(Math.max(
+                    0,
+                    -rect.top,
+                    -rect.left,
+                    rect.bottom - viewportHeight,
+                    rect.right - viewportWidth
+                ).toFixed(2)) : 0,
+                widthRatio: Number((rect && sheetRect?.width ? rect.width / sheetRect.width : 0).toFixed(3)),
+                clipX: clip.clipX,
+                clipY: clip.clipY
+            };
+        }
+
+        const dateTimeFields = Array.from(document.querySelectorAll('.fleet-sidebar__field'))
+            .map((field, index) => {
+                const label = field.querySelector(':scope > span:not(.fleet-sidebar__field-shell)');
+                const shell = field.querySelector('.fleet-sidebar__field-shell');
+                const display = field.querySelector('.fleet-sidebar__field-display');
+                const input = field.querySelector('input');
+                const base = controlData(shell, input?.id || `fleet-field-${index}`, 'date_time_field', display || shell);
+
+                return {
+                    ...base,
+                    label: textFor(label),
+                    value: textFor(input),
+                    displayText: textFor(display)
+                };
+            });
+
+        const selects = Array.from(document.querySelectorAll('.fleet-sidebar select'))
+            .map((select) => controlData(select, select.className || select.getAttribute('aria-label') || 'select', 'select', select));
+        const buttons = Array.from(document.querySelectorAll('.fleet-sidebar button, .fleet-filter-close'))
+            .map((button) => controlData(button, button.className || textFor(button), 'button', button));
+        const rangeInputs = Array.from(document.querySelectorAll('.fleet-price-range__input'))
+            .map((input) => controlData(input, input.className || input.getAttribute('aria-label') || 'range', 'range', input));
+        const selectedFilterLabels = selects.map((select) => select.text).filter(Boolean);
+        const displayTexts = dateTimeFields.map((field) => field.displayText).filter(Boolean);
+        const visibleFilledFieldCount = dateTimeFields.filter((field) => field.displayText && field.visibleInViewport).length;
+        const sheetRect = rectData(sidebar);
+
+        return {
+            available: Boolean(sidebar),
+            isOpen: Boolean(browser?.classList.contains('fleet-filters-open')),
+            viewportWidth,
+            viewportHeight,
+            sheetRect,
+            sheetHeightRatio: Number((sheetRect?.height ? sheetRect.height / Math.max(1, viewportHeight) : 0).toFixed(3)),
+            sheetHorizontalOverflowPx: sidebar ? Number(Math.max(0, sidebar.scrollWidth - sidebar.clientWidth).toFixed(2)) : 0,
+            displayTexts,
+            selectedFilterLabels,
+            visibleFilledFieldCount,
+            dateTimeFields,
+            controls: [...dateTimeFields, ...selects, ...buttons, ...rangeInputs]
+        };
+    });
+
+    const screenshotPath = path.join(pageDir, 'fleet-mobile-filters-filled.png');
+    await page.screenshot({
+        path: screenshotPath,
+        fullPage: false,
+        animations: 'disabled',
+        caret: 'hide'
+    });
+
+    await page.locator('.fleet-filter-close').first().click().catch(() => {});
+    await page.waitForTimeout(80);
+
+    return {
+        ...state,
+        screenshotPath
+    };
+}
+
+function buildFleetMobileFilterFindings({ route, viewportName, viewportWidth, state, screenshotPath }) {
+    const findings = [];
+    const normalizedRoute = normalizeRoute(route);
+    const contract = getMobileInteractionContract({
+        interaction: 'fleet_filter_sheet',
+        viewportName,
+        viewportWidth
+    });
+    const stateScreenshotPath = state?.screenshotPath || screenshotPath;
+
+    if (normalizedRoute !== '/fleet.html' || !contract) {
+        return findings;
+    }
+
+    if (!state?.available) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'form_visibility',
+            message: 'The mobile fleet filter sheet cannot be reached from the visible toolbar.',
+            evidence: `state=${state?.reason || 'missing'}`,
+            likelyCause: 'The mobile filters toggle, sheet, or Fleet controls are not rendering in the mobile layout.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+        return findings;
+    }
+
+    if (!state.isOpen) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'interaction_state',
+            message: 'The mobile fleet filter toggle did not open the filter sheet.',
+            evidence: 'fleet-filters-open=false',
+            likelyCause: 'The mobile filter interaction is not wiring the toolbar button to the sheet state.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    if (Number(state.sheetHorizontalOverflowPx || 0) > contract.maxHorizontalOverflowPx) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'overflow',
+            message: 'The mobile fleet filter sheet creates horizontal overflow.',
+            evidence: `sheetHorizontalOverflowPx=${state.sheetHorizontalOverflowPx}; max=${contract.maxHorizontalOverflowPx}`,
+            likelyCause: 'A date field, filter select, or price control is wider than the mobile sheet.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    if (
+        Number.isFinite(contract.maxSheetHeightRatio) &&
+        Number(state.sheetHeightRatio || 0) > contract.maxSheetHeightRatio
+    ) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'medium',
+            category: 'form_visibility',
+            message: 'The mobile fleet filter sheet is too tall for a comfortable bottom-sheet interaction.',
+            evidence: `sheetHeightRatio=${state.sheetHeightRatio}; max=${contract.maxSheetHeightRatio}`,
+            likelyCause: 'The filter sheet is occupying nearly the entire mobile viewport and leaving little orientation context.',
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    const displayTexts = state.displayTexts || [];
+    const selectedFilterLabels = state.selectedFilterLabels || [];
+    const missingFilledValues = (contract.requiredFilledValues || [])
+        .filter((value) => !displayTexts.includes(value));
+    const missingFilterLabels = (contract.requiredFilterLabels || [])
+        .filter((label) => !selectedFilterLabels.includes(label));
+
+    if (missingFilledValues.length > 0) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'form_visibility',
+            message: 'Filled mobile date and time values are not visibly reflected in the fleet filter sheet.',
+            evidence: `missingValues=${missingFilledValues.join(', ')}; visibleValues=${displayTexts.join(' | ') || 'none'}`,
+            likelyCause: 'The real inputs may be hidden without a reliable visible display layer, or the display layer is not syncing after input.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    if (missingFilterLabels.length > 0) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'interaction_state',
+            message: 'Selected mobile fleet filters are not visibly reflected after interaction.',
+            evidence: `missingFilters=${missingFilterLabels.join(', ')}; selectedFilters=${selectedFilterLabels.join(' | ') || 'none'}`,
+            likelyCause: 'The brand/type select state is not updating, or the selected option is not readable in the mobile sheet.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    if (Number(state.visibleFilledFieldCount || 0) < contract.minVisibleFilledFieldCount) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'form_visibility',
+            message: 'Too few filled schedule controls are visible when the mobile filter sheet opens.',
+            evidence: `visibleFilledFieldCount=${state.visibleFilledFieldCount}; min=${contract.minVisibleFilledFieldCount}`,
+            likelyCause: 'The date/time controls are pushed too far down or compressed out of the first mobile sheet view.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    const narrowFields = (state.dateTimeFields || [])
+        .filter((field) => Number(field.widthRatio || 0) < contract.minFilledFieldWidthRatio);
+
+    if (narrowFields.length > 0) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'form_visibility',
+            message: 'Mobile date/time fields are too narrow to read or tap comfortably after values are entered.',
+            evidence: narrowFields.map((field) => `${field.key}:${field.widthRatio}`).join('; '),
+            likelyCause: 'The schedule controls are still using a desktop-style multi-column grid on a narrow mobile sheet.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    const smallTargets = (state.controls || [])
+        .filter((control) => {
+            const rect = control.rect || {};
+
+            if (control.kind === 'range') {
+                return Number(rect.width || 0) < contract.minUsefulControlWidthPx;
+            }
+
+            return Number(rect.width || 0) < contract.minTapTargetPx ||
+                Number(rect.height || 0) < contract.minTapTargetPx ||
+                (
+                    control.kind !== 'range' &&
+                    Number(rect.width || 0) < contract.minUsefulControlWidthPx
+                );
+        });
+
+    if (smallTargets.length > 0) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'form_visibility',
+            message: 'Some mobile fleet filter controls are below the usable tap/readability size.',
+            evidence: smallTargets.slice(0, 5).map((control) => `${control.key}:${control.rect?.width}x${control.rect?.height}`).join('; '),
+            likelyCause: 'Mobile controls are being squeezed into columns or inheriting desktop sizing.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    const clippedControls = (state.controls || [])
+        .filter((control) => (
+            Number(control.clipX || 0) > contract.maxTextClipPx ||
+            Number(control.clipY || 0) > contract.maxTextClipPx
+        ));
+
+    if (clippedControls.length > 0) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'clipping',
+            message: 'Mobile fleet filter control text is clipped after entering values.',
+            evidence: clippedControls.slice(0, 5).map((control) => `${control.key}:clipX=${control.clipX},clipY=${control.clipY},text="${control.text || control.displayText || ''}"`).join('; '),
+            likelyCause: 'A value display, select, or button has fixed sizing that cannot hold its real mobile content.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    const viewportClippedControls = (state.controls || [])
+        .filter((control) => (
+            control.visibleInViewport &&
+            !control.fullyVisibleInViewport &&
+            Number(control.viewportClipPx || 0) > Number(contract.maxViewportClipPx || 2)
+        ));
+
+    if (viewportClippedControls.length > 0) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'clipping',
+            message: 'Mobile fleet filter controls are partially cut by the short viewport after the sheet opens.',
+            evidence: viewportClippedControls.slice(0, 5).map((control) => `${control.key}:viewportClipPx=${control.viewportClipPx},text="${control.text || control.displayText || ''}"`).join('; '),
+            likelyCause: 'The bottom sheet is too tall or the internal scroll position is not reset for short mobile screens.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    return findings;
+}
+
+async function collectContactFormState(page, pageDir) {
+    const form = page.locator('#contactForm').first();
+
+    if ((await form.count()) === 0 || !(await form.isVisible().catch(() => false))) {
+        return {
+            available: false,
+            reason: 'contactFormMissing'
+        };
+    }
+
+    await page.evaluate((values) => {
+        const setControlValue = (id, value) => {
+            const element = document.getElementById(id);
+
+            if (!element) {
+                return;
+            }
+
+            element.value = value;
+            element.dispatchEvent(new Event('input', { bubbles: true }));
+            element.dispatchEvent(new Event('change', { bubbles: true }));
+        };
+
+        for (const [id, value] of Object.entries(values)) {
+            setControlValue(id, value);
+        }
+    }, HUMAN_SCENARIO_VALUES.contact);
+
+    await settlePage(page, 120);
+
+    const state = await page.evaluate((expectedValues) => {
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const root = document.documentElement;
+        const body = document.body;
+
+        function rectData(element) {
+            if (!(element instanceof HTMLElement)) {
+                return null;
+            }
+
+            const rect = element.getBoundingClientRect();
+            return {
+                top: Number(rect.top.toFixed(2)),
+                right: Number(rect.right.toFixed(2)),
+                bottom: Number(rect.bottom.toFixed(2)),
+                left: Number(rect.left.toFixed(2)),
+                width: Number(rect.width.toFixed(2)),
+                height: Number(rect.height.toFixed(2))
+            };
+        }
+
+        function isVisible(element) {
+            if (!(element instanceof HTMLElement)) {
+                return false;
+            }
+
+            const style = window.getComputedStyle(element);
+            const rect = element.getBoundingClientRect();
+            return style.display !== 'none' &&
+                style.visibility !== 'hidden' &&
+                Number(style.opacity) >= 0.05 &&
+                rect.width >= 4 &&
+                rect.height >= 4;
+        }
+
+        function textFor(element) {
+            if (element instanceof HTMLSelectElement) {
+                return String(element.selectedOptions[0]?.textContent || element.value || '').replace(/\s+/g, ' ').trim();
+            }
+
+            if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
+                return String(element.value || '').replace(/\s+/g, ' ').trim();
+            }
+
+            return String(element?.innerText || element?.textContent || '').replace(/\s+/g, ' ').trim();
+        }
+
+        function controlData(id) {
+            const element = document.getElementById(id);
+            const rect = rectData(element);
+            const visibleIntersectionHeight = rect
+                ? Math.max(0, Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0))
+                : 0;
+            const visibleIntersectionWidth = rect
+                ? Math.max(0, Math.min(rect.right, viewportWidth) - Math.max(rect.left, 0))
+                : 0;
+
+            return {
+                key: id,
+                text: textFor(element),
+                value: element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement || element instanceof HTMLSelectElement
+                    ? String(element.value || '').trim()
+                    : textFor(element),
+                expectedText: expectedValues[id] || '',
+                rect,
+                visible: isVisible(element),
+                visibleInViewport: Boolean(visibleIntersectionHeight > 8 && visibleIntersectionWidth > 8),
+                fullyVisibleInViewport: Boolean(rect && rect.top >= 0 && rect.left >= 0 && rect.bottom <= viewportHeight && rect.right <= viewportWidth),
+                viewportClipPx: rect ? Number(Math.max(
+                    0,
+                    -rect.top,
+                    -rect.left,
+                    rect.bottom - viewportHeight,
+                    rect.right - viewportWidth
+                ).toFixed(2)) : 0,
+                clipX: element instanceof HTMLElement ? Number(Math.max(0, element.scrollWidth - element.clientWidth).toFixed(2)) : 0
+            };
+        }
+
+        const fieldKeys = ['contactName', 'contactEmail', 'contactPhone', 'contactSubject', 'contactMessage', 'contactSubmitButton'];
+        const controls = fieldKeys.map(controlData);
+        const form = document.getElementById('contactForm');
+
+        return {
+            available: Boolean(form),
+            viewportWidth,
+            viewportHeight,
+            formRect: rectData(form),
+            horizontalOverflowPx: Math.max(
+                0,
+                root.scrollWidth - viewportWidth,
+                (body ? body.scrollWidth : 0) - viewportWidth
+            ),
+            controls
+        };
+    }, HUMAN_SCENARIO_VALUES.contact);
+
+    const screenshotPath = path.join(pageDir, 'contact-form-filled.png');
+    await page.screenshot({
+        path: screenshotPath,
+        fullPage: false,
+        animations: 'disabled',
+        caret: 'hide'
+    });
+
+    return {
+        ...state,
+        screenshotPath
+    };
+}
+
+async function collectReserveBookingIntentState(page, pageDir) {
+    const startDate = page.locator('#startDate').first();
+
+    if ((await startDate.count()) === 0 || !(await startDate.isVisible().catch(() => false))) {
+        return {
+            available: false,
+            reason: 'reserveScheduleMissing'
+        };
+    }
+
+    await page.evaluate((values) => {
+        const setControlValue = (id, value) => {
+            const element = document.getElementById(id);
+
+            if (!element) {
+                return false;
+            }
+
+            if (element instanceof HTMLSelectElement) {
+                const hasOption = Array.from(element.options).some((option) => option.value === value);
+
+                if (!hasOption) {
+                    return false;
+                }
+            }
+
+            element.value = value;
+            element.dispatchEvent(new Event('input', { bubbles: true }));
+            element.dispatchEvent(new Event('change', { bubbles: true }));
+            return true;
+        };
+
+        for (const key of ['startDate', 'endDate', 'pickupTime', 'dropoffTime', 'pickupLocation']) {
+            setControlValue(key, values[key]);
+        }
+
+        if (typeof window.updateCalendarFromInputs === 'function') {
+            window.updateCalendarFromInputs();
+        }
+
+        if (typeof window.updatePricing === 'function') {
+            window.updatePricing();
+        }
+    }, HUMAN_SCENARIO_VALUES.reserve);
+
+    await settlePage(page, 180);
+
+    const scheduleState = await page.evaluate((expectedValues) => {
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const root = document.documentElement;
+        const body = document.body;
+
+        function rectData(element) {
+            if (!(element instanceof HTMLElement)) {
+                return null;
+            }
+
+            const rect = element.getBoundingClientRect();
+            return {
+                top: Number(rect.top.toFixed(2)),
+                right: Number(rect.right.toFixed(2)),
+                bottom: Number(rect.bottom.toFixed(2)),
+                left: Number(rect.left.toFixed(2)),
+                width: Number(rect.width.toFixed(2)),
+                height: Number(rect.height.toFixed(2))
+            };
+        }
+
+        function isVisible(element) {
+            if (!(element instanceof HTMLElement)) {
+                return false;
+            }
+
+            const style = window.getComputedStyle(element);
+            const rect = element.getBoundingClientRect();
+            return style.display !== 'none' &&
+                style.visibility !== 'hidden' &&
+                Number(style.opacity) >= 0.05 &&
+                rect.width >= 4 &&
+                rect.height >= 4;
+        }
+
+        function textFor(element) {
+            if (element instanceof HTMLSelectElement) {
+                return String(element.value || element.selectedOptions[0]?.textContent || '').replace(/\s+/g, ' ').trim();
+            }
+
+            if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
+                return String(element.value || '').replace(/\s+/g, ' ').trim();
+            }
+
+            return String(element?.innerText || element?.textContent || '').replace(/\s+/g, ' ').trim();
+        }
+
+        function controlData(id) {
+            const element = document.getElementById(id);
+            const rect = rectData(element);
+            const visibleIntersectionHeight = rect
+                ? Math.max(0, Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0))
+                : 0;
+            const visibleIntersectionWidth = rect
+                ? Math.max(0, Math.min(rect.right, viewportWidth) - Math.max(rect.left, 0))
+                : 0;
+
+            return {
+                key: id,
+                text: textFor(element),
+                value: element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement || element instanceof HTMLSelectElement
+                    ? String(element.value || '').trim()
+                    : textFor(element),
+                expectedText: expectedValues[id] || '',
+                rect,
+                visible: isVisible(element),
+                visibleInViewport: Boolean(visibleIntersectionHeight > 8 && visibleIntersectionWidth > 8),
+                fullyVisibleInViewport: Boolean(rect && rect.top >= 0 && rect.left >= 0 && rect.bottom <= viewportHeight && rect.right <= viewportWidth),
+                viewportClipPx: rect ? Number(Math.max(
+                    0,
+                    -rect.top,
+                    -rect.left,
+                    rect.bottom - viewportHeight,
+                    rect.right - viewportWidth
+                ).toFixed(2)) : 0,
+                clipX: element instanceof HTMLElement ? Number(Math.max(0, element.scrollWidth - element.clientWidth).toFixed(2)) : 0
+            };
+        }
+
+        const continueButtons = Array.from(document.querySelectorAll('#continueToPaymentBtn, #reserveMobileAction'))
+            .filter((button) => button instanceof HTMLButtonElement);
+        const visibleContinueButton = continueButtons.find((button) => isVisible(button));
+
+        return {
+            horizontalOverflowPx: Math.max(
+                0,
+                root.scrollWidth - viewportWidth,
+                (body ? body.scrollWidth : 0) - viewportWidth
+            ),
+            continueEnabledAfterSchedule: visibleContinueButton ? !visibleContinueButton.disabled : false,
+            scheduleControls: ['startDate', 'endDate', 'pickupTime', 'dropoffTime', 'pickupLocation'].map(controlData)
+        };
+    }, HUMAN_SCENARIO_VALUES.reserve);
+
+    const continueButtons = page.locator('#continueToPaymentBtn, #reserveMobileAction');
+    let continueButton = null;
+
+    for (let index = 0; index < await continueButtons.count(); index += 1) {
+        const candidate = continueButtons.nth(index);
+
+        if ((await candidate.isVisible().catch(() => false)) && !(await candidate.isDisabled().catch(() => true))) {
+            continueButton = candidate;
+            break;
+        }
+    }
+
+    const canAdvance = Boolean(continueButton);
+
+    if (canAdvance) {
+        await continueButton.click().catch(() => {});
+        await settlePage(page, 220);
+    }
+
+    await page.evaluate((values) => {
+        const setControlValue = (id, value) => {
+            const element = document.getElementById(id);
+
+            if (!element) {
+                return;
+            }
+
+            element.value = value;
+            element.dispatchEvent(new Event('input', { bubbles: true }));
+            element.dispatchEvent(new Event('change', { bubbles: true }));
+        };
+
+        for (const key of ['fullName', 'passport', 'phone', 'email']) {
+            setControlValue(key, values[key]);
+        }
+    }, HUMAN_SCENARIO_VALUES.reserve);
+
+    await settlePage(page, 120);
+
+    const state = await page.evaluate((expectedValues) => {
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const root = document.documentElement;
+        const body = document.body;
+
+        function rectData(element) {
+            if (!(element instanceof HTMLElement)) {
+                return null;
+            }
+
+            const rect = element.getBoundingClientRect();
+            return {
+                top: Number(rect.top.toFixed(2)),
+                right: Number(rect.right.toFixed(2)),
+                bottom: Number(rect.bottom.toFixed(2)),
+                left: Number(rect.left.toFixed(2)),
+                width: Number(rect.width.toFixed(2)),
+                height: Number(rect.height.toFixed(2))
+            };
+        }
+
+        function isVisible(element) {
+            if (!(element instanceof HTMLElement)) {
+                return false;
+            }
+
+            const style = window.getComputedStyle(element);
+            const rect = element.getBoundingClientRect();
+            return style.display !== 'none' &&
+                style.visibility !== 'hidden' &&
+                Number(style.opacity) >= 0.05 &&
+                rect.width >= 4 &&
+                rect.height >= 4;
+        }
+
+        function textFor(element) {
+            if (element instanceof HTMLSelectElement) {
+                return String(element.value || element.selectedOptions[0]?.textContent || '').replace(/\s+/g, ' ').trim();
+            }
+
+            if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
+                return String(element.value || '').replace(/\s+/g, ' ').trim();
+            }
+
+            return String(element?.innerText || element?.textContent || '').replace(/\s+/g, ' ').trim();
+        }
+
+        function controlData(id) {
+            const element = document.getElementById(id);
+            const rect = rectData(element);
+            const visibleIntersectionHeight = rect
+                ? Math.max(0, Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0))
+                : 0;
+            const visibleIntersectionWidth = rect
+                ? Math.max(0, Math.min(rect.right, viewportWidth) - Math.max(rect.left, 0))
+                : 0;
+
+            return {
+                key: id,
+                text: textFor(element),
+                value: element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement || element instanceof HTMLSelectElement
+                    ? String(element.value || '').trim()
+                    : textFor(element),
+                expectedText: expectedValues[id] || '',
+                rect,
+                visible: isVisible(element),
+                visibleInViewport: Boolean(visibleIntersectionHeight > 8 && visibleIntersectionWidth > 8),
+                fullyVisibleInViewport: Boolean(rect && rect.top >= 0 && rect.left >= 0 && rect.bottom <= viewportHeight && rect.right <= viewportWidth),
+                viewportClipPx: rect ? Number(Math.max(
+                    0,
+                    -rect.top,
+                    -rect.left,
+                    rect.bottom - viewportHeight,
+                    rect.right - viewportWidth
+                ).toFixed(2)) : 0,
+                clipX: element instanceof HTMLElement ? Number(Math.max(0, element.scrollWidth - element.clientWidth).toFixed(2)) : 0
+            };
+        }
+
+        const scheduleKeys = ['startDate', 'endDate', 'pickupTime', 'dropoffTime', 'pickupLocation'];
+        const guestKeys = ['fullName', 'passport', 'phone', 'email'];
+        const scheduleControls = scheduleKeys.map(controlData);
+        const guestControls = guestKeys.map(controlData);
+        const continueButton = document.getElementById('continueToPaymentBtn') || document.getElementById('reserveMobileAction');
+        const activeStep = document.querySelector('.step-content.active');
+        const step2 = document.getElementById('step2');
+        const summaryTotal = document.getElementById('summaryTotal');
+
+        return {
+            available: Boolean(document.getElementById('startDate')),
+            viewportWidth,
+            viewportHeight,
+            activeStepId: activeStep?.id || '',
+            step2Visible: isVisible(step2),
+            continueEnabledAfterSchedule: continueButton instanceof HTMLButtonElement ? !continueButton.disabled : false,
+            summaryTotalText: textFor(summaryTotal),
+            horizontalOverflowPx: Math.max(
+                0,
+                root.scrollWidth - viewportWidth,
+                (body ? body.scrollWidth : 0) - viewportWidth
+            ),
+            scheduleControls,
+            guestControls,
+            controls: [...scheduleControls, ...guestControls]
+        };
+    }, HUMAN_SCENARIO_VALUES.reserve);
+
+    const screenshotPath = path.join(pageDir, 'reserve-booking-intent-filled.png');
+    await page.screenshot({
+        path: screenshotPath,
+        fullPage: false,
+        animations: 'disabled',
+        caret: 'hide'
+    });
+
+    return {
+        ...state,
+        canAdvanceFromSchedule: canAdvance,
+        continueEnabledAfterSchedule: scheduleState.continueEnabledAfterSchedule,
+        horizontalOverflowPx: Math.max(
+            Number(state.horizontalOverflowPx || 0),
+            Number(scheduleState.horizontalOverflowPx || 0)
+        ),
+        scheduleControls: scheduleState.scheduleControls,
+        controls: [...(scheduleState.scheduleControls || []), ...(state.guestControls || [])],
+        screenshotPath
+    };
+}
+
+function buildFilledControlFindings({ route, viewportName, contract, state, requiredKeys, controls, screenshotPath, noun }) {
+    const findings = [];
+    const stateScreenshotPath = state?.screenshotPath || screenshotPath;
+    const controlList = controls || [];
+    const byKey = new Map(controlList.map((control) => [control.key, control]));
+    const missingKeys = (requiredKeys || [])
+        .filter((key) => {
+            const control = byKey.get(key);
+            return !control || !control.visible || !String(control.text || '').trim();
+        });
+
+    if (missingKeys.length > 0) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'form_visibility',
+            message: `Filled ${noun} fields are missing, hidden, or not preserving user-entered values.`,
+            evidence: `missingKeys=${missingKeys.join(', ')}`,
+            likelyCause: 'The filled form state is not visually stable after a realistic user interaction.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    const mismatchedValues = controlList
+        .filter((control) => (
+            control.expectedText &&
+            control.visible &&
+            String(control.value || control.text || '').trim() !== String(control.expectedText).trim()
+        ));
+
+    if (mismatchedValues.length > 0) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'interaction_state',
+            message: `Filled ${noun} values are not preserved after realistic input.`,
+            evidence: mismatchedValues.slice(0, 5).map((control) => `${control.key}:expected="${control.expectedText}",actual="${control.value || control.text || ''}"`).join('; '),
+            likelyCause: 'The form may be ignoring typed values, failing to populate select options, or resetting state during render.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    const smallControls = controlList
+        .filter((control) => {
+            const rect = control.rect || {};
+            const minUsefulWidth = /button|submit|action/i.test(control.key || '')
+                ? Math.min(Number(contract.minUsefulControlWidthPx || 0), 120)
+                : Number(contract.minUsefulControlWidthPx || 0);
+
+            return Number(rect.width || 0) < minUsefulWidth ||
+                Number(rect.height || 0) < contract.minTapTargetPx;
+        });
+
+    if (smallControls.length > 0) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'form_visibility',
+            message: `Filled ${noun} controls are below the usable tap/readability size.`,
+            evidence: smallControls.slice(0, 5).map((control) => `${control.key}:${control.rect?.width}x${control.rect?.height}`).join('; '),
+            likelyCause: 'Responsive form controls are being squeezed after realistic user data is entered.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    const clippedControls = controlList
+        .filter((control) => Number(control.clipX || 0) > contract.maxTextClipPx);
+
+    if (clippedControls.length > 0) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'clipping',
+            message: `Filled ${noun} values are horizontally clipped.`,
+            evidence: clippedControls.slice(0, 5).map((control) => `${control.key}:clipX=${control.clipX},text="${control.text}"`).join('; '),
+            likelyCause: 'A fixed-width input, select, or textarea cannot hold realistic booking copy.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    const viewportClippedControls = controlList
+        .filter((control) => (
+            control.visibleInViewport &&
+            !control.fullyVisibleInViewport &&
+            Number(control.viewportClipPx || 0) > Number(contract.maxViewportClipPx || 2)
+        ));
+
+    if (viewportClippedControls.length > 0) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'clipping',
+            message: `Filled ${noun} controls are partially cut by the viewport.`,
+            evidence: viewportClippedControls.slice(0, 5).map((control) => `${control.key}:viewportClipPx=${control.viewportClipPx}`).join('; '),
+            likelyCause: 'The form state is visible but the current viewport clips its useful controls.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    return findings;
+}
+
+function buildContactFormStateFindings({ route, viewportName, viewportWidth, state, screenshotPath }) {
+    const findings = [];
+    const normalizedRoute = normalizeRoute(route);
+    const contract = getMobileInteractionContract({
+        interaction: 'contact_form_filled',
+        viewportName,
+        viewportWidth
+    });
+    const stateScreenshotPath = state?.screenshotPath || screenshotPath;
+
+    if (normalizedRoute !== '/contact.html' || !contract) {
+        return findings;
+    }
+
+    if (!state?.available) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'form_visibility',
+            message: 'The contact form cannot be reached for a filled human-state visual audit.',
+            evidence: `state=${state?.reason || 'missing'}`,
+            likelyCause: 'The contact form route no longer exposes the expected form shell.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+        return findings;
+    }
+
+    if (Number(state.horizontalOverflowPx || 0) > contract.maxHorizontalOverflowPx) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'overflow',
+            message: 'The filled contact form creates horizontal overflow.',
+            evidence: `horizontalOverflowPx=${state.horizontalOverflowPx}; max=${contract.maxHorizontalOverflowPx}`,
+            likelyCause: 'A filled input, textarea, or button is wider than the viewport.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    return findings.concat(buildFilledControlFindings({
+        route,
+        viewportName,
+        contract,
+        state,
+        requiredKeys: contract.requiredFieldKeys,
+        controls: state.controls,
+        screenshotPath,
+        noun: 'contact form'
+    }));
+}
+
+function buildReserveBookingIntentFindings({ route, viewportName, viewportWidth, state, screenshotPath }) {
+    const findings = [];
+    const normalizedRoute = normalizeRoute(route);
+    const contract = getMobileInteractionContract({
+        interaction: 'reserve_booking_intent',
+        viewportName,
+        viewportWidth
+    });
+    const stateScreenshotPath = state?.screenshotPath || screenshotPath;
+
+    if (normalizedRoute !== '/app/reserve/page.html' || !contract) {
+        return findings;
+    }
+
+    if (!state?.available) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'form_visibility',
+            message: 'The reserve flow cannot receive a realistic booking intent.',
+            evidence: `state=${state?.reason || 'missing'}`,
+            likelyCause: 'The reserve scheduling controls are missing, hidden, or not rendering.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+        return findings;
+    }
+
+    if (Number(state.horizontalOverflowPx || 0) > contract.maxHorizontalOverflowPx) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'overflow',
+            message: 'The filled reserve flow creates horizontal overflow.',
+            evidence: `horizontalOverflowPx=${state.horizontalOverflowPx}; max=${contract.maxHorizontalOverflowPx}`,
+            likelyCause: 'A filled schedule, location, or guest field is wider than the viewport.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    if (!state.canAdvanceFromSchedule || !state.step2Visible) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'interaction_state',
+            message: 'A realistic reserve schedule does not advance cleanly into guest details.',
+            evidence: `canAdvanceFromSchedule=${Boolean(state.canAdvanceFromSchedule)}; step2Visible=${Boolean(state.step2Visible)}; activeStepId=${state.activeStepId || 'unknown'}`,
+            likelyCause: 'Schedule validation, button state, or deferred step rendering is broken after realistic date/location input.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    return findings
+        .concat(buildFilledControlFindings({
+            route,
+            viewportName,
+            contract,
+            state,
+            requiredKeys: contract.requiredScheduleFieldKeys,
+            controls: state.scheduleControls,
+            screenshotPath,
+            noun: 'reserve schedule'
+        }))
+        .concat(buildFilledControlFindings({
+            route,
+            viewportName,
+            contract,
+            state,
+            requiredKeys: contract.requiredGuestFieldKeys,
+            controls: state.guestControls,
+            screenshotPath,
+            noun: 'reserve guest'
+        }));
+}
+
+async function collectPageDepthScanState(page, pageDir, viewport) {
+    const viewportSize = page.viewportSize() || {
+        width: viewport?.width || 0,
+        height: viewport?.height || 0
+    };
+    const viewportHeight = viewportSize.height || viewport?.height || 768;
+    const documentMetrics = await page.evaluate(() => ({
+        width: Math.max(document.documentElement.scrollWidth, document.body?.scrollWidth || 0),
+        height: Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight || 0),
+        viewportWidth: window.innerWidth,
+        viewportHeight: window.innerHeight
+    }));
+    const maxY = Math.max(0, documentMetrics.height - viewportHeight);
+    const positions = [0];
+    const step = Math.max(1, Math.floor(viewportHeight * 0.82));
+
+    for (let y = step; y < maxY; y += step) {
+        positions.push(y);
+
+        if (positions.length >= 5) {
+            break;
+        }
+    }
+
+    if (maxY > 0 && !positions.includes(maxY)) {
+        positions.push(maxY);
+    }
+
+    const scanDir = path.join(pageDir, 'page-depth-scan');
+    ensureDir(scanDir);
+
+    const frames = [];
+    for (let index = 0; index < positions.length; index += 1) {
+        const y = positions[index];
+        await page.evaluate((scrollY) => window.scrollTo(0, scrollY), y).catch(() => {});
+        await settlePage(page, 90);
+
+        const screenshotPath = path.join(scanDir, `viewport-${String(index + 1).padStart(2, '0')}.png`);
+        await page.screenshot({
+            path: screenshotPath,
+            fullPage: false,
+            animations: 'disabled',
+            caret: 'hide'
+        });
+        const frameMetric = await page.evaluate(() => {
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            function isVisible(element) {
+                if (!(element instanceof HTMLElement)) {
+                    return false;
+                }
+
+                const style = window.getComputedStyle(element);
+                const rect = element.getBoundingClientRect();
+                return style.display !== 'none' &&
+                    style.visibility !== 'hidden' &&
+                    Number(style.opacity) >= 0.05 &&
+                    rect.width >= 6 &&
+                    rect.height >= 6 &&
+                    rect.bottom > 0 &&
+                    rect.top < viewportHeight &&
+                    rect.right > 0 &&
+                    rect.left < viewportWidth;
+            }
+
+            function rectData(element) {
+                const rect = element.getBoundingClientRect();
+                return {
+                    top: Number(rect.top.toFixed(2)),
+                    right: Number(rect.right.toFixed(2)),
+                    bottom: Number(rect.bottom.toFixed(2)),
+                    left: Number(rect.left.toFixed(2)),
+                    width: Number(rect.width.toFixed(2)),
+                    height: Number(rect.height.toFixed(2))
+                };
+            }
+
+            function textFor(element) {
+                return String(element?.innerText || element?.textContent || element?.getAttribute?.('aria-label') || '').replace(/\s+/g, ' ').trim();
+            }
+
+            function selectorLabel(element) {
+                if (!(element instanceof HTMLElement)) {
+                    return 'unknown';
+                }
+
+                const id = element.id ? `#${element.id}` : '';
+                const className = String(element.className || '')
+                    .split(/\s+/)
+                    .filter(Boolean)
+                    .slice(0, 3)
+                    .map((value) => `.${value}`)
+                    .join('');
+                return `${element.tagName.toLowerCase()}${id}${className}`;
+            }
+
+            const actionElements = Array.from(document.querySelectorAll('main a[href], main button, main [role="button"], .reserve-mobile-bar a, .reserve-mobile-bar button'))
+                .filter((element) => element instanceof HTMLElement && isVisible(element));
+            const majorElements = Array.from(document.querySelectorAll([
+                'main h1',
+                'main h2',
+                'main h3',
+                'main p',
+                'main li',
+                'main img',
+                'main picture',
+                'main video',
+                'main form',
+                'main input:not([type="hidden"])',
+                'main select',
+                'main textarea',
+                'main a[href]',
+                'main button',
+                '.fleet-card',
+                '.vehicle-card',
+                '.model-card',
+                '.service-card',
+                '.location-card',
+                '.guide-card',
+                '.reserve-mobile-bar'
+            ].join(',')))
+                .filter((element) => element instanceof HTMLElement && isVisible(element));
+            const actionMetrics = actionElements.map((element) => {
+                const rect = rectData(element);
+                const href = element.getAttribute('href') || '';
+                const className = String(element.className || '').toLowerCase();
+                const label = textFor(element).slice(0, 80);
+                const edgePaddingPx = Math.min(
+                    Math.max(0, rect.left),
+                    Math.max(0, viewportWidth - rect.right)
+                );
+                const widthRatio = rect.width / Math.max(1, viewportWidth);
+                const heightRatio = rect.height / Math.max(1, viewportHeight);
+                const areaRatio = (rect.width * rect.height) / Math.max(1, viewportWidth * viewportHeight);
+                const isContactAction = /^(tel:|mailto:)/i.test(href) ||
+                    /wa\.me|whatsapp/i.test(href) ||
+                    /\b(call|whatsapp|wa|mail|email)\b/i.test(label);
+                const isSecondaryAction = /secondary|ghost|outline|contact/i.test(className) ||
+                    isContactAction;
+
+                return {
+                    label,
+                    selector: selectorLabel(element),
+                    href,
+                    className,
+                    rect,
+                    edgePaddingPx: Number(edgePaddingPx.toFixed(2)),
+                    widthRatio: Number(widthRatio.toFixed(3)),
+                    heightRatio: Number(heightRatio.toFixed(3)),
+                    areaRatio: Number(areaRatio.toFixed(4)),
+                    isContactAction,
+                    isSecondaryAction,
+                    insideCard: Boolean(element.closest('.fleet-card, .vehicle-card, .model-card, .service-card, .location-card, .guide-card, article[class*="card"], .card'))
+                };
+            });
+            function labelForDateElement(element) {
+                if (!(element instanceof HTMLElement)) {
+                    return '';
+                }
+
+                const labels = [];
+                const control = element.matches('input, select, textarea')
+                    ? element
+                    : element.querySelector('input, select, textarea');
+
+                if (control?.id) {
+                    const matchingLabel = Array.from(document.querySelectorAll('label'))
+                        .find((labelElement) => labelElement.htmlFor === control.id);
+                    labels.push(textFor(matchingLabel));
+                }
+
+                labels.push(textFor(element.closest('label')));
+
+                const field = element.closest([
+                    '.field',
+                    '.form-field',
+                    '.input-group',
+                    '.reserve-field',
+                    '.vehicle-booking__field',
+                    '.fleet-sidebar__field',
+                    '[class*="field"]'
+                ].join(','));
+
+                if (field && field !== element) {
+                    labels.push(textFor(field.querySelector('label, legend, [class*="label"], span')));
+                }
+
+                labels.push(element.getAttribute('aria-label') || '');
+                labels.push(control?.getAttribute?.('aria-label') || '');
+
+                return [...new Set(labels.map((labelText) => String(labelText || '').replace(/\s+/g, ' ').trim()).filter(Boolean))]
+                    .join(' | ')
+                    .slice(0, 160);
+            }
+
+            function isDateCandidate(element) {
+                if (!(element instanceof HTMLElement)) {
+                    return false;
+                }
+
+                const control = element.matches('input, select, textarea')
+                    ? element
+                    : element.querySelector('input, select, textarea');
+                const context = [
+                    element.id,
+                    element.getAttribute('name'),
+                    element.className,
+                    element.getAttribute('aria-label'),
+                    element.getAttribute('placeholder'),
+                    control?.id,
+                    control?.getAttribute?.('name'),
+                    control?.className,
+                    control?.getAttribute?.('aria-label'),
+                    control?.getAttribute?.('placeholder'),
+                    labelForDateElement(element),
+                    textFor(element).slice(0, 120)
+                ].join(' ');
+
+                return control?.getAttribute?.('type') === 'date' ||
+                    /\b(date|calendar|pickup|return|delivery|dropoff|schedule)\b/i.test(context);
+            }
+
+            function dateControlData(element, index) {
+                const control = element.matches('input, select, textarea')
+                    ? element
+                    : element.querySelector('input, select, textarea');
+                const rect = rectData(element);
+                const controlRect = control instanceof HTMLElement ? rectData(control) : rect;
+                const rawValue = control?.value || control?.getAttribute?.('value') || element.getAttribute('value') || '';
+                const displayText = textFor(element);
+                const labelText = labelForDateElement(element);
+
+                return {
+                    key: control?.id || control?.getAttribute?.('name') || element.id || element.getAttribute('name') || element.className || `date-control-${index + 1}`,
+                    selector: selectorLabel(control instanceof HTMLElement ? control : element),
+                    label: labelText,
+                    value: String(rawValue || '').trim(),
+                    displayText,
+                    min: control?.getAttribute?.('min') || element.getAttribute('min') || '',
+                    rect: controlRect,
+                    containerRect: rect,
+                    visibleInViewport: isVisible(element)
+                };
+            }
+
+            const dateCandidateElements = [];
+            const seenDateElements = new Set();
+
+            for (const element of Array.from(document.querySelectorAll([
+                'main input:not([type="hidden"])',
+                'main button',
+                'main [role="button"]',
+                'main .fleet-sidebar__field',
+                'main .vehicle-booking__field',
+                'main .reserve-field',
+                'main [class*="date"]',
+                '.hero-lab-overlay input:not([type="hidden"])',
+                '.hero-lab-overlay [class*="date"]'
+            ].join(',')))) {
+                if (!(element instanceof HTMLElement) || seenDateElements.has(element) || !isVisible(element) || !isDateCandidate(element)) {
+                    continue;
+                }
+
+                seenDateElements.add(element);
+                dateCandidateElements.push(element);
+
+                if (dateCandidateElements.length >= 30) {
+                    break;
+                }
+            }
+
+            const dateControlMetrics = dateCandidateElements.map(dateControlData);
+            const elementRects = majorElements
+                .map(rectData)
+                .filter((rect) => rect.width >= 20 && rect.height >= 8)
+                .sort((left, right) => left.top - right.top);
+            let largestBlankGapPx = 0;
+
+            if (elementRects.length > 0) {
+                largestBlankGapPx = Math.max(0, elementRects[0].top);
+
+                for (let rectIndex = 1; rectIndex < elementRects.length; rectIndex += 1) {
+                    largestBlankGapPx = Math.max(largestBlankGapPx, elementRects[rectIndex].top - elementRects[rectIndex - 1].bottom);
+                }
+
+                largestBlankGapPx = Math.max(largestBlankGapPx, viewportHeight - elementRects[elementRects.length - 1].bottom);
+            }
+
+            return {
+                scrollY: Number((window.scrollY || window.pageYOffset || 0).toFixed(2)),
+                viewportWidth,
+                viewportHeight,
+                visibleMajorElementCount: elementRects.length,
+                visibleActionCount: actionMetrics.length,
+                largestBlankGapPx: Number(largestBlankGapPx.toFixed(2)),
+                largestBlankGapRatio: Number((largestBlankGapPx / Math.max(1, viewportHeight)).toFixed(3)),
+                actionMetrics: actionMetrics.slice(0, 40),
+                dateControlMetrics
+            };
+        });
+
+        frames.push({
+            index: index + 1,
+            scrollY: y,
+            viewportTop: y,
+            viewportBottom: y + viewportHeight,
+            screenshotPath,
+            metric: frameMetric
+        });
+    }
+
+    await page.evaluate(() => window.scrollTo(0, 0)).catch(() => {});
+    await settlePage(page, 90);
+
+    const cardActionMetrics = await page.evaluate(() => {
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        function isVisible(element) {
+            if (!(element instanceof HTMLElement)) {
+                return false;
+            }
+
+            const style = window.getComputedStyle(element);
+            const rect = element.getBoundingClientRect();
+            return style.display !== 'none' &&
+                style.visibility !== 'hidden' &&
+                Number(style.opacity) >= 0.05 &&
+                rect.width >= 6 &&
+                rect.height >= 6;
+        }
+
+        function rectData(element) {
+            if (!(element instanceof HTMLElement)) {
+                return null;
+            }
+
+            const rect = element.getBoundingClientRect();
+            const scrollY = window.scrollY || window.pageYOffset || 0;
+            const scrollX = window.scrollX || window.pageXOffset || 0;
+
+            return {
+                top: Number((rect.top + scrollY).toFixed(2)),
+                right: Number((rect.right + scrollX).toFixed(2)),
+                bottom: Number((rect.bottom + scrollY).toFixed(2)),
+                left: Number((rect.left + scrollX).toFixed(2)),
+                width: Number(rect.width.toFixed(2)),
+                height: Number(rect.height.toFixed(2)),
+                viewportTop: Number(rect.top.toFixed(2)),
+                viewportBottom: Number(rect.bottom.toFixed(2))
+            };
+        }
+
+        function unionRects(rects) {
+            const validRects = (rects || []).filter(Boolean);
+
+            if (validRects.length === 0) {
+                return null;
+            }
+
+            const left = Math.min(...validRects.map((rect) => rect.left));
+            const right = Math.max(...validRects.map((rect) => rect.right));
+            const top = Math.min(...validRects.map((rect) => rect.top));
+            const bottom = Math.max(...validRects.map((rect) => rect.bottom));
+
+            return {
+                top: Number(top.toFixed(2)),
+                right: Number(right.toFixed(2)),
+                bottom: Number(bottom.toFixed(2)),
+                left: Number(left.toFixed(2)),
+                width: Number((right - left).toFixed(2)),
+                height: Number((bottom - top).toFixed(2))
+            };
+        }
+
+        function textFor(element) {
+            return String(element?.innerText || element?.textContent || '').replace(/\s+/g, ' ').trim();
+        }
+
+        function uniqueRowCount(elements) {
+            const rows = elements
+                .map((element) => Math.round(element.getBoundingClientRect().top))
+                .sort((left, right) => left - right);
+            const uniqueRows = [];
+
+            for (const row of rows) {
+                if (!uniqueRows.some((known) => Math.abs(known - row) <= 4)) {
+                    uniqueRows.push(row);
+                }
+            }
+
+            return uniqueRows.length;
+        }
+
+        function radiusPx(element) {
+            if (!(element instanceof HTMLElement)) {
+                return 0;
+            }
+
+            const style = window.getComputedStyle(element);
+            const value = Number.parseFloat(style.borderTopLeftRadius || '0');
+            return Number(Number.isFinite(value) ? value.toFixed(2) : 0);
+        }
+
+        const cardSelectors = [
+            '.fleet-card',
+            '.vehicle-card',
+            '.model-card',
+            '.service-card',
+            '.location-card',
+            '.guide-card',
+            'article[class*="card"]',
+            '.card'
+        ];
+        const seen = new Set();
+        const cards = [];
+
+        for (const selector of cardSelectors) {
+            for (const element of Array.from(document.querySelectorAll(selector))) {
+                if (!(element instanceof HTMLElement) || seen.has(element) || !isVisible(element)) {
+                    continue;
+                }
+
+                seen.add(element);
+                cards.push(element);
+
+                if (cards.length >= 48) {
+                    break;
+                }
+            }
+        }
+
+        return cards
+            .map((card, index) => {
+                const cardRect = rectData(card);
+
+                if (!cardRect || cardRect.width < 150 || cardRect.height < 120) {
+                    return null;
+                }
+
+                const title = card.querySelector('.fleet-card__title, .vehicle-card__title, .model-card h3, h2, h3, [class*="title"]');
+                const price = card.querySelector('.fleet-card__price-value, [class*="price"], [class*="rate"]');
+                const primaryActions = Array.from(card.querySelectorAll([
+                    '.fleet-card__primary',
+                    '.vehicle-booking__submit',
+                    '.btn-primary',
+                    '.button--primary',
+                    '[class*="primary"]',
+                    'a[href*="reserve"]',
+                    'button[type="submit"]'
+                ].join(','))).filter((element) => element instanceof HTMLElement && isVisible(element));
+                const secondaryActions = Array.from(card.querySelectorAll([
+                    '.fleet-card__secondary',
+                    '.button--secondary',
+                    '[class*="secondary"]',
+                    'a[href^="tel:"]',
+                    'a[href*="wa.me"]',
+                    'a[href*="whatsapp"]'
+                ].join(','))).filter((element) => element instanceof HTMLElement && isVisible(element));
+                const actionElements = [...new Set([...primaryActions, ...secondaryActions])];
+                const titleRect = rectData(title);
+                const priceRect = rectData(price);
+                const primaryRects = primaryActions.map(rectData);
+                const secondaryRects = secondaryActions.map(rectData);
+                const actionGroupRect = unionRects(actionElements.map(rectData));
+                const secondaryGroupRect = unionRects(secondaryRects);
+                const coreRect = unionRects([titleRect, priceRect]);
+                const cardWidth = Math.max(1, cardRect.width);
+                const cardHeight = Math.max(1, cardRect.height);
+                const actionInlinePaddingPx = actionGroupRect
+                    ? Math.min(
+                        Math.max(0, actionGroupRect.left - cardRect.left),
+                        Math.max(0, cardRect.right - actionGroupRect.right)
+                    )
+                    : 0;
+                const secondaryInlinePaddingPx = secondaryGroupRect
+                    ? Math.min(
+                        Math.max(0, secondaryGroupRect.left - cardRect.left),
+                        Math.max(0, cardRect.right - secondaryGroupRect.right)
+                    )
+                    : 0;
+                const secondaryMaxButtonWidth = secondaryRects.length
+                    ? Math.max(...secondaryRects.map((rect) => Number(rect?.width || 0)))
+                    : 0;
+                const primaryMaxHeight = primaryRects.length
+                    ? Math.max(...primaryRects.map((rect) => Number(rect?.height || 0)))
+                    : 0;
+                const secondaryMaxHeight = secondaryRects.length
+                    ? Math.max(...secondaryRects.map((rect) => Number(rect?.height || 0)))
+                    : 0;
+                const coreHeight = Math.max(1, Number(coreRect?.height || 0));
+
+                return {
+                    index: index + 1,
+                    label: textFor(title).slice(0, 80) || card.className || `card-${index + 1}`,
+                    cardClass: String(card.className || ''),
+                    cardRect,
+                    titleRect,
+                    priceRect,
+                    actionGroupRect,
+                    secondaryGroupRect,
+                    actionInlinePaddingPx: Number(actionInlinePaddingPx.toFixed(2)),
+                    secondaryInlinePaddingPx: Number(secondaryInlinePaddingPx.toFixed(2)),
+                    actionGroupHeightRatio: Number((Number(actionGroupRect?.height || 0) / cardHeight).toFixed(3)),
+                    secondaryActionHeightRatio: Number((Number(secondaryGroupRect?.height || 0) / cardHeight).toFixed(3)),
+                    secondaryDominanceRatio: Number((Number(secondaryGroupRect?.height || 0) / coreHeight).toFixed(3)),
+                    secondaryMaxButtonWidthRatio: Number((secondaryMaxButtonWidth / cardWidth).toFixed(3)),
+                    primaryMaxHeight,
+                    secondaryMaxHeight,
+                    primaryCount: primaryActions.length,
+                    secondaryCount: secondaryActions.length,
+                    secondaryRowCount: uniqueRowCount(secondaryActions),
+                    primaryLabels: primaryActions.map(textFor).filter(Boolean).slice(0, 4),
+                    secondaryLabels: secondaryActions.map(textFor).filter(Boolean).slice(0, 4),
+                    buttonRadiusSpreadPx: actionElements.length
+                        ? Number((Math.max(...actionElements.map(radiusPx)) - Math.min(...actionElements.map(radiusPx))).toFixed(2))
+                        : 0,
+                    viewportWidth,
+                    viewportHeight
+                };
+            })
+            .filter(Boolean);
+    });
+
+    return {
+        available: true,
+        viewportName: viewport?.name || '',
+        viewportWidth: documentMetrics.viewportWidth,
+        viewportHeight: documentMetrics.viewportHeight,
+        documentHeight: documentMetrics.height,
+        frames,
+        cardActionMetrics
+    };
+}
+
+async function collectStaleBookingDateProbeState({ context, baseUrl, route, pageDir, viewport }) {
+    const normalizedRoute = normalizeRoute(route);
+
+    if (normalizedRoute !== '/app/reserve/page.html') {
+        return null;
+    }
+
+    const auditDateIso = formatLocalDateIso();
+    const staleStartDate = addLocalDaysIso(-1);
+    const futureEndDate = addLocalDaysIso(1);
+    const probePage = await context.newPage();
+    const probeDir = path.join(pageDir, 'stale-booking-date-probe');
+    const probeRoute = `/app/reserve/page.html?startDate=${encodeURIComponent(staleStartDate)}&endDate=${encodeURIComponent(futureEndDate)}&pickupTime=12%3A00&dropoffTime=12%3A00`;
+
+    ensureDir(probeDir);
+
+    try {
+        await probePage.goto(`${baseUrl}${probeRoute}`, { waitUntil: 'domcontentloaded' });
+        await settlePage(probePage, 450);
+
+        return {
+            available: true,
+            auditDateIso,
+            staleStartDate,
+            futureEndDate,
+            probeRoute,
+            pageDepthScanState: await collectPageDepthScanState(probePage, probeDir, viewport)
+        };
+    } catch (error) {
+        return {
+            available: false,
+            auditDateIso,
+            staleStartDate,
+            futureEndDate,
+            probeRoute,
+            reason: error.message
+        };
+    } finally {
+        await probePage.close().catch(() => {});
+    }
+}
+
+function screenshotForScanMetric(state, metric, fallbackScreenshotPath) {
+    const cardTop = Number(metric?.cardRect?.top || 0);
+    const frame = (state?.frames || []).find((entry) => (
+        cardTop >= Number(entry.viewportTop || 0) &&
+        cardTop <= Number(entry.viewportBottom || 0)
+    ));
+
+    return frame?.screenshotPath || state?.frames?.[0]?.screenshotPath || fallbackScreenshotPath;
+}
+
+function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state, screenshotPath, auditDateIso = formatLocalDateIso() }) {
+    const findings = [];
+    const cardContract = getMobileInteractionContract({
+        interaction: 'mobile_card_actions',
+        viewportName,
+        viewportWidth
+    });
+    const scanContract = getMobileInteractionContract({
+        interaction: 'page_depth_scan',
+        viewportName,
+        viewportWidth
+    });
+    const dateContract = getMobileInteractionContract({
+        interaction: 'booking_date_defaults',
+        viewportName,
+        viewportWidth
+    });
+    const currentDateIso = normalizeIsoDate(auditDateIso) || formatLocalDateIso();
+    const currentDayNumber = dateIsoToDayNumber(currentDateIso);
+
+    if (!state?.available) {
+        return findings;
+    }
+
+    if (dateContract && Number.isFinite(currentDayNumber)) {
+        const reportedDateKeys = new Set();
+
+        for (const frame of state.frames || []) {
+            const frameMetric = frame.metric || {};
+            const frameScreenshotPath = frame.screenshotPath || screenshotPath;
+            const frameEvidence = `frame=${frame.index}; scrollY=${frame.scrollY}`;
+
+            for (const dateControl of frameMetric.dateControlMetrics || []) {
+                const rawText = [
+                    dateControl.value,
+                    dateControl.displayText
+                ].filter(Boolean).join(' ');
+                const parsedDateIso = parseVisualDateValue(rawText);
+                const minDateIso = parseVisualDateValue(dateControl.min);
+                const dateKey = `${dateControl.key || dateControl.selector || ''}:${parsedDateIso || rawText}`;
+
+                if (reportedDateKeys.has(dateKey)) {
+                    continue;
+                }
+
+                if (parsedDateIso) {
+                    const parsedDayNumber = dateIsoToDayNumber(parsedDateIso);
+                    const pastDays = currentDayNumber - parsedDayNumber;
+
+                    if (Number.isFinite(parsedDayNumber) && pastDays > Number(dateContract.maxPastDays || 0)) {
+                        reportedDateKeys.add(dateKey);
+                        findings.push(createVisualFinding({
+                            route,
+                            viewport: viewportName,
+                            severity: 'high',
+                            category: 'date_currentness',
+                            selector: dateControl.selector,
+                            message: 'A booking date control is prefilled with a past date.',
+                            evidence: `${frameEvidence}; control="${dateControl.label || dateControl.key || dateControl.selector}"; value=${parsedDateIso}; today=${currentDateIso}; pastDays=${pastDays}`,
+                            likelyCause: 'The booking flow is reusing a stale stored/query/default date instead of refreshing the customer-facing schedule to today or a future date.',
+                            hardFail: true,
+                            screenshotPath: frameScreenshotPath,
+                            source: 'page_depth_scan'
+                        }));
+                    }
+                }
+
+                if (
+                    dateContract.requireMinDateAtLeastToday &&
+                    minDateIso &&
+                    dateIsoToDayNumber(minDateIso) < currentDayNumber
+                ) {
+                    const minKey = `${dateControl.key || dateControl.selector || ''}:min:${minDateIso}`;
+
+                    if (!reportedDateKeys.has(minKey)) {
+                        reportedDateKeys.add(minKey);
+                        findings.push(createVisualFinding({
+                            route,
+                            viewport: viewportName,
+                            severity: 'medium',
+                            category: 'date_currentness',
+                            selector: dateControl.selector,
+                            message: 'A booking date control allows dates before today.',
+                            evidence: `${frameEvidence}; control="${dateControl.label || dateControl.key || dateControl.selector}"; min=${minDateIso}; today=${currentDateIso}`,
+                            likelyCause: 'The date picker lower bound is stale, so guests can enter an invalid rental date.',
+                            screenshotPath: frameScreenshotPath,
+                            source: 'page_depth_scan'
+                        }));
+                    }
+                }
+            }
+        }
+    }
+
+    if (scanContract) {
+        for (const frame of state.frames || []) {
+            const frameMetric = frame.metric || {};
+            const frameScreenshotPath = frame.screenshotPath || screenshotPath;
+            const frameEvidence = `frame=${frame.index}; scrollY=${frame.scrollY}`;
+
+            if (
+                Number(frameMetric.visibleMajorElementCount || 0) >= Number(scanContract.minVisibleElementsForGapAudit || 0) &&
+                Number(frameMetric.largestBlankGapRatio || 0) > Number(scanContract.maxBlankGapRatio || 1)
+            ) {
+                findings.push(createVisualFinding({
+                    route,
+                    viewport: viewportName,
+                    severity: 'medium',
+                    category: 'layout_gap',
+                    message: 'A vertical scan frame contains a large unexplained blank gap.',
+                    evidence: `${frameEvidence}; largestBlankGapRatio=${frameMetric.largestBlankGapRatio}; max=${scanContract.maxBlankGapRatio}; visibleElements=${frameMetric.visibleMajorElementCount}`,
+                    likelyCause: 'A section, card, or responsive stack is leaving dead space as the customer scrolls down the page.',
+                    screenshotPath: frameScreenshotPath,
+                    source: 'page_depth_scan'
+                }));
+            }
+
+            for (const action of frameMetric.actionMetrics || []) {
+                if (
+                    action.isContactAction &&
+                    Number(action.widthRatio || 0) > Number(scanContract.maxContactActionWidthRatio || 1)
+                ) {
+                    findings.push(createVisualFinding({
+                        route,
+                        viewport: viewportName,
+                        severity: action.insideCard ? 'high' : 'medium',
+                        category: 'cta_hierarchy',
+                        message: 'A contact action is wider than expected for its supporting role.',
+                        evidence: `${frameEvidence}; action="${action.label || action.selector}"; widthRatio=${action.widthRatio}; max=${scanContract.maxContactActionWidthRatio}; insideCard=${Boolean(action.insideCard)}`,
+                        likelyCause: 'Call, WhatsApp, or email actions are reading like the main product content instead of supporting the booking path.',
+                        hardFail: Boolean(action.insideCard),
+                        screenshotPath: frameScreenshotPath,
+                        source: 'page_depth_scan'
+                    }));
+                }
+
+                if (
+                    action.isContactAction &&
+                    Number(action.rect?.height || 0) > Number(scanContract.maxContactActionHeightPx || 999)
+                ) {
+                    findings.push(createVisualFinding({
+                        route,
+                        viewport: viewportName,
+                        severity: 'medium',
+                        category: 'cta_hierarchy',
+                        message: 'A contact action is taller than expected for a supporting action.',
+                        evidence: `${frameEvidence}; action="${action.label || action.selector}"; height=${action.rect?.height}; max=${scanContract.maxContactActionHeightPx}`,
+                        likelyCause: 'A secondary contact CTA is styled too close to a full primary action.',
+                        screenshotPath: frameScreenshotPath,
+                        source: 'page_depth_scan'
+                    }));
+                }
+
+                if (
+                    action.isContactAction &&
+                    Number(action.areaRatio || 0) > Number(scanContract.maxContactActionAreaRatio || 1)
+                ) {
+                    findings.push(createVisualFinding({
+                        route,
+                        viewport: viewportName,
+                        severity: action.insideCard ? 'high' : 'medium',
+                        category: 'cta_hierarchy',
+                        message: 'A contact action occupies too much of the visible screen.',
+                        evidence: `${frameEvidence}; action="${action.label || action.selector}"; areaRatio=${action.areaRatio}; max=${scanContract.maxContactActionAreaRatio}; insideCard=${Boolean(action.insideCard)}`,
+                        likelyCause: 'The support CTA is visually competing with the main task in this viewport segment.',
+                        hardFail: Boolean(action.insideCard),
+                        screenshotPath: frameScreenshotPath,
+                        source: 'page_depth_scan'
+                    }));
+                }
+
+                if (
+                    action.isSecondaryAction &&
+                    Number(action.widthRatio || 0) > Number(scanContract.maxSecondaryActionWidthRatio || 1)
+                ) {
+                    findings.push(createVisualFinding({
+                        route,
+                        viewport: viewportName,
+                        severity: 'medium',
+                        category: 'cta_hierarchy',
+                        message: 'A secondary action is nearly as wide as a primary page action.',
+                        evidence: `${frameEvidence}; action="${action.label || action.selector}"; widthRatio=${action.widthRatio}; max=${scanContract.maxSecondaryActionWidthRatio}`,
+                        likelyCause: 'A secondary or support action is taking page-level visual authority.',
+                        screenshotPath: frameScreenshotPath,
+                        source: 'page_depth_scan'
+                    }));
+                }
+
+                if (
+                    Number(action.widthRatio || 0) > Number(scanContract.maxEdgeToEdgeActionWidthRatio || 1) &&
+                    Number(action.edgePaddingPx || 0) < Number(scanContract.minViewportActionSidePaddingPx || 0)
+                ) {
+                    findings.push(createVisualFinding({
+                        route,
+                        viewport: viewportName,
+                        severity: action.insideCard ? 'high' : 'medium',
+                        category: 'spacing',
+                        message: 'An action hugs the viewport edge during the vertical visual scan.',
+                        evidence: `${frameEvidence}; action="${action.label || action.selector}"; widthRatio=${action.widthRatio}; edgePaddingPx=${action.edgePaddingPx}; min=${scanContract.minViewportActionSidePaddingPx}`,
+                        likelyCause: 'The action is escaping its layout container or losing responsive side padding.',
+                        hardFail: Boolean(action.insideCard),
+                        screenshotPath: frameScreenshotPath,
+                        source: 'page_depth_scan'
+                    }));
+                }
+            }
+        }
+    }
+
+    if (!cardContract) {
+        return findings;
+    }
+
+    const cardMetrics = state.cardActionMetrics || [];
+    const summarizeCardLabels = (metrics) => {
+        const labels = metrics
+            .map((metric) => metric.label)
+            .filter(Boolean)
+            .slice(0, 4);
+        return `affectedCards=${metrics.length}; examples=${labels.join(', ')}`;
+    };
+    const stackedFullWidthCards = cardMetrics.filter((metric) => (
+        Number(metric.secondaryRowCount || 0) > 1 &&
+        Number(metric.secondaryMaxButtonWidthRatio || 0) > Number(cardContract.maxSecondaryButtonWidthRatio || 1)
+    ));
+    const edgeTouchingCards = cardMetrics.filter((metric) => (
+        Number(metric.secondaryCount || 0) > 0 &&
+        Number(metric.secondaryInlinePaddingPx || 0) < Number(cardContract.minCardInlinePaddingPx || 0)
+    ));
+    const dominantActionCards = cardMetrics.filter((metric) => (
+        Number(metric.actionGroupHeightRatio || 0) > Number(cardContract.maxActionGroupHeightRatio || 1)
+    ));
+
+    if (stackedFullWidthCards.length > 1) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'cta_hierarchy',
+            message: 'A repeated mobile card pattern makes stacked contact buttons read as main content across the page.',
+            evidence: `${summarizeCardLabels(stackedFullWidthCards)}; maxSecondaryButtonWidthRatio=${Math.max(...stackedFullWidthCards.map((metric) => Number(metric.secondaryMaxButtonWidthRatio || 0))).toFixed(3)}; max=${cardContract.maxSecondaryButtonWidthRatio}`,
+            likelyCause: 'The issue is not isolated to one vehicle card; the shared card action layout is giving secondary contact CTAs too much authority.',
+            hardFail: true,
+            screenshotPath: screenshotForScanMetric(state, stackedFullWidthCards[0], screenshotPath),
+            source: 'page_depth_scan'
+        }));
+    }
+
+    if (edgeTouchingCards.length > 1) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'spacing',
+            message: 'A repeated mobile card pattern lets contact buttons touch the card edge across the page.',
+            evidence: `${summarizeCardLabels(edgeTouchingCards)}; minInlinePaddingPx=${Math.min(...edgeTouchingCards.map((metric) => Number(metric.secondaryInlinePaddingPx || 0))).toFixed(2)}; min=${cardContract.minCardInlinePaddingPx}`,
+            likelyCause: 'The shared card CTA group is escaping the card padding, so the problem will reappear on every card using this component.',
+            hardFail: true,
+            screenshotPath: screenshotForScanMetric(state, edgeTouchingCards[0], screenshotPath),
+            source: 'page_depth_scan'
+        }));
+    }
+
+    if (dominantActionCards.length > 1) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'cta_hierarchy',
+            message: 'A repeated mobile card pattern makes the action group dominate several cards.',
+            evidence: `${summarizeCardLabels(dominantActionCards)}; maxActionGroupHeightRatio=${Math.max(...dominantActionCards.map((metric) => Number(metric.actionGroupHeightRatio || 0))).toFixed(3)}; max=${cardContract.maxActionGroupHeightRatio}`,
+            likelyCause: 'The reusable card layout is letting booking and contact controls outweigh the vehicle name, price, and product content.',
+            hardFail: true,
+            screenshotPath: screenshotForScanMetric(state, dominantActionCards[0], screenshotPath),
+            source: 'page_depth_scan'
+        }));
+    }
+
+    for (const metric of cardMetrics) {
+        const metricScreenshotPath = screenshotForScanMetric(state, metric, screenshotPath);
+        const labelEvidence = `card="${metric.label}"`;
+
+        if (Number(metric.secondaryCount || 0) > Number(cardContract.maxSecondaryContactActions || 2)) {
+            findings.push(createVisualFinding({
+                route,
+                viewport: viewportName,
+                severity: 'medium',
+                category: 'cta_hierarchy',
+                message: 'A mobile card exposes too many visible secondary contact actions.',
+                evidence: `${labelEvidence}; secondaryCount=${metric.secondaryCount}; max=${cardContract.maxSecondaryContactActions}`,
+                likelyCause: 'The card is asking for too many immediate contact decisions before the guest has focused on the car and price.',
+                screenshotPath: metricScreenshotPath,
+                source: 'page_depth_scan'
+            }));
+        }
+
+        if (Number(metric.actionGroupHeightRatio || 0) > Number(cardContract.maxActionGroupHeightRatio || 1)) {
+            findings.push(createVisualFinding({
+                route,
+                viewport: viewportName,
+                severity: 'high',
+                category: 'cta_hierarchy',
+                message: 'A mobile card action group visually dominates the card content.',
+                evidence: `${labelEvidence}; actionGroupHeightRatio=${metric.actionGroupHeightRatio}; max=${cardContract.maxActionGroupHeightRatio}`,
+                likelyCause: 'Reserve, call, or WhatsApp controls are taking more vertical weight than the vehicle name, price, and booking intent.',
+                hardFail: true,
+                screenshotPath: metricScreenshotPath,
+                source: 'page_depth_scan'
+            }));
+        }
+
+        if (
+            Number(metric.secondaryActionHeightRatio || 0) > Number(cardContract.maxSecondaryActionHeightRatio || 1) ||
+            Number(metric.secondaryDominanceRatio || 0) > Number(cardContract.maxSecondaryDominanceRatio || 99)
+        ) {
+            findings.push(createVisualFinding({
+                route,
+                viewport: viewportName,
+                severity: 'high',
+                category: 'cta_hierarchy',
+                message: 'Mobile contact actions are overpowering the vehicle title and price hierarchy.',
+                evidence: `${labelEvidence}; secondaryActionHeightRatio=${metric.secondaryActionHeightRatio}; max=${cardContract.maxSecondaryActionHeightRatio}; secondaryDominanceRatio=${metric.secondaryDominanceRatio}; maxDominance=${cardContract.maxSecondaryDominanceRatio}`,
+                likelyCause: 'Call and WhatsApp buttons are too visually heavy compared with the information the guest needs before contacting.',
+                hardFail: true,
+                screenshotPath: metricScreenshotPath,
+                source: 'page_depth_scan'
+            }));
+        }
+
+        if (
+            Number(metric.secondaryRowCount || 0) > 1 &&
+            Number(metric.secondaryMaxButtonWidthRatio || 0) > Number(cardContract.maxSecondaryButtonWidthRatio || 1)
+        ) {
+            findings.push(createVisualFinding({
+                route,
+                viewport: viewportName,
+                severity: 'high',
+                category: 'cta_hierarchy',
+                message: 'Stacked mobile contact buttons span almost the full card width and read as the main content.',
+                evidence: `${labelEvidence}; secondaryRowCount=${metric.secondaryRowCount}; secondaryMaxButtonWidthRatio=${metric.secondaryMaxButtonWidthRatio}; max=${cardContract.maxSecondaryButtonWidthRatio}`,
+                likelyCause: 'The secondary contact group is styled like page-level full-width CTAs instead of a contained card action group.',
+                hardFail: true,
+                screenshotPath: metricScreenshotPath,
+                source: 'page_depth_scan'
+            }));
+        }
+
+        if (
+            Number(metric.secondaryCount || 0) > 0 &&
+            Number(metric.secondaryInlinePaddingPx || 0) < Number(cardContract.minCardInlinePaddingPx || 0)
+        ) {
+            findings.push(createVisualFinding({
+                route,
+                viewport: viewportName,
+                severity: 'high',
+                category: 'spacing',
+                message: 'Mobile card contact buttons touch the card edge without enough inner padding.',
+                evidence: `${labelEvidence}; secondaryInlinePaddingPx=${metric.secondaryInlinePaddingPx}; min=${cardContract.minCardInlinePaddingPx}`,
+                likelyCause: 'The contact row is escaping the card padding, making the CTA block feel detached from the vehicle card.',
+                hardFail: true,
+                screenshotPath: metricScreenshotPath,
+                source: 'page_depth_scan'
+            }));
+        }
+
+        if (
+            Number(metric.primaryMaxHeight || 0) > 0 &&
+            (
+                Number(metric.primaryMaxHeight || 0) < Number(cardContract.minPrimaryActionHeightPx || 0) ||
+                Number(metric.primaryMaxHeight || 0) > Number(cardContract.maxPrimaryActionHeightPx || 999)
+            )
+        ) {
+            findings.push(createVisualFinding({
+                route,
+                viewport: viewportName,
+                severity: 'medium',
+                category: 'cta_hierarchy',
+                message: 'The mobile card primary action is outside the expected useful height range.',
+                evidence: `${labelEvidence}; primaryMaxHeight=${metric.primaryMaxHeight}; min=${cardContract.minPrimaryActionHeightPx}; max=${cardContract.maxPrimaryActionHeightPx}`,
+                likelyCause: 'The primary booking action is either too small to tap or too large for the card rhythm.',
+                screenshotPath: metricScreenshotPath,
+                source: 'page_depth_scan'
+            }));
+        }
+
+        if (Number(metric.secondaryMaxHeight || 0) > Number(cardContract.maxSecondaryActionHeightPx || 999)) {
+            findings.push(createVisualFinding({
+                route,
+                viewport: viewportName,
+                severity: 'medium',
+                category: 'cta_hierarchy',
+                message: 'A mobile card secondary contact button is taller than the allowed supporting action height.',
+                evidence: `${labelEvidence}; secondaryMaxHeight=${metric.secondaryMaxHeight}; max=${cardContract.maxSecondaryActionHeightPx}`,
+                likelyCause: 'Secondary contact CTAs are being styled as primary page buttons instead of supporting card actions.',
+                screenshotPath: metricScreenshotPath,
+                source: 'page_depth_scan'
+            }));
+        }
+    }
+
+    return findings;
+}
+
 async function collectVisualMetrics(page, profile) {
     const profileSelectors = PROFILE_SELECTORS[profile] || PROFILE_SELECTORS.hub_marketing;
 
-    return page.evaluate(({ profileName, selectors }) => {
+    return page.evaluate(({ profileName, selectors, auditRules }) => {
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
         const root = document.documentElement;
@@ -1117,6 +3420,12 @@ async function collectVisualMetrics(page, profile) {
                 .slice(0, 80);
         }
 
+        function normalizeText(value) {
+            return String(value || '')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
         function normalizedFontFamily(value) {
             return String(value || '')
                 .split(',')[0]
@@ -1177,6 +3486,73 @@ async function collectVisualMetrics(page, profile) {
             );
         }
 
+        function contrastRatio(foregroundChannels, backgroundChannels) {
+            if (!foregroundChannels || !backgroundChannels) {
+                return 0;
+            }
+
+            const foreground = relativeLuminance(foregroundChannels);
+            const background = relativeLuminance(backgroundChannels);
+            const lighter = Math.max(foreground, background);
+            const darker = Math.min(foreground, background);
+            return (lighter + 0.05) / (darker + 0.05);
+        }
+
+        function parseColorParts(value) {
+            const match = String(value || '').match(/rgba?\(([^)]+)\)/i);
+
+            if (!match) {
+                return null;
+            }
+
+            const parts = match[1]
+                .split(',')
+                .map((part) => Number.parseFloat(part.trim()));
+
+            if (parts.length < 3 || parts.slice(0, 3).some((part) => !Number.isFinite(part))) {
+                return null;
+            }
+
+            return {
+                channels: parts.slice(0, 3),
+                alpha: Number.isFinite(parts[3]) ? parts[3] : 1
+            };
+        }
+
+        function effectiveBackgroundChannels(element) {
+            let current = element instanceof HTMLElement ? element : null;
+
+            while (current) {
+                const style = window.getComputedStyle(current);
+                const colorParts = parseColorParts(style.backgroundColor);
+
+                if (colorParts && colorParts.alpha > 0.08) {
+                    return colorParts.channels;
+                }
+
+                current = current.parentElement;
+            }
+
+            return parseColorChannels(styleValue(document.body, 'backgroundColor')) || [255, 255, 255];
+        }
+
+        function fontWeightNumber(style) {
+            const rawWeight = String(style?.fontWeight || '').toLowerCase();
+
+            if (rawWeight === 'bold') {
+                return 700;
+            }
+
+            const parsed = Number.parseInt(rawWeight, 10);
+            return Number.isFinite(parsed) ? parsed : 400;
+        }
+
+        function isLargeReadableText(style) {
+            const fontSize = parsePx(style?.fontSize);
+            const fontWeight = fontWeightNumber(style);
+            return fontSize >= 24 || (fontSize >= 18.66 && fontWeight >= 600);
+        }
+
         function looksLikeNeonLime(channels) {
             if (!channels) {
                 return false;
@@ -1229,6 +3605,30 @@ async function collectVisualMetrics(page, profile) {
             }
 
             return null;
+        }
+
+        function topLevelNavTargets(navElement) {
+            if (!(navElement instanceof HTMLElement)) {
+                return [];
+            }
+
+            return Array.from(navElement.children)
+                .map((child) => {
+                    if (!(child instanceof HTMLElement)) {
+                        return null;
+                    }
+
+                    if (child.matches('a, button')) {
+                        return child;
+                    }
+
+                    return child.querySelector(':scope > .lab-nav__trigger, :scope > a, :scope > button');
+                })
+                .filter((element) => element instanceof HTMLElement && isVisible(element));
+        }
+
+        function navLabelSignature(labels) {
+            return (labels || []).map((label) => normalizeText(label)).filter(Boolean).join('|');
         }
 
         function buttonStyleFingerprint(element) {
@@ -1315,6 +3715,34 @@ async function collectVisualMetrics(page, profile) {
             return 'none';
         }
 
+        function inferHeaderVariant(headerElement, hasMegaNav, utilityCount) {
+            if (!(headerElement instanceof HTMLElement)) {
+                return document.querySelector('.site-header')
+                    ? 'site_header'
+                    : document.querySelector('header')
+                        ? 'generic_header'
+                        : 'none';
+            }
+
+            if (headerElement.classList.contains('lab-header--vehicle') && hasMegaNav) {
+                return 'lab_vehicle_mega';
+            }
+
+            if (hasMegaNav && utilityCount > 0) {
+                return 'lab_mega_utility';
+            }
+
+            if (hasMegaNav) {
+                return 'lab_mega';
+            }
+
+            if (utilityCount > 0) {
+                return 'lab_simple_utility';
+            }
+
+            return 'lab_simple';
+        }
+
         function metricsRatio(element, dimension, divisor) {
             if (!(element instanceof HTMLElement) || !divisor) {
                 return 0;
@@ -1384,6 +3812,176 @@ async function collectVisualMetrics(page, profile) {
             }
 
             return overlaps.slice(0, 12);
+        }
+
+        function collectTextContrastIssues() {
+            const minTextContrastRatio = Number(auditRules?.minTextContrastRatio || 4.5);
+            const minLargeTextContrastRatio = Number(auditRules?.minLargeTextContrastRatio || 3);
+            const textSelectors = [
+                'main h1',
+                'main h2',
+                'main h3',
+                'main p',
+                'main li',
+                'main label',
+                'main small',
+                'main strong',
+                'main dt',
+                'main dd',
+                'main summary',
+                'main button',
+                'main a.btn',
+                'main input:not([type="hidden"])',
+                'main select',
+                'main textarea',
+                '.vehicle-booking span',
+                '.reserve-page-panel span',
+                '.summary-section span'
+            ];
+            const seen = new Set();
+            const issues = [];
+
+            for (const selector of textSelectors) {
+                for (const element of Array.from(document.querySelectorAll(selector))) {
+                    if (!(element instanceof HTMLElement) || seen.has(element) || !isVisible(element)) {
+                        continue;
+                    }
+
+                    seen.add(element);
+
+                    if (element.closest('[aria-hidden="true"], .lab-nav__panel, header, nav, svg')) {
+                        continue;
+                    }
+
+                    const rect = element.getBoundingClientRect();
+
+                    if (rect.bottom < 0 || rect.top > viewportHeight * 1.1 || rect.width < 24 || rect.height < 8) {
+                        continue;
+                    }
+
+                    const text = element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement
+                        ? (element.value || element.placeholder || '')
+                        : element instanceof HTMLSelectElement
+                            ? (element.selectedOptions[0]?.textContent || element.value || '')
+                            : (element.innerText || element.textContent || '');
+                    const normalizedText = normalizeText(text);
+
+                    if (normalizedText.length < 2) {
+                        continue;
+                    }
+
+                    const style = window.getComputedStyle(element);
+                    const foregroundChannels = parseColorChannels(style.color);
+                    const backgroundChannels = effectiveBackgroundChannels(element);
+                    const ratio = contrastRatio(foregroundChannels, backgroundChannels);
+                    const threshold = isLargeReadableText(style) ? minLargeTextContrastRatio : minTextContrastRatio;
+
+                    if (ratio > 0 && ratio < threshold) {
+                        issues.push({
+                            selectorLabel: buildLabel(element),
+                            text: normalizedText.slice(0, 70),
+                            contrastRatio: Number(ratio.toFixed(2)),
+                            requiredRatio: threshold,
+                            color: style.color,
+                            background: window.getComputedStyle(element).backgroundColor,
+                            effectiveBackground: `rgb(${backgroundChannels.map((channel) => Math.round(channel)).join(', ')})`,
+                            rect: rectData(element)
+                        });
+                    }
+                }
+            }
+
+            return issues
+                .sort((left, right) => left.contrastRatio - right.contrastRatio)
+                .slice(0, 16);
+        }
+
+        function collectInternalGapIssues() {
+            const maxGapRatio = Number(auditRules?.maxInternalPanelGapRatio || 0.28);
+            const maxGapPx = Number(auditRules?.maxInternalPanelGapPx || 160);
+            const containers = selectorElements([
+                '#step1.step-content.active .step2-layout',
+                '#step1.step-content.active .step2-main',
+                '#step1.step-content.active .step2-side',
+                '#step1 .step2-layout',
+                '#step1 .step2-main',
+                '#step1 .step2-side',
+                '.step2-layout',
+                '.step2-main',
+                '.step2-side',
+                '.reserve-page-panel',
+                '.summary-section',
+                '.vehicle-booking',
+                '.contact-form-card',
+                '.services-hero__feature',
+                '.locations-hero__summary',
+                '.locations-map-card'
+            ], 28);
+            const seen = new Set();
+            const issues = [];
+
+            for (const container of containers) {
+                if (!(container instanceof HTMLElement) || seen.has(container) || !isVisible(container)) {
+                    continue;
+                }
+
+                seen.add(container);
+
+                const containerRect = container.getBoundingClientRect();
+
+                if (
+                    containerRect.top > viewportHeight ||
+                    containerRect.bottom < 0 ||
+                    containerRect.width < 180 ||
+                    containerRect.height < 160
+                ) {
+                    continue;
+                }
+
+                const childRects = Array.from(container.children)
+                    .filter((child) => child instanceof HTMLElement && isVisible(child))
+                    .filter((child) => {
+                        const style = window.getComputedStyle(child);
+                        return !/(absolute|fixed)/.test(style.position);
+                    })
+                    .map((child) => child.getBoundingClientRect())
+                    .filter((rect) => rect.width > 8 && rect.height > 4)
+                    .filter((rect) => rect.bottom > containerRect.top && rect.top < containerRect.bottom)
+                    .sort((left, right) => left.top - right.top);
+
+                if (childRects.length === 0) {
+                    continue;
+                }
+
+                const contentTop = Math.min(...childRects.map((rect) => rect.top));
+                const contentBottom = Math.max(...childRects.map((rect) => rect.bottom));
+                const trailingGapPx = Math.max(0, containerRect.bottom - contentBottom);
+                const leadingGapPx = Math.max(0, contentTop - containerRect.top);
+                let largestBetweenGapPx = 0;
+
+                for (let index = 1; index < childRects.length; index += 1) {
+                    largestBetweenGapPx = Math.max(largestBetweenGapPx, childRects[index].top - childRects[index - 1].bottom);
+                }
+
+                const largestGapPx = Math.max(trailingGapPx, largestBetweenGapPx);
+                const largestGapRatio = largestGapPx / Math.max(1, containerRect.height);
+
+                if (largestGapPx >= maxGapPx && largestGapRatio >= maxGapRatio) {
+                    issues.push({
+                        selectorLabel: buildLabel(container),
+                        largestGapPx: Number(largestGapPx.toFixed(2)),
+                        largestGapRatio: Number(largestGapRatio.toFixed(3)),
+                        trailingGapPx: Number(trailingGapPx.toFixed(2)),
+                        leadingGapPx: Number(leadingGapPx.toFixed(2)),
+                        childCount: childRects.length,
+                        rect: rectData(container)
+                    });
+                }
+            }
+
+            return issues
+                .sort((left, right) => right.largestGapPx - left.largestGapPx)
+                .slice(0, 10);
         }
 
         function hasBackgroundVisualSignal(element) {
@@ -1484,6 +4082,8 @@ async function collectVisualMetrics(page, profile) {
             .map((element) => clipDetails(element))
             .filter((entry) => entry.outsideViewportPx > 4 || entry.textOverflow)
             .slice(0, 16);
+        const textContrastIssues = collectTextContrastIssues();
+        const internalGapIssues = collectInternalGapIssues();
         const brokenMedia = brokenMediaDetails(mediaElements);
         const cardHeights = cardElements.map((card) => Number(card.getBoundingClientRect().height.toFixed(2)));
         const missingCardPriceCount = cardElements.filter((card) => !card.querySelector('.fleet-card__price-value')).length;
@@ -1585,6 +4185,20 @@ async function collectVisualMetrics(page, profile) {
         const fleetGrid = firstVisible(['.js-fleet-grid']);
         const fleetFirstRowMetrics = collectFleetFirstRowMetrics();
         const mainNav = firstVisible(['nav[aria-label="Main navigation"]', '.lab-header .lab-nav']);
+        const headerBrand = firstVisible(['.lab-brand', '.header-brand']);
+        const headerUtilityTargets = header
+            ? Array.from(header.querySelectorAll('.lab-header__utility-link')).filter((element) => isVisible(element)).slice(0, 8)
+            : [];
+        const headerPrimaryNavTargets = topLevelNavTargets(mainNav);
+        const headerPrimaryNavLabels = headerPrimaryNavTargets.map((element) => primaryText(element)).filter(Boolean);
+        const headerPrimaryNavSignature = navLabelSignature(headerPrimaryNavLabels);
+        const headerUtilityLabels = headerUtilityTargets.map((element) => primaryText(element)).filter(Boolean);
+        const headerUtilitySignature = navLabelSignature(headerUtilityLabels);
+        const headerNavRowCount = headerPrimaryNavTargets.length > 0
+            ? [...new Set(headerPrimaryNavTargets.map((element) => Math.round(element.getBoundingClientRect().top)))].length
+            : 0;
+        const headerBrandStyle = headerBrand ? window.getComputedStyle(headerBrand) : null;
+        const headerPrimaryNavStyle = headerPrimaryNavTargets[0] ? window.getComputedStyle(headerPrimaryNavTargets[0]) : null;
         const buttonElements = selectorElements([
             '.hero-lab__actions a',
             '.hero-lab__actions button',
@@ -1628,12 +4242,14 @@ async function collectVisualMetrics(page, profile) {
         const bookingBackgroundLuminance = relativeLuminance(bookingBackgroundChannels);
         const usesOrbitron = headingFontFamily.includes('orbitron');
         const usesSharedLabHeader = headerFamily === 'lab-header';
+        const hasMegaNav = Boolean(document.querySelector('.lab-nav__panel'));
         const darkBody = bodyBackgroundLuminance > 0 && bodyBackgroundLuminance < 0.22;
         const lightBody = bodyBackgroundLuminance >= 0.72;
         const isMotherBaseVehicle = body.classList.contains('vehicle-page--mother-base');
         const isPremiumPilotVehicle = body.classList.contains('vehicle-page--premium-pilot');
         const uppercaseHeading = String(headingStyle?.textTransform || '').toLowerCase() === 'uppercase';
         const buttonStyleFingerprints = uniqueValues(buttonElements.map((element) => buttonStyleFingerprint(element))).slice(0, 8);
+        const headerVariant = inferHeaderVariant(header, hasMegaNav, headerUtilityTargets.length);
         const headingInsideHeroMedia = Boolean(
             visibleH1[0]?.closest(
                 '.vehicle-hero__media, .services-hero, .services-hero__media, .hero-lab, .hero-lab__media, .about-hero, .about-hero__media, .locations-hero, .locations-hero__media, .local-guide-hero, .local-guide-hero__media, .service-detail-hero, .service-detail-hero__media'
@@ -1704,6 +4320,8 @@ async function collectVisualMetrics(page, profile) {
             statusRect: rectData(status),
             headerOcclusionPx: Number(headerOcclusionPx.toFixed(2)),
             clippedElements,
+            textContrastIssues,
+            internalGapIssues,
             overlaps: overlapDetails(keyElements.slice(0, 12)),
             brokenMedia,
             cardHeightSpread: cardHeights.length ? Number((Math.max(...cardHeights) - Math.min(...cardHeights)).toFixed(2)) : 0,
@@ -1712,7 +4330,16 @@ async function collectVisualMetrics(page, profile) {
             missingCardPrimaryCount,
             templateFamily,
             headerFamily,
+            headerVariant,
             headerSignature: classSignature(header),
+            headerBrandFontFamily: normalizedFontFamily(headerBrandStyle?.fontFamily || ''),
+            headerPrimaryNavFontFamily: normalizedFontFamily(headerPrimaryNavStyle?.fontFamily || ''),
+            headerPrimaryNavLabels,
+            headerPrimaryNavSignature,
+            headerUtilityLabels,
+            headerUtilitySignature,
+            headerUtilityCount: headerUtilityTargets.length,
+            headerNavRowCount,
             heroSignature: classSignature(hero),
             primaryCtaSignature: classSignature(primaryCta),
             bodyClassSignature: body ? String(body.className || '').split(/\s+/).filter(Boolean).slice(0, 6).join('.') : '',
@@ -1801,7 +4428,8 @@ async function collectVisualMetrics(page, profile) {
         };
     }, {
         profileName: profile,
-        selectors: profileSelectors
+        selectors: profileSelectors,
+        auditRules: DESIGN_SYSTEM_CONTRACT.global || {}
     });
 }
 
@@ -2490,6 +5118,40 @@ function buildDeterministicFindings({ route, viewport, profile, metrics, console
         }));
     }
 
+    for (const issue of metrics.textContrastIssues || []) {
+        const severeContrast = Number(issue.contrastRatio || 0) > 0 && Number(issue.contrastRatio) < 2.4;
+
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: severeContrast ? 'high' : 'medium',
+            category: 'contrast',
+            selector: issue.selectorLabel,
+            message: 'Visible text does not have enough contrast against its effective background.',
+            evidence: `text="${issue.text}"; contrastRatio=${issue.contrastRatio}; requiredRatio=${issue.requiredRatio}; color=${issue.color}; effectiveBackground=${issue.effectiveBackground}`,
+            likelyCause: 'The text color is too close to the card or page background, so labels and supporting copy fade out.',
+            hardFail: severeContrast,
+            screenshotPath
+        }));
+    }
+
+    for (const issue of metrics.internalGapIssues || []) {
+        const severeGap = Number(issue.largestGapPx || 0) >= 240;
+
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: severeGap ? 'high' : 'medium',
+            category: 'layout_gap',
+            selector: issue.selectorLabel,
+            message: 'A first-viewport panel contains a large empty internal gap.',
+            evidence: `largestGapPx=${issue.largestGapPx}; largestGapRatio=${issue.largestGapRatio}; trailingGapPx=${issue.trailingGapPx}; childCount=${issue.childCount}`,
+            likelyCause: 'The panel content is ending too early or one column is shorter than its companion block, creating a visible dead zone.',
+            hardFail: severeGap,
+            screenshotPath
+        }));
+    }
+
     if (profileConfig.heroLed && metrics.heroActionCount > 2) {
         findings.push(createVisualFinding({
             route,
@@ -2978,6 +5640,8 @@ function buildVisionPrompt({ route, viewport, profile, metrics, findings, baseli
     const compactMetrics = {
         visualIntent: metrics.visualIntent,
         templateFamily: metrics.templateFamily,
+        headerVariant: metrics.headerVariant,
+        headerPrimaryNavSignature: metrics.headerPrimaryNavSignature,
         headingFontFamily: metrics.headingFontFamily,
         bodyFontFamily: metrics.bodyFontFamily,
         bodyFontSizePx: metrics.bodyFontSizePx,
@@ -2986,6 +5650,8 @@ function buildVisionPrompt({ route, viewport, profile, metrics, findings, baseli
         inputRadiusPx: metrics.inputRadiusPx,
         cardRadiusPx: metrics.cardRadiusPx,
         headingTopRatio: metrics.headingTopRatio,
+        textContrastIssues: (metrics.textContrastIssues || []).slice(0, 5),
+        internalGapIssues: (metrics.internalGapIssues || []).slice(0, 5),
         headerFamily: metrics.headerFamily
     };
 
@@ -3340,6 +6006,10 @@ function collectForbiddenFontMismatches(metrics = {}) {
     return mismatches;
 }
 
+function normalizeHeaderSignatureValue(value = '') {
+    return String(value || '').trim().toLowerCase();
+}
+
 function buildContractDesignSystemFindings(page, contract) {
     const findings = [];
     const metrics = page.metrics || {};
@@ -3347,6 +6017,7 @@ function buildContractDesignSystemFindings(page, contract) {
     const surfaceMismatches = [];
     const shapeMismatches = [];
     const buttonMismatches = [];
+    const headerMismatches = [];
 
     if (
         Array.isArray(contract.headingFontFamilies) &&
@@ -3422,6 +6093,47 @@ function buildContractDesignSystemFindings(page, contract) {
         );
     }
 
+    if (
+        Array.isArray(contract.headerVariants) &&
+        contract.headerVariants.length > 0 &&
+        metrics.headerVariant &&
+        !matchesAllowedTokens(metrics.headerVariant, contract.headerVariants)
+    ) {
+        headerMismatches.push(
+            `headerVariant=${metrics.headerVariant} expected=${contract.headerVariants.join('|')}`
+        );
+    }
+
+    if (
+        Array.isArray(contract.headerBrandFontFamilies) &&
+        contract.headerBrandFontFamilies.length > 0 &&
+        metrics.headerBrandFontFamily &&
+        !matchesAllowedTokens(metrics.headerBrandFontFamily, contract.headerBrandFontFamilies)
+    ) {
+        headerMismatches.push(
+            `headerBrandFontFamily=${metrics.headerBrandFontFamily} expected=${contract.headerBrandFontFamilies.join('|')}`
+        );
+    }
+
+    if (
+        Array.isArray(contract.headerPrimaryNavSignatures) &&
+        contract.headerPrimaryNavSignatures.length > 0 &&
+        metrics.headerPrimaryNavSignature &&
+        !contract.headerPrimaryNavSignatures.some((entry) => (
+            normalizeHeaderSignatureValue(entry) === normalizeHeaderSignatureValue(metrics.headerPrimaryNavSignature)
+        ))
+    ) {
+        headerMismatches.push(
+            `headerPrimaryNavSignature=${metrics.headerPrimaryNavSignature} expected=${contract.headerPrimaryNavSignatures.join('|')}`
+        );
+    }
+
+    if (!metricWithinRanges(metrics.headerNavRowCount, contract.headerNavRowCount)) {
+        headerMismatches.push(
+            `headerNavRowCount=${metrics.headerNavRowCount} expected=${formatRangeSpec(contract.headerNavRowCount)}`
+        );
+    }
+
     if (fontMismatches.length > 0) {
         findings.push(createVisualFinding({
             route: page.route,
@@ -3477,6 +6189,24 @@ function buildContractDesignSystemFindings(page, contract) {
             message: 'This page exceeds the allowed CTA/button variety for its page family.',
             evidence: buttonMismatches.join('; '),
             likelyCause: 'The page is accumulating extra button treatments instead of reusing the shared component set.',
+            screenshotPath: pageScreenshotPath(page),
+            source: 'design_contract'
+        }));
+    }
+
+    if (headerMismatches.length > 0) {
+        findings.push(createVisualFinding({
+            route: page.route,
+            viewport: page.viewport,
+            severity: headerMismatches.some((entry) => (
+                entry.includes('headerVariant=') ||
+                entry.includes('headerBrandFontFamily=') ||
+                entry.includes('headerPrimaryNavSignature=')
+            )) ? 'high' : 'medium',
+            category: 'header_consistency',
+            message: 'This page breaks the explicit header contract for its page family.',
+            evidence: headerMismatches.join('; '),
+            likelyCause: 'The route is using a different header variant, brand font, or navigation sequence than the approved family shell.',
             screenshotPath: pageScreenshotPath(page),
             source: 'design_contract'
         }));
@@ -4477,6 +7207,7 @@ function buildMarkdownReport(report) {
         `- review: ${report.summary.byStatus.review}`,
         `- bad: ${report.summary.byStatus.bad}`,
         `- hard fails: ${report.summary.hardFailCount}`,
+        `- human review screenshots: ${report.humanReview?.screenshots || 0}/${report.humanReview?.totalFindings || 0}`,
         '',
         '## Cohorts',
         ''
@@ -4487,6 +7218,12 @@ function buildMarkdownReport(report) {
     }
 
     lines.push(
+        '',
+        '## Human Review Screenshots',
+        '',
+        `- directory: ${report.humanReview?.directory || 'n/a'}`,
+        `- screenshots: ${report.humanReview?.screenshots || 0}`,
+        `- missing screenshots: ${report.humanReview?.missingScreenshots || 0}`,
         '',
         '## Findings'
     );
@@ -4511,6 +7248,9 @@ function buildMarkdownReport(report) {
 
             for (const finding of page.assessment.findings.slice(0, 6)) {
                 lines.push(`  - [${finding.severity}] ${finding.category}: ${finding.message}`);
+                if (finding.humanReviewScreenshotPath) {
+                    lines.push(`    - human review screenshot: ${finding.humanReviewScreenshotPath}`);
+                }
             }
         }
 
@@ -4578,9 +7318,22 @@ async function runPageAudit({ browser, baseUrl, route, viewport, runDir, updateB
         await page.goto(`${baseUrl}${route}`, { waitUntil: 'domcontentloaded' });
         await settlePage(page, 500);
         const metrics = await collectVisualMetrics(page, profile);
+        const pageDepthScanState = await collectPageDepthScanState(page, pageDir, viewport);
         const surfaceMetrics = await collectInteractiveSurfaceMetrics(page, profile, viewport);
         const serviceSelectorStates = route === '/services.html'
             ? await collectServiceSelectorStates(page, pageDir)
+            : null;
+        const fleetMobileFilterState = route === '/fleet.html'
+            ? await collectFleetMobileFilterState(page, pageDir, viewport)
+            : null;
+        const contactFormState = route === '/contact.html'
+            ? await collectContactFormState(page, pageDir)
+            : null;
+        const reserveBookingIntentState = route === '/app/reserve/page.html'
+            ? await collectReserveBookingIntentState(page, pageDir)
+            : null;
+        const staleBookingDateProbeState = route === '/app/reserve/page.html'
+            ? await collectStaleBookingDateProbeState({ context, baseUrl, route, pageDir, viewport })
             : null;
         await resetInteractiveChrome(page);
         await page.screenshot({
@@ -4615,6 +7368,49 @@ async function runPageAudit({ browser, baseUrl, route, viewport, runDir, updateB
             serviceSelectorStates,
             screenshotPath: artifacts.viewportScreenshot
         }));
+        findings = findings.concat(buildFleetMobileFilterFindings({
+            route,
+            viewportName: viewport.name,
+            viewportWidth: viewport.width,
+            state: fleetMobileFilterState,
+            screenshotPath: artifacts.viewportScreenshot
+        }));
+        findings = findings.concat(buildContactFormStateFindings({
+            route,
+            viewportName: viewport.name,
+            viewportWidth: viewport.width,
+            state: contactFormState,
+            screenshotPath: artifacts.viewportScreenshot
+        }));
+        findings = findings.concat(buildReserveBookingIntentFindings({
+            route,
+            viewportName: viewport.name,
+            viewportWidth: viewport.width,
+            state: reserveBookingIntentState,
+            screenshotPath: artifacts.viewportScreenshot
+        }));
+        findings = findings.concat(buildPageDepthScanFindings({
+            route,
+            viewportName: viewport.name,
+            viewportWidth: viewport.width,
+            state: pageDepthScanState,
+            screenshotPath: artifacts.viewportScreenshot
+        }));
+        const staleBookingDateFindings = buildPageDepthScanFindings({
+            route,
+            viewportName: viewport.name,
+            viewportWidth: viewport.width,
+            state: staleBookingDateProbeState?.pageDepthScanState,
+            screenshotPath: artifacts.viewportScreenshot,
+            auditDateIso: staleBookingDateProbeState?.auditDateIso
+        }).filter((finding) => finding.category === 'date_currentness')
+            .map((finding) => ({
+                ...finding,
+                message: finding.message.replace('A booking date control', 'The reserve stale-date probe'),
+                evidence: `${finding.evidence}; probeStartDate=${staleBookingDateProbeState?.staleStartDate || 'n/a'}; probeRoute=${staleBookingDateProbeState?.probeRoute || 'n/a'}`,
+                likelyCause: 'The reservation page accepts stale query/session dates instead of clamping the customer schedule to today or a future date.'
+            }));
+        findings = findings.concat(staleBookingDateFindings);
 
         const baselineResults = [];
         const viewportBaseline = path.join(baselineDir, 'viewport.png');
@@ -4703,6 +7499,11 @@ async function runPageAudit({ browser, baseUrl, route, viewport, runDir, updateB
             metrics,
             surfaceMetrics,
             serviceSelectorStates,
+            fleetMobileFilterState,
+            contactFormState,
+            reserveBookingIntentState,
+            staleBookingDateProbeState,
+            pageDepthScanState,
             findings: assessment.findings,
             assessment,
             baselineDiff,
@@ -4764,7 +7565,9 @@ async function runVisualAgent(options = {}) {
             ...buildTemplateFamilyFindings(pages),
             ...buildSurfaceFindings(pages)
         ];
-        const enrichedPages = applyCrossPageFindings(pages, crossPageFindings);
+        const crossEnrichedPages = applyCrossPageFindings(pages, crossPageFindings);
+        const humanReviewArtifacts = buildVisualHumanReviewArtifacts(crossEnrichedPages, runDir);
+        const enrichedPages = humanReviewArtifacts.pages;
         const findingsSummary = summarizeVisualFindings(enrichedPages.flatMap((page) => page.findings));
         const summary = {
             totalRoutes: selectedRoutes.length,
@@ -4784,6 +7587,14 @@ async function runVisualAgent(options = {}) {
             scope: args.scope || 'landings',
             includeFleetClicks: Boolean(args.includeFleetClicks ?? true),
             summary,
+            humanReview: {
+                kind: humanReviewArtifacts.manifest.kind,
+                directory: humanReviewArtifacts.manifest.directory,
+                totalFindings: humanReviewArtifacts.manifest.totalFindings,
+                screenshots: humanReviewArtifacts.manifest.screenshots,
+                missingScreenshots: humanReviewArtifacts.manifest.missingScreenshots,
+                manifestPath: path.join(humanReviewArtifacts.manifest.directory, 'manifest.json')
+            },
             cohorts: summarizeCohorts(enrichedPages),
             pages: enrichedPages
         };
@@ -4831,8 +7642,12 @@ module.exports = {
     approveBaselinesFromRun,
     applyCrossPageFindings,
     buildCohortFindings,
+    buildContactFormStateFindings,
     buildDesignSystemFindings,
     buildDeterministicFindings,
+    buildFleetMobileFilterFindings,
+    buildPageDepthScanFindings,
+    buildReserveBookingIntentFindings,
     buildServiceInteractionFindings,
     buildMarkdownReport,
     buildProfileReferenceFindings,
