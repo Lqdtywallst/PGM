@@ -2700,15 +2700,7 @@ body.vehicle-page--premium-pilot {
     }
 }
 
-.vehicle-mobile-cta {
-    display: none;
-}
-
 @media (max-width: 760px) {
-    body.vehicle-has-mobile-cta {
-        padding-bottom: 6rem;
-    }
-
     .vehicle-pdp-summary-primary {
         display: flex;
         flex-direction: column;
@@ -2725,6 +2717,8 @@ body.vehicle-page--premium-pilot {
 
     .vehicle-pdp-summary-side > .vehicle-metrics {
         order: 2;
+        align-self: stretch;
+        width: 100%;
     }
 
     .vehicle-pdp-summary-side > .vehicle-pdp-summary-support {
@@ -2759,48 +2753,6 @@ body.vehicle-page--premium-pilot {
 
     .vehicle-booking__note {
         font-size: 0.78rem;
-    }
-
-    .vehicle-mobile-cta {
-        position: fixed;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 92;
-        display: flex;
-        align-items: center;
-        gap: 0.7rem;
-        padding: 0.8rem 1rem calc(0.8rem + env(safe-area-inset-bottom));
-        background: linear-gradient(180deg, rgba(10, 11, 12, 0.92), rgba(10, 11, 12, 0.98));
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.2);
-    }
-
-    .vehicle-mobile-cta__primary,
-    .vehicle-mobile-cta__secondary {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 50px;
-        border-radius: 8px;
-        font-size: 0.8rem;
-        font-weight: 700;
-        line-height: 1;
-        text-align: center;
-    }
-
-    .vehicle-mobile-cta__primary {
-        flex: 1 1 auto;
-        border: 0;
-        background: linear-gradient(135deg, #242a31 0%, #121519 100%);
-        color: #fff;
-    }
-
-    .vehicle-mobile-cta__secondary {
-        flex: 0 0 138px;
-        border: 1px solid rgba(23, 23, 23, 0.14);
-        background: #fff;
-        color: #171717;
     }
 
     .model-grid {

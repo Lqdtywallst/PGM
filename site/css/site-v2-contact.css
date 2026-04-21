@@ -373,6 +373,20 @@
     text-transform: uppercase;
 }
 
+.info-card a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    width: 100%;
+    margin-top: 0.15rem;
+    padding: 0 0.95rem;
+    border: 1px solid rgba(23, 25, 33, 0.12);
+    border-radius: 8px;
+    background: rgba(245, 246, 248, 0.92);
+    text-align: center;
+}
+
 .contact-coverage {
     display: grid;
     grid-template-columns: minmax(0, 0.98fr) minmax(22rem, 1.02fr);

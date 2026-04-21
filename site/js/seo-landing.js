@@ -84,50 +84,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return searchParams.get(name) || storedIntent?.[name] || fallbackValue;
     }
 
-    function initStickyMobileCta(form, bookingSection, whatsappHref, persistIntent) {
-        if (document.querySelector(".vehicle-mobile-cta")) {
-            return;
-        }
-
-        const actionBar = document.createElement("div");
-        actionBar.className = "vehicle-mobile-cta";
-        actionBar.innerHTML = `
-            <button type="button" class="vehicle-mobile-cta__primary">Check availability</button>
-            <a class="vehicle-mobile-cta__secondary" href="${whatsappHref}" target="_blank" rel="noopener">WhatsApp the team</a>
-        `;
-
-        document.body.appendChild(actionBar);
-        document.body.classList.add("vehicle-has-mobile-cta");
-
-        const primaryButton = actionBar.querySelector(".vehicle-mobile-cta__primary");
-        const secondaryLink = actionBar.querySelector(".vehicle-mobile-cta__secondary");
-
-        primaryButton?.addEventListener("click", () => {
-            persistIntent();
-            emitAnalyticsEvent("pdp_check_availability_click", {
-                car: normalizeValue(form.querySelector('input[name="car"]')?.value),
-                page_path: normalizeValue(window.location.pathname),
-                placement: "sticky_mobile_cta"
-            });
-
-            bookingSection?.scrollIntoView({ behavior: "smooth", block: "start" });
-            window.setTimeout(() => {
-                const firstEmpty = Array.from(form.querySelectorAll("input[required]")).find((input) => !input.value);
-                if (firstEmpty instanceof HTMLElement) {
-                    firstEmpty.focus();
-                    return;
-                }
-                form.requestSubmit();
-            }, 180);
-        });
-
-        secondaryLink?.addEventListener("click", () => {
-            emitAnalyticsEvent("pdp_whatsapp_click", {
-                car: normalizeValue(form.querySelector('input[name="car"]')?.value),
-                page_path: normalizeValue(window.location.pathname),
-                placement: "sticky_mobile_cta"
-            });
-        });
+    function clampIsoDate(value, minValue) {
+        const normalizedValue = String(value || "");
+        return /^\d{4}-\d{2}-\d{2}$/.test(normalizedValue) && normalizedValue >= minValue
+            ? normalizedValue
+            : minValue;
     }
 
     bookingForms.forEach((form) => {
@@ -145,8 +106,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const today = getDubaiDateString(0);
-        const defaultStart = getPrefillValue("startDate", getDubaiDateString(1));
-        const defaultEnd = getPrefillValue("endDate", getDubaiDateString(2));
+        const defaultStart = clampIsoDate(getPrefillValue("startDate", today), today);
+        const defaultEnd = clampIsoDate(getPrefillValue("endDate", getDubaiDateString(1)), defaultStart);
         const defaultPickupTime = getPrefillValue("pickupTime", "12:00");
         const defaultDropoffTime = getPrefillValue("dropoffTime", "12:00");
 
@@ -219,6 +180,5 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         persistIntent();
-        initStickyMobileCta(form, bookingSection, whatsappLink?.href || "https://wa.me/971586122568", persistIntent);
     });
 });

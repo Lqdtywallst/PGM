@@ -2362,6 +2362,12 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                 '.service-card',
                 '.location-card',
                 '.guide-card',
+                '.vehicle-booking',
+                '.vehicle-pdp-gallery-top__thumb',
+                '.vehicle-metric',
+                '.vehicle-pdp-summary-support__item',
+                '.vehicle-pdp-panel',
+                '.vehicle-pdp-use__card',
                 '.reserve-mobile-bar'
             ].join(',')))
                 .filter((element) => element instanceof HTMLElement && isVisible(element));
@@ -2710,6 +2716,8 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                 const actionGroupRect = unionRects(actionElements.map(rectData));
                 const secondaryGroupRect = unionRects(secondaryRects);
                 const coreRect = unionRects([titleRect, priceRect]);
+                const cardClass = String(card.className || '');
+                const isVehicleActionCard = Boolean(price) || card.matches('.fleet-card, .vehicle-card, .model-card, .vehicle-booking') || /\b(fleet|vehicle|model)-/.test(cardClass);
                 const cardWidth = Math.max(1, cardRect.width);
                 const cardHeight = Math.max(1, cardRect.height);
                 const actionInlinePaddingPx = actionGroupRect
@@ -2738,7 +2746,9 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                 return {
                     index: index + 1,
                     label: textFor(title).slice(0, 80) || card.className || `card-${index + 1}`,
-                    cardClass: String(card.className || ''),
+                    cardClass,
+                    hasPrice: Boolean(price),
+                    isVehicleActionCard,
                     cardRect,
                     titleRect,
                     priceRect,
@@ -3112,7 +3122,9 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
         const metricScreenshotPath = screenshotForScanMetric(state, metric, screenshotPath);
         const labelEvidence = `card="${metric.label}"`;
 
-        if (Number(metric.secondaryCount || 0) > Number(cardContract.maxSecondaryContactActions || 2)) {
+        const isVehicleActionCard = metric.isVehicleActionCard !== false;
+
+        if (isVehicleActionCard && Number(metric.secondaryCount || 0) > Number(cardContract.maxSecondaryContactActions || 2)) {
             findings.push(createVisualFinding({
                 route,
                 viewport: viewportName,
@@ -3126,7 +3138,7 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
             }));
         }
 
-        if (Number(metric.actionGroupHeightRatio || 0) > Number(cardContract.maxActionGroupHeightRatio || 1)) {
+        if (isVehicleActionCard && Number(metric.actionGroupHeightRatio || 0) > Number(cardContract.maxActionGroupHeightRatio || 1)) {
             findings.push(createVisualFinding({
                 route,
                 viewport: viewportName,
@@ -3142,8 +3154,11 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
         }
 
         if (
-            Number(metric.secondaryActionHeightRatio || 0) > Number(cardContract.maxSecondaryActionHeightRatio || 1) ||
-            Number(metric.secondaryDominanceRatio || 0) > Number(cardContract.maxSecondaryDominanceRatio || 99)
+            isVehicleActionCard &&
+            (
+                Number(metric.secondaryActionHeightRatio || 0) > Number(cardContract.maxSecondaryActionHeightRatio || 1) ||
+                Number(metric.secondaryDominanceRatio || 0) > Number(cardContract.maxSecondaryDominanceRatio || 99)
+            )
         ) {
             findings.push(createVisualFinding({
                 route,
@@ -3160,6 +3175,7 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
         }
 
         if (
+            isVehicleActionCard &&
             Number(metric.secondaryRowCount || 0) > 1 &&
             Number(metric.secondaryMaxButtonWidthRatio || 0) > Number(cardContract.maxSecondaryButtonWidthRatio || 1)
         ) {
@@ -3519,6 +3535,54 @@ async function collectVisualMetrics(page, profile) {
             };
         }
 
+        function blendChannels(foregroundChannels, alpha, backgroundChannels) {
+            if (!foregroundChannels || !backgroundChannels) {
+                return foregroundChannels || backgroundChannels || null;
+            }
+
+            const boundedAlpha = Math.max(0, Math.min(1, Number(alpha)));
+            return foregroundChannels.map((channel, index) => (
+                (channel * boundedAlpha) + (backgroundChannels[index] * (1 - boundedAlpha))
+            ));
+        }
+
+        function parseBackgroundImageChannels(value) {
+            const matches = Array.from(String(value || '').matchAll(/rgba?\(([^)]+)\)/ig));
+
+            if (matches.length === 0) {
+                return null;
+            }
+
+            const totals = [0, 0, 0];
+            let totalWeight = 0;
+
+            for (const match of matches) {
+                const parts = match[1]
+                    .split(',')
+                    .map((part) => Number.parseFloat(part.trim()));
+
+                if (parts.length < 3 || parts.slice(0, 3).some((part) => !Number.isFinite(part))) {
+                    continue;
+                }
+
+                const alpha = Number.isFinite(parts[3]) ? Math.max(0, Math.min(1, parts[3])) : 1;
+
+                if (alpha <= 0.04) {
+                    continue;
+                }
+
+                const weight = Math.max(alpha, 0.12);
+                totals[0] += parts[0] * weight;
+                totals[1] += parts[1] * weight;
+                totals[2] += parts[2] * weight;
+                totalWeight += weight;
+            }
+
+            return totalWeight > 0
+                ? totals.map((total) => total / totalWeight)
+                : null;
+        }
+
         function effectiveBackgroundChannels(element) {
             let current = element instanceof HTMLElement ? element : null;
 
@@ -3526,17 +3590,28 @@ async function collectVisualMetrics(page, profile) {
                 const style = window.getComputedStyle(current);
                 const colorParts = parseColorParts(style.backgroundColor);
 
-                if (colorParts && colorParts.alpha > 0.08) {
+                if (colorParts && colorParts.alpha > 0.92) {
                     return colorParts.channels;
+                }
+
+                if (colorParts && colorParts.alpha > 0.08) {
+                    const parentChannels = effectiveBackgroundChannels(current.parentElement);
+                    return blendChannels(colorParts.channels, colorParts.alpha, parentChannels);
                 }
 
                 const backgroundImage = String(style.backgroundImage || '').toLowerCase();
                 if (backgroundImage && backgroundImage !== 'none') {
+                    const gradientChannels = parseBackgroundImageChannels(backgroundImage);
+
+                    if (gradientChannels) {
+                        return gradientChannels;
+                    }
+
                     if (current.matches('.fleet-sidebar__topbar .fleet-sidebar__select, .fleet-sidebar__topbar .fleet-filter-reset')) {
                         return [36, 27, 20];
                     }
 
-                    if (current.matches('.fleet-date-prompt, .fleet-card, .fleet-card__booking, .fleet-browser__empty, .fleet-page-main, .fleet-browser, .fleet-browser__shell, .fleet-results, .reserve-page-panel, .schedule-card, .delivery-card, .reservation-summary, .step2-main, .step2-side')) {
+                    if (current.matches('.fleet-date-prompt, .fleet-card, .fleet-card__booking, .fleet-browser__empty, .fleet-page-main, .fleet-browser, .fleet-browser__shell, .fleet-results, .reserve-page-panel, .schedule-card, .delivery-card, .reservation-summary, .step2-main, .step2-side, .contact-hero, .contact-band, .contact-form-card, .contact-trust-list li, .contact-methods-grid .info-card, .vehicle-page--mother-base, .vehicle-main--mother-base, .vehicle-page--mother-base .vehicle-booking, .vehicle-page--mother-base .model-card, .vehicle-page--mother-base .vehicle-metric, .vehicle-page--mother-base .vehicle-pdp-summary-support, .service-detail-page-main, .service-detail-hero__copy, .service-detail-hero__panel, .service-detail-card, .service-detail-trust__item, .service-detail-faq__item, .service-detail-cta, .service-detail-related__card')) {
                         return [255, 250, 243];
                     }
 
