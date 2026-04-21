@@ -1,124 +1,67 @@
 # AGENTS.md
 
-## Project Goals
-- Build a premium luxury car rental website for Dubai.
-- Prioritize clarity, trust, booking intent, and SEO-ready structure.
-- Use the existing project stack and file structure instead of introducing a new framework unless explicitly requested.
+## Project priorities
 
-## Current Stack
-- Static HTML in `site/`
-- Modular CSS in `site/css/`
-- Vanilla JS in `site/js/`
-- Backend routes in `server/` and `app/api/`
+The first viewport (above the fold) is the highest-priority UX area of this website.
 
-## Repo Structure
-- `site/index.html`: home page
-- `site/css/home.css`: home CSS entrypoint
-- `site/css/home/`: modular CSS partials for the home page
-- `site/js/home.js`: home JS entrypoint
-- `site/js/home-booking.js`: home booking intent logic
-- `site/app/reserve/page.html`: reservation page
-- `site/fleet.html`, `site/locations.html`, `site/services.html`, `site/about.html`, `site/contact.html`: trunk pages
-- `docs/architecture/`: architecture notes and visual reference docs
-- `server/test-server.js`: smoke test runner
+When working on landing pages, homepage, or hero sections, always optimize the first visible screen first.
 
-## Constraints
-- Do not copy third-party code, copy, branding, images, or videos verbatim.
-- It is acceptable to follow third-party structural logic and UX sequencing.
-- Keep edits modular and localized.
-- Prefer improving the existing stack over rewriting into React, Tailwind, or another framework unless explicitly requested.
-- Preserve SEO-critical URLs unless the task explicitly includes a migration plan.
-- Keep semantic HTML intact and SEO-ready.
+## Visual rules
 
-## Visual Direction
-- Premium luxury aesthetic
-- Dark, restrained palette with lime accent already established in the repo
-- High whitespace, clean spacing rhythm, controlled typography
-- One clear visual priority per section
-- Strong booking CTA without turning the page into a noisy marketplace
-- Editorial tone, but practical conversion flow
+- Prioritize strong visual hierarchy in the first viewport
+- One main headline, one main CTA
+- Secondary CTAs must be visually de-emphasized
+- Avoid clutter above the fold
+- Keep spacing generous and consistent
+- Preserve a premium, clean, visually balanced aesthetic
+- Do not make the hero feel like a generic SaaS block
+- Keep the design elegant across mobile, tablet, laptop, and desktop
+- When two parallel blocks share a row on desktop, align their top and bottom edges unless the layout has an intentional documented exception
 
-## Home Page Rules
-- Desktop first, then laptop, then tablet/mobile
-- Validate the first viewport visually before touching deeper sections
-- The home page must be built in phases:
-  1. Structure
-  2. Layout
-  3. Visual styling
-  4. Interaction/behavior
-  5. Responsive refinement
-  6. SEO and polish
+## Responsive rules
 
-## Required Workflow For Visual Work
-- Never redesign the entire page in one pass.
-- Touch one major block at a time.
-- For any home-page redesign, start with:
-  1. `header`
-  2. `hero`
-  3. booking selector
-- Only after that is approved, continue to:
-  1. featured cars
-  2. supporting sections
-  3. footer
+Any layout change must be validated across:
+- mobile
+- tablet
+- laptop
+- large desktop
 
-## Hero / Booking Workflow
-- First decide structure:
-  - hero text
-  - booking selector placement
-  - viewport composition
-- Then implement layout only.
-- Then style the block.
-- Then validate in real screenshots at:
-  - `1707x893` or similar wide desktop
-  - `1366x768` laptop
-- Only after those screenshots look correct should mobile/tablet begin.
+Avoid:
+- overlapping elements
+- oversized text on small screens
+- weak text/image balance
+- CTA overload
+- cramped spacing
+- broken alignment
 
-## Copy Rules
-- Do not use placeholder copy that sounds generic or exaggerated.
-- Keep hero copy short, premium, and useful.
-- Avoid duplicated headings and repeated labels inside the same block.
-- Prefer simple English that supports booking intent.
+### Mobile card rules
 
-## Booking Selector Rules
-- Booking UI must feel lighter than a traditional form.
-- Inputs must be readable and visually aligned.
-- Avoid oversized cards when a cleaner band or compact dock would work better.
-- If Chrome date inputs show ugly native placeholder text, hide or replace it with custom placeholder treatment.
-- Preserve booking intent logic:
-  - selected dates carry into fleet interactions
-  - selected dates carry into checkout/reservation links
+When auditing or changing fleet cards, vehicle cards, guide cards, or any card with contact actions on mobile:
 
-## Third-Party Inspiration Policy
-- Allowed:
-  - structural inspiration
-  - section order
-  - spacing logic
-  - rhythm and composition ideas
-- Not allowed:
-  - literal HTML/CSS/JS copying
-  - brand wording reuse
-  - asset reuse
-  - close imitation of proprietary visual identity
+- stacked action buttons must read as one clean vertical group
+- each action must span the available card width evenly
+- use one column for card CTAs on mobile, not side-by-side button rows
+- keep button labels centered and fully visible
+- keep equal button height across the same action group
+- allow at most two primary contact actions in the visible mobile card action area unless a third action is clearly secondary and separated
+- preserve enough spacing between stacked buttons so they do not feel merged or cramped
+- never let card buttons touch the card edge without consistent inner padding
+- avoid text wrapping that makes one button visibly taller than the other in the same group
+- do not let CTA groups become the visual focus over the vehicle name, price, or main booking intent
 
-## Validation Rules
-- After meaningful UI edits:
-  - run `npm test`
-  - inspect the page in real screenshots
-- Do not claim visual fixes without checking a fresh render.
-- If something still looks off, say so plainly.
+## Implementation rules
 
-## Editing Rules
-- Prefer editing existing files over creating unnecessary new ones.
-- Use modular CSS partials instead of adding large inline styles.
-- Keep JS split by behavior, not by arbitrary file count.
-- Avoid duplicating markup or styles when the same pattern can be reused.
+When modifying first-viewport sections:
+1. inspect current structure and layout
+2. identify hierarchy, spacing, and responsiveness issues
+3. refactor HTML/CSS/structure where needed
+4. verify visually in browser
+5. summarize changes and tradeoffs
 
-## Default Commands
-- Run smoke tests:
-  - `npm test`
-- Local static preview:
-  - `http://127.0.0.1:8080/`
+## Tooling rules
 
-## Decision Rule
-- If the task is large or ambiguous, break it into explicit phases before implementing.
-- If layout direction is unclear and the choice would materially change UX, ask before proceeding.
+When auditing or improving UI:
+- use Playwright for browser validation
+- use DevTools for DOM/layout inspection
+- use Lighthouse for performance/accessibility/SEO
+- use audit_engine for structure and quality checks

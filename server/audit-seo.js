@@ -5,6 +5,7 @@ const {
     extractTagValue,
     fetchUrl,
     parseSitemapPaths,
+    publicPathForFile,
     siteFileForPath,
     startStaticServer: launchStaticServer,
     stopProcess
@@ -42,7 +43,6 @@ const productCommercialPaths = new Set([
     '/ferrari-296-gts-rental-dubai.html',
     '/mercedes-rental-dubai.html',
     '/mercedes-g63-amg-rental-dubai.html',
-    '/g63-rental-dubai.html',
     '/porsche-rental-dubai.html',
     '/porsche-992-gt3-rental-dubai.html',
     '/rolls-royce-rental-dubai.html',
@@ -50,11 +50,7 @@ const productCommercialPaths = new Set([
 ]);
 
 const seoLandingPaths = new Set([
-    '/supercar-rental-dubai.html',
-    '/downtown-dubai-supercar-rental.html',
-    '/ferrari-rental-downtown-dubai.html',
-    '/lamborghini-rental-palm-jumeirah.html',
-    '/g63-rental-dubai-marina.html'
+    '/supercar-rental-dubai.html'
 ]);
 
 const brokenEncodingPattern = /(?:Â|Ã.|â€”|â€“|â€|�)/;
@@ -151,7 +147,11 @@ function resolveLocalReference(fromFile, reference) {
         return siteFileForPath(siteRoot, cleanReference);
     }
 
-    return path.resolve(path.dirname(fromFile), cleanReference);
+    const html = readFile(fromFile);
+    const baseHref = extractTagValue(html, /<base[^>]+href=["']([^"']+)["'][^>]*>/i);
+    const basePath = baseHref.startsWith('/') ? baseHref : publicPathForFile(siteRoot, fromFile);
+    const resolvedPath = new URL(cleanReference, `https://prestigegoalmotion.com${basePath}`).pathname;
+    return siteFileForPath(siteRoot, resolvedPath);
 }
 
 function collectIncomingLinks(sitemapPaths) {
@@ -168,10 +168,7 @@ function collectIncomingLinks(sitemapPaths) {
                 continue;
             }
 
-            let pathname = `/${path.relative(siteRoot, resolved).replace(/\\/g, '/')}`;
-            if (pathname === '/index.html') {
-                pathname = '/';
-            }
+            const pathname = publicPathForFile(siteRoot, resolved);
 
             if (incoming.has(pathname)) {
                 incoming.get(pathname).add(sourceLabel);
@@ -326,10 +323,7 @@ async function run() {
         );
     });
 
-    const allPublicHtmlPaths = listHtmlFiles(siteRoot).map((filePath) => {
-        const relative = `/${path.relative(siteRoot, filePath).replace(/\\/g, '/')}`;
-        return relative === '/index.html' ? '/' : relative;
-    });
+    const allPublicHtmlPaths = listHtmlFiles(siteRoot).map((filePath) => publicPathForFile(siteRoot, filePath));
 
     const publicHtmlOutsideSitemap = allPublicHtmlPaths.filter((pathname) => !uniqueSitemapPaths.includes(pathname));
     assert(publicHtmlOutsideSitemap.length === 0, 'all public HTML files are represented in sitemap.xml');

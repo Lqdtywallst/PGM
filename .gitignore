@@ -23,6 +23,16 @@ output/
 temp/
 test-results/
 playwright-report/
+artifacts/
+.codex/
+
+# Exportes locales pesados de auditoria
+docs/audit/INVENTARIO-RELACIONAL-*.csv
+docs/audit/INVENTARIO-RELACIONAL-*.json
+
+# Capturas locales que no deben vivir en la superficie publica
+site/home-*.png
+site/rework-*.png
 
 # Variables de entorno (NO subir al repositorio)
 .env

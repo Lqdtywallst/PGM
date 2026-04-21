@@ -1,0 +1,233 @@
+[
+  {
+    "id": "first-time-brand-comparison",
+    "title": "First-time visitor compares brands from the homepage",
+    "persona": "First-time tourist",
+    "priority": "high",
+    "devices": [
+      "desktop",
+      "mobile"
+    ],
+    "entryRoute": "/",
+    "goal": "Understand the offer from the homepage, open the Cars Brands mega menu, compare one or two brand routes, and keep a clear next step toward reservation.",
+    "routesInScope": [
+      "/",
+      "/ferrari-rental-dubai.html",
+      "/mercedes-rental-dubai.html",
+      "/lamborghini-rental-dubai.html",
+      "/app/reserve/page.html"
+    ],
+    "humanBehaviors": [
+      "Read the hero before clicking anything.",
+      "Open the Cars Brands mega menu instead of typing a URL directly.",
+      "Compare at least two brand options before choosing one.",
+      "Prefer the most obvious visible CTA over hidden affordances."
+    ],
+    "successSignals": [
+      "The mega menu is easy to discover and use.",
+      "Brand landings feel distinct enough to support comparison.",
+      "One next action is clearly dominant on each step.",
+      "The chosen route toward reserve is obvious without rereading copy."
+    ],
+    "frictionSignals": [
+      "Too many competing CTAs above the fold.",
+      "Brand pages feel interchangeable or confusing.",
+      "The user hesitates because the next step is unclear.",
+      "Booking intent gets lost during the handoff."
+    ],
+    "stableCoverage": [
+      "tests/e2e/customer-journeys.spec.js"
+    ]
+  },
+  {
+    "id": "seo-landing-to-reserve",
+    "title": "SEO visitor lands on a brand page and tries to reserve fast",
+    "persona": "High-intent search visitor",
+    "priority": "high",
+    "devices": [
+      "desktop",
+      "mobile"
+    ],
+    "entryRoute": "/ferrari-rental-dubai.html",
+    "goal": "Arrive cold on an SEO landing, understand the page in one pass, enter dates, and reach reserve without losing context.",
+    "routesInScope": [
+      "/ferrari-rental-dubai.html",
+      "/porsche-rental-dubai.html",
+      "/rolls-royce-rental-dubai.html",
+      "/app/reserve/page.html"
+    ],
+    "humanBehaviors": [
+      "Skim the headline, price and trust points before scrolling.",
+      "Use the first strong booking CTA rather than exploring deep navigation.",
+      "Enter dates from the landing itself.",
+      "Check whether the reserve page keeps car, dates and times."
+    ],
+    "successSignals": [
+      "The landing immediately communicates the model and price guide.",
+      "The booking widget is visible and understandable.",
+      "Dates and times carry cleanly into the reserve page.",
+      "No console or validation noise appears during the handoff."
+    ],
+    "frictionSignals": [
+      "The page reads like content only, not a bookable product.",
+      "The booking widget feels secondary or hidden.",
+      "Date handoff fails or partially resets.",
+      "The car or price changes unexpectedly in reserve."
+    ],
+    "stableCoverage": [
+      "tests/e2e/customer-journeys.spec.js",
+      "tests/e2e/public-site.spec.js"
+    ]
+  },
+  {
+    "id": "fleet-filter-comparison",
+    "title": "Customer compares fleet options before committing",
+    "persona": "Comparison shopper",
+    "priority": "high",
+    "devices": [
+      "desktop",
+      "mobile"
+    ],
+    "entryRoute": "/fleet.html",
+    "goal": "Use the fleet page to narrow the list by dates and brand, compare options, and move into reserve with the selected schedule intact.",
+    "routesInScope": [
+      "/fleet.html",
+      "/app/reserve/page.html"
+    ],
+    "humanBehaviors": [
+      "Set dates before changing filters.",
+      "Switch between at least two brands.",
+      "Look at visible result counts instead of memorizing cards.",
+      "Reserve directly from the filtered card."
+    ],
+    "successSignals": [
+      "Filters update the visible inventory clearly.",
+      "The selected dates remain visible while comparing brands.",
+      "Only the intended vehicle stays visible after filtering.",
+      "Reserve receives both the car and the chosen schedule."
+    ],
+    "frictionSignals": [
+      "Filters feel sticky, confusing or inconsistent.",
+      "The user cannot tell how many cars are actually visible.",
+      "Dates disappear during comparison.",
+      "The reserve handoff drops the chosen schedule."
+    ],
+    "stableCoverage": [
+      "tests/e2e/customer-journeys.spec.js",
+      "tests/e2e/critical-flows.spec.js"
+    ]
+  },
+  {
+    "id": "vehicle-pdp-schedule-handoff",
+    "title": "Customer opens a vehicle detail page and books from there",
+    "persona": "Model-specific shopper",
+    "priority": "high",
+    "devices": [
+      "desktop",
+      "mobile"
+    ],
+    "entryRoute": "/mercedes-g63-amg-rental-dubai.html",
+    "goal": "Use a vehicle page as the last evaluation step, pick dates there, and confirm the reserve page preserves the exact booking intent.",
+    "routesInScope": [
+      "/mercedes-g63-amg-rental-dubai.html",
+      "/ferrari-296-gts-rental-dubai.html",
+      "/porsche-992-gt3-rental-dubai.html",
+      "/rolls-royce-cullinan-black-badge-rental-dubai.html",
+      "/app/reserve/page.html"
+    ],
+    "humanBehaviors": [
+      "Read the lead and quick specs before booking.",
+      "Use the vehicle booking form instead of navigating back to fleet.",
+      "Expect the same model name and price in reserve.",
+      "Treat this as the final decision step, not just content browsing."
+    ],
+    "successSignals": [
+      "The vehicle page clearly feels transactional.",
+      "The form is easy to complete without extra scrolling confusion.",
+      "The reserve page matches the selected model exactly.",
+      "Date and time state survives the whole handoff."
+    ],
+    "frictionSignals": [
+      "The booking form is visually secondary.",
+      "The page looks editorial but not actionable.",
+      "Model naming shifts between PDP and reserve.",
+      "The reserve page does not inherit the full schedule."
+    ],
+    "stableCoverage": [
+      "tests/e2e/customer-journeys.spec.js"
+    ]
+  },
+  {
+    "id": "reserve-flow-completion",
+    "title": "Guest completes the reserve flow end to end",
+    "persona": "Committed booker",
+    "priority": "high",
+    "devices": [
+      "desktop",
+      "mobile"
+    ],
+    "entryRoute": "/app/reserve/page.html",
+    "goal": "Fill guest details, continue through schedule and payment, and complete the success redirect without blocking errors.",
+    "routesInScope": [
+      "/app/reserve/page.html",
+      "/index.html"
+    ],
+    "humanBehaviors": [
+      "Fill the form in the presented order.",
+      "Expect required fields to explain themselves.",
+      "Continue without guessing hidden prerequisites.",
+      "Treat a successful payment confirmation as the end of the journey."
+    ],
+    "successSignals": [
+      "The step order is obvious and linear.",
+      "Required fields unblock at the right time.",
+      "Mocked payment completes and confirms the reservation.",
+      "The success redirect feels intentional rather than abrupt."
+    ],
+    "frictionSignals": [
+      "The user does not know why Continue is disabled.",
+      "Field validation appears too late or too vaguely.",
+      "Payment step looks broken or half-mounted.",
+      "Success feedback feels weak or easy to miss."
+    ],
+    "stableCoverage": [
+      "tests/e2e/customer-journeys.spec.js",
+      "tests/e2e/public-site.spec.js"
+    ]
+  },
+  {
+    "id": "support-first-contact",
+    "title": "Customer needs reassurance before reserving",
+    "persona": "Low-confidence visitor",
+    "priority": "medium",
+    "devices": [
+      "desktop",
+      "mobile"
+    ],
+    "entryRoute": "/contact.html",
+    "goal": "Find a phone, WhatsApp or contact-form path quickly when the user is not ready to reserve yet.",
+    "routesInScope": [
+      "/locations.html",
+      "/contact.html",
+      "/services.html"
+    ],
+    "humanBehaviors": [
+      "Look for visible support channels before filling forms.",
+      "Expect one easy contact path in the first viewport.",
+      "Use the contact form only after checking the faster channels."
+    ],
+    "successSignals": [
+      "Phone and WhatsApp options are visible quickly.",
+      "The contact form is easy to find and complete.",
+      "Support-oriented pages still suggest a sensible next action."
+    ],
+    "frictionSignals": [
+      "Contact options are buried below the fold.",
+      "The page asks for too much commitment too early.",
+      "The user cannot tell whether WhatsApp, phone or form is preferred."
+    ],
+    "stableCoverage": [
+      "tests/e2e/public-site.spec.js"
+    ]
+  }
+]

@@ -1,0 +1,68 @@
+name: Audit Suite
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/view-connectivity-guard.yml"
+      - "package.json"
+      - "package-lock.json"
+      - "scripts/run-view-connectivity-audit.js"
+      - "scripts/run-visual-agent.js"
+      - "server/design-system-contract.js"
+      - "server/public-page-map.js"
+      - "server/visual-audit-core.js"
+      - "site/**"
+      - "tests/unit/view-connectivity-agent.test.js"
+      - "tests/unit/visual-agent-runner.test.js"
+      - "tests/unit/visual-audit-core.test.js"
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - ".github/workflows/view-connectivity-guard.yml"
+      - "package.json"
+      - "package-lock.json"
+      - "scripts/run-view-connectivity-audit.js"
+      - "scripts/run-visual-agent.js"
+      - "server/design-system-contract.js"
+      - "server/public-page-map.js"
+      - "server/visual-audit-core.js"
+      - "site/**"
+      - "tests/unit/view-connectivity-agent.test.js"
+      - "tests/unit/visual-agent-runner.test.js"
+      - "tests/unit/visual-audit-core.test.js"
+
+jobs:
+  audit-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run full audit suite
+        run: npm run audit
+
+      - name: Upload audit artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-artifacts
+          path: |
+            artifacts/
+            docs/audit/
+          if-no-files-found: ignore

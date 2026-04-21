@@ -4,15 +4,15 @@
 }
 
 .locations-page .lab-shell {
-    width: min(98rem, calc(100% - 2.5rem));
+    width: var(--lab-frame-width);
 }
 
 .locations-page .lab-header {
-    background: linear-gradient(180deg, rgba(7, 8, 10, 0.84) 0%, rgba(7, 8, 10, 0.28) 58%, rgba(7, 8, 10, 0) 100%);
+    background: linear-gradient(180deg, rgba(4, 4, 6, 0.88) 0%, rgba(4, 4, 6, 0.56) 58%, rgba(4, 4, 6, 0) 100%);
 }
 
 .locations-page .lab-header::after {
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0));
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
 }
 
 .locations-page .lab-brand__crest {
@@ -29,19 +29,10 @@
     color: #fffaf2;
 }
 
-.locations-page .lab-brand__copy strong {
-    font-weight: 800;
-}
-
 .locations-page .lab-brand__copy span,
 .locations-page .lab-nav > a,
 .locations-page .lab-nav__trigger {
     color: rgba(255, 250, 242, 0.72);
-}
-
-.locations-page .lab-nav > a,
-.locations-page .lab-nav__trigger {
-    font-weight: 700;
 }
 
 .locations-hero,
@@ -59,7 +50,7 @@
     min-height: clamp(38rem, 84vh, 50rem);
     padding-top: 0;
     color: #fffaf2;
-    background: #13100e;
+    background: #0a0b0d;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     overflow: hidden;
 }
@@ -73,19 +64,19 @@
 }
 
 .locations-hero::before {
-    background-image: url("../images/fleet/rolls-royce-cullinan-black-badge/06-exterior-front-open-doors.png");
+    background-image: url("../images/locations-hero-temp.jpg");
     background-repeat: no-repeat;
     background-size: cover;
     inset: 0;
-    background-position: center 54%;
+    background-position: 72% 42%;
     opacity: 1;
-    filter: saturate(0.9) brightness(0.72);
+    filter: none;
 }
 
 .locations-hero::after {
     background:
-        linear-gradient(180deg, rgba(10, 10, 10, 0.38) 0%, rgba(10, 10, 10, 0.22) 20%, rgba(10, 10, 10, 0.54) 74%, rgba(10, 10, 10, 0.8) 100%),
-        linear-gradient(90deg, rgba(10, 10, 10, 0.56) 0%, rgba(10, 10, 10, 0.34) 38%, rgba(10, 10, 10, 0.12) 100%);
+        linear-gradient(180deg, rgba(7, 8, 10, 0.54) 0%, rgba(7, 8, 10, 0.36) 32%, rgba(7, 8, 10, 0.6) 100%),
+        radial-gradient(circle at center, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0) 52%);
 }
 
 .locations-hero__shell,
@@ -102,10 +93,10 @@
 }
 
 .locations-hero__shell {
-    grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.06fr);
-    align-content: end;
-    align-items: start;
-    gap: 2.4rem;
+    grid-template-columns: minmax(0, 0.98fr) minmax(0, 1.02fr);
+    align-content: stretch;
+    align-items: stretch;
+    gap: clamp(1.8rem, 2.5vw, 2.5rem);
     min-height: inherit;
     padding-top: calc(var(--lab-header-offset) + 2rem);
     padding-bottom: 3rem;
@@ -167,10 +158,11 @@
 }
 
 .locations-hero__copy h1 {
-    max-width: 13.4ch;
-    margin-top: 0.9rem;
-    font-size: 4.45rem;
-    line-height: 0.91;
+    max-width: 15.4ch;
+    margin-top: 0.75rem;
+    font-size: clamp(3.6rem, 4.45vw, 4.7rem);
+    line-height: 0.89;
+    text-wrap: pretty;
     color: #fffaf2;
 }
 
@@ -190,8 +182,8 @@
 }
 
 .locations-hero__lead {
-    max-width: 36rem;
-    margin-top: 1rem;
+    max-width: 31rem;
+    margin-top: 0.8rem;
     color: rgba(255, 250, 242, 0.84);
     font-size: 1.07rem;
     font-weight: 600;
@@ -307,13 +299,24 @@
 .locations-hero__copy {
     display: grid;
     align-content: start;
-    gap: 1rem;
-    grid-column: 1;
+    gap: 0.9rem;
+    max-width: 39rem;
+}
+
+.locations-hero__summary {
+    display: grid;
+    grid-template-rows: minmax(0, auto) minmax(0, 1fr);
+    align-content: stretch;
+    gap: 1.15rem;
+    min-height: 100%;
+    min-width: 0;
 }
 
 .locations-hero__zone-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-column: 1;
+    align-self: stretch;
+    align-content: end;
+    gap: 0.9rem;
 }
 
 .locations-hero__zone {
@@ -324,9 +327,16 @@
     padding: 1rem 1rem 1.05rem;
     border: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: 8px;
-    background: linear-gradient(180deg, rgba(17, 22, 30, 0.76) 0%, rgba(10, 13, 18, 0.84) 100%);
+    background: linear-gradient(180deg, rgba(15, 19, 26, 0.94) 0%, rgba(9, 12, 17, 0.96) 100%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     box-shadow: 0 24px 52px rgba(2, 4, 8, 0.34);
+    isolation: isolate;
     transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.locations-hero__zone:last-child {
+    grid-column: 1 / -1;
 }
 
 .locations-hero__zone:hover,
@@ -493,15 +503,17 @@
 }
 
 .locations-map-card {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 1rem;
     grid-column: 2;
-    grid-row: 1 / span 2;
+    align-self: stretch;
     padding: 1.15rem;
     border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 8px;
     background: linear-gradient(180deg, rgba(17, 22, 30, 0.76) 0%, rgba(10, 13, 18, 0.84) 100%);
     box-shadow: 0 28px 60px rgba(2, 4, 8, 0.38);
+    min-width: 0;
 }
 
 .locations-map-card__head {
@@ -518,12 +530,13 @@
 }
 
 .locations-map-card__frame {
+    flex: 1 1 auto;
     position: relative;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     background: #e9e3d9;
-    min-height: 34rem;
+    min-height: clamp(36rem, 38vw, 40rem);
 }
 
 .locations-map-card__frame iframe {
@@ -806,6 +819,161 @@
     top: calc(var(--lab-header-offset) + 1rem);
 }
 
+@media (min-width: 1181px) and (max-height: 980px) {
+    .locations-page .locations-hero__shell {
+        width: min(100% - clamp(1rem, 1.85vw, 2rem), 108rem);
+        min-height: 100svh;
+        grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+        align-content: stretch;
+        gap: 0.95rem 1.45rem;
+        padding-top: calc(var(--lab-header-offset) + 0.78rem);
+        padding-bottom: 0.85rem;
+    }
+
+    .locations-hero__summary {
+        gap: 0.7rem;
+        align-self: stretch;
+        min-height: 0;
+        transform: none;
+    }
+
+    .locations-hero__copy {
+        gap: 0.5rem;
+    }
+
+    .locations-breadcrumb {
+        margin-bottom: 0.35rem;
+    }
+
+    .locations-hero__copy h1 {
+        max-width: 15.2ch;
+        margin-top: 0.25rem;
+        font-size: clamp(2.35rem, 2.95vw, 2.9rem);
+        line-height: 0.87;
+    }
+
+    .locations-hero__lead {
+        max-width: 28rem;
+        margin-top: 0.2rem;
+        font-size: 0.88rem;
+        line-height: 1.38;
+    }
+
+    .locations-hero__actions {
+        gap: 0.55rem;
+        margin-top: 0.5rem;
+    }
+
+    .locations-button {
+        min-height: 2.38rem;
+        padding: 0 0.82rem;
+        font-size: 0.73rem;
+    }
+
+    .locations-hero__zone-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-self: stretch;
+        align-content: end;
+        gap: 0.55rem;
+    }
+
+    .locations-hero__zone:last-child {
+        grid-column: 1 / -1;
+    }
+
+    .locations-hero__zone {
+        gap: 0.2rem;
+        padding: 0.5rem 0.58rem 0.56rem;
+        min-height: 0;
+    }
+
+    .locations-hero__zone span {
+        font-size: 0.61rem;
+    }
+
+    .locations-hero__zone strong {
+        font-size: 0.8rem;
+        line-height: 1.08;
+    }
+
+    .locations-hero__zone p {
+        font-size: 0.68rem;
+        line-height: 1.22;
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+    }
+
+    .locations-map-card {
+        align-self: stretch;
+        gap: 0.72rem;
+        min-height: 0;
+        height: auto;
+        max-height: none;
+        padding: 0.92rem;
+        transform: none;
+    }
+
+    .locations-map-card__head {
+        gap: 0.45rem;
+    }
+
+    .locations-map-card__head p {
+        font-size: 0.9rem;
+        line-height: 1.42;
+    }
+
+    .locations-map-card__frame {
+        min-height: clamp(18rem, 43vh, 24rem);
+    }
+
+    .locations-map-card__foot {
+        gap: 0.55rem;
+    }
+
+    .locations-map-card__foot div {
+        padding: 0.64rem 0.72rem;
+    }
+
+    .locations-map-card__foot strong {
+        font-size: 0.86rem;
+        line-height: 1.26;
+    }
+}
+
+@media (min-width: 1181px) and (min-height: 981px) {
+    .locations-page .locations-hero__shell {
+        width: min(100% - clamp(1rem, 1.85vw, 2rem), 108rem);
+        min-height: 100svh;
+        grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+        align-content: stretch;
+        gap: clamp(1.4rem, 2vw, 2.2rem);
+        padding-bottom: clamp(1.25rem, 1.8vw, 2rem);
+    }
+
+    .locations-hero__summary {
+        align-self: stretch;
+        min-height: 0;
+        gap: clamp(0.9rem, 1.2vw, 1.25rem);
+    }
+
+    .locations-hero__zone-list {
+        align-self: stretch;
+        align-content: end;
+        gap: 0.8rem;
+    }
+
+    .locations-map-card {
+        align-self: stretch;
+        min-height: 0;
+    }
+
+    .locations-map-card__frame {
+        min-height: clamp(22rem, 49vh, 31rem);
+    }
+}
+
 @media (max-width: 1180px) {
     .locations-hero__shell,
     .locations-section__head,
@@ -817,6 +985,12 @@
     .locations-map-card {
         grid-column: auto;
         grid-row: auto;
+        align-self: start;
+    }
+
+    .locations-hero__summary {
+        gap: 1rem;
+        min-height: auto;
     }
 
     .locations-section__head p {
@@ -840,13 +1014,13 @@
 @media (max-width: 920px) {
     .locations-hero::before {
         inset: 0;
-        background-position: 62% 46%;
+        background-position: 68% 42%;
     }
 
     .locations-hero::after {
         background:
-            linear-gradient(180deg, rgba(10, 10, 10, 0.34) 0%, rgba(10, 10, 10, 0.2) 20%, rgba(10, 10, 10, 0.48) 74%, rgba(10, 10, 10, 0.74) 100%),
-            linear-gradient(90deg, rgba(10, 10, 10, 0.58) 0%, rgba(10, 10, 10, 0.4) 38%, rgba(10, 10, 10, 0.14) 100%);
+            linear-gradient(180deg, rgba(7, 8, 10, 0.54) 0%, rgba(7, 8, 10, 0.36) 32%, rgba(7, 8, 10, 0.6) 100%),
+            radial-gradient(circle at center, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0) 52%);
     }
 
     .locations-hero__zone-list,
@@ -878,7 +1052,7 @@
     }
 
     .locations-map-card__frame {
-        min-height: 24rem;
+        min-height: 27rem;
     }
 
     .locations-map-card__pin--base {
@@ -917,23 +1091,39 @@
 
     .locations-hero {
         min-height: auto;
-        padding-top: calc(var(--lab-header-offset) + 1.8rem);
+        padding-top: calc(var(--lab-header-offset) + 0.9rem);
     }
 
     .locations-hero::before {
         inset: 0;
-        background-position: 64% center;
+        background-position: 64% 42%;
     }
 
     .locations-hero::after {
         background:
-            linear-gradient(180deg, rgba(10, 10, 10, 0.34) 0%, rgba(10, 10, 10, 0.22) 22%, rgba(10, 10, 10, 0.52) 74%, rgba(10, 10, 10, 0.76) 100%),
-            linear-gradient(90deg, rgba(10, 10, 10, 0.64) 0%, rgba(10, 10, 10, 0.44) 40%, rgba(10, 10, 10, 0.16) 100%);
+            linear-gradient(180deg, rgba(7, 8, 10, 0.54) 0%, rgba(7, 8, 10, 0.36) 32%, rgba(7, 8, 10, 0.6) 100%),
+            radial-gradient(circle at center, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0) 52%);
+    }
+
+    .locations-hero__copy {
+        gap: 0.75rem;
     }
 
     .locations-hero__copy h1 {
-        max-width: 12ch;
-        font-size: 3.2rem;
+        max-width: 16ch;
+        font-size: clamp(2.65rem, 6vw, 3.05rem);
+        line-height: 0.91;
+    }
+
+    .locations-hero__lead {
+        max-width: 32rem;
+        margin-top: 0.65rem;
+        font-size: 0.98rem;
+        line-height: 1.55;
+    }
+
+    .locations-hero__actions {
+        margin-top: 0.9rem;
     }
 
     .locations-section__head h2,
@@ -963,7 +1153,7 @@
     }
 
     .locations-map-card__frame {
-        min-height: 20rem;
+        min-height: 22rem;
     }
 
     .locations-map-card__pin {
@@ -990,5 +1180,27 @@
     .locations-map-card__pin--airport {
         top: 16%;
         left: 56%;
+    }
+}
+
+@media (min-width: 861px) {
+    .locations-hero {
+        min-height: 100svh;
+    }
+
+    .locations-hero__shell {
+        min-height: 100svh;
+        padding-top: calc(var(--lab-header-offset) + 1rem);
+        padding-bottom: clamp(1.1rem, 2vh, 1.8rem);
+        align-content: start;
+    }
+
+    .locations-hero__summary,
+    .locations-map-card {
+        max-height: calc(100svh - var(--lab-header-offset) - 2.2rem);
+    }
+
+    .locations-map-card__frame {
+        flex: 1 1 auto;
     }
 }

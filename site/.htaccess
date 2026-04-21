@@ -55,6 +55,33 @@
     
     # Redirect /exclusive-collection to fleet
     RewriteRule ^exclusive-collection/?$ /#fleet [R=301,L]
+
+    # Internal page organization rewrites
+    RewriteRule ^luxury-car-rental-dubai\.html$ /pages/guides/luxury-car-rental-dubai.html [L]
+    RewriteRule ^abu-dhabi-luxury-car-rental\.html$ /pages/guides/abu-dhabi-luxury-car-rental.html [L]
+    RewriteRule ^dubai-airport-luxury-car-rental\.html$ /pages/guides/dubai-airport-luxury-car-rental.html [L]
+    RewriteRule ^palm-jumeirah-luxury-car-rental\.html$ /pages/guides/palm-jumeirah-luxury-car-rental.html [L]
+    RewriteRule ^dubai-marina-luxury-car-rental\.html$ /pages/guides/dubai-marina-luxury-car-rental.html [L]
+    RewriteRule ^supercar-rental-dubai\.html$ /pages/guides/supercar-rental-dubai.html [L]
+    RewriteRule ^airport-concierge-dubai\.html$ /pages/services/airport-concierge-dubai.html [L]
+    RewriteRule ^chauffeur-service-dubai\.html$ /pages/services/chauffeur-service-dubai.html [L]
+    RewriteRule ^hotel-villa-airport-delivery-dubai\.html$ /pages/services/hotel-villa-airport-delivery-dubai.html [L]
+    RewriteRule ^wedding-event-car-rental-dubai\.html$ /pages/services/wedding-event-car-rental-dubai.html [L]
+    RewriteRule ^business-car-rental-dubai\.html$ /pages/services/business-car-rental-dubai.html [L]
+    RewriteRule ^monthly-luxury-car-rental-dubai\.html$ /pages/services/monthly-luxury-car-rental-dubai.html [L]
+    RewriteRule ^lamborghini-rental-dubai\.html$ /pages/brands/lamborghini-rental-dubai.html [L]
+    RewriteRule ^ferrari-rental-dubai\.html$ /pages/brands/ferrari-rental-dubai.html [L]
+    RewriteRule ^mercedes-rental-dubai\.html$ /pages/brands/mercedes-rental-dubai.html [L]
+    RewriteRule ^porsche-rental-dubai\.html$ /pages/brands/porsche-rental-dubai.html [L]
+    RewriteRule ^rolls-royce-rental-dubai\.html$ /pages/brands/rolls-royce-rental-dubai.html [L]
+    RewriteRule ^lamborghini-huracan-evo-spyder-rental-dubai\.html$ /pages/vehicles/lamborghini-huracan-evo-spyder-rental-dubai.html [L]
+    RewriteRule ^lamborghini-urus-rental-dubai\.html$ /pages/vehicles/lamborghini-urus-rental-dubai.html [L]
+    RewriteRule ^ferrari-296-gts-rental-dubai\.html$ /pages/vehicles/ferrari-296-gts-rental-dubai.html [L]
+    RewriteRule ^mercedes-g63-amg-rental-dubai\.html$ /pages/vehicles/mercedes-g63-amg-rental-dubai.html [L]
+    RewriteRule ^porsche-992-gt3-rental-dubai\.html$ /pages/vehicles/porsche-992-gt3-rental-dubai.html [L]
+    RewriteRule ^rolls-royce-cullinan-black-badge-rental-dubai\.html$ /pages/vehicles/rolls-royce-cullinan-black-badge-rental-dubai.html [L]
+    RewriteRule ^terms-and-conditions\.html$ /pages/legal/terms-and-conditions.html [L]
+    RewriteRule ^terms-and-conditions-uae\.html$ /pages/legal/terms-and-conditions-uae.html [L]
     
     # HTTPS redirect (uncomment in production)
     # RewriteCond %{HTTPS} off

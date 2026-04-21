@@ -4,9 +4,17 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const { siteFileForPublicPath } = require('./public-page-map');
 
 const PORT = Number(process.env.PORT || 8080);
 const siteRoot = path.resolve(__dirname, '../site');
+const REDIRECTS = {
+    '/downtown-dubai-supercar-rental.html': '/supercar-rental-dubai.html',
+    '/ferrari-rental-downtown-dubai.html': '/ferrari-rental-dubai.html',
+    '/g63-rental-dubai.html': '/mercedes-g63-amg-rental-dubai.html',
+    '/g63-rental-dubai-marina.html': '/mercedes-g63-amg-rental-dubai.html',
+    '/lamborghini-rental-palm-jumeirah.html': '/lamborghini-rental-dubai.html'
+};
 const CONTENT_SECURITY_POLICY = [
     "default-src 'self'",
     "base-uri 'self'",
@@ -92,7 +100,19 @@ const server = http.createServer((req, res) => {
 
     console.log(`${req.method} ${req.url} -> ${filePath}`);
 
-    let fullPath = path.join(siteRoot, filePath);
+    if (REDIRECTS[filePath]) {
+        const location = REDIRECTS[filePath];
+        console.log(`Redirecting ${filePath} -> ${location}`);
+        res.writeHead(301, {
+            Location: location,
+            ...buildCacheHeaders(filePath),
+            ...buildSecurityHeaders()
+        });
+        res.end();
+        return;
+    }
+
+    let fullPath = siteFileForPublicPath(siteRoot, filePath);
     fullPath = path.normalize(fullPath);
 
     if (!fullPath.startsWith(siteRoot)) {

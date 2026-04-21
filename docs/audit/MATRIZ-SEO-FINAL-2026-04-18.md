@@ -2,7 +2,7 @@
 
 ## Resumen
 
-- URLs auditadas: 37
+- URLs auditadas: 32
 - URLs publicas fuera del sitemap: 0
 - titulos duplicados: 0
 - meta descriptions duplicadas: 0
@@ -33,15 +33,10 @@
 | /lamborghini-rental-dubai.html | product-commercial | OK | OK | OK | OK | OK |
 | /lamborghini-huracan-evo-spyder-rental-dubai.html | product-commercial | OK | OK | OK | OK | OK |
 | /lamborghini-urus-rental-dubai.html | product-commercial | OK | OK | OK | OK | OK |
-| /lamborghini-rental-palm-jumeirah.html | seo-landing | OK | OK | OK | OK | OK |
 | /ferrari-rental-dubai.html | product-commercial | OK | OK | OK | OK | OK |
 | /ferrari-296-gts-rental-dubai.html | product-commercial | OK | OK | OK | OK | OK |
-| /ferrari-rental-downtown-dubai.html | seo-landing | OK | OK | OK | OK | OK |
 | /mercedes-g63-amg-rental-dubai.html | product-commercial | OK | OK | OK | OK | OK |
 | /mercedes-rental-dubai.html | product-commercial | OK | OK | OK | OK | OK |
-| /g63-rental-dubai.html | product-commercial | OK | OK | OK | OK | OK |
-| /g63-rental-dubai-marina.html | seo-landing | OK | OK | OK | OK | OK |
-| /downtown-dubai-supercar-rental.html | seo-landing | OK | OK | OK | OK | OK |
 | /porsche-992-gt3-rental-dubai.html | product-commercial | OK | OK | OK | OK | OK |
 | /porsche-rental-dubai.html | product-commercial | OK | OK | OK | OK | OK |
 | /rolls-royce-rental-dubai.html | product-commercial | OK | OK | OK | OK | OK |

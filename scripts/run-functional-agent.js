@@ -1,0 +1,1387 @@
+const fs = require('fs');
+const net = require('net');
+const path = require('path');
+
+const { chromium, expect } = require('@playwright/test');
+
+const {
+    PUBLIC_PAGE_FILE_MAP
+} = require(path.join(__dirname, '..', 'server', 'public-page-map.js'));
+const {
+    startStaticServer,
+    stopProcess
+} = require(path.join(__dirname, '..', 'server', 'site-audit-utils.js'));
+const {
+    createConsoleTracker,
+    normalizeConsoleErrors,
+    primeHomeAnimations,
+    settlePage
+} = require(path.join(__dirname, '..', 'tests', 'e2e', 'support', 'site-helpers.js'));
+const {
+    contactLead,
+    reservationGuest
+} = require(path.join(__dirname, '..', 'test-data', 'users.json'));
+
+const repoRoot = path.resolve(__dirname, '..');
+const artifactsRoot = path.join(repoRoot, 'artifacts', 'functional-agent');
+const VIEWPORTS = Object.freeze([
+    { name: 'mobile-modern', width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 3 },
+    { name: 'tablet-portrait', width: 768, height: 1024, isMobile: true, hasTouch: true, deviceScaleFactor: 2 },
+    { name: 'desktop-wide', width: 1366, height: 900, isMobile: false, hasTouch: false, deviceScaleFactor: 1 }
+]);
+
+function normalizeRoute(route) {
+    const pathname = String(route || '/').trim().split(/[?#]/)[0] || '/';
+    return pathname === '/index.html' ? '/' : pathname;
+}
+
+function routeFileStem(route) {
+    return normalizeRoute(route)
+        .replace(/^\//, '')
+        .replace(/[\/.]+/g, '-')
+        .replace(/^-+/, '') || 'home';
+}
+
+function slugify(value) {
+    return String(value || 'action')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 72) || 'action';
+}
+
+function timestampSlug(date = new Date()) {
+    return date.toISOString().replace(/[:.]/g, '-');
+}
+
+function ensureDir(targetPath) {
+    fs.mkdirSync(targetPath, { recursive: true });
+}
+
+function formatError(error) {
+    return error && (error.stack || error.message) ? String(error.stack || error.message) : String(error);
+}
+
+function summarizeFailures(items) {
+    return items.map((item) => `${item.resourceType || 'request'} ${item.status || item.failureText || 'error'} ${item.url}`);
+}
+
+function buildContextOptions(viewport) {
+    return {
+        viewport: {
+            width: viewport.width,
+            height: viewport.height
+        },
+        isMobile: viewport.isMobile,
+        hasTouch: viewport.hasTouch,
+        deviceScaleFactor: viewport.deviceScaleFactor,
+        reducedMotion: 'reduce'
+    };
+}
+
+function resolveSelectedViewports(requestedNames) {
+    if (!Array.isArray(requestedNames) || requestedNames.length === 0) {
+        return VIEWPORTS;
+    }
+
+    const normalizedNames = requestedNames.map((value) => String(value || '').trim().toLowerCase());
+    const selected = VIEWPORTS.filter((viewport) => normalizedNames.includes(viewport.name.toLowerCase()));
+
+    if (selected.length === 0) {
+        throw new Error(`Unknown viewport selection: ${requestedNames.join(', ')}`);
+    }
+
+    return selected;
+}
+
+function parseArgs(argv) {
+    const args = {
+        routes: [],
+        viewports: [],
+        baseUrl: process.env.PLAYWRIGHT_BASE_URL || '',
+        outputDir: '',
+        maxLinksPerPage: 8,
+        maxButtonsPerPage: 6,
+        maxSummariesPerPage: 4,
+        maxSelectsPerPage: 4
+    };
+
+    for (let index = 0; index < argv.length; index += 1) {
+        const value = argv[index];
+
+        if (value === '--route' && argv[index + 1]) {
+            args.routes.push(normalizeRoute(argv[index + 1]));
+            index += 1;
+            continue;
+        }
+
+        if (value === '--base-url' && argv[index + 1]) {
+            args.baseUrl = argv[index + 1];
+            index += 1;
+            continue;
+        }
+
+        if (value === '--viewport' && argv[index + 1]) {
+            args.viewports.push(String(argv[index + 1]).trim());
+            index += 1;
+            continue;
+        }
+
+        if (value === '--output-dir' && argv[index + 1]) {
+            args.outputDir = argv[index + 1];
+            index += 1;
+            continue;
+        }
+
+        if (value === '--max-links-per-page' && argv[index + 1]) {
+            const parsed = Number.parseInt(argv[index + 1], 10);
+            if (Number.isFinite(parsed) && parsed > 0) {
+                args.maxLinksPerPage = parsed;
+            }
+            index += 1;
+            continue;
+        }
+
+        if (value === '--max-buttons-per-page' && argv[index + 1]) {
+            const parsed = Number.parseInt(argv[index + 1], 10);
+            if (Number.isFinite(parsed) && parsed > 0) {
+                args.maxButtonsPerPage = parsed;
+            }
+            index += 1;
+            continue;
+        }
+
+        if (value === '--max-summaries-per-page' && argv[index + 1]) {
+            const parsed = Number.parseInt(argv[index + 1], 10);
+            if (Number.isFinite(parsed) && parsed > 0) {
+                args.maxSummariesPerPage = parsed;
+            }
+            index += 1;
+            continue;
+        }
+
+        if (value === '--max-selects-per-page' && argv[index + 1]) {
+            const parsed = Number.parseInt(argv[index + 1], 10);
+            if (Number.isFinite(parsed) && parsed > 0) {
+                args.maxSelectsPerPage = parsed;
+            }
+            index += 1;
+        }
+    }
+
+    return args;
+}
+
+function buildReportSummary(pages) {
+    const actions = pages.flatMap((page) => page.actions);
+    const failedActions = actions.filter((action) => action.status === 'failed');
+    const passedActions = actions.filter((action) => action.status === 'passed');
+    const skippedActions = actions.filter((action) => action.status === 'skipped');
+    const pagesWithFailures = pages.filter((page) => (
+        page.consoleErrors.length > 0 ||
+        page.requestFailures.length > 0 ||
+        page.actions.some((action) => action.status === 'failed')
+    ));
+
+    return {
+        totalRoutes: new Set(pages.map((page) => page.route)).size,
+        totalPageRuns: pages.length,
+        totalViewports: new Set(pages.map((page) => page.viewport)).size,
+        totalActions: actions.length,
+        passedActions: passedActions.length,
+        failedActions: failedActions.length,
+        skippedActions: skippedActions.length,
+        pagesWithFailures: pagesWithFailures.length
+    };
+}
+
+function buildMarkdownReport(report) {
+    const lines = [
+        '# Functional Agent Report',
+        '',
+        `Generated at: ${report.generatedAt}`,
+        `Base URL: ${report.baseUrl}`,
+        '',
+        '## Summary',
+        '',
+        `- routes checked: ${report.summary.totalRoutes}`,
+        `- page runs: ${report.summary.totalPageRuns}`,
+        `- viewports: ${report.summary.totalViewports}`,
+        `- actions executed: ${report.summary.totalActions}`,
+        `- passed actions: ${report.summary.passedActions}`,
+        `- failed actions: ${report.summary.failedActions}`,
+        `- skipped actions: ${report.summary.skippedActions}`,
+        `- pages with failures: ${report.summary.pagesWithFailures}`,
+        '',
+        '## Pages'
+    ];
+
+    for (const page of report.pages) {
+        const pageFailures = page.actions.filter((action) => action.status === 'failed');
+
+        lines.push('');
+        lines.push(`### ${page.route} [${page.viewport}]`);
+        lines.push('');
+        lines.push(`- title: ${page.title || '(untitled)'}`);
+        lines.push(`- actions: ${page.actions.length}`);
+        lines.push(`- failed actions: ${pageFailures.length}`);
+        lines.push(`- console errors: ${page.consoleErrors.length}`);
+        lines.push(`- request failures: ${page.requestFailures.length}`);
+
+        if (page.consoleErrors.length > 0) {
+            lines.push('- console details:');
+            page.consoleErrors.slice(0, 5).forEach((entry) => lines.push(`  - ${entry}`));
+        }
+
+        if (page.requestFailures.length > 0) {
+            lines.push('- request details:');
+            summarizeFailures(page.requestFailures).slice(0, 5).forEach((entry) => lines.push(`  - ${entry}`));
+        }
+
+        if (pageFailures.length === 0) {
+            lines.push('- failed action details: none');
+        } else {
+            lines.push('- failed action details:');
+            pageFailures.slice(0, 10).forEach((action) => {
+                lines.push(`  - ${action.label}: ${action.message}`);
+                if (action.observedUrl) {
+                    lines.push(`    - observed url: ${action.observedUrl}`);
+                }
+                if (action.screenshotPath) {
+                    lines.push(`    - screenshot: ${action.screenshotPath}`);
+                }
+            });
+        }
+    }
+
+    return `${lines.join('\n')}\n`;
+}
+
+async function findAvailablePort() {
+    return new Promise((resolve, reject) => {
+        const server = net.createServer();
+
+        server.on('error', reject);
+        server.listen(0, '127.0.0.1', () => {
+            const address = server.address();
+            server.close(() => {
+                if (!address || typeof address === 'string') {
+                    reject(new Error('Could not resolve a free TCP port.'));
+                    return;
+                }
+
+                resolve(address.port);
+            });
+        });
+    });
+}
+
+function createNetworkTracker(page) {
+    const failures = [];
+
+    page.on('requestfailed', (request) => {
+        const resourceType = request.resourceType();
+        const failureText = request.failure()?.errorText || 'request_failed';
+
+        if (
+            ['document', 'stylesheet', 'script', 'image', 'media', 'xhr', 'fetch'].includes(resourceType) &&
+            !/ERR_ABORTED/i.test(failureText)
+        ) {
+            failures.push({
+                url: request.url(),
+                resourceType,
+                failureText
+            });
+        }
+    });
+
+    page.on('response', (response) => {
+        if (response.status() >= 400) {
+            const request = response.request();
+            const resourceType = request.resourceType();
+            if (['document', 'stylesheet', 'script', 'image', 'media', 'xhr', 'fetch'].includes(resourceType)) {
+                failures.push({
+                    url: response.url(),
+                    resourceType,
+                    status: response.status()
+                });
+            }
+        }
+    });
+
+    return failures;
+}
+
+async function resolveBaseUrl(baseUrl) {
+    if (baseUrl) {
+        return {
+            baseUrl,
+            serverHandle: null
+        };
+    }
+
+    const port = await findAvailablePort();
+    const resolvedBaseUrl = `http://127.0.0.1:${port}`;
+    const serverHandle = await startStaticServer({
+        projectRoot: repoRoot,
+        port,
+        baseUrl: resolvedBaseUrl,
+        label: 'Functional agent static server'
+    });
+
+    return {
+        baseUrl: resolvedBaseUrl,
+        serverHandle
+    };
+}
+
+async function installCommonMocks(page, { enableStripeMock = false } = {}) {
+    await page.route('**/api/test', async (route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ ok: true })
+        });
+    });
+
+    await page.route('**/api/contact', async (route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                success: true,
+                message: 'Message sent successfully. We will respond soon.'
+            })
+        });
+    });
+
+    await page.route('**/api/reserve', async (route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ clientSecret: 'pi_mock_agent_secret' })
+        });
+    });
+
+    await page.route('**/api/reserve/confirm', async (route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ ok: true, emailSent: true })
+        });
+    });
+
+    if (enableStripeMock) {
+        await page.addInitScript(() => {
+            window.Stripe = function StripeMock() {
+                return {
+                    elements() {
+                        return {
+                            create() {
+                                return {
+                                    mount(selector) {
+                                        const container = document.querySelector(selector);
+                                        if (container) {
+                                            container.setAttribute('data-mock-stripe', 'mounted');
+                                        }
+                                    },
+                                    on() {}
+                                };
+                            }
+                        };
+                    },
+                    async confirmCardPayment(clientSecret) {
+                        return {
+                            error: null,
+                            paymentIntent: {
+                                id: 'pi_mock_customer_checkout',
+                                status: 'succeeded',
+                                amount: 165000,
+                                client_secret: clientSecret
+                            }
+                        };
+                    }
+                };
+            };
+        });
+    }
+}
+
+async function openRouteSession(browser, baseUrl, route, { enableStripeMock = false, viewport = VIEWPORTS[VIEWPORTS.length - 1] } = {}) {
+    const context = await browser.newContext(buildContextOptions(viewport));
+    const page = await context.newPage();
+    const consoleErrors = createConsoleTracker(page);
+    const requestFailures = createNetworkTracker(page);
+
+    await installCommonMocks(page, { enableStripeMock });
+    if (route === '/') {
+        await primeHomeAnimations(page);
+    }
+
+    await page.goto(`${baseUrl}${route}`, { waitUntil: 'domcontentloaded' });
+    await settlePage(page, 350);
+
+    return {
+        context,
+        page,
+        consoleErrors,
+        requestFailures,
+        viewport
+    };
+}
+
+async function collectPageMeta(page) {
+    return page.evaluate(() => ({
+        title: document.title || '',
+        hasVehicleBooking: Boolean(document.querySelector('.js-vehicle-booking-form')),
+        modelCardCount: document.querySelectorAll('.model-card').length,
+        hasContactForm: Boolean(document.querySelector('#contactForm')),
+        hasReserveFlow: Boolean(document.querySelector('#payButton')),
+        hasFleetBrowser: Boolean(document.querySelector('.js-fleet-brand-select'))
+    }));
+}
+
+async function discoverInteractiveTargets(page, currentRoute, options) {
+    return page.evaluate(({ route, maxLinks, maxButtons, maxSummaries, maxSelects }) => {
+        function isVisible(element) {
+            if (!(element instanceof HTMLElement)) {
+                return false;
+            }
+
+            const style = window.getComputedStyle(element);
+            const rect = element.getBoundingClientRect();
+            return style.display !== 'none' &&
+                style.visibility !== 'hidden' &&
+                Number(style.opacity || '1') > 0.05 &&
+                rect.width >= 8 &&
+                rect.height >= 8;
+        }
+
+        function buildSelector(element) {
+            const parts = [];
+            let current = element;
+
+            while (current && current.nodeType === Node.ELEMENT_NODE && current !== document.body) {
+                let part = current.tagName.toLowerCase();
+
+                if (current.id) {
+                    part += `#${CSS.escape(current.id)}`;
+                    parts.unshift(part);
+                    break;
+                }
+
+                const classNames = Array.from(current.classList).slice(0, 2);
+                if (classNames.length > 0) {
+                    part += classNames.map((name) => `.${CSS.escape(name)}`).join('');
+                }
+
+                let index = 1;
+                let sibling = current;
+                while ((sibling = sibling.previousElementSibling)) {
+                    if (sibling.tagName === current.tagName) {
+                        index += 1;
+                    }
+                }
+
+                part += `:nth-of-type(${index})`;
+                parts.unshift(part);
+                current = current.parentElement;
+            }
+
+            return parts.join(' > ');
+        }
+
+        function labelFor(link) {
+            return (
+                link.getAttribute('aria-label') ||
+                link.textContent ||
+                link.getAttribute('title') ||
+                link.getAttribute('href') ||
+                ''
+            ).replace(/\s+/g, ' ').trim();
+        }
+
+        function firstText(value) {
+            return String(value || '').replace(/\s+/g, ' ').trim();
+        }
+
+        function limitedPush(collection, value, limit) {
+            if (collection.length < limit) {
+                collection.push(value);
+            }
+        }
+
+        const dedupe = {
+            links: new Set(),
+            buttons: new Set(),
+            summaries: new Set(),
+            selects: new Set()
+        };
+        const output = {
+            links: [],
+            toggleButtons: [],
+            summaries: [],
+            selects: []
+        };
+
+        for (const link of document.querySelectorAll('header a[href], main a[href], footer a[href]')) {
+            if (!(link instanceof HTMLAnchorElement) || !isVisible(link)) {
+                continue;
+            }
+
+            const href = link.getAttribute('href') || '';
+            const label = labelFor(link);
+
+            if (!href || !label) {
+                continue;
+            }
+
+            const dedupeKey = `${label}::${href}`;
+            if (dedupe.links.has(dedupeKey)) {
+                continue;
+            }
+            dedupe.links.add(dedupeKey);
+
+            const absolute = new URL(href, window.location.href);
+            const normalizedPath = absolute.pathname === '/index.html' ? '/' : absolute.pathname;
+            const kind = href.startsWith('#')
+                ? 'hash'
+                : absolute.origin === window.location.origin
+                    ? 'internal'
+                    : 'external';
+
+            if (kind === 'internal' && normalizedPath === route && !absolute.search && !absolute.hash) {
+                continue;
+            }
+
+            limitedPush(output.links, {
+                label,
+                href,
+                absoluteHref: absolute.href,
+                targetPath: `${normalizedPath}${absolute.search}${absolute.hash}`,
+                kind,
+                selector: buildSelector(link)
+            }, maxLinks);
+        }
+
+        for (const button of document.querySelectorAll('header button[aria-controls][aria-expanded], main button[aria-controls][aria-expanded], [role="button"][aria-controls][aria-expanded]')) {
+            if (!(button instanceof HTMLElement) || !isVisible(button)) {
+                continue;
+            }
+
+            const label = labelFor(button);
+            const controlsId = firstText(button.getAttribute('aria-controls'));
+            const dedupeKey = `${label}::${controlsId}`;
+
+            if (!label || !controlsId || dedupe.buttons.has(dedupeKey)) {
+                continue;
+            }
+
+            dedupe.buttons.add(dedupeKey);
+            limitedPush(output.toggleButtons, {
+                label,
+                selector: buildSelector(button),
+                controlsId,
+                expanded: firstText(button.getAttribute('aria-expanded'))
+            }, maxButtons);
+        }
+
+        for (const summary of document.querySelectorAll('details > summary')) {
+            if (!(summary instanceof HTMLElement) || !isVisible(summary)) {
+                continue;
+            }
+
+            const label = labelFor(summary);
+            const dedupeKey = `${label}::${buildSelector(summary)}`;
+
+            if (!label || dedupe.summaries.has(dedupeKey)) {
+                continue;
+            }
+
+            dedupe.summaries.add(dedupeKey);
+            limitedPush(output.summaries, {
+                label,
+                selector: buildSelector(summary),
+                initiallyOpen: Boolean(summary.parentElement?.open)
+            }, maxSummaries);
+        }
+
+        for (const select of document.querySelectorAll('main select, form select')) {
+            if (!(select instanceof HTMLSelectElement) || !isVisible(select)) {
+                continue;
+            }
+
+            const selectableOptions = Array.from(select.options)
+                .filter((option) => !option.disabled && firstText(option.value || option.textContent))
+                .map((option) => ({
+                    value: option.value,
+                    label: firstText(option.textContent || option.value)
+                }));
+
+            if (selectableOptions.length < 2) {
+                continue;
+            }
+
+            const label = firstText(
+                document.querySelector(`label[for="${CSS.escape(select.id)}"]`)?.textContent ||
+                select.getAttribute('aria-label') ||
+                select.name ||
+                select.id
+            );
+            const dedupeKey = `${label}::${buildSelector(select)}`;
+
+            if (!label || dedupe.selects.has(dedupeKey)) {
+                continue;
+            }
+
+            dedupe.selects.add(dedupeKey);
+            limitedPush(output.selects, {
+                label,
+                selector: buildSelector(select),
+                currentValue: select.value,
+                options: selectableOptions.slice(0, 8)
+            }, maxSelects);
+        }
+
+        return output;
+    }, {
+        route: currentRoute,
+        maxLinks: options.maxLinksPerPage,
+        maxButtons: options.maxButtonsPerPage,
+        maxSummaries: options.maxSummariesPerPage,
+        maxSelects: options.maxSelectsPerPage
+    });
+}
+
+function extractConsoleErrors(errors) {
+    return normalizeConsoleErrors(errors).slice(0, 10);
+}
+
+async function runAction(browser, baseUrl, route, viewport, pageDir, action) {
+    const screenshotPath = path.join(pageDir, `${slugify(action.id || action.label)}.png`);
+    const session = await openRouteSession(browser, baseUrl, route, {
+        enableStripeMock: Boolean(action.enableStripeMock),
+        viewport
+    });
+
+    try {
+        const result = await action.run(session.page);
+        return {
+            id: action.id,
+            label: action.label,
+            kind: action.kind,
+            status: 'passed',
+            message: result?.message || 'Action completed successfully.',
+            observedUrl: result?.observedUrl || session.page.url(),
+            consoleErrors: extractConsoleErrors(session.consoleErrors),
+            requestFailures: session.requestFailures.slice(0, 10),
+            screenshotPath: ''
+        };
+    } catch (error) {
+        try {
+            await session.page.screenshot({
+                path: screenshotPath,
+                fullPage: false,
+                animations: 'disabled',
+                caret: 'hide'
+            });
+        } catch (captureError) {
+            // Ignore screenshot capture issues in favor of the original failure.
+        }
+
+        return {
+            id: action.id,
+            label: action.label,
+            kind: action.kind,
+            status: 'failed',
+            message: formatError(error),
+            observedUrl: session.page.url(),
+            consoleErrors: extractConsoleErrors(session.consoleErrors),
+            requestFailures: session.requestFailures.slice(0, 10),
+            screenshotPath: fs.existsSync(screenshotPath) ? screenshotPath : ''
+        };
+    } finally {
+        await session.context.close();
+    }
+}
+
+function createLinkAction(descriptor) {
+    return {
+        id: `link-${slugify(descriptor.label)}-${slugify(descriptor.href)}`,
+        label: `Link: ${descriptor.label}`,
+        kind: `link:${descriptor.kind}`,
+        async run(page) {
+            if (descriptor.kind === 'external') {
+                const isValidExternal = /^(tel:|mailto:|https?:\/\/|\/\/)/i.test(descriptor.absoluteHref);
+                if (!isValidExternal) {
+                    throw new Error(`External href is malformed: ${descriptor.absoluteHref}`);
+                }
+
+                return {
+                    message: `External link looks valid: ${descriptor.absoluteHref}`,
+                    observedUrl: page.url()
+                };
+            }
+
+            const locator = page.locator(descriptor.selector).first();
+            await expect(locator).toBeVisible();
+            await locator.scrollIntoViewIfNeeded();
+
+            if (descriptor.kind === 'hash') {
+                await locator.click({ force: true });
+                await page.waitForTimeout(250);
+
+                const currentUrl = new URL(page.url());
+                if (!currentUrl.hash) {
+                    throw new Error(`Hash link did not update the URL: ${descriptor.href}`);
+                }
+
+                return {
+                    message: `Hash navigation reached ${currentUrl.hash}`,
+                    observedUrl: page.url()
+                };
+            }
+
+            await locator.click({ force: true });
+            await page.waitForLoadState('domcontentloaded').catch(() => null);
+            await settlePage(page, 250);
+
+            const observed = new URL(page.url());
+            const expected = new URL(descriptor.absoluteHref);
+            const observedPath = `${normalizeRoute(observed.pathname)}${observed.search}${observed.hash}`;
+            const expectedPath = `${normalizeRoute(expected.pathname)}${expected.search}${expected.hash}`;
+
+            if (observedPath !== expectedPath) {
+                throw new Error(`Expected ${expectedPath} but landed on ${observedPath}`);
+            }
+
+            return {
+                message: `Reached ${expectedPath}`,
+                observedUrl: page.url()
+            };
+        }
+    };
+}
+
+function createToggleButtonAction(descriptor) {
+    return {
+        id: `toggle-${slugify(descriptor.label)}-${slugify(descriptor.controlsId)}`,
+        label: `Toggle: ${descriptor.label}`,
+        kind: 'toggle',
+        async run(page) {
+            const locator = page.locator(descriptor.selector).first();
+            await expect(locator).toBeVisible();
+
+            const beforeExpanded = await locator.getAttribute('aria-expanded');
+            await locator.click({ force: true });
+            await settlePage(page, 200);
+
+            const afterExpanded = await locator.getAttribute('aria-expanded');
+            const target = page.locator(`#${descriptor.controlsId}`).first();
+            const targetVisible = await target.isVisible().catch(() => false);
+            const targetAriaHidden = await target.getAttribute('aria-hidden').catch(() => null);
+
+            if (
+                beforeExpanded === afterExpanded &&
+                afterExpanded !== 'true' &&
+                !targetVisible &&
+                targetAriaHidden !== 'false'
+            ) {
+                throw new Error(`Button did not visibly toggle its controlled region (${descriptor.controlsId}).`);
+            }
+
+            return {
+                message: `${descriptor.label} toggled ${descriptor.controlsId}.`,
+                observedUrl: page.url()
+            };
+        }
+    };
+}
+
+function createSummaryToggleAction(descriptor) {
+    return {
+        id: `summary-${slugify(descriptor.label)}`,
+        label: `FAQ: ${descriptor.label}`,
+        kind: 'details',
+        async run(page) {
+            const locator = page.locator(descriptor.selector).first();
+            await expect(locator).toBeVisible();
+            const beforeOpen = await page.evaluate((selector) => {
+                const element = document.querySelector(selector);
+                return Boolean(element && element.parentElement && element.parentElement.open);
+            }, descriptor.selector);
+
+            await locator.click({ force: true });
+            await settlePage(page, 150);
+
+            const afterOpen = await page.evaluate((selector) => {
+                const element = document.querySelector(selector);
+                return Boolean(element && element.parentElement && element.parentElement.open);
+            }, descriptor.selector);
+
+            if (beforeOpen === afterOpen) {
+                throw new Error(`Summary did not toggle the details state for "${descriptor.label}".`);
+            }
+
+            return {
+                message: `${descriptor.label} changed from ${beforeOpen ? 'open' : 'closed'} to ${afterOpen ? 'open' : 'closed'}.`,
+                observedUrl: page.url()
+            };
+        }
+    };
+}
+
+function createSelectCycleAction(descriptor) {
+    return {
+        id: `select-${slugify(descriptor.label)}`,
+        label: `Select: ${descriptor.label}`,
+        kind: 'select',
+        async run(page) {
+            const locator = page.locator(descriptor.selector).first();
+            await expect(locator).toBeVisible();
+
+            const targetOption = descriptor.options.find((option) => option.value !== descriptor.currentValue && option.value !== '')
+                || descriptor.options.find((option) => option.value !== descriptor.currentValue);
+
+            if (!targetOption) {
+                throw new Error(`No alternative option found for select "${descriptor.label}".`);
+            }
+
+            await locator.selectOption(targetOption.value);
+            await expect(locator).toHaveValue(targetOption.value);
+
+            return {
+                message: `${descriptor.label} changed to ${targetOption.label || targetOption.value}.`,
+                observedUrl: page.url()
+            };
+        }
+    };
+}
+
+function createHomeNavigationAction() {
+    return {
+        id: 'home-top-nav',
+        label: 'Top navigation cycle',
+        kind: 'nav',
+        async run(page) {
+            const origin = new URL(page.url()).origin;
+            const destinations = [
+                { label: 'Services', expected: /\/services\.html$/i },
+                { label: 'Locations', expected: /\/locations\.html$/i },
+                { label: 'Fleet', expected: /\/fleet\.html$/i },
+                { label: 'About Us', expected: /\/about\.html$/i }
+            ];
+
+            for (const destination of destinations) {
+                await page.getByRole('link', { name: destination.label }).first().click();
+                await expect(page).toHaveURL(destination.expected);
+                await expect(page.locator('h1')).toBeVisible();
+                await page.goto(`${origin}/`, {
+                    waitUntil: 'domcontentloaded'
+                });
+                await settlePage(page, 250);
+            }
+
+            return {
+                message: 'Main navigation routes opened with visible headings.',
+                observedUrl: page.url()
+            };
+        }
+    };
+}
+
+function createHomeMegaMenuAction() {
+    return {
+        id: 'home-mega-menu',
+        label: 'Cars Brands mega menu opens',
+        kind: 'menu',
+        async run(page) {
+            await page.getByRole('button', { name: 'Cars Brands' }).click();
+            await expect(page.locator('#lab-nav-brands-panel')).toBeVisible();
+            const visibleLinks = await page.locator('#lab-nav-brands-panel a[href]').count();
+            if (visibleLinks < 5) {
+                throw new Error(`Expected at least 5 brand links, found ${visibleLinks}`);
+            }
+
+            return {
+                message: `Mega menu opened with ${visibleLinks} visible brand links.`,
+                observedUrl: page.url()
+            };
+        }
+    };
+}
+
+function createHomeOverlaySearchAction() {
+    return {
+        id: 'home-overlay-search',
+        label: 'Home booking overlay submits into fleet',
+        kind: 'form',
+        async run(page) {
+            await page.getByRole('button', { name: /start with dates/i }).click();
+            await expect(page.locator('#hero-lab-overlay')).toHaveAttribute('aria-hidden', 'false');
+
+            await page.locator('#hero-lab-pickup-date').fill('2026-08-03');
+            await page.locator('#hero-lab-return-date').fill('2026-08-05');
+            await page.locator('#hero-lab-pickup-time').selectOption('12:00');
+            await page.locator('#hero-lab-return-time').selectOption('13:00');
+            await page.locator('.hero-lab-overlay__submit').click();
+
+            await expect(page).toHaveURL(/\/fleet\.html\?/i);
+            await expect(page.locator('#fleet-pickup-date')).toHaveValue('2026-08-03');
+            await expect(page.locator('#fleet-return-date')).toHaveValue('2026-08-05');
+
+            return {
+                message: 'Overlay search carried schedule into fleet.',
+                observedUrl: page.url()
+            };
+        }
+    };
+}
+
+function createFleetFilterAction() {
+    return {
+        id: 'fleet-filter-cycle',
+        label: 'Fleet filters keep schedule while cycling brands',
+        kind: 'filter',
+        async run(page) {
+            await page.locator('#fleet-pickup-date').fill('2026-08-10');
+            await page.locator('#fleet-return-date').fill('2026-08-12');
+            await page.locator('#fleet-pickup-time').fill('10:00');
+            await page.locator('#fleet-return-time').fill('18:00');
+
+            const brandSelect = page.locator('.js-fleet-brand-select');
+            const brandValues = await brandSelect.locator('option').evaluateAll((options) => (
+                options
+                    .map((option) => option.value)
+                    .filter((value) => value && value !== 'all')
+            ));
+
+            const seen = [];
+
+            for (const brand of brandValues) {
+                await brandSelect.selectOption(brand);
+                await page.waitForTimeout(200);
+                const countLabel = (await page.locator('.js-fleet-results-count').textContent() || '').trim();
+                const visibleCards = await page.locator('.js-fleet-card:not([hidden])').count();
+                if (visibleCards < 1) {
+                    throw new Error(`Brand ${brand} left the fleet with no visible cards.`);
+                }
+                seen.push(`${brand}:${countLabel || visibleCards}`);
+            }
+
+            await expect(page.locator('#fleet-pickup-date')).toHaveValue('2026-08-10');
+            await expect(page.locator('#fleet-return-date')).toHaveValue('2026-08-12');
+
+            return {
+                message: `Fleet filters cycled successfully (${seen.join(', ')})`,
+                observedUrl: page.url()
+            };
+        }
+    };
+}
+
+function createFleetReserveAction() {
+    return {
+        id: 'fleet-reserve-first-visible',
+        label: 'Fleet reserve CTA opens reserve with schedule',
+        kind: 'reserve-handoff',
+        async run(page) {
+            await page.locator('#fleet-pickup-date').fill('2026-08-10');
+            await page.locator('#fleet-return-date').fill('2026-08-12');
+            await page.locator('#fleet-pickup-time').fill('10:00');
+            await page.locator('#fleet-return-time').fill('18:00');
+            await page.locator('.js-fleet-brand-select').selectOption('mercedes');
+            await page.locator('.js-fleet-card:not([hidden]) .fleet-card__reserve').first().click();
+
+            await expect(page).toHaveURL(/\/app\/reserve\/page\.html\?/i);
+            await expect(page.locator('body')).toHaveClass(/reserve-page/);
+            await expect(page.locator('.lab-header')).toHaveCount(1);
+            await expect(page.locator('.site-v2-footer')).toHaveCount(1);
+            await expect(page.locator('#selectedCar')).toContainText('G63');
+            await expect(page.locator('#startDate')).toHaveValue('2026-08-10');
+            await expect(page.locator('#endDate')).toHaveValue('2026-08-12');
+
+            return {
+                message: 'Reserve CTA preserved the selected schedule.',
+                observedUrl: page.url()
+            };
+        }
+    };
+}
+
+function createContactSubmitAction() {
+    return {
+        id: 'contact-submit',
+        label: 'Contact form submits with demo lead',
+        kind: 'form',
+        async run(page) {
+            await page.locator('#contactName').fill(contactLead.name);
+            await page.locator('#contactEmail').fill(contactLead.email);
+            await page.locator('#contactPhone').fill(contactLead.phone);
+            await page.locator('#contactSubject').selectOption(contactLead.subject);
+            await page.locator('#contactMessage').fill(contactLead.message);
+            await page.locator('#contactSubmitButton').click();
+
+            await expect(page.locator('#contactFormStatus')).toContainText('Message sent successfully');
+
+            return {
+                message: 'Contact form reached the success state.',
+                observedUrl: page.url()
+            };
+        }
+    };
+}
+
+function createContactValidationAction() {
+    return {
+        id: 'contact-required-validation',
+        label: 'Contact form blocks empty submit',
+        kind: 'validation',
+        async run(page) {
+            await page.locator('#contactSubmitButton').click();
+            await expect(page.locator('#contactFormStatus')).toContainText('Please complete all required fields.');
+
+            return {
+                message: 'Contact form shows the required-fields validation before submit.',
+                observedUrl: page.url()
+            };
+        }
+    };
+}
+
+function createVehicleBookingAction() {
+    return {
+        id: 'vehicle-booking-submit',
+        label: 'Vehicle booking form hands off to reserve',
+        kind: 'form',
+        async run(page) {
+            const form = page.locator('.js-vehicle-booking-form').first();
+            await expect(form).toBeVisible();
+            await form.locator('input[name="startDate"]').fill('2026-08-14');
+            await form.locator('input[name="endDate"]').fill('2026-08-16');
+            await form.locator('input[name="pickupTime"]').fill('11:00');
+            await form.locator('input[name="dropoffTime"]').fill('17:00');
+            await form.getByRole('button', { name: /check availability/i }).click();
+
+            await expect(page).toHaveURL(/\/app\/reserve\/page\.html\?/i);
+            await expect(page.locator('#selectedCar')).not.toHaveText('');
+            await expect(page.locator('#startDate')).toHaveValue('2026-08-14');
+            await expect(page.locator('#endDate')).toHaveValue('2026-08-16');
+
+            return {
+                message: 'Vehicle booking form preserved the schedule into reserve.',
+                observedUrl: page.url()
+            };
+        }
+    };
+}
+
+async function createModelCardActions(page) {
+    const count = await page.locator('.model-card').count();
+    const actions = [];
+
+    for (let index = 0; index < count; index += 1) {
+        const title = (await page.locator('.model-card').nth(index).locator('h3').first().textContent() || `Model ${index + 1}`).trim();
+
+        actions.push({
+            id: `model-card-book-${index + 1}`,
+            label: `Model card book: ${title}`,
+            kind: 'reserve-handoff',
+            async run(actionPage) {
+                const card = actionPage.locator('.model-card').nth(index);
+                await expect(card).toBeVisible();
+                await card.getByRole('link', { name: /^book$/i }).click();
+                await expect(actionPage).toHaveURL(/\/app\/reserve\/page\.html\?/i);
+                await expect(actionPage.locator('#selectedCar')).toContainText(title.replace(/\s+/g, ' ').trim());
+
+                return {
+                    message: `${title} book CTA opened reserve.`,
+                    observedUrl: actionPage.url()
+                };
+            }
+        });
+
+        const detailLink = page.locator('.model-card').nth(index).getByRole('link', { name: /detail page|open/i });
+        if (await detailLink.count() > 0) {
+            actions.push({
+                id: `model-card-detail-${index + 1}`,
+                label: `Model card detail: ${title}`,
+                kind: 'detail',
+                async run(actionPage) {
+                    const card = actionPage.locator('.model-card').nth(index);
+                    await expect(card).toBeVisible();
+                    await card.getByRole('link', { name: /detail page|open/i }).click();
+                    await expect(actionPage).toHaveURL(/-rental-dubai\.html$/i);
+                    await expect(actionPage.locator('h1')).toBeVisible();
+
+                    return {
+                        message: `${title} detail page opened successfully.`,
+                        observedUrl: actionPage.url()
+                    };
+                }
+            });
+        }
+    }
+
+    return actions;
+}
+
+function createReserveCheckoutAction() {
+    return {
+        id: 'reserve-complete-checkout',
+        label: 'Reserve flow completes with mocked payment',
+        kind: 'checkout',
+        enableStripeMock: true,
+        async run(page) {
+            await page.goto(`${new URL(page.url()).origin}/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1650&startDate=2026-08-20&endDate=2026-08-22&pickupTime=10:00&dropoffTime=18:00`, {
+                waitUntil: 'domcontentloaded'
+            });
+            await settlePage(page, 350);
+
+            await page.locator('#pickupLocation').fill(reservationGuest.pickupLocation);
+            await expect(page.locator('#continueToPaymentBtn')).toBeEnabled();
+            await page.locator('#continueToPaymentBtn').click();
+            await expect(page.locator('#step2')).toHaveClass(/active/);
+
+            await page.locator('#fullName').fill(reservationGuest.name);
+            await page.locator('#passport').fill(reservationGuest.passport);
+            await page.locator('#phone').fill(reservationGuest.phone);
+            await page.locator('#email').fill(reservationGuest.email);
+            await page.locator('#step2').getByRole('button', { name: /continue to payment/i }).click();
+
+            await expect(page.locator('#step3')).toHaveClass(/active/);
+            await expect(page.locator('#card-element')).toHaveAttribute('data-mock-stripe', 'mounted');
+
+            const successDialogPromise = page.waitForEvent('dialog');
+            await page.locator('#payButton').click();
+
+            const dialog = await successDialogPromise;
+            await dialog.accept();
+
+            await expect(page).toHaveURL(/\/index\.html$/i);
+
+            return {
+                message: 'Reserve flow reached success redirect with mocked payment.',
+                observedUrl: page.url()
+            };
+        }
+    };
+}
+
+function createReserveStep1ValidationAction() {
+    return {
+        id: 'reserve-step1-validation',
+        label: 'Reserve step 1 blocks incomplete schedule',
+        kind: 'validation',
+        async run(page) {
+            await page.goto(`${new URL(page.url()).origin}/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1650&startDate=2026-08-20&endDate=2026-08-22&pickupTime=10:00&dropoffTime=18:00`, {
+                waitUntil: 'domcontentloaded'
+            });
+            await settlePage(page, 350);
+
+            await expect(page.locator('#continueToPaymentBtn')).toBeDisabled();
+            await expect(page.locator('#step1')).toHaveClass(/active/);
+
+            return {
+                message: 'Reserve step 1 keeps the next CTA disabled until the schedule is complete.',
+                observedUrl: page.url()
+            };
+        }
+    };
+}
+
+function createReserveStep2ValidationAction() {
+    return {
+        id: 'reserve-step2-invalid-schedule',
+        label: 'Reserve step 1 blocks invalid schedule',
+        kind: 'validation',
+        async run(page) {
+            await page.goto(`${new URL(page.url()).origin}/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1650&startDate=2026-08-20&endDate=2026-08-22&pickupTime=10:00&dropoffTime=18:00`, {
+                waitUntil: 'domcontentloaded'
+            });
+            await settlePage(page, 350);
+
+            await page.locator('#startDate').fill('2026-08-20');
+            await page.locator('#endDate').fill('2026-08-20');
+            await page.locator('#pickupTime').selectOption('18:00');
+            await page.locator('#dropoffTime').selectOption('10:00');
+            await page.locator('#pickupLocation').fill(reservationGuest.pickupLocation);
+            const continueButton = page.locator('#continueToPaymentBtn');
+            const isDisabled = await continueButton.isDisabled();
+
+            if (!isDisabled) {
+                await continueButton.click();
+            }
+
+            await expect(page.locator('#step1Validation')).toContainText('Return date/time must be after delivery date/time.');
+            await expect(page.locator('#step1')).toHaveClass(/active/);
+
+            return {
+                message: isDisabled
+                    ? 'Reserve step 1 keeps the next CTA disabled for an invalid return schedule.'
+                    : 'Reserve step 1 rejects a return that is earlier than the delivery schedule.',
+                observedUrl: page.url()
+            };
+        }
+    };
+}
+
+function dedupeActions(actions) {
+    const seen = new Set();
+    return actions.filter((action) => {
+        if (!action || !action.id || seen.has(action.id)) {
+            return false;
+        }
+        seen.add(action.id);
+        return true;
+    });
+}
+
+async function buildRouteActions(route, page, options, viewport) {
+    const meta = await collectPageMeta(page);
+    const actions = [];
+    const discovered = await discoverInteractiveTargets(page, route, options);
+
+    if (route === '/' && !viewport.isMobile) {
+        actions.push(
+            createHomeNavigationAction(),
+            createHomeMegaMenuAction()
+        );
+    }
+
+    if (route === '/') {
+        actions.push(createHomeOverlaySearchAction());
+    }
+
+    if (meta.hasFleetBrowser) {
+        actions.push(
+            createFleetFilterAction(),
+            createFleetReserveAction()
+        );
+    }
+
+    if (meta.hasContactForm) {
+        actions.push(createContactValidationAction());
+        actions.push(createContactSubmitAction());
+    }
+
+    if (meta.hasVehicleBooking) {
+        actions.push(createVehicleBookingAction());
+    }
+
+    if (meta.modelCardCount > 0) {
+        actions.push(...await createModelCardActions(page));
+    }
+
+    if (meta.hasReserveFlow || route === '/app/reserve/page.html') {
+        actions.push(createReserveStep1ValidationAction());
+        actions.push(createReserveStep2ValidationAction());
+        actions.push(createReserveCheckoutAction());
+    }
+
+    actions.push(...discovered.links.map(createLinkAction));
+    actions.push(...discovered.toggleButtons.map(createToggleButtonAction));
+    actions.push(...discovered.summaries.map(createSummaryToggleAction));
+    actions.push(...discovered.selects.map(createSelectCycleAction));
+
+    return {
+        meta,
+        actions: dedupeActions(actions)
+    };
+}
+
+async function auditRoute(browser, baseUrl, route, viewport, runDir, options) {
+    const session = await openRouteSession(browser, baseUrl, route, { viewport });
+    const routeDir = path.join(runDir, routeFileStem(route), viewport.name);
+    ensureDir(routeDir);
+
+    try {
+        const { meta, actions } = await buildRouteActions(route, session.page, options, viewport);
+        const title = meta.title || '';
+        const actionsReport = [];
+
+        for (const action of actions) {
+            actionsReport.push(await runAction(browser, baseUrl, route, viewport, routeDir, action));
+        }
+
+        return {
+            route,
+            viewport: viewport.name,
+            title,
+            actions: actionsReport,
+            consoleErrors: extractConsoleErrors(session.consoleErrors),
+            requestFailures: session.requestFailures.slice(0, 10)
+        };
+    } finally {
+        await session.context.close();
+    }
+}
+
+async function runFunctionalAgent(options = {}) {
+    const args = options.argv ? parseArgs(options.argv) : options;
+    const selectedRoutes = (args.routes && args.routes.length > 0
+        ? args.routes
+        : Object.keys(PUBLIC_PAGE_FILE_MAP))
+        .map((route) => normalizeRoute(route));
+    const selectedViewports = resolveSelectedViewports(args.viewports);
+    const generatedAt = new Date().toISOString();
+    const runDir = args.outputDir || path.join(artifactsRoot, timestampSlug(new Date(generatedAt)));
+
+    ensureDir(runDir);
+
+    const { baseUrl, serverHandle } = await resolveBaseUrl(args.baseUrl || '');
+    const browser = await chromium.launch({ headless: true });
+
+    try {
+        const pages = [];
+
+        for (const route of selectedRoutes) {
+            for (const viewport of selectedViewports) {
+                pages.push(await auditRoute(browser, baseUrl, route, viewport, runDir, args));
+            }
+        }
+
+        const report = {
+            generatedAt,
+            baseUrl,
+            summary: buildReportSummary(pages),
+            pages
+        };
+
+        fs.writeFileSync(path.join(runDir, 'report.json'), `${JSON.stringify(report, null, 2)}\n`);
+        fs.writeFileSync(path.join(runDir, 'report.md'), buildMarkdownReport(report));
+
+        return {
+            runDir,
+            report
+        };
+    } finally {
+        await browser.close();
+
+        if (serverHandle?.child) {
+            stopProcess(serverHandle.child);
+        }
+    }
+}
+
+async function main() {
+    const { runDir, report } = await runFunctionalAgent({ argv: process.argv.slice(2) });
+
+    console.log(`Functional agent completed: ${runDir}`);
+    console.log(`routes=${report.summary.totalRoutes} actions=${report.summary.totalActions} failed=${report.summary.failedActions}`);
+}
+
+if (require.main === module) {
+    main().catch((error) => {
+        console.error('Functional agent failed.');
+        console.error(formatError(error));
+        process.exit(1);
+    });
+}
+
+module.exports = {
+    buildMarkdownReport,
+    buildReportSummary,
+    parseArgs,
+    runFunctionalAgent
+};

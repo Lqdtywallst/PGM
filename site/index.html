@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -58,9 +58,10 @@
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./css/site-v2.css?v=20260410s">
-    <script src="./js/site-v2.js?v=20260406ae" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=El+Messiri:wght@600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preload" href="./media/hero-dubai-sunset.mp4" as="video" type="video/mp4" media="(min-width: 861px)">
+    <link rel="stylesheet" href="./css/site-v2.css?v=20260420g">
+    <script src="./js/site-v2.js?v=20260420d" defer></script>
 </head>
 <body class="home-page">
     <!-- Editorial home experience for Dynasty Prestige: hero, booking overlay and curated fleet routing. -->
@@ -249,32 +250,40 @@
              3. contenido editorial a la izquierda
              4. marca fantasma a la derecha para equilibrar el vacio -->
         <section class="hero-lab js-hero-lab">
-            <video class="hero-lab__video js-hero-lab-video" muted loop playsinline preload="none" poster="./images/locations-hero-temp.jpg" aria-hidden="true">
-                <source data-src="./media/hero-dubai-sunset.mp4" type="video/mp4">
+            <video
+                class="hero-lab__video js-hero-lab-video"
+                muted
+                loop
+                playsinline
+                preload="none"
+                poster="./images/home-hero-video-poster.jpg"
+                data-src-desktop="./media/hero-dubai-sunset.mp4"
+                data-src-mobile="./media/hero-sports-road.mp4"
+                aria-hidden="true">
             </video>
+            <div class="hero-lab__still" aria-hidden="true"></div>
             <div class="hero-lab__overlay" aria-hidden="true"></div>
             <div class="hero-lab__glow" aria-hidden="true"></div>
+            <div class="hero-lab__watermark" aria-hidden="true">
+                <img src="./images/dp-crest-cropped.png" alt="">
+            </div>
 
             <div class="lab-shell hero-lab__shell">
                 <div class="hero-lab__body">
                     <div class="hero-lab__content-box">
                         <div class="hero-lab__body-copy">
                             <span class="hero-lab__eyebrow">Dubai luxury car rental</span>
-                            <h1>Looking to rent a <strong>luxury car</strong> in Dubai?</h1>
-                            <p class="hero-lab__lead">Premium fleet, 24/7 support and free delivery across hotels, villas, airports and city arrivals.</p>
+                            <h1>Drive Dubai your way.</h1>
+                            <p class="hero-lab__lead">A curated luxury fleet with direct hotel, villa and airport handovers.</p>
                         </div>
 
                         <div class="hero-lab__launcher">
+                            <h2>Luxury vehicle rental</h2>
+                            <p>Choose a rental window and view the cars available for your stay.</p>
                             <div class="hero-lab__actions">
-                                <a href="./fleet.html" class="hero-lab__cta hero-lab__cta--primary">Rent a car</a>
-                                <a href="./contact.html" class="hero-lab__cta hero-lab__cta--secondary">Contact us</a>
+                                <a href="./fleet.html" class="hero-lab__cta hero-lab__cta--primary">Rent a luxury car</a>
+                                <a href="./fleet.html" class="hero-lab__cta hero-lab__cta--secondary">View fleet</a>
                             </div>
-                            <div class="hero-lab__trust">Hotels, villas, airport and city delivery with one team handling the booking from first message to return.</div>
-                            <ul class="hero-lab__signal-row">
-                                <li>24/7 support</li>
-                                <li>Free delivery</li>
-                                <li>Secure 50% upfront</li>
-                            </ul>
                         </div>
                     </div>
                 </div>
@@ -346,7 +355,7 @@
 
         <section class="fleet-categories" id="fleet-categories" aria-label="Browse by category">
             <div class="lab-shell fleet-categories__shell">
-                <a class="fleet-category fleet-category--sports" href="./supercar-rental-dubai.html">
+                <a class="fleet-category fleet-category--sports" href="./fleet.html?type=sports">
                     <span class="fleet-category__media">
                         <img class="fleet-category__image" src="./images/categories/mock-fastpng/sports-stage.png" alt="Sports car category" loading="lazy" decoding="async">
                     </span>
@@ -354,7 +363,7 @@
                         <strong>Sports</strong>
                     </span>
                 </a>
-                <a class="fleet-category fleet-category--convertible" href="./ferrari-rental-dubai.html">
+                <a class="fleet-category fleet-category--convertible" href="./fleet.html?type=convertible">
                     <span class="fleet-category__media">
                         <img class="fleet-category__image" src="./images/categories/mock-fastpng/convertible-stage.png" alt="Convertible car category" loading="lazy" decoding="async">
                     </span>
@@ -362,7 +371,7 @@
                         <strong>Convertible</strong>
                     </span>
                 </a>
-                <a class="fleet-category fleet-category--luxury" href="./luxury-car-rental-dubai.html">
+                <a class="fleet-category fleet-category--luxury" href="./fleet.html?type=luxury">
                     <span class="fleet-category__media">
                         <img class="fleet-category__image" src="./images/categories/mock-fastpng/luxury-stage.png" alt="Luxury car category" loading="lazy" decoding="async">
                     </span>
@@ -370,7 +379,7 @@
                         <strong>Luxury</strong>
                     </span>
                 </a>
-                <a class="fleet-category fleet-category--suv" href="./lamborghini-rental-dubai.html">
+                <a class="fleet-category fleet-category--suv" href="./fleet.html?type=suv">
                     <span class="fleet-category__media">
                         <img class="fleet-category__image" src="./images/categories/mock-fastpng/suv-stage.png" alt="SUV category" loading="lazy" decoding="async">
                     </span>
@@ -378,7 +387,7 @@
                         <strong>SUV</strong>
                     </span>
                 </a>
-                <a class="fleet-category fleet-category--electric" href="#contact">
+                <a class="fleet-category fleet-category--electric" href="./fleet.html?type=electric">
                     <span class="fleet-category__media">
                         <img class="fleet-category__image" src="./images/categories/mock-fastpng/electric-stage.png" alt="Electric car category" loading="lazy" decoding="async">
                     </span>
@@ -805,7 +814,7 @@
 
                             <div class="guest-reviews__rating">
                                 <span class="guest-reviews__score">4.9</span>
-                                <span class="guest-reviews__stars" aria-hidden="true">★★★★★</span>
+                                <span class="guest-reviews__stars" aria-hidden="true">â˜…â˜…â˜…â˜…â˜…</span>
                             </div>
 
                             <p class="guest-reviews__count">Based on 377 reviews</p>
@@ -858,7 +867,7 @@
                                         <span aria-hidden="true">G</span>
                                     </a>
                                 </div>
-                                <span class="review-card__stars" aria-hidden="true">★★★★★</span>
+                                <span class="review-card__stars" aria-hidden="true">â˜…â˜…â˜…â˜…â˜…</span>
                                 <p>Best car Rental in Dubai I must recommended it.</p>
                             </article>
 
@@ -881,7 +890,7 @@
                                         <span aria-hidden="true">G</span>
                                     </a>
                                 </div>
-                                <span class="review-card__stars" aria-hidden="true">★★★★★</span>
+                                <span class="review-card__stars" aria-hidden="true">â˜…â˜…â˜…â˜…â˜…</span>
                                 <p>Really great service! Friendly! Helpful! I will definitely come back and rent a car from Luxury Supercars Rental again! Thank you so much!</p>
                             </article>
 
@@ -904,7 +913,7 @@
                                         <span aria-hidden="true">G</span>
                                     </a>
                                 </div>
-                                <span class="review-card__stars" aria-hidden="true">★★★★★</span>
+                                <span class="review-card__stars" aria-hidden="true">â˜…â˜…â˜…â˜…â˜…</span>
                                 <p>Amazing customer service. Recommend for each car enthusiast to get their rental cars from them.</p>
                             </article>
                         </div>
@@ -1023,6 +1032,7 @@
     </main>
 </body>
 </html>
+
 
 
 

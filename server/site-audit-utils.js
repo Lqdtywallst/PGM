@@ -2,6 +2,10 @@ const http = require('http');
 const path = require('path');
 const { spawn, spawnSync } = require('child_process');
 const { URL } = require('url');
+const {
+    publicPathForSiteFile,
+    siteFileForPublicPath
+} = require('./public-page-map');
 
 function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -88,12 +92,11 @@ function parseSitemapPaths(xml) {
 }
 
 function siteFileForPath(siteRoot, urlPath) {
-    const pathname = String(urlPath).split(/[?#]/)[0] || '/';
-    if (pathname === '/') {
-        return path.join(siteRoot, 'index.html');
-    }
+    return siteFileForPublicPath(siteRoot, urlPath);
+}
 
-    return path.join(siteRoot, pathname.replace(/^\//, ''));
+function publicPathForFile(siteRoot, filePath) {
+    return publicPathForSiteFile(siteRoot, filePath);
 }
 
 function extractTagValue(html, pattern) {
@@ -110,6 +113,7 @@ module.exports = {
     extractTagValue,
     fetchUrl,
     parseSitemapPaths,
+    publicPathForFile,
     siteFileForPath,
     startStaticServer,
     stopProcess

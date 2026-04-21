@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
+const { siteFileForPublicPath } = require('../server/public-page-map');
 
 const projectRoot = path.resolve(__dirname, '..');
 const auditRoot = path.join(projectRoot, 'docs', 'audit');
@@ -188,8 +189,8 @@ function parseSitemapPaths() {
     const xml = fs.readFileSync(sitemapPath, 'utf8');
     const matches = [...xml.matchAll(/<loc>https:\/\/prestigegoalmotion\.com\/([^<]*)<\/loc>/gi)];
     return new Set(matches.map((match) => {
-        const pathname = match[1];
-        return pathname ? `site/${pathname}` : 'site/index.html';
+        const pathname = match[1] ? `/${match[1]}` : '/';
+        return path.relative(projectRoot, siteFileForPublicPath(path.join(projectRoot, 'site'), pathname)).replace(/\\/g, '/');
     }));
 }
 

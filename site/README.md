@@ -21,6 +21,24 @@
 - Images, videos, icons, and other assets referenced by public URLs
 - Deploy metadata such as `robots.txt`, `sitemap.xml`, `manifest.json`, `sw.js`, and `_redirects`
 
+## Page Structure
+
+- Keep the trunk pages in the `site/` root:
+  - `index.html`
+  - `fleet.html`
+  - `locations.html`
+  - `services.html`
+  - `about.html`
+  - `contact.html`
+- Keep the reservation flow in `site/app/reserve/`
+- Group leaf public pages under `site/pages/` by intent:
+  - `site/pages/guides/`
+  - `site/pages/services/`
+  - `site/pages/brands/`
+  - `site/pages/vehicles/`
+  - `site/pages/legal/`
+- Preserve public URLs through the routing map and hosting rewrites instead of re-flattening the root
+
 ## What Does Not Live Here
 
 - Component previews

@@ -43,3 +43,183 @@
   status = 301
   force = true
 
+[[redirects]]
+  from = "/downtown-dubai-supercar-rental.html"
+  to = "/supercar-rental-dubai.html"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/ferrari-rental-downtown-dubai.html"
+  to = "/ferrari-rental-dubai.html"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/g63-rental-dubai.html"
+  to = "/mercedes-g63-amg-rental-dubai.html"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/g63-rental-dubai-marina.html"
+  to = "/mercedes-g63-amg-rental-dubai.html"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/lamborghini-rental-palm-jumeirah.html"
+  to = "/lamborghini-rental-dubai.html"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/luxury-car-rental-dubai.html"
+  to = "/pages/guides/luxury-car-rental-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/abu-dhabi-luxury-car-rental.html"
+  to = "/pages/guides/abu-dhabi-luxury-car-rental.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/dubai-airport-luxury-car-rental.html"
+  to = "/pages/guides/dubai-airport-luxury-car-rental.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/palm-jumeirah-luxury-car-rental.html"
+  to = "/pages/guides/palm-jumeirah-luxury-car-rental.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/dubai-marina-luxury-car-rental.html"
+  to = "/pages/guides/dubai-marina-luxury-car-rental.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/supercar-rental-dubai.html"
+  to = "/pages/guides/supercar-rental-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/airport-concierge-dubai.html"
+  to = "/pages/services/airport-concierge-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/chauffeur-service-dubai.html"
+  to = "/pages/services/chauffeur-service-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/hotel-villa-airport-delivery-dubai.html"
+  to = "/pages/services/hotel-villa-airport-delivery-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/wedding-event-car-rental-dubai.html"
+  to = "/pages/services/wedding-event-car-rental-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/business-car-rental-dubai.html"
+  to = "/pages/services/business-car-rental-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/monthly-luxury-car-rental-dubai.html"
+  to = "/pages/services/monthly-luxury-car-rental-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/lamborghini-rental-dubai.html"
+  to = "/pages/brands/lamborghini-rental-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/ferrari-rental-dubai.html"
+  to = "/pages/brands/ferrari-rental-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/mercedes-rental-dubai.html"
+  to = "/pages/brands/mercedes-rental-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/porsche-rental-dubai.html"
+  to = "/pages/brands/porsche-rental-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/rolls-royce-rental-dubai.html"
+  to = "/pages/brands/rolls-royce-rental-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/lamborghini-huracan-evo-spyder-rental-dubai.html"
+  to = "/pages/vehicles/lamborghini-huracan-evo-spyder-rental-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/lamborghini-urus-rental-dubai.html"
+  to = "/pages/vehicles/lamborghini-urus-rental-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/ferrari-296-gts-rental-dubai.html"
+  to = "/pages/vehicles/ferrari-296-gts-rental-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/mercedes-g63-amg-rental-dubai.html"
+  to = "/pages/vehicles/mercedes-g63-amg-rental-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/porsche-992-gt3-rental-dubai.html"
+  to = "/pages/vehicles/porsche-992-gt3-rental-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/rolls-royce-cullinan-black-badge-rental-dubai.html"
+  to = "/pages/vehicles/rolls-royce-cullinan-black-badge-rental-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/terms-and-conditions.html"
+  to = "/pages/legal/terms-and-conditions.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/terms-and-conditions-uae.html"
+  to = "/pages/legal/terms-and-conditions-uae.html"
+  status = 200
+  force = true
+

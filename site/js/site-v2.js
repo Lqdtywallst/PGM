@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+function initSiteV2() {
     const header = document.querySelector(".lab-header");
     const hero = document.querySelector(".js-hero-lab");
     const heroVideo = hero?.querySelector(".js-hero-lab-video");
@@ -11,18 +11,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const coarsePointer = window.matchMedia("(pointer: coarse)");
     const mobileViewport = window.matchMedia("(max-width: 860px)");
-    const shouldSimplifyHero = coarsePointer.matches || mobileViewport.matches;
-    const shouldBypassHeroIntro = document.body.classList.contains("home-page");
+    const dataSaverConnection = typeof navigator !== "undefined" ? navigator.connection : null;
+    const shouldBypassHeroIntro = document.body.classList.contains("home-page") || coarsePointer.matches || mobileViewport.matches;
+    const shouldSkipHeroVideo = prefersReducedMotion.matches || Boolean(dataSaverConnection?.saveData);
     const introMemoryKey = "__siteV2HeroIntroSeen";
     const BOOKING_INTENT_KEY = "dynastyBookingIntent";
     const DEFAULT_WHATSAPP_URL = "https://wa.me/971586122568?text=Hi%2C%20I%20would%20like%20help%20booking%20a%20car%20in%20Dubai.";
-    const fleetBrandFilterMap = {
-        lamborghini: "lamborghini",
-        ferrari: "ferrari",
-        mercedes: "mercedes",
-        porsche: "porsche",
-        "rolls-royce": "rolls-royce"
-    };
+    const HEADER_CONTACT_HREF = "/contact.html";
+    const HEADER_RESERVE_HREF = "/app/reserve/page.html";
     const fleetTypeFilterMap = {
         "luxury cars": "luxury",
         "convertible cars": "convertible",
@@ -149,16 +145,100 @@ document.addEventListener("DOMContentLoaded", () => {
         header.classList.toggle("is-scrolled", window.scrollY > 18);
     }
 
-    function initFleetFilterLinks() {
-        document.querySelectorAll(".lab-nav__panel--brands .lab-nav__card").forEach((link) => {
-            const label = normalizeBookingValue(link.querySelector("strong")?.textContent).toLowerCase();
-            const brand = fleetBrandFilterMap[label];
+    function getPathnameFromHref(href) {
+        if (!href) {
+            return "";
+        }
 
-            if (brand) {
-                link.setAttribute("href", buildFleetFilterHref("brand", brand));
+        try {
+            return new URL(href, window.location.href).pathname;
+        } catch (error) {
+            return normalizeBookingValue(href);
+        }
+    }
+
+    function getCurrentPagePath() {
+        const pathname = normalizeBookingValue(window.location.pathname);
+        return pathname === "/" ? "/" : pathname.replace(/\/+$/, "");
+    }
+
+    function pathsMatch(leftPath, rightPath) {
+        const normalizedLeft = normalizeBookingValue(leftPath).replace(/\/+$/, "") || "/";
+        const normalizedRight = normalizeBookingValue(rightPath).replace(/\/+$/, "") || "/";
+        return normalizedLeft === normalizedRight;
+    }
+
+    function buildHeaderUtilityLink(href, label, svgPath, extraAttributes = "") {
+        return `
+            <a class="lab-header__utility-link" href="${href}" aria-label="${label}" ${extraAttributes}>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor" d="${svgPath}"></path>
+                </svg>
+                <span>${label}</span>
+            </a>
+        `;
+    }
+
+    function enhanceHeaderConsistency() {
+        const headerInner = header?.querySelector(".lab-header__inner");
+        const headerNav = header?.querySelector(".lab-header__nav");
+        const nav = headerNav?.querySelector(".lab-nav");
+
+        if (!header || !headerInner || !headerNav || !nav) {
+            return;
+        }
+
+        if (!headerInner.querySelector(".lab-header__utility")) {
+            const utility = document.createElement("nav");
+            utility.className = "lab-header__utility";
+            utility.setAttribute("aria-label", "Quick contact");
+            utility.innerHTML = [
+                buildHeaderUtilityLink(
+                    "tel:+971586122568",
+                    "Call Dynasty Prestige",
+                    "M6.62 10.79a15.47 15.47 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.07 21 3 13.93 3 5c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.24.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2Z"
+                ),
+                buildHeaderUtilityLink(
+                    "mailto:prestigegoalmotion@gmail.com",
+                    "Email Dynasty Prestige",
+                    "M20 5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm-.4 2-6.54 5.23a1.7 1.7 0 0 1-2.12 0L4.4 7h15.2ZM4 17V9.05l5.69 4.56a3.7 3.7 0 0 0 4.62 0L20 9.05V17H4Z"
+                ),
+                buildHeaderUtilityLink(
+                    "https://wa.me/971586122568",
+                    "Open WhatsApp",
+                    "M19.05 4.91A9.82 9.82 0 0 0 12 2a9.94 9.94 0 0 0-8.54 15.02L2 22l5.13-1.35A9.94 9.94 0 1 0 19.05 4.91Zm-7.05 14.1c-1.53 0-3.04-.41-4.36-1.19l-.31-.18-3.04.8.81-2.96-.2-.31a8 8 0 1 1 7.1 3.84Zm4.39-5.91c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.93-1.18-.71-.63-1.2-1.41-1.34-1.65-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.48-.4-.41-.54-.41l-.46-.01c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.09 3.61.57.25 1.01.39 1.36.49.57.18 1.09.15 1.5.09.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z",
+                    'target="_blank" rel="noopener"'
+                )
+            ].join("");
+            headerInner.insertBefore(utility, headerNav);
+        }
+
+        const mainLinks = Array.from(nav.children).filter((item) => item.matches?.("a"));
+        const hasContactLink = mainLinks.some((link) => pathsMatch(getPathnameFromHref(link.getAttribute("href")), HEADER_CONTACT_HREF));
+
+        if (!hasContactLink) {
+            const contactLink = document.createElement("a");
+            contactLink.href = HEADER_CONTACT_HREF;
+            contactLink.textContent = "Contact";
+            if (pathsMatch(getCurrentPagePath(), HEADER_CONTACT_HREF)) {
+                contactLink.setAttribute("aria-current", "page");
             }
-        });
+            nav.appendChild(contactLink);
+        }
 
+        if (!headerNav.querySelector(".lab-reserve")) {
+            const reserveLink = document.createElement("a");
+            reserveLink.href = HEADER_RESERVE_HREF;
+            reserveLink.className = "lab-reserve";
+            reserveLink.textContent = "Reserve";
+            if (pathsMatch(getCurrentPagePath(), HEADER_RESERVE_HREF)) {
+                reserveLink.setAttribute("aria-current", "page");
+            }
+            headerNav.appendChild(reserveLink);
+        }
+    }
+
+    function initFleetFilterLinks() {
         document.querySelectorAll(".lab-nav__panel--types .lab-nav__card").forEach((link) => {
             const label = normalizeBookingValue(link.querySelector("strong")?.textContent).toLowerCase();
             const type = fleetTypeFilterMap[label];
@@ -169,14 +249,35 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    function getHeroVideoSource() {
+        if (!(heroVideo instanceof HTMLVideoElement)) {
+            return "";
+        }
+
+        const desktopSource = normalizeBookingValue(heroVideo.dataset.srcDesktop);
+        const mobileSource = normalizeBookingValue(heroVideo.dataset.srcMobile);
+
+        if (mobileViewport.matches) {
+            return mobileSource || desktopSource;
+        }
+
+        return desktopSource || mobileSource;
+    }
+
     function hydrateHeroVideo() {
-        if (!(heroVideo instanceof HTMLVideoElement) || shouldSimplifyHero) {
+        if (!(heroVideo instanceof HTMLVideoElement) || shouldSkipHeroVideo) {
             return;
         }
 
-        const source = heroVideo.querySelector("source[data-src]");
-        if (source && !source.getAttribute("src")) {
-            source.setAttribute("src", source.dataset.src || "");
+        const selectedSource = getHeroVideoSource();
+        if (!selectedSource) {
+            return;
+        }
+
+        heroVideo.preload = mobileViewport.matches ? "metadata" : "auto";
+
+        if (heroVideo.getAttribute("src") !== selectedSource) {
+            heroVideo.setAttribute("src", selectedSource);
             heroVideo.load();
         }
 
@@ -265,8 +366,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (hero) {
-        if (prefersReducedMotion.matches || wasIntroSeenInMemory() || shouldSimplifyHero || shouldBypassHeroIntro) {
+        if (prefersReducedMotion.matches || wasIntroSeenInMemory() || shouldBypassHeroIntro) {
             hero.classList.add("hero-lab--mobile-ready");
+            hydrateHeroVideo();
             revealHeroImmediately();
         } else {
             hydrateHeroVideo();
@@ -278,6 +380,23 @@ document.addEventListener("DOMContentLoaded", () => {
             document.addEventListener("scroll", maybeSkipIntro, { once: true, passive: true });
             hero.addEventListener("pointerdown", maybeSkipIntro, { once: true });
         }
+    }
+
+    const heroViewportListener = () => {
+        if (!hero) {
+            return;
+        }
+
+        hydrateHeroVideo();
+        if (mobileViewport.matches || coarsePointer.matches) {
+            revealHeroImmediately();
+        }
+    };
+
+    if (typeof mobileViewport.addEventListener === "function") {
+        mobileViewport.addEventListener("change", heroViewportListener);
+    } else if (typeof mobileViewport.addListener === "function") {
+        mobileViewport.addListener(heroViewportListener);
     }
 
     if (!prefersReducedMotion.matches && ambientVideos.length > 0) {
@@ -442,6 +561,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 current: link.getAttribute("aria-current") === "page"
             }));
 
+        const reserveLink = headerNav.querySelector(".lab-reserve");
+        if (reserveLink) {
+            mainLinks.push({
+                href: reserveLink.getAttribute("href") || HEADER_RESERVE_HREF,
+                label: normalizeBookingValue(reserveLink.textContent) || "Reserve",
+                current: reserveLink.getAttribute("aria-current") === "page"
+            });
+        }
+
         const buildSectionLinks = (selector) => Array.from(nav.querySelectorAll(selector))
             .map((link) => `<a href="${link.getAttribute("href") || "#"}">${normalizeBookingValue(link.querySelector("strong")?.textContent || link.textContent)}</a>`)
             .join("");
@@ -467,25 +595,42 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="lab-mobile-drawer__scrim" data-mobile-nav-close></div>
             <div class="lab-mobile-drawer__panel" role="dialog" aria-modal="true" aria-label="Mobile navigation">
                 <div class="lab-mobile-drawer__header">
-                    <strong>Dynasty Prestige</strong>
+                    <div class="lab-mobile-drawer__brand">
+                        <span class="lab-mobile-drawer__crest" aria-hidden="true">
+                            <img src="/images/dp-crest-cropped.png" alt="">
+                        </span>
+                        <div class="lab-mobile-drawer__brand-copy">
+                            <strong>Dynasty Prestige</strong>
+                            <span>Dubai luxury car rental</span>
+                        </div>
+                    </div>
                     <button type="button" class="lab-mobile-drawer__close" data-mobile-nav-close>Close</button>
+                </div>
+                <div class="lab-mobile-drawer__intro">
+                    <p>Pick the route that fits the stay, then move straight into the right fleet and reserve flow.</p>
+                    <div class="lab-mobile-drawer__quick">
+                        <a class="lab-mobile-drawer__quick-link" href="tel:+971586122568">Call</a>
+                        <a class="lab-mobile-drawer__quick-link" href="mailto:prestigegoalmotion@gmail.com">Email</a>
+                        <a class="lab-mobile-drawer__quick-link" href="https://wa.me/971586122568" target="_blank" rel="noopener">WhatsApp</a>
+                    </div>
                 </div>
                 <div class="lab-mobile-drawer__section">
                     <span class="lab-mobile-drawer__label">Navigate</span>
-                    <div class="lab-mobile-drawer__links">
+                    <div class="lab-mobile-drawer__links lab-mobile-drawer__links--nav">
                         ${mainLinks.map((link) => `<a href="${link.href}"${link.current ? " aria-current=\"page\"" : ""}>${link.label}</a>`).join("")}
                     </div>
                 </div>
                 <div class="lab-mobile-drawer__section">
                     <span class="lab-mobile-drawer__label">Brands</span>
-                    <div class="lab-mobile-drawer__links">${buildSectionLinks(".lab-nav__panel--brands .lab-nav__card")}</div>
+                    <div class="lab-mobile-drawer__links lab-mobile-drawer__links--compact">${buildSectionLinks(".lab-nav__panel--brands .lab-nav__card")}</div>
                 </div>
                 <div class="lab-mobile-drawer__section">
                     <span class="lab-mobile-drawer__label">Browse</span>
-                    <div class="lab-mobile-drawer__links">${buildSectionLinks(".lab-nav__panel--types .lab-nav__card")}</div>
+                    <div class="lab-mobile-drawer__links lab-mobile-drawer__links--compact">${buildSectionLinks(".lab-nav__panel--types .lab-nav__card")}</div>
                 </div>
                 <div class="lab-mobile-drawer__actions">
-                    <a class="lab-mobile-drawer__action lab-mobile-drawer__action--primary" href="https://wa.me/971586122568" target="_blank" rel="noopener">WhatsApp now</a>
+                    <a class="lab-mobile-drawer__action lab-mobile-drawer__action--primary" href="${reserveLink?.getAttribute("href") || HEADER_RESERVE_HREF}">Reserve</a>
+                    <a class="lab-mobile-drawer__action lab-mobile-drawer__action--secondary" href="https://wa.me/971586122568" target="_blank" rel="noopener">WhatsApp now</a>
                     <a class="lab-mobile-drawer__action lab-mobile-drawer__action--secondary" href="tel:+971586122568">Call</a>
                 </div>
             </div>
@@ -762,6 +907,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    enhanceHeaderConsistency();
     initFleetFilterLinks();
     setHeaderScrollState();
     initMobileHeaderDrawer();
@@ -819,4 +965,10 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-});
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initSiteV2, { once: true });
+} else {
+    initSiteV2();
+}

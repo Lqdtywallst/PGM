@@ -8,16 +8,13 @@ const criticalPages = [
     { path: '/services.html', name: 'services', expectsVisibleH1: true },
     { path: '/luxury-car-rental-dubai.html', name: 'dubai-guide', expectsVisibleH1: true },
     { path: '/supercar-rental-dubai.html', name: 'seo-landing', expectsVisibleH1: true },
-    { path: '/downtown-dubai-supercar-rental.html', name: 'seo-landing-downtown', expectsVisibleH1: true },
-    { path: '/lamborghini-rental-palm-jumeirah.html', name: 'seo-landing-palm', expectsVisibleH1: true },
-    { path: '/g63-rental-dubai-marina.html', name: 'seo-landing-marina', expectsVisibleH1: true },
     { path: '/chauffeur-service-dubai.html', name: 'service-detail', expectsVisibleH1: true },
     { path: '/ferrari-296-gts-rental-dubai.html', name: 'vehicle-pdp', expectsVisibleH1: true },
-    { path: '/g63-rental-dubai.html', name: 'vehicle-alias-g63', expectsVisibleH1: true },
+    { path: '/mercedes-g63-amg-rental-dubai.html', name: 'vehicle-pdp-g63', expectsVisibleH1: true },
     { path: '/porsche-rental-dubai.html', name: 'vehicle-alias-porsche', expectsVisibleH1: true },
     { path: '/mercedes-rental-dubai.html', name: 'brand-page-mercedes', expectsVisibleH1: true },
     { path: '/contact.html', name: 'contact', expectsVisibleH1: true },
-    { path: '/app/reserve/page.html', name: 'reserve', expectsVisibleH1: false }
+    { path: '/app/reserve/page.html', name: 'reserve', expectsVisibleH1: true, expectsModernShell: true }
 ];
 
 function createConsoleTracker(page) {
@@ -35,6 +32,13 @@ function createConsoleTracker(page) {
 
 function normalizeConsoleErrors(errors) {
     return errors.filter((entry) => entry && !/favicon\.ico/i.test(entry));
+}
+
+async function expectModernShell(page, pathname) {
+    await expect(page.locator('body')).toHaveClass(/reserve-page|home-page|services-page|contact-page/);
+    await expect(page.locator('.lab-header')).toHaveCount(1);
+    await expect(page.locator('.site-v2-footer')).toHaveCount(1);
+    await expect(page.locator('main')).toHaveCount(1);
 }
 
 async function expectNoConsoleErrors(errors, label) {
@@ -83,6 +87,10 @@ test.describe('Public site quality gate', () => {
                 expect(await page.locator('h1').count()).toBeLessThanOrEqual(1);
             }
 
+            if (pageEntry.expectsModernShell) {
+                await expectModernShell(page, pageEntry.path);
+            }
+
             await captureAuditScreenshot(page, testInfo, pageEntry.name);
 
             await expectNoConsoleErrors(consoleErrors, pageEntry.path);
@@ -103,6 +111,40 @@ test.describe('Public site quality gate', () => {
         await expect(page.locator('#hero-lab-pickup-date')).toBeVisible();
 
         await expectNoConsoleErrors(consoleErrors, 'home desktop interactions');
+    });
+
+    test('home desktop hydrates hero video', async ({ page }, testInfo) => {
+        test.skip(testInfo.project.name !== 'desktop-chromium', 'Desktop-only hero video audit');
+
+        const consoleErrors = createConsoleTracker(page);
+        await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+        await page.waitForFunction(() => {
+            const video = document.querySelector('.js-hero-lab-video');
+            return Boolean(
+                video instanceof HTMLVideoElement
+                    && video.getAttribute('src')
+                    && (video.readyState > 0 || video.currentTime > 0)
+            );
+        });
+
+        const heroVideoState = await page.evaluate(() => {
+            const video = document.querySelector('.js-hero-lab-video');
+            return {
+                poster: video?.getAttribute('poster') || '',
+                sourceSrc: video?.getAttribute('src') || '',
+                currentSrc: video?.currentSrc || '',
+                readyState: video?.readyState ?? -1,
+                currentTime: video?.currentTime ?? -1
+            };
+        });
+
+        expect(heroVideoState.poster).toContain('home-hero-video-poster.jpg');
+        expect(heroVideoState.sourceSrc).toContain('hero-dubai-sunset.mp4');
+        expect(heroVideoState.currentSrc).toContain('hero-dubai-sunset.mp4');
+        expect(heroVideoState.readyState > 0 || heroVideoState.currentTime > 0).toBeTruthy();
+
+        await expectNoConsoleErrors(consoleErrors, 'home desktop hero video');
     });
 
     test('locations and contact expose primary actions', async ({ page }) => {
@@ -127,6 +169,8 @@ test.describe('Public site quality gate', () => {
             waitUntil: 'domcontentloaded'
         });
 
+        await expectModernShell(page, '/app/reserve/page.html');
+        await expect(page.locator('h1')).toHaveText(/complete your reservation/i);
         await expect(page.locator('#selectedCar')).toHaveText('Ferrari 296 GTS');
         await expect(page.locator('#selectedCarRate')).toContainText('3,400');
         await expect(page.locator('#startDate')).toHaveValue('2026-04-20');
@@ -140,7 +184,7 @@ test.describe('Public site quality gate', () => {
     test('critical pages pass a focused accessibility scan', async ({ page }, testInfo) => {
         test.skip(testInfo.project.name !== 'desktop-chromium', 'Run focused accessibility scan once on desktop');
 
-        for (const pathname of ['/', '/contact.html', '/app/reserve/page.html', '/g63-rental-dubai-marina.html', '/mercedes-rental-dubai.html']) {
+        for (const pathname of ['/', '/contact.html', '/app/reserve/page.html', '/mercedes-g63-amg-rental-dubai.html', '/mercedes-rental-dubai.html']) {
             await page.goto(pathname, { waitUntil: 'domcontentloaded' });
             await page.addScriptTag({ path: axeSource });
 

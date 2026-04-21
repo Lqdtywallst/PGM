@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { URL } = require('url');
+const { siteFileForPublicPath } = require('../server/public-page-map');
 
 const projectRoot = path.resolve(__dirname, '..');
 const siteRoot = path.join(projectRoot, 'site');
@@ -72,11 +73,7 @@ function readSitemapPaths() {
 }
 
 function siteFileForPath(pathname) {
-    if (pathname === '/') {
-        return path.join(siteRoot, 'index.html');
-    }
-
-    return path.join(siteRoot, pathname.replace(/^\//, ''));
+    return siteFileForPublicPath(siteRoot, pathname);
 }
 
 function extractTitle(head) {

@@ -1,0 +1,184 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+
+const {
+    BRAND_REFERENCE_ROUTE,
+    classifyRouteCohort,
+    classifyRouteProfile,
+    createVisualFinding,
+    dedupeVisualFindings,
+    getDefaultVisualRoutes,
+    getVehicleVisualRoutes,
+    scoreVisualPage,
+    shouldEscalateToVision,
+    summarizeVisualFindings
+} = require('../../server/visual-audit-core');
+
+test('classifyRouteProfile maps key public routes to explicit visual profiles', () => {
+    assert.equal(classifyRouteProfile('/'), 'home');
+    assert.equal(classifyRouteProfile('/fleet.html'), 'fleet');
+    assert.equal(classifyRouteProfile('/contact.html'), 'contact');
+    assert.equal(classifyRouteProfile('/app/reserve/page.html'), 'reserve');
+    assert.equal(classifyRouteProfile('/ferrari-296-gts-rental-dubai.html'), 'vehicle_pdp');
+    assert.equal(classifyRouteProfile('/services.html'), 'hub_marketing');
+    assert.equal(classifyRouteProfile('/porsche-rental-dubai.html'), 'hub_marketing');
+});
+
+test('classifyRouteCohort distinguishes landings, brands, services and vehicle PDPs', () => {
+    assert.equal(classifyRouteCohort('/'), 'home');
+    assert.equal(classifyRouteCohort('/services.html'), 'hub_marketing');
+    assert.equal(classifyRouteCohort('/abu-dhabi-luxury-car-rental.html'), 'guide_landing');
+    assert.equal(classifyRouteCohort('/chauffeur-service-dubai.html'), 'service_landing');
+    assert.equal(classifyRouteCohort(BRAND_REFERENCE_ROUTE), 'brand_landing');
+    assert.equal(classifyRouteCohort('/ferrari-296-gts-rental-dubai.html'), 'vehicle_pdp');
+});
+
+test('getDefaultVisualRoutes exposes landing scope separately from vehicle scope', () => {
+    const landingRoutes = getDefaultVisualRoutes('landings');
+    const vehicleRoutes = getVehicleVisualRoutes();
+
+    assert.ok(landingRoutes.includes('/lamborghini-rental-dubai.html'));
+    assert.ok(landingRoutes.includes('/ferrari-rental-dubai.html'));
+    assert.ok(landingRoutes.includes('/services.html'));
+    assert.ok(!landingRoutes.includes('/ferrari-296-gts-rental-dubai.html'));
+    assert.ok(vehicleRoutes.includes('/ferrari-296-gts-rental-dubai.html'));
+    assert.ok(vehicleRoutes.includes('/rolls-royce-cullinan-black-badge-rental-dubai.html'));
+});
+
+test('scoreVisualPage returns bad when a hard fail exists', () => {
+    const finding = createVisualFinding({
+        route: '/',
+        viewport: 'desktop-wide',
+        severity: 'high',
+        category: 'overflow',
+        message: 'Horizontal overflow',
+        hardFail: true
+    });
+
+    const assessment = scoreVisualPage('home', {}, [finding]);
+
+    assert.equal(assessment.status, 'bad');
+    assert.equal(assessment.hardFails.length, 1);
+    assert.equal(assessment.score, 75);
+});
+
+test('scoreVisualPage returns review for medium non-blocking degradation in the 70-84 band', () => {
+    const findings = [
+        createVisualFinding({
+            route: '/services.html',
+            viewport: 'laptop',
+            severity: 'medium',
+            category: 'cta_hierarchy',
+            message: 'CTA overload'
+        }),
+        createVisualFinding({
+            route: '/services.html',
+            viewport: 'laptop',
+            severity: 'medium',
+            category: 'clipping',
+            message: 'Minor clipping'
+        }),
+        createVisualFinding({
+            route: '/services.html',
+            viewport: 'laptop',
+            severity: 'medium',
+            category: 'media_load',
+            message: 'Hero media missing'
+        })
+    ];
+
+    const assessment = scoreVisualPage('hub_marketing', {}, findings);
+
+    assert.equal(assessment.status, 'review');
+    assert.equal(assessment.score, 70);
+});
+
+test('scoreVisualPage keeps pages in review while the approved baseline is missing', () => {
+    const assessment = scoreVisualPage('home', {}, [], {
+        baselineDiff: {
+            status: 'missing'
+        }
+    });
+
+    assert.equal(assessment.status, 'review');
+    assert.equal(assessment.score, 100);
+    assert.equal(assessment.needsReview, true);
+    assert.ok(assessment.reviewGates.includes('missing_approved_baseline'));
+});
+
+test('scoreVisualPage keeps premium pages in review when the design contract drifts', () => {
+    const findings = [
+        createVisualFinding({
+            route: '/ferrari-rental-dubai.html',
+            viewport: 'desktop-wide',
+            severity: 'medium',
+            category: 'shape_drift',
+            message: 'Radius drift',
+            source: 'design_contract'
+        })
+    ];
+    const assessment = scoreVisualPage('hub_marketing', {}, findings);
+
+    assert.equal(assessment.status, 'review');
+    assert.equal(assessment.score, 90);
+    assert.ok(assessment.reviewGates.includes('premium_contract_drift'));
+});
+
+test('shouldEscalateToVision requires judgement for missing baselines and premium contract drift', () => {
+    const missingBaselineDecision = shouldEscalateToVision({
+        profile: 'home',
+        assessment: { status: 'review' },
+        baselineDiff: { status: 'missing' },
+        findings: []
+    });
+    const premiumContractDecision = shouldEscalateToVision({
+        profile: 'hub_marketing',
+        assessment: { status: 'review' },
+        baselineDiff: null,
+        findings: [
+            createVisualFinding({
+                route: '/services.html',
+                viewport: 'desktop-wide',
+                severity: 'medium',
+                category: 'shape_drift',
+                message: 'Radius drift',
+                source: 'design_contract'
+            })
+        ]
+    });
+
+    assert.equal(missingBaselineDecision.required, true);
+    assert.equal(missingBaselineDecision.reason, 'missing_approved_baseline');
+    assert.equal(premiumContractDecision.required, true);
+    assert.equal(premiumContractDecision.reason, 'premium_critical_review_state');
+});
+
+test('summarizeVisualFindings deduplicates repeated findings and preserves highest severity', () => {
+    const findings = [
+        createVisualFinding({
+            route: '/fleet.html',
+            viewport: 'mobile-modern',
+            severity: 'medium',
+            category: 'grid_stability',
+            selector: '.js-fleet-card',
+            message: 'Card grid drift'
+        }),
+        createVisualFinding({
+            route: '/fleet.html',
+            viewport: 'mobile-modern',
+            severity: 'high',
+            category: 'grid_stability',
+            selector: '.js-fleet-card',
+            message: 'Card grid drift',
+            hardFail: true
+        })
+    ];
+
+    const deduped = dedupeVisualFindings(findings);
+    const summary = summarizeVisualFindings(findings);
+
+    assert.equal(deduped.length, 1);
+    assert.equal(deduped[0].severity, 'high');
+    assert.equal(summary.counts.total, 1);
+    assert.equal(summary.counts.hardFails, 1);
+});

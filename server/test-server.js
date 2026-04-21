@@ -1,11 +1,13 @@
 const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const { PUBLIC_PAGE_FILE_MAP } = require('./public-page-map');
 const {
     countMatches,
     extractTagValue,
     fetchUrl,
     parseSitemapPaths,
+    publicPathForFile: resolvePublicPathForFile,
     siteFileForPath: resolveSiteFileForPath,
     startStaticServer: launchStaticServer,
     stopProcess
@@ -15,6 +17,7 @@ const projectRoot = path.resolve(__dirname, '..');
 const siteRoot = path.join(projectRoot, 'site');
 const staticServerPort = Number(process.env.TEST_STATIC_PORT || (8400 + Math.floor(Math.random() * 200)));
 const staticBaseUrl = `http://127.0.0.1:${staticServerPort}`;
+const requiredPublicFiles = Object.values(PUBLIC_PAGE_FILE_MAP).map((relativePath) => `site/${relativePath}`);
 
 const requiredFiles = [
     'server/backend-example.js',
@@ -28,31 +31,7 @@ const requiredFiles = [
     'site/sitemap.xml',
     'site/manifest.json',
     'site/favicon.ico',
-    'site/app/reserve/page.html',
-    'site/index.html',
-    'site/fleet.html',
-    'site/locations.html',
-    'site/services.html',
-    'site/chauffeur-service-dubai.html',
-    'site/airport-concierge-dubai.html',
-    'site/hotel-villa-airport-delivery-dubai.html',
-    'site/wedding-event-car-rental-dubai.html',
-    'site/business-car-rental-dubai.html',
-    'site/monthly-luxury-car-rental-dubai.html',
-    'site/about.html',
-    'site/contact.html',
-    'site/luxury-car-rental-dubai.html',
-    'site/abu-dhabi-luxury-car-rental.html',
-    'site/dubai-airport-luxury-car-rental.html',
-    'site/palm-jumeirah-luxury-car-rental.html',
-    'site/dubai-marina-luxury-car-rental.html',
-    'site/lamborghini-rental-dubai.html',
-    'site/ferrari-rental-dubai.html',
-    'site/mercedes-rental-dubai.html',
-    'site/porsche-rental-dubai.html',
-    'site/rolls-royce-rental-dubai.html',
-    'site/g63-rental-dubai.html',
-    'site/supercar-rental-dubai.html',
+    ...requiredPublicFiles,
     'site/css/site-v2.css',
     'site/css/site-v2-fleet.css',
     'site/css/site-v2-locations.css',
@@ -116,15 +95,10 @@ const pathsOutsideOfficialServicesCluster = [
     '/mercedes-rental-dubai.html',
     '/porsche-rental-dubai.html',
     '/rolls-royce-rental-dubai.html',
-    '/g63-rental-dubai.html',
     '/abu-dhabi-luxury-car-rental.html',
     '/dubai-airport-luxury-car-rental.html',
     '/palm-jumeirah-luxury-car-rental.html',
-    '/dubai-marina-luxury-car-rental.html',
-    '/ferrari-rental-downtown-dubai.html',
-    '/downtown-dubai-supercar-rental.html',
-    '/g63-rental-dubai-marina.html',
-    '/lamborghini-rental-palm-jumeirah.html'
+    '/dubai-marina-luxury-car-rental.html'
 ];
 
 function report(ok, message) {
@@ -145,6 +119,10 @@ function readFile(relativePath) {
 
 function siteFileForPath(urlPath) {
     return resolveSiteFileForPath(siteRoot, urlPath);
+}
+
+function readPublicPage(pathname) {
+    return fs.readFileSync(siteFileForPath(pathname), 'utf8');
 }
 
 function escapeRegExp(value) {
@@ -283,7 +261,11 @@ function resolveLocalReference(fromFile, reference) {
         return siteFileForPath(cleanReference);
     }
 
-    return path.resolve(path.dirname(fromFile), cleanReference);
+    const html = fs.readFileSync(fromFile, 'utf8');
+    const baseHref = extractTagValue(html, /<base[^>]+href=["']([^"']+)["'][^>]*>/i);
+    const basePath = baseHref.startsWith('/') ? baseHref : resolvePublicPathForFile(siteRoot, fromFile);
+    const resolvedPath = new URL(cleanReference, `https://prestigegoalmotion.com${basePath}`).pathname;
+    return siteFileForPath(resolvedPath);
 }
 
 function collectLocalReferences(html) {
@@ -456,7 +438,7 @@ async function run() {
         'home page links into the locations hub, priority guides and service-guide layer'
     );
 
-    const fleetPage = readFile('site/fleet.html');
+    const fleetPage = readPublicPage('/fleet.html');
     assert(
         fleetPage.includes('./luxury-car-rental-dubai.html') &&
         fleetPage.includes('./dubai-airport-luxury-car-rental.html') &&
@@ -472,7 +454,7 @@ async function run() {
         'fleet page links contextually into the core service detail pages'
     );
 
-    const locationsPage = readFile('site/locations.html');
+    const locationsPage = readPublicPage('/locations.html');
     assert(
         locationsPage.includes('./luxury-car-rental-dubai.html') &&
         locationsPage.includes('./abu-dhabi-luxury-car-rental.html') &&
@@ -510,13 +492,13 @@ async function run() {
     );
 
     [
-        ['site/luxury-car-rental-dubai.html', 'dubai_guide'],
-        ['site/abu-dhabi-luxury-car-rental.html', 'abu_dhabi_guide'],
-        ['site/dubai-airport-luxury-car-rental.html', 'dubai_airport_guide'],
-        ['site/palm-jumeirah-luxury-car-rental.html', 'palm_jumeirah_guide'],
-        ['site/dubai-marina-luxury-car-rental.html', 'dubai_marina_guide']
+        ['/luxury-car-rental-dubai.html', 'dubai_guide'],
+        ['/abu-dhabi-luxury-car-rental.html', 'abu_dhabi_guide'],
+        ['/dubai-airport-luxury-car-rental.html', 'dubai_airport_guide'],
+        ['/palm-jumeirah-luxury-car-rental.html', 'palm_jumeirah_guide'],
+        ['/dubai-marina-luxury-car-rental.html', 'dubai_marina_guide']
     ].forEach(([pathname, locationKey]) => {
-        const html = readFile(pathname);
+        const html = readPublicPage(pathname);
         assert(
             /data-analytics-event=["']location_reservation_click["']/i.test(html) &&
             /data-analytics-event=["']location_whatsapp_click["']/i.test(html) &&
@@ -526,7 +508,7 @@ async function run() {
         );
     });
 
-    const servicesPage = readFile('site/services.html');
+    const servicesPage = readPublicPage('/services.html');
     assert(
         servicesPage.includes('./airport-concierge-dubai.html') &&
         servicesPage.includes('./chauffeur-service-dubai.html') &&
@@ -552,7 +534,7 @@ async function run() {
         'site-v2.js exposes the shared services and locations CTA analytics bridge'
     );
 
-    const aboutPage = readFile('site/about.html');
+    const aboutPage = readPublicPage('/about.html');
     assert(
         aboutPage.includes('./fleet.html') &&
         aboutPage.includes('./contact.html') &&
@@ -560,7 +542,7 @@ async function run() {
         'about page links to fleet, contact and reservation'
     );
 
-    const contactPage = readFile('site/contact.html');
+    const contactPage = readPublicPage('/contact.html');
     assert(
         contactPage.includes('id="contactForm"') &&
         contactPage.includes('/app/reserve/page.html') &&
@@ -641,7 +623,7 @@ async function run() {
             !officialServiceClusterSet.has(pathname),
             `${pathname} stays outside the official services cluster`
         );
-        const html = readFile(`site${pathname}`);
+        const html = readPublicPage(pathname);
         assert(
             !/data-analytics-event=["']service_(?:whatsapp|reservation)_click["']/i.test(html),
             `${pathname} does not emit services-cluster CTA analytics`
