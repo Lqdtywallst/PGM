@@ -3,6 +3,7 @@
     min-height: 100vh;
     background:
         linear-gradient(180deg, #f7f3ee 0%, #fbf9f6 52%, #f4efe8 100%);
+    background-color: #f7f3ee;
     overflow: clip;
 }
 
@@ -712,7 +713,7 @@
     padding: 0 1.1rem;
     border: 1px solid rgba(196, 157, 88, 0.28);
     background: linear-gradient(135deg, rgba(220, 183, 104, 0.96), rgba(198, 151, 66, 0.92));
-    color: #fff;
+    color: #171412;
     box-shadow: none;
     letter-spacing: 0;
     text-transform: none;
@@ -1541,6 +1542,7 @@
     border: 1px solid rgba(140, 108, 73, 0.18);
     border-radius: 8px;
     background: linear-gradient(180deg, rgba(255, 251, 245, 0.98), rgba(247, 239, 227, 0.98));
+    background-color: #fffaf3;
     color: #171412;
     text-align: left;
     box-shadow: 0 16px 32px rgba(35, 25, 16, 0.08);
@@ -1634,7 +1636,7 @@
 
     .fleet-mobile-filter-toggle {
         background: linear-gradient(135deg, rgba(220, 183, 104, 0.96), rgba(198, 151, 66, 0.92));
-        color: #fff;
+        color: #171412;
     }
 
     .fleet-date-prompt {
@@ -1807,6 +1809,39 @@
 
     .fleet-card__contact-row {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 960px) {
+    .fleet-card__primary {
+        min-height: 48px;
+        border-radius: 8px;
+    }
+
+    .fleet-card__contact-row {
+        grid-template-columns: 1fr;
+        gap: 0.55rem;
+        margin-inline: 0;
+        padding-top: 0.1rem;
+        border-top: 0;
+        overflow: visible;
+    }
+
+    .fleet-card__secondary {
+        min-height: 44px;
+        border: 1px solid rgba(126, 96, 60, 0.18);
+        border-radius: 8px;
+        background: rgba(255, 251, 245, 0.82);
+        color: #4d3a25;
+        box-shadow: none;
+        font-size: 0.68rem;
+        letter-spacing: 0;
+    }
+
+    .fleet-card__secondary--wa {
+        border-color: rgba(76, 143, 47, 0.24);
+        background: rgba(76, 143, 47, 0.1);
+        color: #315f21;
     }
 }
 

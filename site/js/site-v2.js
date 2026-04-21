@@ -930,7 +930,104 @@ function initSiteV2() {
         }
     }
 
+    function initServicesLaneSelector() {
+        const planner = document.querySelector("[data-services-selector]");
+        const panel = document.querySelector("[data-service-panel]");
+
+        if (!planner || !panel) {
+            return;
+        }
+
+        const tabs = Array.from(planner.querySelectorAll("[data-service-selector]"));
+        const title = panel.querySelector("[data-service-title]");
+        const kicker = panel.querySelector("[data-service-kicker]");
+        const copy = panel.querySelector("[data-service-copy]");
+        const primary = panel.querySelector("[data-service-primary]");
+        const points = {
+            one: panel.querySelector('[data-service-point="one"]'),
+            two: panel.querySelector('[data-service-point="two"]'),
+            three: panel.querySelector('[data-service-point="three"]')
+        };
+
+        if (tabs.length < 2) {
+            return;
+        }
+
+        function setText(element, value) {
+            if (element) {
+                element.textContent = normalizeAnalyticsValue(value);
+            }
+        }
+
+        function setPoint(name, value) {
+            const element = points[name];
+
+            if (!element) {
+                return;
+            }
+
+            const text = normalizeAnalyticsValue(value);
+            element.textContent = text;
+            element.hidden = !text;
+        }
+
+        function activateServiceTab(tab, options = {}) {
+            if (!(tab instanceof HTMLElement)) {
+                return;
+            }
+
+            tabs.forEach((candidate) => {
+                const isActive = candidate === tab;
+                candidate.classList.toggle("is-active", isActive);
+                candidate.setAttribute("aria-selected", String(isActive));
+                candidate.setAttribute("tabindex", isActive ? "0" : "-1");
+            });
+
+            panel.setAttribute("aria-labelledby", tab.id || "");
+            setText(kicker, tab.dataset.serviceKicker);
+            setText(title, tab.dataset.serviceTitle);
+            setText(copy, tab.dataset.serviceCopy);
+            setPoint("one", tab.dataset.servicePointOne);
+            setPoint("two", tab.dataset.servicePointTwo);
+            setPoint("three", tab.dataset.servicePointThree);
+
+            if (primary) {
+                primary.textContent = normalizeAnalyticsValue(tab.dataset.servicePrimaryLabel) || normalizeAnalyticsValue(tab.textContent);
+                primary.setAttribute("href", tab.dataset.servicePrimaryHref || tab.getAttribute("href") || "#");
+                primary.dataset.analyticsService = normalizeAnalyticsValue(tab.dataset.serviceAnalyticsService);
+            }
+
+            if (options.focus) {
+                tab.focus();
+            }
+        }
+
+        tabs.forEach((tab, index) => {
+            tab.addEventListener("click", (event) => {
+                event.preventDefault();
+                activateServiceTab(tab);
+            });
+
+            tab.addEventListener("keydown", (event) => {
+                const direction = event.key === "ArrowRight" || event.key === "ArrowDown"
+                    ? 1
+                    : event.key === "ArrowLeft" || event.key === "ArrowUp"
+                        ? -1
+                        : 0;
+
+                if (!direction) {
+                    return;
+                }
+
+                event.preventDefault();
+                const nextIndex = (index + direction + tabs.length) % tabs.length;
+                activateServiceTab(tabs[nextIndex], { focus: true });
+            });
+        });
+    }
+
     enhanceHeaderConsistency();
+    initServicesLaneSelector();
     initFleetFilterLinks();
     setHeaderScrollState();
     initMobileHeaderDrawer();

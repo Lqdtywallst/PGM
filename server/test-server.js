@@ -401,14 +401,16 @@ async function run() {
         reservePage.includes('id="selectedCarRate"'),
         'reserve page includes the guided booking primer and selected vehicle summary'
     );
+    const reserveFlowScript = readFile('site/js/reserve-flow.js');
     assert(
-        reservePage.includes("const BOOKING_INTENT_KEY = 'dynastyBookingIntent'") &&
-        reservePage.includes("urlParams.get('startDate')") &&
-        reservePage.includes('applyPrefilledBookingSchedule()'),
-        'reserve page can prefill dates and times from the booking intent'
+        reserveFlowScript.includes("const BOOKING_INTENT_KEY = 'dynastyBookingIntent'") &&
+        reserveFlowScript.includes("urlParams.get('startDate')") &&
+        reserveFlowScript.includes('applyPrefilledBookingSchedule()') &&
+        reserveFlowScript.includes('clampBookingDateValue('),
+        'reserve page can prefill and clamp dates and times from the booking intent'
     );
     assert(
-        reservePage.includes('https://js.stripe.com/v3/') && reservePage.includes('config.js'),
+        reserveFlowScript.includes('https://js.stripe.com/v3/') && reservePage.includes('config.js'),
         'reserve page loads Stripe.js and runtime config'
     );
 

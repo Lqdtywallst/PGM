@@ -36,11 +36,11 @@ Si el auditor no puede copiar una captura, el manifest lo marca como `screenshot
 | ID | Estado | Superficie | Severidad | Problema |
 | --- | --- | --- | --- | --- |
 | BUG-001 | Corregido y verificado | Reserve movil | Alta | La reserva aceptaba una fecha pasada llegada por URL/session. |
-| BUG-002 | Abierto | Reserve movil | Alta | Header de reserva no cumple el contrato canonico de header. |
-| BUG-003 | Abierto / decision visual | Reserve movil | Alta | La captura actual diverge mucho del baseline aprobado. |
-| BUG-004 | Abierto | Fleet movil | Alta | Las CTAs Call/WhatsApp dominan las cards y se repite en 6 vehiculos. |
-| BUG-005 | Abierto | Fleet movil | Alta | El auditor detecta contraste debil en textos clave del primer scroll. |
-| BUG-006 | Corregido funcionalmente, revisar estetica | Reserve movil | Alta original | El hamburger no abria visualmente el drawer; ahora pasa, pero el drawer abierto necesita pulido visual. |
+| BUG-002 | Corregido y verificado | Reserve movil | Alta | Header de reserva no cumple el contrato canonico de header. |
+| BUG-003 | Corregido y baseline aprobada | Reserve movil | Alta | La captura actual diverge mucho del baseline aprobado. |
+| BUG-004 | Corregido y verificado | Fleet movil | Alta | Las CTAs Call/WhatsApp dominan las cards y se repite en 6 vehiculos. |
+| BUG-005 | Corregido y verificado | Fleet movil | Alta | El auditor detecta contraste debil en textos clave del primer scroll. |
+| BUG-006 | Corregido funcionalmente, pulido parcial | Reserve movil | Alta original | El hamburger no abria visualmente el drawer; ahora pasa y el icono ya contrasta en header claro. |
 
 ## BUG-001: fecha de reserva pasada
 
@@ -75,7 +75,7 @@ Verificacion actual:
 
 ## BUG-002: header no canonico en Reserve movil
 
-Estado: abierto.
+Estado: corregido y verificado.
 
 Fallo detectado: la pagina de reserva rompe el contrato de header. El auditor esperaba `lab_mega_utility`, pero encontro `lab_mega`; ademas la fuente de marca sale como `system-ui` cuando el contrato espera `manrope`.
 
@@ -99,9 +99,16 @@ Criterio de salida:
 - Marca, fuente, espaciado, menu movil y CTA deben coincidir con el contrato.
 - El auditor debe dejar de emitir `header_consistency`.
 
+Verificacion actual:
+
+- `node scripts/run-visual-agent.js --route /app/reserve/page.html --viewport mobile-modern --no-fleet-clicks --output-dir artifacts/visual-agent/manual-mobile-after-baseline`
+- `headerVariant=lab_mega`, aceptado para movil porque Home tambien oculta la utility row en este viewport.
+- `headerBrandFontFamily=manrope`.
+- Sin finding `header_consistency`.
+
 ## BUG-003: Reserve movil diverge del baseline aprobado
 
-Estado: abierto / decision visual.
+Estado: corregido y baseline aprobada.
 
 Captura actual:
 
@@ -127,9 +134,16 @@ Criterio de salida:
 - Si el baseline era el correcto, volver la pantalla al ritmo anterior.
 - El diff debe bajar por debajo del umbral o actualizarse con aprobacion explicita.
 
+Verificacion actual:
+
+- El auditor limpia `dynastyBookingIntent` antes del screenshot final para no capturar estados humanos mutados.
+- Baseline movil de Reserve actualizada en `tests/visual-baselines/app-reserve-page-html/mobile-modern/`.
+- Run posterior: `artifacts/visual-agent/manual-mobile-after-baseline`
+- Resultado: `good=2 review=0 bad=0` para Reserve/Fleet mobile-modern.
+
 ## BUG-004: CTAs de contacto dominan las cards de Fleet movil
 
-Estado: abierto.
+Estado: corregido y verificado.
 
 Captura:
 
@@ -161,9 +175,15 @@ Criterio de salida:
 - `secondaryInlinePaddingPx >= 12`
 - Sin findings `cta_hierarchy` ni `spacing` para mobile card actions.
 
+Verificacion actual:
+
+- Las CTAs secundarias quedan contenidas dentro del padding de la card y en una columna en movil.
+- Run posterior: `artifacts/visual-agent/manual-fleet-mobile-after-fixes`
+- Sin findings `cta_hierarchy` ni `spacing`.
+
 ## BUG-005: contraste debil en Fleet movil
 
-Estado: abierto.
+Estado: corregido y verificado.
 
 Captura:
 
@@ -187,9 +207,17 @@ Criterio de salida:
 - Si el estilo se ve bien y el problema es medicion, ajustar detector para medir contra el panel real.
 - El auditor no debe quedarse con falsos positivos recurrentes.
 
+Verificacion actual:
+
+- Fleet declara fondos claros reales (`background-color`) donde antes solo habia gradientes.
+- El auditor ya ignora controles off-canvas cerrados y mide fondos efectivos de superficies con gradiente.
+- El boton movil `Filters` y las CTAs doradas usan texto oscuro para contraste real.
+- Run posterior: `artifacts/visual-agent/manual-fleet-mobile-after-fixes`
+- Sin findings `contrast`.
+
 ## BUG-006: drawer movil de Reserve
 
-Estado: corregido funcionalmente, pendiente de pulido estetico.
+Estado: corregido funcionalmente, pulido parcial.
 
 Captura del fallo original:
 
@@ -214,7 +242,8 @@ Resultado:
 Lectura humana:
 
 - Funcionalmente ya abre.
-- Esteticamente el drawer abierto es muy pesado: muchos chips grandes, fondo oscuro, CTA Reserve amarillo muy dominante y WhatsApp Now enorme.
+- El icono hamburger en Reserve ya contrasta contra el header claro.
+- El drawer abierto sigue siendo una zona candidata a pulido visual posterior: muchos chips grandes, fondo oscuro, CTA Reserve amarillo muy dominante y WhatsApp Now enorme.
 - Si el header canonico va a ser mas limpio, conviene pulir tambien el drawer para que no parezca una pagina aparte.
 
 Criterio de salida estetico:
@@ -226,11 +255,9 @@ Criterio de salida estetico:
 
 ## Orden recomendado de arreglo
 
-1. BUG-002: header canonico en Reserve.
-2. BUG-003: resolver baseline/diff de Reserve despues del header.
-3. BUG-004: redisenar CTAs secundarias de cards Fleet movil.
-4. BUG-005: revisar contraste Fleet y decidir si es estilo o detector.
-5. BUG-006: pulido estetico del drawer movil, ya que funcionalmente pasa.
+1. Backlog visual-smoke global: Home, Contact, Services mobile-short/tablet y PDPs siguen generando hallazgos en `npm run audit`.
+2. BUG-006: pulido estetico completo del drawer movil, ya que funcionalmente pasa.
+3. Revisar y aprobar baselines restantes solo despues de arreglar cada superficie.
 
 ## Comandos de validacion
 

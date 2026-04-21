@@ -20,6 +20,9 @@
 <!-- Favicon - logo DP (scripts/generate-icons.py) -->
     <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         /* Critical first viewport styles: keep this small and mirror reserve-shell.css. */
         :root {
@@ -27,8 +30,8 @@
             --lab-frame-max: 90rem;
             --lab-frame-gutter: clamp(24px, 5.5vw, 82px);
             --lab-frame-width: min(var(--lab-frame-max), calc(100% - (var(--lab-frame-gutter) * 2)));
-            --lab-font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            --lab-font-display: Georgia, 'Times New Roman', serif;
+            --lab-font-sans: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --lab-font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
         }
         *, *::before, *::after { box-sizing: border-box; }
         html { background: #f6f3ee; }
@@ -126,15 +129,15 @@
             justify-content: center;
             flex-direction: column;
             gap: 5px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(50, 39, 27, 0.16);
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.72);
         }
         .lab-mobile-toggle__line {
             width: 17px;
             height: 2px;
             border-radius: 999px;
-            background: #f5f1e8;
+            background: #17120d;
         }
         .reserve-page .step-content { display: none; }
         .reserve-page .step-content.active { display: block; }

@@ -1651,6 +1651,15 @@
             background: linear-gradient(90deg, rgba(23, 23, 23, 0), rgba(23, 23, 23, 0.08), rgba(23, 23, 23, 0));
         }
 
+        .reserve-page .lab-mobile-toggle {
+            border-color: rgba(50, 39, 27, 0.16);
+            background: rgba(255, 255, 255, 0.72);
+        }
+
+        .reserve-page .lab-mobile-toggle__line {
+            background: #17120d;
+        }
+
         .reserve-page .lab-brand__copy strong,
         .reserve-page .lab-brand__copy span,
         .reserve-page .lab-nav a,

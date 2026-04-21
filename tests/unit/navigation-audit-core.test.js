@@ -14,6 +14,7 @@ const {
     DEFAULT_ROUTES,
     DEFAULT_VIEWPORTS,
     buildClickCandidates,
+    buildRenderedRouteLinks,
     parseArgs,
     resolveReferenceToPublicRoute,
     resolveSelectedRoutes
@@ -42,11 +43,22 @@ test('navigation agent args support scoped routes, viewports, strict mode and cl
 test('navigation route selection defaults to all public and can use critical scope', () => {
     const allRoutes = resolveSelectedRoutes({ scope: 'all-public', routes: [] });
     const criticalRoutes = resolveSelectedRoutes({ scope: 'critical', routes: [] });
+    const crawlRoutes = resolveSelectedRoutes({ scope: 'crawl', routes: [] });
 
     assert.ok(allRoutes.includes('/'));
     assert.ok(allRoutes.includes('/lamborghini-rental-dubai.html'));
     assert.deepEqual(criticalRoutes, DEFAULT_ROUTES);
+    assert.deepEqual(crawlRoutes, ['/']);
     assert.deepEqual(DEFAULT_VIEWPORTS, ['mobile-modern', 'laptop']);
+});
+
+test('deep navigation args switch to crawl scope and exhaustive page clicks by default', () => {
+    const args = parseArgs(['--deep']);
+
+    assert.equal(args.deep, true);
+    assert.equal(args.scope, 'crawl');
+    assert.equal(args.maxClicksPerPage, Number.MAX_SAFE_INTEGER);
+    assert.equal(args.maxCrawlDepth, 6);
 });
 
 test('resolveReferenceToPublicRoute keeps only known internal routes', () => {
@@ -96,6 +108,24 @@ test('destination alignment accepts clear route labels and rejects vague mismatc
     assert.equal(aligned.ok, true);
     assert.ok(aligned.overlap.includes('lamborghini'));
     assert.equal(weak.ok, false);
+});
+
+test('destination alignment accepts common customer shortcuts to fleet, reserve and legal routes', () => {
+    assert.equal(labelDestinationAlignment({
+        label: 'Sports',
+        targetRoute: '/fleet.html',
+        destinationHeading: 'Curated luxury cars for Dubai stays.'
+    }).ok, true);
+    assert.equal(labelDestinationAlignment({
+        label: 'Book airport delivery',
+        targetRoute: '/app/reserve/page.html',
+        destinationHeading: 'Complete your reservation.'
+    }).ok, true);
+    assert.equal(labelDestinationAlignment({
+        label: 'Booking T&C',
+        targetRoute: '/terms-and-conditions.html',
+        destinationHeading: 'Terms and conditions'
+    }).ok, true);
 });
 
 test('static navigation graph reports reachability from home', () => {
@@ -194,6 +224,47 @@ test('click candidate selection prioritizes recovery and drawer/header links', (
     }, 2);
 
     assert.deepEqual(candidates.map((candidate) => candidate.targetRoute), ['/', '/contact.html']);
+});
+
+test('click candidate selection includes route-backed buttons', () => {
+    const candidates = buildClickCandidates({
+        route: '/services.html',
+        links: [
+            { kind: 'button', targetRoute: '/fleet.html', text: 'Open fleet', area: 'main' },
+            { kind: 'link', targetRoute: '/contact.html', text: 'Contact', area: 'footer' }
+        ]
+    }, Number.MAX_SAFE_INTEGER);
+
+    assert.deepEqual(candidates.map((candidate) => `${candidate.kind}:${candidate.targetRoute}`).sort(), [
+        'button:/fleet.html',
+        'link:/contact.html'
+    ]);
+});
+
+test('rendered route graph groups links discovered across viewports', () => {
+    const routeLinks = buildRenderedRouteLinks([
+        {
+            route: '/',
+            links: [
+                { targetRoute: '/fleet.html' },
+                { targetRoute: '/contact.html' }
+            ]
+        },
+        {
+            route: '/',
+            links: [
+                { targetRoute: '/fleet.html' },
+                { targetRoute: '/services.html' }
+            ]
+        }
+    ]);
+
+    assert.deepEqual(routeLinks, [
+        {
+            route: '/',
+            outgoingRoutes: ['/contact.html', '/fleet.html', '/services.html']
+        }
+    ]);
 });
 
 test('normalizeRoute treats index as home', () => {

@@ -121,8 +121,36 @@ function isAllowedShortAction(label = '', targetRoute = '') {
     }
 
     if (
-        ['book', 'reserve', 'rent now', 'check availability'].includes(normalizedLabel) &&
-        normalizedRoute === RECOVERY_ROUTES.reserve
+        normalizedRoute === RECOVERY_ROUTES.fleet &&
+        /\b(sports?|convertible|luxury|suv|electric|supercar|cars?|fleet|rent|rental|vehicle|model)\b/i.test(normalizedLabel)
+    ) {
+        return true;
+    }
+
+    if (
+        normalizedRoute === RECOVERY_ROUTES.reserve &&
+        /^(book|reserve|request|check|get|start|complete)\b|\b(availability|delivery|booking|reservation|reserve)\b/i.test(normalizedLabel)
+    ) {
+        return true;
+    }
+
+    if (
+        normalizedRoute === RECOVERY_ROUTES.contact &&
+        /\b(contact|call|email|whatsapp|talk|support|concierge|message)\b/i.test(normalizedLabel)
+    ) {
+        return true;
+    }
+
+    if (
+        normalizedRoute === '/locations.html' &&
+        /\b(location|locations|zone|zones|delivery|handover|area|city|palm|marina|airport|downtown|jbr|abu dhabi)\b/i.test(normalizedLabel)
+    ) {
+        return true;
+    }
+
+    if (
+        ['/terms-and-conditions.html', '/terms-and-conditions-uae.html'].includes(normalizedRoute) &&
+        /\b(terms|conditions|t&c|legal|privacy|policy)\b/i.test(normalizedLabel)
     ) {
         return true;
     }

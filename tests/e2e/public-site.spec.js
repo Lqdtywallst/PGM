@@ -45,6 +45,17 @@ async function expectNoConsoleErrors(errors, label) {
     await expect(normalizeConsoleErrors(errors), `${label} should render without console errors`).toEqual([]);
 }
 
+function formatDateInput(date) {
+    return date.toISOString().slice(0, 10);
+}
+
+function futureDateInput(offsetDays) {
+    const date = new Date();
+    date.setUTCHours(12, 0, 0, 0);
+    date.setUTCDate(date.getUTCDate() + offsetDays);
+    return formatDateInput(date);
+}
+
 async function captureAuditScreenshot(page, testInfo, name) {
     const screenshotPath = testInfo.outputPath(`${name}.png`);
 
@@ -165,7 +176,9 @@ test.describe('Public site quality gate', () => {
 
     test('reserve page applies query prefills', async ({ page }) => {
         const consoleErrors = createConsoleTracker(page);
-        await page.goto('/app/reserve/page.html?car=Ferrari%20296%20GTS&price=3400&startDate=2026-04-20&endDate=2026-04-22&pickupTime=10:00&dropoffTime=18:00', {
+        const startDate = futureDateInput(21);
+        const endDate = futureDateInput(23);
+        await page.goto(`/app/reserve/page.html?car=Ferrari%20296%20GTS&price=3400&startDate=${startDate}&endDate=${endDate}&pickupTime=10:00&dropoffTime=18:00`, {
             waitUntil: 'domcontentloaded'
         });
 
@@ -173,8 +186,8 @@ test.describe('Public site quality gate', () => {
         await expect(page.locator('h1')).toHaveText(/complete your reservation/i);
         await expect(page.locator('#selectedCar')).toHaveText('Ferrari 296 GTS');
         await expect(page.locator('#selectedCarRate')).toContainText('3,400');
-        await expect(page.locator('#startDate')).toHaveValue('2026-04-20');
-        await expect(page.locator('#endDate')).toHaveValue('2026-04-22');
+        await expect(page.locator('#startDate')).toHaveValue(startDate);
+        await expect(page.locator('#endDate')).toHaveValue(endDate);
         await expect(page.locator('#pickupTime')).toHaveValue('10:00');
         await expect(page.locator('#dropoffTime')).toHaveValue('18:00');
 

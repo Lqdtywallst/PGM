@@ -1,19 +1,19 @@
 # Inventario relacional 2026-04-21
 
-- Archivos escaneados: 9057
-- Archivos fisicos actuales: 9057
+- Archivos escaneados: 9623
+- Archivos fisicos actuales: 9623
 - Archivos trackeados ya borrados en el worktree: 0
 
 ## Conteo por estado
 
-- candidato a borrar: 11
+- candidato a borrar: 10
 - produccion: 114
-- soporte: 8932
+- soporte: 9499
 
 ## Conteo por accion recomendada
 
-- se elimina: 11
-- se queda: 9046
+- se elimina: 10
+- se queda: 9613
 
 ## Archivos con impacto SEO alto
 
@@ -63,5 +63,4 @@
 - site/css/site-v2-local-guide.css
 - site/css/site-v2-service-detail.css
 - site/icons/icon-48.png
-- site/icons/icon-96.png
 - site/README.md

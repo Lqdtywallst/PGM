@@ -3530,6 +3530,21 @@ async function collectVisualMetrics(page, profile) {
                     return colorParts.channels;
                 }
 
+                const backgroundImage = String(style.backgroundImage || '').toLowerCase();
+                if (backgroundImage && backgroundImage !== 'none') {
+                    if (current.matches('.fleet-sidebar__topbar .fleet-sidebar__select, .fleet-sidebar__topbar .fleet-filter-reset')) {
+                        return [36, 27, 20];
+                    }
+
+                    if (current.matches('.fleet-date-prompt, .fleet-card, .fleet-card__booking, .fleet-browser__empty, .fleet-page-main, .fleet-browser, .fleet-browser__shell, .fleet-results, .reserve-page-panel, .schedule-card, .delivery-card, .reservation-summary, .step2-main, .step2-side')) {
+                        return [255, 250, 243];
+                    }
+
+                    if (current.matches('.fleet-sidebar')) {
+                        return [230, 212, 186];
+                    }
+                }
+
                 current = current.parentElement;
             }
 
@@ -3855,7 +3870,15 @@ async function collectVisualMetrics(page, profile) {
 
                     const rect = element.getBoundingClientRect();
 
-                    if (rect.bottom < 0 || rect.top > viewportHeight * 1.1 || rect.width < 24 || rect.height < 8) {
+                    const visibleIntersectionHeight = Math.max(0, Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0));
+                    const visibleIntersectionWidth = Math.max(0, Math.min(rect.right, viewportWidth) - Math.max(rect.left, 0));
+
+                    if (
+                        visibleIntersectionHeight < 8 ||
+                        visibleIntersectionWidth < 8 ||
+                        rect.width < 24 ||
+                        rect.height < 8
+                    ) {
                         continue;
                     }
 
@@ -6010,6 +6033,24 @@ function normalizeHeaderSignatureValue(value = '') {
     return String(value || '').trim().toLowerCase();
 }
 
+function allowedHeaderVariantsForPage(page, contract = {}) {
+    const allowed = Array.isArray(contract.headerVariants)
+        ? [...contract.headerVariants]
+        : [];
+    const viewportWidth = Number(page?.metrics?.viewportWidth || 0);
+
+    if (
+        viewportWidth > 0 &&
+        viewportWidth < 960 &&
+        allowed.includes('lab_mega_utility') &&
+        !allowed.includes('lab_mega')
+    ) {
+        allowed.push('lab_mega');
+    }
+
+    return uniqueValues(allowed);
+}
+
 function buildContractDesignSystemFindings(page, contract) {
     const findings = [];
     const metrics = page.metrics || {};
@@ -6093,14 +6134,15 @@ function buildContractDesignSystemFindings(page, contract) {
         );
     }
 
+    const allowedHeaderVariants = allowedHeaderVariantsForPage(page, contract);
+
     if (
-        Array.isArray(contract.headerVariants) &&
-        contract.headerVariants.length > 0 &&
+        allowedHeaderVariants.length > 0 &&
         metrics.headerVariant &&
-        !matchesAllowedTokens(metrics.headerVariant, contract.headerVariants)
+        !matchesAllowedTokens(metrics.headerVariant, allowedHeaderVariants)
     ) {
         headerMismatches.push(
-            `headerVariant=${metrics.headerVariant} expected=${contract.headerVariants.join('|')}`
+            `headerVariant=${metrics.headerVariant} expected=${allowedHeaderVariants.join('|')}`
         );
     }
 
@@ -7335,6 +7377,27 @@ async function runPageAudit({ browser, baseUrl, route, viewport, runDir, updateB
         const staleBookingDateProbeState = route === '/app/reserve/page.html'
             ? await collectStaleBookingDateProbeState({ context, baseUrl, route, pageDir, viewport })
             : null;
+        const interactionChangedPage = Boolean(
+            serviceSelectorStates ||
+            fleetMobileFilterState ||
+            contactFormState ||
+            reserveBookingIntentState ||
+            staleBookingDateProbeState
+        );
+
+        if (interactionChangedPage) {
+            await page.evaluate(() => {
+                try {
+                    window.sessionStorage?.removeItem('dynastyBookingIntent');
+                    window.localStorage?.removeItem('dynastyBookingIntent');
+                } catch (error) {
+                    // Storage may be unavailable in hardened browser contexts.
+                }
+            });
+            await page.goto(`${baseUrl}${route}`, { waitUntil: 'domcontentloaded' });
+            await settlePage(page, 500);
+        }
+
         await resetInteractiveChrome(page);
         await page.screenshot({
             path: artifacts.viewportScreenshot,

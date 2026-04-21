@@ -99,6 +99,46 @@ document.addEventListener("DOMContentLoaded", () => {
         return `${year}-${month}-${day}`;
     }
 
+    function isValidDateInputValue(value) {
+        const normalized = normalizeValue(value);
+
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
+            return false;
+        }
+
+        const [year, month, day] = normalized.split("-").map(Number);
+        const parsed = new Date(year, month - 1, day);
+        return parsed.getFullYear() === year &&
+            parsed.getMonth() === month - 1 &&
+            parsed.getDate() === day;
+    }
+
+    function addDaysToDateInputValue(value, offsetDays = 0) {
+        if (!isValidDateInputValue(value)) {
+            return getDubaiDateString(offsetDays);
+        }
+
+        const [year, month, day] = value.split("-").map(Number);
+        const date = new Date(year, month - 1, day);
+        date.setDate(date.getDate() + offsetDays);
+        const nextYear = date.getFullYear();
+        const nextMonth = String(date.getMonth() + 1).padStart(2, "0");
+        const nextDay = String(date.getDate()).padStart(2, "0");
+        return `${nextYear}-${nextMonth}-${nextDay}`;
+    }
+
+    function clampBookingDateValue(value, fallbackValue, minDateValue) {
+        const normalized = normalizeValue(value);
+        const fallback = isValidDateInputValue(fallbackValue) ? fallbackValue : getDubaiDateString(0);
+        const minimum = isValidDateInputValue(minDateValue) ? minDateValue : getDubaiDateString(0);
+
+        if (!isValidDateInputValue(normalized)) {
+            return fallback < minimum ? minimum : fallback;
+        }
+
+        return normalized < minimum ? minimum : normalized;
+    }
+
     function getStoredBookingIntent() {
         try {
             const rawIntent = window.sessionStorage.getItem(BOOKING_INTENT_KEY);
@@ -210,15 +250,18 @@ document.addEventListener("DOMContentLoaded", () => {
         const incomingIntent = getIncomingBookingIntent();
         const today = getDubaiDateString(0);
         const tomorrow = getDubaiDateString(1);
+        const incomingStartDate = clampBookingDateValue(incomingIntent.startDate, today, today);
+        const incomingEndFallback = incomingIntent.endDate || addDaysToDateInputValue(incomingStartDate, 1);
+        const incomingEndDate = clampBookingDateValue(incomingEndFallback, tomorrow, incomingStartDate);
 
         if (pickupDateInput) {
             pickupDateInput.min = today;
-            pickupDateInput.value = scheduleCaptured ? (incomingIntent.startDate || pickupDateInput.value) : "";
+            pickupDateInput.value = scheduleCaptured ? incomingStartDate : "";
         }
 
         if (returnDateInput) {
-            returnDateInput.min = today;
-            returnDateInput.value = scheduleCaptured ? (incomingIntent.endDate || returnDateInput.value || tomorrow) : "";
+            returnDateInput.min = pickupDateInput?.value || today;
+            returnDateInput.value = scheduleCaptured ? incomingEndDate : "";
         }
 
         if (pickupTimeInput) {

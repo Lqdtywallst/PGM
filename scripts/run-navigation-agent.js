@@ -36,6 +36,7 @@ const artifactsRoot = path.join(repoRoot, 'artifacts', 'navigation-agent');
 const SITE_ORIGIN = 'https://prestigegoalmotion.com';
 const ALL_VIEWPORTS = Object.freeze(getViewportCoverageMatrix('all'));
 const DEFAULT_VIEWPORTS = Object.freeze(['mobile-modern', 'laptop']);
+const DEFAULT_DEEP_CRAWL_DEPTH = 6;
 const DEFAULT_ROUTES = Object.freeze([
     '/',
     '/fleet.html',
@@ -85,8 +86,12 @@ function parseArgs(argv = []) {
         outputDir: '',
         scope: 'all-public',
         maxClicksPerPage: 5,
+        maxCrawlDepth: DEFAULT_DEEP_CRAWL_DEPTH,
+        deep: false,
         strict: false
     };
+    let scopeExplicit = false;
+    let maxClicksExplicit = false;
 
     for (let index = 0; index < argv.length; index += 1) {
         const value = argv[index];
@@ -117,6 +122,7 @@ function parseArgs(argv = []) {
 
         if (value === '--scope' && argv[index + 1]) {
             args.scope = String(argv[index + 1]).trim() || args.scope;
+            scopeExplicit = true;
             index += 1;
             continue;
         }
@@ -125,13 +131,38 @@ function parseArgs(argv = []) {
             const parsed = Number.parseInt(argv[index + 1], 10);
             if (Number.isFinite(parsed) && parsed >= 0) {
                 args.maxClicksPerPage = parsed;
+                maxClicksExplicit = true;
             }
             index += 1;
             continue;
         }
 
+        if (value === '--max-depth' && argv[index + 1]) {
+            const parsed = Number.parseInt(argv[index + 1], 10);
+            if (Number.isFinite(parsed) && parsed >= 0) {
+                args.maxCrawlDepth = parsed;
+            }
+            index += 1;
+            continue;
+        }
+
+        if (value === '--deep' || value === '--exhaustive') {
+            args.deep = true;
+            continue;
+        }
+
         if (value === '--strict') {
             args.strict = true;
+        }
+    }
+
+    if (args.deep) {
+        if (!scopeExplicit && args.routes.length === 0) {
+            args.scope = 'crawl';
+        }
+
+        if (!maxClicksExplicit) {
+            args.maxClicksPerPage = Number.MAX_SAFE_INTEGER;
         }
     }
 
@@ -145,6 +176,10 @@ function resolveSelectedRoutes(args = {}) {
 
     if (args.scope === 'critical') {
         return [...DEFAULT_ROUTES];
+    }
+
+    if (args.scope === 'crawl') {
+        return ['/'];
     }
 
     return Object.keys(PUBLIC_PAGE_FILE_MAP).map(normalizeRoute).sort();
@@ -386,23 +421,24 @@ async function collectVisibleInternalLinks(page, knownRoutes) {
                 return false;
             }
 
+            if (element.closest('[hidden], [inert], [aria-hidden="true"]')) {
+                return false;
+            }
+
             const style = window.getComputedStyle(element);
             const rect = element.getBoundingClientRect();
 
             return (
                 style.display !== 'none' &&
                 style.visibility !== 'hidden' &&
+                style.visibility !== 'collapse' &&
                 Number(style.opacity || 1) > 0 &&
                 rect.width > 0 &&
-                rect.height > 0 &&
-                rect.bottom >= 0 &&
-                rect.right >= 0 &&
-                rect.top <= window.innerHeight &&
-                rect.left <= window.innerWidth
+                rect.height > 0
             );
         }
 
-        function linkArea(element) {
+        function elementArea(element) {
             if (element.closest('.lab-mobile-drawer')) {
                 return 'mobile-drawer';
             }
@@ -424,6 +460,17 @@ async function collectVisibleInternalLinks(page, knownRoutes) {
             return 'other';
         }
 
+        function accessibleName(element) {
+            return normalizeText(
+                element.getAttribute('aria-label') ||
+                element.textContent ||
+                element.getAttribute('title') ||
+                element.getAttribute('value') ||
+                element.querySelector?.('img[alt]')?.getAttribute('alt') ||
+                ''
+            );
+        }
+
         function resolveTargetRoute(href) {
             try {
                 const url = new URL(href, window.location.href);
@@ -438,7 +485,31 @@ async function collectVisibleInternalLinks(page, knownRoutes) {
             }
         }
 
-        return Array.from(document.querySelectorAll('a[href]'))
+        function inferControlReference(element) {
+            const directReference =
+                element.getAttribute('data-href') ||
+                element.getAttribute('data-url') ||
+                element.getAttribute('data-route') ||
+                element.getAttribute('formaction') ||
+                '';
+
+            if (directReference) {
+                return directReference;
+            }
+
+            const form = element.closest('form');
+            const formAction = form?.getAttribute('action') || '';
+            if (formAction && formAction !== '#') {
+                return formAction;
+            }
+
+            const onclick = element.getAttribute('onclick') || '';
+            const match = onclick.match(/(?:location(?:\.href|\.assign|\.replace)?|window\.open)\s*(?:=|\()\s*['"]([^'"]+)['"]/i);
+
+            return match?.[1] || '';
+        }
+
+        const anchors = Array.from(document.querySelectorAll('a[href]'))
             .filter((link) => isVisible(link))
             .map((link) => {
                 const href = link.getAttribute('href') || '';
@@ -449,6 +520,7 @@ async function collectVisibleInternalLinks(page, knownRoutes) {
                 const imageAlt = normalizeText(link.querySelector('img[alt]')?.getAttribute('alt'));
 
                 return {
+                    kind: 'link',
                     href,
                     targetRoute,
                     text,
@@ -456,10 +528,33 @@ async function collectVisibleInternalLinks(page, knownRoutes) {
                     accessibleName: ariaLabel || text || title || imageAlt,
                     ariaLabel,
                     title,
-                    area: linkArea(link)
+                    area: elementArea(link)
                 };
             })
             .filter((link) => link.targetRoute);
+
+        const controls = Array.from(document.querySelectorAll('button, input[type="button"], input[type="submit"], [role="button"]'))
+            .filter((control) => isVisible(control))
+            .map((control) => {
+                const href = inferControlReference(control);
+                const targetRoute = resolveTargetRoute(href);
+                const label = accessibleName(control);
+
+                return {
+                    kind: 'button',
+                    href,
+                    targetRoute,
+                    text: normalizeText(control.textContent || control.getAttribute('value') || ''),
+                    label,
+                    accessibleName: label,
+                    ariaLabel: normalizeText(control.getAttribute('aria-label')),
+                    title: normalizeText(control.getAttribute('title')),
+                    area: elementArea(control)
+                };
+            })
+            .filter((control) => control.targetRoute);
+
+        return anchors.concat(controls);
     }, { routes: knownRoutes });
 }
 
@@ -469,6 +564,7 @@ function dedupeLinks(links = []) {
 
     for (const link of links) {
         const key = [
+            link.kind || 'link',
             normalizeRoute(link.targetRoute || link.href),
             normalizeText(link.accessibleName || link.label || link.text).toLowerCase(),
             link.area || '',
@@ -509,19 +605,20 @@ async function collectBasicPageState(page, knownRoutes) {
                 return false;
             }
 
+            if (element.closest('[hidden], [inert], [aria-hidden="true"]')) {
+                return false;
+            }
+
             const style = window.getComputedStyle(element);
             const rect = element.getBoundingClientRect();
 
             return (
                 style.display !== 'none' &&
                 style.visibility !== 'hidden' &&
+                style.visibility !== 'collapse' &&
                 Number(style.opacity || 1) > 0 &&
                 rect.width > 0 &&
-                rect.height > 0 &&
-                rect.bottom >= 0 &&
-                rect.right >= 0 &&
-                rect.top <= window.innerHeight &&
-                rect.left <= window.innerWidth
+                rect.height > 0
             );
         }
 
@@ -819,6 +916,7 @@ function buildClickCandidates(pageState, maxClicksPerPage) {
 
         const label = normalizeText(link.accessibleName || link.label || link.text);
         const key = [
+            link.kind || 'link',
             link.setupKind || 'direct',
             link.setupControls || '',
             targetRoute,
@@ -895,11 +993,16 @@ async function clickMatchingLink(page, target) {
                 return false;
             }
 
+            if (element.closest('[hidden], [inert], [aria-hidden="true"]')) {
+                return false;
+            }
+
             const style = window.getComputedStyle(element);
             const rect = element.getBoundingClientRect();
             return (
                 style.display !== 'none' &&
                 style.visibility !== 'hidden' &&
+                style.visibility !== 'collapse' &&
                 Number(style.opacity || 1) > 0 &&
                 rect.width > 0 &&
                 rect.height > 0
@@ -940,8 +1043,64 @@ async function clickMatchingLink(page, target) {
             }
         }
 
+        function controlReference(element) {
+            const directReference =
+                element.getAttribute('data-href') ||
+                element.getAttribute('data-url') ||
+                element.getAttribute('data-route') ||
+                element.getAttribute('formaction') ||
+                '';
+
+            if (directReference) {
+                return directReference;
+            }
+
+            const formAction = element.closest('form')?.getAttribute('action') || '';
+            if (formAction && formAction !== '#') {
+                return formAction;
+            }
+
+            const onclick = element.getAttribute('onclick') || '';
+            const match = onclick.match(/(?:location(?:\.href|\.assign|\.replace)?|window\.open)\s*(?:=|\()\s*['"]([^'"]+)['"]/i);
+            return match?.[1] || '';
+        }
+
+        function controlRouteFor(element) {
+            try {
+                const reference = controlReference(element);
+                if (!reference) {
+                    return '';
+                }
+
+                const url = new URL(reference, window.location.href);
+                if (url.origin !== window.location.origin) {
+                    return '';
+                }
+
+                return normalizeRouteToken(url.pathname);
+            } catch (error) {
+                return '';
+            }
+        }
+
+        function targetLabel(element) {
+            return normalizeText(
+                element.getAttribute('aria-label') ||
+                element.textContent ||
+                element.getAttribute('title') ||
+                element.getAttribute('value') ||
+                element.querySelector?.('img[alt]')?.getAttribute('alt') ||
+                ''
+            ).toLowerCase();
+        }
+
+        function labelsMatch(element) {
+            const elementLabel = targetLabel(element);
+            return !label || elementLabel === label || elementLabel.includes(label) || label.includes(elementLabel);
+        }
+
         const label = normalizeText(candidate.label).toLowerCase();
-        const links = Array.from(document.querySelectorAll('a[href]'))
+        const anchors = Array.from(document.querySelectorAll('a[href]'))
             .filter((link) => isVisible(link))
             .filter((link) => targetRouteFor(link) === candidate.targetRoute)
             .filter((link) => {
@@ -949,30 +1108,35 @@ async function clickMatchingLink(page, target) {
                     return false;
                 }
 
-                const linkLabel = normalizeText(
-                    link.getAttribute('aria-label') ||
-                    link.textContent ||
-                    link.getAttribute('title') ||
-                    link.querySelector('img[alt]')?.getAttribute('alt') ||
-                    ''
-                ).toLowerCase();
-
-                return !label || linkLabel === label || linkLabel.includes(label) || label.includes(linkLabel);
+                return labelsMatch(link);
             });
+        const controls = Array.from(document.querySelectorAll('button, input[type="button"], input[type="submit"], [role="button"]'))
+            .filter((control) => isVisible(control))
+            .filter((control) => controlRouteFor(control) === candidate.targetRoute)
+            .filter((control) => {
+                if (candidate.area && linkArea(control) !== candidate.area) {
+                    return false;
+                }
 
-        if (links.length === 0) {
+                return labelsMatch(control);
+            });
+        const targets = candidate.kind === 'button'
+            ? controls.concat(anchors)
+            : anchors.concat(controls);
+
+        if (targets.length === 0) {
             return {
                 clicked: false,
                 reason: 'matching_link_not_found'
             };
         }
 
-        links[0].click();
+        targets[0].click();
 
         return {
             clicked: true,
-            href: links[0].getAttribute('href') || '',
-            label: normalizeText(links[0].textContent)
+            href: targets[0].getAttribute('href') || controlReference(targets[0]) || '',
+            label: normalizeText(targets[0].textContent || targets[0].getAttribute('value') || '')
         };
     }, target);
 }
@@ -1153,16 +1317,149 @@ async function auditRouteViewport({ browser, baseUrl, route, viewport, runDir, k
     return pageState;
 }
 
-function summarizeReport(pages, navigationReview) {
+function buildRenderedRouteLinks(pages = []) {
+    const byRoute = new Map();
+
+    for (const page of pages || []) {
+        const route = normalizeRoute(page.route || '/');
+        const existing = byRoute.get(route) || {
+            route,
+            outgoingRoutes: []
+        };
+
+        existing.outgoingRoutes = [...new Set([
+            ...existing.outgoingRoutes,
+            ...(page.links || [])
+                .map((link) => normalizeRoute(link.targetRoute || link.href))
+                .filter((targetRoute) => targetRoute && targetRoute !== route)
+        ])].sort();
+        byRoute.set(route, existing);
+    }
+
+    return [...byRoute.values()].sort((left, right) => left.route.localeCompare(right.route));
+}
+
+async function auditStaticRouteSet({ browser, baseUrl, selectedRoutes, selectedViewports, runDir, knownRoutes, maxClicksPerPage }) {
+    const pages = [];
+
+    for (const route of selectedRoutes) {
+        for (const viewport of selectedViewports) {
+            pages.push(await auditRouteViewport({
+                browser,
+                baseUrl,
+                route,
+                viewport,
+                runDir,
+                knownRoutes,
+                maxClicksPerPage: Number(maxClicksPerPage || 0)
+            }));
+        }
+    }
+
+    return {
+        pages,
+        crawl: {
+            mode: 'static-route-set',
+            seedRoutes: [...selectedRoutes],
+            maxDepth: 0,
+            discoveredRoutesByViewport: Object.fromEntries(
+                selectedViewports.map((viewport) => [viewport.name, [...selectedRoutes]])
+            )
+        }
+    };
+}
+
+async function auditDeepRouteGraph({ browser, baseUrl, seedRoutes, selectedViewports, runDir, knownRoutes, maxClicksPerPage, maxCrawlDepth }) {
+    const pages = [];
+    const discoveredRoutesByViewport = {};
+
+    for (const viewport of selectedViewports) {
+        const queue = seedRoutes.map((route) => ({
+            route: normalizeRoute(route),
+            depth: 0,
+            discoveredFrom: ''
+        }));
+        const queued = new Set(queue.map((entry) => entry.route));
+        const visited = new Set();
+        discoveredRoutesByViewport[viewport.name] = [];
+
+        while (queue.length > 0) {
+            const item = queue.shift();
+            const route = normalizeRoute(item.route);
+
+            if (visited.has(route) || !knownRoutes.includes(route)) {
+                continue;
+            }
+
+            visited.add(route);
+            discoveredRoutesByViewport[viewport.name].push(route);
+
+            const pageState = await auditRouteViewport({
+                browser,
+                baseUrl,
+                route,
+                viewport,
+                runDir,
+                knownRoutes,
+                maxClicksPerPage: Number(maxClicksPerPage || 0)
+            });
+
+            pageState.crawl = {
+                depth: item.depth,
+                discoveredFrom: item.discoveredFrom || 'seed'
+            };
+            pages.push(pageState);
+
+            if (item.depth >= maxCrawlDepth) {
+                continue;
+            }
+
+            for (const link of pageState.links || []) {
+                const targetRoute = normalizeRoute(link.targetRoute || link.href);
+                if (
+                    targetRoute &&
+                    knownRoutes.includes(targetRoute) &&
+                    !visited.has(targetRoute) &&
+                    !queued.has(targetRoute)
+                ) {
+                    queued.add(targetRoute);
+                    queue.push({
+                        route: targetRoute,
+                        depth: item.depth + 1,
+                        discoveredFrom: route
+                    });
+                }
+            }
+        }
+    }
+
+    return {
+        pages,
+        crawl: {
+            mode: 'deep-dynamic-crawl',
+            seedRoutes: [...seedRoutes],
+            maxDepth: maxCrawlDepth,
+            discoveredRoutesByViewport
+        }
+    };
+}
+
+function summarizeReport(pages, navigationReview, renderedGraph = [], crawl = null) {
     const handoffs = pages.flatMap((page) => page.handoffs || []);
+    const navigationTargets = pages.flatMap((page) => page.links || []);
+    const graphEdges = renderedGraph.reduce((count, entry) => count + (entry.outgoingRoutes || []).length, 0);
 
     return {
         totalRoutes: new Set(pages.map((page) => page.route)).size,
         totalPageRuns: pages.length,
         totalViewports: new Set(pages.map((page) => page.viewport)).size,
+        totalNavigationTargets: navigationTargets.length,
+        totalRouteEdges: graphEdges,
         totalHandoffs: handoffs.length,
         passedHandoffs: handoffs.filter((handoff) => handoff.status === 'passed').length,
         failedHandoffs: handoffs.filter((handoff) => handoff.status === 'failed').length,
+        deepCrawl: crawl?.mode === 'deep-dynamic-crawl',
+        maxCrawlDepth: crawl?.maxDepth || 0,
         navigationStatus: navigationReview.status,
         findings: navigationReview.summary
     };
@@ -1175,6 +1472,8 @@ function buildMarkdownReport(report) {
         `Generated at: ${report.generatedAt}`,
         `Base URL: ${report.baseUrl}`,
         `Scope: ${report.scope}`,
+        `Deep crawl: ${report.summary.deepCrawl ? 'enabled' : 'disabled'}`,
+        `Max crawl depth: ${report.summary.maxCrawlDepth}`,
         `Max clicks per page: ${report.maxClicksPerPage}`,
         '',
         '## Summary',
@@ -1183,6 +1482,8 @@ function buildMarkdownReport(report) {
         `- routes checked: ${report.summary.totalRoutes}`,
         `- page runs: ${report.summary.totalPageRuns}`,
         `- viewports: ${report.summary.totalViewports}`,
+        `- navigation targets discovered: ${report.summary.totalNavigationTargets}`,
+        `- rendered route edges: ${report.summary.totalRouteEdges}`,
         `- handoffs: ${report.summary.totalHandoffs}`,
         `- passed handoffs: ${report.summary.passedHandoffs}`,
         `- failed handoffs: ${report.summary.failedHandoffs}`,
@@ -1190,11 +1491,19 @@ function buildMarkdownReport(report) {
     ];
 
     lines.push(...buildNavigationReviewMarkdownSection(report.navigationReview));
+    lines.push('', '## Rendered Navigation Graph', '');
+
+    for (const entry of (report.renderedGraph || []).slice(0, 80)) {
+        lines.push(`- ${entry.route} -> ${entry.outgoingRoutes.join(', ') || '(none)'}`);
+    }
+
     lines.push('', '## Routes');
 
     for (const page of report.pages) {
         const drawer = page.navigation.mobileDrawer;
         const failedHandoffs = (page.handoffs || []).filter((handoff) => handoff.status === 'failed');
+        const targetSummary = [...new Set((page.links || []).map((link) => `${normalizeRoute(link.targetRoute)} [${link.kind || 'link'}:${link.area || 'unknown'}]`))]
+            .slice(0, 16);
 
         lines.push('');
         lines.push(`### ${page.route} [${page.viewport}]`);
@@ -1205,9 +1514,13 @@ function buildMarkdownReport(report) {
         lines.push(`- visible internal routes: ${page.navigation.visibleInternalLinkCount || 0}`);
         lines.push(`- header nav: ${page.navigation.hasHeaderNav ? 'yes' : 'no'}`);
         lines.push(`- recovery: home=${Boolean(page.recoveryRoutes.home)} fleet=${Boolean(page.recoveryRoutes.fleet)} contact=${Boolean(page.recoveryRoutes.contact)} reserve=${Boolean(page.recoveryRoutes.reserve)}`);
+        if (page.crawl) {
+            lines.push(`- crawl: depth=${page.crawl.depth} discoveredFrom=${page.crawl.discoveredFrom}`);
+        }
         if (drawer) {
             lines.push(`- mobile drawer: toggle=${drawer.toggleFound} opened=${drawer.opened} closed=${drawer.closed} links=${drawer.internalLinkCount}`);
         }
+        lines.push(`- discovered targets: ${targetSummary.join(', ') || 'none'}`);
         lines.push(`- handoffs: ${(page.handoffs || []).length} (${failedHandoffs.length} failed)`);
 
         if (failedHandoffs.length > 0) {
@@ -1234,12 +1547,12 @@ function buildMarkdownReport(report) {
 async function runNavigationAgent(options = {}) {
     const args = options.argv ? parseArgs(options.argv) : options;
     const generatedAt = new Date().toISOString();
-    const selectedRoutes = resolveSelectedRoutes(args);
+    const seedRoutes = resolveSelectedRoutes(args);
     const selectedViewports = resolveSelectedViewports(args.viewports);
     const knownRoutes = Object.keys(PUBLIC_PAGE_FILE_MAP).map(normalizeRoute).sort();
     const runDir = args.outputDir || path.join(artifactsRoot, timestampSlug(new Date(generatedAt)));
     const destinationsByRoute = buildDestinationCatalog();
-    const graph = buildStaticNavigationGraph(buildStaticRouteLinks());
+    const staticGraph = buildStaticNavigationGraph(buildStaticRouteLinks());
 
     ensureDir(runDir);
 
@@ -1247,26 +1560,34 @@ async function runNavigationAgent(options = {}) {
     const browser = await chromium.launch({ headless: true });
 
     try {
-        const pages = [];
-
-        for (const route of selectedRoutes) {
-            for (const viewport of selectedViewports) {
-                pages.push(await auditRouteViewport({
-                    browser,
-                    baseUrl,
-                    route,
-                    viewport,
-                    runDir,
-                    knownRoutes,
-                    maxClicksPerPage: Number(args.maxClicksPerPage || 0)
-                }));
-            }
-        }
+        const auditResult = args.deep
+            ? await auditDeepRouteGraph({
+                browser,
+                baseUrl,
+                seedRoutes,
+                selectedViewports,
+                runDir,
+                knownRoutes,
+                maxClicksPerPage: Number(args.maxClicksPerPage || 0),
+                maxCrawlDepth: Number(args.maxCrawlDepth ?? DEFAULT_DEEP_CRAWL_DEPTH)
+            })
+            : await auditStaticRouteSet({
+                browser,
+                baseUrl,
+                selectedRoutes: seedRoutes,
+                selectedViewports,
+                runDir,
+                knownRoutes,
+                maxClicksPerPage: Number(args.maxClicksPerPage || 0)
+            });
+        const pages = auditResult.pages;
+        const renderedRouteLinks = buildRenderedRouteLinks(pages);
+        const renderedGraph = buildStaticNavigationGraph(renderedRouteLinks);
 
         const navigationReview = buildNavigationReview({
             pages,
-            graph,
-            publicRoutes: selectedRoutes,
+            graph: renderedGraph,
+            publicRoutes: args.deep ? knownRoutes : seedRoutes,
             destinationsByRoute
         });
         const report = {
@@ -1274,11 +1595,16 @@ async function runNavigationAgent(options = {}) {
             baseUrl,
             scope: args.scope || 'all-public',
             maxClicksPerPage: Number(args.maxClicksPerPage || 0),
-            selectedRoutes,
+            maxCrawlDepth: Number(args.maxCrawlDepth ?? DEFAULT_DEEP_CRAWL_DEPTH),
+            deep: Boolean(args.deep),
+            seedRoutes,
+            selectedRoutes: [...new Set(pages.map((page) => page.route))].sort(),
             selectedViewports: selectedViewports.map((viewport) => viewport.name),
-            summary: summarizeReport(pages, navigationReview),
+            summary: summarizeReport(pages, navigationReview, renderedGraph, auditResult.crawl),
             navigationReview,
-            graph,
+            crawl: auditResult.crawl,
+            renderedGraph,
+            staticGraph,
             pages
         };
 
@@ -1327,6 +1653,7 @@ module.exports = {
     buildClickCandidates,
     buildDestinationCatalog,
     buildMarkdownReport,
+    buildRenderedRouteLinks,
     buildStaticRouteLinks,
     parseArgs,
     resolveReferenceToPublicRoute,
