@@ -140,8 +140,10 @@ test('mobile card action contract locks hierarchy and edge padding', () => {
 
     assert.equal(contract.policy, 'locked');
     assert.equal(contract.maxSecondaryContactActions, 2);
+    assert.equal(contract.requireSingleRowContactSplit, true);
     assert.ok(contract.maxActionGroupHeightRatio < 0.4);
     assert.ok(contract.minCardInlinePaddingPx >= 12);
+    assert.ok(contract.minSplitContactStripHeightRatio >= 0.065);
 });
 
 test('visual smoke gate covers human routes and responsive device bands', () => {
@@ -1581,8 +1583,11 @@ test('buildPageDepthScanFindings flags mobile card action groups that dominate t
                     secondaryInlinePaddingPx: 0,
                     primaryMaxHeight: 60,
                     secondaryMaxHeight: 60,
+                    primaryCount: 1,
                     secondaryCount: 2,
-                    secondaryRowCount: 2
+                    secondaryRowCount: 2,
+                    buttonMaxRadiusPx: 999,
+                    buttonRadiusSpreadPx: 999
                 }
             ]
         },
@@ -1591,6 +1596,8 @@ test('buildPageDepthScanFindings flags mobile card action groups that dominate t
 
     assert.ok(findings.some((finding) => finding.category === 'cta_hierarchy' && /dominates/i.test(finding.message)));
     assert.ok(findings.some((finding) => finding.category === 'cta_hierarchy' && /overpowering/i.test(finding.message)));
+    assert.ok(findings.some((finding) => finding.category === 'cta_hierarchy' && /stacked instead of split/i.test(finding.message)));
+    assert.ok(findings.some((finding) => finding.category === 'shape_drift' && /inconsistent button shapes/i.test(finding.message)));
     assert.ok(findings.some((finding) => finding.category === 'spacing' && /touch the card edge/i.test(finding.message)));
     assert.ok(findings.some((finding) => finding.hardFail === true));
 });
@@ -1607,7 +1614,9 @@ test('buildPageDepthScanFindings reports repeated mobile card patterns instead o
         primaryMaxHeight: 52,
         secondaryMaxHeight: 48,
         secondaryCount: 2,
-        secondaryRowCount: 2
+        secondaryRowCount: 2,
+        buttonMaxRadiusPx: 8,
+        buttonRadiusSpreadPx: 0
     });
     const findings = buildPageDepthScanFindings({
         route: '/fleet.html',
@@ -1663,7 +1672,9 @@ test('buildPageDepthScanFindings accepts contained mobile card actions', () => {
                     primaryMaxHeight: 52,
                     secondaryMaxHeight: 48,
                     secondaryCount: 2,
-                    secondaryRowCount: 1
+                    secondaryRowCount: 1,
+                    buttonMaxRadiusPx: 8,
+                    buttonRadiusSpreadPx: 0
                 }
             ]
         },

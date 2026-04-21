@@ -1516,10 +1516,6 @@
         padding: 0.95rem var(--fleet-card-content-pad-x) 0;
     }
 
-    .fleet-card__contact-row {
-        grid-template-columns: 1fr;
-    }
-
     .fleet-filter-button,
     .fleet-filter-reset,
     .fleet-card__primary,
@@ -1819,18 +1815,20 @@
     }
 
     .fleet-card__contact-row {
-        grid-template-columns: 1fr;
-        gap: 0.55rem;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1px;
         margin-inline: 0;
         padding-top: 0.1rem;
         border-top: 0;
-        overflow: visible;
+        overflow: hidden;
+        border-radius: 8px;
+        background: rgba(93, 75, 52, 0.12);
     }
 
     .fleet-card__secondary {
-        min-height: 48px;
+        min-height: 62px;
         border: 1px solid rgba(154, 117, 57, 0.18);
-        border-radius: 8px;
+        border-radius: 0;
         background: linear-gradient(135deg, rgba(212, 178, 95, 0.98), rgba(196, 151, 72, 0.98));
         color: #171412;
         box-shadow: none;
@@ -1843,6 +1841,14 @@
         border-color: rgba(39, 111, 31, 0.22);
         background: linear-gradient(135deg, #3e8b2d, #2f7324);
         color: #fff;
+    }
+
+    .fleet-card__contact-row .fleet-card__secondary:first-child {
+        border-radius: 8px 0 0 8px;
+    }
+
+    .fleet-card__contact-row .fleet-card__secondary:last-child {
+        border-radius: 0 8px 8px 0;
     }
 }
 

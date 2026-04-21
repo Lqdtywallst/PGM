@@ -2741,6 +2741,11 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                 const secondaryMaxHeight = secondaryRects.length
                     ? Math.max(...secondaryRects.map((rect) => Number(rect?.height || 0)))
                     : 0;
+                const actionRadii = actionElements.map(radiusPx);
+                const buttonMaxRadiusPx = actionRadii.length ? Math.max(...actionRadii) : 0;
+                const buttonRadiusSpreadPx = actionRadii.length
+                    ? Number((Math.max(...actionRadii) - Math.min(...actionRadii)).toFixed(2))
+                    : 0;
                 const coreHeight = Math.max(1, Number(coreRect?.height || 0));
 
                 return {
@@ -2760,6 +2765,9 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                     secondaryActionHeightRatio: Number((Number(secondaryGroupRect?.height || 0) / cardHeight).toFixed(3)),
                     secondaryDominanceRatio: Number((Number(secondaryGroupRect?.height || 0) / coreHeight).toFixed(3)),
                     secondaryMaxButtonWidthRatio: Number((secondaryMaxButtonWidth / cardWidth).toFixed(3)),
+                    secondaryBottomGapPx: secondaryGroupRect
+                        ? Number(Math.max(0, cardRect.bottom - secondaryGroupRect.bottom).toFixed(2))
+                        : 0,
                     primaryMaxHeight,
                     secondaryMaxHeight,
                     primaryCount: primaryActions.length,
@@ -2767,9 +2775,8 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                     secondaryRowCount: uniqueRowCount(secondaryActions),
                     primaryLabels: primaryActions.map(textFor).filter(Boolean).slice(0, 4),
                     secondaryLabels: secondaryActions.map(textFor).filter(Boolean).slice(0, 4),
-                    buttonRadiusSpreadPx: actionElements.length
-                        ? Number((Math.max(...actionElements.map(radiusPx)) - Math.min(...actionElements.map(radiusPx))).toFixed(2))
-                        : 0,
+                    buttonMaxRadiusPx: Number(buttonMaxRadiusPx.toFixed(2)),
+                    buttonRadiusSpreadPx,
                     viewportWidth,
                     viewportHeight
                 };
@@ -3072,6 +3079,26 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
     const dominantActionCards = cardMetrics.filter((metric) => (
         Number(metric.actionGroupHeightRatio || 0) > Number(cardContract.maxActionGroupHeightRatio || 1)
     ));
+    const stackedContactCards = cardMetrics.filter((metric) => (
+        metric.isVehicleActionCard !== false &&
+        Number(metric.secondaryCount || 0) >= 2 &&
+        Number(metric.secondaryRowCount || 0) > 1
+    ));
+    const thinContactStripCards = cardMetrics.filter((metric) => (
+        metric.isVehicleActionCard !== false &&
+        Number(metric.secondaryCount || 0) >= 2 &&
+        Number(metric.secondaryRowCount || 0) === 1 &&
+        Number(metric.secondaryActionHeightRatio || 0) < Number(cardContract.minSplitContactStripHeightRatio || 0)
+    ));
+    const inconsistentButtonShapeCards = cardMetrics.filter((metric) => (
+        metric.isVehicleActionCard !== false &&
+        Number(metric.primaryCount || 0) > 0 &&
+        Number(metric.secondaryCount || 0) > 0 &&
+        (
+            Number(metric.buttonMaxRadiusPx || 0) > Number(cardContract.maxButtonRadiusPx || 999) ||
+            Number(metric.buttonRadiusSpreadPx || 0) > Number(cardContract.maxButtonRadiusSpreadPx || 999)
+        )
+    ));
 
     if (stackedFullWidthCards.length > 1) {
         findings.push(createVisualFinding({
@@ -3114,6 +3141,49 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
             likelyCause: 'The reusable card layout is letting booking and contact controls outweigh the vehicle name, price, and product content.',
             hardFail: true,
             screenshotPath: screenshotForScanMetric(state, dominantActionCards[0], screenshotPath),
+            source: 'page_depth_scan'
+        }));
+    }
+
+    if (stackedContactCards.length > 1) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'cta_hierarchy',
+            message: 'A repeated mobile card pattern stacks Call and WhatsApp instead of using a split contact bar.',
+            evidence: `${summarizeCardLabels(stackedContactCards)}; requiredSingleRowContactSplit=${Boolean(cardContract.requireSingleRowContactSplit)}`,
+            likelyCause: 'The card action area is forcing guests through a tall button stack instead of a single bottom contact decision.',
+            hardFail: Boolean(cardContract.requireSingleRowContactSplit),
+            screenshotPath: screenshotForScanMetric(state, stackedContactCards[0], screenshotPath),
+            source: 'page_depth_scan'
+        }));
+    }
+
+    if (thinContactStripCards.length > 1) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'medium',
+            category: 'cta_hierarchy',
+            message: 'A repeated mobile card pattern makes the split contact bar too thin to feel intentional.',
+            evidence: `${summarizeCardLabels(thinContactStripCards)}; minSecondaryActionHeightRatio=${Math.min(...thinContactStripCards.map((metric) => Number(metric.secondaryActionHeightRatio || 0))).toFixed(3)}; min=${cardContract.minSplitContactStripHeightRatio}`,
+            likelyCause: 'Call and WhatsApp are present, but the bottom contact strip reads like a cramped afterthought rather than a useful mobile control.',
+            screenshotPath: screenshotForScanMetric(state, thinContactStripCards[0], screenshotPath),
+            source: 'page_depth_scan'
+        }));
+    }
+
+    if (inconsistentButtonShapeCards.length > 1) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'medium',
+            category: 'shape_drift',
+            message: 'A repeated mobile card pattern mixes pill and square button shapes inside the same action group.',
+            evidence: `${summarizeCardLabels(inconsistentButtonShapeCards)}; maxButtonRadiusPx=${Math.max(...inconsistentButtonShapeCards.map((metric) => Number(metric.buttonMaxRadiusPx || 0))).toFixed(2)}; maxRadiusSpreadPx=${Math.max(...inconsistentButtonShapeCards.map((metric) => Number(metric.buttonRadiusSpreadPx || 0))).toFixed(2)}; max=${cardContract.maxButtonRadiusSpreadPx}`,
+            likelyCause: 'The primary and contact actions do not share a coherent mobile button system, making the card feel patched together.',
+            screenshotPath: screenshotForScanMetric(state, inconsistentButtonShapeCards[0], screenshotPath),
             source: 'page_depth_scan'
         }));
     }
@@ -3194,6 +3264,45 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
         }
 
         if (
+            isVehicleActionCard &&
+            Boolean(cardContract.requireSingleRowContactSplit) &&
+            Number(metric.secondaryCount || 0) >= 2 &&
+            Number(metric.secondaryRowCount || 0) > 1
+        ) {
+            findings.push(createVisualFinding({
+                route,
+                viewport: viewportName,
+                severity: 'high',
+                category: 'cta_hierarchy',
+                message: 'Call and WhatsApp are stacked instead of split into one bottom mobile contact bar.',
+                evidence: `${labelEvidence}; secondaryRowCount=${metric.secondaryRowCount}; requiredSingleRowContactSplit=true`,
+                likelyCause: 'The mobile card contact actions are laid out as separate full-width buttons rather than one clear split control.',
+                hardFail: true,
+                screenshotPath: metricScreenshotPath,
+                source: 'page_depth_scan'
+            }));
+        }
+
+        if (
+            isVehicleActionCard &&
+            Number(metric.secondaryCount || 0) >= 2 &&
+            Number(metric.secondaryRowCount || 0) === 1 &&
+            Number(metric.secondaryActionHeightRatio || 0) < Number(cardContract.minSplitContactStripHeightRatio || 0)
+        ) {
+            findings.push(createVisualFinding({
+                route,
+                viewport: viewportName,
+                severity: 'medium',
+                category: 'cta_hierarchy',
+                message: 'The split mobile contact bar is too thin to feel intentional.',
+                evidence: `${labelEvidence}; secondaryActionHeightRatio=${metric.secondaryActionHeightRatio}; min=${cardContract.minSplitContactStripHeightRatio}`,
+                likelyCause: 'The contact strip does not have enough visual/tap weight relative to the card.',
+                screenshotPath: metricScreenshotPath,
+                source: 'page_depth_scan'
+            }));
+        }
+
+        if (
             Number(metric.secondaryCount || 0) > 0 &&
             Number(metric.secondaryInlinePaddingPx || 0) < Number(cardContract.minCardInlinePaddingPx || 0)
         ) {
@@ -3206,6 +3315,25 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
                 evidence: `${labelEvidence}; secondaryInlinePaddingPx=${metric.secondaryInlinePaddingPx}; min=${cardContract.minCardInlinePaddingPx}`,
                 likelyCause: 'The contact row is escaping the card padding, making the CTA block feel detached from the vehicle card.',
                 hardFail: true,
+                screenshotPath: metricScreenshotPath,
+                source: 'page_depth_scan'
+            }));
+        }
+
+        if (
+            isVehicleActionCard &&
+            Number(metric.primaryCount || 0) > 0 &&
+            Number(metric.secondaryCount || 0) > 0 &&
+            Number(metric.buttonRadiusSpreadPx || 0) > Number(cardContract.maxButtonRadiusSpreadPx || 999)
+        ) {
+            findings.push(createVisualFinding({
+                route,
+                viewport: viewportName,
+                severity: 'medium',
+                category: 'shape_drift',
+                message: 'The mobile card mixes inconsistent button shapes in one action group.',
+                evidence: `${labelEvidence}; buttonRadiusSpreadPx=${metric.buttonRadiusSpreadPx}; max=${cardContract.maxButtonRadiusSpreadPx}`,
+                likelyCause: 'The reserve and contact actions are using different shape systems, so the button area feels visually patched.',
                 screenshotPath: metricScreenshotPath,
                 source: 'page_depth_scan'
             }));

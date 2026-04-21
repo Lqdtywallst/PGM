@@ -2203,11 +2203,11 @@ select {
     align-items: center;
     justify-content: center;
     gap: 0.45rem;
-    width: fit-content;
+    width: 100%;
     min-height: 2.7rem;
     padding: 0 1.35rem;
     border: 1px solid rgba(205, 163, 83, 0.32);
-    border-radius: 999px;
+    border-radius: 8px;
     background: linear-gradient(135deg, rgba(220, 183, 104, 0.96), rgba(198, 151, 66, 0.92));
     color: #fff;
     font-family: var(--lab-font-sans);
@@ -2225,12 +2225,13 @@ select {
 .fleet-visual-card__contact-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0;
-    margin: 0 -0.72rem -0.72rem;
+    gap: 1px;
+    margin: 0.72rem 0 0;
     padding-top: 0;
     overflow: hidden;
     border-top: 1px solid rgba(49, 41, 36, 0.08);
-    border-radius: 0 0 1.45rem 1.45rem;
+    border-radius: 8px;
+    background: rgba(49, 41, 36, 0.08);
 }
 
 .fleet-visual-card__contact-link {
@@ -2238,7 +2239,7 @@ select {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    min-height: 3.45rem;
+    min-height: clamp(3.6rem, 9vw, 4.65rem);
     border: 0;
     border-radius: 0;
     background: #cfad61;
@@ -5342,11 +5343,11 @@ a.brand-marquee__item:focus-visible img {
 
     .fleet-visual-card__contact-row {
         grid-template-columns: 1fr 1fr;
-        margin: 0 -0.72rem -0.72rem;
+        margin: 0.72rem 0 0;
     }
 
     .fleet-visual-card__contact-link {
-        min-height: 3.35rem;
+        min-height: clamp(3.6rem, 9vw, 4.65rem);
         font-size: 0.82rem;
     }
 
@@ -5470,12 +5471,12 @@ a.brand-marquee__item:focus-visible img {
     }
 
     .fleet-visual-card__primary {
-        min-height: 3rem;
+        min-height: 3.2rem;
     }
 
     .fleet-visual-card__contact-link {
-        min-height: 2.9rem;
-        font-size: 0.74rem;
+        min-height: 4rem;
+        font-size: 0.78rem;
     }
 }
 
