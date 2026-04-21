@@ -2339,6 +2339,61 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                 return `${element.tagName.toLowerCase()}${id}${className}`;
             }
 
+            function collectVisibleTextEncodingIssues() {
+                const brokenEncodingPattern = /[\u00c2\u00c3\u00e2\ufffd]/;
+                const selectors = [
+                    'main h1',
+                    'main h2',
+                    'main h3',
+                    'main p',
+                    'main li',
+                    'main label',
+                    'main small',
+                    'main strong',
+                    'main button',
+                    'main a[href]',
+                    'main input:not([type="hidden"])',
+                    'main select',
+                    'main textarea',
+                    'main span',
+                    '.reserve-mobile-bar a',
+                    '.reserve-mobile-bar button'
+                ];
+                const seen = new Set();
+                const issues = [];
+
+                for (const selector of selectors) {
+                    for (const element of Array.from(document.querySelectorAll(selector))) {
+                        if (!(element instanceof HTMLElement) || seen.has(element) || !isVisible(element)) {
+                            continue;
+                        }
+
+                        seen.add(element);
+
+                        if (element.closest('[aria-hidden="true"], .lab-nav__panel, header, nav, svg')) {
+                            continue;
+                        }
+
+                        const text = textFor(element);
+                        if (text.length < 2 || !brokenEncodingPattern.test(text)) {
+                            continue;
+                        }
+
+                        issues.push({
+                            selector: selectorLabel(element),
+                            text: text.slice(0, 90),
+                            rect: rectData(element)
+                        });
+
+                        if (issues.length >= 12) {
+                            return issues;
+                        }
+                    }
+                }
+
+                return issues;
+            }
+
             const actionElements = Array.from(document.querySelectorAll('main a[href], main button, main [role="button"], .reserve-mobile-bar a, .reserve-mobile-bar button'))
                 .filter((element) => element instanceof HTMLElement && isVisible(element));
             const majorElements = Array.from(document.querySelectorAll([
@@ -2546,7 +2601,8 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                 largestBlankGapPx: Number(largestBlankGapPx.toFixed(2)),
                 largestBlankGapRatio: Number((largestBlankGapPx / Math.max(1, viewportHeight)).toFixed(3)),
                 actionMetrics: actionMetrics.slice(0, 40),
-                dateControlMetrics
+                dateControlMetrics,
+                textEncodingIssues: collectVisibleTextEncodingIssues()
             };
         });
 
@@ -2959,6 +3015,22 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
                     message: 'A vertical scan frame contains a large unexplained blank gap.',
                     evidence: `${frameEvidence}; largestBlankGapRatio=${frameMetric.largestBlankGapRatio}; max=${scanContract.maxBlankGapRatio}; visibleElements=${frameMetric.visibleMajorElementCount}`,
                     likelyCause: 'A section, card, or responsive stack is leaving dead space as the customer scrolls down the page.',
+                    screenshotPath: frameScreenshotPath,
+                    source: 'page_depth_scan'
+                }));
+            }
+
+            for (const textIssue of frameMetric.textEncodingIssues || []) {
+                findings.push(createVisualFinding({
+                    route,
+                    viewport: viewportName,
+                    severity: 'high',
+                    category: 'text_encoding',
+                    selector: textIssue.selector,
+                    message: 'Visible customer-facing text contains broken encoding artifacts while scrolling the page.',
+                    evidence: `${frameEvidence}; text="${textIssue.text}"`,
+                    likelyCause: 'A UTF-8 symbol was saved or served through the wrong encoding, so the browser renders mojibake instead of readable copy.',
+                    hardFail: true,
                     screenshotPath: frameScreenshotPath,
                     source: 'page_depth_scan'
                 }));
@@ -4122,6 +4194,77 @@ async function collectVisualMetrics(page, profile) {
                 .slice(0, 16);
         }
 
+        function collectTextEncodingIssues() {
+            const brokenEncodingPattern = /[\u00c2\u00c3\u00e2\ufffd]/;
+            const textSelectors = [
+                'main h1',
+                'main h2',
+                'main h3',
+                'main p',
+                'main li',
+                'main label',
+                'main small',
+                'main strong',
+                'main dt',
+                'main dd',
+                'main summary',
+                'main button',
+                'main a[href]',
+                'main input:not([type="hidden"])',
+                'main select',
+                'main textarea',
+                'main span',
+                '.reserve-mobile-bar a',
+                '.reserve-mobile-bar button'
+            ];
+            const seen = new Set();
+            const issues = [];
+
+            for (const selector of textSelectors) {
+                for (const element of Array.from(document.querySelectorAll(selector))) {
+                    if (!(element instanceof HTMLElement) || seen.has(element) || !isVisible(element)) {
+                        continue;
+                    }
+
+                    seen.add(element);
+
+                    if (element.closest('[aria-hidden="true"], .lab-nav__panel, header, nav, svg')) {
+                        continue;
+                    }
+
+                    const rect = element.getBoundingClientRect();
+                    const visibleIntersectionHeight = Math.max(0, Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0));
+                    const visibleIntersectionWidth = Math.max(0, Math.min(rect.right, viewportWidth) - Math.max(rect.left, 0));
+
+                    if (
+                        visibleIntersectionHeight < 8 ||
+                        visibleIntersectionWidth < 8 ||
+                        rect.width < 16 ||
+                        rect.height < 8
+                    ) {
+                        continue;
+                    }
+
+                    const text = element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement
+                        ? (element.value || element.placeholder || '')
+                        : element instanceof HTMLSelectElement
+                            ? (element.selectedOptions[0]?.textContent || element.value || '')
+                            : (element.innerText || element.textContent || '');
+                    const normalizedText = normalizeText(text);
+
+                    if (normalizedText.length >= 2 && brokenEncodingPattern.test(normalizedText)) {
+                        issues.push({
+                            selectorLabel: buildLabel(element),
+                            text: normalizedText.slice(0, 90),
+                            rect: rectData(element)
+                        });
+                    }
+                }
+            }
+
+            return issues.slice(0, 20);
+        }
+
         function collectInternalGapIssues() {
             const maxGapRatio = Number(auditRules?.maxInternalPanelGapRatio || 0.28);
             const maxGapPx = Number(auditRules?.maxInternalPanelGapPx || 160);
@@ -4309,6 +4452,7 @@ async function collectVisualMetrics(page, profile) {
             .filter((entry) => entry.outsideViewportPx > 4 || entry.textOverflow)
             .slice(0, 16);
         const textContrastIssues = collectTextContrastIssues();
+        const textEncodingIssues = collectTextEncodingIssues();
         const internalGapIssues = collectInternalGapIssues();
         const brokenMedia = brokenMediaDetails(mediaElements);
         const cardHeights = cardElements.map((card) => Number(card.getBoundingClientRect().height.toFixed(2)));
@@ -4547,6 +4691,7 @@ async function collectVisualMetrics(page, profile) {
             headerOcclusionPx: Number(headerOcclusionPx.toFixed(2)),
             clippedElements,
             textContrastIssues,
+            textEncodingIssues,
             internalGapIssues,
             overlaps: overlapDetails(keyElements.slice(0, 12)),
             brokenMedia,
@@ -5357,6 +5502,21 @@ function buildDeterministicFindings({ route, viewport, profile, metrics, console
             evidence: `text="${issue.text}"; contrastRatio=${issue.contrastRatio}; requiredRatio=${issue.requiredRatio}; color=${issue.color}; effectiveBackground=${issue.effectiveBackground}`,
             likelyCause: 'The text color is too close to the card or page background, so labels and supporting copy fade out.',
             hardFail: severeContrast,
+            screenshotPath
+        }));
+    }
+
+    for (const issue of metrics.textEncodingIssues || []) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'text_encoding',
+            selector: issue.selectorLabel,
+            message: 'Visible customer-facing text contains broken encoding artifacts.',
+            evidence: `text="${issue.text}"`,
+            likelyCause: 'A UTF-8 symbol was saved or served through the wrong encoding, so the browser renders mojibake instead of readable copy.',
+            hardFail: true,
             screenshotPath
         }));
     }

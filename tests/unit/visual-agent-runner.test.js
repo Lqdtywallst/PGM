@@ -784,6 +784,52 @@ test('buildDeterministicFindings flags weak visible text contrast on light panel
     )));
 });
 
+test('buildDeterministicFindings flags visible broken text encoding', () => {
+    const findings = buildDeterministicFindings({
+        route: '/app/reserve/page.html',
+        viewport: { name: 'mobile-modern' },
+        profile: 'reserve',
+        metrics: {
+            horizontalOverflowPx: 0,
+            visibleH1Count: 1,
+            headingRect: { top: 24 },
+            viewportWidth: 390,
+            viewportHeight: 844,
+            heroActionCount: 1,
+            primaryCtaRect: { top: 650 },
+            hasVisualMedia: true,
+            hasNav: true,
+            headerOcclusionPx: 0,
+            clippedElements: [],
+            textContrastIssues: [],
+            textEncodingIssues: [
+                {
+                    selectorLabel: 'button#continueToPaymentBtn',
+                    text: 'Continue to Guest Details \u00c2\u2020\u2019'
+                }
+            ],
+            internalGapIssues: [],
+            overlaps: [],
+            brokenMedia: []
+        },
+        consoleErrors: [],
+        networkErrors: {
+            requestFailures: [],
+            criticalResponses: [],
+            pageErrors: []
+        },
+        artifacts: {
+            viewportScreenshot: '/tmp/reserve-broken-text.png'
+        }
+    });
+
+    assert.ok(findings.some((finding) => (
+        finding.category === 'text_encoding' &&
+        /broken encoding/i.test(finding.message) &&
+        finding.hardFail === true
+    )));
+});
+
 test('buildDeterministicFindings flags large internal gaps in first-viewport panels', () => {
     const findings = buildDeterministicFindings({
         route: '/app/reserve/page.html',
@@ -1725,6 +1771,47 @@ test('buildPageDepthScanFindings flags generic visual scan outliers beyond known
     assert.ok(findings.some((finding) => finding.category === 'layout_gap'));
     assert.ok(findings.some((finding) => finding.category === 'cta_hierarchy' && /contact action/i.test(finding.message)));
     assert.ok(findings.some((finding) => finding.category === 'spacing' && /viewport edge/i.test(finding.message)));
+});
+
+test('buildPageDepthScanFindings flags broken text encoding while scrolling', () => {
+    const findings = buildPageDepthScanFindings({
+        route: '/app/reserve/page.html',
+        viewportName: 'mobile-modern',
+        viewportWidth: 390,
+        state: {
+            available: true,
+            frames: [
+                {
+                    index: 1,
+                    scrollY: 0,
+                    viewportTop: 0,
+                    viewportBottom: 844,
+                    screenshotPath: '/tmp/reserve-depth-text.png',
+                    metric: {
+                        visibleMajorElementCount: 8,
+                        largestBlankGapRatio: 0.2,
+                        actionMetrics: [],
+                        dateControlMetrics: [],
+                        textEncodingIssues: [
+                            {
+                                selector: 'button#continueToPaymentBtn',
+                                text: 'Continue to Guest Details \u00c2\u2020\u2019'
+                            }
+                        ]
+                    }
+                }
+            ],
+            cardActionMetrics: []
+        },
+        screenshotPath: '/tmp/reserve.png'
+    });
+
+    assert.ok(findings.some((finding) => (
+        finding.category === 'text_encoding' &&
+        /scrolling/i.test(finding.message) &&
+        finding.hardFail === true &&
+        finding.screenshotPath === '/tmp/reserve-depth-text.png'
+    )));
 });
 
 test('buildPageDepthScanFindings flags booking date controls prefilled before today', () => {

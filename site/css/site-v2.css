@@ -1,6 +1,6 @@
 ﻿:root {
     /* Variables del laboratorio:
-       aquÃ­ fijamos color, contraste y medidas base sin tocar todavÃ­a la home real. */
+       aqui fijamos color, contraste y medidas base sin tocar todavia la home real. */
     --lab-bg: #07080a;
     --lab-text: #f5f1e8;
     --lab-muted: rgba(245, 241, 232, 0.76);
@@ -908,7 +908,7 @@ select {
 }
 
 .lab-nav {
-    /* NavegaciÃ³n en lÃ­nea, sin cÃ¡psula visual detrÃ¡s. */
+    /* Navegacion en linea, sin capsula visual detras. */
     display: flex;
     align-items: center;
     gap: clamp(1.2rem, 1.45vw, 2rem);
@@ -1397,7 +1397,7 @@ select {
 }
 
 .hero-lab {
-    /* Escena principal del hero. Todo lo visual se apila dentro de esta secciÃ³n. */
+    /* Escena principal del hero. Todo lo visual se apila dentro de esta seccion. */
     position: relative;
     min-height: 100svh;
     overflow: clip;
@@ -1442,7 +1442,7 @@ select {
 }
 
 .hero-lab__glow {
-    /* Halo sutil para evitar que la derecha quede completamente vacÃ­a. */
+    /* Halo sutil para evitar que la derecha quede completamente vacia. */
     inset: 9% 5% 10% 40%;
     background:
         radial-gradient(circle at 34% 30%, rgba(214, 188, 134, 0.16), transparent 16%),
@@ -1500,7 +1500,7 @@ select {
 
 .hero-lab__shell {
     /* Marco interno del hero:
-       separa el contenido del header fijo y da altura Ãºtil a toda la composiciÃ³n. */
+       separa el contenido del header fijo y da altura util a toda la composicion. */
     position: relative;
     z-index: 1;
     min-height: clamp(46rem, 86svh, 56rem);
@@ -1510,7 +1510,7 @@ select {
 
 .hero-lab__body {
     /* Caja grande principal alineada a la izquierda.
-       No pensamos en dos columnas de texto, sino en un Ãºnico bloque editorial. */
+       No pensamos en dos columnas de texto, sino en un unico bloque editorial. */
     position: relative;
     width: min(100%, 68rem);
     z-index: 1;
@@ -1539,7 +1539,7 @@ select {
 
 .hero-lab__content-box {
     /* Dentro de esta caja todas las piezas comparten el mismo arranque izquierdo.
-       Luego cada una usa su propia anchura para crear jerarquÃ­a. */
+       Luego cada una usa su propia anchura para crear jerarquia. */
     width: 100%;
     position: relative;
     z-index: 1;
@@ -1671,7 +1671,7 @@ select {
 }
 
 .hero-lab__lead {
-    /* El pÃ¡rrafo sigue naciendo desde el mismo borde izquierdo,
+    /* El parrafo sigue naciendo desde el mismo borde izquierdo,
        pero con menos ancho que el h1 para que se lea como apoyo. */
     width: min(100%, 35rem);
     margin: 0;
@@ -1682,7 +1682,7 @@ select {
 
 .hero-lab__launcher {
     /* El launcher es el tercer ancho de la misma caja.
-       MÃ¡s estrecho que el lead para que se lea como activaciÃ³n, no como continuaciÃ³n. */
+       Mas estrecho que el lead para que se lea como activacion, no como continuacion. */
     width: min(100%, 30rem);
     margin-top: 5.2rem;
     padding-bottom: 1rem;
@@ -1734,7 +1734,7 @@ select {
 }
 
 .hero-lab__actions {
-    /* Los CTAs se colocan en fila porque aquÃ­ estamos trabajando desktop first. */
+    /* Los CTAs se colocan en fila porque aqui estamos trabajando desktop first. */
     display: flex;
     align-items: center;
     gap: 0.8rem;
@@ -1759,7 +1759,7 @@ select {
 }
 
 .hero-lab__cta--primary {
-    /* CTA principal: mÃ¡s ancho y con acento visual fuerte. */
+    /* CTA principal: mas ancho y con acento visual fuerte. */
     min-width: 17.5rem;
     background: linear-gradient(135deg, var(--lab-accent-soft), var(--lab-accent));
     color: #111;
@@ -3469,7 +3469,7 @@ a.brand-marquee__item:focus-visible img {
 }
 
 .guest-faq__item[open] summary::after {
-    content: "âˆ’";
+    content: "-";
 }
 
 .guest-faq__item p {
