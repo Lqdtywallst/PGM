@@ -1,0 +1,19 @@
+{
+  "contactLead": {
+    "name": "Alex Morgan",
+    "email": "alex.morgan@example.com",
+    "phone": "+971500000001",
+    "subject": "reservation",
+    "message": "I need a two-day Dubai rental with airport delivery and a calm handover."
+  },
+  "reservationGuest": {
+    "name": "Sofia Bennett",
+    "passport": "XK938271",
+    "email": "sofia.bennett@example.com",
+    "phone": "+971501234567",
+    "address": "Atlantis The Royal, Palm Jumeirah",
+    "city": "Dubai",
+    "country": "AE",
+    "pickupLocation": "Atlantis The Royal, Palm Jumeirah"
+  }
+}

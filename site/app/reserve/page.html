@@ -16,6 +16,7 @@
     <meta name="twitter:title" content="Reserve Luxury Car in Dubai | Dynasty Prestige">
     <meta name="twitter:description" content="Book your supercar reservation in Dubai in three simple steps.">
     <meta name="twitter:image" content="https://prestigegoalmotion.com/logo-dp-transparent.png">
+    <script>document.documentElement.classList.add("js");</script>
 <!-- Favicon — logo DP (scripts/generate-icons.py) -->
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
@@ -28,37 +29,207 @@
     <link rel="apple-touch-icon" href="/icons/icon-180.png">
     <link rel="shortcut icon" href="/favicon.ico">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://js.stripe.com/v3/"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/site-v2.css?v=20260420e">
+    <script src="/js/site-v2.js?v=20260406ae" defer></script>
     <script src="../../config.js"></script>
     <style>
+        :root {
+            --reserve-shell-max-width: 1180px;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        body {
+        html {
+            background: #050505;
+        }
+
+        body.reserve-page {
             min-height: 100vh;
-            background:
-                radial-gradient(circle at top, rgba(214, 240, 60, 0.16), transparent 26%),
-                radial-gradient(circle at bottom right, rgba(214, 240, 60, 0.08), transparent 24%),
-                #000;
+            background: #050506;
             color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
+            font-family: 'Manrope', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: block;
+            padding: 0;
+        }
+
+        .reserve-page-main {
+            position: relative;
+            padding: calc(var(--lab-header-offset) + 1.75rem) 0 0;
+            background:
+                radial-gradient(circle at 18% 14%, rgba(214, 188, 134, 0.08), transparent 20%),
+                radial-gradient(circle at 84% 22%, rgba(227, 246, 85, 0.05), transparent 24%),
+                linear-gradient(180deg, #050506 0%, #07090d 42%, #050506 100%);
+        }
+
+        .reserve-page-shell {
+            padding: 0 1.25rem 5.5rem;
+        }
+
+        .reserve-page-intro {
+            max-width: var(--reserve-shell-max-width);
+            margin: 0 auto 1.35rem;
+            display: grid;
+            gap: 1rem;
+        }
+
+        .reserve-page-intro__grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+            gap: 1.25rem;
+            align-items: end;
+        }
+
+        .reserve-page-breadcrumb {
+            display: inline-flex;
+            flex-wrap: wrap;
             align-items: center;
-            padding: 2rem;
+            gap: 0.55rem;
+            margin-bottom: 0.8rem;
+            color: rgba(245, 241, 232, 0.72);
+            font-size: 0.8rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .reserve-page-breadcrumb a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .reserve-page-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+            color: #f3d58c;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .reserve-page-heading {
+            margin: 0;
+            color: #fff8e7;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2.2rem, 4vw, 4rem);
+            line-height: 0.94;
+        }
+
+        .reserve-page-lead {
+            max-width: 720px;
+            margin: 0.85rem 0 0;
+            color: rgba(245, 241, 232, 0.78);
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .reserve-page-panel {
+            padding: 1.2rem 1.25rem;
+            border-radius: 18px;
+            border: 1px solid rgba(214, 240, 60, 0.18);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(10, 10, 11, 0.88));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        }
+
+        .reserve-page-panel__eyebrow {
+            display: block;
+            margin-bottom: 0.45rem;
+            color: #f3d58c;
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .reserve-page-panel__title {
+            margin: 0;
+            color: #fff;
+            font-size: 1.15rem;
+            line-height: 1.35;
+        }
+
+        .reserve-page-panel__copy {
+            margin: 0.55rem 0 0;
+            color: #b9b9c1;
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+
+        .reserve-page-panel__facts {
+            display: grid;
+            gap: 0.7rem;
+            margin-top: 1rem;
+        }
+
+        .reserve-page-panel__facts div {
+            display: grid;
+            gap: 0.12rem;
+            padding: 0.8rem 0.9rem;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .reserve-page-panel__facts strong {
+            color: #fff8e7;
+            font-size: 0.9rem;
+        }
+
+        .reserve-page-panel__facts span {
+            color: #b9b9c1;
+            font-size: 0.84rem;
+            line-height: 1.5;
+        }
+
+        .reserve-page-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .reserve-page-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            padding: 0 1.1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .reserve-page-action--primary {
+            background: linear-gradient(135deg, var(--lab-accent-soft), var(--lab-accent));
+            color: #101010;
+            box-shadow: 0 14px 34px rgba(227, 246, 85, 0.16);
+        }
+
+        .reserve-page-action--secondary {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.03);
+            color: #fff8e7;
         }
 
         .reserve-container {
             width: 100%;
             max-width: 1080px;
-            background: linear-gradient(180deg, rgba(24, 24, 27, 0.99), rgba(11, 11, 13, 0.995));
-            padding: 2rem;
-            border-radius: 24px;
-            box-shadow: 0 28px 90px rgba(0, 0, 0, 0.55), 0 20px 60px rgba(214, 240, 60, 0.12);
-            border: 1px solid rgba(214, 240, 60, 0.2);
+            margin: 0 auto;
+            padding: 2rem 0 0;
+            border-radius: 0;
+            box-shadow: none;
+            border: 0;
             backdrop-filter: none;
             -webkit-backdrop-filter: none;
         }
@@ -1139,6 +1310,23 @@
         }
 
         @media (max-width: 768px) {
+            .reserve-page-shell {
+                padding: 0 0.95rem 5rem;
+            }
+
+            .reserve-page-intro__grid {
+                grid-template-columns: 1fr;
+            }
+
+            .reserve-page-actions {
+                display: grid;
+                grid-template-columns: 1fr;
+            }
+
+            .reserve-page-action {
+                width: 100%;
+            }
+
             .primer-grid {
                 grid-template-columns: 1fr;
             }
@@ -1146,16 +1334,13 @@
 
         @media (max-width: 768px) {
             /* Avoid vertically centering the whole flow on mobile — it breaks scroll order and feels “out of sequence” */
-            body {
-                align-items: flex-start;
-                justify-content: flex-start;
-                padding: 1rem;
+            body.reserve-page {
                 min-height: 100%;
             }
 
             .reserve-container {
-                padding: 1.25rem 1rem 2rem;
-                border-radius: 18px;
+                padding: 1.25rem 0 2rem;
+                border-radius: 0;
                 max-width: 100%;
             }
 
@@ -1239,26 +1424,1379 @@
                 grid-template-columns: 1fr;
             }
         }
-    </style>
+
+        .reserve-mobile-summary,
+        .reserve-mobile-bar {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body.reserve-page {
+                padding: 0;
+            }
+
+            .reserve-container {
+                min-height: 100vh;
+                padding: 1rem 0 6.5rem;
+                border-radius: 0;
+            }
+
+            .reserve-mobile-summary {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 0.75rem;
+                margin-bottom: 1rem;
+                padding: 0.9rem 1rem;
+                border: 1px solid rgba(214, 240, 60, 0.16);
+                border-radius: 12px;
+                background: linear-gradient(180deg, rgba(214, 240, 60, 0.08), rgba(255, 255, 255, 0.02));
+            }
+
+            .reserve-mobile-summary__copy {
+                display: grid;
+                gap: 0.22rem;
+                min-width: 0;
+            }
+
+            .reserve-mobile-summary__step {
+                color: #d6f03c;
+                font-size: 0.72rem;
+                font-weight: 700;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+            }
+
+            .reserve-mobile-summary__car {
+                color: #fff;
+                font-size: 1rem;
+                font-weight: 700;
+                line-height: 1.2;
+            }
+
+            .reserve-mobile-summary__rate {
+                color: #b9b9c1;
+                font-size: 0.84rem;
+                line-height: 1.4;
+            }
+
+            .reserve-mobile-summary__whatsapp {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 42px;
+                padding: 0 0.85rem;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 12px;
+                background: rgba(255, 255, 255, 0.04);
+                color: #fff;
+                font-size: 0.74rem;
+                font-weight: 700;
+                white-space: nowrap;
+            }
+
+            .steps-indicator {
+                flex-direction: row;
+                gap: 0.55rem;
+                margin-bottom: 1rem;
+            }
+
+            .step-pill {
+                justify-content: center;
+                padding: 0.75rem;
+                border-radius: 12px;
+            }
+
+            .step-pill-copy,
+            .booking-primer,
+            .step1-side,
+            .payment-side {
+                display: none;
+            }
+
+            .step1-layout,
+            .step2-layout,
+            .payment-layout {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .step2-side {
+                display: contents;
+            }
+
+            .reservation-summary {
+                order: 1;
+                position: sticky;
+                top: 0.2rem;
+                z-index: 3;
+            }
+
+            .step2-main {
+                display: flex;
+                flex-direction: column;
+                order: 2;
+            }
+
+            .schedule-card {
+                order: 2;
+            }
+
+            .calendar-container {
+                order: 2;
+            }
+
+            .delivery-card {
+                order: 1;
+            }
+
+            .route-guide-card {
+                order: 4;
+            }
+
+            .delivery-map-wrapper,
+            .delivery-map-link,
+            .delivery-map-hint {
+                display: none;
+            }
+
+            .info-card,
+            .reservation-summary,
+            .delivery-card,
+            .route-guide-card,
+            .summary-section {
+                border-radius: 12px;
+                padding: 1rem;
+            }
+
+            .step-heading {
+                font-size: 1.85rem;
+                line-height: 1;
+            }
+
+            .step-heading-sub,
+            .payment-trust {
+                font-size: 0.88rem;
+                line-height: 1.5;
+            }
+
+            .reserve-mobile-bar {
+                position: fixed;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 120;
+                display: grid;
+                gap: 0.7rem;
+                padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+                background: linear-gradient(180deg, rgba(11, 11, 13, 0.94), rgba(11, 11, 13, 0.99));
+                border-top: 1px solid rgba(255, 255, 255, 0.08);
+                box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.28);
+            }
+
+            .reserve-mobile-bar__meta {
+                display: grid;
+                gap: 0.08rem;
+                min-width: 0;
+            }
+
+            .reserve-mobile-bar__step {
+                color: #d6f03c;
+                font-size: 0.68rem;
+                font-weight: 700;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+            }
+
+            .reserve-mobile-bar__car {
+                color: #fff;
+                font-size: 0.82rem;
+                font-weight: 700;
+                line-height: 1.25;
+            }
+
+            .reserve-mobile-bar__actions {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto;
+                gap: 0.65rem;
+            }
+
+            .reserve-mobile-bar__primary,
+            .reserve-mobile-bar__secondary {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 48px;
+                border-radius: 12px;
+                font-size: 0.8rem;
+                font-weight: 700;
+                line-height: 1;
+                text-align: center;
+            }
+
+            .reserve-mobile-bar__primary {
+                border: 0;
+                background: linear-gradient(135deg, #d6f03c, rgba(214, 240, 60, 0.82));
+                color: #111;
+            }
+
+            .reserve-mobile-bar__primary[disabled] {
+                opacity: 0.5;
+            }
+
+            .reserve-mobile-bar__secondary {
+                min-width: 116px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                background: rgba(255, 255, 255, 0.04);
+                color: #fff;
+            }
+        }
+        /* 2026 reserve refresh: cleaner, lighter and less text-heavy */
+        html {
+            background: #f4efe6;
+        }
+
+        body.reserve-page {
+            background: #f4efe6;
+            color: #181512;
+        }
+
+        .reserve-page .lab-header {
+            background: linear-gradient(180deg, rgba(246, 243, 238, 0.94) 0%, rgba(246, 243, 238, 0.82) 60%, rgba(246, 243, 238, 0) 100%);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 1px 0 rgba(50, 39, 27, 0.06);
+        }
+
+        .reserve-page .lab-header::after {
+            background: linear-gradient(90deg, rgba(23, 23, 23, 0), rgba(23, 23, 23, 0.08), rgba(23, 23, 23, 0));
+        }
+
+        .reserve-page .lab-brand__copy strong,
+        .reserve-page .lab-brand__copy span,
+        .reserve-page .lab-nav a,
+        .reserve-page .lab-nav__trigger {
+            color: #17120d;
+        }
+
+        .reserve-page .lab-nav a:hover,
+        .reserve-page .lab-nav__trigger:hover {
+            color: #5a4630;
+        }
+
+        .reserve-page .lab-header__utility-link {
+            border-color: rgba(98, 77, 50, 0.18);
+            background: rgba(255, 255, 255, 0.74);
+            color: #5c4831;
+            box-shadow: 0 8px 24px rgba(64, 45, 20, 0.06);
+        }
+
+        .reserve-page .lab-header__utility-link:hover,
+        .reserve-page .lab-header__utility-link:focus-visible {
+            border-color: rgba(221, 183, 90, 0.45);
+            background: #fff;
+            color: #17120d;
+        }
+
+        .reserve-page-main {
+            padding: calc(var(--lab-header-offset) + 0.72rem) 0 0;
+            background:
+                radial-gradient(circle at top left, rgba(221, 183, 90, 0.12), transparent 24%),
+                radial-gradient(circle at 88% 10%, rgba(199, 168, 119, 0.14), transparent 18%),
+                linear-gradient(180deg, #f6f3ee 0%, #f2ece2 30%, #efe7da 100%);
+        }
+
+        .reserve-page-shell {
+            padding: 0 1.25rem 4rem;
+        }
+
+        .reserve-page-intro {
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .reserve-page-intro__grid {
+            grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .reserve-container {
+            max-width: 1180px;
+            padding-top: 0.4rem;
+        }
+
+        .reserve-page-intro__copy,
+        .reserve-page-panel,
+        .step-pill,
+        .info-card,
+        .selected-plan-card,
+        .schedule-card,
+        .calendar-container,
+        .reservation-summary,
+        .route-guide-card,
+        .delivery-card,
+        .summary-section,
+        .payment-side-card,
+        .payment-trust,
+        .btn-home {
+            border: 1px solid rgba(92, 72, 49, 0.12);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(251, 248, 243, 0.94) 100%);
+            box-shadow: 0 18px 48px rgba(71, 50, 26, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.82);
+        }
+
+        .reserve-page-intro__copy,
+        .reserve-page-panel {
+            position: relative;
+            overflow: hidden;
+            padding: 1.2rem 1.35rem;
+            border-radius: 1.25rem;
+        }
+
+        .reserve-page-intro__copy::before,
+        .reserve-page-panel::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .reserve-page-intro__copy::before {
+            background: radial-gradient(circle at 14% 14%, rgba(221, 183, 90, 0.16) 0%, rgba(221, 183, 90, 0) 34%), linear-gradient(120deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 30%);
+        }
+
+        .reserve-page-panel::before {
+            background: radial-gradient(circle at 82% 12%, rgba(227, 246, 85, 0.12) 0%, rgba(227, 246, 85, 0) 36%), linear-gradient(180deg, rgba(255, 255, 255, 0.44), rgba(255, 255, 255, 0) 36%);
+        }
+
+        .reserve-page-intro__copy > *,
+        .reserve-page-panel > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .reserve-page-breadcrumb {
+            margin-bottom: 0.75rem;
+            color: rgba(64, 48, 31, 0.58);
+        }
+
+        .reserve-page-kicker,
+        .reserve-page-panel__eyebrow {
+            color: #8f6c42;
+            font-size: 0.74rem;
+            letter-spacing: 0.16em;
+        }
+
+        .reserve-page-heading {
+            color: #17120d;
+            font-size: clamp(2.15rem, 3.5vw, 3.35rem);
+            line-height: 0.94;
+            text-wrap: balance;
+        }
+
+        .reserve-page-lead {
+            max-width: 38rem;
+            margin-top: 0.55rem;
+            font-size: 0.96rem;
+            line-height: 1.55;
+        }
+
+        .reserve-page-lead,
+        .reserve-page-panel__copy,
+        .step-heading-sub,
+        .info-card-note,
+        .summary-caption,
+        .route-guide-copy,
+        .delivery-card-note,
+        .payment-caption,
+        .payment-side-copy,
+        .payment-trust,
+        .primer-copy {
+            color: rgba(52, 43, 32, 0.74);
+        }
+
+        .reserve-page-panel__title,
+        .summary-title,
+        .route-guide-title,
+        .assurance-title,
+        .selected-plan-title {
+            color: #17120d;
+        }
+
+        .reserve-page-panel__facts {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.65rem;
+        }
+
+        .reserve-page-panel__facts div,
+        .selected-plan-points div,
+        .route-guide-item,
+        .payment-perk,
+        .assurance-item {
+            border-color: rgba(92, 72, 49, 0.08);
+            background: rgba(255, 255, 255, 0.66);
+        }
+
+        .reserve-page-panel__facts strong,
+        .selected-plan-points strong,
+        .route-guide-item strong,
+        .payment-perk strong,
+        .assurance-item strong,
+        .info-card-title,
+        .payment-side-title,
+        .delivery-card-title {
+            color: #17120d;
+        }
+
+        .reserve-page-panel__facts span,
+        .selected-plan-points span,
+        .route-guide-item span,
+        .payment-perk span,
+        .assurance-item span,
+        .selected-plan-copy,
+        .assurance-note,
+        .delivery-map-hint,
+        .reserve-mobile-summary__rate {
+            color: rgba(52, 43, 32, 0.68);
+        }
+
+        .reserve-page-action,
+        .btn,
+        .confirm-pay-btn,
+        .btn-secondary,
+        .reserve-mobile-bar__primary {
+            border-radius: 999px;
+            font-family: var(--lab-font-sans);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .reserve-page-action--primary,
+        .btn,
+        .confirm-pay-btn,
+        .reserve-mobile-bar__primary {
+            background: linear-gradient(135deg, #efd793, #ddb75a);
+            color: #17120d;
+            box-shadow: 0 14px 32px rgba(221, 183, 90, 0.18);
+        }
+
+        .reserve-page-action--secondary,
+        .btn-secondary {
+            border: 1px solid rgba(92, 72, 49, 0.14);
+            background: rgba(255, 255, 255, 0.72);
+            color: #17120d;
+        }
+
+        .steps-indicator {
+            margin-bottom: 1.25rem;
+        }
+
+        .step-pill {
+            border-radius: 1.25rem;
+            color: #6f5a42;
+        }
+
+        .step-pill-label {
+            color: #17120d;
+        }
+
+        .step-pill-meta {
+            color: rgba(84, 66, 43, 0.56);
+        }
+
+        .step-pill-index {
+            border-color: rgba(92, 72, 49, 0.12);
+            background: rgba(255, 255, 255, 0.72);
+            color: #5d4831;
+        }
+
+        .step-pill.active {
+            border-color: rgba(221, 183, 90, 0.34);
+            background: linear-gradient(180deg, rgba(255, 248, 224, 0.96), rgba(248, 241, 229, 0.94));
+        }
+
+        .step-pill.active .step-pill-index,
+        .step-pill.completed .step-pill-index {
+            border-color: rgba(221, 183, 90, 0.3);
+            background: linear-gradient(135deg, #efd793, #ddb75a);
+            color: #17120d;
+        }
+
+        .step-pill.active .step-pill-label,
+        .step-pill.active .step-pill-meta {
+            color: #5d4831;
+        }
+
+        .booking-primer,
+        .step1-side .assurance-card,
+        .route-guide-card,
+        .btn-home {
+            display: none;
+        }
+
+        .step-heading {
+            margin-bottom: 0.55rem;
+            color: #17120d;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2.2rem, 4vw, 3.2rem);
+            font-weight: 600;
+            line-height: 0.96;
+            letter-spacing: -0.03em;
+        }
+
+        .step-heading-sub {
+            margin: 0 0 1.2rem;
+            max-width: 42rem;
+            font-size: 0.98rem;
+        }
+
+        .step1-layout {
+            grid-template-columns: minmax(0, 1fr) minmax(260px, 0.5fr);
+        }
+
+        .info-card,
+        .selected-plan-card,
+        .schedule-card,
+        .calendar-container,
+        .reservation-summary,
+        .route-guide-card,
+        .delivery-card,
+        .summary-section,
+        .payment-side-card {
+            border-radius: 1.35rem;
+            padding: 1.35rem;
+        }
+
+        .info-card--optional {
+            padding: 1rem 1.1rem;
+        }
+
+        .reserve-optional-panel {
+            display: grid;
+            gap: 0.9rem;
+        }
+
+        .reserve-optional-summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            cursor: pointer;
+            list-style: none;
+        }
+
+        .reserve-optional-summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .reserve-optional-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            color: #17120d;
+            font-weight: 700;
+        }
+
+        .reserve-optional-hint {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 32px;
+            padding: 0 0.8rem;
+            border-radius: 999px;
+            background: rgba(221, 183, 90, 0.14);
+            color: #8f6c42;
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .field-label {
+            margin-bottom: 0.42rem;
+            color: #5d4831;
+            font-size: 0.84rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .input {
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid rgba(92, 72, 49, 0.14);
+            color: #17120d;
+        }
+
+        .input::placeholder {
+            color: rgba(92, 72, 49, 0.45);
+        }
+
+        .input:focus {
+            border-color: rgba(221, 183, 90, 0.72);
+            box-shadow: 0 0 0 4px rgba(221, 183, 90, 0.16);
+        }
+
+        .info-grid .form-group,
+        .schedule-grid .form-group {
+            border-color: rgba(92, 72, 49, 0.08);
+            background: rgba(255, 255, 255, 0.42);
+        }
+
+        .summary-kicker,
+        .route-guide-kicker,
+        .payment-kicker,
+        .selected-plan-badge,
+        .assurance-kicker {
+            background: rgba(221, 183, 90, 0.14);
+            color: #8f6c42;
+        }
+
+        .summary-row,
+        .payment-breakdown-row {
+            color: rgba(52, 43, 32, 0.76);
+        }
+
+        .summary-value,
+        .summary-section .total,
+        .selected-plan-rate,
+        .summary-value.gold,
+        .summary-section h3,
+        .schedule-card-title,
+        .reserve-mobile-summary__step,
+        .reserve-mobile-bar__step {
+            color: #8f6c42;
+        }
+
+        .reservation-summary,
+        .summary-section {
+            background: linear-gradient(180deg, rgba(255, 251, 240, 0.96), rgba(250, 244, 232, 0.96));
+        }
+
+        .payment-trust {
+            margin-top: 0;
+            padding: 1rem 1.1rem;
+            border-radius: 1rem;
+        }
+
+        #card-element {
+            background: rgba(255, 255, 255, 0.94) !important;
+            border: 1px solid rgba(92, 72, 49, 0.14) !important;
+        }
+
+        .reserve-mobile-summary {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 0.95rem 1.1rem;
+            border-radius: 1rem;
+            border-color: rgba(92, 72, 49, 0.12);
+            background: rgba(255, 255, 255, 0.84);
+            box-shadow: 0 16px 36px rgba(71, 50, 26, 0.08);
+        }
+
+        .reserve-mobile-summary__copy {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 0.4rem 0.75rem;
+        }
+
+        .reserve-mobile-summary__step {
+            color: #8f6c42;
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .reserve-mobile-summary__car {
+            color: #17120d;
+            font-size: 1.1rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .reserve-mobile-summary__rate {
+            color: rgba(52, 43, 32, 0.7);
+            font-size: 0.98rem;
+        }
+
+        .reserve-mobile-summary__car,
+        .reserve-mobile-bar__car {
+            color: #17120d;
+        }
+
+        .reserve-mobile-summary__whatsapp {
+            display: none;
+        }
+
+        .reserve-mobile-bar {
+            background: #f8f2e8;
+            border-top: 1px solid rgba(92, 72, 49, 0.08);
+            box-shadow: 0 -18px 36px rgba(71, 50, 26, 0.08);
+        }
+
+        .reserve-mobile-bar__actions {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .reserve-mobile-bar__secondary {
+            display: none;
+        }
+
+        @media (max-width: 960px) {
+            .reserve-page-intro__grid,
+            .step1-layout,
+            .step2-layout,
+            .payment-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .reserve-page-panel__facts {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .reserve-page-main {
+                padding-top: calc(var(--lab-header-offset) + 0.6rem);
+            }
+
+            .reserve-page-intro {
+                display: block;
+                margin-bottom: 0.75rem;
+            }
+
+            .reserve-page-intro__grid {
+                grid-template-columns: 1fr;
+                gap: 0.7rem;
+            }
+
+            .reserve-mobile-summary {
+                display: flex;
+            }
+
+            .reserve-page-actions {
+                display: none;
+            }
+
+            .reserve-page-intro__copy,
+            .reserve-page-panel,
+            .step-pill,
+            .info-card,
+            .selected-plan-card,
+            .schedule-card,
+            .calendar-container,
+            .reservation-summary,
+            .route-guide-card,
+            .delivery-card,
+            .summary-section {
+                border-radius: 1.1rem;
+            }
+
+            .reserve-page-intro__copy,
+            .reserve-page-panel {
+                padding: 1rem;
+            }
+
+            .reserve-page-breadcrumb,
+            .reserve-page-panel,
+            .reserve-page-lead {
+                display: none;
+            }
+
+            .reserve-page-heading {
+                max-width: 8ch;
+                font-size: clamp(1.95rem, 11vw, 2.7rem);
+                line-height: 0.95;
+            }
+
+            .reserve-page-kicker {
+                margin-bottom: 0.35rem;
+            }
+
+            .reserve-mobile-summary {
+                margin-bottom: 0.75rem;
+                padding: 0.75rem 0.9rem;
+            }
+
+            .reserve-mobile-summary__copy {
+                gap: 0.2rem 0.55rem;
+            }
+
+            .reserve-mobile-summary__car {
+                font-size: 0.98rem;
+            }
+
+            .reserve-mobile-summary__rate {
+                font-size: 0.86rem;
+            }
+
+            .step-pill {
+                background: rgba(255, 255, 255, 0.84);
+            }
+
+            .calendar-container {
+                display: none;
+            }
+
+            .step2-layout {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .step2-main {
+                order: 1;
+            }
+
+            .step2-side {
+                order: 2;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .schedule-card {
+                order: 1;
+            }
+
+            .delivery-card {
+                order: 2;
+            }
+
+            .reservation-summary {
+                order: 1;
+                position: static;
+            }
+        }
+
+        /* Final reserve cleanup */
+        .reserve-page .lab-header__inner {
+            justify-content: space-between;
+            gap: 1.2rem;
+        }
+
+        .reserve-page-shell {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding-top: 0.2rem;
+        }
+
+        .booking-primer,
+        .calendar-container,
+        .route-guide-card,
+        .delivery-map-wrapper,
+        .delivery-map-link,
+        .delivery-map-hint,
+        .btn-home,
+        .assurance-card {
+            display: none !important;
+        }
+
+        .reserve-page-intro {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .reserve-page-intro__grid {
+            grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+            gap: 0.85rem;
+            align-items: start;
+        }
+
+        .reserve-page-intro__copy {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            min-height: 148px;
+            background:
+                linear-gradient(102deg, rgba(250, 246, 238, 0.96) 0%, rgba(250, 246, 238, 0.88) 48%, rgba(250, 246, 238, 0.52) 100%),
+                url('/images/home-hero-video-poster.jpg') center right / cover no-repeat;
+        }
+
+        .reserve-page-panel {
+            display: grid;
+            gap: 0.55rem;
+            align-content: start;
+            padding: 0.95rem 1rem;
+        }
+
+        .reserve-page-panel__title {
+            font-size: 1rem;
+            line-height: 1.35;
+        }
+
+        .reserve-page-panel__copy {
+            margin: 0.35rem 0 0;
+            font-size: 0.86rem;
+            line-height: 1.45;
+        }
+
+        .reserve-page-panel__facts {
+            display: none;
+        }
+
+        .reserve-page-actions {
+            margin-top: 0.7rem;
+        }
+
+        .reserve-page-lead {
+            max-width: 28rem;
+            margin-top: 0.55rem;
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        .reserve-page-heading {
+            max-width: 16ch;
+            font-size: clamp(2.15rem, 3.1vw, 3rem);
+        }
+
+        .reserve-container {
+            max-width: 1180px;
+            padding-top: 0.05rem;
+        }
+
+        .reserve-mobile-summary {
+            margin-bottom: 0.85rem;
+        }
+
+        .steps-indicator {
+            margin-bottom: 0.42rem;
+        }
+
+        .step-pill {
+            gap: 0.65rem;
+            padding: 0.6rem 0.8rem;
+        }
+
+        .step-pill-index {
+            width: 30px;
+            height: 30px;
+            font-size: 0.86rem;
+        }
+
+        .step-pill-label {
+            font-size: 0.96rem;
+        }
+
+        .step-pill-meta {
+            font-size: 0.68rem;
+        }
+
+        .step-heading {
+            margin-bottom: 0.25rem;
+        }
+
+        .step-heading-sub {
+            display: none;
+        }
+
+        .step1-layout,
+        .step2-layout {
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .step1-layout {
+            grid-template-columns: minmax(0, 1fr) minmax(300px, 340px);
+        }
+
+        .step2-layout {
+            grid-template-columns: minmax(0, 1fr) minmax(320px, 360px);
+        }
+
+        .step1-main,
+        .step2-main,
+        .step2-side,
+        .payment-main {
+            gap: 1rem;
+        }
+
+        .step1-side {
+            position: sticky;
+            top: calc(var(--lab-header-offset) + 1rem);
+        }
+
+        .info-card,
+        .selected-plan-card,
+        .schedule-card,
+        .reservation-summary,
+        .delivery-card,
+        .summary-section,
+        .payment-trust {
+            padding: 1.15rem;
+        }
+
+        .info-card-note,
+        .schedule-card-note,
+        .delivery-card-note,
+        .summary-caption,
+        .payment-caption,
+        .payment-trust {
+            font-size: 0.92rem;
+        }
+
+        .schedule-grid {
+            gap: 0.85rem;
+        }
+
+        .delivery-card .form-group,
+        .schedule-grid .form-group,
+        .info-grid .form-group {
+            padding: 0.9rem;
+        }
+
+        .schedule-card {
+            border-color: rgba(221, 183, 90, 0.22);
+        }
+
+        .reserve-page-intro__copy,
+        .reserve-page-panel,
+        .step-pill,
+        .info-card,
+        .selected-plan-card,
+        .schedule-card,
+        .reservation-summary,
+        .delivery-card,
+        .summary-section,
+        .payment-side-card,
+        .payment-trust,
+        .reserve-mobile-summary,
+        .reserve-mobile-bar {
+            border-radius: 12px;
+        }
+
+        .reserve-page-action,
+        .btn,
+        .btn-secondary,
+        .confirm-pay-btn,
+        .reserve-mobile-bar__primary,
+        .reserve-mobile-bar__secondary,
+        .contact-chip {
+            border-radius: 8px;
+        }
+
+        .delivery-card .form-group,
+        .schedule-grid .form-group,
+        .info-grid .form-group,
+        .payment-breakdown,
+        #card-element {
+            border-radius: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .reserve-page-main {
+                padding-top: calc(var(--lab-header-offset) + 0.18rem);
+            }
+
+            .reserve-page-intro {
+                margin-bottom: 0.5rem;
+            }
+
+            .reserve-page-intro__grid {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .reserve-page-panel,
+            .reserve-page-breadcrumb,
+            .reserve-page-lead,
+            .reserve-mobile-summary {
+                display: none;
+            }
+
+            .reserve-page-intro__copy {
+                width: 100%;
+                min-height: 108px;
+                padding: 0.8rem 0.9rem;
+                background-position: center;
+            }
+
+            .reserve-page-kicker {
+                margin-bottom: 0.25rem;
+            }
+
+            .reserve-page-heading {
+                max-width: 13ch;
+                font-size: clamp(1.52rem, 7.6vw, 1.95rem);
+            }
+
+            .steps-indicator {
+                margin-bottom: 0.45rem;
+            }
+
+            .step-pill {
+                padding: 0.58rem 0.65rem;
+            }
+        }
+
+        .step-navigation {
+            justify-content: flex-end;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .step-navigation .btn-secondary,
+        .step-navigation .btn {
+            flex: 0 0 auto;
+            min-width: 180px;
+            width: auto;
+            margin-top: 0;
+        }
+
+        .payment-layout {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .payment-side {
+            display: none;
+        }
+
+        .summary-section {
+            text-align: left;
+        }
+
+        .payment-breakdown {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+        }
+
+        #payment-form-container {
+            margin-top: 0.75rem !important;
+        }
+
+        @media (max-width: 900px) {
+            .step1-layout,
+            .step2-layout,
+            .payment-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .step1-side {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .reserve-page .lab-header__utility-link[href^="mailto:"] {
+                display: none;
+            }
+
+            .reserve-mobile-summary__copy {
+                display: grid;
+                gap: 0.22rem;
+            }
+
+            .steps-indicator {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 0.55rem;
+            }
+
+            .step-pill {
+                min-height: 60px;
+                padding: 0.65rem;
+            }
+
+            .step-pill-copy {
+                display: none;
+            }
+
+            .step-navigation {
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+
+            .step-navigation .btn-secondary,
+            .step-navigation .btn {
+                width: 100%;
+                min-width: 0;
+            }
+        }
+</style>
 </head>
-<body>
-    <div class="reserve-container">
+<body class="reserve-page">
+    <header class="lab-header">
+        <div class="lab-shell lab-header__inner">
+            <a href="/index.html" class="lab-brand" aria-label="Dynasty Prestige home">
+                <span class="lab-brand__crest" aria-hidden="true">
+                    <img src="/images/dp-crest-cropped.png" alt="">
+                </span>
+                <span class="lab-brand__copy">
+                    <strong>Dynasty Prestige</strong>
+                    <span>Dubai luxury car rental</span>
+                </span>
+            </a>
+
+            <nav class="lab-header__utility" aria-label="Quick contact">
+                <a class="lab-header__utility-link" href="tel:+971586122568" aria-label="Call Dynasty Prestige">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill="currentColor" d="M6.62 10.79a15.47 15.47 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.07 21 3 13.93 3 5c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.24.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2Z"/>
+                    </svg>
+                    <span>Call</span>
+                </a>
+                <a class="lab-header__utility-link" href="mailto:prestigegoalmotion@gmail.com" aria-label="Email Dynasty Prestige">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill="currentColor" d="M20 5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm-.4 2-6.54 5.23a1.7 1.7 0 0 1-2.12 0L4.4 7h15.2ZM4 17V9.05l5.69 4.56a3.7 3.7 0 0 0 4.62 0L20 9.05V17H4Z"/>
+                    </svg>
+                    <span>Email</span>
+                </a>
+                <a class="lab-header__utility-link" href="https://wa.me/971586122568" target="_blank" rel="noopener" aria-label="Open WhatsApp">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill="currentColor" d="M19.05 4.91A9.82 9.82 0 0 0 12 2a9.94 9.94 0 0 0-8.54 15.02L2 22l5.13-1.35A9.94 9.94 0 1 0 19.05 4.91Zm-7.05 14.1c-1.53 0-3.04-.41-4.36-1.19l-.31-.18-3.04.8.81-2.96-.2-.31a8 8 0 1 1 7.1 3.84Zm4.39-5.91c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.93-1.18-.71-.63-1.2-1.41-1.34-1.65-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.48-.4-.41-.54-.41l-.46-.01c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.09 3.61.57.25 1.01.39 1.36.49.57.18 1.09.15 1.5.09.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"/>
+                    </svg>
+                    <span>WhatsApp</span>
+                </a>
+            </nav>
+
+            <div class="lab-header__nav">
+                <nav class="lab-nav" aria-label="Main navigation">
+                    <a href="/index.html">Home</a>
+                    <a href="/fleet.html">Fleet</a>
+
+                    <div class="lab-nav__item lab-nav__item--has-panel js-nav-mega">
+                        <button type="button" class="lab-nav__trigger" aria-expanded="false" aria-controls="reserve-nav-brands-panel">
+                            <span>Cars Brands</span>
+                            <span class="lab-nav__chevron" aria-hidden="true"></span>
+                        </button>
+
+                        <div class="lab-nav__panel lab-nav__panel--brands" id="reserve-nav-brands-panel">
+                            <div class="lab-nav__panel-grid lab-nav__panel-grid--brands">
+                                <a class="lab-nav__card lab-nav__card--brand" href="/lamborghini-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--brand"><img src="/images/brands/lamborghini-mark.png" alt=""></span>
+                                    <span class="lab-nav__card-copy"><strong>Lamborghini</strong><span>Huracan and Urus selection.</span></span>
+                                </a>
+                                <a class="lab-nav__card lab-nav__card--brand" href="/ferrari-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--brand"><img src="/images/brands/ferrari-mark.png" alt=""></span>
+                                    <span class="lab-nav__card-copy"><strong>Ferrari</strong><span>Convertible-led flagship moments.</span></span>
+                                </a>
+                                <a class="lab-nav__card lab-nav__card--brand" href="/mercedes-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--brand"><img src="/images/brands/mercedes-mark.png" alt=""></span>
+                                    <span class="lab-nav__card-copy"><strong>Mercedes</strong><span>G-Class and executive balance.</span></span>
+                                </a>
+                                <a class="lab-nav__card lab-nav__card--brand" href="/porsche-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--brand"><img src="/images/brands/porsche-mark.png" alt=""></span>
+                                    <span class="lab-nav__card-copy"><strong>Porsche</strong><span>Focused driver-first delivery.</span></span>
+                                </a>
+                                <a class="lab-nav__card lab-nav__card--brand" href="/rolls-royce-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--brand"><img src="/images/brands/rolls-royce-mark.png" alt=""></span>
+                                    <span class="lab-nav__card-copy"><strong>Rolls-Royce</strong><span>Arrival-first quiet authority.</span></span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lab-nav__item lab-nav__item--has-panel js-nav-mega">
+                        <button type="button" class="lab-nav__trigger" aria-expanded="false" aria-controls="reserve-nav-types-panel">
+                            <span>Cars Types</span>
+                            <span class="lab-nav__chevron" aria-hidden="true"></span>
+                        </button>
+
+                        <div class="lab-nav__panel lab-nav__panel--types" id="reserve-nav-types-panel">
+                            <div class="lab-nav__panel-grid lab-nav__panel-grid--types">
+                                <a class="lab-nav__card lab-nav__card--type" href="/luxury-car-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--type"><img src="/images/categories/mock-fastpng/luxury-stage.png" alt=""></span>
+                                    <span class="lab-nav__card-copy"><strong>Luxury Cars</strong><span>Comfort-first arrivals and city stays.</span></span>
+                                </a>
+                                <a class="lab-nav__card lab-nav__card--type" href="/ferrari-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--type"><img src="/images/categories/mock-fastpng/convertible-stage.png" alt=""></span>
+                                    <span class="lab-nav__card-copy"><strong>Convertible Cars</strong><span>Open-top Dubai movement with presence.</span></span>
+                                </a>
+                                <a class="lab-nav__card lab-nav__card--type" href="/supercar-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--type"><img src="/images/categories/mock-fastpng/sports-stage.png" alt=""></span>
+                                    <span class="lab-nav__card-copy"><strong>Sports Cars</strong><span>Sharper performance-led picks.</span></span>
+                                </a>
+                                <a class="lab-nav__card lab-nav__card--type" href="/fleet.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--type"><img src="/images/categories/mock-fastpng/electric-stage.png" alt=""></span>
+                                    <span class="lab-nav__card-copy"><strong>Electric Cars</strong><span>Quiet torque and future-ready browsing.</span></span>
+                                </a>
+                                <a class="lab-nav__card lab-nav__card--type" href="/luxury-car-rental-dubai.html">
+                                    <span class="lab-nav__card-media lab-nav__card-media--type"><img src="/images/categories/mock-fastpng/suv-stage.png" alt=""></span>
+                                    <span class="lab-nav__card-copy"><strong>SUV Cars</strong><span>Room, height and hotel-ready comfort.</span></span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="/services.html">Services</a>
+                    <a href="/locations.html">Locations</a>
+                    <a href="/about.html">About Us</a>
+                    <a href="/contact.html">Contact</a>
+                </nav>
+                <a href="/app/reserve/page.html" class="lab-reserve" aria-current="page">Reserve</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="lab-main reserve-page-main">
+        <section class="reserve-page-shell">
+            <div class="reserve-page-intro">
+                <div class="reserve-page-intro__grid">
+                    <div class="reserve-page-intro__copy">
+                        <nav class="reserve-page-breadcrumb" aria-label="Breadcrumb">
+                            <a href="/index.html">Home</a>
+                            <span>/</span>
+                            <a href="/fleet.html">Fleet</a>
+                            <span>/</span>
+                            <span aria-current="page">Reserve</span>
+                        </nav>
+                        <span class="reserve-page-kicker">Reserve online</span>
+                        <h1 class="reserve-page-heading">Choose your dates first, then lock the booking.</h1>
+                        <p class="reserve-page-lead">Start with delivery and return. Guest details and secure payment come right after.</p>
+                    </div>
+
+                    <aside class="reserve-page-panel" aria-labelledby="reserve-page-panel-title">
+                        <span class="reserve-page-panel__eyebrow">Your selection</span>
+                        <h2 class="reserve-page-panel__title" id="reserve-page-panel-title"><span id="reserveHeroCar">Mercedes GLE 53 AMG</span> from <span id="reserveHeroRate">AED 2,000 / day</span></h2>
+                        <p class="reserve-page-panel__copy">Your car, live quote and amount due stay visible while you book.</p>
+                        <div class="reserve-page-panel__facts">
+                            <div>
+                                <strong>What stays locked</strong>
+                                <span>Vehicle, schedule and quote remain linked to this reservation.</span>
+                            </div>
+                            <div>
+                                <strong>Fast help</strong>
+                                <span>Use WhatsApp for airport, event or handover coordination.</span>
+                            </div>
+                        </div>
+                        <div class="reserve-page-actions">
+                            <a class="reserve-page-action reserve-page-action--secondary" href="/fleet.html">View fleet</a>
+                            <a class="reserve-page-action reserve-page-action--primary" href="https://wa.me/971586122568" target="_blank" rel="noopener noreferrer">Need help?</a>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+
+            <div class="reserve-container">
+        <div class="reserve-mobile-summary">
+            <div class="reserve-mobile-summary__copy">
+                <span class="reserve-mobile-summary__step" id="reserveMobileStep">Step 1 of 3</span>
+                <strong class="reserve-mobile-summary__car" id="reserveMobileCar">Mercedes GLE 53 AMG</strong>
+                <span class="reserve-mobile-summary__rate" id="reserveMobileRate">AED 2,000 / day</span>
+            </div>
+            <a class="reserve-mobile-summary__whatsapp" id="reserveMobileWhatsAppTop" href="https://wa.me/971586122568" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+        </div>
+
         <!-- STEPS INDICATOR -->
-        <div class="steps-indicator">
-            <div id="step1-indicator" class="step-pill active">
-                <span class="step-pill-index">1</span>
-                <span class="step-pill-copy">
-                    <span class="step-pill-label">Guest Info</span>
-                    <span class="step-pill-meta">Identity and contact</span>
-                </span>
-            </div>
-            <div id="step2-indicator" class="step-pill">
-                <span class="step-pill-index">2</span>
-                <span class="step-pill-copy">
-                    <span class="step-pill-label">Schedule</span>
-                    <span class="step-pill-meta">Dates, hours and location</span>
-                </span>
-            </div>
+            <div class="steps-indicator">
+                <div id="step1-indicator" class="step-pill active">
+                    <span class="step-pill-index">1</span>
+                    <span class="step-pill-copy">
+                        <span class="step-pill-label">Schedule</span>
+                        <span class="step-pill-meta">Dates and delivery</span>
+                    </span>
+                </div>
+                <div id="step2-indicator" class="step-pill">
+                    <span class="step-pill-index">2</span>
+                    <span class="step-pill-copy">
+                        <span class="step-pill-label">Guest details</span>
+                        <span class="step-pill-meta">Contact and ID</span>
+                    </span>
+                </div>
             <div id="step3-indicator" class="step-pill">
                 <span class="step-pill-index">3</span>
                 <span class="step-pill-copy">
@@ -1291,98 +2829,103 @@
             </div>
         </div>
 
-        <!-- STEP 1: Customer Information -->
-        <div id="step1" class="step-content active">
+        <!-- STEP 2: Guest Details -->
+        <div id="step2" class="step-content">
             <div style="margin-bottom: 1.5rem;">
                 <a href="/index.html" class="btn-home">
                     <i class="fas fa-arrow-left"></i>
                     <span>Back to Home</span>
                 </a>
             </div>
-            <h2 class="step-heading">Tell Us About You</h2>
-            <p class="step-heading-sub">Share your contact and identification details so we can secure the vehicle, validate availability, and prepare a smooth handover experience.</p>
-            <div id="step1Validation" class="form-feedback" role="alert"></div>
+            <h2 class="step-heading">Who is booking?</h2>
+            <p class="step-heading-sub">Add the guest details needed to secure the car.</p>
+            <div id="step2Validation" class="form-feedback" role="alert"></div>
             <div class="step1-layout">
                 <div class="step1-main">
                     <div class="info-card">
-                        <h3 class="info-card-title"><i class="fa-regular fa-address-card"></i> Guest Details</h3>
-                        <p class="info-card-note">Use the same details you want associated with the reservation and payment confirmation.</p>
+                        <h3 class="info-card-title"><i class="fa-regular fa-address-card"></i> Guest details</h3>
+                        <p class="info-card-note">Use the same details you want on the booking confirmation.</p>
                         <div class="info-grid">
                             <div class="form-group span-2">
                                 <label for="fullName" class="field-label"><i class="fa-regular fa-user"></i>Full Name *</label>
-                                <input type="text" id="fullName" name="fullName" placeholder="e.g. John Smith" class="input" data-label="Full name" required>
+                                <input type="text" id="fullName" name="fullName" placeholder="e.g. John Smith" class="input" data-label="Full name" autocomplete="name" required>
                                 <p class="field-error" id="fullName-error"></p>
                             </div>
                             <div class="form-group">
                                 <label for="passport" class="field-label"><i class="fa-regular fa-id-card"></i>ID / Passport *</label>
-                                <input type="text" id="passport" name="passport" placeholder="Passport or Emirates ID number" class="input" data-label="ID / Passport" required>
+                                <input type="text" id="passport" name="passport" placeholder="Passport or Emirates ID number" class="input" data-label="ID / Passport" autocomplete="off" required>
                                 <p class="field-error" id="passport-error"></p>
                             </div>
                             <div class="form-group">
                                 <label for="phone" class="field-label"><i class="fa-brands fa-whatsapp"></i>Phone / WhatsApp *</label>
-                                <input type="tel" id="phone" name="phone" placeholder="+971 ..." class="input" data-label="Phone / WhatsApp" required>
+                                <input type="tel" id="phone" name="phone" placeholder="+971 ..." class="input" data-label="Phone / WhatsApp" autocomplete="tel" inputmode="tel" required>
                                 <p class="field-error" id="phone-error"></p>
                             </div>
                             <div class="form-group span-2">
                                 <label for="email" class="field-label"><i class="fa-regular fa-envelope"></i>Email *</label>
-                                <input type="email" id="email" name="email" placeholder="name@email.com" class="input" data-label="Email" required>
+                                <input type="email" id="email" name="email" placeholder="name@email.com" class="input" data-label="Email" autocomplete="email" inputmode="email" required>
                                 <p class="field-error" id="email-error"></p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="info-card">
-                        <h3 class="info-card-title"><i class="fa-solid fa-location-dot"></i> Billing Address</h3>
-                        <p class="info-card-note">These details are used for payment verification and reservation records. In Dubai, addresses usually don’t use a postal code — building, street and area are enough.</p>
-                        <div class="info-grid">
-                            <div class="form-group span-2">
-                                <label for="address" class="field-label"><i class="fa-solid fa-road"></i>Full Address *</label>
-                                <input type="text" id="address" name="address" placeholder="Building / Street / Area" class="input" data-label="Full address" required>
-                                <p class="field-error" id="address-error"></p>
+                    <div class="info-card info-card--optional">
+                        <details class="reserve-optional-panel">
+                            <summary class="reserve-optional-summary">
+                                <span class="reserve-optional-title"><i class="fa-solid fa-location-dot"></i> Billing details</span>
+                                <span class="reserve-optional-hint">Optional</span>
+                            </summary>
+                            <p class="info-card-note">Add them only if you want the booking record to leave this page already complete.</p>
+                            <div class="info-grid">
+                                <div class="form-group span-2">
+                                    <label for="address" class="field-label"><i class="fa-solid fa-road"></i>Full Address</label>
+                                    <input type="text" id="address" name="address" placeholder="Building / Street / Area" class="input" data-label="Full address" autocomplete="street-address">
+                                    <p class="field-error" id="address-error"></p>
+                                </div>
+                                <div class="form-group">
+                                    <label for="city" class="field-label"><i class="fa-regular fa-building"></i>City</label>
+                                    <input type="text" id="city" name="city" placeholder="Dubai" class="input" data-label="City" autocomplete="address-level2">
+                                    <p class="field-error" id="city-error"></p>
+                                </div>
+                                <div class="form-group span-2">
+                                    <label for="country" class="field-label"><i class="fa-solid fa-earth-asia"></i>Country</label>
+                                    <select id="country" name="country" class="input" data-label="Country" autocomplete="country-name">
+                                        <option value="AE" selected>United Arab Emirates</option>
+                                        <option value="FR">France</option>
+                                        <option value="IT">Italy</option>
+                                        <option value="DE">Germany</option>
+                                        <option value="GB">United Kingdom</option>
+                                        <option value="US">United States</option>
+                                        <option value="">Other</option>
+                                    </select>
+                                    <p class="field-error" id="country-error"></p>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="city" class="field-label"><i class="fa-regular fa-building"></i>City *</label>
-                                <input type="text" id="city" name="city" placeholder="Dubai" class="input" data-label="City" required>
-                                <p class="field-error" id="city-error"></p>
-                            </div>
-                            <div class="form-group span-2">
-                                <label for="country" class="field-label"><i class="fa-solid fa-earth-asia"></i>Country *</label>
-                                <select id="country" name="country" class="input" data-label="Country" required>
-                                    <option value="AE" selected>United Arab Emirates</option>
-                                    <option value="FR">France</option>
-                                    <option value="IT">Italy</option>
-                                    <option value="DE">Germany</option>
-                                    <option value="GB">United Kingdom</option>
-                                    <option value="US">United States</option>
-                                    <option value="">Other</option>
-                                </select>
-                                <p class="field-error" id="country-error"></p>
-                            </div>
-                        </div>
+                        </details>
                     </div>
                 </div>
 
                 <div class="step1-side">
                     <div class="selected-plan-card">
                         <div class="selected-plan-top">
-                            <span class="selected-plan-badge"><i class="fa-solid fa-car-side"></i> Current Selection</span>
+                            <span class="selected-plan-badge"><i class="fa-solid fa-car-side"></i> Selected Car</span>
                             <span class="selected-plan-rate" id="selectedCarRate">AED 2,000 / day</span>
                         </div>
                         <h3 class="selected-plan-title" id="selectedPlanTitle">Mercedes GLE 53 AMG</h3>
-                        <p class="selected-plan-copy">This summary stays visible from the start so the booking always feels tied to the vehicle you actually want, not just to the form.</p>
+                        <p class="selected-plan-copy">The car and quote stay visible while you finish the booking.</p>
                         <div class="selected-plan-points">
                             <div>
                                 <i class="fa-solid fa-circle-check"></i>
                                 <div>
-                                    <strong>Best for direct bookings</strong>
-                                    <span>If you already know the model, this page will carry you from details to payment without needing extra back-and-forth.</span>
+                                    <strong>Direct booking</strong>
+                                    <span>Go from contact details to payment without opening extra pages.</span>
                                 </div>
                             </div>
                             <div>
                                 <i class="fa-solid fa-receipt"></i>
                                 <div>
-                                    <strong>Pricing stays clear</strong>
-                                    <span>Your total updates from the selected schedule, and the page always shows what is due today versus before delivery.</span>
+                                    <strong>Live quote</strong>
+                                    <span>The total updates from the chosen schedule, including the amount due today.</span>
                                 </div>
                             </div>
                         </div>
@@ -1421,20 +2964,20 @@
                     </div>
                 </div>
             </div>
-            <button onclick="nextStep()" class="btn">Continue to Dates →</button>
+            <button onclick="nextStep()" class="btn">Continue to Payment →</button>
         </div>
 
-        <!-- STEP 2: Dates -->
-        <div id="step2" class="step-content">
+        <!-- STEP 1: Dates -->
+        <div id="step1" class="step-content active">
             <div style="margin-bottom: 1.5rem;">
                 <a href="/index.html" class="btn-home">
                     <i class="fas fa-arrow-left"></i>
                     <span>Back to Home</span>
                 </a>
             </div>
-            <h2 class="step-heading">Design Your Rental Schedule</h2>
-            <p class="step-heading-sub">Choose your preferred delivery and return timing, review the prorated pricing instantly, and confirm the schedule that fits your stay in Dubai.</p>
-            <div id="step2Validation" class="form-feedback" role="alert"></div>
+            <h2 class="step-heading">When and where?</h2>
+            <p class="step-heading-sub">Set delivery, return and location. The quote updates instantly.</p>
+            <div id="step1Validation" class="form-feedback" role="alert"></div>
             <div class="step2-layout">
                 <div class="step2-main">
                     <div class="calendar-container">
@@ -1447,8 +2990,8 @@
                     </div>
 
                     <div class="schedule-card">
-                        <p class="schedule-card-title"><i class="fa-regular fa-clock"></i> Delivery And Return Schedule</p>
-                        <p class="schedule-card-note">Choose both the date and exact time for delivery and return. Pricing is calculated on a 24-hour basis and prorated by hours.</p>
+                        <p class="schedule-card-title"><i class="fa-regular fa-clock"></i> Trip Schedule</p>
+                        <p class="schedule-card-note">Choose delivery and return. The quote recalculates automatically.</p>
                         <div class="schedule-grid">
                             <div class="form-group">
                                 <label class="field-label" for="startDate"><i class="fa-solid fa-calendar-day"></i>Delivery Date *</label>
@@ -1470,13 +3013,36 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="delivery-card">
+                        <h3 class="delivery-card-title"><i class="fa-solid fa-location-dot"></i> Delivery Address</h3>
+                        <p class="delivery-card-note">Start with the area, hotel or airport.</p>
+                        <div class="form-group" style="margin-top: 0;">
+                            <label for="pickupLocation" class="field-label"><i class="fa-solid fa-map-pin"></i>Delivery Address *</label>
+                            <input type="text" id="pickupLocation" name="pickupLocation" placeholder="Palm Jumeirah, Marina, Downtown, hotel or airport" class="input" autocomplete="street-address" required>
+                            <p class="field-error" id="pickupLocation-error"></p>
+                            <div class="delivery-map-wrapper">
+                                <iframe
+                                    title="Dubai delivery area map"
+                                    loading="lazy"
+                                    referrerpolicy="no-referrer-when-downgrade"
+                                    src="https://www.openstreetmap.org/export/embed.html?bbox=54.95%2C24.85%2C55.65%2C25.45&layer=mapnik&marker=25.2048%2C55.2708">
+                                </iframe>
+                            </div>
+                            <a class="delivery-map-link" href="https://www.google.com/maps/search/?api=1&query=Dubai+Palm+Jumeirah+Marina+Downtown+JBR+Airport" target="_blank" rel="noopener noreferrer">
+                                <i class="fas fa-map-marked-alt" aria-hidden="true"></i>
+                                Open map in Google Maps
+                            </a>
+                            <p class="delivery-map-hint">Delivery area includes Dubai and nearby zones such as Palm Jumeirah, Dubai Marina, Downtown Dubai, JBR and Dubai Airport.</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="step2-side">
                     <div class="reservation-summary">
                         <div class="summary-kicker"><i class="fa-solid fa-gem"></i> Instant Quote</div>
-                        <h3 class="summary-title">Reservation Overview</h3>
-                        <p class="summary-caption">Your premium rental estimate updates live as you adjust the schedule.</p>
+                        <h3 class="summary-title">Live quote</h3>
+                        <p class="summary-caption">This estimate updates as soon as you change the schedule.</p>
                         <div class="summary-row">
                             <span>Rental duration</span>
                             <span id="summaryDays" class="summary-value gold">0h</span>
@@ -1505,8 +3071,8 @@
 
                     <div class="route-guide-card">
                         <div class="route-guide-kicker"><i class="fa-solid fa-route"></i> Delivery Planner</div>
-                        <h3 class="route-guide-title">Most bookings usually follow one of these plans</h3>
-                        <p class="route-guide-copy">You do not need the exact building wording right away. Start with the stay type and the team can finalize the precise handover details after payment.</p>
+                        <h3 class="route-guide-title">Choose the handover style first</h3>
+                        <p class="route-guide-copy">You do not need the final building wording yet. The exact handover point can be confirmed after payment.</p>
                         <div class="route-guide-list">
                             <div class="route-guide-item">
                                 <i class="fa-solid fa-hotel"></i>
@@ -1532,33 +3098,11 @@
                         </div>
                     </div>
 
-                    <div class="delivery-card">
-                        <h3 class="delivery-card-title"><i class="fa-solid fa-location-dot"></i> Delivery Location</h3>
-                        <p class="delivery-card-note">Tell us where you want the vehicle delivered. Our coverage includes premium Dubai destinations and nearby zones.</p>
-                        <div class="form-group" style="margin-top: 0;">
-                            <label for="pickupLocation" class="field-label"><i class="fa-solid fa-map-pin"></i>Delivery Address *</label>
-                            <input type="text" id="pickupLocation" name="pickupLocation" placeholder="Enter delivery location in Dubai (e.g. Palm Jumeirah, Marina, Downtown) *" class="input" required>
-                            <p class="field-error" id="pickupLocation-error"></p>
-                            <div class="delivery-map-wrapper">
-                                <iframe
-                                    title="Dubai delivery area map"
-                                    loading="lazy"
-                                    referrerpolicy="no-referrer-when-downgrade"
-                                    src="https://www.openstreetmap.org/export/embed.html?bbox=54.95%2C24.85%2C55.65%2C25.45&layer=mapnik&marker=25.2048%2C55.2708">
-                                </iframe>
-                            </div>
-                            <a class="delivery-map-link" href="https://www.google.com/maps/search/?api=1&query=Dubai+Palm+Jumeirah+Marina+Downtown+JBR+Airport" target="_blank" rel="noopener noreferrer">
-                                <i class="fas fa-map-marked-alt" aria-hidden="true"></i>
-                                Open map in Google Maps
-                            </a>
-                            <p class="delivery-map-hint">Delivery area includes Dubai and nearby zones such as Palm Jumeirah, Dubai Marina, Downtown Dubai, JBR and Dubai Airport.</p>
-                        </div>
-                    </div>
                 </div>
             </div>
             <div class="step-navigation">
                 <button onclick="prevStep()" class="btn-secondary">← Back</button>
-                <button onclick="nextStep()" class="btn" id="continueToPaymentBtn" disabled style="opacity: 0.5; cursor: not-allowed;">Continue to Payment →</button>
+                <button onclick="nextStep()" class="btn" id="continueToPaymentBtn" disabled style="opacity: 0.5; cursor: not-allowed;">Continue to Guest Details →</button>
             </div>
         </div>
 
@@ -1570,7 +3114,7 @@
                     <span>Back to Home</span>
                 </a>
             </div>
-            <h2 class="step-heading" style="text-align: center;">Secure Your Reservation</h2>
+            <h2 class="step-heading" style="text-align: center;">Confirm and pay</h2>
             <div class="payment-layout">
                 <div class="payment-main">
                     <div class="summary-section">
@@ -1578,7 +3122,7 @@
                         <h3 id="selectedCar">Mercedes GLE 53 AMG</h3>
                         <p style="margin-top: 1rem; color: #a1a1aa;">Total Reservation</p>
                         <p class="total" id="totalAmount">AED 0.00</p>
-                        <p class="payment-caption">Confirm your luxury booking with a protected `50%` upfront payment. The remaining balance is settled before delivery.</p>
+                        <p class="payment-caption">Pay 50% now to secure the reservation. The rest is settled before delivery.</p>
                         <div class="payment-breakdown">
                             <div class="payment-breakdown-row">
                                 <span>Pay now</span>
@@ -1600,7 +3144,7 @@
                     </div>
                     <div class="payment-trust">
                         <strong>Secure checkout:</strong> card payments are processed by Stripe with encrypted transmission.
-                        Need support before paying? Contact us on WhatsApp: <a href="https://wa.me/971586122568" style="color:#d6f03c;">+971 58 612 2568</a>.
+                        Need help before paying? Contact the team on WhatsApp: <a href="https://wa.me/971586122568" style="color:#8f6c42;">+971 58 612 2568</a>.
                     </div>
                     
                     <div id="paymentStatus"></div>
@@ -1663,11 +3207,75 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
             <div class="step-navigation" style="margin-top: 1rem;">
                 <button onclick="prevStep()" class="btn-secondary">← Back</button>
             </div>
+        </div>
+            </div>
+        </section>
+
+        <footer class="site-v2-footer" id="contact-footer">
+            <div class="lab-shell site-v2-footer__shell">
+                <div class="site-v2-footer__top">
+                    <div class="site-v2-footer__brand">
+                        <span class="site-v2-footer__crest" aria-hidden="true">
+                            <img src="/images/dp-crest-cropped.png" alt="">
+                        </span>
+                        <p>Dynasty Prestige combines a premium fleet with discreet coordination, clear timing and polished handovers across Dubai and the UAE.</p>
+                    </div>
+
+                    <div class="site-v2-footer__column">
+                        <h3>Useful links</h3>
+                        <a href="/index.html">Home</a>
+                        <a href="/fleet.html">Fleet</a>
+                        <a href="/locations.html">Locations</a>
+                        <a href="/services.html">Services</a>
+                        <a href="/about.html">About us</a>
+                    </div>
+
+                    <div class="site-v2-footer__column">
+                        <h3>Contact us</h3>
+                        <a href="tel:+971586122568">+971 58 612 2568</a>
+                        <a href="https://wa.me/971586122568" target="_blank" rel="noopener">WhatsApp the team</a>
+                        <a href="mailto:prestigegoalmotion@gmail.com">prestigegoalmotion@gmail.com</a>
+                        <p>Palm Jumeirah, Dubai UAE with hotel, villa and airport coordination across the city.</p>
+                    </div>
+                </div>
+
+                <div class="site-v2-footer__middle">
+                    <div class="site-v2-footer__service">
+                        <strong>24/7</strong>
+                        <span>Reservation support</span>
+                    </div>
+                </div>
+
+                <div class="site-v2-footer__bottom">
+                    <div class="site-v2-footer__legal">
+                        <a href="/terms-and-conditions.html">Booking T&amp;C</a>
+                        <a href="/contact.html">Privacy &amp; contact</a>
+                    </div>
+                    <p>&copy; 2026 Dynasty Prestige. All rights reserved.</p>
+                    <div class="site-v2-footer__socials">
+                        <a href="tel:+971586122568" aria-label="Call Dynasty Prestige">Call</a>
+                        <a href="https://wa.me/971586122568" target="_blank" rel="noopener" aria-label="Open WhatsApp">WA</a>
+                        <a href="mailto:prestigegoalmotion@gmail.com" aria-label="Send email">Mail</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <div class="reserve-mobile-bar">
+        <div class="reserve-mobile-bar__meta">
+            <span class="reserve-mobile-bar__step" id="reserveMobileBarStep">Step 1 of 3</span>
+            <span class="reserve-mobile-bar__car" id="reserveMobileBarCar">Mercedes GLE 53 AMG</span>
+        </div>
+        <div class="reserve-mobile-bar__actions">
+            <button type="button" class="reserve-mobile-bar__primary" id="reserveMobileAction">Continue to Guest Details</button>
+            <a class="reserve-mobile-bar__secondary" id="reserveMobileWhatsApp" href="https://wa.me/971586122568" target="_blank" rel="noopener noreferrer">WhatsApp</a>
         </div>
     </div>
 
@@ -1679,6 +3287,29 @@
         const isAED = true;
         const CURRENCY_SYMBOL = 'AED';
         const CURRENCY_ZERO = 'AED 0.00';
+        const SUPPORT_WHATSAPP_URL = 'https://wa.me/971586122568';
+        function normalizeValue(value) {
+            return String(value || '').trim();
+        }
+        function emitAnalyticsEvent(eventName, payload) {
+            const safePayload = { ...payload };
+            if (window.google_tag_manager) {
+                window.dataLayer = window.dataLayer || [];
+                window.dataLayer.push({ event: eventName, ...safePayload });
+            } else if (typeof window.gtag === 'function') {
+                window.gtag('event', eventName, safePayload);
+            } else {
+                window.dataLayer = window.dataLayer || [];
+                window.dataLayer.push({ event: eventName, ...safePayload });
+            }
+
+            document.dispatchEvent(new CustomEvent('dynasty:analytics', {
+                detail: {
+                    event: eventName,
+                    payload: safePayload
+                }
+            }));
+        }
         function formatAmount(n) {
             const num = typeof n === 'number' ? n : parseFloat(n);
             return 'AED ' + num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -1792,7 +3423,7 @@
         let currentDate = new Date();
         let selectedStartDate = null;
         let selectedEndDate = null;
-        
+
         // Stripe
         let stripe = null;
         let elements = null;
@@ -1806,6 +3437,7 @@
         const endDateParam = urlParams.get('endDate');
         const pickupTimeParam = urlParams.get('pickupTime');
         const dropoffTimeParam = urlParams.get('dropoffTime');
+        const pickupLocationParam = urlParams.get('pickupLocation');
 
         function getStoredBookingIntent() {
             try {
@@ -1822,13 +3454,128 @@
             }
         }
 
+        function storeBookingIntent(intent) {
+            try {
+                window.sessionStorage.setItem(BOOKING_INTENT_KEY, JSON.stringify({
+                    car: normalizeValue(intent?.car),
+                    price: normalizeValue(intent?.price),
+                    startDate: normalizeValue(intent?.startDate),
+                    endDate: normalizeValue(intent?.endDate),
+                    pickupTime: normalizeValue(intent?.pickupTime),
+                    dropoffTime: normalizeValue(intent?.dropoffTime),
+                    pickupLocation: normalizeValue(intent?.pickupLocation),
+                    step: Number(intent?.step) || 1,
+                    fullName: normalizeValue(intent?.fullName),
+                    passport: normalizeValue(intent?.passport),
+                    phone: normalizeValue(intent?.phone),
+                    email: normalizeValue(intent?.email),
+                    address: normalizeValue(intent?.address),
+                    city: normalizeValue(intent?.city),
+                    country: normalizeValue(intent?.country),
+                    savedAt: Date.now()
+                }));
+            } catch (error) {
+                // Ignore storage failures.
+            }
+        }
+
+        function persistBookingIntent() {
+            storeBookingIntent({
+                car: selectedCar,
+                price: pricePerDay,
+                startDate: document.getElementById('startDate')?.value,
+                endDate: document.getElementById('endDate')?.value,
+                pickupTime: document.getElementById('pickupTime')?.value,
+                dropoffTime: document.getElementById('dropoffTime')?.value,
+                pickupLocation: document.getElementById('pickupLocation')?.value,
+                step: currentStep,
+                fullName: document.getElementById('fullName')?.value,
+                passport: document.getElementById('passport')?.value,
+                phone: document.getElementById('phone')?.value,
+                email: document.getElementById('email')?.value,
+                address: document.getElementById('address')?.value,
+                city: document.getElementById('city')?.value,
+                country: document.getElementById('country')?.value
+            });
+        }
+
+        function applyReloadBookingProgress(storedIntent) {
+            const navigationEntry = window.performance?.getEntriesByType?.('navigation')?.[0];
+            const isReloadNavigation = navigationEntry?.type === 'reload';
+
+            if (!storedIntent || !isReloadNavigation) {
+                return;
+            }
+
+            ['fullName', 'passport', 'phone', 'email', 'address', 'city', 'country'].forEach((fieldId) => {
+                const input = document.getElementById(fieldId);
+                const storedValue = normalizeValue(storedIntent?.[fieldId]);
+
+                if (input && storedValue) {
+                    input.value = storedValue;
+                }
+            });
+
+            const storedStep = Number(storedIntent?.step);
+            if (storedStep >= 1 && storedStep <= 3) {
+                currentStep = storedStep;
+            }
+        }
+
+        function updateMobileReserveUi() {
+            const stepLabel = `Step ${currentStep} of 3`;
+            const rateLabel = `${formatAmount(pricePerDay)} / day`;
+            const mobileAction = document.getElementById('reserveMobileAction');
+            const continueToPaymentBtn = document.getElementById('continueToPaymentBtn');
+            const payButton = document.getElementById('payButton');
+
+            const summaryStep = document.getElementById('reserveMobileStep');
+            const summaryCar = document.getElementById('reserveMobileCar');
+            const summaryRate = document.getElementById('reserveMobileRate');
+            const barStep = document.getElementById('reserveMobileBarStep');
+            const barCar = document.getElementById('reserveMobileBarCar');
+
+            if (summaryStep) summaryStep.textContent = stepLabel;
+            if (summaryCar) summaryCar.textContent = selectedCar;
+            if (summaryRate) summaryRate.textContent = rateLabel;
+            if (barStep) barStep.textContent = stepLabel;
+            if (barCar) barCar.textContent = selectedCar;
+
+            if (!mobileAction) {
+                return;
+            }
+
+            if (currentStep === 1) {
+                mobileAction.textContent = 'Continue to Guest Details';
+                mobileAction.disabled = !!continueToPaymentBtn?.disabled;
+                return;
+            }
+
+            if (currentStep === 2) {
+                mobileAction.textContent = 'Continue to Payment';
+                mobileAction.disabled = false;
+                return;
+            }
+
+            mobileAction.textContent = restorePayButtonLabel();
+            mobileAction.disabled = !!payButton?.disabled;
+        }
+
         function applyPrefilledBookingSchedule() {
             const storedIntent = getStoredBookingIntent();
+            const navigationEntry = window.performance?.getEntriesByType?.('navigation')?.[0];
+            const isReloadNavigation = navigationEntry?.type === 'reload';
+            const preferCurrentSessionValue = (paramValue, storedValue) => (
+                isReloadNavigation
+                    ? (storedValue || paramValue || '')
+                    : (paramValue || storedValue || '')
+            );
             const prefills = {
-                startDate: startDateParam || storedIntent?.startDate || '',
-                endDate: endDateParam || storedIntent?.endDate || '',
-                pickupTime: pickupTimeParam || storedIntent?.pickupTime || '',
-                dropoffTime: dropoffTimeParam || storedIntent?.dropoffTime || ''
+                startDate: preferCurrentSessionValue(startDateParam, storedIntent?.startDate),
+                endDate: preferCurrentSessionValue(endDateParam, storedIntent?.endDate),
+                pickupTime: preferCurrentSessionValue(pickupTimeParam, storedIntent?.pickupTime),
+                dropoffTime: preferCurrentSessionValue(dropoffTimeParam, storedIntent?.dropoffTime),
+                pickupLocation: preferCurrentSessionValue(pickupLocationParam, storedIntent?.pickupLocation)
             };
 
             if (!prefills.startDate || !prefills.endDate) {
@@ -1839,11 +3586,13 @@
             const endDateInput = document.getElementById('endDate');
             const pickupTimeInput = document.getElementById('pickupTime');
             const dropoffTimeInput = document.getElementById('dropoffTime');
+            const pickupLocationInput = document.getElementById('pickupLocation');
 
             if (startDateInput) startDateInput.value = prefills.startDate;
             if (endDateInput) endDateInput.value = prefills.endDate;
             if (pickupTimeInput && prefills.pickupTime) pickupTimeInput.value = prefills.pickupTime;
             if (dropoffTimeInput && prefills.dropoffTime) dropoffTimeInput.value = prefills.dropoffTime;
+            if (pickupLocationInput && prefills.pickupLocation) pickupLocationInput.value = prefills.pickupLocation;
 
             updateCalendarFromInputs();
         }
@@ -1862,6 +3611,8 @@
         const selectedCarPriceIntroElement = document.getElementById('selectedCarPriceIntro');
         const selectedPlanTitleElement = document.getElementById('selectedPlanTitle');
         const selectedCarRateElement = document.getElementById('selectedCarRate');
+        const reserveHeroCarElement = document.getElementById('reserveHeroCar');
+        const reserveHeroRateElement = document.getElementById('reserveHeroRate');
         
         if (selectedCarElement) {
             selectedCarElement.textContent = selectedCar;
@@ -1872,6 +3623,9 @@
         if (selectedPlanTitleElement) {
             selectedPlanTitleElement.textContent = selectedCar;
         }
+        if (reserveHeroCarElement) {
+            reserveHeroCarElement.textContent = selectedCar;
+        }
         if (summaryPriceElement) {
             summaryPriceElement.textContent = formatAmount(pricePerDay);
         }
@@ -1881,13 +3635,54 @@
         if (selectedCarRateElement) {
             selectedCarRateElement.textContent = `${formatAmount(pricePerDay)} / day`;
         }
+        if (reserveHeroRateElement) {
+            reserveHeroRateElement.textContent = `${formatAmount(pricePerDay)} / day`;
+        }
+
+        document.getElementById('reserveMobileAction')?.addEventListener('click', () => {
+            if (currentStep < 3) {
+                nextStep();
+                return;
+            }
+
+            submitReservation();
+        });
+
+        [document.getElementById('reserveMobileWhatsApp'), document.getElementById('reserveMobileWhatsAppTop')]
+            .filter(Boolean)
+            .forEach((link) => {
+                link.href = SUPPORT_WHATSAPP_URL;
+                link.addEventListener('click', () => {
+                    emitAnalyticsEvent('reserve_whatsapp_click', {
+                        car: selectedCar,
+                        page_path: normalizeValue(window.location.pathname),
+                        step: currentStep
+                    });
+                });
+            });
+
+        document.querySelectorAll('a[href*="wa.me/"]').forEach((link) => {
+            if (link.id === 'reserveMobileWhatsApp' || link.id === 'reserveMobileWhatsAppTop') {
+                return;
+            }
+
+            link.addEventListener('click', () => {
+                emitAnalyticsEvent('reserve_whatsapp_click', {
+                    car: selectedCar,
+                    page_path: normalizeValue(window.location.pathname),
+                    step: currentStep
+                });
+            });
+        });
+
         initializeTimeSelect('pickupTime', '10:00');
         initializeTimeSelect('dropoffTime', '10:00');
+        applyReloadBookingProgress(getStoredBookingIntent());
         applyPrefilledBookingSchedule();
-        var summaryTotalEl = document.getElementById('summaryTotal');
-        var totalAmountEl = document.getElementById('totalAmount');
-        if (summaryTotalEl) summaryTotalEl.textContent = CURRENCY_ZERO;
-        if (totalAmountEl) totalAmountEl.textContent = CURRENCY_ZERO;
+        persistBookingIntent();
+        updateStepDisplay();
+        calculateTotal();
+        updateMobileReserveUi();
         
         console.log('[RESERVE PAGE] Page initialized successfully');
 
@@ -1914,30 +3709,60 @@
                 window.location.hostname === '127.0.0.1';
         }
         
-        // Initialize Stripe
+        // Initialize Stripe lazily
         const STRIPE_PUBLISHABLE_KEY = typeof window.getStripePublishableKey === 'function'
             ? window.getStripePublishableKey()
             : (window.STRIPE_CONFIG?.publishableKey || '');
-        console.log('[STRIPE INIT] Initializing Stripe...');
-        console.log('[STRIPE INIT] Publishable key:', STRIPE_PUBLISHABLE_KEY ? STRIPE_PUBLISHABLE_KEY.substring(0, 20) + '...' : 'NOT FOUND');
-        console.log('[STRIPE INIT] Stripe available:', typeof Stripe !== 'undefined');
-        
+        let stripeScriptPromise = null;
+
+        function loadStripeScript() {
+            if (typeof Stripe !== 'undefined') {
+                return Promise.resolve(window.Stripe);
+            }
+
+            if (stripeScriptPromise) {
+                return stripeScriptPromise;
+            }
+
+            stripeScriptPromise = new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://js.stripe.com/v3/';
+                script.async = true;
+                script.onload = () => resolve(window.Stripe);
+                script.onerror = () => reject(new Error('Stripe script failed to load.'));
+                document.head.appendChild(script);
+            });
+
+            return stripeScriptPromise;
+        }
+
+        async function ensureStripeReady() {
+            if (!STRIPE_PUBLISHABLE_KEY) {
+                console.error('[STRIPE INIT] No publishable key configured for this environment. Review config.js before testing payments.');
+                return false;
+            }
+
+            if (!stripe || !elements) {
+                try {
+                    await loadStripeScript();
+                    stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+                    elements = stripe.elements();
+                    console.log('[STRIPE INIT] Stripe initialized successfully');
+                } catch (error) {
+                    console.error('[STRIPE INIT] Error initializing Stripe:', error);
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         if (!STRIPE_PUBLISHABLE_KEY) {
             console.error('[STRIPE INIT] No publishable key configured for this environment. Review config.js before testing payments.');
-        } else if (typeof Stripe !== 'undefined') {
-            try {
-                stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
-                elements = stripe.elements();
-                console.log('[STRIPE INIT] ✅ Stripe initialized successfully');
-            } catch (error) {
-                console.error('[STRIPE INIT] ❌ Error initializing Stripe:', error);
-            }
-        } else {
-            console.error('[STRIPE INIT] ❌ Stripe is not available (script not loaded)');
         }
         
         // Initialize calendar when the page loads
-        if (document.getElementById('step2').classList.contains('active')) {
+        if (document.getElementById('step1').classList.contains('active')) {
             generateCalendar();
         }
 
@@ -1973,7 +3798,7 @@
         }
 
         function validateStep1() {
-            const required = ['fullName', 'passport', 'email', 'phone', 'address', 'city', 'country'];
+            const required = ['fullName', 'passport', 'email', 'phone'];
             const missing = [];
 
             required.forEach((fieldId) => {
@@ -2003,11 +3828,11 @@
             });
 
             if (missing.length) {
-                showStepValidation('step1', 'Please complete all required fields before continuing.');
+                showStepValidation('step2', 'Please complete all required fields before continuing.');
                 return false;
             }
 
-            showStepValidation('step1', '');
+            showStepValidation('step2', '');
             return true;
         }
 
@@ -2024,24 +3849,47 @@
 
             if (!pickupLocation) {
                 setFieldError('pickupLocation', 'Delivery location is required.');
-                showStepValidation('step2', 'Please choose dates and provide a delivery location.');
+                showStepValidation('step1', 'Please choose dates and provide a delivery location.');
                 return false;
             }
 
             if (!startDate || !endDate || !pickupTime || !dropoffTime) {
                 if (!pickupTime) setFieldError('pickupTime', 'Delivery time is required.');
                 if (!dropoffTime) setFieldError('dropoffTime', 'Return time is required.');
-                showStepValidation('step2', 'Please complete delivery and return date/time.');
+                showStepValidation('step1', 'Please complete delivery and return date/time.');
                 return false;
             }
 
             if (!getReservationPricing().isValid) {
-                showStepValidation('step2', 'Return date/time must be after delivery date/time.');
+                showStepValidation('step1', 'Return date/time must be after delivery date/time.');
                 return false;
             }
 
-            showStepValidation('step2', '');
+            showStepValidation('step1', '');
             return true;
+        }
+
+        function syncStep2RealtimeState() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const pickupTime = document.getElementById('pickupTime').value;
+            const dropoffTime = document.getElementById('dropoffTime').value;
+            const pickupLocation = document.getElementById('pickupLocation').value.trim();
+            const hasAnyValue = [startDate, endDate, pickupTime, dropoffTime, pickupLocation].some(Boolean);
+
+            if (!hasAnyValue) {
+                showStepValidation('step1', '');
+                return;
+            }
+
+            if (startDate && endDate && pickupTime && dropoffTime && pickupLocation) {
+                if (!getReservationPricing().isValid) {
+                    showStepValidation('step1', 'Return date/time must be after delivery date/time.');
+                    return;
+                }
+
+                showStepValidation('step1', '');
+            }
         }
 
         function bindRealtimeValidation() {
@@ -2051,7 +3899,8 @@
                 const eventName = input.tagName === 'SELECT' ? 'change' : 'input';
                 input.addEventListener(eventName, () => {
                     clearFieldError(fieldId);
-                    showStepValidation('step1', '');
+                    showStepValidation('step2', '');
+                    persistBookingIntent();
                 });
             });
 
@@ -2059,8 +3908,9 @@
             if (pickupInput) {
                 pickupInput.addEventListener('input', () => {
                     clearFieldError('pickupLocation');
-                    showStepValidation('step2', '');
+                    persistBookingIntent();
                     updateContinueButton();
+                    syncStep2RealtimeState();
                 });
             }
             ['pickupTime', 'dropoffTime'].forEach((fieldId) => {
@@ -2068,19 +3918,19 @@
                 if (!input) return;
                 input.addEventListener('input', () => {
                     clearFieldError(fieldId);
-                    showStepValidation('step2', '');
                     calculateTotal();
+                    syncStep2RealtimeState();
                 });
             });
         }
 
         function nextStep() {
             if (currentStep === 1) {
-                if (!validateStep1()) {
+                if (!validateStep2()) {
                     return;
                 }
             } else if (currentStep === 2) {
-                if (!validateStep2()) {
+                if (!validateStep1()) {
                     return;
                 }
 
@@ -2088,13 +3938,20 @@
                 calculateTotal();
             }
             
-            // Inicializar calendario cuando se entra al paso 2
-            if (currentStep === 2) {
+            // Keep the calendar ready while the schedule step is active
+            if (currentStep === 1) {
                 generateCalendar();
             }
 
             if (currentStep < 3) {
+                const previousStep = currentStep;
                 currentStep++;
+                emitAnalyticsEvent('reserve_step_advance', {
+                    car: selectedCar,
+                    from_step: previousStep,
+                    to_step: currentStep,
+                    page_path: normalizeValue(window.location.pathname)
+                });
                 updateStepDisplay();
             }
         }
@@ -2125,15 +3982,21 @@
                 }
             });
             
-            // Inicializar calendario cuando se muestra el paso 2
-            if (currentStep === 2) {
+            // Inicializar calendario cuando se muestra el paso 1
+            if (currentStep === 1) {
                 generateCalendar();
             }
             
         // Initialize Stripe Elements when step 3 is shown
             if (currentStep === 3) {
                 initializeStripeElements();
+                emitAnalyticsEvent('reserve_payment_view', {
+                    car: selectedCar,
+                    page_path: normalizeValue(window.location.pathname)
+                });
             }
+
+            updateMobileReserveUi();
         }
         
         // Calendar functions
@@ -2333,6 +4196,8 @@
             }
 
             updateContinueButton();
+            persistBookingIntent();
+            updateMobileReserveUi();
         }
 
         // Listen for date changes to calculate the total
@@ -2351,13 +4216,11 @@
         bindRealtimeValidation();
 
         // Initialize Stripe Elements
-        function initializeStripeElements() {
+        async function initializeStripeElements() {
             console.log('[STRIPE ELEMENTS] Initializing Stripe elements...');
-            console.log('[STRIPE ELEMENTS] Stripe available:', !!stripe);
-            console.log('[STRIPE ELEMENTS] Elements available:', !!elements);
-            
-            if (!stripe || !elements) {
-                console.error('[STRIPE ELEMENTS] ❌ Stripe is not initialized');
+
+            if (!(await ensureStripeReady())) {
+                console.error('[STRIPE ELEMENTS] Stripe is not initialized');
                 return;
             }
 
@@ -2487,6 +4350,7 @@
             const payButton = document.getElementById('payButton');
             payButton.disabled = true;
             payButton.textContent = 'Processing...';
+            updateMobileReserveUi();
 
             // Check server connection first
             const BACKEND_URL = getConfiguredBackendUrl();
@@ -2508,9 +4372,21 @@
                 showMessage(errorMsg, 'error');
                 payButton.disabled = false;
                 payButton.textContent = restorePayButtonLabel();
+                updateMobileReserveUi();
                 return;
             }
             console.log('[PAYMENT] ✅ Server connection verified, proceeding with payment...');
+
+            const stripeReady = await ensureStripeReady();
+            if (!stripeReady) {
+                showMessage('Secure payment could not be initialized. Please reload the page or contact the team on WhatsApp.', 'error');
+                payButton.disabled = false;
+                payButton.textContent = restorePayButtonLabel();
+                updateMobileReserveUi();
+                return;
+            }
+
+            await initializeStripeElements();
 
             // Collect form data
             const formData = {
@@ -2544,12 +4420,20 @@
                 showMessage('Invalid delivery/return schedule. Please review dates and times.', 'error');
                 payButton.disabled = false;
                 payButton.textContent = restorePayButtonLabel();
+                updateMobileReserveUi();
                 return;
             }
             const total = pricing.total;
             const upfrontAmount = pricing.upfrontAmount;
             const remainingAmount = pricing.remainingAmount;
             const totalCents = Math.round(upfrontAmount * 100);
+
+            emitAnalyticsEvent('reserve_submit', {
+                car: selectedCar,
+                total_amount: total,
+                upfront_amount: upfrontAmount,
+                page_path: normalizeValue(window.location.pathname)
+            });
 
             console.log('[PAYMENT] Calculations:', {
                 durationHours: pricing.durationHours,
@@ -2691,6 +4575,10 @@
                 console.log('[PAYMENT] Stripe available:', !!stripe);
                 console.log('[PAYMENT] CardElement available:', !!cardElement);
                 
+                if (!stripe || !cardElement) {
+                    await initializeStripeElements();
+                }
+
                 if (!stripe || !cardElement) {
                     console.error('[PAYMENT] ❌ Stripe is not initialized');
                     throw new Error('Stripe is not initialized. Please reload the page.');

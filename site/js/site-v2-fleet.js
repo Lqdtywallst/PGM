@@ -5,8 +5,15 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
+    const BOOKING_INTENT_KEY = "dynastyBookingIntent";
+    const DEFAULT_WHATSAPP_URL = "https://wa.me/971586122568?text=Hi%2C%20I%20would%20like%20help%20booking%20a%20car%20in%20Dubai.";
+    const searchParams = new URLSearchParams(window.location.search);
     const cards = Array.from(browser.querySelectorAll(".js-fleet-card"));
+    const results = browser.querySelector(".fleet-results");
+    const resultsHeader = browser.querySelector(".fleet-results__header");
     const resultsList = browser.querySelector(".js-fleet-grid");
+    const sidebar = browser.querySelector(".fleet-sidebar");
+    const sidebarTopbar = sidebar?.querySelector(".fleet-sidebar__topbar");
     const sortSelect = browser.querySelector(".js-fleet-sort");
     const brandSelect = browser.querySelector(".js-fleet-brand-select");
     const typeSelect = browser.querySelector(".js-fleet-type-select");
@@ -19,8 +26,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const resultCount = browser.querySelector(".js-fleet-results-count");
     const emptyState = browser.querySelector(".js-fleet-empty");
     const resetButtons = Array.from(browser.querySelectorAll(".js-fleet-reset"));
-    const dateInputs = Array.from(browser.querySelectorAll(".js-fleet-date"));
     const fieldInputs = Array.from(browser.querySelectorAll(".js-fleet-field-input"));
+    const pickupDateInput = document.getElementById("fleet-pickup-date");
+    const pickupTimeInput = document.getElementById("fleet-pickup-time");
+    const returnDateInput = document.getElementById("fleet-return-date");
+    const returnTimeInput = document.getElementById("fleet-return-time");
+
     if (!resultsList || !priceMinInput || !priceMaxInput) {
         return;
     }
@@ -50,6 +61,98 @@ document.addEventListener("DOMContentLoaded", () => {
     priceMaxInput.max = String(catalogMax);
     priceMaxInput.value = String(defaultState.priceMax);
 
+    function normalizeValue(value) {
+        return String(value || "").trim();
+    }
+
+    function normalizeFilterValue(value) {
+        return normalizeValue(value).toLowerCase();
+    }
+
+    function emitAnalyticsEvent(eventName, payload) {
+        const safePayload = { ...payload };
+
+        if (window.google_tag_manager) {
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({ event: eventName, ...safePayload });
+        } else if (typeof window.gtag === "function") {
+            window.gtag("event", eventName, safePayload);
+        } else {
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({ event: eventName, ...safePayload });
+        }
+
+        document.dispatchEvent(new CustomEvent("dynasty:analytics", {
+            detail: {
+                event: eventName,
+                payload: safePayload
+            }
+        }));
+    }
+
+    function getDubaiDateString(offsetDays = 0) {
+        const dubaiNow = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Dubai" }));
+        dubaiNow.setDate(dubaiNow.getDate() + offsetDays);
+        const year = dubaiNow.getFullYear();
+        const month = String(dubaiNow.getMonth() + 1).padStart(2, "0");
+        const day = String(dubaiNow.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    }
+
+    function getStoredBookingIntent() {
+        try {
+            const rawIntent = window.sessionStorage.getItem(BOOKING_INTENT_KEY);
+
+            if (!rawIntent) {
+                return null;
+            }
+
+            const parsedIntent = JSON.parse(rawIntent);
+
+            if (!parsedIntent || typeof parsedIntent !== "object") {
+                return null;
+            }
+
+            return parsedIntent;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    function storeBookingIntent(bookingIntent) {
+        const normalizedIntent = {
+            car: normalizeValue(bookingIntent?.car),
+            price: normalizeValue(bookingIntent?.price),
+            startDate: normalizeValue(bookingIntent?.startDate),
+            endDate: normalizeValue(bookingIntent?.endDate),
+            pickupTime: normalizeValue(bookingIntent?.pickupTime),
+            dropoffTime: normalizeValue(bookingIntent?.dropoffTime),
+            savedAt: Date.now()
+        };
+
+        try {
+            window.sessionStorage.setItem(BOOKING_INTENT_KEY, JSON.stringify(normalizedIntent));
+        } catch (error) {
+            // Ignore sessionStorage failures.
+        }
+
+        return normalizedIntent;
+    }
+
+    function getIncomingBookingIntent() {
+        const storedIntent = getStoredBookingIntent();
+        return {
+            startDate: searchParams.get("startDate") || storedIntent?.startDate || "",
+            endDate: searchParams.get("endDate") || storedIntent?.endDate || "",
+            pickupTime: searchParams.get("pickupTime") || storedIntent?.pickupTime || "",
+            dropoffTime: searchParams.get("dropoffTime") || storedIntent?.dropoffTime || ""
+        };
+    }
+
+    function hasSchedule(intent) {
+        return Boolean(normalizeValue(intent?.startDate) && normalizeValue(intent?.endDate));
+    }
+
     function tokenList(attributeValue) {
         return (attributeValue || "")
             .split(/\s+/)
@@ -61,38 +164,8 @@ document.addEventListener("DOMContentLoaded", () => {
         return `AED ${Number(value).toLocaleString("en-US")}`;
     }
 
-    function clampPriceState() {
-        state.priceMin = Math.max(catalogMin, Math.min(state.priceMin, state.priceMax));
-        state.priceMax = Math.min(catalogMax, Math.max(state.priceMax, state.priceMin));
-    }
-
-    function syncDateDefaults() {
-        if (!dateInputs.length) {
-            return;
-        }
-
-        const today = new Date();
-        const tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate() + 1);
-
-        const formatDate = (date) => {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, "0");
-            const day = String(date.getDate()).padStart(2, "0");
-            return `${year}-${month}-${day}`;
-        };
-
-        const defaults = [formatDate(today), formatDate(tomorrow)];
-
-        dateInputs.forEach((input, index) => {
-            if (!input.value) {
-                input.value = defaults[index] || defaults[0];
-            }
-        });
-    }
-
     function formatFieldValue(input) {
-        if (!input.value) {
+        if (!input?.value) {
             return "";
         }
 
@@ -111,6 +184,15 @@ document.addEventListener("DOMContentLoaded", () => {
         return input.value;
     }
 
+    function getCurrentSchedule() {
+        return {
+            startDate: pickupDateInput?.value || "",
+            endDate: returnDateInput?.value || "",
+            pickupTime: pickupTimeInput?.value || "",
+            dropoffTime: returnTimeInput?.value || ""
+        };
+    }
+
     function syncFieldDisplays() {
         fieldInputs.forEach((input) => {
             const shell = input.parentElement;
@@ -120,6 +202,43 @@ document.addEventListener("DOMContentLoaded", () => {
                 display.textContent = formatFieldValue(input);
             }
         });
+    }
+
+    let scheduleCaptured = hasSchedule(getIncomingBookingIntent());
+
+    function syncDateDefaults() {
+        const incomingIntent = getIncomingBookingIntent();
+        const today = getDubaiDateString(0);
+        const tomorrow = getDubaiDateString(1);
+
+        if (pickupDateInput) {
+            pickupDateInput.min = today;
+            pickupDateInput.value = scheduleCaptured ? (incomingIntent.startDate || pickupDateInput.value) : "";
+        }
+
+        if (returnDateInput) {
+            returnDateInput.min = today;
+            returnDateInput.value = scheduleCaptured ? (incomingIntent.endDate || returnDateInput.value || tomorrow) : "";
+        }
+
+        if (pickupTimeInput) {
+            pickupTimeInput.value = incomingIntent.pickupTime || pickupTimeInput.value || "12:00";
+        }
+
+        if (returnTimeInput) {
+            returnTimeInput.value = incomingIntent.dropoffTime || returnTimeInput.value || "12:00";
+        }
+
+        if (pickupDateInput && returnDateInput && pickupDateInput.value && returnDateInput.value < pickupDateInput.value) {
+            returnDateInput.value = pickupDateInput.value;
+        }
+
+        storeBookingIntent(getCurrentSchedule());
+    }
+
+    function clampPriceState() {
+        state.priceMin = Math.max(catalogMin, Math.min(state.priceMin, state.priceMax));
+        state.priceMax = Math.min(catalogMax, Math.max(state.priceMax, state.priceMin));
     }
 
     function updateSelectStates() {
@@ -135,6 +254,56 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateSortState() {
         if (sortSelect) {
             sortSelect.value = state.sort;
+        }
+    }
+
+    function syncStateFromControls() {
+        if (brandSelect) {
+            state.brand = normalizeFilterValue(brandSelect.value) || defaultState.brand;
+        }
+
+        if (typeSelect) {
+            state.type = normalizeFilterValue(typeSelect.value) || defaultState.type;
+        }
+
+        if (sortSelect) {
+            state.sort = normalizeValue(sortSelect.value) || defaultState.sort;
+        }
+
+        const nextPriceMin = Number(priceMinInput.value);
+        const nextPriceMax = Number(priceMaxInput.value);
+
+        if (Number.isFinite(nextPriceMin)) {
+            state.priceMin = nextPriceMin;
+        }
+
+        if (Number.isFinite(nextPriceMax)) {
+            state.priceMax = nextPriceMax;
+        }
+
+        clampPriceState();
+    }
+
+    function applyIncomingFleetFilters() {
+        const availableBrands = new Set(
+            Array.from(brandSelect?.options || [])
+                .map((option) => normalizeFilterValue(option.value))
+                .filter(Boolean)
+        );
+        const availableTypes = new Set(
+            Array.from(typeSelect?.options || [])
+                .map((option) => normalizeFilterValue(option.value))
+                .filter(Boolean)
+        );
+        const incomingBrand = normalizeFilterValue(searchParams.get("brand"));
+        const incomingType = normalizeFilterValue(searchParams.get("type"));
+
+        if (incomingBrand && availableBrands.has(incomingBrand)) {
+            state.brand = incomingBrand;
+        }
+
+        if (incomingType && availableTypes.has(incomingType)) {
+            state.type = incomingType;
         }
     }
 
@@ -192,6 +361,241 @@ document.addEventListener("DOMContentLoaded", () => {
         sortedCards.forEach((card) => resultsList.appendChild(card));
     }
 
+    function buildReserveHref(card) {
+        const schedule = getCurrentSchedule();
+        const title = normalizeValue(card.querySelector(".fleet-card__title a")?.textContent);
+        const params = new URLSearchParams({
+            car: title,
+            price: normalizeValue(card.dataset.price)
+        });
+
+        if (schedule.startDate) {
+            params.set("startDate", schedule.startDate);
+        }
+
+        if (schedule.endDate) {
+            params.set("endDate", schedule.endDate);
+        }
+
+        if (schedule.pickupTime) {
+            params.set("pickupTime", schedule.pickupTime);
+        }
+
+        if (schedule.dropoffTime) {
+            params.set("dropoffTime", schedule.dropoffTime);
+        }
+
+        return `./app/reserve/page.html?${params.toString()}`;
+    }
+
+    function syncCardActions() {
+        cards.forEach((card, index) => {
+            const title = normalizeValue(card.querySelector(".fleet-card__title a")?.textContent);
+            const reserveLink = card.querySelector(".fleet-card__primary");
+            const whatsappLink = card.querySelector(".fleet-card__secondary--wa");
+            const image = card.querySelector(".fleet-card__media img");
+            const specs = Array.from(card.querySelectorAll(".fleet-card__spec"));
+
+            if (image) {
+                image.loading = index === 0 ? "eager" : "lazy";
+                image.decoding = "async";
+            }
+
+            if (specs.length > 3) {
+                specs.slice(3).forEach((spec) => spec.remove());
+            }
+
+            if (reserveLink) {
+                reserveLink.textContent = "Reserve";
+                reserveLink.setAttribute("href", buildReserveHref(card));
+                reserveLink.classList.add("fleet-card__reserve");
+                reserveLink.addEventListener("click", () => {
+                    const schedule = getCurrentSchedule();
+                    storeBookingIntent({
+                        car: title,
+                        price: card.dataset.price,
+                        ...schedule
+                    });
+
+                    emitAnalyticsEvent("fleet_reserve_click", {
+                        car: title,
+                        price: normalizeValue(card.dataset.price),
+                        start_date: schedule.startDate,
+                        end_date: schedule.endDate,
+                        page_path: normalizeValue(window.location.pathname)
+                    });
+                });
+            }
+
+            if (whatsappLink) {
+                whatsappLink.addEventListener("click", () => {
+                    emitAnalyticsEvent("fleet_whatsapp_click", {
+                        car: title,
+                        price: normalizeValue(card.dataset.price),
+                        page_path: normalizeValue(window.location.pathname)
+                    });
+                });
+            }
+        });
+    }
+
+    function persistSchedule() {
+        scheduleCaptured = hasSchedule(getCurrentSchedule());
+        storeBookingIntent(getCurrentSchedule());
+        syncCardActions();
+        updateDatePrompts();
+        updateFilterChips();
+    }
+
+    let mobileControls = null;
+    let topDatePrompt = null;
+
+    function setFilterSheetState(isOpen) {
+        if (!mobileControls?.scrim) {
+            return;
+        }
+
+        browser.classList.toggle("fleet-filters-open", isOpen);
+        mobileControls.scrim.hidden = !isOpen;
+    }
+
+    function createPromptButton(placement) {
+        const prompt = document.createElement("button");
+        prompt.type = "button";
+        prompt.className = "fleet-date-prompt";
+        prompt.innerHTML = `
+            <strong>Choose dates first</strong>
+            <span>Carry your rental window into every Reserve CTA.</span>
+        `;
+        prompt.addEventListener("click", () => {
+            emitAnalyticsEvent("booking_sheet_open", {
+                page_path: normalizeValue(window.location.pathname),
+                placement
+            });
+            setFilterSheetState(true);
+            pickupDateInput?.focus();
+        });
+        return prompt;
+    }
+
+    function updateDatePrompts() {
+        const showPrompt = !scheduleCaptured;
+
+        if (topDatePrompt) {
+            topDatePrompt.hidden = !showPrompt;
+        }
+    }
+
+    function formatScheduleChipLabel() {
+        const schedule = getCurrentSchedule();
+
+        if (!hasSchedule(schedule)) {
+            return "Choose dates";
+        }
+
+        const startShort = normalizeValue(schedule.startDate).slice(5).replace("-", "/");
+        const endShort = normalizeValue(schedule.endDate).slice(5).replace("-", "/");
+
+        if (startShort && endShort) {
+            return `${startShort} - ${endShort}`;
+        }
+
+        return "Edit dates";
+    }
+
+    function updateFilterChips() {
+        if (!mobileControls) {
+            return;
+        }
+
+        mobileControls.dates.textContent = formatScheduleChipLabel();
+
+        const activeFilterCount = [
+            state.brand !== defaultState.brand,
+            state.type !== defaultState.type,
+            state.priceMin !== defaultState.priceMin,
+            state.priceMax !== defaultState.priceMax,
+            state.sort !== defaultState.sort
+        ].filter(Boolean).length;
+
+        mobileControls.toggle.textContent = activeFilterCount > 0
+            ? `Filters (${activeFilterCount})`
+            : "Filters";
+    }
+
+    function initMobileFilters() {
+        if (!sidebar || !results) {
+            return;
+        }
+
+        const toolbar = document.createElement("div");
+        toolbar.className = "fleet-mobile-toolbar";
+        toolbar.innerHTML = `
+            <button type="button" class="fleet-mobile-chip fleet-mobile-chip--dates js-fleet-mobile-dates">Choose dates</button>
+            <button type="button" class="fleet-mobile-filter-toggle">Filters</button>
+        `;
+
+        const scrim = document.createElement("button");
+        scrim.type = "button";
+        scrim.className = "fleet-filter-scrim";
+        scrim.hidden = true;
+        scrim.setAttribute("aria-label", "Close filters");
+
+        results.insertBefore(toolbar, resultsHeader?.nextSibling || results.firstChild);
+        browser.appendChild(scrim);
+
+        const closeButton = document.createElement("button");
+        closeButton.type = "button";
+        closeButton.className = "fleet-filter-close";
+        closeButton.textContent = "Close";
+        sidebarTopbar?.appendChild(closeButton);
+
+        mobileControls = {
+            toolbar,
+            scrim,
+            dates: toolbar.querySelector(".js-fleet-mobile-dates"),
+            toggle: toolbar.querySelector(".fleet-mobile-filter-toggle"),
+            close: closeButton
+        };
+
+        const openSheet = () => {
+            setFilterSheetState(true);
+        };
+
+        mobileControls.toggle?.addEventListener("click", openSheet);
+        mobileControls.dates?.addEventListener("click", () => {
+            openSheet();
+            pickupDateInput?.focus();
+        });
+        mobileControls.close?.addEventListener("click", () => {
+            setFilterSheetState(false);
+        });
+        scrim.addEventListener("click", () => {
+            setFilterSheetState(false);
+        });
+        document.addEventListener("dynasty:fleet-open-dates", () => {
+            setFilterSheetState(true);
+            pickupDateInput?.focus();
+        });
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && browser.classList.contains("fleet-filters-open")) {
+                setFilterSheetState(false);
+            }
+        });
+
+        updateFilterChips();
+    }
+
+    function initDatePrompts() {
+        if (!resultsHeader || !resultsList) {
+            return;
+        }
+
+        topDatePrompt = createPromptButton("top");
+        resultsHeader.insertAdjacentElement("afterend", topDatePrompt);
+        updateDatePrompts();
+    }
+
     function render() {
         updatePriceUi();
         updateSelectStates();
@@ -218,11 +622,14 @@ document.addEventListener("DOMContentLoaded", () => {
         if (emptyState) {
             emptyState.hidden = visibleCount !== 0;
         }
+
+        updateDatePrompts();
     }
 
     if (brandSelect) {
         brandSelect.addEventListener("change", () => {
             state.brand = brandSelect.value || defaultState.brand;
+            updateFilterChips();
             render();
         });
     }
@@ -230,6 +637,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (typeSelect) {
         typeSelect.addEventListener("change", () => {
             state.type = typeSelect.value || defaultState.type;
+            updateFilterChips();
             render();
         });
     }
@@ -261,19 +669,33 @@ document.addEventListener("DOMContentLoaded", () => {
         button.addEventListener("click", () => {
             Object.assign(state, defaultState);
             render();
+            updateFilterChips();
         });
     });
 
     fieldInputs.forEach((input) => {
         const sync = () => {
             syncFieldDisplays();
+            persistSchedule();
         };
 
         input.addEventListener("input", sync);
         input.addEventListener("change", sync);
     });
 
+    window.addEventListener("pageshow", () => {
+        syncStateFromControls();
+        syncFieldDisplays();
+        persistSchedule();
+        render();
+    });
+
+    applyIncomingFleetFilters();
     syncDateDefaults();
     syncFieldDisplays();
+    syncCardActions();
+    initMobileFilters();
+    initDatePrompts();
+    syncStateFromControls();
     render();
 });
