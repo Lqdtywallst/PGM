@@ -643,6 +643,8 @@ async function collectPageMeta(page) {
     return page.evaluate(() => ({
         title: document.title || '',
         hasVehicleBooking: Boolean(document.querySelector('.js-vehicle-booking-form')),
+        hasVehicleMediaGallery: Boolean(document.querySelector('.vehicle-pdp-gallery-top__thumb--media img, .vehicle-pdp-gallery-top__stage img')),
+        hasServicesSelector: Boolean(document.querySelector('[data-services-selector] [data-service-selector]')),
         modelCardCount: document.querySelectorAll('.model-card').length,
         hasContactForm: Boolean(document.querySelector('#contactForm')),
         hasReserveFlow: Boolean(document.querySelector('#payButton')),
@@ -1048,6 +1050,134 @@ function createLinkAction(descriptor) {
 
             return {
                 message: `Reached ${expectedPath}`,
+                observedUrl: page.url()
+            };
+        }
+    };
+}
+
+function createServicesLaneSelectorAction() {
+    return {
+        id: 'services-lane-circles-update-panel',
+        label: 'Services lane circles update the preview panel and CTA',
+        kind: 'service-selector',
+        async run(page) {
+            const selectors = page.locator('[data-services-selector] [data-service-selector]');
+            const count = await selectors.count();
+
+            if (count < 2) {
+                throw new Error(`Expected at least 2 service circles, found ${count}.`);
+            }
+
+            const observedTitles = new Set();
+
+            for (let index = 0; index < count; index += 1) {
+                const selector = selectors.nth(index);
+                await expect(selector).toBeVisible();
+
+                const expectedTitle = (await selector.getAttribute('data-service-title') || '').trim();
+                const expectedHref = (await selector.getAttribute('data-service-primary-href') || '').trim();
+                const selectorId = await selector.getAttribute('id') || '';
+
+                if (!expectedTitle || !expectedHref) {
+                    throw new Error(`Service circle ${selectorId || index + 1} is missing title or destination metadata.`);
+                }
+
+                await selector.evaluate((element) => element.scrollIntoView({ block: 'center', inline: 'center' }));
+                await selector.click();
+                await settlePage(page, 250);
+
+                const state = await page.evaluate(({ expectedTitle, expectedHref, selectorId }) => {
+                    const panel = document.querySelector('[data-service-panel]');
+                    const title = panel?.querySelector('[data-service-title]')?.textContent?.trim() || '';
+                    const primary = panel?.querySelector('[data-service-primary]');
+                    const primaryHref = primary?.getAttribute('href') || '';
+                    const active = document.querySelector('[data-service-selector].is-active');
+                    const selected = selectorId
+                        ? document.getElementById(selectorId)?.getAttribute('aria-selected')
+                        : '';
+                    const panelRect = panel?.getBoundingClientRect();
+
+                    return {
+                        title,
+                        primaryHref,
+                        activeId: active?.id || '',
+                        selected,
+                        panelVisible: Boolean(panelRect && panelRect.width > 20 && panelRect.height > 20),
+                        expectedHrefMatches: primaryHref === expectedHref
+                    };
+                }, { expectedTitle, expectedHref, selectorId });
+
+                if (state.title !== expectedTitle) {
+                    throw new Error(`Service circle ${selectorId || index + 1} did not update the panel title. Expected "${expectedTitle}", saw "${state.title}".`);
+                }
+
+                if (!state.expectedHrefMatches) {
+                    throw new Error(`Service circle ${selectorId || index + 1} did not update the primary CTA href. Expected "${expectedHref}", saw "${state.primaryHref}".`);
+                }
+
+                if (selectorId && state.activeId !== selectorId && state.selected !== 'true') {
+                    throw new Error(`Service circle ${selectorId} did not become the active selected circle.`);
+                }
+
+                if (!state.panelVisible) {
+                    throw new Error(`Service circle ${selectorId || index + 1} updated hidden content instead of a visible panel.`);
+                }
+
+                observedTitles.add(state.title);
+            }
+
+            if (observedTitles.size < Math.min(2, count)) {
+                throw new Error('Service circles did not produce distinct visible panel states.');
+            }
+
+            return {
+                message: `Verified ${count} service circles update a visible panel and matching CTA.`,
+                observedUrl: page.url()
+            };
+        }
+    };
+}
+
+function createVehicleGalleryLightboxAction() {
+    return {
+        id: 'vehicle-gallery-opens-lightbox',
+        label: 'Vehicle gallery thumbnails open a media lightbox',
+        kind: 'media-lightbox',
+        async run(page) {
+            const trigger = page.locator('.vehicle-pdp-gallery-top__thumb--media.is-lightbox-trigger, .vehicle-pdp-gallery-top__thumb--media[role="button"]').first();
+            await expect(trigger).toBeVisible();
+            await trigger.evaluate((element) => element.scrollIntoView({ block: 'center', inline: 'center' }));
+            await trigger.click();
+            await settlePage(page, 250);
+
+            const dialog = page.locator('.vehicle-media-lightbox[role="dialog"].is-open').first();
+            await expect(dialog).toBeVisible();
+            await expect(dialog.locator('.vehicle-media-lightbox__image')).toBeVisible();
+            await expect(dialog.locator('[data-vehicle-media-close]').first()).toBeVisible();
+
+            const state = await dialog.evaluate((element) => {
+                const image = element.querySelector('.vehicle-media-lightbox__image');
+                const caption = element.querySelector('[data-vehicle-media-caption]');
+                const counter = element.querySelector('[data-vehicle-media-counter]');
+
+                return {
+                    ariaHidden: element.getAttribute('aria-hidden'),
+                    imageSrc: image?.getAttribute('src') || '',
+                    caption: caption?.textContent?.trim() || '',
+                    counter: counter?.textContent?.trim() || ''
+                };
+            });
+
+            if (state.ariaHidden === 'true' || !state.imageSrc || !state.caption || !/\d+\s*\/\s*\d+/.test(state.counter)) {
+                throw new Error(`Vehicle media lightbox opened without complete image, caption and counter state: ${JSON.stringify(state)}.`);
+            }
+
+            await page.keyboard.press('Escape');
+            await expect(dialog).toBeHidden();
+
+            return {
+                message: `Vehicle gallery opened a visible media lightbox with ${state.counter}.`,
                 observedUrl: page.url()
             };
         }
@@ -1564,6 +1694,14 @@ async function buildRouteActions(route, page, options, viewport) {
 
     if (meta.hasVehicleBooking) {
         actions.push(createVehicleBookingAction());
+    }
+
+    if (meta.hasVehicleMediaGallery) {
+        actions.push(createVehicleGalleryLightboxAction());
+    }
+
+    if (meta.hasServicesSelector) {
+        actions.push(createServicesLaneSelectorAction());
     }
 
     if (meta.modelCardCount > 0) {

@@ -569,6 +569,22 @@ async function run() {
         sharedSiteCss.includes('.fleet-filter-sheet-open .lab-floating-back'),
         'shared and reserve shells style the floating previous-page navigation'
     );
+    const servicesCss = readFile('site/css/site-v2-services.css');
+    const functionalAgentScript = readFile('scripts/run-functional-agent.js');
+    assert(
+        siteV2Script.includes('initVehicleMediaLightbox') &&
+        siteV2Script.includes('vehicle-media-lightbox') &&
+        sharedSiteCss.includes('.vehicle-media-lightbox.is-open') &&
+        sharedSiteCss.includes('.is-lightbox-trigger'),
+        'vehicle galleries expose an interactive media lightbox'
+    );
+    assert(
+        siteV2Script.includes('is-service-updating') &&
+        servicesCss.includes('services-panel-response') &&
+        functionalAgentScript.includes('createServicesLaneSelectorAction') &&
+        functionalAgentScript.includes('createVehicleGalleryLightboxAction'),
+        'functional auditor checks service circles and vehicle gallery popups'
+    );
 
     const fleetScript = readFile('site/js/site-v2-fleet.js');
     const fleetCss = readFile('site/css/site-v2-fleet.css');

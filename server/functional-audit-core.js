@@ -47,7 +47,7 @@ const FUNCTIONAL_HUMAN_REVIEW_RULES = Object.freeze([
 ]);
 
 const HARD_REQUEST_TYPES = new Set(['document', 'script', 'stylesheet', 'xhr', 'fetch']);
-const IMPORTANT_ACTION_PATTERN = /(checkout|reserve|handoff|form|validation|filter|nav|menu|link:internal)/i;
+const IMPORTANT_ACTION_PATTERN = /(checkout|reserve|handoff|form|validation|filter|nav|menu|link:internal|tab-link|service-selector|media-lightbox)/i;
 
 function textSnippet(value, maxLength = 180) {
     const normalized = String(value || '').replace(/\s+/g, ' ').trim();

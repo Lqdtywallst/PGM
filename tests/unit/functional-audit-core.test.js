@@ -68,6 +68,42 @@ test('functional human review marks important action failures as bad', () => {
     assert.match(review.findings[0].message, /failed during a customer-like interaction/i);
 });
 
+test('functional human review treats dead visual affordances as hard failures', () => {
+    const review = buildFunctionalHumanReview({
+        pages: [
+            {
+                route: '/lamborghini-huracan-evo-spyder-rental-dubai.html',
+                viewport: 'mobile-modern',
+                actions: [
+                    {
+                        id: 'vehicle-gallery-opens-lightbox',
+                        label: 'Vehicle gallery thumbnails open a media lightbox',
+                        kind: 'media-lightbox',
+                        status: 'failed',
+                        message: 'Clicked a gallery tile but no visible dialog opened.'
+                    },
+                    {
+                        id: 'services-lane-circles-update-panel',
+                        label: 'Services lane circles update the preview panel and CTA',
+                        kind: 'service-selector',
+                        status: 'failed',
+                        message: 'Clicked a service circle but the panel title and CTA stayed unchanged.'
+                    }
+                ],
+                consoleErrors: [],
+                requestFailures: []
+            }
+        ],
+        customerJourneys: { scenarios: [] },
+        coverageProfile: COMPLETE_DEEP_SCOPE
+    });
+
+    assert.equal(review.status, 'bad');
+    assert.equal(review.summary.hardFails, 2);
+    assert.ok(review.findings.some((finding) => finding.actionId === 'vehicle-gallery-opens-lightbox' && finding.hardFail));
+    assert.ok(review.findings.some((finding) => finding.actionId === 'services-lane-circles-update-panel' && finding.hardFail));
+});
+
 test('functional human review treats partial mission evidence as review', () => {
     const review = buildFunctionalHumanReview({
         pages: [],

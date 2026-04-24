@@ -481,6 +481,29 @@
     box-shadow: 0 22px 42px rgba(0, 0, 0, 0.16);
 }
 
+.services-hero__feature.is-service-updating {
+    animation: services-panel-response 560ms ease;
+}
+
+@keyframes services-panel-response {
+    0% {
+        transform: translateY(0);
+        box-shadow: 0 22px 42px rgba(0, 0, 0, 0.16);
+    }
+
+    35% {
+        transform: translateY(-0.26rem);
+        box-shadow:
+            0 28px 56px rgba(0, 0, 0, 0.22),
+            0 0 0 1px rgba(227, 246, 85, 0.18);
+    }
+
+    100% {
+        transform: translateY(0);
+        box-shadow: 0 22px 42px rgba(0, 0, 0, 0.16);
+    }
+}
+
 .services-hero__feature-main {
     display: grid;
     grid-template-rows: auto auto;

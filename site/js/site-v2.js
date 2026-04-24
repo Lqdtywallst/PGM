@@ -1139,11 +1139,40 @@ function initSiteV2() {
             if (options.focus) {
                 tab.focus();
             }
+
+            if (options.reveal) {
+                panel.classList.remove("is-service-updating");
+                window.requestAnimationFrame(() => {
+                    panel.classList.add("is-service-updating");
+
+                    if (coarsePointer.matches || mobileViewport.matches) {
+                        const rect = panel.getBoundingClientRect();
+                        const shouldRevealPanel = rect.top > window.innerHeight * 0.58 || rect.bottom > window.innerHeight;
+
+                        if (shouldRevealPanel) {
+                            panel.scrollIntoView({
+                                block: "center",
+                                behavior: prefersReducedMotion.matches ? "auto" : "smooth"
+                            });
+                        }
+                    }
+                });
+            }
         }
 
         tabs.forEach((tab, index) => {
             tab.addEventListener("click", (event) => {
                 event.preventDefault();
+                activateServiceTab(tab, { reveal: true });
+            });
+
+            tab.addEventListener("mouseenter", () => {
+                if (!coarsePointer.matches) {
+                    activateServiceTab(tab);
+                }
+            });
+
+            tab.addEventListener("focus", () => {
                 activateServiceTab(tab);
             });
 
@@ -1165,8 +1194,165 @@ function initSiteV2() {
         });
     }
 
+    function initVehicleMediaLightbox() {
+        const galleryImages = Array.from(document.querySelectorAll([
+            ".vehicle-pdp-gallery-top__stage img",
+            ".vehicle-pdp-gallery-top__thumb--media img",
+            ".vehicle-pdp-gallery-panel__item img",
+            ".vehicle-pdp-gallery-card__media img"
+        ].join(",")));
+
+        if (galleryImages.length < 2) {
+            return;
+        }
+
+        const seenSources = new Set();
+        const items = [];
+        const triggerEntries = [];
+
+        function getCaptionForImage(image) {
+            const thumb = image.closest(".vehicle-pdp-gallery-top__thumb");
+            const card = image.closest(".vehicle-pdp-gallery-card");
+            const figure = image.closest("figure");
+
+            return normalizeBookingValue(
+                thumb?.querySelector(".vehicle-pdp-gallery-top__thumb-copy strong")?.textContent ||
+                card?.querySelector(".vehicle-pdp-gallery-card__copy h3")?.textContent ||
+                figure?.querySelector("figcaption")?.textContent ||
+                image.getAttribute("alt") ||
+                "Vehicle media"
+            );
+        }
+
+        galleryImages.forEach((image) => {
+            const source = image.getAttribute("src") || image.currentSrc;
+            const absoluteSource = image.src || source;
+
+            if (!source || seenSources.has(absoluteSource)) {
+                return;
+            }
+
+            const item = {
+                src: source,
+                alt: normalizeBookingValue(image.getAttribute("alt")) || "Vehicle media",
+                caption: getCaptionForImage(image)
+            };
+            const trigger = image.closest(".vehicle-pdp-gallery-top__stage, .vehicle-pdp-gallery-top__thumb--media, .vehicle-pdp-gallery-panel__item, .vehicle-pdp-gallery-card__media");
+
+            seenSources.add(absoluteSource);
+            items.push(item);
+
+            if (trigger instanceof HTMLElement) {
+                triggerEntries.push({ trigger, index: items.length - 1, item });
+            }
+        });
+
+        if (items.length < 2 || triggerEntries.length === 0) {
+            return;
+        }
+
+        const lightbox = document.createElement("div");
+        lightbox.className = "vehicle-media-lightbox";
+        lightbox.setAttribute("role", "dialog");
+        lightbox.setAttribute("aria-modal", "true");
+        lightbox.setAttribute("aria-hidden", "true");
+        lightbox.setAttribute("aria-label", "Vehicle media gallery");
+        lightbox.innerHTML = `
+            <button class="vehicle-media-lightbox__scrim" type="button" data-vehicle-media-close aria-label="Close media gallery"></button>
+            <div class="vehicle-media-lightbox__panel">
+                <button class="vehicle-media-lightbox__close" type="button" data-vehicle-media-close aria-label="Close media gallery">&times;</button>
+                <button class="vehicle-media-lightbox__nav vehicle-media-lightbox__nav--prev" type="button" data-vehicle-media-prev aria-label="Previous image">&lsaquo;</button>
+                <figure class="vehicle-media-lightbox__figure">
+                    <span class="vehicle-media-lightbox__counter" data-vehicle-media-counter></span>
+                    <img class="vehicle-media-lightbox__image" src="" alt="">
+                    <figcaption class="vehicle-media-lightbox__caption" data-vehicle-media-caption></figcaption>
+                </figure>
+                <button class="vehicle-media-lightbox__nav vehicle-media-lightbox__nav--next" type="button" data-vehicle-media-next aria-label="Next image">&rsaquo;</button>
+            </div>
+        `;
+        document.body.appendChild(lightbox);
+
+        const image = lightbox.querySelector(".vehicle-media-lightbox__image");
+        const caption = lightbox.querySelector("[data-vehicle-media-caption]");
+        const counter = lightbox.querySelector("[data-vehicle-media-counter]");
+        const closeButton = lightbox.querySelector(".vehicle-media-lightbox__close");
+        let activeIndex = 0;
+        let lightboxLastFocus = null;
+
+        function renderItem(index) {
+            const nextIndex = (index + items.length) % items.length;
+            const item = items[nextIndex];
+
+            activeIndex = nextIndex;
+            image.src = item.src;
+            image.alt = item.alt;
+            caption.textContent = item.caption;
+            counter.textContent = `${activeIndex + 1} / ${items.length}`;
+        }
+
+        function openLightbox(index) {
+            lightboxLastFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+            renderItem(index);
+            lightbox.classList.add("is-open");
+            lightbox.setAttribute("aria-hidden", "false");
+            document.body.classList.add("vehicle-media-lightbox-open");
+            closeButton.focus({ preventScroll: true });
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove("is-open");
+            lightbox.setAttribute("aria-hidden", "true");
+            document.body.classList.remove("vehicle-media-lightbox-open");
+
+            if (lightboxLastFocus instanceof HTMLElement) {
+                lightboxLastFocus.focus({ preventScroll: true });
+            }
+        }
+
+        triggerEntries.forEach(({ trigger, index, item }) => {
+            trigger.classList.add("is-lightbox-trigger");
+            trigger.setAttribute("role", "button");
+            trigger.setAttribute("tabindex", "0");
+
+            if (!trigger.getAttribute("aria-label")) {
+                trigger.setAttribute("aria-label", `Open media gallery: ${item.caption}`);
+            }
+
+            trigger.addEventListener("click", () => openLightbox(index));
+            trigger.addEventListener("keydown", (event) => {
+                if (event.key !== "Enter" && event.key !== " ") {
+                    return;
+                }
+
+                event.preventDefault();
+                openLightbox(index);
+            });
+        });
+
+        lightbox.querySelectorAll("[data-vehicle-media-close]").forEach((button) => {
+            button.addEventListener("click", closeLightbox);
+        });
+        lightbox.querySelector("[data-vehicle-media-prev]")?.addEventListener("click", () => renderItem(activeIndex - 1));
+        lightbox.querySelector("[data-vehicle-media-next]")?.addEventListener("click", () => renderItem(activeIndex + 1));
+
+        document.addEventListener("keydown", (event) => {
+            if (!lightbox.classList.contains("is-open")) {
+                return;
+            }
+
+            if (event.key === "Escape") {
+                closeLightbox();
+            } else if (event.key === "ArrowLeft") {
+                renderItem(activeIndex - 1);
+            } else if (event.key === "ArrowRight") {
+                renderItem(activeIndex + 1);
+            }
+        });
+    }
+
     enhanceHeaderConsistency();
     initServicesLaneSelector();
+    initVehicleMediaLightbox();
     initFleetFilterLinks();
     initFloatingBackButton();
     setHeaderScrollState();
