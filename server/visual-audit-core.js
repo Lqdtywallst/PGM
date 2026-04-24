@@ -142,6 +142,7 @@ const FINDING_BUCKETS = Object.freeze({
 
 const KEY_VISUAL_ROUTES = Object.freeze([
     '/',
+    '/about.html',
     '/fleet.html',
     '/services.html',
     '/locations.html',

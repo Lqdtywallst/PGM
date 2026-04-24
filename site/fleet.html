@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -22,9 +22,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=El+Messiri:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./css/site-v2.css?v=20260421-menu3">
-    <link rel="stylesheet" href="./css/site-v2-fleet.css?v=20260421e">
-    <script src="./js/site-v2.js?v=20260421-menu3" defer></script>
+    <link rel="stylesheet" href="./css/site-v2.css?v=20260424-backnav1">
+    <link rel="stylesheet" href="./css/site-v2-fleet.css?v=20260424-contactsplit1">
+    <script src="./js/site-v2.js?v=20260424-backnav1" defer></script>
     <script src="./js/site-v2-fleet.js?v=20260410c" defer></script>
 </head>
 <body class="fleet-page">
@@ -531,7 +531,7 @@
                             <label class="fleet-sidebar__control fleet-sidebar__control--tight fleet-sidebar__control--toolbar">
                                 <span class="fleet-sidebar__visually-hidden">Sort fleet</span>
                                 <span class="fleet-sidebar__select-shell">
-                                    <select class="fleet-sidebar__select js-fleet-sort" aria-label="Sort fleet">
+                                    <select id="fleet-sort" name="fleetSort" class="fleet-sidebar__select js-fleet-sort" aria-label="Sort fleet">
                                         <option value="featured">Featured</option>
                                         <option value="price-asc">Price low to high</option>
                                         <option value="price-desc">Price high to low</option>
@@ -586,7 +586,7 @@
                                     <label class="fleet-sidebar__control fleet-sidebar__control--compact">
                                         <span class="fleet-sidebar__visually-hidden">Filter fleet by brand</span>
                                         <span class="fleet-sidebar__select-shell">
-                                            <select class="fleet-sidebar__select js-fleet-brand-select" aria-label="Filter fleet by brand">
+                                            <select id="fleet-brand-filter" name="fleetBrand" class="fleet-sidebar__select js-fleet-brand-select" aria-label="Filter fleet by brand">
                                                 <option value="all">All brands</option>
                                                 <option value="lamborghini">Lamborghini</option>
                                                 <option value="ferrari">Ferrari</option>
@@ -605,7 +605,7 @@
                                     <label class="fleet-sidebar__control fleet-sidebar__control--compact">
                                         <span class="fleet-sidebar__visually-hidden">Filter fleet by vehicle type</span>
                                         <span class="fleet-sidebar__select-shell">
-                                            <select class="fleet-sidebar__select js-fleet-type-select" aria-label="Filter fleet by vehicle type">
+                                            <select id="fleet-type-filter" name="fleetType" class="fleet-sidebar__select js-fleet-type-select" aria-label="Filter fleet by vehicle type">
                                                 <option value="all">All types</option>
                                                 <option value="convertible">Convertible</option>
                                                 <option value="sports">Sports</option>
@@ -625,8 +625,8 @@
                                         <div class="fleet-price-range__selection js-fleet-price-selected">AED 1,650 - AED 3,750</div>
 
                                         <div class="fleet-price-range__slider">
-                                            <input class="fleet-price-range__input js-fleet-price-min" type="range" min="1650" max="3750" step="50" value="1650" aria-label="Minimum daily price">
-                                            <input class="fleet-price-range__input js-fleet-price-max" type="range" min="1650" max="3750" step="50" value="3750" aria-label="Maximum daily price">
+                                            <input id="fleet-price-min" name="fleetPriceMin" class="fleet-price-range__input js-fleet-price-min" type="range" min="1650" max="3750" step="50" value="1650" aria-label="Minimum daily price">
+                                            <input id="fleet-price-max" name="fleetPriceMax" class="fleet-price-range__input js-fleet-price-max" type="range" min="1650" max="3750" step="50" value="3750" aria-label="Maximum daily price">
                                         </div>
 
                                         <div class="fleet-price-range__limits">

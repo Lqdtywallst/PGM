@@ -23,6 +23,118 @@ function visualPageKey(page = {}) {
     return `${page.route || '(unknown route)'} [${page.viewport || 'unknown viewport'}]`;
 }
 
+const VISUAL_RISK_GROUPS = Object.freeze([
+    Object.freeze({
+        key: 'firstViewport',
+        label: 'first viewport',
+        categories: Object.freeze(['heading', 'primary_cta', 'cta_hierarchy', 'first_viewport_layout', 'layout_gap', 'header_occlusion'])
+    }),
+    Object.freeze({
+        key: 'layoutDrift',
+        label: 'layout drift',
+        categories: Object.freeze(['overflow', 'overlap', 'clipping', 'grid_stability', 'layout_instability', 'section_rhythm', 'spacing', 'layout_homogeneity'])
+    }),
+    Object.freeze({
+        key: 'familyDrift',
+        label: 'family/template drift',
+        categories: Object.freeze(['family_layout_drift', 'cohort_mismatch', 'legacy_template', 'card_consistency'])
+    }),
+    Object.freeze({
+        key: 'surfaceQuality',
+        label: 'surface quality',
+        categories: Object.freeze(['font_drift', 'surface_drift', 'shape_drift', 'button_variant_sprawl', 'header_consistency', 'border_weight_drift', 'visual_affordance'])
+    }),
+    Object.freeze({
+        key: 'readability',
+        label: 'readability',
+        categories: Object.freeze(['contrast', 'text_encoding'])
+    }),
+    Object.freeze({
+        key: 'mediaState',
+        label: 'media/state',
+        categories: Object.freeze(['media_load', 'interaction_state', 'form_visibility', 'fleet_handoff', 'date_currentness'])
+    }),
+    Object.freeze({
+        key: 'unexpectedChange',
+        label: 'unexpected screenshot change',
+        categories: Object.freeze(['unexpected_diff', 'vision_review'])
+    })
+]);
+
+function summarizeVisualIntelligence(report = {}) {
+    const groups = Object.fromEntries(VISUAL_RISK_GROUPS.map((group) => [
+        group.key,
+        {
+            label: group.label,
+            pages: 0,
+            hardFails: 0,
+            findings: 0,
+            examples: []
+        }
+    ]));
+    const seenGroupPages = new Set();
+
+    for (const page of report.pages || []) {
+        const pageFindings = page.assessment?.findings || page.findings || [];
+
+        for (const finding of pageFindings) {
+            const group = VISUAL_RISK_GROUPS.find((candidate) => candidate.categories.includes(finding.category));
+
+            if (!group) {
+                continue;
+            }
+
+            const bucket = groups[group.key];
+            const groupPageKey = `${group.key}::${visualPageKey(page)}`;
+
+            if (!seenGroupPages.has(groupPageKey)) {
+                seenGroupPages.add(groupPageKey);
+                bucket.pages += 1;
+            }
+
+            bucket.findings += 1;
+
+            if (finding.hardFail || finding.severity === 'high') {
+                bucket.hardFails += 1;
+            }
+
+            if (bucket.examples.length < 3) {
+                bucket.examples.push({
+                    route: page.route || '',
+                    viewport: page.viewport || '',
+                    severity: finding.severity || 'medium',
+                    category: finding.category || '',
+                    message: finding.message || '',
+                    evidence: finding.evidence || '',
+                    screenshotPath: finding.screenshotPath || page.artifacts?.viewportScreenshot || ''
+                });
+            }
+        }
+    }
+
+    const activeGroups = Object.entries(groups)
+        .filter(([, details]) => details.findings > 0)
+        .map(([key, details]) => ({ key, ...details }));
+
+    return {
+        activeGroups,
+        summary: Object.fromEntries(activeGroups.map((group) => [
+            group.key,
+            {
+                pages: group.pages,
+                findings: group.findings,
+                hardFails: group.hardFails
+            }
+        ])),
+        totals: {
+            groups: activeGroups.length,
+            pages: activeGroups.reduce((sum, group) => sum + group.pages, 0),
+            findings: activeGroups.reduce((sum, group) => sum + group.findings, 0),
+            hardFails: activeGroups.reduce((sum, group) => sum + group.hardFails, 0)
+        }
+    };
+}
+
 function summarizeVisualChangeGuard(report = {}, options = {}) {
     const strictReview = normalizeBoolean(options.strictReview, true);
     const requireMemory = normalizeBoolean(options.requireMemory, true);
@@ -45,6 +157,7 @@ function summarizeVisualChangeGuard(report = {}, options = {}) {
     const baselineDiffPages = pages.filter((page) => ['review', 'bad'].includes(page.baselineDiff?.status));
     const missingMemory = requireMemory && !approvedMemory;
     const memoryRegressions = auditMemory.status === 'bad' ? auditMemory.regressions || [] : [];
+    const intelligence = summarizeVisualIntelligence(report);
     const failed = badPages.length > 0 ||
         reviewPages.length > 0 ||
         hardFailPages.length > 0 ||
@@ -68,6 +181,7 @@ function summarizeVisualChangeGuard(report = {}, options = {}) {
         missingBaselinePages,
         baselineDiffPages,
         memoryRegressions,
+        intelligence,
         summary: {
             badPages: badPages.length,
             reviewPages: reviewPages.length,
@@ -75,9 +189,19 @@ function summarizeVisualChangeGuard(report = {}, options = {}) {
             missingBaselinePages: missingBaselinePages.length,
             baselineDiffPages: baselineDiffPages.length,
             memoryRegressions: memoryRegressions.length,
-            missingMemory
+            missingMemory,
+            intelligenceGroups: intelligence.totals.groups,
+            intelligenceFindings: intelligence.totals.findings
         }
     };
+}
+
+function formatVisualFindingExample(example = {}) {
+    const location = `${example.route || '(unknown route)'} [${example.viewport || 'unknown viewport'}]`;
+    const evidence = example.evidence ? ` evidence=${example.evidence}` : '';
+    const screenshot = example.screenshotPath ? ` screenshot=${example.screenshotPath}` : '';
+
+    return `${location} ${example.severity || 'medium'} ${example.category || 'visual'}: ${example.message || 'Visual finding.'}${evidence}${screenshot}`;
 }
 
 function formatVisualChangeGuardFailure(guard = {}) {
@@ -93,6 +217,14 @@ function formatVisualChangeGuardFailure(guard = {}) {
 
     for (const page of guard.reviewPages || []) {
         lines.push(`- review: ${visualPageKey(page)} score=${page.assessment?.score ?? 'n/a'} gates=${(page.assessment?.reviewGates || []).join(',') || 'none'}`);
+    }
+
+    for (const group of guard.intelligence?.activeGroups || []) {
+        lines.push(`- visual intelligence: ${group.label} pages=${group.pages} findings=${group.findings} hardFails=${group.hardFails}`);
+
+        for (const example of group.examples || []) {
+            lines.push(`  - ${formatVisualFindingExample(example)}`);
+        }
     }
 
     for (const page of guard.missingBaselinePages || []) {
@@ -112,5 +244,6 @@ function formatVisualChangeGuardFailure(guard = {}) {
 
 module.exports = {
     formatVisualChangeGuardFailure,
+    summarizeVisualIntelligence,
     summarizeVisualChangeGuard
 };

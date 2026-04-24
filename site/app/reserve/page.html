@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -311,7 +311,7 @@
         }
         .reserve-page .field-error { min-height: 1rem; margin-top: 0.4rem; color: #b42318; font-size: 0.82rem; }
         @media (max-width: 860px) {
-            :root { --lab-header-offset: 92px; }
+            :root { --lab-header-offset: 84px; }
             .lab-header {
                 position: fixed;
                 background: rgba(4, 4, 6, 0.94);
@@ -328,12 +328,12 @@
             .reserve-page .reserve-page-intro__grid { grid-template-columns: 1fr; gap: 0; }
             .reserve-page .reserve-page-intro__copy {
                 width: 100%;
-                min-height: 108px;
-                padding: 0.8rem 0.9rem;
+                min-height: clamp(84px, 11svh, 96px);
+                padding: 0.68rem 0.9rem;
             }
             .reserve-page .reserve-page-heading {
                 max-width: 13ch;
-                font-size: clamp(1.52rem, 7.6vw, 1.95rem);
+                font-size: clamp(1.42rem, 7vw, 1.82rem);
             }
             .reserve-page .reserve-container {
                 min-height: 100vh;
@@ -342,42 +342,135 @@
             .reserve-page .steps-indicator {
                 display: grid;
                 grid-template-columns: repeat(3, minmax(0, 1fr));
-                gap: 0.55rem;
-                margin-bottom: 0.45rem;
+                gap: 0.45rem;
+                margin-bottom: 0.34rem;
             }
             .reserve-page .step-pill {
-                min-height: 60px;
+                min-height: clamp(48px, 6.8svh, 56px);
                 justify-content: center;
-                padding: 0.65rem;
+                padding: 0.5rem;
             }
+            .reserve-page .step-pill-index { width: 28px; height: 28px; }
             .reserve-page .step-pill-copy { display: none; }
-            .reserve-page .step-heading { font-size: 1.85rem; line-height: 1; }
+            .reserve-page .step-heading {
+                margin-bottom: 0.18rem;
+                font-size: clamp(1.55rem, 7vw, 1.78rem);
+                line-height: 1;
+            }
             .reserve-page .step2-layout {
                 display: flex;
                 flex-direction: column;
-                gap: 1rem;
+                gap: 0.75rem;
             }
             .reserve-page .step2-main,
             .reserve-page .step2-side {
                 display: flex;
                 flex-direction: column;
-                gap: 1rem;
+                gap: 0.75rem;
             }
-            .reserve-page .schedule-grid { grid-template-columns: 1fr; }
+            .reserve-page .schedule-card,
+            .reserve-page .delivery-card,
+            .reserve-page .reservation-summary {
+                padding: clamp(0.72rem, 3.2vw, 0.88rem);
+            }
+            .reserve-page .schedule-card-title,
+            .reserve-page .delivery-card-title {
+                margin-bottom: 0.22rem;
+                font-size: 0.88rem;
+            }
+            .reserve-page .schedule-card-note,
+            .reserve-page .delivery-card-note {
+                margin-bottom: 0.55rem;
+                font-size: 0.8rem;
+                line-height: 1.36;
+            }
+            .reserve-page .schedule-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.46rem;
+            }
+            .reserve-page .schedule-grid .form-group,
+            .reserve-page .delivery-card .form-group {
+                padding: 0.48rem;
+            }
+            .reserve-page .field-label {
+                margin-bottom: 0.26rem;
+                font-size: 0.66rem;
+                letter-spacing: 0.025em;
+            }
+            .reserve-page .field-label i {
+                display: none;
+            }
+            .reserve-page .input {
+                min-height: 44px;
+                padding: 8px 10px;
+                border-radius: 10px;
+                font-size: 0.88rem;
+            }
+            .reserve-page .schedule-grid input[type="date"]::-webkit-calendar-picker-indicator {
+                width: 16px;
+                height: 16px;
+                margin: 0;
+            }
+            .reserve-page .field-error:empty {
+                display: none;
+            }
+            .reserve-page .field-error {
+                min-height: 0;
+                margin-top: 0.28rem;
+            }
+            @media (max-height: 700px) {
+                :root { --lab-header-offset: 76px; }
+                .reserve-page .reserve-page-intro__copy {
+                    min-height: 58px;
+                    padding: 0.48rem 0.72rem;
+                }
+                .reserve-page .reserve-page-kicker { display: none; }
+                .reserve-page .reserve-page-heading {
+                    max-width: none;
+                    font-size: clamp(1.18rem, 5.8vw, 1.42rem);
+                    line-height: 1.05;
+                }
+                .reserve-page .steps-indicator { gap: 0.34rem; margin-bottom: 0.24rem; }
+                .reserve-page .step-pill { min-height: 38px; padding: 0.38rem; }
+                .reserve-page .step-pill-index { width: 24px; height: 24px; font-size: 0.78rem; }
+                .reserve-page .step-heading { font-size: 1.34rem; }
+                .reserve-page .step2-layout,
+                .reserve-page .step2-main { gap: 0.55rem; }
+                .reserve-page .schedule-card,
+                .reserve-page .delivery-card { padding: 0.58rem; }
+                .reserve-page .schedule-card-title,
+                .reserve-page .delivery-card-title { font-size: 0.78rem; }
+                .reserve-page .schedule-card-note,
+                .reserve-page .delivery-card-note { display: none; }
+                .reserve-page .schedule-grid { gap: 0.36rem; }
+                .reserve-page .schedule-grid .form-group,
+                .reserve-page .delivery-card .form-group { padding: 0.4rem; }
+                .reserve-page .input { min-height: 44px; padding: 7px 9px; font-size: 0.84rem; }
+            }
+            @media (max-width: 380px) {
+                .reserve-page .schedule-grid { gap: 0.3rem; }
+                .reserve-page .schedule-grid .form-group { padding: 0.34rem; }
+                .reserve-page .schedule-grid .field-label { font-size: 0.6rem; }
+                .reserve-page .schedule-grid .input {
+                    min-height: 44px;
+                    padding: 6px 6px;
+                    font-size: 0.76rem;
+                }
+            }
         }
     </style>
     <script>
         if (window.matchMedia('(min-width: 861px)').matches) {
-            document.write('<link rel="stylesheet" href="/css/reserve-shell.css?v=20260421-menu3">');
+            document.write('<link rel="stylesheet" href="/css/reserve-shell.css?v=20260424-backnav1">');
         }
     </script>
     <noscript>
-        <link rel="stylesheet" href="/css/reserve-shell.css?v=20260421-menu3">
-        <link rel="stylesheet" href="/css/reserve-page.css?v=20260421b">
+        <link rel="stylesheet" href="/css/reserve-shell.css?v=20260424-backnav1">
+        <link rel="stylesheet" href="/css/reserve-page.css?v=20260424-responsive1">
     </noscript>
     <script>
         if (window.matchMedia('(min-width: 861px)').matches) {
-            document.write('<script src="/js/reserve-shell.js?v=20260421-menu3" defer></scr' + 'ipt>');
+            document.write('<script src="/js/reserve-shell.js?v=20260424-backnav1" defer></scr' + 'ipt>');
         }
     </script>
     <script>
@@ -401,7 +494,7 @@
                     return;
                 }
                 reserveShellStylesRequested = true;
-                appendStylesheet('/css/reserve-shell.css?v=20260421-menu3');
+                appendStylesheet('/css/reserve-shell.css?v=20260424-backnav1');
             };
 
             const loadReservePageStyles = () => {
@@ -409,7 +502,7 @@
                     return;
                 }
                 reservePageStylesRequested = true;
-                appendStylesheet('/css/reserve-page.css?v=20260421b');
+                appendStylesheet('/css/reserve-page.css?v=20260424-responsive1');
             };
 
             const loadReserveShellScript = () => {
@@ -418,7 +511,7 @@
                 }
                 reserveShellScriptRequested = true;
                 const reserveShellScript = document.createElement('script');
-                reserveShellScript.src = '/js/reserve-shell.js?v=20260421-menu3';
+                reserveShellScript.src = '/js/reserve-shell.js?v=20260424-backnav1';
                 reserveShellScript.defer = true;
                 document.body.appendChild(reserveShellScript);
             };
@@ -504,6 +597,11 @@
             if (window.location.search) {
                 window.setTimeout(wakeReserveEnhancements, 0);
             }
+
+            window.setTimeout(() => {
+                loadReserveShellStyles();
+                loadReserveShellScript();
+            }, 0);
 
             ['pointerdown', 'keydown', 'touchstart', 'scroll', 'focusin', 'input', 'change'].forEach((eventName) => {
                 window.addEventListener(eventName, wakeReserveEnhancements, { once: true, passive: true, capture: true });

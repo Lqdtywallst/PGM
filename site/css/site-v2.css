@@ -591,13 +591,14 @@
 
     .home-page .hero-lab__video {
         display: block;
-        object-position: 66% 30%;
-        opacity: 0.04;
-        transform: scale(1.12);
-        filter: saturate(0.8) brightness(0.46) contrast(1.02);
+        object-position: 58% 50%;
+        opacity: 0.72;
+        transform: scale(1.04);
+        filter: saturate(1.02) brightness(0.62) contrast(1.08);
     }
 
     .home-page .hero-lab__still {
+        opacity: 0;
         background:
             linear-gradient(180deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.04)),
             url("../images/fleet/ferrari-296-gts/07-hero-dubai.jpeg") 58% 34% / cover no-repeat;
@@ -605,8 +606,8 @@
 
     .home-page .hero-lab__overlay {
         background:
-            linear-gradient(180deg, rgba(5, 6, 8, 0.62) 0%, rgba(6, 7, 9, 0.22) 20%, rgba(6, 7, 9, 0.7) 58%, rgba(5, 6, 8, 0.95) 100%),
-            linear-gradient(90deg, rgba(5, 6, 8, 0.92) 0%, rgba(5, 6, 8, 0.64) 34%, rgba(5, 6, 8, 0.24) 100%);
+            linear-gradient(180deg, rgba(5, 6, 8, 0.76) 0%, rgba(6, 7, 9, 0.38) 25%, rgba(6, 7, 9, 0.72) 62%, rgba(5, 6, 8, 0.95) 100%),
+            linear-gradient(90deg, rgba(5, 6, 8, 0.92) 0%, rgba(5, 6, 8, 0.68) 38%, rgba(5, 6, 8, 0.32) 100%);
     }
 
     .home-page .hero-lab__glow {
@@ -5343,12 +5344,19 @@ a.brand-marquee__item:focus-visible img {
     }
 
     .fleet-visual-card__contact-row {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
+        gap: 0.55rem;
         margin: 0.72rem 0 0;
+        overflow: visible;
+        border-top: 0;
+        border-radius: 0;
+        background: transparent;
     }
 
     .fleet-visual-card__contact-link {
-        min-height: clamp(3.6rem, 9vw, 4.65rem);
+        width: 100%;
+        min-height: 3.1rem;
+        border-radius: 8px;
         font-size: 0.82rem;
     }
 
@@ -5462,10 +5470,13 @@ a.brand-marquee__item:focus-visible img {
     }
 
     .fleet-visual-card__contact-row {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 1px;
-        margin: 0.72rem -0.72rem -0.72rem;
-        border-radius: 0 0 8px 8px;
+        grid-template-columns: 1fr;
+        gap: 0.55rem;
+        margin: 0.72rem 0 0;
+        overflow: visible;
+        border-top: 0;
+        border-radius: 0;
+        background: transparent;
     }
 
     .fleet-visual-card__primary,
@@ -5478,7 +5489,8 @@ a.brand-marquee__item:focus-visible img {
     }
 
     .fleet-visual-card__contact-link {
-        min-height: 4rem;
+        min-height: 3.1rem;
+        border-radius: 8px;
         font-size: 0.78rem;
     }
 }
@@ -5800,6 +5812,8 @@ a.brand-marquee__item:focus-visible img {
     position: fixed;
     inset: 0;
     z-index: 110;
+    width: 100vw;
+    overflow: hidden;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -5810,6 +5824,10 @@ a.brand-marquee__item:focus-visible img {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
+}
+
+.lab-mobile-drawer:not(.is-open) .lab-mobile-drawer__panel {
+    display: none;
 }
 
 .lab-mobile-drawer__scrim {
@@ -6139,6 +6157,73 @@ a.brand-marquee__item:focus-visible img {
     color: rgba(245, 241, 232, 0.92);
 }
 
+.lab-floating-back {
+    position: fixed;
+    left: max(1rem, env(safe-area-inset-left));
+    top: calc(var(--lab-header-offset) + 1rem);
+    z-index: 96;
+    display: inline-grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border: 1px solid rgba(241, 226, 189, 0.34);
+    border-radius: 999px;
+    background:
+        linear-gradient(180deg, rgba(23, 24, 27, 0.68), rgba(7, 8, 10, 0.58));
+    color: rgba(248, 238, 214, 0.96);
+    box-shadow:
+        0 18px 44px rgba(0, 0, 0, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(-8px, 8px, 0) scale(0.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: opacity 180ms ease, transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.lab-floating-back.is-visible {
+    opacity: 0.76;
+    pointer-events: auto;
+    transform: translate3d(0, 0, 0) scale(1);
+}
+
+.home-page .lab-floating-back,
+.hero-lab-overlay-open .lab-floating-back,
+.lab-mobile-nav-open .lab-floating-back,
+.fleet-filter-sheet-open .lab-floating-back {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translate3d(-8px, 8px, 0) scale(0.96);
+}
+
+.lab-floating-back:hover,
+.lab-floating-back:focus-visible {
+    opacity: 1;
+    border-color: rgba(227, 246, 85, 0.46);
+    background:
+        linear-gradient(180deg, rgba(31, 33, 38, 0.82), rgba(8, 9, 11, 0.76));
+    outline: none;
+    transform: translateY(-2px);
+}
+
+.lab-floating-back svg {
+    width: 21px;
+    height: 21px;
+}
+
+.lab-floating-back span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 body.lab-has-mobile-bar {
     padding-bottom: 5.9rem;
 }
@@ -6157,6 +6242,13 @@ body.lab-mobile-nav-open {
         background: linear-gradient(180deg, rgba(4, 4, 6, 0.94) 0%, rgba(4, 4, 6, 0.76) 70%, rgba(4, 4, 6, 0.18) 100%);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
+    }
+
+    .lab-floating-back {
+        left: max(0.85rem, env(safe-area-inset-left));
+        top: calc(var(--lab-header-offset) + 0.65rem);
+        width: 44px;
+        height: 44px;
     }
 
     .lab-header__inner {
@@ -6282,6 +6374,18 @@ body.lab-mobile-nav-open {
 
     .hero-lab__video {
         display: none;
+    }
+
+    .home-page .hero-lab__video {
+        display: block;
+        object-position: 58% 50%;
+        opacity: 0.72;
+        transform: scale(1.04);
+        filter: saturate(1.02) brightness(0.62) contrast(1.08);
+    }
+
+    .home-page .hero-lab__still {
+        opacity: 0;
     }
 
     .hero-lab__body {

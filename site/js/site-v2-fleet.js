@@ -657,8 +657,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const closeTopButton = document.createElement("button");
         closeTopButton.type = "button";
         closeTopButton.className = "fleet-filter-close fleet-filter-close--top";
-        closeTopButton.textContent = "Back to cars";
-        closeTopButton.setAttribute("aria-label", "Back to car results");
+        closeTopButton.innerHTML = `
+            <span class="fleet-filter-close__icon" aria-hidden="true"></span>
+            <span class="fleet-filter-close__label">Close filters</span>
+        `;
+        closeTopButton.setAttribute("aria-label", "Close filters and return to car results");
         sheetHeader.appendChild(closeTopButton);
         sidebar.insertBefore(sheetHeader, sidebar.firstChild);
 

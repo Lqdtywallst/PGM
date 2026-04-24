@@ -294,6 +294,108 @@ function extractFunctionalSignals(report = {}) {
     return signals;
 }
 
+const VISUAL_SEMANTIC_GUARDS = Object.freeze([
+    Object.freeze({
+        family: 'visual.first-viewport',
+        label: 'first viewport hierarchy and composition stay intentional',
+        categories: Object.freeze([
+            'heading',
+            'primary_cta',
+            'cta_hierarchy',
+            'first_viewport_layout',
+            'layout_gap',
+            'header_occlusion'
+        ])
+    }),
+    Object.freeze({
+        family: 'visual.layout-stability',
+        label: 'layout geometry does not drift, overflow, overlap, or clip',
+        categories: Object.freeze([
+            'overflow',
+            'overlap',
+            'clipping',
+            'grid_stability',
+            'layout_instability',
+            'section_rhythm',
+            'spacing',
+            'layout_homogeneity'
+        ])
+    }),
+    Object.freeze({
+        family: 'visual.family-drift',
+        label: 'route keeps its approved family rhythm and template identity',
+        categories: Object.freeze([
+            'family_layout_drift',
+            'cohort_mismatch',
+            'legacy_template',
+            'card_consistency'
+        ])
+    }),
+    Object.freeze({
+        family: 'visual.surface-quality',
+        label: 'surface, typography, shape, and button treatment stay consistent',
+        categories: Object.freeze([
+            'font_drift',
+            'surface_drift',
+            'shape_drift',
+            'button_variant_sprawl',
+            'header_consistency',
+            'border_weight_drift',
+            'visual_affordance'
+        ])
+    }),
+    Object.freeze({
+        family: 'visual.readability',
+        label: 'visible text remains readable and correctly encoded',
+        categories: Object.freeze([
+            'contrast',
+            'text_encoding'
+        ])
+    }),
+    Object.freeze({
+        family: 'visual.media-and-state',
+        label: 'media, forms, interactions, and dated booking state stay healthy',
+        categories: Object.freeze([
+            'media_load',
+            'interaction_state',
+            'form_visibility',
+            'fleet_handoff',
+            'date_currentness'
+        ])
+    }),
+    Object.freeze({
+        family: 'visual.unexpected-change',
+        label: 'approved screenshots do not show unexpected visual change',
+        categories: Object.freeze([
+            'unexpected_diff',
+            'vision_review'
+        ])
+    })
+]);
+
+function visualFindingStatus(findings = []) {
+    if (findings.some((finding) => finding.hardFail || finding.severity === 'high')) {
+        return 'failed';
+    }
+
+    if (findings.length > 0) {
+        return 'review';
+    }
+
+    return 'passed';
+}
+
+function visualFindingEvidence(findings = []) {
+    if (findings.length === 0) {
+        return 'no findings';
+    }
+
+    return findings
+        .slice(0, 3)
+        .map((finding) => `${finding.category || 'unknown'}:${finding.severity || 'medium'}:${String(finding.message || '').slice(0, 120)}`)
+        .join(' | ');
+}
+
 function extractVisualSignals(report = {}) {
     const signals = [];
 
@@ -301,6 +403,7 @@ function extractVisualSignals(report = {}) {
         const route = normalizeRoute(page.route || '/');
         const viewport = String(page.viewport || '');
         const pageKey = `${route}::${viewport}`;
+        const findings = page.assessment?.findings || page.findings || [];
 
         pushSignal(signals, {
             key: `visual:page-health:${pageKey}`,
@@ -323,6 +426,24 @@ function extractVisualSignals(report = {}) {
                 label: `${route} matches approved visual baseline on ${viewport}`,
                 evidence: page.baselineDiff.message || `status=${page.baselineDiff.status || 'missing'}`,
                 source: 'page.baselineDiff'
+            });
+        }
+
+        for (const guard of VISUAL_SEMANTIC_GUARDS) {
+            const guardFindings = findings.filter((finding) => guard.categories.includes(finding.category));
+
+            pushSignal(signals, {
+                key: `${guard.family}:${pageKey}`,
+                family: guard.family,
+                route,
+                viewport,
+                status: visualFindingStatus(guardFindings),
+                label: `${route} ${guard.label} on ${viewport}`,
+                evidence: visualFindingEvidence(guardFindings),
+                source: 'page.assessment.findings',
+                metadata: {
+                    categories: [...guard.categories]
+                }
             });
         }
     }
@@ -664,6 +785,13 @@ function canApproveAuditMemory(report = {}, options = {}) {
 
         if (Number(report.summary?.hardFailCount || 0) > 0) {
             reasons.push(`hardFails=${report.summary.hardFailCount}`);
+        }
+
+        const visualFindings = (report.pages || [])
+            .reduce((count, page) => count + Number(page.assessment?.findings?.length || page.findings?.length || 0), 0);
+
+        if (visualFindings > 0) {
+            reasons.push(`visualFindings=${visualFindings}`);
         }
     }
 

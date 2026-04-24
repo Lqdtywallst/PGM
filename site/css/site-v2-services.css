@@ -1367,7 +1367,7 @@
 
     .services-hero__shell {
         gap: 1rem;
-        padding-top: calc(var(--lab-header-offset) + 1.2rem);
+        padding-top: calc(var(--lab-header-offset) + 0.78rem);
         padding-bottom: 1.45rem;
     }
 
@@ -1391,7 +1391,7 @@
     }
 
     .services-hero__feature {
-        min-height: 37.75rem;
+        min-height: auto;
         padding: 0.95rem;
     }
 
@@ -1405,7 +1405,12 @@
     .services-hero__feature-actions {
         display: grid;
         width: 100%;
+        margin-inline: 0;
         justify-self: stretch;
+    }
+
+    .services-hero__feature-actions .services-button {
+        border-radius: 8px;
     }
 
     .services-hero__feature-list li {
@@ -1470,6 +1475,89 @@
     .services-lane-card__actions,
     .services-faq__cta-actions {
         display: grid;
+    }
+}
+
+@media (max-width: 640px) and (max-height: 860px) {
+    .services-hero__shell {
+        gap: 0.46rem;
+        padding-top: calc(var(--lab-header-offset) + 0.48rem);
+    }
+
+    .services-hero__selector {
+        gap: 0.38rem 0.36rem;
+    }
+
+    .services-lane-orb {
+        gap: 0.28rem;
+    }
+
+    .services-lane-orb__media {
+        width: min(100%, 3.75rem);
+    }
+
+    .services-lane-orb__label {
+        font-size: 0.86rem;
+        line-height: 1.05;
+    }
+
+    .services-lane-orb__meta {
+        font-size: 0.54rem;
+    }
+
+    .services-hero__feature {
+        gap: 0.52rem;
+        padding: 0.74rem;
+    }
+
+    .services-breadcrumb,
+    .services-hero__feature p,
+    .services-hero__feature-list,
+    .services-hero__note,
+    .services-hero__feature-actions .services-button--ghost {
+        display: none;
+    }
+
+    .services-hero__feature h1,
+    .services-hero__feature h2 {
+        font-size: clamp(1.36rem, 8vw, 1.7rem);
+    }
+
+    .services-hero__feature-actions {
+        width: 100%;
+        margin-inline: 0;
+    }
+
+    .services-hero__feature-actions .services-button {
+        min-height: 2.58rem;
+        font-size: 0.78rem;
+    }
+}
+
+@media (max-width: 380px) and (max-height: 700px) {
+    .services-hero__shell {
+        gap: 0.36rem;
+    }
+
+    .services-lane-orb__media {
+        width: min(100%, 3.25rem);
+    }
+
+    .services-lane-orb__label {
+        font-size: 0.78rem;
+    }
+
+    .services-lane-orb__meta {
+        font-size: 0.5rem;
+    }
+
+    .services-hero__feature {
+        padding: 0.66rem;
+    }
+
+    .services-hero__feature-actions {
+        width: 100%;
+        margin-inline: 0;
     }
 }
 

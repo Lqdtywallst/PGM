@@ -462,8 +462,206 @@
             to {
                 opacity: 1;
                 transform: translateY(0);
-            }
         }
+    }
+
+@media (max-width: 768px) {
+    .reserve-page .reserve-page-intro {
+        margin-bottom: 0.38rem;
+    }
+
+    .reserve-page .reserve-page-intro__copy {
+        min-height: clamp(84px, 11svh, 96px);
+        padding: 0.68rem 0.9rem;
+    }
+
+    .reserve-page .reserve-page-heading {
+        font-size: clamp(1.42rem, 7vw, 1.82rem);
+    }
+
+    .reserve-page .steps-indicator {
+        gap: 0.45rem;
+        margin-bottom: 0.34rem;
+    }
+
+    .reserve-page .step-pill {
+        min-height: clamp(48px, 6.8svh, 56px);
+        padding: 0.5rem;
+    }
+
+    .reserve-page .step-pill-index {
+        width: 28px;
+        height: 28px;
+    }
+
+    .reserve-page .step-heading {
+        margin-bottom: 0.18rem;
+        font-size: clamp(1.55rem, 7vw, 1.78rem);
+    }
+
+    .reserve-page .step2-layout,
+    .reserve-page .step2-main,
+    .reserve-page .step2-side {
+        gap: 0.75rem;
+    }
+
+    .reserve-page .schedule-card,
+    .reserve-page .delivery-card,
+    .reserve-page .reservation-summary {
+        padding: clamp(0.72rem, 3.2vw, 0.88rem);
+    }
+
+    .reserve-page .schedule-card-title,
+    .reserve-page .delivery-card-title {
+        margin-bottom: 0.22rem;
+        font-size: 0.88rem;
+    }
+
+    .reserve-page .schedule-card-note,
+    .reserve-page .delivery-card-note {
+        margin-bottom: 0.55rem;
+        font-size: 0.8rem;
+        line-height: 1.36;
+    }
+
+    .reserve-page .schedule-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.46rem;
+    }
+
+    .reserve-page .schedule-grid .form-group,
+    .reserve-page .delivery-card .form-group {
+        padding: 0.48rem;
+    }
+
+    .reserve-page .field-label {
+        margin-bottom: 0.26rem;
+        font-size: 0.66rem;
+        letter-spacing: 0.025em;
+    }
+
+    .reserve-page .field-label i {
+        display: none;
+    }
+
+    .reserve-page .input {
+        min-height: 44px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        font-size: 0.88rem;
+    }
+
+    .reserve-page .schedule-grid input[type="date"]::-webkit-calendar-picker-indicator {
+        width: 16px;
+        height: 16px;
+        margin: 0;
+    }
+
+    .reserve-page .field-error:empty {
+        display: none;
+    }
+
+    .reserve-page .field-error {
+        min-height: 0;
+        margin-top: 0.28rem;
+    }
+}
+
+@media (max-width: 768px) and (max-height: 700px) {
+    :root {
+        --lab-header-offset: 76px;
+    }
+
+    .reserve-page .reserve-page-intro__copy {
+        min-height: 58px;
+        padding: 0.48rem 0.72rem;
+    }
+
+    .reserve-page .reserve-page-kicker {
+        display: none;
+    }
+
+    .reserve-page .reserve-page-heading {
+        max-width: none;
+        font-size: clamp(1.18rem, 5.8vw, 1.42rem);
+        line-height: 1.05;
+    }
+
+    .reserve-page .steps-indicator {
+        gap: 0.34rem;
+        margin-bottom: 0.24rem;
+    }
+
+    .reserve-page .step-pill {
+        min-height: 38px;
+        padding: 0.38rem;
+    }
+
+    .reserve-page .step-pill-index {
+        width: 24px;
+        height: 24px;
+        font-size: 0.78rem;
+    }
+
+    .reserve-page .step-heading {
+        font-size: 1.34rem;
+    }
+
+    .reserve-page .step2-layout,
+    .reserve-page .step2-main {
+        gap: 0.55rem;
+    }
+
+    .reserve-page .schedule-card,
+    .reserve-page .delivery-card {
+        padding: 0.58rem;
+    }
+
+    .reserve-page .schedule-card-title,
+    .reserve-page .delivery-card-title {
+        font-size: 0.78rem;
+    }
+
+    .reserve-page .schedule-card-note,
+    .reserve-page .delivery-card-note {
+        display: none;
+    }
+
+    .reserve-page .schedule-grid {
+        gap: 0.36rem;
+    }
+
+    .reserve-page .schedule-grid .form-group,
+    .reserve-page .delivery-card .form-group {
+        padding: 0.4rem;
+    }
+
+    .reserve-page .input {
+        min-height: 44px;
+        padding: 7px 9px;
+        font-size: 0.84rem;
+    }
+}
+
+@media (max-width: 380px) {
+    .reserve-page .schedule-grid {
+        gap: 0.3rem;
+    }
+
+    .reserve-page .schedule-grid .form-group {
+        padding: 0.34rem;
+    }
+
+    .reserve-page .schedule-grid .field-label {
+        font-size: 0.6rem;
+    }
+
+    .reserve-page .schedule-grid .input {
+        min-height: 44px;
+        padding: 6px 6px;
+        font-size: 0.76rem;
+    }
+}
         @keyframes riseIn {
             from {
                 opacity: 0;

@@ -23,8 +23,10 @@ const artifactsRoot = path.join(repoRoot, 'artifacts', 'change-guard-audit');
 
 const DEFAULT_ROUTES = Object.freeze([
     '/',
+    '/about.html',
     '/fleet.html',
     '/services.html',
+    '/locations.html',
     '/contact.html',
     '/app/reserve/page.html',
     '/lamborghini-rental-dubai.html',
@@ -202,8 +204,18 @@ function buildMarkdownReport({ runDir, report, guard }) {
         `- missing baselines: ${guard.summary.missingBaselinePages}`,
         `- baseline diffs: ${guard.summary.baselineDiffPages}`,
         `- memory regressions: ${guard.summary.memoryRegressions}`,
-        `- missing memory: ${guard.summary.missingMemory}`
+        `- missing memory: ${guard.summary.missingMemory}`,
+        `- visual intelligence groups: ${guard.summary.intelligenceGroups}`,
+        `- visual intelligence findings: ${guard.summary.intelligenceFindings}`
     ];
+
+    if ((guard.intelligence?.activeGroups || []).length > 0) {
+        lines.push('', '## Visual Intelligence', '');
+
+        for (const group of guard.intelligence.activeGroups) {
+            lines.push(`- ${group.label}: pages=${group.pages}, findings=${group.findings}, hardFails=${group.hardFails}`);
+        }
+    }
 
     if (guard.failed) {
         lines.push('', '## Failures', '', formatVisualChangeGuardFailure(guard));

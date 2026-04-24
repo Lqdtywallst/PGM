@@ -41,9 +41,11 @@ test('classifyRouteCohort distinguishes landings, brands, services and vehicle P
 });
 
 test('getDefaultVisualRoutes exposes landing scope separately from vehicle scope', () => {
+    const keyRoutes = getDefaultVisualRoutes();
     const landingRoutes = getDefaultVisualRoutes('landings');
     const vehicleRoutes = getVehicleVisualRoutes();
 
+    assert.ok(keyRoutes.includes('/about.html'));
     assert.ok(landingRoutes.includes('/lamborghini-rental-dubai.html'));
     assert.ok(landingRoutes.includes('/ferrari-rental-dubai.html'));
     assert.ok(landingRoutes.includes('/services.html'));

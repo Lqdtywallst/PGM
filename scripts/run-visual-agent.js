@@ -471,6 +471,17 @@ function normalizeIsoDate(value) {
     return `${year}-${month}-${day}`;
 }
 
+function formatDisplayDateFromIso(value) {
+    const normalized = normalizeIsoDate(value);
+
+    if (!normalized) {
+        return '';
+    }
+
+    const [year, month, day] = normalized.split('-');
+    return `${day}/${month}/${year}`;
+}
+
 function dateIsoToDayNumber(value) {
     const isoDate = normalizeIsoDate(value);
 
@@ -1165,6 +1176,7 @@ async function collectFleetMobileFilterState(page, pageDir, viewport) {
         const viewportHeight = window.innerHeight;
         const sidebar = document.querySelector('.fleet-sidebar');
         const browser = document.querySelector('.fleet-browser');
+        const toolbar = document.querySelector('.fleet-mobile-toolbar');
 
         function isVisible(element) {
             if (!(element instanceof HTMLElement)) {
@@ -1317,6 +1329,17 @@ async function collectFleetMobileFilterState(page, pageDir, viewport) {
             };
         }
 
+        function verticalGap(fromElement, toElement) {
+            const fromRect = rectData(fromElement);
+            const toRect = rectData(toElement);
+
+            if (!fromRect || !toRect) {
+                return null;
+            }
+
+            return Number((toRect.top - fromRect.bottom).toFixed(2));
+        }
+
         const dateTimeFields = Array.from(document.querySelectorAll('.fleet-sidebar__field'))
             .map((field, index) => {
                 const label = field.querySelector(':scope > span:not(.fleet-sidebar__field-shell)');
@@ -1329,7 +1352,8 @@ async function collectFleetMobileFilterState(page, pageDir, viewport) {
                     ...base,
                     label: textFor(label),
                     value: textFor(input),
-                    displayText: textFor(display)
+                    displayText: textFor(display),
+                    labelToControlGapPx: verticalGap(label, shell)
                 };
             });
 
@@ -1351,12 +1375,43 @@ async function collectFleetMobileFilterState(page, pageDir, viewport) {
             .filter((button) => String(button.key || '').includes('fleet-filter-close--inline') && button.visibleInViewport)
             .length;
         const sheetRect = rectData(sidebar);
+        const toolbarStyle = toolbar instanceof HTMLElement ? window.getComputedStyle(toolbar) : null;
+        const toolbarRect = rectData(toolbar);
+        const sheetHeader = document.querySelector('.fleet-filter-sheet-head');
+        const topbar = document.querySelector('.fleet-sidebar__topbar');
+        const visibleModules = Array.from(document.querySelectorAll('.fleet-sidebar__module'))
+            .map((module) => {
+                const rect = rectData(module);
+                const summary = module.querySelector('.fleet-sidebar__summary');
+                const firstBodyControl = module.querySelector('.fleet-sidebar__body .fleet-sidebar__control, .fleet-sidebar__body .fleet-sidebar__field-grid, .fleet-sidebar__body .fleet-price-range');
+
+                return {
+                    id: module.getAttribute('aria-labelledby') || '',
+                    rect,
+                    summaryToControlGapPx: verticalGap(summary, firstBodyControl)
+                };
+            })
+            .filter((module) => module.rect && module.rect.height > 4)
+            .sort((left, right) => left.rect.top - right.rect.top);
+        const firstModule = visibleModules[0] || null;
+        const spacingMetrics = {
+            headerToTopbarGapPx: verticalGap(sheetHeader, topbar),
+            topbarToFirstModuleGapPx: firstModule ? verticalGap(topbar, document.getElementById(firstModule.id)) : null,
+            fieldLabelControlGapsPx: dateTimeFields
+                .map((field) => field.labelToControlGapPx)
+                .filter((gap) => Number.isFinite(gap)),
+            moduleHeadingControlGapsPx: visibleModules
+                .map((module) => module.summaryToControlGapPx)
+                .filter((gap) => Number.isFinite(gap))
+        };
 
         return {
             available: Boolean(sidebar),
             isOpen: Boolean(browser?.classList.contains('fleet-filters-open')),
             viewportWidth,
             viewportHeight,
+            toolbarPosition: toolbarStyle?.position || '',
+            toolbarRect,
             sheetRect,
             sheetHeightRatio: Number((sheetRect?.height ? sheetRect.height / Math.max(1, viewportHeight) : 0).toFixed(3)),
             sheetHorizontalOverflowPx: sidebar ? Number(Math.max(0, sidebar.scrollWidth - sidebar.clientWidth).toFixed(2)) : 0,
@@ -1367,6 +1422,7 @@ async function collectFleetMobileFilterState(page, pageDir, viewport) {
             visibleFilledFieldCount,
             visibleFilterSelectCount,
             visibleInlineApplyButtonCount,
+            spacingMetrics,
             dateTimeFields,
             controls: [...dateTimeFields, ...selects, ...buttons, ...rangeInputs]
         };
@@ -1952,6 +2008,61 @@ function buildFleetMobileFilterFindings({ route, viewportName, viewportWidth, st
         }));
     }
 
+    if (
+        Boolean(contract.forbidPinnedClosedToolbar) &&
+        /^(fixed|sticky)$/i.test(String(state.toolbarPosition || ''))
+    ) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'visual_affordance',
+            message: 'The closed mobile fleet filter bar is pinned over scrolling car content.',
+            evidence: `toolbarPosition=${state.toolbarPosition}; toolbarTop=${state.toolbarRect?.top ?? 'unknown'}`,
+            likelyCause: 'The Fleet mobile toolbar is using sticky/fixed positioning, so it floats over vehicle imagery and competes with the back affordance while scrolling.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
+    const spacingMetrics = state.spacingMetrics || {};
+    const fieldLabelGaps = (spacingMetrics.fieldLabelControlGapsPx || [])
+        .map((value) => Number(value))
+        .filter((value) => Number.isFinite(value));
+    const moduleHeadingGaps = (spacingMetrics.moduleHeadingControlGapsPx || [])
+        .map((value) => Number(value))
+        .filter((value) => Number.isFinite(value));
+    const minFieldLabelGap = fieldLabelGaps.length ? Math.min(...fieldLabelGaps) : Infinity;
+    const minModuleHeadingGap = moduleHeadingGaps.length ? Math.min(...moduleHeadingGaps) : Infinity;
+    const topbarGap = Number(spacingMetrics.topbarToFirstModuleGapPx);
+    const crampedSpacingEvidence = [
+        Number.isFinite(minFieldLabelGap) && minFieldLabelGap < Number(contract.minFieldLabelControlGapPx || 0)
+            ? `minFieldLabelControlGapPx=${minFieldLabelGap.toFixed(2)}`
+            : '',
+        Number.isFinite(minModuleHeadingGap) && minModuleHeadingGap < Number(contract.minModuleHeadingControlGapPx || 0)
+            ? `minModuleHeadingControlGapPx=${minModuleHeadingGap.toFixed(2)}`
+            : '',
+        Number.isFinite(topbarGap) && topbarGap < Number(contract.minTopbarToFirstModuleGapPx || 0)
+            ? `topbarToFirstModuleGapPx=${topbarGap.toFixed(2)}`
+            : ''
+    ].filter(Boolean);
+
+    if (crampedSpacingEvidence.length > 0) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'spacing',
+            message: 'The mobile fleet filter sheet feels cramped because labels and controls do not have enough breathing room.',
+            evidence: `${crampedSpacingEvidence.join('; ')}; minField=${contract.minFieldLabelControlGapPx}; minHeading=${contract.minModuleHeadingControlGapPx}; minTopbar=${contract.minTopbarToFirstModuleGapPx}`,
+            likelyCause: 'Compact mobile sheet spacing was reduced too aggressively, making headings, labels and input boxes visually stick together.',
+            hardFail: true,
+            screenshotPath: stateScreenshotPath,
+            source: 'interaction'
+        }));
+    }
+
     if (Number(state.sheetHorizontalOverflowPx || 0) > contract.maxHorizontalOverflowPx) {
         findings.push(createVisualFinding({
             route,
@@ -2006,7 +2117,24 @@ function buildFleetMobileFilterFindings({ route, viewportName, viewportWidth, st
     const displayTexts = state.displayTexts || [];
     const selectedFilterLabels = state.selectedFilterLabels || [];
     const visibleSelectedFilterLabels = state.visibleSelectedFilterLabels || [];
-    const missingFilledValues = (contract.requiredFilledValues || [])
+    const expectedSyncedFieldValues = contract.requireDateTimeDisplaySync
+        ? (state.dateTimeFields || [])
+            .map((field) => {
+                const value = String(field?.value || '').trim();
+
+                if (!value) {
+                    return '';
+                }
+
+                return formatDisplayDateFromIso(value) || value;
+            })
+            .filter(Boolean)
+        : [];
+    const requiredFilledValues = Array.from(new Set([
+        ...(contract.requiredFilledValues || []),
+        ...expectedSyncedFieldValues
+    ]));
+    const missingFilledValues = requiredFilledValues
         .filter((value) => !displayTexts.includes(value));
     const missingFilterLabels = (contract.requiredFilterLabels || [])
         .filter((label) => !selectedFilterLabels.includes(label));
@@ -2076,8 +2204,12 @@ function buildFleetMobileFilterFindings({ route, viewportName, viewportWidth, st
         }));
     }
 
+    const compactScheduleMinWidth = Number(contract.minCompactScheduleControlWidthPx || 0);
     const narrowFields = (state.dateTimeFields || [])
-        .filter((field) => Number(field.widthRatio || 0) < contract.minFilledFieldWidthRatio);
+        .filter((field) => (
+            Number(field.widthRatio || 0) < contract.minFilledFieldWidthRatio &&
+            Number(field.rect?.width || 0) < compactScheduleMinWidth
+        ));
 
     if (narrowFields.length > 0) {
         findings.push(createVisualFinding({
@@ -2667,7 +2799,7 @@ async function collectReserveBookingIntentState(page, pageDir) {
     };
 }
 
-function buildFilledControlFindings({ route, viewportName, contract, state, requiredKeys, controls, screenshotPath, noun }) {
+function buildFilledControlFindings({ route, viewportName, viewportWidth, contract, state, requiredKeys, controls, screenshotPath, noun }) {
     const findings = [];
     const stateScreenshotPath = state?.screenshotPath || screenshotPath;
     const controlList = controls || [];
@@ -2718,9 +2850,17 @@ function buildFilledControlFindings({ route, viewportName, contract, state, requ
     const smallControls = controlList
         .filter((control) => {
             const rect = control.rect || {};
-            const minUsefulWidth = /button|submit|action/i.test(control.key || '')
+            const key = String(control.key || '');
+            const baseMinUsefulWidth = /button|submit|action/i.test(key)
                 ? Math.min(Number(contract.minUsefulControlWidthPx || 0), 120)
                 : Number(contract.minUsefulControlWidthPx || 0);
+            const viewportRatioMin = Number.isFinite(Number(contract.minUsefulControlWidthRatio)) && Number(viewportWidth || 0) > 0
+                ? Number(viewportWidth) * Number(contract.minUsefulControlWidthRatio)
+                : baseMinUsefulWidth;
+            const compactScheduleMin = /reserve schedule/i.test(noun || '') && /date|time/i.test(key)
+                ? Number(contract.minCompactScheduleControlWidthPx || baseMinUsefulWidth)
+                : baseMinUsefulWidth;
+            const minUsefulWidth = Math.min(baseMinUsefulWidth, viewportRatioMin, compactScheduleMin);
 
             return Number(rect.width || 0) < minUsefulWidth ||
                 Number(rect.height || 0) < contract.minTapTargetPx;
@@ -2832,6 +2972,7 @@ function buildContactFormStateFindings({ route, viewportName, viewportWidth, sta
     return findings.concat(buildFilledControlFindings({
         route,
         viewportName,
+        viewportWidth,
         contract,
         state,
         requiredKeys: contract.requiredFieldKeys,
@@ -2905,6 +3046,7 @@ function buildReserveBookingIntentFindings({ route, viewportName, viewportWidth,
         .concat(buildFilledControlFindings({
             route,
             viewportName,
+            viewportWidth,
             contract,
             state,
             requiredKeys: contract.requiredScheduleFieldKeys,
@@ -2915,6 +3057,7 @@ function buildReserveBookingIntentFindings({ route, viewportName, viewportWidth,
         .concat(buildFilledControlFindings({
             route,
             viewportName,
+            viewportWidth,
             contract,
             state,
             requiredKeys: contract.requiredGuestFieldKeys,
@@ -4248,9 +4391,11 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
         Number(metric.secondaryCount || 0) >= 2 &&
         Number(metric.secondaryRowCount || 0) === 1
     );
-    const stackedFullWidthCards = cardMetrics.filter((metric) => (
+    const narrowStackedContactCards = cardMetrics.filter((metric) => (
+        metric.isVehicleActionCard !== false &&
         Number(metric.secondaryRowCount || 0) > 1 &&
-        Number(metric.secondaryMaxButtonWidthRatio || 0) > Number(cardContract.maxSecondaryButtonWidthRatio || 1)
+        Number(metric.secondaryCount || 0) >= 2 &&
+        Number(metric.secondaryMaxButtonWidthRatio || 0) < Number(cardContract.minStackedContactButtonWidthRatio || 0)
     ));
     const edgeTouchingCards = cardMetrics.filter((metric) => (
         Number(metric.secondaryCount || 0) > 0 &&
@@ -4260,16 +4405,23 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
     const dominantActionCards = cardMetrics.filter((metric) => (
         Number(metric.actionGroupHeightRatio || 0) > Number(cardContract.maxActionGroupHeightRatio || 1)
     ));
+    const splitContactCards = cardMetrics.filter((metric) => (
+        metric.isVehicleActionCard !== false &&
+        Number(metric.secondaryCount || 0) >= 2 &&
+        Number(metric.secondaryRowCount || 0) === 1
+    ));
     const stackedContactCards = cardMetrics.filter((metric) => (
         metric.isVehicleActionCard !== false &&
         Number(metric.secondaryCount || 0) >= 2 &&
         Number(metric.secondaryRowCount || 0) > 1
     ));
     const thinContactStripCards = cardMetrics.filter((metric) => (
+        Boolean(cardContract.requireSingleRowContactSplit) &&
         isSingleRowSplitContact(metric) &&
         Number(metric.secondaryActionHeightRatio || 0) < Number(cardContract.minSplitContactStripHeightRatio || 0)
     ));
     const narrowSplitContactCards = cardMetrics.filter((metric) => (
+        Boolean(cardContract.requireSingleRowContactSplit) &&
         isSingleRowSplitContact(metric) &&
         (
             Number(metric.splitContactGroupWidthRatio || 0) < Number(cardContract.minSplitContactGroupWidthRatio || 0) ||
@@ -4286,17 +4438,17 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
         )
     ));
 
-    if (stackedFullWidthCards.length > 1) {
+    if (narrowStackedContactCards.length > 1) {
         findings.push(createVisualFinding({
             route,
             viewport: viewportName,
             severity: 'high',
             category: 'cta_hierarchy',
-            message: 'A repeated mobile card pattern makes stacked contact buttons read as main content across the page.',
-            evidence: `${summarizeCardLabels(stackedFullWidthCards)}; maxSecondaryButtonWidthRatio=${Math.max(...stackedFullWidthCards.map((metric) => Number(metric.secondaryMaxButtonWidthRatio || 0))).toFixed(3)}; max=${cardContract.maxSecondaryButtonWidthRatio}`,
-            likelyCause: 'The issue is not isolated to one vehicle card; the shared card action layout is giving secondary contact CTAs too much authority.',
+            message: 'A repeated mobile card pattern makes stacked contact buttons too narrow to read as one clean group.',
+            evidence: `${summarizeCardLabels(narrowStackedContactCards)}; minSecondaryButtonWidthRatio=${Math.min(...narrowStackedContactCards.map((metric) => Number(metric.secondaryMaxButtonWidthRatio || 0))).toFixed(3)}; min=${cardContract.minStackedContactButtonWidthRatio}`,
+            likelyCause: 'The shared card action layout is shrinking contact CTAs instead of letting them span the card content width evenly.',
             hardFail: true,
-            screenshotPath: screenshotForScanMetric(state, stackedFullWidthCards[0], screenshotPath),
+            screenshotPath: screenshotForScanMetric(state, narrowStackedContactCards[0], screenshotPath),
             source: 'page_depth_scan'
         }));
     }
@@ -4331,16 +4483,31 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
         }));
     }
 
-    if (stackedContactCards.length > 1) {
+    if (splitContactCards.length > 1 && Boolean(cardContract.requireStackedContactActions)) {
         findings.push(createVisualFinding({
             route,
             viewport: viewportName,
             severity: 'high',
             category: 'cta_hierarchy',
-            message: 'A repeated mobile card pattern stacks Call and WhatsApp instead of using a split contact bar.',
-            evidence: `${summarizeCardLabels(stackedContactCards)}; requiredSingleRowContactSplit=${Boolean(cardContract.requireSingleRowContactSplit)}`,
-            likelyCause: 'The card action area is forcing guests through a tall button stack instead of a single bottom contact decision.',
-            hardFail: Boolean(cardContract.requireSingleRowContactSplit),
+            message: 'A repeated mobile card pattern uses side-by-side contact buttons instead of one clean vertical mobile group.',
+            evidence: `${summarizeCardLabels(splitContactCards)}; requireStackedContactActions=true`,
+            likelyCause: 'Call and WhatsApp are being squeezed into a desktop-style row, which becomes harder to scan and tap across varied mobile widths.',
+            hardFail: true,
+            screenshotPath: screenshotForScanMetric(state, splitContactCards[0], screenshotPath),
+            source: 'page_depth_scan'
+        }));
+    }
+
+    if (stackedContactCards.length > 1 && Boolean(cardContract.requireSingleRowContactSplit)) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'cta_hierarchy',
+            message: 'A repeated mobile card pattern stacks Call and WhatsApp instead of using one split bottom bar.',
+            evidence: `${summarizeCardLabels(stackedContactCards)}; requireSingleRowContactSplit=true`,
+            likelyCause: 'The shared card action layout regressed from the approved bottom strip into separate stacked buttons.',
+            hardFail: true,
             screenshotPath: screenshotForScanMetric(state, stackedContactCards[0], screenshotPath),
             source: 'page_depth_scan'
         }));
@@ -4448,16 +4615,37 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
         if (
             isVehicleActionCard &&
             Number(metric.secondaryRowCount || 0) > 1 &&
-            Number(metric.secondaryMaxButtonWidthRatio || 0) > Number(cardContract.maxSecondaryButtonWidthRatio || 1)
+            Number(metric.secondaryCount || 0) >= 2 &&
+            Number(metric.secondaryMaxButtonWidthRatio || 0) < Number(cardContract.minStackedContactButtonWidthRatio || 0)
         ) {
             findings.push(createVisualFinding({
                 route,
                 viewport: viewportName,
                 severity: 'high',
                 category: 'cta_hierarchy',
-                message: 'Stacked mobile contact buttons span almost the full card width and read as the main content.',
-                evidence: `${labelEvidence}; secondaryRowCount=${metric.secondaryRowCount}; secondaryMaxButtonWidthRatio=${metric.secondaryMaxButtonWidthRatio}; max=${cardContract.maxSecondaryButtonWidthRatio}`,
-                likelyCause: 'The secondary contact group is styled like page-level full-width CTAs instead of a contained card action group.',
+                message: 'Stacked mobile contact buttons are too narrow to read as one clean vertical group.',
+                evidence: `${labelEvidence}; secondaryRowCount=${metric.secondaryRowCount}; secondaryMaxButtonWidthRatio=${metric.secondaryMaxButtonWidthRatio}; min=${cardContract.minStackedContactButtonWidthRatio}`,
+                likelyCause: 'The secondary contact group is being squeezed instead of spanning the available card content width evenly.',
+                hardFail: true,
+                screenshotPath: metricScreenshotPath,
+                source: 'page_depth_scan'
+            }));
+        }
+
+        if (
+            isVehicleActionCard &&
+            Boolean(cardContract.requireStackedContactActions) &&
+            Number(metric.secondaryCount || 0) >= 2 &&
+            Number(metric.secondaryRowCount || 0) === 1
+        ) {
+            findings.push(createVisualFinding({
+                route,
+                viewport: viewportName,
+                severity: 'high',
+                category: 'cta_hierarchy',
+                message: 'Call and WhatsApp are side-by-side instead of stacked into one clean mobile contact group.',
+                evidence: `${labelEvidence}; secondaryRowCount=${metric.secondaryRowCount}; requireStackedContactActions=true`,
+                likelyCause: 'The mobile card contact actions are still using a desktop-style split row, which is fragile on narrow phones.',
                 hardFail: true,
                 screenshotPath: metricScreenshotPath,
                 source: 'page_depth_scan'
@@ -4475,9 +4663,9 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
                 viewport: viewportName,
                 severity: 'high',
                 category: 'cta_hierarchy',
-                message: 'Call and WhatsApp are stacked instead of split into one bottom mobile contact bar.',
-                evidence: `${labelEvidence}; secondaryRowCount=${metric.secondaryRowCount}; requiredSingleRowContactSplit=true`,
-                likelyCause: 'The mobile card contact actions are laid out as separate full-width buttons rather than one clear split control.',
+                message: 'Call and WhatsApp are stacked instead of forming one split bottom bar.',
+                evidence: `${labelEvidence}; secondaryRowCount=${metric.secondaryRowCount}; requireSingleRowContactSplit=true`,
+                likelyCause: 'The mobile card contact actions should occupy the full lower edge as one control split into Call and WhatsApp halves.',
                 hardFail: true,
                 screenshotPath: metricScreenshotPath,
                 source: 'page_depth_scan'
@@ -4486,6 +4674,7 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
 
         if (
             isVehicleActionCard &&
+            Boolean(cardContract.requireSingleRowContactSplit) &&
             isSingleRowSplitContact(metric) &&
             Number(metric.secondaryActionHeightRatio || 0) < Number(cardContract.minSplitContactStripHeightRatio || 0)
         ) {
@@ -4503,6 +4692,7 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
         }
 
         if (
+            Boolean(cardContract.requireSingleRowContactSplit) &&
             isSingleRowSplitContact(metric) &&
             (
                 Number(metric.splitContactGroupWidthRatio || 0) < Number(cardContract.minSplitContactGroupWidthRatio || 0) ||
@@ -5675,6 +5865,7 @@ async function collectVisualMetrics(page, profile) {
         const contactIntro = firstVisible(['.contact-hero__intro']);
         const contactFormCard = firstVisible(['.contact-form-card']);
         const contactHeroShell = firstVisible(['.contact-hero__shell']);
+        const contactHeroAction = firstVisible(['.contact-hero__actions a', '.contact-hero__actions button']);
         const reserveStep1Layout = firstVisible([
             '#step1.step-content.active .step2-layout',
             '#step1 .step2-layout',
@@ -5697,6 +5888,9 @@ async function collectVisualMetrics(page, profile) {
         const reserveIntroCopy = firstVisible(['.reserve-page-intro__copy']);
         const reserveIntroPanel = firstVisible(['.reserve-page-panel']);
         const reservePageHeading = firstVisible(['.reserve-page-heading']);
+        const reserveStepPills = firstVisible(['.steps-indicator']);
+        const reserveScheduleCard = firstVisible(['#step1.step-content.active .schedule-card', '#step1 .schedule-card', '.schedule-card']);
+        const reserveDeliveryCard = firstVisible(['#step1.step-content.active .delivery-card', '#step1 .delivery-card', '.delivery-card']);
         const reserveStartDate = firstVisible(['#startDate']);
         const reservePickupLocation = firstVisible(['#pickupLocation']);
         const vehicleHeroMedia = firstVisible(['.vehicle-hero__media', '.vehicle-pdp-gallery-top__stage']);
@@ -5924,6 +6118,7 @@ async function collectVisualMetrics(page, profile) {
             contactIntroRect: rectData(contactIntro),
             contactFormCardRect: rectData(contactFormCard),
             contactHeroShellRect: rectData(contactHeroShell),
+            contactHeroActionRect: rectData(contactHeroAction),
             reserveStep1LayoutRect: rectData(reserveStep1Layout),
             reserveStep1MainRect: rectData(reserveStep1Main),
             reserveStep1SideRect: rectData(reserveStep1Side),
@@ -5931,6 +6126,9 @@ async function collectVisualMetrics(page, profile) {
             reserveIntroCopyRect: rectData(reserveIntroCopy),
             reserveIntroPanelRect: rectData(reserveIntroPanel),
             reservePageHeadingRect: rectData(reservePageHeading),
+            reserveStepPillsRect: rectData(reserveStepPills),
+            reserveScheduleCardRect: rectData(reserveScheduleCard),
+            reserveDeliveryCardRect: rectData(reserveDeliveryCard),
             reserveStartDateRect: rectData(reserveStartDate),
             reservePickupLocationRect: rectData(reservePickupLocation),
             vehicleHeroMediaRect: rectData(vehicleHeroMedia),
@@ -6473,6 +6671,143 @@ function buildDeterministicFindings({ route, viewport, profile, metrics, console
         }
     }
 
+    if (firstViewportContract?.check === 'services_mobile_feature_reveal') {
+        const selectorBottomRatio = metrics.servicesSelectorRect ? metrics.servicesSelectorRect.bottom / metrics.viewportHeight : 0;
+        const selectorWidthRatio = metrics.servicesSelectorRect ? metrics.servicesSelectorRect.width / metrics.viewportWidth : 0;
+        const featureTopRatio = metrics.servicesFeatureRect ? metrics.servicesFeatureRect.top / metrics.viewportHeight : 0;
+        const servicesMobileFailures = [];
+
+        if (!metrics.servicesSelectorRect || !metrics.servicesFeatureRect) {
+            servicesMobileFailures.push('missingServicesMobileRegions');
+        } else {
+            if (
+                firstViewportContract.selectorBottomRatio &&
+                selectorBottomRatio > firstViewportContract.selectorBottomRatio.max
+            ) {
+                servicesMobileFailures.push(`selectorBottomRatio=${selectorBottomRatio.toFixed(3)}`);
+            }
+
+            if (
+                firstViewportContract.featureTopRatio &&
+                featureTopRatio > firstViewportContract.featureTopRatio.max
+            ) {
+                servicesMobileFailures.push(`featureTopRatio=${featureTopRatio.toFixed(3)}`);
+            }
+
+            if (
+                Number.isFinite(firstViewportContract.minSelectorWidthRatio) &&
+                selectorWidthRatio < firstViewportContract.minSelectorWidthRatio
+            ) {
+                servicesMobileFailures.push(`selectorWidthRatio=${selectorWidthRatio.toFixed(3)}`);
+            }
+        }
+
+        if (
+            Number.isFinite(firstViewportContract.maxHeadingTopRatio) &&
+            metrics.headingRect &&
+            metrics.headingRect.top / metrics.viewportHeight > firstViewportContract.maxHeadingTopRatio
+        ) {
+            servicesMobileFailures.push(`headingTopRatio=${(metrics.headingRect.top / metrics.viewportHeight).toFixed(3)}`);
+        }
+
+        if (
+            Number.isFinite(firstViewportContract.maxPrimaryCtaTopRatio) &&
+            metrics.primaryCtaRect &&
+            metrics.primaryCtaRect.top / metrics.viewportHeight > firstViewportContract.maxPrimaryCtaTopRatio
+        ) {
+            servicesMobileFailures.push(`primaryCtaTopRatio=${(metrics.primaryCtaRect.top / metrics.viewportHeight).toFixed(3)}`);
+        }
+
+        if (servicesMobileFailures.length > 0) {
+            findings.push(createVisualFinding({
+                route,
+                viewport: viewportName,
+                severity: 'high',
+                category: 'first_viewport_layout',
+                message: 'The services mobile first viewport no longer reveals both the service selector and an active service panel.',
+                evidence: servicesMobileFailures.join('; '),
+                likelyCause: 'The mobile services hero is letting the selector, heading, or feature panel consume the whole first screen before the next useful action is visible.',
+                screenshotPath
+            }));
+        } else {
+            heroHeadingRuleSatisfiedByComposition = true;
+        }
+    }
+
+    if (firstViewportContract?.check === 'mobile_useful_first_viewport') {
+        const mobileUsefulFailures = [];
+        const viewportHeight = Number(metrics.viewportHeight || 0);
+        const viewportWidth = Number(metrics.viewportWidth || 0);
+        const pushTopFailure = ({ rect, label, maxRatio, required = true }) => {
+            if (!Number.isFinite(maxRatio)) {
+                return;
+            }
+
+            if (!rect) {
+                if (required) {
+                    mobileUsefulFailures.push(`${label}=missing`);
+                }
+                return;
+            }
+
+            const topRatio = viewportHeight > 0 ? Number(rect.top || 0) / viewportHeight : 0;
+
+            if (topRatio > maxRatio) {
+                mobileUsefulFailures.push(`${label}TopRatio=${topRatio.toFixed(3)}>${maxRatio}`);
+            }
+        };
+        const usefulRect = firstViewportContract.usefulRectKey
+            ? metrics[firstViewportContract.usefulRectKey]
+            : null;
+        const ctaRect = firstViewportContract.primaryCtaRectKey
+            ? metrics[firstViewportContract.primaryCtaRectKey]
+            : metrics.primaryCtaRect;
+
+        pushTopFailure({
+            rect: metrics.headingRect,
+            label: 'heading',
+            maxRatio: firstViewportContract.maxHeadingTopRatio
+        });
+        pushTopFailure({
+            rect: ctaRect,
+            label: 'primaryCta',
+            maxRatio: firstViewportContract.maxPrimaryCtaTopRatio
+        });
+        pushTopFailure({
+            rect: usefulRect,
+            label: firstViewportContract.usefulLabel || firstViewportContract.usefulRectKey || 'usefulContent',
+            maxRatio: firstViewportContract.maxUsefulTopRatio,
+            required: Boolean(firstViewportContract.usefulRectKey)
+        });
+
+        if (
+            ctaRect &&
+            Number.isFinite(firstViewportContract.minPrimaryCtaWidthRatio) &&
+            viewportWidth > 0
+        ) {
+            const ctaWidthRatio = Number(ctaRect.width || 0) / viewportWidth;
+
+            if (ctaWidthRatio < firstViewportContract.minPrimaryCtaWidthRatio) {
+                mobileUsefulFailures.push(`primaryCtaWidthRatio=${ctaWidthRatio.toFixed(3)}<${firstViewportContract.minPrimaryCtaWidthRatio}`);
+            }
+        }
+
+        if (mobileUsefulFailures.length > 0) {
+            findings.push(createVisualFinding({
+                route,
+                viewport: viewportName,
+                severity: 'high',
+                category: 'first_viewport_layout',
+                message: 'The mobile first viewport no longer exposes enough useful page intent.',
+                evidence: mobileUsefulFailures.join('; '),
+                likelyCause: 'The mobile opening composition is pushing the headline, primary action, or next useful content too far down the first screen.',
+                screenshotPath
+            }));
+        } else if (profileConfig.heroLed) {
+            heroHeadingRuleSatisfiedByComposition = true;
+        }
+    }
+
     if (firstViewportContract?.check === 'two_column_alignment') {
         const alignmentFailures = evaluateTwoColumnSplit({
             primaryRect: metrics.locationsSummaryRect,
@@ -6572,6 +6907,88 @@ function buildDeterministicFindings({ route, viewport, profile, metrics, console
                 message: 'The fleet first row no longer distributes the visible cards cleanly across the first screen.',
                 evidence: fleetFailures.join('; '),
                 likelyCause: 'The opening fleet grid is under-filling, collapsing, or losing row alignment.'
+            }));
+        }
+    }
+
+    if (firstViewportContract?.check === 'reserve_mobile_schedule_reveal') {
+        const viewportHeight = Number(metrics.viewportHeight || 0);
+        const shortViewport = (
+            viewportHeight > 0 &&
+            Number.isFinite(firstViewportContract.shortViewportHeightPx) &&
+            viewportHeight <= firstViewportContract.shortViewportHeightPx
+        );
+        const deliveryCardTopLimitRatio = shortViewport && Number.isFinite(firstViewportContract.shortMaxDeliveryCardTopRatio)
+            ? firstViewportContract.shortMaxDeliveryCardTopRatio
+            : firstViewportContract.maxDeliveryCardTopRatio;
+        const pickupLocationTopLimitRatio = shortViewport && Number.isFinite(firstViewportContract.shortMaxPickupLocationTopRatio)
+            ? firstViewportContract.shortMaxPickupLocationTopRatio
+            : firstViewportContract.maxPickupLocationTopRatio;
+        const reserveRevealFailures = [];
+        const ratio = (rect, edge = 'top') => (
+            rect && viewportHeight > 0 && Number.isFinite(Number(rect[edge]))
+                ? Number(rect[edge]) / viewportHeight
+                : null
+        );
+        const addRatioFailure = ({ rect, label, edge = 'top', maxRatio }) => {
+            if (!Number.isFinite(maxRatio)) {
+                return;
+            }
+
+            const value = ratio(rect, edge);
+
+            if (value === null) {
+                reserveRevealFailures.push(`${label}=missing`);
+                return;
+            }
+
+            if (value > maxRatio) {
+                reserveRevealFailures.push(`${label}${edge[0].toUpperCase()}${edge.slice(1)}Ratio=${value.toFixed(3)}>${maxRatio}`);
+            }
+        };
+
+        addRatioFailure({
+            rect: metrics.reserveIntroRect || metrics.reservePageHeadingRect,
+            label: 'reserveIntro',
+            edge: 'bottom',
+            maxRatio: firstViewportContract.maxIntroBottomRatio
+        });
+        addRatioFailure({
+            rect: metrics.reserveStepPillsRect,
+            label: 'stepPills',
+            edge: 'bottom',
+            maxRatio: firstViewportContract.maxStepPillsBottomRatio
+        });
+        addRatioFailure({
+            rect: metrics.reserveStartDateRect,
+            label: 'startDate',
+            maxRatio: firstViewportContract.maxStartDateTopRatio
+        });
+        addRatioFailure({
+            rect: metrics.reserveDeliveryCardRect,
+            label: 'deliveryCard',
+            maxRatio: deliveryCardTopLimitRatio
+        });
+        addRatioFailure({
+            rect: metrics.reservePickupLocationRect,
+            label: 'pickupLocation',
+            maxRatio: pickupLocationTopLimitRatio
+        });
+
+        if (reserveRevealFailures.length > 0) {
+            findings.push(createVisualFinding({
+                route,
+                viewport: viewportName,
+                severity: 'high',
+                category: 'first_viewport_layout',
+                message: 'The reserve mobile first viewport does not reveal enough useful scheduling and delivery context.',
+                evidence: [
+                    ...reserveRevealFailures,
+                    `viewportHeight=${metrics.viewportHeight}`,
+                    shortViewport ? 'shortViewport=true' : 'shortViewport=false'
+                ].join('; '),
+                likelyCause: 'The mobile entry stack is spending too much height on intro, step pills, or schedule controls before the delivery address field appears.',
+                screenshotPath
             }));
         }
     }

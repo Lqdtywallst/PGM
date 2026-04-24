@@ -14,8 +14,10 @@ const artifactsRoot = path.join(repoRoot, 'artifacts', 'visual-smoke-audit');
 
 const DEFAULT_ROUTES = Object.freeze([
     '/',
+    '/about.html',
     '/fleet.html',
     '/services.html',
+    '/locations.html',
     '/contact.html',
     '/app/reserve/page.html',
     '/lamborghini-rental-dubai.html',
@@ -24,6 +26,7 @@ const DEFAULT_ROUTES = Object.freeze([
 ]);
 
 const DEFAULT_VIEWPORTS = Object.freeze([
+    'mobile-tiny',
     'mobile-short',
     'mobile-modern',
     'tablet-portrait',

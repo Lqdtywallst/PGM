@@ -150,6 +150,116 @@
         `;
     }
 
+    function initFloatingBackButton() {
+        const navigationMemoryKey = "dynastyPreviousPage";
+
+        function normalizeInternalPath(href) {
+            if (!href) {
+                return "";
+            }
+
+            try {
+                const url = new URL(href, window.location.href);
+
+                if (url.origin !== window.location.origin) {
+                    return "";
+                }
+
+                const pathname = url.pathname.replace(/\/index\.html$/i, "/") || "/";
+                const normalizedPathname = pathname === "/" ? "/" : pathname.replace(/\/+$/, "");
+                return `${normalizedPathname}${url.search}`;
+            } catch (error) {
+                return "";
+            }
+        }
+
+        function stripHashAndTrailingSlash(value) {
+            const [pathWithSearch] = normalizeValue(value).split("#");
+            const [pathname, search = ""] = pathWithSearch.split("?");
+            const normalizedPathname = (pathname || "/").replace(/\/index\.html$/i, "/");
+            const compactPathname = normalizedPathname === "/" ? "/" : normalizedPathname.replace(/\/+$/, "");
+            return `${compactPathname}${search ? `?${search}` : ""}`;
+        }
+
+        function pathsEqual(left, right) {
+            return stripHashAndTrailingSlash(left) === stripHashAndTrailingSlash(right);
+        }
+
+        function readNavigationMemory() {
+            try {
+                const rawMemory = window.sessionStorage.getItem(navigationMemoryKey);
+                const parsedMemory = rawMemory ? JSON.parse(rawMemory) : null;
+                return parsedMemory && typeof parsedMemory === "object" ? parsedMemory : {};
+            } catch (error) {
+                return {};
+            }
+        }
+
+        function writeNavigationMemory(memory) {
+            try {
+                window.sessionStorage.setItem(navigationMemoryKey, JSON.stringify(memory));
+            } catch (error) {
+                // Ignore storage failures in restricted browsing modes.
+            }
+        }
+
+        const currentPath = normalizeInternalPath(window.location.href);
+        const referrerPath = normalizeInternalPath(document.referrer);
+        const storedMemory = readNavigationMemory();
+        const storedCurrentPath = normalizeInternalPath(storedMemory.current);
+        const storedPreviousPath = normalizeInternalPath(storedMemory.previous);
+        const previousPath = [
+            referrerPath,
+            storedCurrentPath && !pathsEqual(storedCurrentPath, currentPath) ? storedCurrentPath : "",
+            storedPreviousPath
+        ].find((candidate) => candidate && !pathsEqual(candidate, currentPath));
+
+        writeNavigationMemory({
+            current: currentPath,
+            previous: previousPath || "",
+            updatedAt: Date.now()
+        });
+
+        if (pathsEqual(currentPath, "/") || document.body.classList.contains("home-page")) {
+            return;
+        }
+
+        if (!previousPath || document.querySelector(".lab-floating-back")) {
+            return;
+        }
+
+        const backButton = document.createElement("a");
+        backButton.className = "lab-floating-back";
+        backButton.href = previousPath;
+        backButton.setAttribute("aria-label", "Go back to the previous Dynasty Prestige page");
+        backButton.setAttribute("title", "Back");
+        backButton.innerHTML = `
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path fill="currentColor" d="M14.7 5.3a1 1 0 0 1 0 1.4L10.41 11H20a1 1 0 1 1 0 2h-9.59l4.3 4.3a1 1 0 0 1-1.42 1.4l-6-6a1 1 0 0 1 0-1.4l6-6a1 1 0 0 1 1.41 0Z"></path>
+            </svg>
+            <span>Back</span>
+        `;
+
+        backButton.addEventListener("click", (event) => {
+            const liveReferrerPath = normalizeInternalPath(document.referrer);
+
+            if (!liveReferrerPath || !pathsEqual(liveReferrerPath, previousPath) || window.history.length <= 1) {
+                return;
+            }
+
+            event.preventDefault();
+            window.history.back();
+            window.setTimeout(() => {
+                if (!document.hidden) {
+                    window.location.href = previousPath;
+                }
+            }, 240);
+        });
+
+        document.body.appendChild(backButton);
+        window.requestAnimationFrame(() => backButton.classList.add("is-visible"));
+    }
+
     function initMobileDrawer() {
         const header = document.querySelector(".lab-header");
         const headerInner = header?.querySelector(".lab-header__inner");
@@ -303,6 +413,7 @@
     function init() {
         initMegaNav();
         initMobileDrawer();
+        initFloatingBackButton();
     }
 
     if (document.readyState === "loading") {

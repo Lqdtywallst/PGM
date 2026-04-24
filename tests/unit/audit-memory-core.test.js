@@ -8,6 +8,8 @@ const {
     writeApprovedAuditMemory
 } = require('../../server/audit-memory-core');
 const {
+    formatVisualChangeGuardFailure,
+    summarizeVisualIntelligence,
     summarizeVisualChangeGuard
 } = require('../../server/change-guard-core');
 const {
@@ -130,11 +132,114 @@ test('audit memory treats a visual good-to-review change as a regression', () =>
     assert.equal(comparison.regressions[0].family, 'visual.page-health');
 });
 
+test('audit memory catches semantic visual drift even when the page remains good', () => {
+    const approvedMemory = buildAuditMemory({
+        generatedAt: '2026-04-21T00:00:00.000Z',
+        summary: { byStatus: { good: 1, review: 0, bad: 0 }, hardFailCount: 0 },
+        pages: [
+            {
+                route: '/services.html',
+                viewport: 'desktop-wide',
+                assessment: { status: 'good', score: 100, findings: [] },
+                baselineDiff: { status: 'pass', message: 'Viewport baseline passed.' }
+            }
+        ]
+    }, { kind: 'visual' });
+    const comparison = compareAuditMemory({
+        generatedAt: '2026-04-21T00:01:00.000Z',
+        summary: { byStatus: { good: 1, review: 0, bad: 0 }, hardFailCount: 0 },
+        pages: [
+            {
+                route: '/services.html',
+                viewport: 'desktop-wide',
+                assessment: {
+                    status: 'good',
+                    score: 90,
+                    findings: [
+                        {
+                            severity: 'medium',
+                            category: 'first_viewport_layout',
+                            message: 'The first viewport lost its clean split.'
+                        }
+                    ]
+                },
+                baselineDiff: { status: 'pass', message: 'Viewport baseline passed.' }
+            }
+        ]
+    }, approvedMemory, { kind: 'visual' });
+
+    assert.equal(comparison.status, 'bad');
+    assert.ok(comparison.regressions.some((regression) => (
+        regression.family === 'visual.first-viewport' &&
+        regression.currentStatus === 'review'
+    )));
+});
+
 test('audit memory approval rejects dirty navigation runs unless forced by caller', () => {
     const approval = canApproveAuditMemory(navigationReportWithLocalExit('failed'), { kind: 'navigation' });
 
     assert.equal(approval.canApprove, false);
     assert.ok(approval.reasons.some((reason) => reason.includes('navigationStatus=')));
+});
+
+test('audit memory approval rejects visually dirty good runs', () => {
+    const approval = canApproveAuditMemory({
+        generatedAt: '2026-04-21T00:00:00.000Z',
+        summary: { byStatus: { good: 1, review: 0, bad: 0 }, hardFailCount: 0 },
+        pages: [
+            {
+                route: '/services.html',
+                viewport: 'desktop-wide',
+                assessment: {
+                    status: 'good',
+                    score: 92,
+                    findings: [
+                        {
+                            severity: 'low',
+                            category: 'spacing',
+                            message: 'A section has minor spacing drift.'
+                        }
+                    ]
+                }
+            }
+        ]
+    }, { kind: 'visual' });
+
+    assert.equal(approval.canApprove, false);
+    assert.ok(approval.reasons.includes('visualFindings=1'));
+});
+
+test('visual intelligence groups findings into human-readable change risks', () => {
+    const report = {
+        pages: [
+            {
+                route: '/services.html',
+                viewport: 'desktop-wide',
+                assessment: {
+                    findings: [
+                        {
+                            severity: 'medium',
+                            category: 'first_viewport_layout',
+                            message: 'The services hero panel moved too low.',
+                            evidence: 'featureTopRatio=0.71',
+                            screenshotPath: '/tmp/services.png'
+                        },
+                        {
+                            severity: 'high',
+                            category: 'surface_drift',
+                            message: 'The CTA style changed family.',
+                            hardFail: true
+                        }
+                    ]
+                }
+            }
+        ]
+    };
+    const intelligence = summarizeVisualIntelligence(report);
+
+    assert.equal(intelligence.totals.groups, 2);
+    assert.equal(intelligence.summary.firstViewport.findings, 1);
+    assert.equal(intelligence.summary.surfaceQuality.hardFails, 1);
 });
 
 test('visual change guard requires approved memory before accepting a clean run', () => {
@@ -198,11 +303,13 @@ test('visual change guard catches a previously approved visual page that moves t
         requireApprovedBaselines: true,
         strictReview: true
     });
+    const failureText = formatVisualChangeGuardFailure(guard);
 
     assert.equal(guard.failed, true);
     assert.ok(guard.memoryRegressions.some((regression) => regression.family === 'visual.page-health'));
     assert.equal(guard.reviewPages.length, 1);
     assert.equal(guard.baselineDiffPages.length, 1);
+    assert.match(failureText, /baseline diff/i);
 });
 
 test('change guard args resolve responsive and full visual memory scopes', () => {

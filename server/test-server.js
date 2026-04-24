@@ -415,12 +415,21 @@ async function run() {
     );
 
     const indexPage = readFile('site/index.html');
+    const homeSiteCss = readFile('site/css/site-v2.css');
     assert(
         indexPage.includes('id="hero-lab-overlay"') &&
         indexPage.includes('id="hero-lab-pickup-date"') &&
         indexPage.includes('id="hero-lab-return-date"') &&
         indexPage.includes('js-booking-open'),
         'home page exposes the date-first hero controls'
+    );
+    const homeMobileHeroVideoRule = /\.home-page\s+\.hero-lab__video\s*\{(?=[^}]*display:\s*block;)(?=[^}]*opacity:\s*0\.72;)[^}]*\}/m;
+    const homeMobileHeroStillRule = /\.home-page\s+\.hero-lab__still\s*\{(?=[^}]*opacity:\s*0;)[^}]*\}/m;
+    assert(
+        indexPage.includes('data-src-mobile="./media/hero-sports-road.mp4"') &&
+        homeMobileHeroVideoRule.test(homeSiteCss) &&
+        homeMobileHeroStillRule.test(homeSiteCss),
+        'home mobile hero keeps the lightweight video visible above the fold'
     );
     assert(
         indexPage.includes('./fleet.html') &&
@@ -534,6 +543,46 @@ async function run() {
         siteV2Script.includes('location_name') &&
         siteV2Script.includes('eventName.endsWith("_reservation_click")'),
         'site-v2.js exposes the shared services and locations CTA analytics bridge'
+    );
+    assert(
+        siteV2Script.includes('initFloatingBackButton') &&
+        siteV2Script.includes('dynastyPreviousPage') &&
+        siteV2Script.includes('lab-floating-back'),
+        'site-v2.js exposes the shared floating previous-page navigation'
+    );
+
+    const reserveShellScript = readFile('site/js/reserve-shell.js');
+    const sharedSiteCss = readFile('site/css/site-v2.css');
+    const reserveShellCss = readFile('site/css/reserve-shell.css');
+    assert(
+        reserveShellScript.includes('initFloatingBackButton') &&
+        reserveShellScript.includes('dynastyPreviousPage') &&
+        reserveShellScript.includes('lab-floating-back'),
+        'reserve shell exposes the floating previous-page navigation'
+    );
+    assert(
+        sharedSiteCss.includes('.lab-floating-back') &&
+        reserveShellCss.includes('.lab-floating-back') &&
+        sharedSiteCss.includes('.home-page .lab-floating-back') &&
+        sharedSiteCss.includes('.hero-lab-overlay-open .lab-floating-back') &&
+        sharedSiteCss.includes('.lab-mobile-nav-open .lab-floating-back') &&
+        sharedSiteCss.includes('.fleet-filter-sheet-open .lab-floating-back'),
+        'shared and reserve shells style the floating previous-page navigation'
+    );
+
+    const fleetScript = readFile('site/js/site-v2-fleet.js');
+    const fleetCss = readFile('site/css/site-v2-fleet.css');
+    assert(
+        fleetScript.includes('fleet-filter-close__icon') &&
+        fleetScript.includes('Close filters and return to car results') &&
+        !fleetScript.includes('Back to cars'),
+        'fleet mobile filter sheet uses a close icon instead of a competing back button'
+    );
+    const mobileToolbarBlocks = [...fleetCss.matchAll(/\.fleet-mobile-toolbar\s*\{([\s\S]*?)\n\s*\}/g)].map((match) => match[1]);
+    assert(
+        mobileToolbarBlocks.some((block) => /position:\s*relative\b/.test(block)) &&
+        !mobileToolbarBlocks.some((block) => /position:\s*(sticky|fixed)\b/.test(block)),
+        'fleet mobile filter toolbar scrolls with car results instead of pinning over cards'
     );
 
     const aboutPage = readPublicPage('/about.html');
