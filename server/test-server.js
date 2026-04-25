@@ -25,6 +25,7 @@ const requiredFiles = [
     'server/server-http.js',
     'server/verificar-stripe.js',
     'vercel.json',
+    'scripts/run-copy-audit.js',
     'app/api/reserve/route.js',
     'site/config.js',
     'site/robots.txt',
@@ -42,7 +43,9 @@ const requiredFiles = [
     'site/css/hub-pages.css',
     'site/js/site-v2.js',
     'site/js/site-v2-fleet.js',
-    'site/js/contact-form.js'
+    'site/js/contact-form.js',
+    'site/js/reservation-lookup.js',
+    'site/css/site-v2-reservation-lookup.css'
 ];
 
 const syntaxFiles = [
@@ -50,8 +53,10 @@ const syntaxFiles = [
     'server/email-config.js',
     'server/server-http.js',
     'server/verificar-stripe.js',
+    'scripts/run-copy-audit.js',
     'app/api/reserve/route.js',
-    'site/config.js'
+    'site/config.js',
+    'site/js/reservation-lookup.js'
 ];
 
 const keyMarketingPaths = [
@@ -61,6 +66,7 @@ const keyMarketingPaths = [
     '/services.html',
     '/about.html',
     '/contact.html',
+    '/reservation-lookup.html',
     '/luxury-car-rental-dubai.html',
     '/abu-dhabi-luxury-car-rental.html',
     '/dubai-airport-luxury-car-rental.html',
@@ -338,6 +344,11 @@ async function run() {
 
     const vercelConfig = JSON.parse(readFile('vercel.json'));
     report(true, 'vercel.json parses as valid JSON');
+    const packageJson = JSON.parse(readFile('package.json'));
+    assert(
+        packageJson.scripts && packageJson.scripts['audit:copy'] === 'node scripts/run-copy-audit.js',
+        'package.json exposes the advisory copy audit script'
+    );
 
     const hasSiteRewrite = Array.isArray(vercelConfig.rewrites) &&
         vercelConfig.rewrites.some((rule) => String(rule.destination || '').startsWith('/site/'));
@@ -380,6 +391,26 @@ async function run() {
     assert(
         reserveRoute.includes("require('../../../server/email-config')"),
         'reservation route reuses the shared email configuration helper'
+    );
+    assert(
+        reserveRoute.includes("require('../../../server/reservation-store')") &&
+        reserveRoute.includes('saveReservationRecord') &&
+        reserveRoute.includes('reservationId'),
+        'reservation backend persists each booking with a stable reservation id'
+    );
+    assert(
+        reserveRoute.includes("router.post('/lookup'") &&
+        reserveRoute.includes('buildSafeReservationLookupSummary') &&
+        reserveRoute.includes('findReservationForLookup'),
+        'reservation backend exposes a safe customer lookup endpoint without raw customer records'
+    );
+    const reservationStore = readFile('server/reservation-store.js');
+    assert(
+        reservationStore.includes('CREATE TABLE IF NOT EXISTS reservations') &&
+        reservationStore.includes('DATABASE_URL') &&
+        reservationStore.includes('runtimeReservationDir') &&
+        reservationStore.includes('findReservationForLookup'),
+        'reservation store supports PostgreSQL, local JSON storage and secure reservation lookup'
     );
 
     const reservePage = readFile('site/app/reserve/page.html');
@@ -550,6 +581,13 @@ async function run() {
         siteV2Script.includes('lab-floating-back'),
         'site-v2.js exposes the shared floating previous-page navigation'
     );
+    assert(
+        siteV2Script.includes('initFloatingContactButtons') &&
+        siteV2Script.includes('normalizeGenericContactLinks') &&
+        siteV2Script.includes('lab-floating-contact') &&
+        siteV2Script.includes('help booking a luxury car in Dubai'),
+        'site-v2.js exposes generic floating call and WhatsApp contact buttons'
+    );
 
     const reserveShellScript = readFile('site/js/reserve-shell.js');
     const sharedSiteCss = readFile('site/css/site-v2.css');
@@ -561,13 +599,22 @@ async function run() {
         'reserve shell exposes the floating previous-page navigation'
     );
     assert(
+        reserveShellScript.includes('initFloatingContactButtons') &&
+        reserveShellScript.includes('normalizeGenericContactLinks') &&
+        reserveShellScript.includes('lab-floating-contact') &&
+        reserveShellScript.includes('help booking a luxury car in Dubai'),
+        'reserve shell exposes generic floating call and WhatsApp contact buttons'
+    );
+    assert(
         sharedSiteCss.includes('.lab-floating-back') &&
         reserveShellCss.includes('.lab-floating-back') &&
+        sharedSiteCss.includes('.lab-floating-contact') &&
+        reserveShellCss.includes('.lab-floating-contact') &&
         sharedSiteCss.includes('.home-page .lab-floating-back') &&
         sharedSiteCss.includes('.hero-lab-overlay-open .lab-floating-back') &&
         sharedSiteCss.includes('.lab-mobile-nav-open .lab-floating-back') &&
         sharedSiteCss.includes('.fleet-filter-sheet-open .lab-floating-back'),
-        'shared and reserve shells style the floating previous-page navigation'
+        'shared and reserve shells style floating previous-page and contact navigation'
     );
     const servicesCss = readFile('site/css/site-v2-services.css');
     const functionalAgentScript = readFile('scripts/run-functional-agent.js');
@@ -584,6 +631,13 @@ async function run() {
         functionalAgentScript.includes('createServicesLaneSelectorAction') &&
         functionalAgentScript.includes('createVehicleGalleryLightboxAction'),
         'functional auditor checks service circles and vehicle gallery popups'
+    );
+    assert(
+        functionalAgentScript.includes('createContactProtocolLinksAction') &&
+        functionalAgentScript.includes('EXPECTED_CONTACT_PHONE_E164') &&
+        functionalAgentScript.includes('EXPECTED_GENERIC_WHATSAPP_MESSAGE') &&
+        functionalAgentScript.includes('car-context WhatsApp'),
+        'functional agent validates call and WhatsApp number/message contracts'
     );
 
     const fleetScript = readFile('site/js/site-v2-fleet.js');
@@ -616,6 +670,22 @@ async function run() {
         contactPage.includes('config.js') &&
         contactPage.includes('/js/contact-form.js'),
         'contact page includes the contact form, reservation link and runtime config'
+    );
+
+    const reservationLookupPage = readPublicPage('/reservation-lookup.html');
+    assert(
+        reservationLookupPage.includes('data-reservation-lookup-form') &&
+        reservationLookupPage.includes('/api/reserve/lookup') === false &&
+        reservationLookupPage.includes('./js/reservation-lookup.js') &&
+        reservationLookupPage.includes('Find booking'),
+        'reservation lookup page exposes a safe customer-facing lookup form'
+    );
+    const reservationLookupScript = readFile('site/js/reservation-lookup.js');
+    assert(
+        reservationLookupScript.includes('/api/reserve/lookup') &&
+        reservationLookupScript.includes('Reservation lookup is not configured yet') &&
+        reservationLookupScript.includes('WhatsApp the team'),
+        'reservation lookup script calls the secure backend endpoint with support fallbacks'
     );
 
     const htmlFiles = listFilesRecursive(siteRoot, '.html');
@@ -655,6 +725,17 @@ async function run() {
         backendFile.includes("require('./email-config')") &&
         backendFile.includes('Stripe-dependent routes will return 503'),
         'backend reuses shared email config and no longer hard-fails without Stripe'
+    );
+    assert(
+        backendFile.includes("require('./reservation-store')") &&
+        backendFile.includes('buildReservationRecordFromPaymentIntent') &&
+        backendFile.includes('stripe webhook payment succeeded'),
+        'backend records reservation state from legacy payment intents and Stripe webhooks'
+    );
+    const envExample = readFile('.env.example');
+    assert(
+        envExample.includes('DATABASE_URL=') && envExample.includes('DATABASE_SSL='),
+        '.env.example documents production reservation database settings'
     );
 
     const staticServerFile = readFile('server/server-http.js');
@@ -700,7 +781,7 @@ async function run() {
     const { child, logs } = await startStaticServer();
 
     try {
-        const specialPaths = ['/', '/robots.txt', '/sitemap.xml', '/manifest.json', '/contact.html', '/app/reserve/page.html'];
+        const specialPaths = ['/', '/robots.txt', '/sitemap.xml', '/manifest.json', '/contact.html', '/reservation-lookup.html', '/app/reserve/page.html'];
         for (const pathname of [...specialPaths, ...sitemapPaths]) {
             const response = await fetchUrl(`${staticBaseUrl}${pathname}`);
             assert(response.statusCode === 200, `${pathname} responds with HTTP 200 on the local static server`);

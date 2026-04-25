@@ -581,7 +581,9 @@ async function collectVisibleInternalLinks(page, knownRoutes) {
         const anchors = Array.from(document.querySelectorAll('a[href]'))
             .filter((link) => isVisible(link))
             .map((link) => {
-                const isServiceSelector = link.hasAttribute('data-service-selector') && Boolean(link.getAttribute('data-service-primary-href'));
+                const isServiceSelector = link.hasAttribute('data-service-selector') &&
+                    !link.getAttribute('href') &&
+                    Boolean(link.getAttribute('data-service-primary-href'));
                 const href = isServiceSelector
                     ? link.getAttribute('data-service-primary-href') || ''
                     : link.getAttribute('href') || '';

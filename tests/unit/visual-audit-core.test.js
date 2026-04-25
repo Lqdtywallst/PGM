@@ -8,6 +8,7 @@ const {
     classifyRouteProfile,
     createVisualFinding,
     dedupeVisualFindings,
+    evaluateMobileHeroHeadingBalance,
     getDefaultVisualRoutes,
     getVehicleVisualRoutes,
     scoreVisualPage,
@@ -26,9 +27,63 @@ test('classifyRouteProfile maps key public routes to explicit visual profiles', 
 });
 
 test('visual finding categories include current regression checks emitted by the visual agent', () => {
-    for (const category of ['date_currentness', 'text_encoding', 'border_weight_drift', 'spacing', 'layout_homogeneity', 'visual_affordance']) {
+    for (const category of ['date_currentness', 'text_encoding', 'border_weight_drift', 'spacing', 'layout_homogeneity', 'visual_affordance', 'heading_balance']) {
         assert.ok(VISUAL_FINDING_CATEGORIES.includes(category), `${category} should be accepted by visual tooling`);
     }
+});
+
+test('evaluateMobileHeroHeadingBalance catches stepped left-heavy mobile headlines', () => {
+    const failures = evaluateMobileHeroHeadingBalance({
+        viewportWidth: 390,
+        headingLineMetrics: {
+            text: 'Drive Dubai your way.',
+            textAlign: 'left',
+            lineCount: 4,
+            minLineWidthRatio: 0.21,
+            lineWidthSpreadRatio: 0.18,
+            maxLineCenterOffsetRatio: 0.28,
+            blockCenterOffsetRatio: 0.27
+        }
+    }, {
+        headingBalance: {
+            requireCenteredText: true,
+            maxLineCount: 3,
+            minLineWidthRatio: 0.32,
+            maxLineWidthSpreadRatio: 0.34,
+            maxCenterOffsetRatio: 0.12,
+            maxBlockCenterOffsetRatio: 0.1
+        }
+    });
+
+    assert.ok(failures.some((failure) => failure.startsWith('lineCount=')));
+    assert.ok(failures.some((failure) => failure.startsWith('blockCenterOffsetRatio=')));
+    assert.ok(failures.includes('textAlign=left'));
+});
+
+test('evaluateMobileHeroHeadingBalance accepts centered balanced mobile headlines', () => {
+    const failures = evaluateMobileHeroHeadingBalance({
+        viewportWidth: 390,
+        headingLineMetrics: {
+            text: 'Drive Dubai your way.',
+            textAlign: 'center',
+            lineCount: 2,
+            minLineWidthRatio: 0.43,
+            lineWidthSpreadRatio: 0.14,
+            maxLineCenterOffsetRatio: 0.04,
+            blockCenterOffsetRatio: 0.02
+        }
+    }, {
+        headingBalance: {
+            requireCenteredText: true,
+            maxLineCount: 3,
+            minLineWidthRatio: 0.32,
+            maxLineWidthSpreadRatio: 0.34,
+            maxCenterOffsetRatio: 0.12,
+            maxBlockCenterOffsetRatio: 0.1
+        }
+    });
+
+    assert.deepEqual(failures, []);
 });
 
 test('classifyRouteCohort distinguishes landings, brands, services and vehicle PDPs', () => {

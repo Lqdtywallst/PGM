@@ -62,7 +62,7 @@ const CUSTOMER_JOURNEY_SCENARIOS = Object.freeze([
         intent: 'Filter the fleet, shortlist a model, and open reserve with the same schedule.',
         deviceTargets: Object.freeze(['desktop', 'mobile']),
         routes: Object.freeze(['/fleet.html']),
-        actionIds: Object.freeze(['fleet-filter-cycle', 'fleet-reserve-first-visible']),
+        actionIds: Object.freeze(['fleet-filter-cycle', 'fleet-reserve-first-visible', 'fleet-all-cars-checkout']),
         actionPrefixes: Object.freeze([]),
         e2eSpecs: Object.freeze([
             'tests/e2e/customer-journeys.spec.js',
@@ -74,6 +74,7 @@ const CUSTOMER_JOURNEY_SCENARIOS = Object.freeze([
         customerSignals: Object.freeze([
             'brand filters never leave the guest with an empty useful result',
             'visible reserve CTAs keep the active schedule',
+            'every fleet model can complete a mocked checkout from its Reserve CTA',
             'back navigation and car switching do not carry stale state'
         ])
     }),
@@ -83,7 +84,7 @@ const CUSTOMER_JOURNEY_SCENARIOS = Object.freeze([
         intent: 'Use dates, filters, reset, and reserve from a cramped phone viewport.',
         deviceTargets: Object.freeze(['mobile']),
         routes: Object.freeze(['/fleet.html']),
-        actionIds: Object.freeze(['fleet-filter-cycle', 'fleet-reserve-first-visible']),
+        actionIds: Object.freeze(['fleet-filter-cycle', 'fleet-reset-filters', 'fleet-mobile-filter-sheet', 'fleet-reserve-first-visible']),
         actionPrefixes: Object.freeze([]),
         e2eSpecs: Object.freeze([
             'tests/e2e/mobile-friction-points.spec.js',

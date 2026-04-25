@@ -2,7 +2,7 @@
 
 ## Resumen
 
-- URLs auditadas: 32
+- URLs auditadas: 33
 - URLs publicas fuera del sitemap: 0
 - titulos duplicados: 0
 - meta descriptions duplicadas: 0
@@ -19,6 +19,7 @@
 | /services.html | services-hub | OK | OK | OK | OK | OK |
 | /about.html | about | OK | OK | OK | OK | OK |
 | /contact.html | contact | OK | OK | OK | OK | OK |
+| /reservation-lookup.html | public-page | OK | OK | OK | OK | OK |
 | /luxury-car-rental-dubai.html | location-guide | OK | OK | OK | OK | OK |
 | /abu-dhabi-luxury-car-rental.html | location-guide | OK | OK | OK | OK | OK |
 | /dubai-airport-luxury-car-rental.html | location-guide | OK | OK | OK | OK | OK |

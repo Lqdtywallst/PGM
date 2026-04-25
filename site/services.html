@@ -25,7 +25,6 @@
     <link rel="stylesheet" href="./css/site-v2.css?v=20260424-backnav1">
     <link rel="stylesheet" href="./css/site-v2-services.css?v=20260424-responsive1">
     <script src="./js/site-v2.js?v=20260424-backnav1" defer></script>
-    <script src="./js/services-selector.js?v=20260419a" defer></script>
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -274,16 +273,23 @@
             </div>
 
             <div class="lab-shell services-hero__shell">
-                <div class="services-hero__planner" data-services-selector>
-                    <div class="services-hero__selector" role="tablist" aria-label="Primary service lanes">
+                <div class="services-hero__planner services-hero__planner--direct" data-services-selector>
+                    <div class="services-hero__hub-intro">
+                        <nav class="services-breadcrumb" aria-label="Breadcrumb">
+                            <a href="./index.html">Home</a>
+                            <span aria-current="page">Services</span>
+                        </nav>
+                        <span class="services-kicker">Dubai luxury car services</span>
+                        <h1>Choose the service around the stay.</h1>
+                        <p class="services-hero__lead">Airport concierge, private chauffeur movement, tailored delivery and monthly support, each routed directly to the right booking path.</p>
+                    </div>
+
+                    <nav class="services-hero__selector" aria-label="Primary service lanes">
                         <a
                             id="services-lane-tab-airport"
                             class="services-lane-orb is-active"
                             href="./airport-concierge-dubai.html"
-                            role="tab"
-                            aria-selected="true"
-                            aria-controls="services-lane-panel"
-                            tabindex="0"
+                            aria-label="Open airport concierge service"
                             data-service-selector
                             data-service-kicker="Arrival-first lane"
                             data-service-title="Airport concierge"
@@ -305,10 +311,7 @@
                             id="services-lane-tab-chauffeur"
                             class="services-lane-orb"
                             href="./chauffeur-service-dubai.html"
-                            role="tab"
-                            aria-selected="false"
-                            aria-controls="services-lane-panel"
-                            tabindex="-1"
+                            aria-label="Open chauffeur service"
                             data-service-selector
                             data-service-kicker="Movement lane"
                             data-service-title="VIP chauffeur"
@@ -330,10 +333,7 @@
                             id="services-lane-tab-delivery"
                             class="services-lane-orb"
                             href="./hotel-villa-airport-delivery-dubai.html"
-                            role="tab"
-                            aria-selected="false"
-                            aria-controls="services-lane-panel"
-                            tabindex="-1"
+                            aria-label="Open tailored delivery service"
                             data-service-selector
                             data-service-kicker="Handover lane"
                             data-service-title="Tailored delivery"
@@ -355,10 +355,7 @@
                             id="services-lane-tab-monthly"
                             class="services-lane-orb"
                             href="./monthly-luxury-car-rental-dubai.html"
-                            role="tab"
-                            aria-selected="false"
-                            aria-controls="services-lane-panel"
-                            tabindex="-1"
+                            aria-label="Open monthly luxury rental service"
                             data-service-selector
                             data-service-kicker="Longer-stay lane"
                             data-service-title="Monthly luxury rental"
@@ -375,43 +372,7 @@
                             <span class="services-lane-orb__label">Monthly</span>
                             <span class="services-lane-orb__meta">Longer stay</span>
                         </a>
-                    </div>
-
-                    <article class="services-hero__feature" id="services-lane-panel" role="tabpanel" aria-labelledby="services-lane-tab-airport" data-service-panel>
-                        <div class="services-hero__feature-main">
-                            <div class="services-hero__feature-copy">
-                                <nav class="services-breadcrumb" aria-label="Breadcrumb">
-                                    <a href="./index.html">Home</a>
-                                    <span aria-current="page">Services</span>
-                                </nav>
-                                <span class="services-hero__feature-kicker" data-service-kicker>Arrival-first lane</span>
-                                <h1 data-service-title>Airport concierge</h1>
-                                <p data-service-copy>Meet-and-greet, flight tracking and onward routing from DXB or DWC before the city even starts.</p>
-                            </div>
-
-                            <ul class="services-hero__feature-list">
-                                <li data-service-point="one">Flight tracking before touchdown</li>
-                                <li data-service-point="two">Meet-and-greet with onward routing</li>
-                                <li data-service-point="three">Hotel, villa or city continuation planned early</li>
-                            </ul>
-                        </div>
-
-                        <div class="services-hero__feature-side">
-                            <div class="services-hero__feature-actions">
-                                <a
-                                    class="services-button services-button--primary"
-                                    href="./airport-concierge-dubai.html"
-                                    data-service-primary
-                                    data-analytics-event="service_reservation_click"
-                                    data-analytics-service="airport_concierge"
-                                    data-analytics-placement="hero_lane"
-                                    data-analytics-channel="service_page">Explore airport concierge</a>
-                                <a class="services-button services-button--ghost" href="./app/reserve/page.html" data-analytics-event="service_reservation_click" data-analytics-service="services_hub" data-analytics-placement="hero" data-analytics-channel="reservation">Open reservation flow</a>
-                            </div>
-
-                            <p class="services-hero__note">Need a quieter request? <a href="https://wa.me/971586122568?text=Hi%2C%20I%20want%20help%20choosing%20the%20right%20Dynasty%20Prestige%20service%20in%20Dubai." target="_blank" rel="noopener" data-analytics-event="service_whatsapp_click" data-analytics-service="services_hub" data-analytics-placement="hero" data-analytics-channel="whatsapp">Talk to the concierge</a>.</p>
-                        </div>
-                    </article>
+                    </nav>
                 </div>
             </div>
         </section>
@@ -420,7 +381,7 @@
             <div class="lab-shell services-directory__shell">
                 <div class="services-section__head services-section__head--center">
                     <span class="services-kicker services-kicker--dark">Other routes</span>
-                    <h2 id="service-directory-title">Keep the extra pages useful, not noisy.</h2>
+                    <h2 id="service-directory-title">Useful detail, only where it helps the booking.</h2>
                     <p>Once the main lane is clear, use the narrower pages for events, business mobility and location-led starting points.</p>
                 </div>
 
@@ -480,7 +441,7 @@
             <div class="lab-shell services-flow__shell">
                 <div class="services-section__head">
                     <span class="services-kicker services-kicker--dark">How it works</span>
-                    <h2 id="service-flow-title">Keep the booking path premium by keeping it short.</h2>
+                    <h2 id="service-flow-title">A premium booking path should stay short.</h2>
                     <p>The guest should explain the stay once. After that, the route, the vehicle and the handover should already feel aligned.</p>
                 </div>
 

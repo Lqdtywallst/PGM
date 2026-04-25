@@ -157,6 +157,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 0.56rem;
     min-height: 3.25rem;
     padding: 0 1.15rem;
     border: 1px solid transparent;
@@ -175,10 +176,35 @@
     transform: translateY(-1px);
 }
 
+.contact-button__icon {
+    width: 1.16rem;
+    height: 1.16rem;
+    flex: 0 0 auto;
+}
+
 .contact-button--primary {
     background: #171921;
     color: #ffffff;
     box-shadow: 0 16px 34px rgba(23, 25, 33, 0.14);
+}
+
+.contact-button--whatsapp {
+    border-color: rgba(255, 255, 255, 0.16);
+    background:
+        radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 28%),
+        linear-gradient(135deg, #22c762 0%, #12a64a 56%, #087f37 100%);
+    color: #ffffff;
+    box-shadow:
+        0 18px 38px rgba(18, 166, 74, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.contact-button--whatsapp:hover,
+.contact-button--whatsapp:focus-visible {
+    border-color: rgba(255, 255, 255, 0.24);
+    box-shadow:
+        0 22px 44px rgba(18, 166, 74, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .contact-button--secondary {
@@ -482,6 +508,10 @@
 }
 
 @media (max-width: 860px) {
+    .contact-page .lab-floating-contact {
+        display: none;
+    }
+
     .contact-hero {
         padding: 1rem 0 1.25rem;
     }

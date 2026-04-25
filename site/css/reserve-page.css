@@ -1509,7 +1509,7 @@
         }
 
         @media (max-width: 768px) {
-            /* Avoid vertically centering the whole flow on mobile â€” it breaks scroll order and feels â€œout of sequenceâ€ */
+            /* Avoid vertically centering the whole flow on mobile; it breaks scroll order. */
             body.reserve-page {
                 min-height: 100%;
             }
@@ -1527,7 +1527,7 @@
             .step2-layout {
                 grid-template-columns: 1fr;
             }
-            /* Step 2: keep reading order logical on small screens â€” main (calendar + times) first, then delivery, then live quote */
+            /* Step 2: keep reading order logical on small screens: schedule first, then delivery, then live quote. */
             .step2-layout {
                 display: flex;
                 flex-direction: column;

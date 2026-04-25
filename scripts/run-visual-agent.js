@@ -22,6 +22,7 @@ const {
     classifyRouteCohort,
     classifyRouteProfile,
     createVisualFinding,
+    evaluateMobileHeroHeadingBalance,
     getDefaultVisualRoutes,
     getVehicleVisualRoutes,
     getProfileConfig,
@@ -133,6 +134,7 @@ const PROFILE_SELECTORS = Object.freeze({
             '.service-detail-button--primary',
             '.local-guide-button--primary',
             '.about-button--primary',
+            '.services-lane-orb',
             '.services-button--primary',
             '.locations-button--primary',
             '.vehicle-hero__actions a'
@@ -142,6 +144,7 @@ const PROFILE_SELECTORS = Object.freeze({
             '.service-detail-button--primary',
             '.local-guide-button--primary',
             '.about-button--primary',
+            '.services-lane-orb',
             '.services-button--primary',
             '.locations-button--primary',
             '.vehicle-hero__actions a'
@@ -165,12 +168,13 @@ const PROFILE_SELECTORS = Object.freeze({
             '.service-detail-button--primary',
             '.local-guide-button--primary',
             '.about-button--primary',
+            '.services-lane-orb',
             '.services-button--primary',
             '.locations-button--primary',
             '.vehicle-hero__actions a',
             '.local-guide-hero__aside',
             '.service-detail-hero__panel',
-            '.services-hero__feature',
+            '.services-hero__selector',
             '.locations-map-card',
             '.vehicle-hero__copy'
         ],
@@ -179,6 +183,7 @@ const PROFILE_SELECTORS = Object.freeze({
             '.service-detail-button--primary',
             '.local-guide-button--primary',
             '.about-button--primary',
+            '.services-lane-orb',
             '.services-button--primary',
             '.locations-button--primary',
             '.vehicle-hero__actions a'
@@ -920,8 +925,9 @@ function serviceStateScreenshotPath(pageDir, tabId = '') {
 async function collectServiceSelectorStates(page, pageDir) {
     const tabLocator = page.locator('[data-service-selector]');
     const tabCount = await tabLocator.count();
+    const hasPreviewPanel = await page.locator('[data-service-panel]').count();
 
-    if (tabCount < 2) {
+    if (tabCount < 2 || hasPreviewPanel === 0) {
         return null;
     }
 
@@ -3307,7 +3313,11 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
             }
 
             const actionElements = Array.from(document.querySelectorAll('main a[href], main button, main [role="button"], .reserve-mobile-bar a, .reserve-mobile-bar button'))
-                .filter((element) => element instanceof HTMLElement && isVisible(element));
+                .filter((element) => (
+                    element instanceof HTMLElement &&
+                    isVisible(element) &&
+                    !element.closest('footer, .site-v2-footer, header, .lab-header, .lab-nav__panel, .lab-mobile-drawer')
+                ));
             const majorElements = Array.from(document.querySelectorAll([
                 'main h1',
                 'main h2',
@@ -3337,7 +3347,11 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                 '.vehicle-pdp-use__card',
                 '.reserve-mobile-bar'
             ].join(',')))
-                .filter((element) => element instanceof HTMLElement && isVisible(element));
+                .filter((element) => (
+                    element instanceof HTMLElement &&
+                    isVisible(element) &&
+                    !element.closest('header, .lab-header, .lab-nav__panel, .lab-mobile-drawer')
+                ));
             const actionMetrics = actionElements.map((element) => {
                 const rect = rectData(element);
                 const href = element.getAttribute('href') || '';
@@ -5383,6 +5397,84 @@ async function collectVisualMetrics(page, profile) {
             return Number((value / divisor).toFixed(4));
         }
 
+        function collectHeadingLineMetrics(element) {
+            if (!(element instanceof HTMLElement) || !isVisible(element)) {
+                return null;
+            }
+
+            const style = window.getComputedStyle(element);
+            const range = document.createRange();
+            range.selectNodeContents(element);
+
+            const rawRects = Array.from(range.getClientRects())
+                .map((rect) => ({
+                    top: rect.top,
+                    right: rect.right,
+                    bottom: rect.bottom,
+                    left: rect.left,
+                    width: rect.width,
+                    height: rect.height
+                }))
+                .filter((rect) => rect.width >= 4 && rect.height >= 4);
+            range.detach();
+
+            const sourceRects = rawRects.length > 0
+                ? rawRects
+                : [element.getBoundingClientRect()];
+            const groupedLines = [];
+
+            sourceRects
+                .sort((left, right) => left.top - right.top || left.left - right.left)
+                .forEach((rect) => {
+                    const existing = groupedLines.find((line) => Math.abs(line.top - rect.top) <= 3);
+
+                    if (existing) {
+                        existing.top = Math.min(existing.top, rect.top);
+                        existing.right = Math.max(existing.right, rect.right);
+                        existing.bottom = Math.max(existing.bottom, rect.bottom);
+                        existing.left = Math.min(existing.left, rect.left);
+                        existing.width = existing.right - existing.left;
+                        existing.height = existing.bottom - existing.top;
+                        return;
+                    }
+
+                    groupedLines.push({ ...rect });
+                });
+
+            const lineRects = groupedLines
+                .map((rect) => ({
+                    top: Number(rect.top.toFixed(2)),
+                    right: Number(rect.right.toFixed(2)),
+                    bottom: Number(rect.bottom.toFixed(2)),
+                    left: Number(rect.left.toFixed(2)),
+                    width: Number(rect.width.toFixed(2)),
+                    height: Number(rect.height.toFixed(2))
+                }))
+                .filter((rect) => rect.width >= 4 && rect.height >= 4);
+            const lineWidthRatios = lineRects.map((rect) => rect.width / Math.max(1, viewportWidth));
+            const lineCenterOffsetRatios = lineRects.map((rect) => (
+                Math.abs(((rect.left + rect.right) / 2) - (viewportWidth / 2)) / Math.max(1, viewportWidth)
+            ));
+            const headingRect = element.getBoundingClientRect();
+            const text = normalizeText(element.innerText || element.textContent || '');
+            const wordCount = text ? text.split(/\s+/).filter(Boolean).length : 0;
+
+            return {
+                text: text.slice(0, 90),
+                wordCount,
+                textAlign: String(style.textAlign || '').toLowerCase(),
+                fontSizePx: Number(parsePx(style.fontSize).toFixed(2)),
+                lineCount: lineRects.length,
+                lineRects,
+                lineWidthRatios: lineWidthRatios.map((value) => Number(value.toFixed(3))),
+                minLineWidthRatio: lineWidthRatios.length ? Number(Math.min(...lineWidthRatios).toFixed(3)) : 0,
+                maxLineWidthRatio: lineWidthRatios.length ? Number(Math.max(...lineWidthRatios).toFixed(3)) : 0,
+                lineWidthSpreadRatio: lineWidthRatios.length ? Number((Math.max(...lineWidthRatios) - Math.min(...lineWidthRatios)).toFixed(3)) : 0,
+                maxLineCenterOffsetRatio: lineCenterOffsetRatios.length ? Number(Math.max(...lineCenterOffsetRatios).toFixed(3)) : 0,
+                blockCenterOffsetRatio: Number((Math.abs((headingRect.left + (headingRect.width / 2)) - (viewportWidth / 2)) / Math.max(1, viewportWidth)).toFixed(3))
+            };
+        }
+
         function clipDetails(element) {
             const style = window.getComputedStyle(element);
             const rect = element.getBoundingClientRect();
@@ -6026,6 +6118,7 @@ async function collectVisualMetrics(page, profile) {
             heroActionLabels: heroActions.map((element) => primaryText(element)).filter(Boolean).slice(0, 4),
             heroRect: rectData(hero),
             headingRect: rectData(visibleH1[0] || null),
+            headingLineMetrics: collectHeadingLineMetrics(visibleH1[0] || null),
             primaryCtaRect: rectData(primaryCta),
             primaryCtaLabel: primaryText(primaryCta),
             priceRect: rectData(price),
@@ -6671,6 +6764,88 @@ function buildDeterministicFindings({ route, viewport, profile, metrics, console
         }
     }
 
+    if (firstViewportContract?.check === 'services_direct_lanes') {
+        const selectorBottomRatio = metrics.servicesSelectorRect ? metrics.servicesSelectorRect.bottom / metrics.viewportHeight : 0;
+        const selectorWidthRatio = metrics.servicesSelectorRect ? metrics.servicesSelectorRect.width / metrics.viewportWidth : 0;
+        const selectorSlotWidth = metrics.servicesSelectorRect && metrics.servicesOrbMetrics?.count
+            ? metrics.servicesSelectorRect.width / metrics.servicesOrbMetrics.count
+            : 0;
+        const orbSlotFillRatio = selectorSlotWidth > 0 && metrics.servicesOrbMetrics
+            ? metrics.servicesOrbMetrics.minWidthPx / selectorSlotWidth
+            : 0;
+        const headingTopRatio = metrics.headingRect ? metrics.headingRect.top / metrics.viewportHeight : 0;
+        const headingBottomRatio = metrics.headingRect ? metrics.headingRect.bottom / metrics.viewportHeight : 0;
+        const directLaneFailures = [];
+
+        if (!metrics.servicesSelectorRect) {
+            directLaneFailures.push('missingServicesDirectLanes');
+        } else {
+            if (firstViewportContract.selectorBottomRatio && selectorBottomRatio > firstViewportContract.selectorBottomRatio.max) {
+                directLaneFailures.push(`selectorBottomRatio=${selectorBottomRatio.toFixed(3)}`);
+            }
+
+            if (
+                Number.isFinite(firstViewportContract.minSelectorWidthRatio) &&
+                selectorWidthRatio < firstViewportContract.minSelectorWidthRatio
+            ) {
+                directLaneFailures.push(`selectorWidthRatio=${selectorWidthRatio.toFixed(3)}`);
+            }
+
+            if (!metrics.servicesOrbMetrics || metrics.servicesOrbMetrics.count < 4) {
+                directLaneFailures.push(`orbCount=${metrics.servicesOrbMetrics?.count || 0}`);
+            }
+
+            if (
+                Number.isFinite(firstViewportContract.minOrbSlotFillRatio) &&
+                orbSlotFillRatio < firstViewportContract.minOrbSlotFillRatio
+            ) {
+                directLaneFailures.push(`orbSlotFillRatio=${orbSlotFillRatio.toFixed(3)}`);
+            }
+
+            if (
+                Number.isFinite(firstViewportContract.minOrbMediaWidthPx) &&
+                (!metrics.servicesOrbMetrics || metrics.servicesOrbMetrics.minWidthPx < firstViewportContract.minOrbMediaWidthPx)
+            ) {
+                directLaneFailures.push(`orbMinWidthPx=${metrics.servicesOrbMetrics?.minWidthPx?.toFixed(2) || 'missing'}`);
+            }
+        }
+
+        if (firstViewportContract.requireNoFeaturePanel && metrics.servicesFeatureRect) {
+            directLaneFailures.push('legacyServicePreviewPanelVisible');
+        }
+
+        if (
+            Number.isFinite(firstViewportContract.maxHeadingTopRatio) &&
+            metrics.headingRect &&
+            headingTopRatio > firstViewportContract.maxHeadingTopRatio
+        ) {
+            directLaneFailures.push(`headingTopRatio=${headingTopRatio.toFixed(3)}`);
+        }
+
+        if (
+            Number.isFinite(firstViewportContract.maxHeadingBottomRatio) &&
+            metrics.headingRect &&
+            headingBottomRatio > firstViewportContract.maxHeadingBottomRatio
+        ) {
+            directLaneFailures.push(`headingBottomRatio=${headingBottomRatio.toFixed(3)}`);
+        }
+
+        if (directLaneFailures.length > 0) {
+            findings.push(createVisualFinding({
+                route,
+                viewport: viewportName,
+                severity: 'high',
+                category: 'first_viewport_layout',
+                message: 'The services first viewport no longer presents the four service circles as clean direct links.',
+                evidence: directLaneFailures.join('; '),
+                likelyCause: 'The direct service lanes are either buried, visually too small, too narrow, or the removed preview panel has returned.',
+                screenshotPath
+            }));
+        } else {
+            heroHeadingRuleSatisfiedByComposition = true;
+        }
+    }
+
     if (firstViewportContract?.check === 'services_mobile_feature_reveal') {
         const selectorBottomRatio = metrics.servicesSelectorRect ? metrics.servicesSelectorRect.bottom / metrics.viewportHeight : 0;
         const selectorWidthRatio = metrics.servicesSelectorRect ? metrics.servicesSelectorRect.width / metrics.viewportWidth : 0;
@@ -6805,6 +6980,36 @@ function buildDeterministicFindings({ route, viewport, profile, metrics, console
             }));
         } else if (profileConfig.heroLed) {
             heroHeadingRuleSatisfiedByComposition = true;
+        }
+    }
+
+    if (firstViewportContract?.headingBalance) {
+        const headingBalanceFailures = evaluateMobileHeroHeadingBalance(metrics, firstViewportContract);
+
+        if (headingBalanceFailures.length > 0) {
+            const lineMetrics = metrics.headingLineMetrics || {};
+            const severeHeadingBalance = headingBalanceFailures.some((failure) => (
+                /^lineCount=/.test(failure) ||
+                /^blockCenterOffsetRatio=/.test(failure) ||
+                /^maxLineCenterOffsetRatio=/.test(failure)
+            ));
+
+            findings.push(createVisualFinding({
+                route,
+                viewport: viewportName,
+                severity: severeHeadingBalance ? 'high' : 'medium',
+                category: 'heading_balance',
+                selector: 'h1',
+                message: 'The mobile hero headline is visually unbalanced across its wrapped lines.',
+                evidence: [
+                    headingBalanceFailures.join('; '),
+                    `text="${lineMetrics.text || ''}"`,
+                    `lineWidths=${(lineMetrics.lineWidthRatios || []).join(',')}`,
+                    `textAlign=${lineMetrics.textAlign || 'unknown'}`
+                ].filter(Boolean).join('; '),
+                likelyCause: 'The mobile H1 is wrapping into a stepped left-heavy shape instead of reading as a centered, evenly distributed headline block.',
+                screenshotPath
+            }));
         }
     }
 
@@ -7601,6 +7806,7 @@ function buildVisionPrompt({ route, viewport, profile, metrics, findings, baseli
         headerVariant: metrics.headerVariant,
         headerPrimaryNavSignature: metrics.headerPrimaryNavSignature,
         headingFontFamily: metrics.headingFontFamily,
+        headingLineMetrics: metrics.headingLineMetrics,
         bodyFontFamily: metrics.bodyFontFamily,
         bodyFontSizePx: metrics.bodyFontSizePx,
         bodyLineHeightPx: metrics.bodyLineHeightPx,

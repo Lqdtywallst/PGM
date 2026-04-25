@@ -32,7 +32,16 @@ const FUNCTIONAL_HUMAN_REVIEW_RULES = Object.freeze([
         checks: Object.freeze([
             'no console errors during customer-like actions',
             'no broken document, script, stylesheet, fetch or XHR requests',
-            'external contact paths must be well-formed even when not followed'
+            'call and WhatsApp paths must use the approved number and context-aware message'
+        ])
+    }),
+    Object.freeze({
+        id: 'interaction_contract',
+        label: 'Interactive controls must prove their destination or state change',
+        checks: Object.freeze([
+            'visible buttons are clicked in functional audits',
+            'navigation buttons must reach the expected destination',
+            'state buttons must visibly open, close, reset, validate or change UI state'
         ])
     }),
     Object.freeze({
@@ -47,7 +56,7 @@ const FUNCTIONAL_HUMAN_REVIEW_RULES = Object.freeze([
 ]);
 
 const HARD_REQUEST_TYPES = new Set(['document', 'script', 'stylesheet', 'xhr', 'fetch']);
-const IMPORTANT_ACTION_PATTERN = /(checkout|reserve|handoff|form|validation|filter|nav|menu|link:internal|tab-link|service-selector|media-lightbox)/i;
+const IMPORTANT_ACTION_PATTERN = /(checkout|reserve|handoff|form|validation|filter|nav|menu|link:internal|tab-link|service-selector|media-lightbox|contact-link|button)/i;
 
 function textSnippet(value, maxLength = 180) {
     const normalized = String(value || '').replace(/\s+/g, ' ').trim();
@@ -315,7 +324,7 @@ function summarizeCoverageProfile(coverageProfile = {}) {
         lines.push(`viewports: ${coverageProfile.checkedViewportCount}/${coverageProfile.totalFunctionalViewports}`);
     }
     if (coverageProfile.actionCaps) {
-        lines.push(`caps: links=${formatLimit(coverageProfile.actionCaps.maxLinksPerPage)}, buttons=${formatLimit(coverageProfile.actionCaps.maxButtonsPerPage)}, summaries=${formatLimit(coverageProfile.actionCaps.maxSummariesPerPage)}, selects=${formatLimit(coverageProfile.actionCaps.maxSelectsPerPage)}, options=${formatLimit(coverageProfile.actionCaps.maxOptionsPerSelect)}`);
+        lines.push(`caps: links=${formatLimit(coverageProfile.actionCaps.maxLinksPerPage)}, toggleButtons=${formatLimit(coverageProfile.actionCaps.maxButtonsPerPage)}, genericButtons=${formatLimit(coverageProfile.actionCaps.maxGenericButtonsPerPage)}, summaries=${formatLimit(coverageProfile.actionCaps.maxSummariesPerPage)}, selects=${formatLimit(coverageProfile.actionCaps.maxSelectsPerPage)}, options=${formatLimit(coverageProfile.actionCaps.maxOptionsPerSelect)}`);
     }
     if (Number.isFinite(coverageProfile.truncatedTargetCount)) {
         lines.push(`truncated targets: ${coverageProfile.truncatedTargetCount}`);

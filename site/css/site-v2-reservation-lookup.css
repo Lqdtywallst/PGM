@@ -1,0 +1,282 @@
+.reservation-lookup-page {
+    background:
+        radial-gradient(circle at 88% 12%, rgba(212, 178, 100, 0.12), rgba(212, 178, 100, 0) 24rem),
+        linear-gradient(180deg, #f7f4ef 0%, #ffffff 52%, #f4f6f8 100%);
+}
+
+.lookup-hero {
+    min-height: calc(100vh - 92px);
+    padding: clamp(2.5rem, 5vw, 5rem) 0 clamp(3rem, 6vw, 5.5rem);
+    background:
+        linear-gradient(130deg, rgba(248, 249, 251, 0.94) 0%, rgba(248, 249, 251, 0.76) 48%, rgba(235, 226, 208, 0.82) 100%),
+        url("../images/fleet/ferrari-296-gts/07-hero-dubai.jpeg") center/cover no-repeat;
+}
+
+.lookup-hero__shell {
+    display: grid;
+    grid-template-columns: minmax(0, 0.96fr) minmax(20rem, 0.9fr);
+    align-items: start;
+    gap: clamp(1.25rem, 4vw, 4rem);
+}
+
+.lookup-hero__intro {
+    display: grid;
+    align-content: start;
+    gap: 1.1rem;
+    padding-top: clamp(0.25rem, 2vw, 1.25rem);
+}
+
+.lookup-hero h1,
+.lookup-help h2 {
+    margin: 0;
+    color: #12161d;
+    font-family: var(--lab-font-display);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 0.92;
+    text-wrap: balance;
+}
+
+.lookup-hero h1 {
+    max-width: 9ch;
+    font-size: clamp(3.55rem, 8vw, 7.6rem);
+}
+
+.lookup-help h2 {
+    max-width: 12ch;
+    font-size: clamp(2.5rem, 5vw, 4.4rem);
+}
+
+.lookup-hero__lead,
+.lookup-help p,
+.lookup-card > p {
+    margin: 0;
+    color: rgba(30, 34, 42, 0.74);
+    font-size: 1rem;
+    line-height: 1.68;
+}
+
+.lookup-hero__lead {
+    max-width: 39rem;
+}
+
+.lookup-proof-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    max-width: 44rem;
+    margin-top: 0.4rem;
+}
+
+.lookup-proof-grid div,
+.lookup-help__cards article {
+    display: grid;
+    gap: 0.34rem;
+    min-height: 8.25rem;
+    padding: 1rem;
+    border: 1px solid rgba(20, 24, 32, 0.08);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.72);
+    box-shadow: 0 18px 44px rgba(20, 24, 32, 0.06);
+}
+
+.lookup-proof-grid strong,
+.lookup-help__cards strong,
+.lookup-detail strong {
+    color: #151821;
+    font-family: var(--lab-font-sans);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.lookup-proof-grid span,
+.lookup-help__cards span,
+.lookup-detail span {
+    color: rgba(30, 34, 42, 0.66);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.lookup-card {
+    display: grid;
+    gap: 1rem;
+    padding: clamp(1.15rem, 3vw, 1.65rem);
+    border: 1px solid rgba(20, 24, 32, 0.1);
+    border-radius: 24px;
+    background:
+        radial-gradient(circle at top right, rgba(211, 179, 106, 0.18), rgba(211, 179, 106, 0) 16rem),
+        rgba(255, 255, 255, 0.88);
+    box-shadow: 0 30px 72px rgba(20, 24, 32, 0.14);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.lookup-card h2 {
+    margin: 0;
+    color: #12161d;
+    font-family: var(--lab-font-display);
+    font-size: clamp(2.3rem, 5vw, 3.4rem);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 0.95;
+}
+
+.lookup-form {
+    display: grid;
+    gap: 0.95rem;
+}
+
+.lookup-form__actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+}
+
+.lookup-status {
+    min-height: 1.35rem;
+    color: rgba(30, 34, 42, 0.72);
+    font-size: 0.92rem;
+    line-height: 1.45;
+}
+
+.lookup-status.is-error {
+    color: #9a3412;
+}
+
+.lookup-status.is-success {
+    color: #166534;
+}
+
+.lookup-result {
+    margin-top: 0.35rem;
+}
+
+.lookup-result-card {
+    display: grid;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid rgba(22, 101, 52, 0.18);
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(240, 253, 244, 0.95), rgba(255, 255, 255, 0.96));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.lookup-result-card__eyebrow {
+    margin: 0;
+    color: #166534;
+    font-family: var(--lab-font-sans);
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.lookup-result-card h3 {
+    margin: 0;
+    color: #10141b;
+    font-family: var(--lab-font-display);
+    font-size: 2rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 0.98;
+}
+
+.lookup-result-card__meta,
+.lookup-result-card__next {
+    margin: 0;
+    color: rgba(20, 24, 32, 0.7);
+    line-height: 1.55;
+}
+
+.lookup-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+}
+
+.lookup-detail {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0.78rem;
+    border: 1px solid rgba(20, 24, 32, 0.08);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.74);
+}
+
+.lookup-result-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+}
+
+.lookup-band {
+    padding: clamp(3rem, 6vw, 5.5rem) 0;
+    background:
+        radial-gradient(circle at 10% 10%, rgba(211, 179, 106, 0.12), rgba(211, 179, 106, 0) 22rem),
+        #ffffff;
+}
+
+.lookup-help {
+    display: grid;
+    grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+    gap: clamp(1.25rem, 4vw, 3rem);
+    align-items: start;
+}
+
+.lookup-help > div:first-child {
+    display: grid;
+    gap: 1rem;
+}
+
+.lookup-help__cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.9rem;
+}
+
+@media (max-width: 1100px) {
+    .lookup-hero__shell,
+    .lookup-help {
+        grid-template-columns: 1fr;
+    }
+
+    .lookup-hero h1 {
+        max-width: 11ch;
+    }
+}
+
+@media (max-width: 760px) {
+    .lookup-hero {
+        min-height: auto;
+        padding: 2rem 0 3rem;
+    }
+
+    .lookup-hero__shell {
+        gap: 1.4rem;
+    }
+
+    .lookup-proof-grid,
+    .lookup-help__cards {
+        grid-template-columns: 1fr;
+    }
+
+    .lookup-proof-grid div,
+    .lookup-help__cards article {
+        min-height: auto;
+    }
+
+    .lookup-card {
+        border-radius: 20px;
+    }
+
+    .lookup-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .lookup-result-card__actions {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+}

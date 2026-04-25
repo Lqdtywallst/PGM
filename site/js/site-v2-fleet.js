@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const BOOKING_INTENT_KEY = "dynastyBookingIntent";
-    const DEFAULT_WHATSAPP_URL = "https://wa.me/971586122568?text=Hi%2C%20I%20would%20like%20help%20booking%20a%20car%20in%20Dubai.";
+    const DEFAULT_WHATSAPP_URL = "https://wa.me/971586122568?text=Hi%2C%20I%20would%20like%20help%20booking%20a%20luxury%20car%20in%20Dubai.";
     const searchParams = new URLSearchParams(window.location.search);
     const cards = Array.from(browser.querySelectorAll(".js-fleet-card"));
     const results = browser.querySelector(".fleet-results");
@@ -222,6 +222,25 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         return input.value;
+    }
+
+    function formatCompactDateLabel(value) {
+        const normalized = normalizeValue(value);
+
+        if (!isValidDateInputValue(normalized)) {
+            return "";
+        }
+
+        const [, month, day] = normalized.split("-");
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const monthIndex = Number(month) - 1;
+        const dayNumber = Number(day);
+
+        if (!Number.isFinite(dayNumber) || monthIndex < 0 || monthIndex >= monthNames.length) {
+            return "";
+        }
+
+        return `${dayNumber} ${monthNames[monthIndex]}`;
     }
 
     function getCurrentSchedule() {
@@ -587,21 +606,49 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function formatScheduleChipLabel() {
+    function getScheduleChipCopy() {
         const schedule = getCurrentSchedule();
 
         if (!hasSchedule(schedule)) {
-            return "Choose dates";
+            return {
+                eyebrow: "Rental dates",
+                value: "Choose pickup & return"
+            };
         }
 
-        const startShort = normalizeValue(schedule.startDate).slice(5).replace("-", "/");
-        const endShort = normalizeValue(schedule.endDate).slice(5).replace("-", "/");
+        const startShort = formatCompactDateLabel(schedule.startDate);
+        const endShort = formatCompactDateLabel(schedule.endDate);
 
         if (startShort && endShort) {
-            return `${startShort} - ${endShort}`;
+            return {
+                eyebrow: "Rental dates",
+                value: `${startShort} - ${endShort}`
+            };
         }
 
-        return "Edit dates";
+        return {
+            eyebrow: "Rental dates",
+            value: "Edit pickup & return"
+        };
+    }
+
+    function updateMobileDateChip() {
+        if (!mobileControls?.dates) {
+            return;
+        }
+
+        const copy = getScheduleChipCopy();
+        const eyebrow = document.createElement("span");
+        const value = document.createElement("span");
+
+        eyebrow.className = "fleet-mobile-chip__eyebrow";
+        eyebrow.textContent = copy.eyebrow;
+        value.className = "fleet-mobile-chip__value";
+        value.textContent = copy.value;
+
+        mobileControls.dates.replaceChildren(eyebrow, value);
+        mobileControls.dates.setAttribute("aria-label", `${copy.eyebrow}: ${copy.value}. Opens rental period filters.`);
+        mobileControls.dates.title = `${copy.eyebrow}: ${copy.value}`;
     }
 
     function updateFilterChips() {
@@ -609,7 +656,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        mobileControls.dates.textContent = formatScheduleChipLabel();
+        updateMobileDateChip();
 
         const activeFilterCount = [
             state.brand !== defaultState.brand,
@@ -632,7 +679,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const toolbar = document.createElement("div");
         toolbar.className = "fleet-mobile-toolbar";
         toolbar.innerHTML = `
-            <button type="button" class="fleet-mobile-chip fleet-mobile-chip--dates js-fleet-mobile-dates">Choose dates</button>
+            <button type="button" class="fleet-mobile-chip fleet-mobile-chip--dates js-fleet-mobile-dates">
+                <span class="fleet-mobile-chip__eyebrow">Rental dates</span>
+                <span class="fleet-mobile-chip__value">Choose pickup & return</span>
+            </button>
             <button type="button" class="fleet-mobile-filter-toggle">Filters</button>
         `;
 

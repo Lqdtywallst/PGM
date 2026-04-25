@@ -175,6 +175,131 @@ test('audit memory catches semantic visual drift even when the page remains good
     )));
 });
 
+test('functional memory catches approved button destination drift', () => {
+    const approvedMemory = buildAuditMemory({
+        generatedAt: '2026-04-21T00:00:00.000Z',
+        functionalReview: { status: 'good', summary: { hardFails: 0 } },
+        summary: { totalRoutes: 1, totalActions: 1, failedActions: 0 },
+        pages: [
+            {
+                route: '/',
+                viewport: 'desktop-wide',
+                consoleErrors: [],
+                requestFailures: [],
+                actions: [
+                    {
+                        id: 'button-book-now-header-reserve',
+                        label: 'Button: Book now',
+                        kind: 'button:navigation',
+                        status: 'passed',
+                        message: 'Book now reached /app/reserve/page.html.',
+                        expectedTargetPath: '/app/reserve/page.html',
+                        observedPath: '/app/reserve/page.html'
+                    }
+                ]
+            }
+        ]
+    }, { kind: 'functional' });
+    const comparison = compareAuditMemory({
+        generatedAt: '2026-04-21T00:01:00.000Z',
+        functionalReview: { status: 'good', summary: { hardFails: 0 } },
+        summary: { totalRoutes: 1, totalActions: 1, failedActions: 0 },
+        pages: [
+            {
+                route: '/',
+                viewport: 'desktop-wide',
+                consoleErrors: [],
+                requestFailures: [],
+                actions: [
+                    {
+                        id: 'button-book-now-header-reserve',
+                        label: 'Button: Book now',
+                        kind: 'button:navigation',
+                        status: 'passed',
+                        message: 'Book now reached /contact.html.',
+                        expectedTargetPath: '/contact.html',
+                        observedPath: '/contact.html'
+                    }
+                ]
+            }
+        ]
+    }, approvedMemory, { kind: 'functional' });
+
+    assert.equal(comparison.status, 'bad');
+    assert.ok(comparison.regressions.some((regression) => (
+        regression.family === 'functional.navigation-target' &&
+        regression.type === 'missing_signal'
+    )));
+});
+
+test('functional memory catches approved real journey step regression', () => {
+    const approvedMemory = buildAuditMemory({
+        generatedAt: '2026-04-21T00:00:00.000Z',
+        functionalReview: { status: 'good', summary: { hardFails: 0 } },
+        summary: { totalRoutes: 1, totalActions: 1, realSteps: 3, failedActions: 0 },
+        pages: [
+            {
+                route: '/app/reserve/page.html',
+                viewport: 'laptop',
+                consoleErrors: [],
+                requestFailures: [],
+                actions: [
+                    {
+                        id: 'reserve-complete-checkout',
+                        label: 'Reserve flow completes with mocked payment',
+                        kind: 'checkout',
+                        status: 'passed',
+                        message: 'Reserve flow reached success redirect with mocked payment.',
+                        steps: [
+                            { id: 'load-reserve-with-intent', label: 'Load reserve with booking intent', status: 'passed' },
+                            { id: 'advance-to-payment', label: 'Advance to payment', status: 'passed', expected: 'mock Stripe mounted', observed: 'mounted' },
+                            { id: 'success-redirect-home', label: 'Success redirects home', status: 'passed', expected: '/', observed: '/' }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }, { kind: 'functional' });
+    const comparison = compareAuditMemory({
+        generatedAt: '2026-04-21T00:01:00.000Z',
+        functionalReview: { status: 'bad', summary: { hardFails: 1 } },
+        summary: { totalRoutes: 1, totalActions: 1, realSteps: 2, failedActions: 1 },
+        pages: [
+            {
+                route: '/app/reserve/page.html',
+                viewport: 'laptop',
+                consoleErrors: [],
+                requestFailures: [],
+                actions: [
+                    {
+                        id: 'reserve-complete-checkout',
+                        label: 'Reserve flow completes with mocked payment',
+                        kind: 'checkout',
+                        status: 'failed',
+                        message: 'Payment step never mounted.',
+                        steps: [
+                            { id: 'load-reserve-with-intent', label: 'Load reserve with booking intent', status: 'passed' },
+                            { id: 'advance-to-payment', label: 'Advance to payment', status: 'failed', expected: 'mock Stripe mounted', observed: 'missing' }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }, approvedMemory, { kind: 'functional' });
+
+    assert.equal(comparison.status, 'bad');
+    assert.ok(comparison.regressions.some((regression) => (
+        regression.family === 'functional.action-step' &&
+        /Advance to payment/i.test(regression.label) &&
+        regression.currentStatus === 'failed'
+    )));
+    assert.ok(comparison.regressions.some((regression) => (
+        regression.family === 'functional.action-step' &&
+        /Success redirects home/i.test(regression.label) &&
+        regression.type === 'missing_signal'
+    )));
+});
+
 test('audit memory approval rejects dirty navigation runs unless forced by caller', () => {
     const approval = canApproveAuditMemory(navigationReportWithLocalExit('failed'), { kind: 'navigation' });
 

@@ -92,6 +92,12 @@ test('viewport coverage matrix defines the canonical responsive device bands', (
 });
 
 test('getFirstViewportContract keeps desktop and mobile first viewport rules locked', () => {
+    const homeMobile = getFirstViewportContract({
+        route: '/',
+        cohort: 'home',
+        viewportName: 'mobile-modern',
+        viewportWidth: 390
+    });
     const aboutMobile = getFirstViewportContract({
         route: '/about.html',
         cohort: 'hub_marketing',
@@ -111,13 +117,17 @@ test('getFirstViewportContract keeps desktop and mobile first viewport rules loc
         viewportWidth: 390
     });
 
+    assert.equal(homeMobile.policy, 'locked');
+    assert.equal(homeMobile.check, 'single_panel_fill');
+    assert.equal(homeMobile.headingBalance.requireCenteredText, true);
+    assert.equal(homeMobile.headingBalance.maxLineCount, 3);
     assert.equal(aboutMobile.policy, 'locked');
     assert.equal(aboutMobile.check, 'mobile_useful_first_viewport');
     assert.ok(aboutMobile.maxPrimaryCtaTopRatio <= 0.9);
     assert.equal(servicesDesktop.policy, 'locked');
-    assert.equal(servicesDesktop.check, 'service_tabs_split');
+    assert.equal(servicesDesktop.check, 'services_direct_lanes');
     assert.equal(servicesMobile.policy, 'locked');
-    assert.equal(servicesMobile.check, 'services_mobile_feature_reveal');
+    assert.equal(servicesMobile.check, 'services_direct_lanes');
 });
 
 test('getFirstViewportContract locks reserve mobile useful schedule reveal', () => {
@@ -1077,7 +1087,7 @@ test('buildDeterministicFindings flags large internal gaps in first-viewport pan
     )));
 });
 
-test('buildDeterministicFindings accepts the services desktop split when circles stay above the lower panel', () => {
+test('buildDeterministicFindings accepts services desktop when direct circles stay prominent without a panel', () => {
     const findings = buildDeterministicFindings({
         route: '/services.html',
         viewport: { name: 'desktop-wide' },
@@ -1085,21 +1095,16 @@ test('buildDeterministicFindings accepts the services desktop split when circles
         metrics: {
             horizontalOverflowPx: 0,
             visibleH1Count: 1,
-            headingRect: { top: 540 },
+            headingRect: { top: 470, bottom: 612 },
             viewportWidth: 1707,
             viewportHeight: 893,
-            servicesSelectorRect: { top: 300, bottom: 498, width: 1184, height: 198 },
+            servicesSelectorRect: { top: 660, bottom: 810, width: 1184, height: 150 },
             servicesOrbMetrics: { count: 4, minWidthPx: 172, averageWidthPx: 173, maxWidthPx: 174 },
-            servicesFeatureRect: { top: 520, bottom: 872, width: 1240, height: 352 },
-            servicesFeatureCopyRect: { left: 148, right: 712, top: 542, bottom: 704, width: 564, height: 162 },
-            servicesFeatureListRect: { left: 148, right: 758, top: 714, bottom: 764, width: 610, height: 50 },
-            servicesFeatureSideRect: { left: 904, right: 1144, top: 542, bottom: 764, width: 240, height: 222 },
             servicesDirectoryShellRect: { top: 940, bottom: 1720, width: 1280, height: 780 },
             servicesFlowShellRect: { top: 1800, bottom: 2350, width: 1280, height: 550 },
             servicesFaqShellRect: { top: 2440, bottom: 3200, width: 1280, height: 760 },
-            headingTopRatio: 0.605,
-            heroActionCount: 2,
-            primaryCtaRect: { top: 590 },
+            headingTopRatio: 0.526,
+            heroActionCount: 0,
             headerFamily: 'lab-header',
             visualIntent: 'modern_dark_system',
             hasVisualMedia: true,
@@ -1129,7 +1134,7 @@ test('buildDeterministicFindings accepts the services desktop split when circles
     assert.equal(findings.some((finding) => finding.category === 'section_rhythm'), false);
 });
 
-test('buildDeterministicFindings accepts services mobile when selector and feature panel both appear in the first view', () => {
+test('buildDeterministicFindings accepts services mobile when direct circles are visible in the first view', () => {
     const findings = buildDeterministicFindings({
         route: '/services.html',
         viewport: { name: 'mobile-modern' },
@@ -1137,13 +1142,12 @@ test('buildDeterministicFindings accepts services mobile when selector and featu
         metrics: {
             horizontalOverflowPx: 0,
             visibleH1Count: 1,
-            headingRect: { top: 459 },
+            headingRect: { top: 132, bottom: 212 },
             viewportWidth: 390,
             viewportHeight: 844,
-            servicesSelectorRect: { top: 111, bottom: 370, width: 342, height: 259 },
-            servicesFeatureRect: { top: 381, bottom: 985, width: 342, height: 604 },
-            heroActionCount: 1,
-            primaryCtaRect: { top: 786, bottom: 838, width: 310, height: 52 },
+            servicesSelectorRect: { top: 308, bottom: 510, width: 342, height: 202 },
+            servicesOrbMetrics: { count: 4, minWidthPx: 64, averageWidthPx: 65, maxWidthPx: 66 },
+            heroActionCount: 0,
             headerFamily: 'lab-header',
             visualIntent: 'modern_dark_system',
             hasVisualMedia: true,
@@ -1171,7 +1175,7 @@ test('buildDeterministicFindings accepts services mobile when selector and featu
     assert.equal(findings.some((finding) => finding.category === 'first_viewport_layout'), false);
 });
 
-test('buildDeterministicFindings flags services mobile when the selector pushes the useful panel below the fold', () => {
+test('buildDeterministicFindings flags services mobile when direct circles are buried too low', () => {
     const findings = buildDeterministicFindings({
         route: '/services.html',
         viewport: { name: 'mobile-modern' },
@@ -1179,13 +1183,12 @@ test('buildDeterministicFindings flags services mobile when the selector pushes 
         metrics: {
             horizontalOverflowPx: 0,
             visibleH1Count: 1,
-            headingRect: { top: 630 },
+            headingRect: { top: 360, bottom: 460 },
             viewportWidth: 390,
             viewportHeight: 844,
-            servicesSelectorRect: { top: 112, bottom: 548, width: 342, height: 436 },
-            servicesFeatureRect: { top: 584, bottom: 1160, width: 342, height: 576 },
-            heroActionCount: 1,
-            primaryCtaRect: { top: 950, bottom: 1002, width: 310, height: 52 },
+            servicesSelectorRect: { top: 610, bottom: 760, width: 342, height: 150 },
+            servicesOrbMetrics: { count: 4, minWidthPx: 64, averageWidthPx: 65, maxWidthPx: 66 },
+            heroActionCount: 0,
             headerFamily: 'lab-header',
             visualIntent: 'modern_dark_system',
             hasVisualMedia: true,
@@ -1211,16 +1214,16 @@ test('buildDeterministicFindings flags services mobile when the selector pushes 
     });
     const finding = findings.find((entry) => (
         entry.category === 'first_viewport_layout' &&
-        /services mobile first viewport/i.test(entry.message)
+        /four service circles as clean direct links/i.test(entry.message)
     ));
 
     assert.ok(finding);
     assert.equal(finding.severity, 'high');
     assert.match(finding.evidence, /selectorBottomRatio/);
-    assert.match(finding.evidence, /featureTopRatio/);
+    assert.match(finding.evidence, /headingTopRatio/);
 });
 
-test('buildDeterministicFindings flags services desktop when the lower panel sinks and the heading drops too far', () => {
+test('buildDeterministicFindings flags services desktop if the removed preview panel returns', () => {
     const findings = buildDeterministicFindings({
         route: '/services.html',
         viewport: { name: 'desktop-wide' },
@@ -1261,10 +1264,12 @@ test('buildDeterministicFindings flags services desktop when the lower panel sin
         }
     });
 
-    assert.ok(findings.some((finding) => finding.category === 'first_viewport_layout'));
+    const finding = findings.find((entry) => entry.category === 'first_viewport_layout');
+    assert.ok(finding);
+    assert.match(finding.evidence, /legacyServicePreviewPanelVisible/);
 });
 
-test('buildDeterministicFindings flags services desktop when the panel leaves a dead zone between the copy and action column', () => {
+test('buildDeterministicFindings flags services desktop when direct lanes drift out of the first viewport', () => {
     const findings = buildDeterministicFindings({
         route: '/services.html',
         viewport: { name: 'desktop-wide' },
@@ -1272,18 +1277,13 @@ test('buildDeterministicFindings flags services desktop when the panel leaves a 
         metrics: {
             horizontalOverflowPx: 0,
             visibleH1Count: 1,
-            headingRect: { top: 552 },
-            headingTopRatio: 0.618,
+            headingRect: { top: 640, bottom: 790 },
+            headingTopRatio: 0.717,
             viewportWidth: 1707,
             viewportHeight: 893,
-            servicesSelectorRect: { top: 304, bottom: 500, width: 1184, height: 196 },
+            servicesSelectorRect: { top: 812, bottom: 912, width: 1184, height: 100 },
             servicesOrbMetrics: { count: 4, minWidthPx: 172, averageWidthPx: 173, maxWidthPx: 174 },
-            servicesFeatureRect: { top: 512, bottom: 792, width: 1240, height: 280 },
-            servicesFeatureCopyRect: { left: 148, right: 540, top: 540, bottom: 692, width: 392, height: 152 },
-            servicesFeatureListRect: { left: 148, right: 538, top: 704, bottom: 752, width: 390, height: 48 },
-            servicesFeatureSideRect: { left: 926, right: 1166, top: 540, bottom: 752, width: 240, height: 212 },
-            heroActionCount: 2,
-            primaryCtaRect: { top: 594, bottom: 646 },
+            heroActionCount: 0,
             headerFamily: 'lab-header',
             visualIntent: 'modern_dark_system',
             hasVisualMedia: true,
@@ -1308,10 +1308,12 @@ test('buildDeterministicFindings flags services desktop when the panel leaves a 
         }
     });
 
-    assert.ok(findings.some((finding) => finding.category === 'first_viewport_layout'));
+    const finding = findings.find((entry) => entry.category === 'first_viewport_layout');
+    assert.ok(finding);
+    assert.match(finding.evidence, /selectorBottomRatio/);
 });
 
-test('buildDeterministicFindings flags services when the hero panel is materially narrower than the sections below', () => {
+test('buildDeterministicFindings still flags services when a legacy lead panel breaks section rhythm', () => {
     const findings = buildDeterministicFindings({
         route: '/services.html',
         viewport: { name: 'desktop-wide' },

@@ -6,6 +6,7 @@ const PUBLIC_PAGE_FILE_MAP = Object.freeze({
     '/contact.html': 'contact.html',
     '/fleet.html': 'fleet.html',
     '/locations.html': 'locations.html',
+    '/reservation-lookup.html': 'reservation-lookup.html',
     '/services.html': 'services.html',
     '/luxury-car-rental-dubai.html': 'pages/guides/luxury-car-rental-dubai.html',
     '/abu-dhabi-luxury-car-rental.html': 'pages/guides/abu-dhabi-luxury-car-rental.html',

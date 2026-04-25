@@ -250,6 +250,12 @@ function extractFunctionalSignals(report = {}) {
 
         for (const action of page.actions || []) {
             const id = slugify(action.id || action.label || action.selector || stableHash(JSON.stringify(action)));
+            const expectedTargetPath = action.expectedTargetPath ? normalizeRoute(action.expectedTargetPath) : '';
+            const observedPath = action.observedPath
+                ? normalizeRoute(action.observedPath)
+                : action.observedUrl
+                    ? normalizeRoute(action.observedUrl)
+                    : '';
 
             pushSignal(signals, {
                 key: `functional:action:${pageKey}:${id}`,
@@ -258,9 +264,65 @@ function extractFunctionalSignals(report = {}) {
                 viewport,
                 status: action.status || 'missing',
                 label: action.label || action.id || id,
-                evidence: action.message || action.error || '',
-                source: 'page.actions'
+                evidence: [
+                    action.message || action.error || '',
+                    expectedTargetPath ? `expected=${expectedTargetPath}` : '',
+                    observedPath ? `observed=${observedPath}` : ''
+                ].filter(Boolean).join('; '),
+                source: 'page.actions',
+                metadata: {
+                    kind: action.kind || '',
+                    interactionType: action.interactionType || '',
+                    expectedTargetPath,
+                    observedPath
+                }
             });
+
+            if (expectedTargetPath) {
+                pushSignal(signals, {
+                    key: `functional:navigation-target:${pageKey}:${id}:${slugify(expectedTargetPath)}`,
+                    family: 'functional.navigation-target',
+                    route,
+                    viewport,
+                    status: action.status === 'passed' && observedPath === expectedTargetPath ? 'passed' : 'failed',
+                    label: `${action.label || action.id || id} reaches ${expectedTargetPath}`,
+                    evidence: `expected=${expectedTargetPath}; observed=${observedPath || 'unknown'}`,
+                    source: 'page.actions.expectedTargetPath',
+                    metadata: {
+                        actionId: action.id || id,
+                        expectedTargetPath,
+                        observedPath
+                    }
+                });
+            }
+
+            for (const [stepIndex, step] of (action.steps || []).entries()) {
+                const stepId = slugify(step.id || step.label || `step-${stepIndex + 1}`);
+                const stepStatus = action.status === 'passed'
+                    ? (step.status || 'passed')
+                    : 'failed';
+
+                pushSignal(signals, {
+                    key: `functional:action-step:${pageKey}:${id}:${String(stepIndex + 1).padStart(2, '0')}:${stepId}`,
+                    family: 'functional.action-step',
+                    route,
+                    viewport,
+                    status: stepStatus,
+                    label: `${action.label || action.id || id}: ${step.label || stepId}`,
+                    evidence: [
+                        step.expected ? `expected=${step.expected}` : '',
+                        step.observed ? `observed=${step.observed}` : '',
+                        step.detail || ''
+                    ].filter(Boolean).join('; ') || action.message || '',
+                    source: 'page.actions.steps',
+                    metadata: {
+                        actionId: action.id || id,
+                        actionKind: action.kind || '',
+                        stepIndex: stepIndex + 1,
+                        stepId
+                    }
+                });
+            }
         }
     }
 
@@ -300,6 +362,7 @@ const VISUAL_SEMANTIC_GUARDS = Object.freeze([
         label: 'first viewport hierarchy and composition stay intentional',
         categories: Object.freeze([
             'heading',
+            'heading_balance',
             'primary_cta',
             'cta_hierarchy',
             'first_viewport_layout',
@@ -591,6 +654,7 @@ function summarizeReportForMemory(report = {}, kind = inferAuditKind(report)) {
             status: report.functionalReview?.status || 'unknown',
             routes: report.summary?.totalRoutes ?? 0,
             actions: report.summary?.totalActions ?? 0,
+            realSteps: report.summary?.realSteps ?? 0,
             failedActions: report.summary?.failedActions ?? 0,
             hardFails: report.functionalReview?.summary?.hardFails ?? 0
         };

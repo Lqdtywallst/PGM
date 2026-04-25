@@ -10,6 +10,10 @@ const {
     getEmailDiagnostics,
     isEmailConfigured
 } = require('./email-config');
+const {
+    buildReservationId,
+    saveReservationRecord
+} = require('./reservation-store');
 
 const stripeConfigured = Boolean(
     process.env.STRIPE_SECRET_KEY &&
@@ -24,7 +28,7 @@ if (!stripeConfigured) {
     console.warn('[BACKEND] Stripe-dependent routes will return 503 until configured.');
 }
 
-// Inicializar Stripe
+// Initialize Stripe.
 const stripe = stripeConfigured
     ? require('stripe')(process.env.STRIPE_SECRET_KEY, {
         timeout: 30000,
@@ -64,6 +68,94 @@ function maskEmail(email) {
     if (!localPart || !domain) return '[redacted-email]';
     const visibleLocal = localPart.slice(0, 2);
     return `${visibleLocal}${'*'.repeat(Math.max(localPart.length - 2, 1))}@${domain}`;
+}
+
+function parseNumericValue(value) {
+    if (value === undefined || value === null || value === '') return null;
+    const parsed = typeof value === 'number'
+        ? value
+        : Number.parseFloat(String(value).replace(/[^0-9.-]+/g, ''));
+
+    return Number.isFinite(parsed) ? parsed : null;
+}
+
+function stableReservationIdFromPaymentIntent(paymentIntent) {
+    return paymentIntent.metadata?.reservationId ||
+        `res_${String(paymentIntent.id || buildReservationId()).replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+}
+
+function buildReservationRecordFromPaymentIntent(paymentIntent, status, source = 'stripe_webhook') {
+    const metadata = paymentIntent.metadata || {};
+    const reservationId = stableReservationIdFromPaymentIntent(paymentIntent);
+    const stripeCustomerId = typeof paymentIntent.customer === 'string'
+        ? paymentIntent.customer
+        : paymentIntent.customer?.id || null;
+
+    return {
+        reservationId,
+        paymentIntentId: paymentIntent.id,
+        stripeCustomerId,
+        status,
+        source,
+        customerData: {
+            name: metadata.customerName || null,
+            email: metadata.customerEmail || null
+        },
+        reservationData: {
+            reservationId,
+            car: metadata.car || null,
+            days: parseNumericValue(metadata.days),
+            startDate: metadata.startDate || null,
+            endDate: metadata.endDate || null,
+            pickupTime: metadata.pickupTime || null,
+            dropoffTime: metadata.dropoffTime || null,
+            durationHours: parseNumericValue(metadata.durationHours),
+            durationLabel: metadata.durationLabel || null,
+            pricePerDay: parseNumericValue(metadata.pricePerDay),
+            totalAmount: parseNumericValue(metadata.totalAmount),
+            total: metadata.totalDisplay || null,
+            upfrontAmount: parseNumericValue(metadata.upfrontAmount),
+            upfrontDisplay: metadata.upfrontDisplay || null,
+            remainingAmount: parseNumericValue(metadata.remainingAmount),
+            remainingDisplay: metadata.remainingDisplay || null,
+            pickupLocation: metadata.pickupLocation || null,
+            currency: (paymentIntent.currency || 'aed').toUpperCase()
+        },
+        payment: {
+            paymentIntentId: paymentIntent.id,
+            stripeStatus: paymentIntent.status || null,
+            amount: paymentIntent.amount || null,
+            currency: paymentIntent.currency || null,
+            lastPaymentError: paymentIntent.last_payment_error?.message || null
+        }
+    };
+}
+
+async function persistBackendReservation(record, contextLabel, options = {}) {
+    const { critical = false } = options;
+
+    try {
+        const savedRecord = await saveReservationRecord(record);
+        console.log('[DB] Reservation saved:', {
+            context: contextLabel,
+            reservationId: savedRecord.reservationId,
+            paymentIntentId: savedRecord.paymentIntentId,
+            status: savedRecord.status,
+            storage: savedRecord.storage
+        });
+        return savedRecord;
+    } catch (error) {
+        console.error('[DB] Error saving reservation:', {
+            context: contextLabel,
+            message: error.message
+        });
+
+        if (critical) {
+            throw error;
+        }
+
+        return null;
+    }
 }
 
 const exactAllowedOrigins = new Set([
@@ -128,19 +220,35 @@ async function handleStripeWebhook(req, res) {
             console.log('   Cliente:', maskEmail(paymentIntent.metadata.customerEmail));
             console.log('   Vehicle:', paymentIntent.metadata.car);
             console.log('   Monto:', paymentIntent.amount / 100, paymentIntent.currency.toUpperCase());
+            await persistBackendReservation(
+                buildReservationRecordFromPaymentIntent(paymentIntent, 'confirmed', 'stripe_webhook'),
+                'stripe webhook payment succeeded'
+            );
             break;
         }
         case 'payment_intent.payment_failed': {
             const failedPayment = event.data.object;
             console.log('[ERROR] Pago fallido:', failedPayment.id);
             console.log('   Reason:', failedPayment.last_payment_error?.message || 'Unknown');
+            await persistBackendReservation(
+                buildReservationRecordFromPaymentIntent(failedPayment, 'payment_failed', 'stripe_webhook'),
+                'stripe webhook payment failed'
+            );
             break;
         }
         case 'payment_intent.canceled':
             console.log('[INFO] Pago cancelado:', event.data.object.id);
+            await persistBackendReservation(
+                buildReservationRecordFromPaymentIntent(event.data.object, 'payment_canceled', 'stripe_webhook'),
+                'stripe webhook payment canceled'
+            );
             break;
         case 'payment_intent.requires_action':
             console.log('[WARN] Payment requires action:', event.data.object.id);
+            await persistBackendReservation(
+                buildReservationRecordFromPaymentIntent(event.data.object, 'payment_requires_action', 'stripe_webhook'),
+                'stripe webhook payment requires action'
+            );
             break;
         default:
             console.log(`[INFO] Evento no manejado: ${event.type}`);
@@ -181,7 +289,7 @@ if (process.env.NODE_ENV === 'development') {
 // Rutas
 app.use('/api/reserve', reserveRoutes);
 
-// Endpoint para crear PaymentIntent (compatibilidad)
+// Compatibility endpoint for creating a Stripe payment intent.
 app.post('/api/create-payment-intent', async (req, res) => {
     try {
         if (!stripe) {
@@ -202,10 +310,25 @@ app.post('/api/create-payment-intent', async (req, res) => {
             return res.status(400).json({ error: 'Reservation data is required' });
         }
 
+        const reservationId = reservationData.reservationId || buildReservationId();
+        reservationData.reservationId = reservationId;
+
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(customerData.email)) {
             return res.status(400).json({ error: 'The provided email is not valid' });
         }
+
+        await persistBackendReservation({
+            reservationId,
+            status: 'checkout_started',
+            source: 'legacy_payment_intent_endpoint',
+            customerData,
+            reservationData,
+            payment: {
+                amount: Math.round(amount),
+                currency: (currency || 'aed').toLowerCase()
+            }
+        }, 'legacy checkout started', { critical: true });
 
         // Create or retrieve customer
         let customer;
@@ -244,10 +367,19 @@ app.post('/api/create-payment-intent', async (req, res) => {
             }
         } catch (customerError) {
             console.error('Error processing customer:', customerError);
+            await persistBackendReservation({
+                reservationId,
+                status: 'customer_processing_failed',
+                customerData,
+                reservationData,
+                payment: {
+                    error: customerError.message
+                }
+            }, 'legacy stripe customer failure');
             return res.status(500).json({ error: 'Error processing customer data' });
         }
 
-        // Crear PaymentIntent
+        // Create the Stripe payment intent.
         const paymentIntentParams = {
             amount: Math.round(amount),
             currency: (currency || 'aed').toLowerCase(),
@@ -256,6 +388,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
             confirm: false,
             description: `Reservation: ${reservationData.car} - ${reservationData.days} days`,
             metadata: {
+                reservationId,
                 car: reservationData.car,
                 days: reservationData.days.toString(),
                 startDate: reservationData.startDate,
@@ -276,7 +409,24 @@ app.post('/api/create-payment-intent', async (req, res) => {
 
         const paymentIntent = await stripe.paymentIntents.create(paymentIntentParams);
 
+        await persistBackendReservation({
+            reservationId,
+            paymentIntentId: paymentIntent.id,
+            stripeCustomerId: customer.id,
+            status: 'payment_intent_created',
+            source: 'legacy_payment_intent_endpoint',
+            customerData,
+            reservationData,
+            payment: {
+                paymentIntentId: paymentIntent.id,
+                stripeStatus: paymentIntent.status,
+                amount: paymentIntent.amount,
+                currency: paymentIntent.currency
+            }
+        }, 'legacy payment intent created', { critical: true });
+
         res.json({
+            reservationId,
             clientSecret: paymentIntent.client_secret,
             paymentIntentId: paymentIntent.id,
             customerId: customer.id,
@@ -299,7 +449,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
     }
 });
 
-// Endpoint para confirmar PaymentIntent
+// Compatibility endpoint for confirming a Stripe payment intent.
 app.post('/api/confirm-payment-intent', async (req, res) => {
     try {
         if (!stripe) {

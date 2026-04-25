@@ -6224,6 +6224,87 @@ a.brand-marquee__item:focus-visible img {
     border: 0;
 }
 
+.lab-floating-contact {
+    position: fixed;
+    right: max(1.15rem, env(safe-area-inset-right));
+    bottom: calc(1.25rem + env(safe-area-inset-bottom));
+    z-index: 95;
+    display: grid;
+    gap: 0.78rem;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(8px, 10px, 0) scale(0.96);
+    transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.lab-floating-contact.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+}
+
+.lab-floating-contact__button {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    color: #fff;
+    pointer-events: auto;
+    text-decoration: none;
+    box-shadow:
+        0 18px 38px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+}
+
+.lab-floating-contact__button:hover,
+.lab-floating-contact__button:focus-visible {
+    outline: none;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow:
+        0 22px 46px rgba(0, 0, 0, 0.36),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    filter: saturate(1.05);
+}
+
+.lab-floating-contact__button--call {
+    background: linear-gradient(135deg, #d4ad5b, #f0ce83);
+    color: #17120d;
+}
+
+.lab-floating-contact__button--wa {
+    background: linear-gradient(135deg, #35c551, #108e34);
+    color: #fff;
+}
+
+.lab-floating-contact__button svg {
+    width: 25px;
+    height: 25px;
+}
+
+.lab-floating-contact__button span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.hero-lab-overlay-open .lab-floating-contact,
+.lab-mobile-nav-open .lab-floating-contact,
+.fleet-filter-sheet-open .lab-floating-contact,
+.vehicle-media-lightbox-open .lab-floating-contact {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translate3d(8px, 10px, 0) scale(0.96);
+}
+
 body.vehicle-media-lightbox-open {
     overflow: hidden;
 }
@@ -6460,6 +6541,26 @@ body.lab-mobile-nav-open {
         top: calc(var(--lab-header-offset) + 0.65rem);
         width: 44px;
         height: 44px;
+    }
+
+    .lab-floating-contact {
+        right: max(0.85rem, env(safe-area-inset-right));
+        bottom: calc(1rem + env(safe-area-inset-bottom));
+        gap: 0.72rem;
+    }
+
+    body.lab-has-mobile-bar .lab-floating-contact {
+        bottom: calc(6.55rem + env(safe-area-inset-bottom));
+    }
+
+    .lab-floating-contact__button {
+        width: 54px;
+        height: 54px;
+    }
+
+    .lab-floating-contact__button svg {
+        width: 24px;
+        height: 24px;
     }
 
     .lab-header__inner {

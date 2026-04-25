@@ -1,5 +1,10 @@
 (function initReserveShell() {
     const HEADER_RESERVE_HREF = "/app/reserve/page.html";
+    const HEADER_LOOKUP_HREF = "/reservation-lookup.html";
+    const HEADER_CONTACT_HREF = "/contact.html";
+    const CONTACT_PHONE_HREF = "tel:+971586122568";
+    const DEFAULT_WHATSAPP_MESSAGE = "Hi, I would like help booking a luxury car in Dubai.";
+    const DEFAULT_WHATSAPP_URL = `https://wa.me/971586122568?text=${encodeURIComponent(DEFAULT_WHATSAPP_MESSAGE)}`;
 
     function normalizeValue(value) {
         return String(value || "").replace(/\s+/g, " ").trim();
@@ -136,6 +141,10 @@
 
     function buildDisclosureSection(nav, { key, label, selector }) {
         const count = Array.from(nav.querySelectorAll(selector)).length;
+        if (count === 0) {
+            return "";
+        }
+
         const countLabel = count === 1 ? "1 option" : `${count} options`;
 
         return `
@@ -260,6 +269,65 @@
         window.requestAnimationFrame(() => backButton.classList.add("is-visible"));
     }
 
+    function normalizeGenericContactLinks() {
+        document.querySelectorAll('a[href*="wa.me/971586122568"], a[href*="api.whatsapp.com/send"]').forEach((link) => {
+            const rawHref = link.getAttribute("href") || "";
+
+            try {
+                const url = new URL(rawHref, window.location.href);
+                const whatsappNumber = url.hostname.includes("wa.me")
+                    ? url.pathname.replace(/\D/g, "")
+                    : (url.searchParams.get("phone") || "").replace(/\D/g, "");
+
+                if (whatsappNumber !== "971586122568" || url.searchParams.get("text")) {
+                    return;
+                }
+
+                link.setAttribute("href", DEFAULT_WHATSAPP_URL);
+            } catch (error) {
+                // Leave malformed URLs for the functional auditor to report.
+            }
+        });
+    }
+
+    function initFloatingContactButtons() {
+        if (document.querySelector(".lab-floating-contact")) {
+            return;
+        }
+
+        const contactNav = document.createElement("nav");
+        contactNav.className = "lab-floating-contact";
+        contactNav.setAttribute("aria-label", "Quick contact");
+        contactNav.innerHTML = `
+            <a class="lab-floating-contact__button lab-floating-contact__button--call" href="${CONTACT_PHONE_HREF}" data-contact-channel="call" data-contact-context="generic" aria-label="Call Dynasty Prestige at +971 58 612 2568">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path fill="currentColor" d="M6.62 10.79a15.5 15.5 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.07 21 3 13.93 3 5c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.24.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2Z"></path>
+                </svg>
+                <span>Call</span>
+            </a>
+            <a class="lab-floating-contact__button lab-floating-contact__button--wa" href="${DEFAULT_WHATSAPP_URL}" target="_blank" rel="noopener" data-contact-channel="whatsapp" data-contact-context="generic" aria-label="WhatsApp Dynasty Prestige">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path fill="currentColor" d="M19.05 4.91A9.82 9.82 0 0 0 12 2a9.94 9.94 0 0 0-8.54 15.02L2 22l5.13-1.35A9.94 9.94 0 1 0 19.05 4.91ZM12 19.01c-1.53 0-3.04-.41-4.36-1.19l-.31-.18-3.04.8.81-2.96-.2-.31a8 8 0 1 1 7.1 3.84Zm4.39-5.91c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.93-1.18-.71-.63-1.2-1.41-1.34-1.65-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.48-.4-.41-.54-.41l-.46-.01c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.09 3.61.57.25 1.01.39 1.36.49.57.18 1.09.15 1.5.09.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"></path>
+                </svg>
+                <span>WhatsApp</span>
+            </a>
+        `;
+
+        contactNav.querySelectorAll("a").forEach((link) => {
+            link.addEventListener("click", () => {
+                emitShellEvent("floating_contact_click", {
+                    cta_channel: normalizeValue(link.dataset.contactChannel),
+                    cta_context: normalizeValue(link.dataset.contactContext) || "generic",
+                    page_path: normalizeValue(window.location.pathname),
+                    page_title: normalizeValue(document.title)
+                });
+            });
+        });
+
+        document.body.appendChild(contactNav);
+        window.requestAnimationFrame(() => contactNav.classList.add("is-visible"));
+    }
+
     function initMobileDrawer() {
         const header = document.querySelector(".lab-header");
         const headerInner = header?.querySelector(".lab-header__inner");
@@ -278,14 +346,6 @@
                 label: normalizeValue(link.textContent),
                 current: link.getAttribute("aria-current") === "page"
             }));
-
-        if (reserveLink) {
-            mainLinks.push({
-                href: reserveLink.getAttribute("href") || HEADER_RESERVE_HREF,
-                label: normalizeValue(reserveLink.textContent) || "Reserve",
-                current: reserveLink.getAttribute("aria-current") === "page"
-            });
-        }
 
         let toggle = header.querySelector(".lab-mobile-toggle");
         if (!toggle) {
@@ -333,7 +393,7 @@
                     <div class="lab-mobile-drawer__intro">
                         <p>Pick the route that fits the stay, then move straight into the right fleet and reserve flow.</p>
                         <div class="lab-mobile-drawer__quick">
-                            <a class="lab-mobile-drawer__quick-link lab-mobile-drawer__quick-link--call" href="tel:+971586122568" aria-label="Call Dynasty Prestige">
+                            <a class="lab-mobile-drawer__quick-link lab-mobile-drawer__quick-link--call" href="${CONTACT_PHONE_HREF}" aria-label="Call Dynasty Prestige">
                                 <span class="lab-mobile-drawer__quick-icon" aria-hidden="true">
                                     <svg viewBox="0 0 24 24" focusable="false">
                                         <path fill="currentColor" d="M6.62 10.79a15.5 15.5 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.07 21 3 13.93 3 5c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.24.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2Z"/>
@@ -349,7 +409,7 @@
                                 </span>
                                 <span class="lab-mobile-drawer__quick-text">Email</span>
                             </a>
-                            <a class="lab-mobile-drawer__quick-link lab-mobile-drawer__quick-link--wa" href="https://wa.me/971586122568" target="_blank" rel="noopener" aria-label="Open WhatsApp Dynasty Prestige">
+                            <a class="lab-mobile-drawer__quick-link lab-mobile-drawer__quick-link--wa" href="${DEFAULT_WHATSAPP_URL}" target="_blank" rel="noopener" aria-label="Open WhatsApp Dynasty Prestige">
                                 <span class="lab-mobile-drawer__quick-icon" aria-hidden="true">
                                     <svg viewBox="0 0 24 24" focusable="false">
                                         <path fill="currentColor" d="M19.05 4.91A9.82 9.82 0 0 0 12 2a9.94 9.94 0 0 0-8.54 15.02L2 22l5.13-1.35A9.94 9.94 0 1 0 19.05 4.91ZM12 19.01c-1.53 0-3.04-.41-4.36-1.19l-.31-.18-3.04.8.81-2.96-.2-.31a8 8 0 1 1 7.1 3.84Zm4.39-5.91c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.93-1.18-.71-.63-1.2-1.41-1.34-1.65-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.48-.4-.41-.54-.41l-.46-.01c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.09 3.61.57.25 1.01.39 1.36.49.57.18 1.09.15 1.5.09.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"/>
@@ -410,10 +470,49 @@
         });
     }
 
+    function normalizePathname(href) {
+        try {
+            return new URL(href, window.location.href).pathname.replace(/\/+$/, "") || "/";
+        } catch (error) {
+            return normalizeValue(href).replace(/\/+$/, "") || "/";
+        }
+    }
+
+    function pathsMatch(leftPath, rightPath) {
+        return normalizePathname(leftPath) === normalizePathname(rightPath);
+    }
+
+    function enhanceReserveNavigation() {
+        const nav = document.querySelector(".lab-header .lab-nav");
+        if (!nav) {
+            return;
+        }
+
+        const mainLinks = Array.from(nav.children).filter((item) => item.matches?.("a"));
+        const hasLookupLink = mainLinks.some((link) => pathsMatch(link.getAttribute("href"), HEADER_LOOKUP_HREF));
+
+        if (hasLookupLink) {
+            return;
+        }
+
+        const lookupLink = document.createElement("a");
+        lookupLink.href = HEADER_LOOKUP_HREF;
+        lookupLink.textContent = "Find booking";
+        if (pathsMatch(window.location.pathname, HEADER_LOOKUP_HREF)) {
+            lookupLink.setAttribute("aria-current", "page");
+        }
+
+        const contactLink = mainLinks.find((link) => pathsMatch(link.getAttribute("href"), HEADER_CONTACT_HREF));
+        nav.insertBefore(lookupLink, contactLink || null);
+    }
+
     function init() {
         initMegaNav();
+        normalizeGenericContactLinks();
+        enhanceReserveNavigation();
         initMobileDrawer();
         initFloatingBackButton();
+        initFloatingContactButtons();
     }
 
     if (document.readyState === "loading") {

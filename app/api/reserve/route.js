@@ -7,10 +7,16 @@ const {
     EMAIL_CONFIG,
     createEmailTransporter
 } = require('../../../server/email-config');
+const {
+    buildReservationId,
+    findReservationForLookup,
+    readReservationRecord,
+    saveReservationRecord
+} = require('../../../server/reservation-store');
 
 // Verify that STRIPE_SECRET_KEY is configured
 if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('tu_clave')) {
-    console.error('[RESERVE ROUTE] ❌ ERROR: STRIPE_SECRET_KEY is not configured');
+    console.error('[RESERVE ROUTE]  ERROR: STRIPE_SECRET_KEY is not configured');
     console.error('[RESERVE ROUTE] The module will load but payment functions will not work');
 }
 
@@ -124,6 +130,154 @@ function summarizeReservationRequest(data = {}) {
     };
 }
 
+function summarizeSavedReservationRecord(record = null) {
+    if (!record) return null;
+
+    return {
+        reservationId: record.reservationId || null,
+        paymentIntentId: record.paymentIntentId || null,
+        status: record.status || null,
+        storage: record.storage || null,
+        customer: summarizeCustomerData(record.customerData || {}),
+        reservation: summarizeReservationData(record.reservationData || {}),
+        email: record.email || {},
+        createdAt: record.createdAt || null,
+        updatedAt: record.updatedAt || null
+    };
+}
+
+function normalizeLookupValue(value) {
+    return String(value || '').trim();
+}
+
+function normalizeLookupEmail(value) {
+    return normalizeLookupValue(value).toLowerCase();
+}
+
+function buildReservationStatusLabel(status) {
+    const normalizedStatus = normalizeLookupValue(status).toLowerCase();
+    const labels = {
+        confirmed: 'Confirmed',
+        payment_succeeded: 'Payment received',
+        confirmed_email_failed: 'Confirmed',
+        payment_intent_created: 'Payment pending',
+        checkout_started: 'Checkout started',
+        lead_received: 'Request received',
+        received: 'Request received',
+        payment_failed: 'Payment failed',
+        payment_canceled: 'Payment canceled',
+        payment_requires_action: 'Payment needs attention'
+    };
+
+    return labels[normalizedStatus] || (normalizedStatus ? normalizedStatus.replace(/_/g, ' ') : 'In review');
+}
+
+function buildReservationNextStep(status) {
+    const normalizedStatus = normalizeLookupValue(status).toLowerCase();
+
+    if (['confirmed', 'payment_succeeded', 'confirmed_email_failed'].includes(normalizedStatus)) {
+        return 'Your booking is saved. The Dynasty Prestige team will coordinate handover details directly with you.';
+    }
+
+    if (['payment_intent_created', 'checkout_started', 'payment_requires_action'].includes(normalizedStatus)) {
+        return 'Payment is not fully confirmed yet. If you already paid, WhatsApp the team with your reservation ID.';
+    }
+
+    if (['payment_failed', 'payment_canceled'].includes(normalizedStatus)) {
+        return 'The payment did not complete. You can restart the reservation or contact the team for help.';
+    }
+
+    return 'Your request is in the system. The team will confirm availability and next steps.';
+}
+
+function formatOptionalMoneyDisplay(value, currency) {
+    const parsedValue = parseMoneyValue(value);
+    return parsedValue === null ? null : formatMoneyDisplay(parsedValue, currency);
+}
+
+function displayEmailValue(value, fallback = 'To be confirmed') {
+    const normalized = String(value || '').trim();
+    return normalized || fallback;
+}
+
+function buildSafeReservationLookupSummary(record = {}) {
+    const reservationData = record.reservationData || {};
+    const paymentData = record.payment || {};
+    const currency = reservationData.currency || paymentData.currency || 'AED';
+
+    return {
+        reservationId: record.reservationId || reservationData.reservationId || null,
+        status: record.status || 'received',
+        statusLabel: buildReservationStatusLabel(record.status),
+        vehicle: reservationData.car || 'Vehicle to be confirmed',
+        startDate: reservationData.startDate || null,
+        endDate: reservationData.endDate || null,
+        pickupTime: reservationData.pickupTime || null,
+        dropoffTime: reservationData.dropoffTime || null,
+        durationLabel: reservationData.durationLabel || (reservationData.days ? `${reservationData.days} day rental` : null),
+        pickupLocationSummary: reservationData.pickupLocation ? 'Pickup location provided to the team' : 'Pickup location to be confirmed',
+        totalDisplay: reservationData.total || formatOptionalMoneyDisplay(reservationData.totalAmount, currency),
+        upfrontDisplay: reservationData.upfrontDisplay || formatOptionalMoneyDisplay(reservationData.upfrontAmount, currency),
+        remainingDisplay: reservationData.remainingDisplay || formatOptionalMoneyDisplay(reservationData.remainingAmount, currency),
+        paymentStatus: paymentData.stripeStatus || record.status || null,
+        emailStatus: record.email?.confirmation?.status || record.email?.pendingNotification?.status || null,
+        nextStep: buildReservationNextStep(record.status),
+        updatedAt: record.updatedAt || null
+    };
+}
+
+function sanitizeReservationRequestForStorage(data = {}) {
+    return {
+        hasNestedCustomerData: !!data.customerData,
+        hasNestedReservationData: !!data.reservationData,
+        amount: data.amount || null,
+        currency: data.currency || data.reservationData?.currency || null,
+        submittedAt: new Date().toISOString()
+    };
+}
+
+function buildPaymentPersistence(paymentIntent = null, currency = 'aed') {
+    if (!paymentIntent) {
+        return {
+            currency: (currency || 'aed').toLowerCase()
+        };
+    }
+
+    return {
+        paymentIntentId: paymentIntent.id,
+        stripeStatus: paymentIntent.status || null,
+        amount: paymentIntent.amount || null,
+        currency: paymentIntent.currency || currency || 'aed'
+    };
+}
+
+async function persistReservationUpdate(record, contextLabel, options = {}) {
+    const { critical = false } = options;
+
+    try {
+        const savedRecord = await saveReservationRecord(record);
+        console.log('[DB] Reservation saved:', {
+            context: contextLabel,
+            reservationId: savedRecord.reservationId,
+            paymentIntentId: savedRecord.paymentIntentId,
+            status: savedRecord.status,
+            storage: savedRecord.storage
+        });
+        return savedRecord;
+    } catch (error) {
+        console.error('[DB] Error saving reservation:', {
+            context: contextLabel,
+            message: error.message
+        });
+
+        if (critical) {
+            throw error;
+        }
+
+        return null;
+    }
+}
+
 function parseMoneyValue(value) {
     if (value === undefined || value === null || value === '') return null;
     if (typeof value === 'number') return Number.isFinite(value) ? value : null;
@@ -206,24 +360,24 @@ async function sendReservationNotificationEmail(reservationData, customerData) {
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>🔔 New Pending Reservation - Dynasty Prestige</h1>
+                    <h1>New pending reservation - Dynasty Prestige</h1>
                 </div>
                 <div class="content">
-                    <div class="status">⏳ PAYMENT PENDING</div>
+                    <div class="status">PAYMENT PENDING</div>
                     <h2>Reservation Details</h2>
-                    <div class="info-row"><span class="label">Vehicle:</span> ${reservationData.car || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Start date:</span> ${reservationData.startDate || 'N/A'}${reservationData.pickupTime ? ` at ${reservationData.pickupTime}` : ''}</div>
-                    <div class="info-row"><span class="label">End date:</span> ${reservationData.endDate || 'N/A'}${reservationData.dropoffTime ? ` at ${reservationData.dropoffTime}` : ''}</div>
-                    <div class="info-row"><span class="label">Rental duration:</span> ${reservationData.durationLabel || reservationData.days || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Vehicle:</span> ${displayEmailValue(reservationData.car, 'Vehicle to be confirmed')}</div>
+                    <div class="info-row"><span class="label">Start date:</span> ${displayEmailValue(reservationData.startDate)}${reservationData.pickupTime ? ` at ${reservationData.pickupTime}` : ''}</div>
+                    <div class="info-row"><span class="label">End date:</span> ${displayEmailValue(reservationData.endDate)}${reservationData.dropoffTime ? ` at ${reservationData.dropoffTime}` : ''}</div>
+                    <div class="info-row"><span class="label">Rental duration:</span> ${displayEmailValue(reservationData.durationLabel || reservationData.days)}</div>
                     <div class="info-row"><span class="label">Price per day:</span> ${formatMoneyDisplay(reservationData.pricePerDay, reservationData.currency)}</div>
-                    <div class="info-row"><span class="label">Total reservation:</span> ${reservationData.total || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Pay now (50%):</span> ${reservationData.upfrontDisplay || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Remaining balance:</span> ${reservationData.remainingDisplay || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Total reservation:</span> ${displayEmailValue(reservationData.total)}</div>
+                    <div class="info-row"><span class="label">Pay now (50%):</span> ${displayEmailValue(reservationData.upfrontDisplay)}</div>
+                    <div class="info-row"><span class="label">Remaining balance:</span> ${displayEmailValue(reservationData.remainingDisplay)}</div>
                     ${reservationData.pickupLocation ? `<div class="info-row"><span class="label">Pickup location:</span> ${reservationData.pickupLocation}</div>` : ''}
                     <h3>Customer Details</h3>
-                    <div class="info-row"><span class="label">Name:</span> ${customerData.name || customerData.fullName || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Email:</span> ${customerData.email || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Phone:</span> ${customerData.phone || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Name:</span> ${displayEmailValue(customerData.name || customerData.fullName)}</div>
+                    <div class="info-row"><span class="label">Email:</span> ${displayEmailValue(customerData.email)}</div>
+                    <div class="info-row"><span class="label">Phone:</span> ${displayEmailValue(customerData.phone)}</div>
                     ${customerData.dni || customerData.passport ? `<div class="info-row"><span class="label">DNI/Passport:</span> ${customerData.dni || customerData.passport}</div>` : ''}
                     ${customerData.address ? `<div class="info-row"><span class="label">Address:</span> ${customerData.address}</div>` : ''}
                     ${customerData.city ? `<div class="info-row"><span class="label">City:</span> ${customerData.city}</div>` : ''}
@@ -272,24 +426,24 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>🚗 New Reservation - Dynasty Prestige</h1>
+                    <h1>New reservation - Dynasty Prestige</h1>
                 </div>
                 <div class="content">
                     <h2>Reservation Details</h2>
-                    <div class="info-row"><span class="label">Vehicle:</span> ${reservationData.car || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Start date:</span> ${reservationData.startDate || 'N/A'}${reservationData.pickupTime ? ` at ${reservationData.pickupTime}` : ''}</div>
-                    <div class="info-row"><span class="label">End date:</span> ${reservationData.endDate || 'N/A'}${reservationData.dropoffTime ? ` at ${reservationData.dropoffTime}` : ''}</div>
-                    <div class="info-row"><span class="label">Rental duration:</span> ${reservationData.durationLabel || reservationData.days || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Vehicle:</span> ${displayEmailValue(reservationData.car, 'Vehicle to be confirmed')}</div>
+                    <div class="info-row"><span class="label">Start date:</span> ${displayEmailValue(reservationData.startDate)}${reservationData.pickupTime ? ` at ${reservationData.pickupTime}` : ''}</div>
+                    <div class="info-row"><span class="label">End date:</span> ${displayEmailValue(reservationData.endDate)}${reservationData.dropoffTime ? ` at ${reservationData.dropoffTime}` : ''}</div>
+                    <div class="info-row"><span class="label">Rental duration:</span> ${displayEmailValue(reservationData.durationLabel || reservationData.days)}</div>
                     <div class="info-row"><span class="label">Price per day:</span> ${formatMoneyDisplay(reservationData.pricePerDay, reservationData.currency)}</div>
-                    <div class="info-row"><span class="label">Total reservation:</span> ${reservationData.total || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Pay now (50%):</span> ${reservationData.upfrontDisplay || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Remaining balance:</span> ${reservationData.remainingDisplay || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Total reservation:</span> ${displayEmailValue(reservationData.total)}</div>
+                    <div class="info-row"><span class="label">Pay now (50%):</span> ${displayEmailValue(reservationData.upfrontDisplay)}</div>
+                    <div class="info-row"><span class="label">Remaining balance:</span> ${displayEmailValue(reservationData.remainingDisplay)}</div>
                     ${reservationData.pickupLocation ? `<div class="info-row"><span class="label">Pickup location:</span> ${reservationData.pickupLocation}</div>` : ''}
                     ${paymentIntentId ? `<div class="info-row"><span class="label">Payment Intent ID:</span> ${paymentIntentId}</div>` : ''}
                     <h3>Customer Details</h3>
-                    <div class="info-row"><span class="label">Name:</span> ${customerData.name || customerData.fullName || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Email:</span> ${customerData.email || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Phone:</span> ${customerData.phone || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Name:</span> ${displayEmailValue(customerData.name || customerData.fullName)}</div>
+                    <div class="info-row"><span class="label">Email:</span> ${displayEmailValue(customerData.email)}</div>
+                    <div class="info-row"><span class="label">Phone:</span> ${displayEmailValue(customerData.phone)}</div>
                     ${customerData.dni || customerData.passport ? `<div class="info-row"><span class="label">DNI/Passport:</span> ${customerData.dni || customerData.passport}</div>` : ''}
                     ${customerData.address ? `<div class="info-row"><span class="label">Address:</span> ${customerData.address}</div>` : ''}
                     ${customerData.city ? `<div class="info-row"><span class="label">City:</span> ${customerData.city}</div>` : ''}
@@ -318,22 +472,22 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>✅ Reservation Confirmed - Dynasty Prestige</h1>
+                    <h1>Reservation confirmed - Dynasty Prestige</h1>
                 </div>
                 <div class="content">
                     <p>Dear ${customerData.name || customerData.fullName || 'Customer'},</p>
-                    <p>Your reservation has been confirmed successfully. Below are the details:</p>
+                    <p>Your reservation is confirmed. Here are the key details for your booking:</p>
                     <h2>Reservation Details</h2>
-                    <div class="info-row"><span class="label">Vehicle:</span> ${reservationData.car || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Start date:</span> ${reservationData.startDate || 'N/A'}${reservationData.pickupTime ? ` at ${reservationData.pickupTime}` : ''}</div>
-                    <div class="info-row"><span class="label">End date:</span> ${reservationData.endDate || 'N/A'}${reservationData.dropoffTime ? ` at ${reservationData.dropoffTime}` : ''}</div>
-                    <div class="info-row"><span class="label">Rental duration:</span> ${reservationData.durationLabel || reservationData.days || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Vehicle:</span> ${displayEmailValue(reservationData.car, 'Vehicle to be confirmed')}</div>
+                    <div class="info-row"><span class="label">Start date:</span> ${displayEmailValue(reservationData.startDate)}${reservationData.pickupTime ? ` at ${reservationData.pickupTime}` : ''}</div>
+                    <div class="info-row"><span class="label">End date:</span> ${displayEmailValue(reservationData.endDate)}${reservationData.dropoffTime ? ` at ${reservationData.dropoffTime}` : ''}</div>
+                    <div class="info-row"><span class="label">Rental duration:</span> ${displayEmailValue(reservationData.durationLabel || reservationData.days)}</div>
                     <div class="info-row"><span class="label">Price per day:</span> ${formatMoneyDisplay(reservationData.pricePerDay, reservationData.currency)}</div>
-                    <div class="info-row"><span class="label">Total reservation:</span> ${reservationData.total || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Paid now (50%):</span> ${reservationData.upfrontDisplay || 'N/A'}</div>
-                    <div class="info-row"><span class="label">Remaining balance:</span> ${reservationData.remainingDisplay || 'N/A'}</div>
+                    <div class="info-row"><span class="label">Total reservation:</span> ${displayEmailValue(reservationData.total)}</div>
+                    <div class="info-row"><span class="label">Paid now (50%):</span> ${displayEmailValue(reservationData.upfrontDisplay)}</div>
+                    <div class="info-row"><span class="label">Remaining balance:</span> ${displayEmailValue(reservationData.remainingDisplay)}</div>
                     ${reservationData.pickupLocation ? `<div class="info-row"><span class="label">Pickup location:</span> ${reservationData.pickupLocation}</div>` : ''}
-                    <p style="margin-top: 20px;">Thank you for choosing Dynasty Prestige.</p>
+                    <p style="margin-top: 20px;">The team will coordinate handover details directly with you. Thank you for choosing Dynasty Prestige.</p>
                 </div>
             </div>
         </body>
@@ -358,7 +512,7 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
             subject: `New Reservation: ${reservationData.car || 'Vehicle'} - ${customerData.name || customerData.fullName || 'Customer'}`,
             html: companyEmailHtml,
         });
-        console.log('[EMAIL] ✅ Company email sent:', {
+        console.log('[EMAIL]  Company email sent:', {
             messageId: companyEmailResult.messageId,
             accepted: companyEmailResult.accepted,
             rejected: companyEmailResult.rejected
@@ -370,23 +524,23 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
             const customerEmailResult = await emailTransporter.sendMail({
                 from: EMAIL_CONFIG.from,
                 to: customerData.email,
-                subject: `Reservation Confirmed - Dynasty Prestige`,
+                subject: `Reservation confirmed - Dynasty Prestige`,
                 html: customerEmailHtml,
                 replyTo: companyEmail,
             });
-            console.log('[EMAIL] ✅ Customer email sent:', {
+            console.log('[EMAIL]  Customer email sent:', {
                 messageId: customerEmailResult.messageId,
                 accepted: customerEmailResult.accepted,
                 rejected: customerEmailResult.rejected
             });
         } else {
-            console.warn('[EMAIL] ⚠️ Customer email not sent: no email in customerData');
+            console.warn('[EMAIL]  Customer email not sent: no email in customerData');
         }
         
-        console.log('[EMAIL] ✅ All emails sent successfully');
+        console.log('[EMAIL]  All emails sent successfully');
         return { success: true };
     } catch (error) {
-        console.error('[EMAIL] ❌ ERROR SENDING EMAILS:', error);
+        console.error('[EMAIL]  ERROR SENDING EMAILS:', error);
         console.error('[EMAIL] Error details:', {
             message: error.message,
             code: error.code,
@@ -411,21 +565,21 @@ router.post('/', async (req, res) => {
         // Basic validation (similar to the provided TypeScript code)
         console.log('[API] Validating data...');
         if (!data.fullName && !data.customerData?.name) {
-        console.error('[API] ❌ Validation failed: Missing fullName');
+        console.error('[API]  Validation failed: Missing fullName');
             return res.status(400).json({ error: 'Missing fullName' });
         }
 
         if (!data.email && !data.customerData?.email) {
-        console.error('[API] ❌ Validation failed: Missing email');
+        console.error('[API]  Validation failed: Missing email');
             return res.status(400).json({ error: 'Missing email' });
         }
 
         if (!data.startDate && !data.reservationData?.startDate) {
-        console.error('[API] ❌ Validation failed: Missing startDate');
+        console.error('[API]  Validation failed: Missing startDate');
             return res.status(400).json({ error: 'Missing startDate' });
         }
 
-        console.log('[API] ✅ Validation passed');
+        console.log('[API]  Validation passed');
         // Normalize data (supports both formats: direct or nested)
         console.log('[API] Normalizing data...');
         const customerData = data.customerData || {
@@ -442,7 +596,7 @@ router.post('/', async (req, res) => {
         const reservationData = data.reservationData || {
             car: data.car || 'Mercedes GLE 53 AMG',
             pricePerDay: data.pricePerDay || 500,
-            days: data.days || 1,
+            days: data.days,
             startDate: data.startDate,
             endDate: data.endDate,
             pickupTime: data.pickupTime,
@@ -458,6 +612,8 @@ router.post('/', async (req, res) => {
             pickupLocation: data.pickupLocation,
             currency: reservationCurrency.toUpperCase(),
         };
+        const reservationId = data.reservationId || reservationData.reservationId || buildReservationId();
+        reservationData.reservationId = reservationId;
         enrichReservationPricing(reservationData, reservationCurrency);
 
         console.log('[API] Normalized reservation summary:', {
@@ -473,29 +629,65 @@ router.post('/', async (req, res) => {
             remainingAmount: reservationData.remainingAmount
         });
 
+        const persistedReservation = await persistReservationUpdate({
+            reservationId,
+            status: data.amount ? 'checkout_started' : 'lead_received',
+            source: 'website',
+            customerData,
+            reservationData,
+            payment: buildPaymentPersistence(null, reservationCurrency),
+            email: {
+                pendingNotification: {
+                    status: 'queued',
+                    queuedAt: new Date().toISOString()
+                }
+            },
+            rawRequest: sanitizeReservationRequestForStorage(data)
+        }, 'reservation received', { critical: true });
+
         // Send notification email BEFORE payment (async, non-blocking)
         console.log('[API] Sending notification email (async)...');
         sendReservationNotificationEmail(reservationData, customerData)
             .then((emailResult) => {
-                console.log('[API] ✅ Notification email sent (async):', emailResult);
+                void persistReservationUpdate({
+                    reservationId,
+                    email: {
+                        pendingNotification: {
+                            status: emailResult.success ? 'sent' : 'failed',
+                            attemptedAt: new Date().toISOString(),
+                            error: emailResult.error || null
+                        }
+                    }
+                }, 'pending notification email result');
+                console.log('[API]  Notification email processed (async):', emailResult);
             })
             .catch((emailError) => {
-                console.warn('[API] ⚠️ Error sending notification email (non-critical, async):', emailError);
+                void persistReservationUpdate({
+                    reservationId,
+                    email: {
+                        pendingNotification: {
+                            status: 'failed',
+                            attemptedAt: new Date().toISOString(),
+                            error: emailError.message || String(emailError)
+                        }
+                    }
+                }, 'pending notification email failure');
+                console.warn('[API]  Error sending notification email (non-critical, async):', emailError);
                 // Do not fail reservation if email fails
             });
 
-        // If amount is provided, create PaymentIntent with Stripe
+        // If amount is provided, create a Stripe payment intent.
         let paymentIntent = null;
         let customer = null;
 
         if (data.amount) {
             console.log('[API] Amount received:', data.amount);
-            console.log('[API] Creating PaymentIntent with Stripe...');
+            console.log('[API] Creating payment intent with Stripe...');
             
             // Validate email format
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(customerData.email)) {
-                console.error('[API] ❌ Invalid email:', customerData.email);
+                console.error('[API]  Invalid email:', customerData.email);
                 return res.status(400).json({ 
                     error: 'Invalid email format' 
                 });
@@ -503,9 +695,9 @@ router.post('/', async (req, res) => {
 
             // Verify Stripe is configured
             if (!stripe) {
-                console.error('[API] ❌ Stripe is not initialized');
+                console.error('[API]  Stripe is not initialized');
                 return res.status(500).json({ 
-                    error: 'Stripe not configured' 
+                    error: 'Secure payment is temporarily unavailable' 
                 });
             }
 
@@ -556,22 +748,33 @@ router.post('/', async (req, res) => {
                     });
                     const createDuration = Date.now() - createStartTime;
                     const totalCustomerDuration = Date.now() - customerStartTime;
-                    console.log('[API] ✅ Customer created:', customer.id, `(${createDuration}ms, total: ${totalCustomerDuration}ms)`);
+                    console.log('[API]  Customer created:', customer.id, `(${createDuration}ms, total: ${totalCustomerDuration}ms)`);
                 }
             } catch (error) {
-                console.error('[API] ❌ Error creating/updating customer:', error);
+                console.error('[API]  Error creating/updating customer:', error);
                 console.error('[API] Error details:', {
                     message: error.message,
                     type: error.type,
                     code: error.code
                 });
+                await persistReservationUpdate({
+                    reservationId,
+                    status: 'customer_processing_failed',
+                    customerData,
+                    reservationData,
+                    payment: {
+                        error: error.message,
+                        errorType: error.type || null,
+                        errorCode: error.code || null
+                    }
+                }, 'stripe customer failure');
                 return res.status(500).json({ 
                     error: 'Error processing customer data: ' + error.message 
                 });
             }
 
-            // Create PaymentIntent
-            console.log('[API] Creating PaymentIntent...');
+            // Create the Stripe payment intent.
+            console.log('[API] Creating payment intent...');
             const paymentIntentStartTime = Date.now();
             try {
                 const paymentIntentData = {
@@ -582,6 +785,7 @@ router.post('/', async (req, res) => {
                     confirm: false,
                     description: `Reservation: ${reservationData.car} - 50% upfront`,
                     metadata: {
+                        reservationId,
                         car: reservationData.car,
                         days: reservationData.days.toString(),
                         startDate: reservationData.startDate,
@@ -605,7 +809,7 @@ router.post('/', async (req, res) => {
                     payment_method_types: ['card'],
                 };
                 
-                console.log('[API] PaymentIntent data:', {
+                console.log('[API] Payment intent data:', {
                     amount: paymentIntentData.amount,
                     currency: paymentIntentData.currency,
                     customer: paymentIntentData.customer,
@@ -614,64 +818,74 @@ router.post('/', async (req, res) => {
                 
                 paymentIntent = await stripe.paymentIntents.create(paymentIntentData);
                 const paymentIntentDuration = Date.now() - paymentIntentStartTime;
-                console.log('[API] ✅ PaymentIntent created:', {
+                console.log('[API]  Payment intent created:', {
                     id: paymentIntent.id,
                     status: paymentIntent.status,
                     client_secret: paymentIntent.client_secret ? paymentIntent.client_secret.substring(0, 20) + '...' : null,
                     duration: `${paymentIntentDuration}ms`
                 });
+                await persistReservationUpdate({
+                    reservationId,
+                    paymentIntentId: paymentIntent.id,
+                    stripeCustomerId: customer.id,
+                    status: 'payment_intent_created',
+                    customerData,
+                    reservationData,
+                    payment: buildPaymentPersistence(paymentIntent, reservationCurrency)
+                }, 'payment intent created', { critical: true });
             } catch (error) {
-                console.error('[API] ❌ Error creating PaymentIntent:', error);
+                console.error('[API]  Error creating payment intent:', error);
                 console.error('[API] Error details:', {
                     message: error.message,
                     type: error.type,
                     code: error.code,
                     decline_code: error.decline_code
                 });
+                await persistReservationUpdate({
+                    reservationId,
+                    status: 'payment_intent_failed',
+                    customerData,
+                    reservationData,
+                    payment: {
+                        error: error.message,
+                        errorType: error.type || null,
+                        errorCode: error.code || null,
+                        declineCode: error.decline_code || null
+                    }
+                }, 'payment intent failure');
                 return res.status(500).json({ 
                     error: 'Error creating payment intent: ' + error.message 
                 });
             }
         } else {
-            console.log('[API] ⚠️ Amount not received, PaymentIntent will not be created');
+            console.log('[API]  Amount not received, payment intent will not be created');
         }
 
-        // Send confirmation emails asynchronously (non-blocking)
-        // We do not wait for the response to avoid timeouts
-        // EMAIL DISABLED - Commented out per user request
+        // Confirmation emails are sent after Stripe confirms the payment in /api/reserve/confirm.
         // console.log('[API] Sending confirmation emails (async)...');
         // sendReservationEmail(
         //     reservationData,
         //     customerData,
         //     paymentIntent?.id || null
         // ).then((emailResult) => {
-        //     console.log('[API] ✅ Emails sent (async):', emailResult);
+        //     console.log('[API]  Emails sent (async):', emailResult);
         // }).catch((emailError) => {
-        //     console.warn('[API] ⚠️ Error sending emails (non-critical, async):', emailError);
+        //     console.warn('[API]  Error sending emails (non-critical, async):', emailError);
         //     // Do not fail the reservation if email fails
         // });
-        console.log('[API] ℹ️ Email notification disabled');
-
-        // Here you can save to the database
-        // Ejemplo:
-        // await saveReservation({
-        //     paymentIntentId: paymentIntent?.id,
-        //     customerId: customer?.id,
-        //     status: paymentIntent ? 'pending' : 'confirmed',
-        //     ...reservationData,
-        //     ...customerData
-        // });
+        console.log('[API]  Confirmation email waits for payment confirmation');
 
         // Response
         console.log('[API] Preparing response...');
         if (paymentIntent) {
             const response = {
                 success: true,
+                reservationId: persistedReservation.reservationId,
                 clientSecret: paymentIntent.client_secret,
                 paymentIntentId: paymentIntent.id,
                 customerId: customer.id,
             };
-            console.log('[API] ✅ Successful response with PaymentIntent:', {
+            console.log('[API]  Successful response with payment intent:', {
                 paymentIntentId: response.paymentIntentId,
                 customerId: response.customerId,
                 hasClientSecret: !!response.clientSecret
@@ -680,17 +894,60 @@ router.post('/', async (req, res) => {
         } else {
             const response = {
                 success: true,
+                reservationId: persistedReservation.reservationId,
                 message: 'Reservation created successfully',
             };
-            console.log('[API] ✅ Successful response without PaymentIntent');
+            console.log('[API]  Successful response without payment intent');
             return res.json(response);
         }
 
     } catch (error) {
-        console.error('[API] ❌ GENERAL ERROR:', error);
-        console.error('[API] Stack trace:', error.stack);
+        console.error('[API]  GENERAL ERROR:', error);
+        console.error('[API] Trace:', error.stack);
         return res.status(500).json({ 
             error: 'Error processing reservation: ' + error.message 
+        });
+    }
+});
+
+// POST /api/reserve/lookup - Secure customer-facing reservation lookup
+router.post('/lookup', async (req, res) => {
+    try {
+        const reservationId = normalizeLookupValue(req.body?.reservationId);
+        const email = normalizeLookupEmail(req.body?.email);
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        res.set('Cache-Control', 'no-store');
+
+        if (!reservationId || !email || !emailRegex.test(email)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Enter your reservation ID and the email used for the booking.'
+            });
+        }
+
+        const record = await findReservationForLookup({ reservationId, email });
+
+        if (!record) {
+            console.warn('[API LOOKUP] Reservation lookup mismatch:', {
+                reservationId,
+                email: maskEmail(email)
+            });
+            return res.status(404).json({
+                success: false,
+                error: 'We could not match those details. Check the reservation ID and email, or WhatsApp the team.'
+            });
+        }
+
+        return res.json({
+            success: true,
+            reservation: buildSafeReservationLookupSummary(record)
+        });
+    } catch (error) {
+        console.error('[API LOOKUP] Error:', error);
+        return res.status(500).json({
+            success: false,
+            error: 'Reservation lookup is temporarily unavailable. Please try again or WhatsApp the team.'
         });
     }
 });
@@ -709,26 +966,33 @@ router.post('/confirm', async (req, res) => {
         });
 
         if (!paymentIntentId) {
-            console.error('[API CONFIRM] ❌ PaymentIntentId required');
+            console.error('[API CONFIRM]  Payment intent ID required');
             return res.status(400).json({ 
                 error: 'Payment Intent ID is required' 
             });
         }
 
+        if (!stripe) {
+            return res.status(503).json({
+                error: 'Secure payment is temporarily unavailable'
+            });
+        }
+
         // Check payment status
-        console.log('[API CONFIRM] Retrieving PaymentIntent from Stripe...');
+        console.log('[API CONFIRM] Retrieving payment intent from Stripe...');
         const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-        console.log('[API CONFIRM] PaymentIntent retrieved:', {
+        console.log('[API CONFIRM] Payment intent retrieved:', {
             id: paymentIntent.id,
             status: paymentIntent.status,
             amount: paymentIntent.amount,
             currency: paymentIntent.currency
         });
+        const existingReservation = await readReservationRecord(paymentIntentId);
 
         if (paymentIntent.status === 'succeeded') {
-            console.log('[API CONFIRM] ✅ Payment successful, sending emails...');
+            console.log('[API CONFIRM]  Payment successful, sending emails...');
             
-            // Prepare reservation data (use provided data or PaymentIntent metadata)
+            // Prepare reservation data (use provided data or payment metadata)
             let finalReservationData = reservationData || {
                 car: paymentIntent.metadata.car,
                 days: parseMoneyValue(paymentIntent.metadata.days) || 1,
@@ -748,9 +1012,11 @@ router.post('/confirm', async (req, res) => {
                 pickupLocation: paymentIntent.metadata.pickupLocation,
                 currency: paymentIntent.currency || 'aed',
             };
+            const reservationId = finalReservationData.reservationId || paymentIntent.metadata.reservationId || existingReservation?.reservationId || buildReservationId();
+            finalReservationData.reservationId = reservationId;
             enrichReservationPricing(finalReservationData, finalReservationData.currency || paymentIntent.currency || 'aed');
             
-            // Prepare customer data (use provided data or PaymentIntent metadata)
+            // Prepare customer data (use provided data or payment metadata)
             let finalCustomerData = customerData;
             if (!finalCustomerData) {
                 finalCustomerData = {
@@ -769,10 +1035,24 @@ router.post('/confirm', async (req, res) => {
                         finalCustomerData.dni = customer.metadata?.dni || '';
                     }
                 } catch (customerError) {
-                    console.warn('[API CONFIRM] ⚠️ Error fetching customer data:', customerError);
+                    console.warn('[API CONFIRM]  Error fetching customer data:', customerError);
                 }
             }
             
+            const stripeCustomerId = typeof paymentIntent.customer === 'string'
+                ? paymentIntent.customer
+                : paymentIntent.customer?.id || null;
+
+            await persistReservationUpdate({
+                reservationId,
+                paymentIntentId,
+                stripeCustomerId,
+                status: 'payment_succeeded',
+                customerData: finalCustomerData,
+                reservationData: finalReservationData,
+                payment: buildPaymentPersistence(paymentIntent, paymentIntent.currency || finalReservationData.currency)
+            }, 'payment confirmed', { critical: true });
+
             // Send confirmation emails
             console.log('[API CONFIRM] Sending confirmation emails...');
             console.log('[API CONFIRM] Calling sendReservationEmail with data:', {
@@ -789,16 +1069,30 @@ router.post('/confirm', async (req, res) => {
                     finalCustomerData,
                     paymentIntentId
                 );
-                console.log('[API CONFIRM] ✅ Email send result:', emailResult);
+                console.log('[API CONFIRM]  Email send result:', emailResult);
             } catch (emailErr) {
                 emailError = emailErr.message || emailErr.toString();
-                console.error('[API CONFIRM] ❌ Error sending emails:', emailError);
+                console.error('[API CONFIRM]  Error sending emails:', emailError);
                 // Do not fail confirmation if email fails; payment already succeeded
             }
+
+            await persistReservationUpdate({
+                reservationId,
+                paymentIntentId,
+                status: emailResult?.success ? 'confirmed' : 'confirmed_email_failed',
+                email: {
+                    confirmation: {
+                        status: emailResult?.success ? 'sent' : 'failed',
+                        attemptedAt: new Date().toISOString(),
+                        error: emailResult?.error || emailError || null
+                    }
+                }
+            }, 'confirmation email result');
             
-            console.log('[API CONFIRM] ✅ Confirmation completed');
+            console.log('[API CONFIRM]  Confirmation completed');
             return res.json({
                 success: true,
+                reservationId,
                 paymentIntentId: paymentIntent.id,
                 status: paymentIntent.status,
                 emailSent: emailResult?.success || false,
@@ -806,17 +1100,25 @@ router.post('/confirm', async (req, res) => {
                 message: emailResult?.success ? 'Reservation confirmed and emails sent' : (emailError ? 'Reservation confirmed but email failed' : 'Reservation confirmed')
             });
         } else {
-            console.log('[API CONFIRM] ⚠️ Payment not completed, status:', paymentIntent.status);
+            console.log('[API CONFIRM]  Payment not completed, status:', paymentIntent.status);
+            const reservationId = paymentIntent.metadata.reservationId || existingReservation?.reservationId || buildReservationId();
+            await persistReservationUpdate({
+                reservationId,
+                paymentIntentId,
+                status: `payment_${paymentIntent.status || 'not_completed'}`,
+                payment: buildPaymentPersistence(paymentIntent, paymentIntent.currency || 'aed')
+            }, 'payment not completed');
             return res.json({
                 success: false,
+                reservationId,
                 paymentIntentId: paymentIntent.id,
                 status: paymentIntent.status,
                 message: 'Payment has not been completed yet',
             });
         }
     } catch (error) {
-        console.error('[API CONFIRM] ❌ ERROR:', error);
-        console.error('[API CONFIRM] Stack trace:', error.stack);
+        console.error('[API CONFIRM]  ERROR:', error);
+        console.error('[API CONFIRM] Trace:', error.stack);
         return res.status(500).json({ 
             error: 'Error confirming reservation: ' + error.message 
         });
@@ -827,6 +1129,21 @@ router.post('/confirm', async (req, res) => {
 router.get('/:paymentIntentId', async (req, res) => {
     try {
         const { paymentIntentId } = req.params;
+        const savedRecord = await readReservationRecord(paymentIntentId);
+
+        if (!stripe) {
+            if (savedRecord) {
+                return res.json({
+                    paymentIntentId,
+                    status: savedRecord.status,
+                    reservation: summarizeSavedReservationRecord(savedRecord)
+                });
+            }
+
+            return res.status(503).json({
+                error: 'Secure payment is temporarily unavailable'
+            });
+        }
 
         const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
@@ -836,6 +1153,7 @@ router.get('/:paymentIntentId', async (req, res) => {
             amount: paymentIntent.amount,
             currency: paymentIntent.currency,
             metadata: paymentIntent.metadata,
+            reservation: summarizeSavedReservationRecord(savedRecord),
         });
     } catch (error) {
         console.error('Error retrieving reservation:', error);

@@ -40,7 +40,7 @@ test.describe('Services hub deep links', () => {
         );
     });
 
-    test('services preview panel updates on desktop hover before navigation', async ({ browser }) => {
+    test('primary service circles navigate directly without a preview panel', async ({ browser }) => {
         const context = await browser.newContext(buildContextOptions(serviceViewports[2]));
         const page = await context.newPage();
 
@@ -48,10 +48,13 @@ test.describe('Services hub deep links', () => {
             await page.goto('/services.html', { waitUntil: 'domcontentloaded' });
             await settlePage(page);
 
-            await expect(page.locator('h1[data-service-title]')).toContainText('Airport concierge');
-            await page.locator('#services-lane-tab-chauffeur').hover();
-            await expect(page.locator('h1[data-service-title]')).toContainText('VIP chauffeur');
-            await expect(page.locator('[data-service-primary]')).toHaveAttribute('href', './chauffeur-service-dubai.html');
+            await expect(page.locator('[data-service-panel]')).toHaveCount(0);
+            await expect(page.locator('h1')).toContainText('Choose the service around the stay');
+
+            const chauffeurCircle = page.locator('#services-lane-tab-chauffeur');
+            await expect(chauffeurCircle).toHaveAttribute('href', './chauffeur-service-dubai.html');
+            await chauffeurCircle.click();
+            await expect(page).toHaveURL(/\/chauffeur-service-dubai\.html$/i);
         } finally {
             await context.close();
         }

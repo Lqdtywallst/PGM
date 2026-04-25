@@ -22,6 +22,7 @@ const COMPLETE_DEEP_SCOPE = Object.freeze({
     actionCaps: {
         maxLinksPerPage: Number.MAX_SAFE_INTEGER,
         maxButtonsPerPage: Number.MAX_SAFE_INTEGER,
+        maxGenericButtonsPerPage: Number.MAX_SAFE_INTEGER,
         maxSummariesPerPage: Number.MAX_SAFE_INTEGER,
         maxSelectsPerPage: Number.MAX_SAFE_INTEGER,
         maxOptionsPerSelect: Number.MAX_SAFE_INTEGER
@@ -35,6 +36,7 @@ test('functional human review defines real customer judgement rules', () => {
     assert.ok(ids.includes('visible_recovery'));
     assert.ok(ids.includes('mobile_unblocked'));
     assert.ok(ids.includes('technical_confidence'));
+    assert.ok(ids.includes('interaction_contract'));
     assert.ok(ids.includes('journey_evidence'));
 });
 
@@ -83,11 +85,11 @@ test('functional human review treats dead visual affordances as hard failures', 
                         message: 'Clicked a gallery tile but no visible dialog opened.'
                     },
                     {
-                        id: 'services-lane-circles-update-panel',
-                        label: 'Services lane circles update the preview panel and CTA',
-                        kind: 'service-selector',
+                        id: 'services-lane-circles-navigate-directly',
+                        label: 'Services lane circles navigate directly to service pages',
+                        kind: 'service-navigation',
                         status: 'failed',
-                        message: 'Clicked a service circle but the panel title and CTA stayed unchanged.'
+                        message: 'Clicked a service circle but it did not open the matching service page.'
                     }
                 ],
                 consoleErrors: [],
@@ -101,7 +103,7 @@ test('functional human review treats dead visual affordances as hard failures', 
     assert.equal(review.status, 'bad');
     assert.equal(review.summary.hardFails, 2);
     assert.ok(review.findings.some((finding) => finding.actionId === 'vehicle-gallery-opens-lightbox' && finding.hardFail));
-    assert.ok(review.findings.some((finding) => finding.actionId === 'services-lane-circles-update-panel' && finding.hardFail));
+    assert.ok(review.findings.some((finding) => finding.actionId === 'services-lane-circles-navigate-directly' && finding.hardFail));
 });
 
 test('functional human review treats partial mission evidence as review', () => {
@@ -199,6 +201,7 @@ test('functional human review refuses to call bounded scope perfect', () => {
             actionCaps: {
                 maxLinksPerPage: 6,
                 maxButtonsPerPage: 5,
+                maxGenericButtonsPerPage: 6,
                 maxSummariesPerPage: 4,
                 maxSelectsPerPage: 4,
                 maxOptionsPerSelect: 8

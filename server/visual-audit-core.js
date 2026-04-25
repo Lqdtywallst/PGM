@@ -48,6 +48,7 @@ const VISUAL_FINDING_CATEGORIES = Object.freeze([
     'shape_drift',
     'button_variant_sprawl',
     'header_consistency',
+    'heading_balance',
     'date_currentness',
     'text_encoding',
     'border_weight_drift',
@@ -116,6 +117,7 @@ const FINDING_BUCKETS = Object.freeze({
     shape_drift: 'layoutIntegrity',
     button_variant_sprawl: 'layoutIntegrity',
     header_consistency: 'layoutIntegrity',
+    heading_balance: 'firstViewportHierarchy',
     date_currentness: 'stabilityInteraction',
     text_encoding: 'readability',
     border_weight_drift: 'layoutIntegrity',
@@ -548,7 +550,7 @@ function shouldEscalateToVision({
     const hasPremiumContractDrift = config.premiumCritical && uniqueFindings.some((finding) => isDesignContractDrift(finding));
     const hasAmbiguousMediumFinding = uniqueFindings.some((finding) => (
         finding.severity === 'medium' &&
-        ['cta_hierarchy', 'clipping', 'contrast', 'grid_stability', 'layout_gap', 'layout_instability'].includes(finding.category)
+        ['cta_hierarchy', 'clipping', 'contrast', 'grid_stability', 'heading_balance', 'layout_gap', 'layout_instability'].includes(finding.category)
     ));
 
     if (hasHardFail) {
@@ -599,6 +601,68 @@ function shouldEscalateToVision({
     };
 }
 
+function evaluateMobileHeroHeadingBalance(metrics = {}, rules = {}) {
+    const headingRules = rules.headingBalance || rules;
+    const viewportWidth = Number(metrics.viewportWidth || 0);
+    const lineMetrics = metrics.headingLineMetrics || {};
+    const lineCount = Number(lineMetrics.lineCount || 0);
+
+    if (!viewportWidth || viewportWidth > Number(headingRules.maxViewportWidthPx || 760) || lineCount < 1) {
+        return [];
+    }
+
+    const failures = [];
+    const textAlign = String(lineMetrics.textAlign || '').toLowerCase();
+    const maxLineCount = Number(headingRules.maxLineCount || 0);
+    const minLineWidthRatio = Number(headingRules.minLineWidthRatio || 0);
+    const maxLineWidthSpreadRatio = Number(headingRules.maxLineWidthSpreadRatio || 0);
+    const maxCenterOffsetRatio = Number(headingRules.maxCenterOffsetRatio || 0);
+    const maxBlockCenterOffsetRatio = Number(headingRules.maxBlockCenterOffsetRatio || maxCenterOffsetRatio || 0);
+    const requireCenteredText = Boolean(headingRules.requireCenteredText);
+
+    if (maxLineCount && lineCount > maxLineCount) {
+        failures.push(`lineCount=${lineCount}>${maxLineCount}`);
+    }
+
+    if (
+        minLineWidthRatio &&
+        Number.isFinite(Number(lineMetrics.minLineWidthRatio)) &&
+        Number(lineMetrics.minLineWidthRatio) < minLineWidthRatio
+    ) {
+        failures.push(`minLineWidthRatio=${Number(lineMetrics.minLineWidthRatio).toFixed(3)}<${minLineWidthRatio}`);
+    }
+
+    if (
+        maxLineWidthSpreadRatio &&
+        Number.isFinite(Number(lineMetrics.lineWidthSpreadRatio)) &&
+        Number(lineMetrics.lineWidthSpreadRatio) > maxLineWidthSpreadRatio
+    ) {
+        failures.push(`lineWidthSpreadRatio=${Number(lineMetrics.lineWidthSpreadRatio).toFixed(3)}>${maxLineWidthSpreadRatio}`);
+    }
+
+    if (
+        maxCenterOffsetRatio &&
+        Number.isFinite(Number(lineMetrics.maxLineCenterOffsetRatio)) &&
+        Number(lineMetrics.maxLineCenterOffsetRatio) > maxCenterOffsetRatio
+    ) {
+        failures.push(`maxLineCenterOffsetRatio=${Number(lineMetrics.maxLineCenterOffsetRatio).toFixed(3)}>${maxCenterOffsetRatio}`);
+    }
+
+    if (
+        maxBlockCenterOffsetRatio &&
+        Number.isFinite(Number(lineMetrics.blockCenterOffsetRatio)) &&
+        Number(lineMetrics.blockCenterOffsetRatio) > maxBlockCenterOffsetRatio
+    ) {
+        failures.push(`blockCenterOffsetRatio=${Number(lineMetrics.blockCenterOffsetRatio).toFixed(3)}>${maxBlockCenterOffsetRatio}`);
+    }
+
+    if (requireCenteredText && textAlign && !['center', '-webkit-center'].includes(textAlign)) {
+        failures.push(`textAlign=${textAlign}`);
+    }
+
+    return failures;
+}
+
 module.exports = {
     BRAND_REFERENCE_ROUTE,
     COHORT_CONFIG,
@@ -612,6 +676,7 @@ module.exports = {
     clamp,
     createVisualFinding,
     dedupeVisualFindings,
+    evaluateMobileHeroHeadingBalance,
     filePathForRoute,
     getCohortConfig,
     getDefaultVisualRoutes,

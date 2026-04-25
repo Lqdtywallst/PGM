@@ -82,7 +82,7 @@
 
         const backendUrl = getBackendBaseUrl();
         if (!backendUrl) {
-            setStatus(statusElement, 'error', 'Backend URL is not configured. Check config.js.');
+            setStatus(statusElement, 'error', 'This contact form is not ready yet. Please use WhatsApp and the team will help.');
             return;
         }
 
@@ -124,7 +124,7 @@
                 setStatus(
                     statusElement,
                     'error',
-                    'Could not reach the local backend. Start `npm start` or use WhatsApp while testing locally.'
+                    'We could not reach the contact service right now. Please use WhatsApp and the team will help.'
                 );
             } else {
                 setStatus(statusElement, 'error', message);
