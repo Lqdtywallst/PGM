@@ -1,0 +1,1273 @@
+{
+  "version": 1,
+  "kind": "visual",
+  "generatedAt": "2026-04-25T14:47:47.101Z",
+  "sourceGeneratedAt": "2026-04-25T14:46:21.813Z",
+  "sourceSummary": {
+    "good": 8,
+    "review": 0,
+    "bad": 0,
+    "hardFails": 0
+  },
+  "signalHash": "d13583dd9d29",
+  "signalsSummary": {
+    "total": 72,
+    "passed": 72,
+    "review": 0,
+    "failed": 0,
+    "missing": 0,
+    "byFamily": {
+      "visual.baseline-diff": 8,
+      "visual.page-health": 8,
+      "visual.family-drift": 8,
+      "visual.first-viewport": 8,
+      "visual.layout-stability": 8,
+      "visual.media-and-state": 8,
+      "visual.readability": 8,
+      "visual.surface-quality": 8,
+      "visual.unexpected-change": 8
+    }
+  },
+  "signals": [
+    {
+      "key": "visual:baseline-diff:/lamborghini-huracan-evo-spyder-rental-dubai.html::desktop-wide",
+      "family": "visual.baseline-diff",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "desktop-wide",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html matches approved visual baseline on desktop-wide",
+      "evidence": "Mismatch ratio 0.000000 against threshold 0.015000.",
+      "source": "page.baselineDiff",
+      "metadata": {}
+    },
+    {
+      "key": "visual:baseline-diff:/lamborghini-huracan-evo-spyder-rental-dubai.html::laptop",
+      "family": "visual.baseline-diff",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "laptop",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html matches approved visual baseline on laptop",
+      "evidence": "Mismatch ratio 0.000000 against threshold 0.015000.",
+      "source": "page.baselineDiff",
+      "metadata": {}
+    },
+    {
+      "key": "visual:baseline-diff:/lamborghini-huracan-evo-spyder-rental-dubai.html::mobile-modern",
+      "family": "visual.baseline-diff",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "mobile-modern",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html matches approved visual baseline on mobile-modern",
+      "evidence": "Mismatch ratio 0.000000 against threshold 0.015000.",
+      "source": "page.baselineDiff",
+      "metadata": {}
+    },
+    {
+      "key": "visual:baseline-diff:/lamborghini-huracan-evo-spyder-rental-dubai.html::tablet-portrait",
+      "family": "visual.baseline-diff",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "tablet-portrait",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html matches approved visual baseline on tablet-portrait",
+      "evidence": "Mismatch ratio 0.000000 against threshold 0.015000.",
+      "source": "page.baselineDiff",
+      "metadata": {}
+    },
+    {
+      "key": "visual:baseline-diff:/lamborghini-rental-dubai.html::desktop-wide",
+      "family": "visual.baseline-diff",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "desktop-wide",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html matches approved visual baseline on desktop-wide",
+      "evidence": "Mismatch ratio 0.000000 against threshold 0.015000.",
+      "source": "page.baselineDiff",
+      "metadata": {}
+    },
+    {
+      "key": "visual:baseline-diff:/lamborghini-rental-dubai.html::laptop",
+      "family": "visual.baseline-diff",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "laptop",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html matches approved visual baseline on laptop",
+      "evidence": "Mismatch ratio 0.000000 against threshold 0.015000.",
+      "source": "page.baselineDiff",
+      "metadata": {}
+    },
+    {
+      "key": "visual:baseline-diff:/lamborghini-rental-dubai.html::mobile-modern",
+      "family": "visual.baseline-diff",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "mobile-modern",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html matches approved visual baseline on mobile-modern",
+      "evidence": "Mismatch ratio 0.000000 against threshold 0.015000.",
+      "source": "page.baselineDiff",
+      "metadata": {}
+    },
+    {
+      "key": "visual:baseline-diff:/lamborghini-rental-dubai.html::tablet-portrait",
+      "family": "visual.baseline-diff",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "tablet-portrait",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html matches approved visual baseline on tablet-portrait",
+      "evidence": "Mismatch ratio 0.000000 against threshold 0.015000.",
+      "source": "page.baselineDiff",
+      "metadata": {}
+    },
+    {
+      "key": "visual:page-health:/lamborghini-huracan-evo-spyder-rental-dubai.html::desktop-wide",
+      "family": "visual.page-health",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "desktop-wide",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html visual health on desktop-wide",
+      "evidence": "score=100",
+      "source": "page.assessment",
+      "metadata": {}
+    },
+    {
+      "key": "visual:page-health:/lamborghini-huracan-evo-spyder-rental-dubai.html::laptop",
+      "family": "visual.page-health",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "laptop",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html visual health on laptop",
+      "evidence": "score=100",
+      "source": "page.assessment",
+      "metadata": {}
+    },
+    {
+      "key": "visual:page-health:/lamborghini-huracan-evo-spyder-rental-dubai.html::mobile-modern",
+      "family": "visual.page-health",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "mobile-modern",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html visual health on mobile-modern",
+      "evidence": "score=100",
+      "source": "page.assessment",
+      "metadata": {}
+    },
+    {
+      "key": "visual:page-health:/lamborghini-huracan-evo-spyder-rental-dubai.html::tablet-portrait",
+      "family": "visual.page-health",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "tablet-portrait",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html visual health on tablet-portrait",
+      "evidence": "score=100",
+      "source": "page.assessment",
+      "metadata": {}
+    },
+    {
+      "key": "visual:page-health:/lamborghini-rental-dubai.html::desktop-wide",
+      "family": "visual.page-health",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "desktop-wide",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html visual health on desktop-wide",
+      "evidence": "score=100",
+      "source": "page.assessment",
+      "metadata": {}
+    },
+    {
+      "key": "visual:page-health:/lamborghini-rental-dubai.html::laptop",
+      "family": "visual.page-health",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "laptop",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html visual health on laptop",
+      "evidence": "score=100",
+      "source": "page.assessment",
+      "metadata": {}
+    },
+    {
+      "key": "visual:page-health:/lamborghini-rental-dubai.html::mobile-modern",
+      "family": "visual.page-health",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "mobile-modern",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html visual health on mobile-modern",
+      "evidence": "score=100",
+      "source": "page.assessment",
+      "metadata": {}
+    },
+    {
+      "key": "visual:page-health:/lamborghini-rental-dubai.html::tablet-portrait",
+      "family": "visual.page-health",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "tablet-portrait",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html visual health on tablet-portrait",
+      "evidence": "score=100",
+      "source": "page.assessment",
+      "metadata": {}
+    },
+    {
+      "key": "visual.family-drift:/lamborghini-huracan-evo-spyder-rental-dubai.html::desktop-wide",
+      "family": "visual.family-drift",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "desktop-wide",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html route keeps its approved family rhythm and template identity on desktop-wide",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "family_layout_drift",
+          "cohort_mismatch",
+          "legacy_template",
+          "card_consistency"
+        ]
+      }
+    },
+    {
+      "key": "visual.family-drift:/lamborghini-huracan-evo-spyder-rental-dubai.html::laptop",
+      "family": "visual.family-drift",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "laptop",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html route keeps its approved family rhythm and template identity on laptop",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "family_layout_drift",
+          "cohort_mismatch",
+          "legacy_template",
+          "card_consistency"
+        ]
+      }
+    },
+    {
+      "key": "visual.family-drift:/lamborghini-huracan-evo-spyder-rental-dubai.html::mobile-modern",
+      "family": "visual.family-drift",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "mobile-modern",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html route keeps its approved family rhythm and template identity on mobile-modern",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "family_layout_drift",
+          "cohort_mismatch",
+          "legacy_template",
+          "card_consistency"
+        ]
+      }
+    },
+    {
+      "key": "visual.family-drift:/lamborghini-huracan-evo-spyder-rental-dubai.html::tablet-portrait",
+      "family": "visual.family-drift",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "tablet-portrait",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html route keeps its approved family rhythm and template identity on tablet-portrait",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "family_layout_drift",
+          "cohort_mismatch",
+          "legacy_template",
+          "card_consistency"
+        ]
+      }
+    },
+    {
+      "key": "visual.family-drift:/lamborghini-rental-dubai.html::desktop-wide",
+      "family": "visual.family-drift",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "desktop-wide",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html route keeps its approved family rhythm and template identity on desktop-wide",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "family_layout_drift",
+          "cohort_mismatch",
+          "legacy_template",
+          "card_consistency"
+        ]
+      }
+    },
+    {
+      "key": "visual.family-drift:/lamborghini-rental-dubai.html::laptop",
+      "family": "visual.family-drift",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "laptop",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html route keeps its approved family rhythm and template identity on laptop",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "family_layout_drift",
+          "cohort_mismatch",
+          "legacy_template",
+          "card_consistency"
+        ]
+      }
+    },
+    {
+      "key": "visual.family-drift:/lamborghini-rental-dubai.html::mobile-modern",
+      "family": "visual.family-drift",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "mobile-modern",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html route keeps its approved family rhythm and template identity on mobile-modern",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "family_layout_drift",
+          "cohort_mismatch",
+          "legacy_template",
+          "card_consistency"
+        ]
+      }
+    },
+    {
+      "key": "visual.family-drift:/lamborghini-rental-dubai.html::tablet-portrait",
+      "family": "visual.family-drift",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "tablet-portrait",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html route keeps its approved family rhythm and template identity on tablet-portrait",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "family_layout_drift",
+          "cohort_mismatch",
+          "legacy_template",
+          "card_consistency"
+        ]
+      }
+    },
+    {
+      "key": "visual.first-viewport:/lamborghini-huracan-evo-spyder-rental-dubai.html::desktop-wide",
+      "family": "visual.first-viewport",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "desktop-wide",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html first viewport hierarchy and composition stay intentional on desktop-wide",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "heading",
+          "heading_balance",
+          "primary_cta",
+          "cta_hierarchy",
+          "first_viewport_layout",
+          "layout_gap",
+          "header_occlusion"
+        ]
+      }
+    },
+    {
+      "key": "visual.first-viewport:/lamborghini-huracan-evo-spyder-rental-dubai.html::laptop",
+      "family": "visual.first-viewport",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "laptop",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html first viewport hierarchy and composition stay intentional on laptop",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "heading",
+          "heading_balance",
+          "primary_cta",
+          "cta_hierarchy",
+          "first_viewport_layout",
+          "layout_gap",
+          "header_occlusion"
+        ]
+      }
+    },
+    {
+      "key": "visual.first-viewport:/lamborghini-huracan-evo-spyder-rental-dubai.html::mobile-modern",
+      "family": "visual.first-viewport",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "mobile-modern",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html first viewport hierarchy and composition stay intentional on mobile-modern",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "heading",
+          "heading_balance",
+          "primary_cta",
+          "cta_hierarchy",
+          "first_viewport_layout",
+          "layout_gap",
+          "header_occlusion"
+        ]
+      }
+    },
+    {
+      "key": "visual.first-viewport:/lamborghini-huracan-evo-spyder-rental-dubai.html::tablet-portrait",
+      "family": "visual.first-viewport",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "tablet-portrait",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html first viewport hierarchy and composition stay intentional on tablet-portrait",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "heading",
+          "heading_balance",
+          "primary_cta",
+          "cta_hierarchy",
+          "first_viewport_layout",
+          "layout_gap",
+          "header_occlusion"
+        ]
+      }
+    },
+    {
+      "key": "visual.first-viewport:/lamborghini-rental-dubai.html::desktop-wide",
+      "family": "visual.first-viewport",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "desktop-wide",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html first viewport hierarchy and composition stay intentional on desktop-wide",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "heading",
+          "heading_balance",
+          "primary_cta",
+          "cta_hierarchy",
+          "first_viewport_layout",
+          "layout_gap",
+          "header_occlusion"
+        ]
+      }
+    },
+    {
+      "key": "visual.first-viewport:/lamborghini-rental-dubai.html::laptop",
+      "family": "visual.first-viewport",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "laptop",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html first viewport hierarchy and composition stay intentional on laptop",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "heading",
+          "heading_balance",
+          "primary_cta",
+          "cta_hierarchy",
+          "first_viewport_layout",
+          "layout_gap",
+          "header_occlusion"
+        ]
+      }
+    },
+    {
+      "key": "visual.first-viewport:/lamborghini-rental-dubai.html::mobile-modern",
+      "family": "visual.first-viewport",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "mobile-modern",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html first viewport hierarchy and composition stay intentional on mobile-modern",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "heading",
+          "heading_balance",
+          "primary_cta",
+          "cta_hierarchy",
+          "first_viewport_layout",
+          "layout_gap",
+          "header_occlusion"
+        ]
+      }
+    },
+    {
+      "key": "visual.first-viewport:/lamborghini-rental-dubai.html::tablet-portrait",
+      "family": "visual.first-viewport",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "tablet-portrait",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html first viewport hierarchy and composition stay intentional on tablet-portrait",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "heading",
+          "heading_balance",
+          "primary_cta",
+          "cta_hierarchy",
+          "first_viewport_layout",
+          "layout_gap",
+          "header_occlusion"
+        ]
+      }
+    },
+    {
+      "key": "visual.layout-stability:/lamborghini-huracan-evo-spyder-rental-dubai.html::desktop-wide",
+      "family": "visual.layout-stability",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "desktop-wide",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html layout geometry does not drift, overflow, overlap, or clip on desktop-wide",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "overflow",
+          "overlap",
+          "clipping",
+          "grid_stability",
+          "layout_instability",
+          "section_rhythm",
+          "spacing",
+          "layout_homogeneity"
+        ]
+      }
+    },
+    {
+      "key": "visual.layout-stability:/lamborghini-huracan-evo-spyder-rental-dubai.html::laptop",
+      "family": "visual.layout-stability",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "laptop",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html layout geometry does not drift, overflow, overlap, or clip on laptop",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "overflow",
+          "overlap",
+          "clipping",
+          "grid_stability",
+          "layout_instability",
+          "section_rhythm",
+          "spacing",
+          "layout_homogeneity"
+        ]
+      }
+    },
+    {
+      "key": "visual.layout-stability:/lamborghini-huracan-evo-spyder-rental-dubai.html::mobile-modern",
+      "family": "visual.layout-stability",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "mobile-modern",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html layout geometry does not drift, overflow, overlap, or clip on mobile-modern",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "overflow",
+          "overlap",
+          "clipping",
+          "grid_stability",
+          "layout_instability",
+          "section_rhythm",
+          "spacing",
+          "layout_homogeneity"
+        ]
+      }
+    },
+    {
+      "key": "visual.layout-stability:/lamborghini-huracan-evo-spyder-rental-dubai.html::tablet-portrait",
+      "family": "visual.layout-stability",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "tablet-portrait",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html layout geometry does not drift, overflow, overlap, or clip on tablet-portrait",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "overflow",
+          "overlap",
+          "clipping",
+          "grid_stability",
+          "layout_instability",
+          "section_rhythm",
+          "spacing",
+          "layout_homogeneity"
+        ]
+      }
+    },
+    {
+      "key": "visual.layout-stability:/lamborghini-rental-dubai.html::desktop-wide",
+      "family": "visual.layout-stability",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "desktop-wide",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html layout geometry does not drift, overflow, overlap, or clip on desktop-wide",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "overflow",
+          "overlap",
+          "clipping",
+          "grid_stability",
+          "layout_instability",
+          "section_rhythm",
+          "spacing",
+          "layout_homogeneity"
+        ]
+      }
+    },
+    {
+      "key": "visual.layout-stability:/lamborghini-rental-dubai.html::laptop",
+      "family": "visual.layout-stability",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "laptop",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html layout geometry does not drift, overflow, overlap, or clip on laptop",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "overflow",
+          "overlap",
+          "clipping",
+          "grid_stability",
+          "layout_instability",
+          "section_rhythm",
+          "spacing",
+          "layout_homogeneity"
+        ]
+      }
+    },
+    {
+      "key": "visual.layout-stability:/lamborghini-rental-dubai.html::mobile-modern",
+      "family": "visual.layout-stability",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "mobile-modern",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html layout geometry does not drift, overflow, overlap, or clip on mobile-modern",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "overflow",
+          "overlap",
+          "clipping",
+          "grid_stability",
+          "layout_instability",
+          "section_rhythm",
+          "spacing",
+          "layout_homogeneity"
+        ]
+      }
+    },
+    {
+      "key": "visual.layout-stability:/lamborghini-rental-dubai.html::tablet-portrait",
+      "family": "visual.layout-stability",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "tablet-portrait",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html layout geometry does not drift, overflow, overlap, or clip on tablet-portrait",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "overflow",
+          "overlap",
+          "clipping",
+          "grid_stability",
+          "layout_instability",
+          "section_rhythm",
+          "spacing",
+          "layout_homogeneity"
+        ]
+      }
+    },
+    {
+      "key": "visual.media-and-state:/lamborghini-huracan-evo-spyder-rental-dubai.html::desktop-wide",
+      "family": "visual.media-and-state",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "desktop-wide",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html media, forms, interactions, and dated booking state stay healthy on desktop-wide",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "media_load",
+          "interaction_state",
+          "form_visibility",
+          "fleet_handoff",
+          "date_currentness"
+        ]
+      }
+    },
+    {
+      "key": "visual.media-and-state:/lamborghini-huracan-evo-spyder-rental-dubai.html::laptop",
+      "family": "visual.media-and-state",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "laptop",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html media, forms, interactions, and dated booking state stay healthy on laptop",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "media_load",
+          "interaction_state",
+          "form_visibility",
+          "fleet_handoff",
+          "date_currentness"
+        ]
+      }
+    },
+    {
+      "key": "visual.media-and-state:/lamborghini-huracan-evo-spyder-rental-dubai.html::mobile-modern",
+      "family": "visual.media-and-state",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "mobile-modern",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html media, forms, interactions, and dated booking state stay healthy on mobile-modern",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "media_load",
+          "interaction_state",
+          "form_visibility",
+          "fleet_handoff",
+          "date_currentness"
+        ]
+      }
+    },
+    {
+      "key": "visual.media-and-state:/lamborghini-huracan-evo-spyder-rental-dubai.html::tablet-portrait",
+      "family": "visual.media-and-state",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "tablet-portrait",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html media, forms, interactions, and dated booking state stay healthy on tablet-portrait",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "media_load",
+          "interaction_state",
+          "form_visibility",
+          "fleet_handoff",
+          "date_currentness"
+        ]
+      }
+    },
+    {
+      "key": "visual.media-and-state:/lamborghini-rental-dubai.html::desktop-wide",
+      "family": "visual.media-and-state",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "desktop-wide",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html media, forms, interactions, and dated booking state stay healthy on desktop-wide",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "media_load",
+          "interaction_state",
+          "form_visibility",
+          "fleet_handoff",
+          "date_currentness"
+        ]
+      }
+    },
+    {
+      "key": "visual.media-and-state:/lamborghini-rental-dubai.html::laptop",
+      "family": "visual.media-and-state",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "laptop",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html media, forms, interactions, and dated booking state stay healthy on laptop",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "media_load",
+          "interaction_state",
+          "form_visibility",
+          "fleet_handoff",
+          "date_currentness"
+        ]
+      }
+    },
+    {
+      "key": "visual.media-and-state:/lamborghini-rental-dubai.html::mobile-modern",
+      "family": "visual.media-and-state",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "mobile-modern",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html media, forms, interactions, and dated booking state stay healthy on mobile-modern",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "media_load",
+          "interaction_state",
+          "form_visibility",
+          "fleet_handoff",
+          "date_currentness"
+        ]
+      }
+    },
+    {
+      "key": "visual.media-and-state:/lamborghini-rental-dubai.html::tablet-portrait",
+      "family": "visual.media-and-state",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "tablet-portrait",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html media, forms, interactions, and dated booking state stay healthy on tablet-portrait",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "media_load",
+          "interaction_state",
+          "form_visibility",
+          "fleet_handoff",
+          "date_currentness"
+        ]
+      }
+    },
+    {
+      "key": "visual.readability:/lamborghini-huracan-evo-spyder-rental-dubai.html::desktop-wide",
+      "family": "visual.readability",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "desktop-wide",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html visible text remains readable and correctly encoded on desktop-wide",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "contrast",
+          "text_encoding"
+        ]
+      }
+    },
+    {
+      "key": "visual.readability:/lamborghini-huracan-evo-spyder-rental-dubai.html::laptop",
+      "family": "visual.readability",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "laptop",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html visible text remains readable and correctly encoded on laptop",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "contrast",
+          "text_encoding"
+        ]
+      }
+    },
+    {
+      "key": "visual.readability:/lamborghini-huracan-evo-spyder-rental-dubai.html::mobile-modern",
+      "family": "visual.readability",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "mobile-modern",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html visible text remains readable and correctly encoded on mobile-modern",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "contrast",
+          "text_encoding"
+        ]
+      }
+    },
+    {
+      "key": "visual.readability:/lamborghini-huracan-evo-spyder-rental-dubai.html::tablet-portrait",
+      "family": "visual.readability",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "tablet-portrait",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html visible text remains readable and correctly encoded on tablet-portrait",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "contrast",
+          "text_encoding"
+        ]
+      }
+    },
+    {
+      "key": "visual.readability:/lamborghini-rental-dubai.html::desktop-wide",
+      "family": "visual.readability",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "desktop-wide",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html visible text remains readable and correctly encoded on desktop-wide",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "contrast",
+          "text_encoding"
+        ]
+      }
+    },
+    {
+      "key": "visual.readability:/lamborghini-rental-dubai.html::laptop",
+      "family": "visual.readability",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "laptop",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html visible text remains readable and correctly encoded on laptop",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "contrast",
+          "text_encoding"
+        ]
+      }
+    },
+    {
+      "key": "visual.readability:/lamborghini-rental-dubai.html::mobile-modern",
+      "family": "visual.readability",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "mobile-modern",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html visible text remains readable and correctly encoded on mobile-modern",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "contrast",
+          "text_encoding"
+        ]
+      }
+    },
+    {
+      "key": "visual.readability:/lamborghini-rental-dubai.html::tablet-portrait",
+      "family": "visual.readability",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "tablet-portrait",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html visible text remains readable and correctly encoded on tablet-portrait",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "contrast",
+          "text_encoding"
+        ]
+      }
+    },
+    {
+      "key": "visual.surface-quality:/lamborghini-huracan-evo-spyder-rental-dubai.html::desktop-wide",
+      "family": "visual.surface-quality",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "desktop-wide",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html surface, typography, shape, and button treatment stay consistent on desktop-wide",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "font_drift",
+          "surface_drift",
+          "shape_drift",
+          "button_variant_sprawl",
+          "header_consistency",
+          "border_weight_drift",
+          "visual_affordance"
+        ]
+      }
+    },
+    {
+      "key": "visual.surface-quality:/lamborghini-huracan-evo-spyder-rental-dubai.html::laptop",
+      "family": "visual.surface-quality",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "laptop",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html surface, typography, shape, and button treatment stay consistent on laptop",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "font_drift",
+          "surface_drift",
+          "shape_drift",
+          "button_variant_sprawl",
+          "header_consistency",
+          "border_weight_drift",
+          "visual_affordance"
+        ]
+      }
+    },
+    {
+      "key": "visual.surface-quality:/lamborghini-huracan-evo-spyder-rental-dubai.html::mobile-modern",
+      "family": "visual.surface-quality",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "mobile-modern",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html surface, typography, shape, and button treatment stay consistent on mobile-modern",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "font_drift",
+          "surface_drift",
+          "shape_drift",
+          "button_variant_sprawl",
+          "header_consistency",
+          "border_weight_drift",
+          "visual_affordance"
+        ]
+      }
+    },
+    {
+      "key": "visual.surface-quality:/lamborghini-huracan-evo-spyder-rental-dubai.html::tablet-portrait",
+      "family": "visual.surface-quality",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "tablet-portrait",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html surface, typography, shape, and button treatment stay consistent on tablet-portrait",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "font_drift",
+          "surface_drift",
+          "shape_drift",
+          "button_variant_sprawl",
+          "header_consistency",
+          "border_weight_drift",
+          "visual_affordance"
+        ]
+      }
+    },
+    {
+      "key": "visual.surface-quality:/lamborghini-rental-dubai.html::desktop-wide",
+      "family": "visual.surface-quality",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "desktop-wide",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html surface, typography, shape, and button treatment stay consistent on desktop-wide",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "font_drift",
+          "surface_drift",
+          "shape_drift",
+          "button_variant_sprawl",
+          "header_consistency",
+          "border_weight_drift",
+          "visual_affordance"
+        ]
+      }
+    },
+    {
+      "key": "visual.surface-quality:/lamborghini-rental-dubai.html::laptop",
+      "family": "visual.surface-quality",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "laptop",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html surface, typography, shape, and button treatment stay consistent on laptop",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "font_drift",
+          "surface_drift",
+          "shape_drift",
+          "button_variant_sprawl",
+          "header_consistency",
+          "border_weight_drift",
+          "visual_affordance"
+        ]
+      }
+    },
+    {
+      "key": "visual.surface-quality:/lamborghini-rental-dubai.html::mobile-modern",
+      "family": "visual.surface-quality",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "mobile-modern",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html surface, typography, shape, and button treatment stay consistent on mobile-modern",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "font_drift",
+          "surface_drift",
+          "shape_drift",
+          "button_variant_sprawl",
+          "header_consistency",
+          "border_weight_drift",
+          "visual_affordance"
+        ]
+      }
+    },
+    {
+      "key": "visual.surface-quality:/lamborghini-rental-dubai.html::tablet-portrait",
+      "family": "visual.surface-quality",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "tablet-portrait",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html surface, typography, shape, and button treatment stay consistent on tablet-portrait",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "font_drift",
+          "surface_drift",
+          "shape_drift",
+          "button_variant_sprawl",
+          "header_consistency",
+          "border_weight_drift",
+          "visual_affordance"
+        ]
+      }
+    },
+    {
+      "key": "visual.unexpected-change:/lamborghini-huracan-evo-spyder-rental-dubai.html::desktop-wide",
+      "family": "visual.unexpected-change",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "desktop-wide",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html approved screenshots do not show unexpected visual change on desktop-wide",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "unexpected_diff",
+          "vision_review"
+        ]
+      }
+    },
+    {
+      "key": "visual.unexpected-change:/lamborghini-huracan-evo-spyder-rental-dubai.html::laptop",
+      "family": "visual.unexpected-change",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "laptop",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html approved screenshots do not show unexpected visual change on laptop",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "unexpected_diff",
+          "vision_review"
+        ]
+      }
+    },
+    {
+      "key": "visual.unexpected-change:/lamborghini-huracan-evo-spyder-rental-dubai.html::mobile-modern",
+      "family": "visual.unexpected-change",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "mobile-modern",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html approved screenshots do not show unexpected visual change on mobile-modern",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "unexpected_diff",
+          "vision_review"
+        ]
+      }
+    },
+    {
+      "key": "visual.unexpected-change:/lamborghini-huracan-evo-spyder-rental-dubai.html::tablet-portrait",
+      "family": "visual.unexpected-change",
+      "route": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+      "viewport": "tablet-portrait",
+      "status": "passed",
+      "label": "/lamborghini-huracan-evo-spyder-rental-dubai.html approved screenshots do not show unexpected visual change on tablet-portrait",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "unexpected_diff",
+          "vision_review"
+        ]
+      }
+    },
+    {
+      "key": "visual.unexpected-change:/lamborghini-rental-dubai.html::desktop-wide",
+      "family": "visual.unexpected-change",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "desktop-wide",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html approved screenshots do not show unexpected visual change on desktop-wide",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "unexpected_diff",
+          "vision_review"
+        ]
+      }
+    },
+    {
+      "key": "visual.unexpected-change:/lamborghini-rental-dubai.html::laptop",
+      "family": "visual.unexpected-change",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "laptop",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html approved screenshots do not show unexpected visual change on laptop",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "unexpected_diff",
+          "vision_review"
+        ]
+      }
+    },
+    {
+      "key": "visual.unexpected-change:/lamborghini-rental-dubai.html::mobile-modern",
+      "family": "visual.unexpected-change",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "mobile-modern",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html approved screenshots do not show unexpected visual change on mobile-modern",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "unexpected_diff",
+          "vision_review"
+        ]
+      }
+    },
+    {
+      "key": "visual.unexpected-change:/lamborghini-rental-dubai.html::tablet-portrait",
+      "family": "visual.unexpected-change",
+      "route": "/lamborghini-rental-dubai.html",
+      "viewport": "tablet-portrait",
+      "status": "passed",
+      "label": "/lamborghini-rental-dubai.html approved screenshots do not show unexpected visual change on tablet-portrait",
+      "evidence": "no findings",
+      "source": "page.assessment.findings",
+      "metadata": {
+        "categories": [
+          "unexpected_diff",
+          "vision_review"
+        ]
+      }
+    }
+  ]
+}

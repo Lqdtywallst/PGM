@@ -201,6 +201,92 @@ function initSiteV2() {
             }
         }
 
+        function bindAdaptiveBackOpacity(button) {
+            const importantContentSelector = [
+                "h1",
+                "h2",
+                "h3",
+                "h4",
+                "p",
+                "li",
+                "label",
+                "legend",
+                "summary",
+                "a:not(.lab-floating-back)",
+                "button",
+                "input",
+                "select",
+                "textarea",
+                "[role='button']",
+                ".fleet-card",
+                ".vehicle-card",
+                ".service-card",
+                ".location-card",
+                ".guide-card",
+                ".reservation-summary",
+                ".reserve-shell-card",
+                ".vehicle-detail-card",
+                ".vehicle-spec-card"
+            ].join(", ");
+            const ignoredSurfaceSelector = ".lab-floating-back, .lab-header, .lab-mobile-drawer, .lab-floating-contact";
+            let frameId = 0;
+
+            function isImportantUnderlyingElement(element) {
+                if (!element || button.contains(element) || element.closest(ignoredSurfaceSelector)) {
+                    return false;
+                }
+
+                const importantElement = element.closest(importantContentSelector);
+                if (!importantElement || button.contains(importantElement) || importantElement.closest(ignoredSurfaceSelector)) {
+                    return false;
+                }
+
+                if (importantElement.matches("a, button, input, select, textarea, [role='button']")) {
+                    return true;
+                }
+
+                return (importantElement.textContent || "").replace(/\s+/g, " ").trim().length > 3;
+            }
+
+            function updateOverlapState() {
+                frameId = 0;
+
+                if (!button.isConnected || !button.classList.contains("is-visible")) {
+                    return;
+                }
+
+                const rect = button.getBoundingClientRect();
+                const samplePoints = [
+                    [rect.left + rect.width * 0.5, rect.top + rect.height * 0.5],
+                    [rect.left + rect.width * 0.28, rect.top + rect.height * 0.28],
+                    [rect.left + rect.width * 0.72, rect.top + rect.height * 0.28],
+                    [rect.left + rect.width * 0.28, rect.top + rect.height * 0.72],
+                    [rect.left + rect.width * 0.72, rect.top + rect.height * 0.72]
+                ];
+                const overlapsImportantContent = samplePoints.some(([x, y]) => (
+                    document.elementsFromPoint(x, y).some(isImportantUnderlyingElement)
+                ));
+
+                button.classList.toggle("is-over-important-content", overlapsImportantContent);
+            }
+
+            function requestOverlapUpdate() {
+                if (frameId) {
+                    return;
+                }
+
+                frameId = window.requestAnimationFrame(updateOverlapState);
+            }
+
+            window.addEventListener("scroll", requestOverlapUpdate, { capture: true, passive: true });
+            window.addEventListener("resize", requestOverlapUpdate, { passive: true });
+            window.addEventListener("orientationchange", requestOverlapUpdate, { passive: true });
+            window.setTimeout(requestOverlapUpdate, 250);
+            window.setTimeout(requestOverlapUpdate, 900);
+            requestOverlapUpdate();
+            return requestOverlapUpdate;
+        }
+
         const currentPath = normalizeInternalPath(window.location.href);
         const referrerPath = normalizeInternalPath(document.referrer);
         const storedMemory = readNavigationMemory();
@@ -255,7 +341,11 @@ function initSiteV2() {
         });
 
         document.body.appendChild(backButton);
-        window.requestAnimationFrame(() => backButton.classList.add("is-visible"));
+        const requestBackOverlapUpdate = bindAdaptiveBackOpacity(backButton);
+        window.requestAnimationFrame(() => {
+            backButton.classList.add("is-visible");
+            requestBackOverlapUpdate();
+        });
     }
 
     function normalizeGenericContactLinks() {
@@ -282,6 +372,67 @@ function initSiteV2() {
     function initFloatingContactButtons() {
         if (document.querySelector(".lab-floating-contact")) {
             return;
+        }
+
+        function bindFloatingContactCollision(contactNav) {
+            const collisionSelector = [
+                ".fleet-card__primary",
+                ".fleet-card__contact-row",
+                ".fleet-visual-card__primary",
+                ".fleet-visual-card__contact-row",
+                ".vehicle-booking__submit",
+                ".vehicle-booking__secondary",
+                ".reserve-page .btn",
+                ".reserve-page .btn-secondary"
+            ].join(", ");
+            const ignoredSurfaceSelector = ".lab-floating-contact, .lab-floating-back, .lab-header, .lab-mobile-drawer";
+            let frameId = 0;
+
+            function isCollisionElement(element) {
+                if (!element || contactNav.contains(element) || element.closest(ignoredSurfaceSelector)) {
+                    return false;
+                }
+
+                return Boolean(element.closest(collisionSelector));
+            }
+
+            function updateCollisionState() {
+                frameId = 0;
+
+                if (!contactNav.isConnected || !contactNav.classList.contains("is-visible")) {
+                    return;
+                }
+
+                const rect = contactNav.getBoundingClientRect();
+                const samplePoints = [
+                    [rect.left + rect.width * 0.5, rect.top + rect.height * 0.5],
+                    [rect.left + rect.width * 0.35, rect.top + rect.height * 0.2],
+                    [rect.left + rect.width * 0.65, rect.top + rect.height * 0.2],
+                    [rect.left + rect.width * 0.35, rect.top + rect.height * 0.8],
+                    [rect.left + rect.width * 0.65, rect.top + rect.height * 0.8]
+                ];
+                const overlapsCardActions = samplePoints.some(([x, y]) => (
+                    document.elementsFromPoint(x, y).some(isCollisionElement)
+                ));
+
+                contactNav.classList.toggle("is-over-card-actions", overlapsCardActions);
+            }
+
+            function requestCollisionUpdate() {
+                if (frameId) {
+                    return;
+                }
+
+                frameId = window.requestAnimationFrame(updateCollisionState);
+            }
+
+            window.addEventListener("scroll", requestCollisionUpdate, { capture: true, passive: true });
+            window.addEventListener("resize", requestCollisionUpdate, { passive: true });
+            window.addEventListener("orientationchange", requestCollisionUpdate, { passive: true });
+            window.setTimeout(requestCollisionUpdate, 250);
+            window.setTimeout(requestCollisionUpdate, 900);
+            requestCollisionUpdate();
+            return requestCollisionUpdate;
         }
 
         const contactNav = document.createElement("nav");
@@ -314,7 +465,11 @@ function initSiteV2() {
         });
 
         document.body.appendChild(contactNav);
-        window.requestAnimationFrame(() => contactNav.classList.add("is-visible"));
+        const requestContactCollisionUpdate = bindFloatingContactCollision(contactNav);
+        window.requestAnimationFrame(() => {
+            contactNav.classList.add("is-visible");
+            requestContactCollisionUpdate();
+        });
     }
 
     function getPathnameFromHref(href) {
@@ -812,7 +967,7 @@ function initSiteV2() {
                 <div class="lab-mobile-drawer__header">
                     <div class="lab-mobile-drawer__brand">
                         <span class="lab-mobile-drawer__crest" aria-hidden="true">
-                            <img src="/icons/icon-192.png" width="192" height="192" loading="lazy" decoding="async" alt="">
+                            <img src="/images/dp-crest-cropped.png" width="192" height="192" loading="lazy" decoding="async" alt="">
                         </span>
                         <div class="lab-mobile-drawer__brand-copy">
                             <strong>Dynasty Prestige</strong>

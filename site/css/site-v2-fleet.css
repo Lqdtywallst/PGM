@@ -395,8 +395,9 @@
 }
 
 .fleet-card {
+    --fleet-card-content-pad-x: 1rem;
     display: grid;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto 1fr auto;
     gap: 0;
     border: 1px solid rgba(152, 126, 96, 0.16);
     border-radius: 1.55rem;
@@ -434,9 +435,9 @@
 .fleet-card__content {
     --fleet-card-content-pad-x: 1rem;
     display: grid;
-    grid-template-rows: auto auto 1fr auto;
+    grid-template-rows: auto auto 1fr;
     gap: 0.72rem;
-    padding: 1rem var(--fleet-card-content-pad-x) 0;
+    padding: 1rem var(--fleet-card-content-pad-x) 0.85rem;
     min-height: 100%;
 }
 
@@ -724,9 +725,12 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0;
-    margin-inline: calc(var(--fleet-card-content-pad-x) * -1);
+    width: 100%;
+    margin: 0;
+    padding: 0;
     overflow: hidden;
     border-top: 1px solid rgba(152, 126, 96, 0.14);
+    background: rgba(93, 75, 52, 0.14);
 }
 
 .fleet-card__secondary {
@@ -1547,7 +1551,7 @@
 
     .fleet-card__content {
         --fleet-card-content-pad-x: 0.95rem;
-        padding: 0.95rem var(--fleet-card-content-pad-x) 0;
+        padding: 0.95rem var(--fleet-card-content-pad-x) 0.75rem;
     }
 
     .fleet-filter-button,
@@ -2013,9 +2017,9 @@
 
     .fleet-filter-close--top {
         grid-column: auto;
-        width: 44px;
-        min-width: 44px;
-        height: 44px;
+        width: 48px;
+        min-width: 48px;
+        height: 48px;
     }
 
     .fleet-mobile-chip--dates {
@@ -2080,10 +2084,10 @@
     .fleet-card__contact-row {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 1px;
-        width: auto;
-        margin-inline: calc(var(--fleet-card-content-pad-x) * -1);
+        width: 100%;
+        margin: 0;
+        padding: 0;
         margin-bottom: 0;
-        padding-top: 0;
         border-top: 1px solid rgba(152, 126, 96, 0.14);
         border-radius: 0 0 18px 18px;
         background: rgba(93, 75, 52, 0.14);
@@ -2209,4 +2213,13 @@
         margin-top: 0.18rem;
         padding-top: 0.24rem;
     }
+}
+
+/* Homogeneity guardrail: Fleet inherits the same premium type system as Home. */
+body.fleet-page :is(p, li, a, button, label, span, strong, small, input, select, textarea, [class]) {
+    font-family: var(--lab-font-sans);
+}
+
+body.fleet-page :is(h1, h2, h3, h4, h5, h6) {
+    font-family: var(--lab-font-display);
 }

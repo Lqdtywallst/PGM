@@ -258,6 +258,36 @@ function findLocalReservationForLookup({ reservationId, email }) {
     return reservationEmailMatches(record, email) ? record : null;
 }
 
+function listLocalReservationRecords({ limit = 1000 } = {}) {
+    if (!fs.existsSync(runtimeReservationDir)) {
+        return [];
+    }
+
+    const maxRows = Math.min(Math.max(Number(limit || 1000), 1), 5000);
+
+    return fs.readdirSync(runtimeReservationDir)
+        .filter((file) => file.endsWith('.json'))
+        .map((file) => {
+            const filePath = path.join(runtimeReservationDir, file);
+            const record = safeJsonParse(fs.readFileSync(filePath, 'utf8'));
+            const fileStats = fs.statSync(filePath);
+
+            return record
+                ? {
+                    ...record,
+                    updatedAt: record.updatedAt || fileStats.mtime.toISOString(),
+                    storage: record.storage || 'local-json'
+                }
+                : null;
+        })
+        .filter(Boolean)
+        .sort((left, right) => (
+            new Date(right.updatedAt || right.createdAt || 0) -
+            new Date(left.updatedAt || left.createdAt || 0)
+        ))
+        .slice(0, maxRows);
+}
+
 function saveLocalReservationRecord(record) {
     const recordKey = getPrimaryRecordKey(record);
     if (!recordKey) {
@@ -329,6 +359,21 @@ async function findPostgresReservationForLookup({ reservationId, email }) {
     );
 
     return rowToReservationRecord(result.rows[0]);
+}
+
+async function listPostgresReservationRecords({ limit = 1000 } = {}) {
+    await ensureDatabaseSchema();
+    const pool = getDatabasePool();
+    const maxRows = Math.min(Math.max(Number(limit || 1000), 1), 5000);
+    const result = await pool.query(
+        `SELECT *
+         FROM reservations
+         ORDER BY updated_at DESC
+         LIMIT $1`,
+        [maxRows]
+    );
+
+    return result.rows.map(rowToReservationRecord).filter(Boolean);
 }
 
 async function savePostgresReservationRecord(record) {
@@ -464,6 +509,14 @@ async function findReservationForLookup({ reservationId, email } = {}) {
     });
 }
 
+async function listReservationRecords(options = {}) {
+    if (isDatabaseConfigured()) {
+        return listPostgresReservationRecords(options);
+    }
+
+    return listLocalReservationRecords(options);
+}
+
 async function saveReservationRecord(record) {
     const recordKey = getPrimaryRecordKey(record) || buildReservationId();
     const existingRecord = await readReservationRecord(recordKey);
@@ -497,6 +550,7 @@ module.exports = {
     getReservationRecordPath,
     getReservationStoreMode,
     isDatabaseConfigured,
+    listReservationRecords,
     readReservationRecord,
     runtimeReservationDir,
     saveReservationRecord

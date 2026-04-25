@@ -100,10 +100,10 @@ function renderCard(card) {
         `                                        </div>`,
         `                                    </div>`,
         ``,
-        `                                    <div class="fleet-card__contact-row">`,
-        `                                        <a class="fleet-card__secondary" href="tel:${escapeHtml(PHONE_DISPLAY)}">Call</a>`,
-        `                                        <a class="fleet-card__secondary fleet-card__secondary--wa" href="${escapeHtml(buildWhatsAppHref(card.contact.whatsappText))}" target="_blank" rel="noopener">WhatsApp</a>`,
-        `                                    </div>`,
+        `                                </div>`,
+        `                                <div class="fleet-card__contact-row">`,
+        `                                    <a class="fleet-card__secondary" href="tel:${escapeHtml(PHONE_DISPLAY)}">Call</a>`,
+        `                                    <a class="fleet-card__secondary fleet-card__secondary--wa" href="${escapeHtml(buildWhatsAppHref(card.contact.whatsappText))}" target="_blank" rel="noopener">WhatsApp</a>`,
         `                                </div>`,
         `                            </article>`
     ].join("\n");

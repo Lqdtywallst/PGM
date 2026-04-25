@@ -124,7 +124,7 @@
 .services-local-card h3,
 .services-faq__cta h3 {
     margin: 0;
-    font-family: "Cormorant Garamond", serif;
+    font-family: var(--lab-font-display);
     font-weight: 700;
     letter-spacing: 0;
 }
@@ -788,7 +788,7 @@
     margin: 0;
     padding-top: 0.9rem;
     border-top: 1px solid rgba(68, 59, 52, 0.16);
-    font-family: "Cormorant Garamond", serif;
+    font-family: var(--lab-font-display);
     font-size: 2.1rem;
     line-height: 1;
     color: #171412;
@@ -818,7 +818,7 @@
 }
 
 .services-directory__title {
-    font-family: "Cormorant Garamond", serif;
+    font-family: var(--lab-font-display);
     font-size: 1.9rem;
     font-weight: 700;
     line-height: 1.02;

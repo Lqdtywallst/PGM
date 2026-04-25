@@ -135,7 +135,7 @@ test.describe('Desktop complete customer flows intelligent audit', () => {
         const successDialogPromise = page.waitForEvent('dialog');
         await page.locator('#payButton').click();
         const successDialog = await successDialogPromise;
-        expect(successDialog.message()).toContain('Payment successful');
+        expect(successDialog.message()).toContain('Payment received');
         expect(successDialog.message()).toContain('G63 AMG');
         await successDialog.accept();
 
@@ -208,7 +208,7 @@ test.describe('Mobile complete customer flows intelligent audit', () => {
         const successDialogPromise = page.waitForEvent('dialog');
         await page.locator('#payButton').click();
         const successDialog = await successDialogPromise;
-        expect(successDialog.message()).toContain('Payment successful');
+        expect(successDialog.message()).toContain('Payment received');
         await successDialog.accept();
 
         await expect(page).toHaveURL(/\/index\.html$/i);

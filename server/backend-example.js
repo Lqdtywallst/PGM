@@ -14,6 +14,22 @@ const {
     buildReservationId,
     saveReservationRecord
 } = require('./reservation-store');
+const {
+    clearAdminSessionCookie,
+    createAdminSessionToken,
+    getAdminConfig,
+    getAdminSessionFromRequest,
+    requireAdminSession,
+    setAdminSessionCookie,
+    verifyAdminCredentials
+} = require('./admin-auth');
+const {
+    renderAdminLoginPage,
+    renderAdminReservationsPage
+} = require('./admin-pages');
+const {
+    createAdminReservationsRouter
+} = require('./admin-reservations');
 
 const stripeConfigured = Boolean(
     process.env.STRIPE_SECRET_KEY &&
@@ -192,6 +208,11 @@ function isAllowedOrigin(origin) {
     }
 }
 
+function setAdminNoIndexHeaders(res) {
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+}
+
 async function handleStripeWebhook(req, res) {
     if (!stripe) {
         return res.status(503).send('Stripe is not configured');
@@ -287,6 +308,73 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Rutas
+app.get('/admin/login.html', (req, res) => {
+    setAdminNoIndexHeaders(res);
+    const adminConfig = getAdminConfig();
+    const session = adminConfig.configured ? getAdminSessionFromRequest(req) : null;
+
+    if (session) {
+        return res.redirect('/admin/reservations.html');
+    }
+
+    return res.type('html').send(renderAdminLoginPage());
+});
+
+app.post('/api/admin/login', (req, res) => {
+    setAdminNoIndexHeaders(res);
+
+    const credentialResult = verifyAdminCredentials(req.body || {});
+    if (!credentialResult.ok) {
+        const isSetupMissing = credentialResult.reason === 'not_configured';
+        return res.status(isSetupMissing ? 503 : 401).json({
+            error: isSetupMissing
+                ? 'Admin access is not configured yet'
+                : 'Invalid admin credentials'
+        });
+    }
+
+    const token = createAdminSessionToken(credentialResult.user);
+    setAdminSessionCookie(res, token);
+
+    return res.json({
+        ok: true,
+        user: credentialResult.user
+    });
+});
+
+app.post('/api/admin/logout', (req, res) => {
+    setAdminNoIndexHeaders(res);
+    clearAdminSessionCookie(res);
+    res.json({ ok: true });
+});
+
+app.get('/api/admin/session', (req, res) => {
+    setAdminNoIndexHeaders(res);
+    const adminConfig = getAdminConfig();
+
+    if (!adminConfig.configured) {
+        return res.json({
+            authenticated: false,
+            configured: false
+        });
+    }
+
+    const session = getAdminSessionFromRequest(req);
+    return res.status(session ? 200 : 401).json({
+        authenticated: Boolean(session),
+        configured: true,
+        user: session?.user || null,
+        expiresAt: session?.expiresAt || null
+    });
+});
+
+app.get('/admin/reservations.html', requireAdminSession({ redirectToLogin: true }), (req, res) => {
+    setAdminNoIndexHeaders(res);
+    res.type('html').send(renderAdminReservationsPage());
+});
+
+app.use('/api/admin', requireAdminSession(), createAdminReservationsRouter());
+
 app.use('/api/reserve', reserveRoutes);
 
 // Compatibility endpoint for creating a Stripe payment intent.

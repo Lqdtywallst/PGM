@@ -19,7 +19,8 @@ const {
     buildRenderedRouteLinks,
     parseArgs,
     resolveReferenceToPublicRoute,
-    resolveSelectedRoutes
+    resolveSelectedRoutes,
+    summarizeReport
 } = require('../../scripts/run-navigation-agent');
 
 test('navigation agent args support scoped routes, viewports, strict mode and click caps', () => {
@@ -351,6 +352,49 @@ test('strict navigation gate fails only when strict mode is enabled', () => {
             'nav_handoff_failure=1'
         ]
     });
+});
+
+test('navigation summary tracks browser and floating back checks separately', () => {
+    const summary = summarizeReport([
+        {
+            route: '/',
+            viewport: 'laptop',
+            links: [{ targetRoute: '/fleet.html' }],
+            navigation: { clickableRouteActionCount: 2 },
+            handoffs: [
+                {
+                    status: 'passed',
+                    browserBackWorked: true,
+                    floatingBackTested: true,
+                    floatingBackWorked: true
+                },
+                {
+                    status: 'failed',
+                    browserBackWorked: true,
+                    floatingBackTested: true,
+                    floatingBackWorked: false
+                },
+                {
+                    status: 'passed',
+                    browserBackWorked: true,
+                    floatingBackTested: false,
+                    floatingBackWorked: true
+                }
+            ]
+        }
+    ], {
+        status: 'bad',
+        summary: { total: 1 }
+    }, [
+        { route: '/', outgoingRoutes: ['/fleet.html'] }
+    ]);
+
+    assert.equal(summary.totalHandoffs, 3);
+    assert.equal(summary.passedBrowserBacks, 3);
+    assert.equal(summary.failedBrowserBacks, 0);
+    assert.equal(summary.testedFloatingBacks, 2);
+    assert.equal(summary.passedFloatingBacks, 1);
+    assert.equal(summary.failedFloatingBacks, 1);
 });
 
 test('click candidate selection prioritizes recovery and drawer/header links', () => {

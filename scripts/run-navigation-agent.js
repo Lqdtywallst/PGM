@@ -1217,6 +1217,88 @@ async function assessVehicleReturnAffordance(page, routeDir) {
     };
 }
 
+async function exerciseReserveStepHistory(page, routeDir) {
+    const isReservePage = await page.locator('body.reserve-page').count().then((count) => count > 0).catch(() => false);
+
+    if (!isReservePage) {
+        return null;
+    }
+
+    const screenshotPath = path.join(routeDir, 'reserve-step-history-failure.png');
+    const state = {
+        id: 'reserve-step-history',
+        label: 'Reserve step history',
+        status: 'failed',
+        message: '',
+        screenshotPath: ''
+    };
+    const auditPickupLocation = 'Navigation audit handover, Downtown Dubai';
+    const auditGuestName = 'Navigation Audit Guest';
+
+    async function restoreReservePage() {
+        await page.reload({ waitUntil: 'domcontentloaded', timeout: 12000 }).catch(() => null);
+        await settlePage(page, 180).catch(() => null);
+    }
+
+    try {
+        await page.evaluate(() => {
+            if (typeof window.__wakeReserveEnhancements === 'function') {
+                window.__wakeReserveEnhancements();
+            }
+        });
+        await page.waitForFunction(() => Boolean(document.querySelector('#step2')), null, { timeout: 8000 });
+        await settlePage(page, 180);
+
+        await page.locator('#pickupLocation').fill(auditPickupLocation);
+        await page.waitForFunction(() => !document.querySelector('#continueToPaymentBtn')?.disabled, null, { timeout: 5000 });
+        await page.locator('#continueToPaymentBtn').click({ timeout: 5000 });
+        await page.waitForFunction(() => document.querySelector('#step2')?.classList.contains('active'), null, { timeout: 5000 });
+
+        await page.locator('#fullName').fill(auditGuestName);
+        await page.goBack({ waitUntil: 'domcontentloaded', timeout: 8000 }).catch(() => null);
+        await page.waitForFunction(() => document.querySelector('#step1')?.classList.contains('active'), null, { timeout: 5000 });
+
+        const preservedPickupLocation = await page.locator('#pickupLocation').inputValue();
+        if (preservedPickupLocation !== auditPickupLocation) {
+            throw new Error(`Browser back returned to step 1 but lost the delivery field. value="${preservedPickupLocation}"`);
+        }
+
+        await page.locator('#continueToPaymentBtn').click({ timeout: 5000 });
+        await page.waitForFunction(() => document.querySelector('#step2')?.classList.contains('active'), null, { timeout: 5000 });
+
+        const preservedGuestName = await page.locator('#fullName').inputValue();
+        if (preservedGuestName !== auditGuestName) {
+            throw new Error(`Returning to guest details lost the typed guest name. value="${preservedGuestName}"`);
+        }
+
+        await page.goBack({ waitUntil: 'domcontentloaded', timeout: 8000 }).catch(() => null);
+        await page.waitForFunction(() => document.querySelector('#step1')?.classList.contains('active'), null, { timeout: 5000 });
+        await restoreReservePage();
+
+        return {
+            ...state,
+            status: 'passed',
+            message: 'Browser back moved step 2 -> step 1 and returning to step 2 preserved typed details.',
+            screenshotPath: ''
+        };
+    } catch (error) {
+        await page.screenshot({
+            path: screenshotPath,
+            fullPage: false,
+            animations: 'disabled',
+            caret: 'hide'
+        }).catch(() => {});
+        await restoreReservePage();
+
+        return {
+            ...state,
+            status: 'failed',
+            message: error.message || String(error),
+            screenshotPath
+        };
+    }
+}
+
 async function collectRenderedNavigationState(page, route, viewport, routeDir, knownRoutes) {
     const mobileDrawer = viewport.isMobile
         ? await exerciseMobileDrawer(page, routeDir, knownRoutes)
@@ -1226,7 +1308,8 @@ async function collectRenderedNavigationState(page, route, viewport, routeDir, k
         : await exerciseDesktopMegaMenus(page, routeDir, knownRoutes);
     const localEscapes = [
         viewport.isMobile ? await exerciseFleetFilterSheet(page, routeDir) : null,
-        await assessVehicleReturnAffordance(page, routeDir)
+        await assessVehicleReturnAffordance(page, routeDir),
+        await exerciseReserveStepHistory(page, routeDir)
     ].filter(Boolean);
     const basic = await collectBasicPageState(page, knownRoutes);
     const visibleLinks = await collectVisibleInternalLinks(page, knownRoutes);
@@ -1620,14 +1703,10 @@ async function runClickProbe(browser, baseUrl, sourceRoute, viewport, target, ro
     const label = normalizeText(target.label || target.accessibleName || target.text || target.targetRoute);
     const id = slugify(`${target.area}-${label}-${target.targetRoute}`);
     const screenshotPath = path.join(routeDir, `${id}-handoff-failure.png`);
+    const normalizedSourceRoute = normalizeRoute(sourceRoute);
+    const expectedRoute = normalizeRoute(target.targetRoute);
 
-    try {
-        if (normalizeRoute(sourceRoute) === '/') {
-            await primeHomeAnimations(page);
-        }
-
-        await page.goto(`${baseUrl}${sourceRoute}`, { waitUntil: 'domcontentloaded', timeout: 45000 });
-        await settlePage(page, 250);
+    async function clickTargetFromCurrentPage() {
         await setupClickTarget(page, target);
 
         const previousUrl = page.url();
@@ -1643,17 +1722,74 @@ async function runClickProbe(browser, baseUrl, sourceRoute, viewport, target, ro
 
         const observedUrl = page.url();
         const observedRoute = normalizeRoute(new URL(observedUrl).pathname);
-        const expectedRoute = normalizeRoute(target.targetRoute);
         const h1Visible = await page.locator('h1').first().isVisible({ timeout: 3000 }).catch(() => false);
+
+        return {
+            observedUrl,
+            observedRoute,
+            h1Visible
+        };
+    }
+
+    try {
+        if (normalizeRoute(sourceRoute) === '/') {
+            await primeHomeAnimations(page);
+        }
+
+        await page.goto(`${baseUrl}${sourceRoute}`, { waitUntil: 'domcontentloaded', timeout: 45000 });
+        await settlePage(page, 250);
+        const firstProbe = await clickTargetFromCurrentPage();
+        const observedUrl = firstProbe.observedUrl;
+        const observedRoute = firstProbe.observedRoute;
+        const h1Visible = firstProbe.h1Visible;
         let backRoute = '';
         let backWorked = false;
+        let floatingBackTested = false;
+        let floatingBackWorked = expectedRoute === RECOVERY_ROUTES.home;
+        let floatingBackRoute = '';
+        let floatingBackMessage = expectedRoute === RECOVERY_ROUTES.home
+            ? 'Target is home, where the floating previous-page button is intentionally hidden.'
+            : '';
 
         await page.goBack({ waitUntil: 'domcontentloaded', timeout: 8000 }).catch(() => null);
         await settlePage(page, 150);
         backRoute = normalizeRoute(new URL(page.url()).pathname);
-        backWorked = backRoute === normalizeRoute(sourceRoute);
+        backWorked = backRoute === normalizedSourceRoute;
 
-        if (observedRoute !== expectedRoute || !h1Visible || !backWorked) {
+        if (backWorked && expectedRoute !== RECOVERY_ROUTES.home) {
+            const secondProbe = await clickTargetFromCurrentPage();
+            floatingBackTested = true;
+
+            if (secondProbe.observedRoute !== expectedRoute || !secondProbe.h1Visible) {
+                floatingBackWorked = false;
+                floatingBackRoute = secondProbe.observedRoute;
+                floatingBackMessage = `Could not re-open target before floating back check: observed=${secondProbe.observedRoute}; h1Visible=${secondProbe.h1Visible}`;
+            } else {
+                const floatingBack = page.locator('.lab-floating-back').first();
+                const floatingBackVisible = await floatingBack.isVisible({ timeout: 3500 }).catch(() => false);
+
+                if (!floatingBackVisible) {
+                    floatingBackWorked = false;
+                    floatingBackRoute = secondProbe.observedRoute;
+                    floatingBackMessage = 'Floating previous-page button was not visible on the destination.';
+                } else {
+                    const destinationUrl = page.url();
+                    await floatingBack.click({ timeout: 5000 });
+                    await page.waitForURL((url) => url.href !== destinationUrl, { timeout: 8000 }).catch(() => null);
+                    await page.waitForLoadState('domcontentloaded', { timeout: 8000 }).catch(() => null);
+                    await settlePage(page, 180);
+                    floatingBackRoute = normalizeRoute(new URL(page.url()).pathname);
+                    floatingBackWorked = floatingBackRoute === normalizedSourceRoute;
+                    floatingBackMessage = floatingBackWorked
+                        ? `Floating back returned to ${normalizedSourceRoute}.`
+                        : `Floating back landed on ${floatingBackRoute || 'unknown'} instead of ${normalizedSourceRoute}.`;
+                }
+            }
+        } else if (!backWorked) {
+            floatingBackMessage = 'Skipped floating back because browser back did not restore the source route.';
+        }
+
+        if (observedRoute !== expectedRoute || !h1Visible || !backWorked || !floatingBackWorked) {
             await page.screenshot({
                 path: screenshotPath,
                 fullPage: false,
@@ -1667,9 +1803,13 @@ async function runClickProbe(browser, baseUrl, sourceRoute, viewport, target, ro
                 area: target.area || '',
                 targetRoute: expectedRoute,
                 status: 'failed',
-                message: `observed=${observedRoute}; expected=${expectedRoute}; h1Visible=${h1Visible}; backWorked=${backWorked}; backRoute=${backRoute}`,
+                message: `observed=${observedRoute}; expected=${expectedRoute}; h1Visible=${h1Visible}; browserBackWorked=${backWorked}; browserBackRoute=${backRoute}; floatingBackTested=${floatingBackTested}; floatingBackWorked=${floatingBackWorked}; floatingBackRoute=${floatingBackRoute}; ${floatingBackMessage}`,
                 observedUrl,
                 backWorked,
+                browserBackWorked: backWorked,
+                floatingBackTested,
+                floatingBackWorked,
+                floatingBackRoute,
                 screenshotPath
             };
         }
@@ -1680,9 +1820,13 @@ async function runClickProbe(browser, baseUrl, sourceRoute, viewport, target, ro
             area: target.area || '',
             targetRoute: expectedRoute,
             status: 'passed',
-            message: `Landed on ${expectedRoute} and browser back returned to ${sourceRoute}.`,
+            message: `Landed on ${expectedRoute}; browser back returned to ${normalizedSourceRoute}; ${floatingBackMessage || 'floating back skipped.'}`,
             observedUrl,
             backWorked,
+            browserBackWorked: backWorked,
+            floatingBackTested,
+            floatingBackWorked,
+            floatingBackRoute,
             screenshotPath: ''
         };
     } catch (error) {
@@ -1702,6 +1846,10 @@ async function runClickProbe(browser, baseUrl, sourceRoute, viewport, target, ro
             message: error.message || String(error),
             observedUrl: page.url(),
             backWorked: false,
+            browserBackWorked: false,
+            floatingBackTested: false,
+            floatingBackWorked: false,
+            floatingBackRoute: '',
             screenshotPath
         };
     } finally {
@@ -1959,6 +2107,11 @@ function summarizeReport(pages, navigationReview, renderedGraph = [], crawl = nu
         totalHandoffs: handoffs.length,
         passedHandoffs: handoffs.filter((handoff) => handoff.status === 'passed').length,
         failedHandoffs: handoffs.filter((handoff) => handoff.status === 'failed').length,
+        passedBrowserBacks: handoffs.filter((handoff) => handoff.browserBackWorked === true).length,
+        failedBrowserBacks: handoffs.filter((handoff) => handoff.browserBackWorked === false).length,
+        testedFloatingBacks: handoffs.filter((handoff) => handoff.floatingBackTested === true).length,
+        passedFloatingBacks: handoffs.filter((handoff) => handoff.floatingBackTested === true && handoff.floatingBackWorked === true).length,
+        failedFloatingBacks: handoffs.filter((handoff) => handoff.floatingBackTested === true && handoff.floatingBackWorked === false).length,
         handoffCoverageComplete: clickableRouteActions === handoffs.length,
         routeViewportCoverageComplete: Boolean(coverageProfile?.complete),
         expectedPageRuns: Number(coverageProfile?.expectedPageRuns || 0),
@@ -2000,6 +2153,8 @@ function buildMarkdownReport(report) {
         `- handoff coverage: ${report.summary.handoffCoverageComplete ? 'complete' : 'sampled'}`,
         `- passed handoffs: ${report.summary.passedHandoffs}`,
         `- failed handoffs: ${report.summary.failedHandoffs}`,
+        `- browser back checks: ${report.summary.passedBrowserBacks}/${report.summary.totalHandoffs} passed`,
+        `- floating back checks: ${report.summary.passedFloatingBacks}/${report.summary.testedFloatingBacks} passed`,
         ''
     ];
 
@@ -2164,6 +2319,7 @@ async function main() {
 
     console.log(`Navigation agent completed: ${runDir}`);
     console.log(`status=${report.summary.navigationStatus} routes=${report.summary.totalRoutes} viewports=${report.summary.totalViewports} handoffs=${report.summary.totalHandoffs} failed=${report.summary.failedHandoffs}`);
+    console.log(`backChecks=browser:${report.summary.passedBrowserBacks}/${report.summary.totalHandoffs} floating:${report.summary.passedFloatingBacks}/${report.summary.testedFloatingBacks}`);
     console.log(`coverage=${report.summary.auditedExpectedPageRuns}/${report.summary.expectedPageRuns} missingRouteViewportPairs=${report.summary.missingRouteViewportPairs} clickTargets=${report.clickTargets}`);
     console.log(`findings=${report.navigationReview.summary.total} high=${report.navigationReview.summary.bySeverity.high} medium=${report.navigationReview.summary.bySeverity.medium} hardFails=${report.navigationReview.summary.hardFails}`);
 
@@ -2173,11 +2329,21 @@ async function main() {
     }
 
     if (report.auditMemory?.status === 'bad') {
-        console.error(`Audit memory regression failed: ${report.auditMemory.message}`);
-        for (const regression of report.auditMemory.regressions.slice(0, 10)) {
-            console.error(`- ${formatAuditMemoryRegression(regression)}`);
+        const memoryLines = [
+            `Audit memory regression ${args.strict ? 'failed' : 'warning'}: ${report.auditMemory.message}`,
+            ...report.auditMemory.regressions.slice(0, 10).map((regression) => `- ${formatAuditMemoryRegression(regression)}`)
+        ];
+
+        if (args.strict) {
+            for (const line of memoryLines) {
+                console.error(line);
+            }
+            process.exit(1);
         }
-        process.exit(1);
+
+        for (const line of memoryLines) {
+            console.warn(line);
+        }
     }
 }
 

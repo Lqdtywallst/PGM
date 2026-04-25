@@ -76,7 +76,7 @@
     "pricePerDay": 2100,
     "href": "./porsche-rental-dubai.html",
     "image": {
-      "src": "https://www.chicagomotorcars.com/imagetag/11513/main/l/Used-2024-Porsche-911-GT3-RS-Weissach!-Full-Body-PPF!-Front-End-Lifter!-Sinister-Spec!-Loaded!-1707950268.jpg",
+      "src": "./images/fleet/porsche-992-gt3/01-exterior-front.jpg",
       "alt": "Porsche 992 GT3 in Dubai",
       "loading": "lazy"
     },
@@ -144,7 +144,7 @@
     "pricePerDay": 1650,
     "href": "./mercedes-g63-amg-rental-dubai.html",
     "image": {
-      "src": "https://toyzrentalme.com/wp-content/uploads/2025/03/URB00168.jpg",
+      "src": "./images/fleet/mercedes-g63-amg/01-exterior-front.jpg",
       "alt": "Mercedes G63 AMG in Dubai",
       "loading": "lazy"
     },

@@ -151,7 +151,7 @@
 .locations-process__item h3,
 .locations-faq__cta h3 {
     margin: 0;
-    font-family: "Cormorant Garamond", serif;
+    font-family: var(--lab-font-display);
     font-weight: 700;
     letter-spacing: 0;
     color: #171615;

@@ -1,6 +1,9 @@
 ﻿        // Region (Dubai-only site, AED currency)
         const urlParams = new URLSearchParams(window.location.search);
         const BOOKING_INTENT_KEY = 'dynastyBookingIntent';
+        const RESERVE_HISTORY_STEP_KEY = 'dynastyReserveStep';
+        const TOTAL_RESERVE_STEPS = 3;
+        const GUEST_DETAIL_FIELD_IDS = ['fullName', 'passport', 'phone', 'email', 'address', 'city', 'country'];
         const RESERVE_REGION = 'AE';
         const isAED = true;
         const CURRENCY_SYMBOL = 'AED';
@@ -9,6 +12,40 @@
         const SUPPORT_WHATSAPP_URL = `https://wa.me/971586122568?text=${encodeURIComponent(SUPPORT_WHATSAPP_MESSAGE)}`;
         function normalizeValue(value) {
             return String(value || '').trim();
+        }
+        function getNavigationType() {
+            return window.performance?.getEntriesByType?.('navigation')?.[0]?.type || '';
+        }
+        function isReloadNavigation() {
+            return getNavigationType() === 'reload';
+        }
+        function getValidReserveStep(value) {
+            const parsed = Number(value);
+            return Number.isInteger(parsed) && parsed >= 1 && parsed <= TOTAL_RESERVE_STEPS ? parsed : null;
+        }
+        function getReserveHistoryStep(state = window.history?.state) {
+            return getValidReserveStep(state?.[RESERVE_HISTORY_STEP_KEY]);
+        }
+        function writeReserveHistoryStep(step, mode = 'replace') {
+            const normalizedStep = getValidReserveStep(step);
+            if (!normalizedStep || !window.history?.replaceState) {
+                return;
+            }
+
+            const currentState = window.history.state && typeof window.history.state === 'object'
+                ? { ...window.history.state }
+                : {};
+            const nextState = {
+                ...currentState,
+                [RESERVE_HISTORY_STEP_KEY]: normalizedStep
+            };
+
+            if (mode === 'push' && typeof window.history.pushState === 'function') {
+                window.history.pushState(nextState, document.title, window.location.href);
+                return;
+            }
+
+            window.history.replaceState(nextState, document.title, window.location.href);
         }
         function emitAnalyticsEvent(eventName, payload) {
             const safePayload = { ...payload };
@@ -219,15 +256,6 @@
                     endDate: normalizeValue(intent?.endDate),
                     pickupTime: normalizeValue(intent?.pickupTime),
                     dropoffTime: normalizeValue(intent?.dropoffTime),
-                    pickupLocation: normalizeValue(intent?.pickupLocation),
-                    step: Number(intent?.step) || 1,
-                    fullName: normalizeValue(intent?.fullName),
-                    passport: normalizeValue(intent?.passport),
-                    phone: normalizeValue(intent?.phone),
-                    email: normalizeValue(intent?.email),
-                    address: normalizeValue(intent?.address),
-                    city: normalizeValue(intent?.city),
-                    country: normalizeValue(intent?.country),
                     savedAt: Date.now()
                 }));
             } catch (error) {
@@ -243,38 +271,69 @@
                 endDate: document.getElementById('endDate')?.value,
                 pickupTime: document.getElementById('pickupTime')?.value,
                 dropoffTime: document.getElementById('dropoffTime')?.value,
-                pickupLocation: document.getElementById('pickupLocation')?.value,
-                step: currentStep,
-                fullName: document.getElementById('fullName')?.value,
-                passport: document.getElementById('passport')?.value,
-                phone: document.getElementById('phone')?.value,
-                email: document.getElementById('email')?.value,
-                address: document.getElementById('address')?.value,
-                city: document.getElementById('city')?.value,
-                country: document.getElementById('country')?.value
+                step: currentStep
             });
         }
 
-        function applyReloadBookingProgress(storedIntent) {
-            const navigationEntry = window.performance?.getEntriesByType?.('navigation')?.[0];
-            const isReloadNavigation = navigationEntry?.type === 'reload';
+        function clearGuestDetailFields() {
+            GUEST_DETAIL_FIELD_IDS.forEach((fieldId) => {
+                const input = document.getElementById(fieldId);
+                if (input) {
+                    input.value = fieldId === 'country' ? 'AE' : '';
+                }
+            });
+        }
 
-            if (!storedIntent || !isReloadNavigation) {
+        function clearStoredBookingIntent() {
+            try {
+                window.sessionStorage.removeItem(BOOKING_INTENT_KEY);
+            } catch (error) {
+                // Ignore storage failures.
+            }
+        }
+
+        function applyNavigationBookingProgress() {
+            if (isReloadNavigation()) {
+                clearStoredBookingIntent();
+                clearGuestDetailFields();
+                currentStep = 1;
                 return;
             }
 
-            ['fullName', 'passport', 'phone', 'email', 'address', 'city', 'country'].forEach((fieldId) => {
-                const input = document.getElementById(fieldId);
-                const storedValue = normalizeValue(storedIntent?.[fieldId]);
+            const historyStep = getReserveHistoryStep();
+            if (historyStep) {
+                currentStep = historyStep;
+            }
+        }
 
-                if (input && storedValue) {
-                    input.value = storedValue;
-                }
-            });
+        function clearReservationDraft(options = {}) {
+            clearGuestDetailFields();
+            paymentIntentClientSecret = null;
 
-            const storedStep = Number(storedIntent?.step);
-            if (storedStep >= 1 && storedStep <= 3) {
-                currentStep = storedStep;
+            GUEST_DETAIL_FIELD_IDS.forEach(clearFieldError);
+            showStepValidation('step2', '');
+
+            if (options.resetStep) {
+                setReserveStep(1, {
+                    historyMode: 'replace',
+                    scroll: options.scroll !== false
+                });
+            }
+
+            if (options.clearStoredIntent) {
+                clearStoredBookingIntent();
+            } else {
+                persistBookingIntent();
+            }
+
+            updateMobileReserveUi();
+
+            if (options.emit !== false) {
+                emitAnalyticsEvent('reserve_clear_details', {
+                    car: selectedCar,
+                    step: currentStep,
+                    page_path: normalizeValue(window.location.pathname)
+                });
             }
         }
 
@@ -319,19 +378,15 @@
 
         function applyPrefilledBookingSchedule() {
             const storedIntent = getStoredBookingIntent();
-            const navigationEntry = window.performance?.getEntriesByType?.('navigation')?.[0];
-            const isReloadNavigation = navigationEntry?.type === 'reload';
             const preferCurrentSessionValue = (paramValue, storedValue) => (
-                isReloadNavigation
-                    ? (storedValue || paramValue || '')
-                    : (paramValue || storedValue || '')
+                paramValue || storedValue || ''
             );
             const rawPrefills = {
                 startDate: preferCurrentSessionValue(startDateParam, storedIntent?.startDate),
                 endDate: preferCurrentSessionValue(endDateParam, storedIntent?.endDate),
                 pickupTime: preferCurrentSessionValue(pickupTimeParam, storedIntent?.pickupTime),
                 dropoffTime: preferCurrentSessionValue(dropoffTimeParam, storedIntent?.dropoffTime),
-                pickupLocation: preferCurrentSessionValue(pickupLocationParam, storedIntent?.pickupLocation)
+                pickupLocation: pickupLocationParam || ''
             };
             const today = getDubaiDateString(0);
             const startDate = clampBookingDateValue(rawPrefills.startDate, today, today);
@@ -454,8 +509,9 @@
 
         initializeTimeSelect('pickupTime', '10:00');
         initializeTimeSelect('dropoffTime', '10:00');
-        applyReloadBookingProgress(getStoredBookingIntent());
+        applyNavigationBookingProgress();
         applyPrefilledBookingSchedule();
+        installReserveHistoryControls();
         persistBookingIntent();
         updateStepDisplay();
         calculateTotal();
@@ -710,6 +766,65 @@
             window.scrollTo({ top: targetTop, behavior: 'auto' });
         }
 
+        let reserveBackFallbackTimer = null;
+
+        function clearReserveBackFallbackTimer() {
+            if (reserveBackFallbackTimer !== null) {
+                window.clearTimeout(reserveBackFallbackTimer);
+                reserveBackFallbackTimer = null;
+            }
+        }
+
+        function setReserveStep(step, options = {}) {
+            const nextStepNumber = getValidReserveStep(step);
+            if (!nextStepNumber) {
+                return false;
+            }
+
+            currentStep = nextStepNumber;
+
+            if (options.historyMode) {
+                writeReserveHistoryStep(currentStep, options.historyMode);
+            }
+
+            updateStepDisplay();
+
+            if (options.scroll !== false) {
+                scrollCurrentStepIntoView();
+            }
+
+            return true;
+        }
+
+        function installReserveHistoryControls() {
+            writeReserveHistoryStep(currentStep, 'replace');
+
+            window.addEventListener('popstate', (event) => {
+                const historyStep = getReserveHistoryStep(event.state);
+                if (!historyStep) {
+                    return;
+                }
+
+                clearReserveBackFallbackTimer();
+                setReserveStep(historyStep, {
+                    historyMode: null,
+                    scroll: true
+                });
+            });
+
+            document.addEventListener('click', (event) => {
+                const floatingBack = event.target?.closest?.('.lab-floating-back');
+                if (!floatingBack || currentStep <= 1) {
+                    return;
+                }
+
+                event.preventDefault();
+                event.stopPropagation();
+                event.stopImmediatePropagation();
+                prevStep();
+            }, true);
+        }
+
         function nextStep() {
             if (currentStep === 1) {
                 if (!validateStep2()) {
@@ -731,23 +846,43 @@
 
             if (currentStep < 3) {
                 const previousStep = currentStep;
-                currentStep++;
+                const nextStepNumber = currentStep + 1;
                 emitAnalyticsEvent('reserve_step_advance', {
                     car: selectedCar,
                     from_step: previousStep,
-                    to_step: currentStep,
+                    to_step: nextStepNumber,
                     page_path: normalizeValue(window.location.pathname)
                 });
-                updateStepDisplay();
-                scrollCurrentStepIntoView();
+                setReserveStep(nextStepNumber, {
+                    historyMode: 'push',
+                    scroll: true
+                });
             }
         }
 
         function prevStep() {
             if (currentStep > 1) {
-                currentStep--;
-                updateStepDisplay();
-                scrollCurrentStepIntoView();
+                const targetStep = currentStep - 1;
+                persistBookingIntent();
+
+                if (getReserveHistoryStep() === currentStep && window.history.length > 1) {
+                    clearReserveBackFallbackTimer();
+                    reserveBackFallbackTimer = window.setTimeout(() => {
+                        if (currentStep !== targetStep) {
+                            setReserveStep(targetStep, {
+                                historyMode: 'replace',
+                                scroll: true
+                            });
+                        }
+                    }, 180);
+                    window.history.back();
+                    return;
+                }
+
+                setReserveStep(targetStep, {
+                    historyMode: 'replace',
+                    scroll: true
+                });
             }
         }
 
@@ -785,6 +920,7 @@
             }
 
             updateMobileReserveUi();
+            persistBookingIntent();
         }
         
         // Calendar functions
@@ -1509,6 +1645,12 @@
 
                     // Show success message and redirect
                     console.log('[PAYMENT] Process completed successfully');
+                    clearReservationDraft({
+                        clearStoredIntent: true,
+                        emit: false,
+                        resetStep: true,
+                        scroll: false
+                    });
                     setTimeout(() => {
                         alert(`Payment received.\n\nVehicle: ${selectedCar}\nDuration: ${pricing.durationLabel}\nTotal reservation: ${formatAmount(total)}\nPaid now: ${formatAmount(upfrontAmount)}\nRemaining balance: ${formatAmount(remainingAmount)}\n\nYou will receive a confirmation email and the team will coordinate the handover details.`);
                         window.location.href = '/index.html';

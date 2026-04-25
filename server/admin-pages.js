@@ -1,0 +1,874 @@
+function renderAdminLoginPage() {
+    return `<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    <title>Dynasty Prestige Admin Login</title>
+    <style>
+        :root {
+            --ink: #f7f0df;
+            --muted: #b8ad9b;
+            --line: rgba(255, 255, 255, 0.14);
+            --panel: rgba(12, 12, 13, 0.88);
+            --gold: #e4bd60;
+            --gold-soft: #f6df9a;
+            --danger: #ff8a8a;
+            --bg: #090807;
+        }
+        * { box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: grid;
+            place-items: center;
+            padding: 28px;
+            color: var(--ink);
+            font-family: "Georgia", "Times New Roman", serif;
+            background:
+                radial-gradient(circle at top left, rgba(228, 189, 96, 0.24), transparent 32rem),
+                linear-gradient(135deg, #050505 0%, #15100b 58%, #070707 100%);
+        }
+        .login-card {
+            width: min(100%, 460px);
+            padding: 34px;
+            border: 1px solid var(--line);
+            border-radius: 26px;
+            background: var(--panel);
+            box-shadow: 0 28px 90px rgba(0, 0, 0, 0.46);
+        }
+        .brand {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+        .brand-mark {
+            width: 50px;
+            height: 50px;
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(228, 189, 96, 0.55);
+            border-radius: 14px;
+            color: var(--gold-soft);
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+        .brand strong {
+            display: block;
+            font-family: Arial, sans-serif;
+            font-size: 0.9rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+        .brand span {
+            display: block;
+            margin-top: 3px;
+            color: var(--muted);
+            font-family: Arial, sans-serif;
+            font-size: 0.72rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+        h1 {
+            margin: 0 0 10px;
+            font-size: clamp(2rem, 7vw, 3.2rem);
+            line-height: 0.95;
+        }
+        p {
+            margin: 0 0 24px;
+            color: var(--muted);
+            font-family: Arial, sans-serif;
+            line-height: 1.55;
+        }
+        label {
+            display: block;
+            margin: 18px 0 8px;
+            color: var(--gold-soft);
+            font-family: Arial, sans-serif;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+        input {
+            width: 100%;
+            min-height: 50px;
+            padding: 0 16px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--ink);
+            font: 600 1rem Arial, sans-serif;
+            outline: none;
+        }
+        input:focus {
+            border-color: rgba(228, 189, 96, 0.85);
+            box-shadow: 0 0 0 4px rgba(228, 189, 96, 0.12);
+        }
+        button {
+            width: 100%;
+            min-height: 54px;
+            margin-top: 24px;
+            border: 0;
+            border-radius: 15px;
+            background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+            color: #090807;
+            cursor: pointer;
+            font: 900 0.82rem Arial, sans-serif;
+            letter-spacing: 0.11em;
+            text-transform: uppercase;
+        }
+        .message {
+            min-height: 20px;
+            margin-top: 16px;
+            color: var(--danger);
+            font: 700 0.88rem Arial, sans-serif;
+        }
+        .setup-note {
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid var(--line);
+            color: var(--muted);
+            font: 0.82rem/1.55 Arial, sans-serif;
+        }
+        code {
+            color: var(--gold-soft);
+            font-family: Consolas, monospace;
+        }
+    </style>
+</head>
+<body>
+    <main class="login-card" aria-labelledby="admin-title">
+        <div class="brand">
+            <div class="brand-mark">DP</div>
+            <div>
+                <strong>Dynasty Prestige</strong>
+                <span>Private Admin</span>
+            </div>
+        </div>
+        <h1 id="admin-title">Reservations desk.</h1>
+        <p>Private access for managing client reservations, payment state and handover follow-up.</p>
+        <form id="loginForm" autocomplete="off">
+            <label for="username">Admin user</label>
+            <input id="username" name="username" autocomplete="username" required>
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" autocomplete="current-password" required>
+            <button type="submit">Open admin desk</button>
+            <div class="message" id="message" role="status" aria-live="polite"></div>
+        </form>
+        <div class="setup-note">
+            Setup uses <code>ADMIN_USER</code>, <code>ADMIN_PASSWORD_HASH</code> and <code>ADMIN_SESSION_SECRET</code>. No admin API opens without them.
+        </div>
+    </main>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            var message = document.getElementById('message');
+            message.textContent = 'Checking access...';
+
+            try {
+                var response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('username').value,
+                        password: document.getElementById('password').value
+                    })
+                });
+                var data = await response.json().catch(function () { return {}; });
+                if (!response.ok) {
+                    message.textContent = data.error || 'Access denied.';
+                    return;
+                }
+
+                window.location.href = '/admin/reservations.html';
+            } catch (error) {
+                message.textContent = 'The admin desk is not reachable right now.';
+            }
+        });
+    </script>
+</body>
+</html>`;
+}
+
+function renderAdminReservationsPage() {
+    return `<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    <title>Dynasty Prestige Reservations Desk</title>
+    <style>
+        :root {
+            --bg: #f5efe4;
+            --ink: #17120d;
+            --muted: #756b61;
+            --panel: rgba(255, 255, 255, 0.88);
+            --line: rgba(23, 18, 13, 0.12);
+            --black: #0d0d0f;
+            --gold: #dcb458;
+            --gold-soft: #f7df95;
+            --green: #1f8f54;
+            --red: #b64035;
+            --amber: #b47825;
+            --shadow: 0 22px 70px rgba(52, 38, 21, 0.14);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            font-family: Arial, sans-serif;
+            background:
+                radial-gradient(circle at 18% 0%, rgba(220, 180, 88, 0.24), transparent 34rem),
+                linear-gradient(135deg, #fbf7ef 0%, var(--bg) 52%, #e7d8c4 100%);
+        }
+        a { color: inherit; }
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            padding: 16px clamp(16px, 4vw, 36px);
+            border-bottom: 1px solid var(--line);
+            background: rgba(13, 13, 15, 0.92);
+            color: #fff8e7;
+            backdrop-filter: blur(16px);
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .brand-mark {
+            width: 46px;
+            height: 46px;
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(247, 223, 149, 0.58);
+            border-radius: 13px;
+            color: var(--gold-soft);
+            font: 800 0.86rem Georgia, serif;
+        }
+        .brand strong {
+            display: block;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-size: 0.88rem;
+        }
+        .brand span {
+            display: block;
+            margin-top: 3px;
+            color: rgba(255, 248, 231, 0.66);
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            font-size: 0.68rem;
+        }
+        .logout {
+            min-height: 42px;
+            padding: 0 18px;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 13px;
+            background: transparent;
+            color: #fff8e7;
+            cursor: pointer;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.7fr);
+            gap: 22px;
+            width: min(1480px, 100%);
+            margin: 0 auto;
+            padding: clamp(18px, 4vw, 36px);
+        }
+        .hero {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            gap: 24px;
+            align-items: end;
+            padding: 28px;
+            border: 1px solid var(--line);
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.62);
+            box-shadow: var(--shadow);
+        }
+        h1 {
+            margin: 0;
+            max-width: 760px;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(2.3rem, 6vw, 5rem);
+            line-height: 0.92;
+            letter-spacing: -0.05em;
+        }
+        .hero p {
+            max-width: 470px;
+            margin: 14px 0 0;
+            color: var(--muted);
+            line-height: 1.55;
+        }
+        .toolbar,
+        .list-panel,
+        .detail-panel {
+            border: 1px solid var(--line);
+            border-radius: 26px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+        }
+        .toolbar {
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+        .search-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        input,
+        textarea {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 15px;
+            background: #fff;
+            color: var(--ink);
+            font: 600 0.98rem Arial, sans-serif;
+            outline: none;
+        }
+        input {
+            min-height: 48px;
+            padding: 0 15px;
+        }
+        textarea {
+            min-height: 112px;
+            padding: 14px;
+            resize: vertical;
+        }
+        input:focus,
+        textarea:focus {
+            border-color: rgba(220, 180, 88, 0.78);
+            box-shadow: 0 0 0 4px rgba(220, 180, 88, 0.16);
+        }
+        .button,
+        .filter,
+        .action {
+            min-height: 44px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 0 15px;
+            background: #fff;
+            color: var(--ink);
+            font: 900 0.75rem Arial, sans-serif;
+            letter-spacing: 0.08em;
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+        .button.primary,
+        .action.primary {
+            border-color: rgba(220, 180, 88, 0.75);
+            background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+        }
+        .action.danger {
+            border-color: rgba(182, 64, 53, 0.26);
+            color: var(--red);
+        }
+        .action[aria-disabled="true"] {
+            opacity: 0.45;
+            pointer-events: none;
+        }
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+        }
+        .filter.is-active {
+            background: var(--black);
+            color: #fff8e7;
+        }
+        .list-panel {
+            overflow: hidden;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 18px 18px 0;
+            color: var(--muted);
+            font-size: 0.88rem;
+        }
+        .cards {
+            display: grid;
+            gap: 12px;
+            padding: 18px;
+        }
+        .reservation-card {
+            width: 100%;
+            text-align: left;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            padding: 16px;
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            background: #fffaf2;
+            color: var(--ink);
+            cursor: pointer;
+        }
+        .reservation-card.is-active {
+            border-color: rgba(220, 180, 88, 0.95);
+            box-shadow: 0 0 0 4px rgba(220, 180, 88, 0.15);
+        }
+        .reservation-title {
+            margin: 0 0 7px;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 1.32rem;
+            line-height: 1.05;
+        }
+        .reservation-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 14px;
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.45;
+        }
+        .status {
+            align-self: start;
+            padding: 8px 10px;
+            border-radius: 999px;
+            background: rgba(117, 107, 97, 0.12);
+            color: var(--muted);
+            font: 900 0.66rem Arial, sans-serif;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .status.confirmed { background: rgba(31, 143, 84, 0.13); color: var(--green); }
+        .status.pending { background: rgba(180, 120, 37, 0.14); color: var(--amber); }
+        .status.failed { background: rgba(182, 64, 53, 0.12); color: var(--red); }
+        .detail-panel {
+            position: sticky;
+            top: 92px;
+            align-self: start;
+            max-height: calc(100vh - 116px);
+            overflow: auto;
+            padding: 22px;
+        }
+        .detail-empty {
+            padding: 60px 12px;
+            text-align: center;
+            color: var(--muted);
+        }
+        .detail-title {
+            margin: 0;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 2.25rem;
+            line-height: 0.98;
+            letter-spacing: -0.04em;
+        }
+        .detail-subtitle {
+            margin: 10px 0 18px;
+            color: var(--muted);
+            line-height: 1.45;
+        }
+        .detail-actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin: 18px 0;
+        }
+        .section {
+            padding: 18px 0;
+            border-top: 1px solid var(--line);
+        }
+        .section h2 {
+            margin: 0 0 12px;
+            font-size: 0.78rem;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+        }
+        .field-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+        .field {
+            min-width: 0;
+            padding: 12px;
+            border: 1px solid var(--line);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.7);
+        }
+        .field span {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--muted);
+            font-size: 0.68rem;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .field strong {
+            display: block;
+            overflow-wrap: anywhere;
+            font-size: 0.96rem;
+        }
+        .empty {
+            padding: 28px;
+            color: var(--muted);
+            text-align: center;
+        }
+        @media (max-width: 980px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+            .hero {
+                display: block;
+            }
+            .detail-panel {
+                position: static;
+                max-height: none;
+            }
+        }
+        @media (max-width: 620px) {
+            .topbar {
+                align-items: flex-start;
+            }
+            .brand span {
+                display: none;
+            }
+            .layout {
+                padding: 14px;
+            }
+            .hero,
+            .toolbar,
+            .detail-panel {
+                border-radius: 20px;
+                padding: 18px;
+            }
+            .search-row,
+            .reservation-card,
+            .detail-actions,
+            .field-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-mark">DP</div>
+            <div>
+                <strong>Dynasty Prestige</strong>
+                <span>Private reservations desk</span>
+            </div>
+        </div>
+        <button class="logout" id="logoutButton" type="button">Logout</button>
+    </header>
+    <main class="layout">
+        <section class="hero" aria-labelledby="pageTitle">
+            <div>
+                <h1 id="pageTitle">Reservations, clients and handovers.</h1>
+                <p>Track every booking from checkout to confirmed handover, with quick contact actions and private admin notes.</p>
+            </div>
+            <button class="button primary" id="exportCsvButton" type="button">Export CSV</button>
+        </section>
+
+        <section>
+            <div class="toolbar">
+                <div class="search-row">
+                    <input id="searchInput" type="search" placeholder="Search by client, email, phone, vehicle or reservation ID">
+                    <button class="button primary" id="refreshButton" type="button">Refresh</button>
+                </div>
+                <div class="filters" id="filters">
+                    <button class="filter is-active" type="button" data-filter="">All</button>
+                    <button class="filter" type="button" data-filter="pending_payment">Pending payment</button>
+                    <button class="filter" type="button" data-filter="confirmed">Confirmed</button>
+                    <button class="filter" type="button" data-filter="today">Today</button>
+                    <button class="filter" type="button" data-filter="next_7_days">Next 7 days</button>
+                    <button class="filter" type="button" data-filter="needs_contact">Needs contact</button>
+                    <button class="filter" type="button" data-filter="failed_payment">Failed payment</button>
+                </div>
+            </div>
+            <div class="list-panel">
+                <div class="stats">
+                    <span id="resultCount">Loading reservations...</span>
+                    <span id="storageMode"></span>
+                </div>
+                <div class="cards" id="reservationList"></div>
+            </div>
+        </section>
+
+        <aside class="detail-panel" id="reservationDetail" aria-live="polite">
+            <div class="detail-empty">Select a reservation to see client details, payment state and admin actions.</div>
+        </aside>
+    </main>
+
+    <script>
+        var state = { quick: '', q: '', selectedId: '' };
+        var searchTimer = null;
+
+        function escapeHtml(value) {
+            return String(value == null ? '' : value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function display(value, fallback) {
+            var clean = value == null ? '' : String(value).trim();
+            return clean || (fallback || 'Not set');
+        }
+
+        function formatDate(value) {
+            if (!value) return 'Not set';
+            var date = new Date(value);
+            if (Number.isNaN(date.getTime())) return value;
+            return new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).format(date);
+        }
+
+        function statusClass(item) {
+            if (item.flags && item.flags.failedPayment) return 'failed';
+            if (item.flags && item.flags.pendingPayment) return 'pending';
+            if (item.flags && item.flags.confirmed) return 'confirmed';
+            return '';
+        }
+
+        async function api(path, options) {
+            var response = await fetch(path, Object.assign({ credentials: 'same-origin' }, options || {}));
+            if (response.status === 401) {
+                window.location.href = '/admin/login.html';
+                return Promise.reject(new Error('Admin session required'));
+            }
+            return response;
+        }
+
+        function currentQueryString() {
+            var params = new URLSearchParams();
+            if (state.quick) params.set('quick', state.quick);
+            if (state.q) params.set('q', state.q);
+            params.set('limit', '500');
+            return params.toString();
+        }
+
+        function renderCard(item) {
+            var activeClass = item.id === state.selectedId ? ' is-active' : '';
+            var dateText = display(item.schedule.startDate) + ' to ' + display(item.schedule.endDate);
+            var contactFlag = item.flags.needsContact ? 'Needs contact' : (item.admin.contacted ? 'Contacted' : 'No contact mark');
+            return '<button class="reservation-card' + activeClass + '" type="button" data-reservation-id="' + escapeHtml(item.id) + '">' +
+                '<div>' +
+                    '<h2 class="reservation-title">' + escapeHtml(display(item.vehicle.name, 'Vehicle not set')) + '</h2>' +
+                    '<div class="reservation-meta">' +
+                        '<span>' + escapeHtml(display(item.customer.name, 'Guest not set')) + '</span>' +
+                        '<span>' + escapeHtml(dateText) + '</span>' +
+                        '<span>' + escapeHtml(display(item.payment.total, 'Total not set')) + '</span>' +
+                        '<span>' + escapeHtml(contactFlag) + '</span>' +
+                    '</div>' +
+                '</div>' +
+                '<span class="status ' + statusClass(item) + '">' + escapeHtml(item.statusLabel) + '</span>' +
+            '</button>';
+        }
+
+        function bindReservationCards() {
+            document.querySelectorAll('[data-reservation-id]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    openReservation(button.getAttribute('data-reservation-id'));
+                });
+            });
+        }
+
+        function renderList(data) {
+            var list = document.getElementById('reservationList');
+            document.getElementById('resultCount').textContent = data.total + ' reservation' + (data.total === 1 ? '' : 's') + ' found';
+            document.getElementById('storageMode').textContent = data.storage ? 'Storage: ' + data.storage : '';
+
+            if (!data.items.length) {
+                list.innerHTML = '<div class="empty">No reservations match this view yet.</div>';
+                return;
+            }
+
+            list.innerHTML = data.items.map(renderCard).join('');
+            bindReservationCards();
+        }
+
+        async function loadReservations() {
+            var list = document.getElementById('reservationList');
+            list.innerHTML = '<div class="empty">Loading reservations...</div>';
+            try {
+                var response = await api('/api/admin/reservations?' + currentQueryString());
+                var data = await response.json();
+                renderList(data);
+            } catch (error) {
+                list.innerHTML = '<div class="empty">Reservations could not be loaded.</div>';
+            }
+        }
+
+        function field(label, value) {
+            return '<div class="field"><span>' + escapeHtml(label) + '</span><strong>' + escapeHtml(display(value)) + '</strong></div>';
+        }
+
+        function externalAction(label, href, primary) {
+            if (!href) {
+                return '<a class="action" aria-disabled="true">' + escapeHtml(label) + '</a>';
+            }
+            return '<a class="action' + (primary ? ' primary' : '') + '" href="' + escapeHtml(href) + '" target="_blank" rel="noopener">' + escapeHtml(label) + '</a>';
+        }
+
+        function renderDetail(payload) {
+            var r = payload.reservation;
+            var detail = document.getElementById('reservationDetail');
+            detail.innerHTML =
+                '<h2 class="detail-title">' + escapeHtml(display(r.vehicle.name, 'Reservation detail')) + '</h2>' +
+                '<p class="detail-subtitle">' + escapeHtml(display(r.customer.name, 'Guest not set')) + ' · ' + escapeHtml(display(r.reservationId)) + '</p>' +
+                '<span class="status ' + statusClass(r) + '">' + escapeHtml(r.statusLabel) + '</span>' +
+                '<div class="detail-actions">' +
+                    externalAction('WhatsApp client', r.customer.whatsappHref, true) +
+                    externalAction('Call', r.customer.callHref, false) +
+                    externalAction('Email', r.customer.emailHref, false) +
+                    '<button class="action" type="button" data-action="mark_contacted">Mark contacted</button>' +
+                '</div>' +
+                '<div class="section"><h2>Client</h2><div class="field-grid">' +
+                    field('Name', r.customer.name) +
+                    field('Email', r.customer.email) +
+                    field('Phone', r.customer.phone) +
+                    field('ID / Passport', r.customer.idDocument) +
+                '</div></div>' +
+                '<div class="section"><h2>Reservation</h2><div class="field-grid">' +
+                    field('Vehicle', r.vehicle.name) +
+                    field('Date range', display(r.schedule.startDate) + ' to ' + display(r.schedule.endDate)) +
+                    field('Pickup time', r.schedule.pickupTime) +
+                    field('Dropoff time', r.schedule.dropoffTime) +
+                    field('Pickup', r.schedule.pickupLocation) +
+                    field('Dropoff', r.schedule.dropoffLocation) +
+                '</div></div>' +
+                '<div class="section"><h2>Payment</h2><div class="field-grid">' +
+                    field('Total', r.payment.total) +
+                    field('Upfront', r.payment.upfront) +
+                    field('Remaining', r.payment.remaining) +
+                    field('Stripe status', r.payment.stripeStatus) +
+                    field('Payment issue', r.payment.error) +
+                    field('Email status', r.email.status || r.email.sentAt) +
+                '</div></div>' +
+                '<div class="section"><h2>Admin notes</h2>' +
+                    '<textarea id="adminNotes" placeholder="Internal notes for the team">' + escapeHtml(r.admin.notes || '') + '</textarea>' +
+                    '<div class="detail-actions">' +
+                        '<button class="action primary" type="button" data-action="update_notes">Save notes</button>' +
+                        '<button class="action" type="button" data-action="confirm_handover">Confirm handover</button>' +
+                        '<button class="action danger" type="button" data-action="cancel">Cancel</button>' +
+                    '</div>' +
+                    '<div class="field-grid">' +
+                        field('Contacted at', r.admin.contactedAt ? formatDate(r.admin.contactedAt) : '') +
+                        field('Handover confirmed', r.admin.handoverConfirmedAt ? formatDate(r.admin.handoverConfirmedAt) : '') +
+                    '</div>' +
+                '</div>' +
+                '<div class="section"><h2>Technical</h2><div class="field-grid">' +
+                    field('Payment intent', r.technical.paymentIntentId) +
+                    field('Source', r.technical.source) +
+                    field('Storage', r.technical.storage) +
+                    field('Updated', r.updatedAt ? formatDate(r.updatedAt) : '') +
+                '</div></div>';
+
+            detail.querySelectorAll('[data-action]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    runAction(button.getAttribute('data-action'));
+                });
+            });
+        }
+
+        async function openReservation(id) {
+            state.selectedId = id;
+            document.querySelectorAll('[data-reservation-id]').forEach(function (button) {
+                button.classList.toggle('is-active', button.getAttribute('data-reservation-id') === id);
+            });
+            document.getElementById('reservationDetail').innerHTML = '<div class="detail-empty">Loading reservation...</div>';
+            await loadReservations();
+
+            try {
+                var response = await api('/api/admin/reservations/' + encodeURIComponent(id));
+                if (!response.ok) throw new Error('Reservation not found');
+                var data = await response.json();
+                renderDetail(data);
+            } catch (error) {
+                document.getElementById('reservationDetail').innerHTML = '<div class="detail-empty">Reservation detail could not be loaded.</div>';
+            }
+        }
+
+        async function runAction(action) {
+            if (!state.selectedId) return;
+            if (action === 'cancel' && !window.confirm('Cancel this reservation in the admin desk?')) {
+                return;
+            }
+
+            var notesInput = document.getElementById('adminNotes');
+            var payload = {
+                action: action,
+                notes: notesInput ? notesInput.value : ''
+            };
+
+            try {
+                var response = await api('/api/admin/reservations/' + encodeURIComponent(state.selectedId), {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error('Action failed');
+                var data = await response.json();
+                renderDetail(data);
+                await loadReservations();
+            } catch (error) {
+                window.alert('This reservation could not be updated.');
+            }
+        }
+
+        document.getElementById('refreshButton').addEventListener('click', loadReservations);
+        document.getElementById('exportCsvButton').addEventListener('click', function () {
+            window.location.href = '/api/admin/reservations.csv?' + currentQueryString();
+        });
+        document.getElementById('logoutButton').addEventListener('click', async function () {
+            await api('/api/admin/logout', { method: 'POST' }).catch(function () {});
+            window.location.href = '/admin/login.html';
+        });
+        document.getElementById('searchInput').addEventListener('input', function (event) {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(function () {
+                state.q = event.target.value.trim();
+                loadReservations();
+            }, 220);
+        });
+        document.querySelectorAll('[data-filter]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                document.querySelectorAll('[data-filter]').forEach(function (item) { item.classList.remove('is-active'); });
+                button.classList.add('is-active');
+                state.quick = button.getAttribute('data-filter') || '';
+                loadReservations();
+            });
+        });
+
+        loadReservations();
+    </script>
+</body>
+</html>`;
+}
+
+module.exports = {
+    renderAdminLoginPage,
+    renderAdminReservationsPage
+};

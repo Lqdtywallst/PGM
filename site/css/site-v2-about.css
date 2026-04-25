@@ -100,7 +100,7 @@
 .about-section-head h2,
 .about-cta__copy h2 {
     margin: 0;
-    font-family: "Cormorant Garamond", serif;
+    font-family: var(--lab-font-display);
     font-weight: 600;
     letter-spacing: 0;
 }

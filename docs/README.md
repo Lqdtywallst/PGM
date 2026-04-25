@@ -49,6 +49,8 @@ This repository keeps only active working documentation under `docs/` so the pro
   - working decisions, open questions, and phased roadmap for the premium vehicle detail page rollout
 - [vehicle-page-template.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/vehicle-page-template.md)
   - structural rules for the premium vehicle page system, including common base, family variants, layout order, and SEO requirements
+- [pricing-agent.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/pricing-agent.md)
+  - safe pricing agent workflow: demand inputs, competitor snapshots, policy guardrails, apply mode, and automation path
 
 ## Cleanup Rules
 

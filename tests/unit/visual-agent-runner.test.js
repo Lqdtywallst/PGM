@@ -215,6 +215,23 @@ test('mobile card action contract locks hierarchy and edge padding', () => {
     assert.ok(contract.minSplitContactGroupWidthRatio >= 0.98);
     assert.equal(contract.allowFullBleedContactStrip, true);
     assert.ok(contract.maxSplitContactSideGapPx <= 2);
+    assert.ok(contract.maxSplitContactOverflowPx <= 2);
+});
+
+test('desktop card action contract locks the same full-width split contact bar', () => {
+    const contract = getMobileInteractionContract({
+        interaction: 'mobile_card_actions',
+        viewportName: 'desktop-wide',
+        viewportWidth: 1707
+    });
+
+    assert.equal(contract.policy, 'locked');
+    assert.equal(contract.maxSecondaryContactActions, 2);
+    assert.equal(contract.requireSingleRowContactSplit, true);
+    assert.equal(contract.allowFullBleedContactStrip, true);
+    assert.ok(contract.minSplitContactGroupWidthRatio >= 0.98);
+    assert.ok(contract.maxSplitContactSideGapPx <= 2);
+    assert.ok(contract.maxSecondaryActionHeightPx <= 72);
 });
 
 test('visual smoke gate covers human routes and responsive device bands', () => {
@@ -699,8 +716,8 @@ test('buildDesignSystemFindings respects the explicit brand landing contract', (
             route: '/ferrari-rental-dubai.html',
             viewport: 'desktop-wide',
             metrics: {
-                headingFontFamily: 'montserrat',
-                bodyFontFamily: 'inter',
+                headingFontFamily: 'el messiri',
+                bodyFontFamily: 'manrope',
                 visualIntent: 'modern_light_system',
                 bodyFontSizePx: 15.8,
                 bodyLineHeightPx: 24.8,
@@ -718,8 +735,8 @@ test('buildDesignSystemFindings respects the explicit brand landing contract', (
             route: '/lamborghini-rental-dubai.html',
             viewport: 'desktop-wide',
             metrics: {
-                headingFontFamily: 'montserrat',
-                bodyFontFamily: 'inter',
+                headingFontFamily: 'el messiri',
+                bodyFontFamily: 'manrope',
                 visualIntent: 'modern_light_system',
                 bodyFontSizePx: 15.1,
                 bodyLineHeightPx: 23.9,
@@ -990,6 +1007,210 @@ test('buildDeterministicFindings flags weak visible text contrast on light panel
     assert.ok(findings.some((finding) => (
         finding.category === 'contrast' &&
         /not have enough contrast/i.test(finding.message) &&
+        finding.hardFail === true
+    )));
+});
+
+test('buildDeterministicFindings flags inline white copy on light premium pages', () => {
+    const findings = buildDeterministicFindings({
+        route: '/lamborghini-rental-dubai.html',
+        viewport: { name: 'desktop-wide' },
+        profile: 'hub_marketing',
+        metrics: {
+            horizontalOverflowPx: 0,
+            visibleH1Count: 1,
+            viewportWidth: 1707,
+            viewportHeight: 893,
+            heroActionCount: 1,
+            hasVisualMedia: true,
+            hasNav: true,
+            headerOcclusionPx: 0,
+            clippedElements: [],
+            textContrastIssues: [],
+            textEncodingIssues: [],
+            forcedLightTextIssues: [
+                {
+                    selectorLabel: 'strong :: Lamborghini rental in Dubai',
+                    text: 'Lamborghini rental in Dubai',
+                    style: 'color:#fff;'
+                }
+            ],
+            headerTextContrastIssues: [],
+            internalGapIssues: [],
+            overlaps: [],
+            brokenMedia: []
+        },
+        consoleErrors: [],
+        networkErrors: {
+            requestFailures: [],
+            criticalResponses: [],
+            pageErrors: []
+        },
+        artifacts: {
+            viewportScreenshot: '/tmp/lamborghini-inline-white-copy.png'
+        }
+    });
+
+    assert.ok(findings.some((finding) => (
+        finding.category === 'contrast' &&
+        /inline styling/i.test(finding.message) &&
+        finding.hardFail === true
+    )));
+});
+
+test('buildDeterministicFindings flags cramped desktop header brand blocks', () => {
+    const findings = buildDeterministicFindings({
+        route: '/lamborghini-huracan-evo-spyder-rental-dubai.html',
+        viewport: { name: 'desktop-wide' },
+        profile: 'vehicle_pdp',
+        metrics: {
+            horizontalOverflowPx: 0,
+            visibleH1Count: 1,
+            headingRect: { top: 210 },
+            viewportWidth: 1527,
+            viewportHeight: 768,
+            heroActionCount: 1,
+            primaryCtaRect: { top: 520 },
+            hasVisualMedia: true,
+            hasNav: true,
+            headerOcclusionPx: 0,
+            clippedElements: [],
+            textContrastIssues: [],
+            headerTextContrastIssues: [],
+            textEncodingIssues: [],
+            internalGapIssues: [],
+            overlaps: [],
+            brokenMedia: [],
+            usesSharedLabHeader: true,
+            headerCrestRect: { width: 40, height: 40 },
+            headerCrestImageRect: { width: 30, height: 34 },
+            headerBrandStrongRect: { width: 113, height: 48 },
+            headerBrandStrongLineMetrics: { lineCount: 2 },
+            headerBrandSubLineMetrics: { lineCount: 2 }
+        },
+        consoleErrors: [],
+        networkErrors: {
+            requestFailures: [],
+            criticalResponses: [],
+            pageErrors: []
+        },
+        artifacts: {
+            viewportScreenshot: '/tmp/vehicle-cramped-header.png'
+        }
+    });
+
+    assert.ok(findings.some((finding) => (
+        finding.category === 'header_consistency' &&
+        /brand block/i.test(finding.message) &&
+        finding.hardFail === true
+    )));
+});
+
+test('buildDeterministicFindings flags weak header icon contrast', () => {
+    const findings = buildDeterministicFindings({
+        route: '/lamborghini-huracan-evo-spyder-rental-dubai.html',
+        viewport: { name: 'desktop-wide' },
+        profile: 'vehicle_pdp',
+        metrics: {
+            horizontalOverflowPx: 0,
+            visibleH1Count: 1,
+            headingRect: { top: 210 },
+            viewportWidth: 1527,
+            viewportHeight: 768,
+            heroActionCount: 1,
+            primaryCtaRect: { top: 520 },
+            hasVisualMedia: true,
+            hasNav: true,
+            headerOcclusionPx: 0,
+            clippedElements: [],
+            textContrastIssues: [],
+            headerTextContrastIssues: [
+                {
+                    selectorLabel: 'a.lab-header__utility-link :: Call Dynasty Prestige',
+                    text: 'Call Dynasty Prestige',
+                    contrastRatio: 1.38,
+                    requiredRatio: 4.5,
+                    color: 'rgb(241, 226, 189)',
+                    effectiveBackground: 'rgb(224, 224, 224)'
+                }
+            ],
+            textEncodingIssues: [],
+            internalGapIssues: [],
+            overlaps: [],
+            brokenMedia: [],
+            usesSharedLabHeader: true,
+            headerCrestRect: { width: 56, height: 56 },
+            headerCrestImageRect: { width: 44, height: 50 },
+            headerBrandStrongRect: { width: 180, height: 16 },
+            headerBrandStrongLineMetrics: { lineCount: 1 },
+            headerBrandSubLineMetrics: { lineCount: 1 }
+        },
+        consoleErrors: [],
+        networkErrors: {
+            requestFailures: [],
+            criticalResponses: [],
+            pageErrors: []
+        },
+        artifacts: {
+            viewportScreenshot: '/tmp/vehicle-weak-header-icon.png'
+        }
+    });
+
+    assert.ok(findings.some((finding) => (
+        finding.category === 'contrast' &&
+        /Header text or icon contrast/i.test(finding.message) &&
+        finding.hardFail === true
+    )));
+});
+
+test('buildDeterministicFindings flags whitewashed premium SEO headers', () => {
+    const findings = buildDeterministicFindings({
+        route: '/lamborghini-huracan-evo-spyder-rental-dubai.html',
+        viewport: { name: 'desktop-wide' },
+        profile: 'vehicle_pdp',
+        metrics: {
+            horizontalOverflowPx: 0,
+            visibleH1Count: 1,
+            headingRect: { top: 210 },
+            viewportWidth: 1527,
+            viewportHeight: 768,
+            heroActionCount: 1,
+            primaryCtaRect: { top: 520 },
+            hasVisualMedia: true,
+            hasNav: true,
+            headerOcclusionPx: 0,
+            clippedElements: [],
+            textContrastIssues: [],
+            headerTextContrastIssues: [],
+            textEncodingIssues: [],
+            internalGapIssues: [],
+            overlaps: [],
+            brokenMedia: [],
+            usesSharedLabHeader: true,
+            headerRect: { width: 1527, height: 88 },
+            headerSurfaceLuminance: 0.94,
+            headerBackground: 'rgba(255, 255, 255, 0.98)',
+            headerBackgroundImage: 'linear-gradient(rgb(255, 255, 255), rgb(250, 248, 243))',
+            headerCrestRect: { width: 56, height: 56 },
+            headerCrestImageRect: { width: 44, height: 50 },
+            headerBrandStrongRect: { width: 180, height: 16 },
+            headerBrandStrongLineMetrics: { lineCount: 1 },
+            headerBrandSubLineMetrics: { lineCount: 1 }
+        },
+        consoleErrors: [],
+        networkErrors: {
+            requestFailures: [],
+            criticalResponses: [],
+            pageErrors: []
+        },
+        artifacts: {
+            viewportScreenshot: '/tmp/vehicle-white-header.png'
+        }
+    });
+
+    assert.ok(findings.some((finding) => (
+        finding.category === 'header_consistency' &&
+        /too bright and flat/i.test(finding.message) &&
         finding.hardFail === true
     )));
 });
@@ -1946,6 +2167,7 @@ test('buildFleetMobileFilterFindings accepts readable filled mobile filter contr
                 { key: 'fleet-pickup-date', kind: 'date_time_field', rect: { width: 326, height: 56 }, clipX: 0, clipY: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 },
                 { key: 'brand', kind: 'select', rect: { width: 326, height: 50 }, clipX: 0, clipY: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 },
                 { key: 'close', kind: 'button', rect: { width: 326, height: 48 }, clipX: 0, clipY: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 },
+                { key: 'fleet-filter-close fleet-filter-close--top', kind: 'button', rect: { width: 48, height: 48 }, clipX: 0, clipY: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 },
                 { key: 'price', kind: 'range', rect: { width: 326, height: 44 }, clipX: 0, clipY: 0, visibleInViewport: true, fullyVisibleInViewport: true, viewportClipPx: 0 }
             ],
             screenshotPath: '/tmp/fleet-mobile-filters-filled.png'
@@ -2612,6 +2834,143 @@ test('buildPageDepthScanFindings flags stacked mobile contact buttons', () => {
     )));
 });
 
+test('buildPageDepthScanFindings flags split contact bars that overflow the mobile card shell', () => {
+    const findings = buildPageDepthScanFindings({
+        route: '/fleet.html',
+        viewportName: 'mobile-modern',
+        viewportWidth: 390,
+        state: {
+            available: true,
+            frames: [
+                {
+                    viewportTop: 0,
+                    viewportBottom: 844,
+                    screenshotPath: '/tmp/fleet-depth-overflow-contact-bar.png'
+                }
+            ],
+            cardActionMetrics: [
+                {
+                    label: 'Huracan EVO Spyder',
+                    cardRect: { top: 0, bottom: 540, left: 18, right: 372, width: 354, height: 540 },
+                    actionGroupHeightRatio: 0.26,
+                    secondaryActionHeightRatio: 0.11,
+                    secondaryDominanceRatio: 0.9,
+                    secondaryMaxButtonWidthRatio: 0.5,
+                    splitContactGroupWidthRatio: 1.09,
+                    splitContactSideGapPx: 0,
+                    splitContactOverflowPx: 18,
+                    secondaryInlinePaddingPx: 0,
+                    primaryMaxHeight: 52,
+                    secondaryMaxHeight: 54,
+                    secondaryCount: 2,
+                    secondaryRowCount: 1,
+                    buttonMaxRadiusPx: 8,
+                    buttonRadiusSpreadPx: 0
+                }
+            ]
+        },
+        screenshotPath: '/tmp/fleet.png'
+    });
+
+    assert.ok(findings.some((finding) => (
+        finding.category === 'spacing' &&
+        /overflows outside the mobile card shell/i.test(finding.message) &&
+        /splitContactOverflowPx=18/.test(finding.evidence) &&
+        finding.hardFail === true
+    )));
+});
+
+test('buildPageDepthScanFindings accepts full-width desktop fleet card contact actions', () => {
+    const fullWidthCard = (label) => ({
+        label,
+        cardRect: { top: 0, bottom: 620, left: 0, right: 390, width: 390, height: 620 },
+        actionGroupHeightRatio: 0.19,
+        secondaryActionHeightRatio: 0.08,
+        secondaryDominanceRatio: 0.7,
+        secondaryMaxButtonWidthRatio: 0.5,
+        splitContactGroupWidthRatio: 1,
+        splitContactSideGapPx: 0,
+        splitContactOverflowPx: 0,
+        secondaryInlinePaddingPx: 0,
+        primaryMaxHeight: 48,
+        secondaryMaxHeight: 50,
+        primaryCount: 1,
+        secondaryCount: 2,
+        secondaryRowCount: 1,
+        buttonMaxRadiusPx: 8,
+        buttonRadiusSpreadPx: 0
+    });
+    const findings = buildPageDepthScanFindings({
+        route: '/fleet.html',
+        viewportName: 'desktop-wide',
+        viewportWidth: 1707,
+        state: {
+            available: true,
+            frames: [
+                {
+                    viewportTop: 0,
+                    viewportBottom: 960,
+                    screenshotPath: '/tmp/fleet-desktop-full-width.png'
+                }
+            ],
+            cardActionMetrics: [
+                fullWidthCard('Huracan EVO Spyder'),
+                fullWidthCard('Ferrari 296 GTS')
+            ]
+        },
+        screenshotPath: '/tmp/fleet.png'
+    });
+
+    assert.equal(findings.length, 0);
+});
+
+test('buildPageDepthScanFindings flags desktop fleet cards with side gutters around contact actions', () => {
+    const findings = buildPageDepthScanFindings({
+        route: '/fleet.html',
+        viewportName: 'desktop-wide',
+        viewportWidth: 1707,
+        state: {
+            available: true,
+            frames: [
+                {
+                    viewportTop: 0,
+                    viewportBottom: 960,
+                    screenshotPath: '/tmp/fleet-desktop-contained.png'
+                }
+            ],
+            cardActionMetrics: [
+                {
+                    label: 'Cullinan Black Badge',
+                    cardRect: { top: 0, bottom: 620, left: 0, right: 390, width: 390, height: 620 },
+                    actionGroupHeightRatio: 0.18,
+                    secondaryActionHeightRatio: 0.074,
+                    secondaryDominanceRatio: 0.68,
+                    secondaryMaxButtonWidthRatio: 0.44,
+                    splitContactGroupWidthRatio: 0.89,
+                    splitContactSideGapPx: 20,
+                    splitContactOverflowPx: 0,
+                    secondaryInlinePaddingPx: 20,
+                    primaryMaxHeight: 48,
+                    secondaryMaxHeight: 46,
+                    primaryCount: 1,
+                    secondaryCount: 2,
+                    secondaryRowCount: 1,
+                    buttonMaxRadiusPx: 8,
+                    buttonRadiusSpreadPx: 0
+                }
+            ]
+        },
+        screenshotPath: '/tmp/fleet.png'
+    });
+
+    assert.ok(findings.some((finding) => (
+        finding.category === 'spacing' &&
+        /full desktop card width/i.test(finding.message) &&
+        /splitContactSideGapPx=20/.test(finding.evidence) &&
+        finding.hardFail === true
+    )));
+});
+
 test('buildPageDepthScanFindings flags mobile section width drift', () => {
     const findings = buildPageDepthScanFindings({
         route: '/',
@@ -2871,6 +3230,52 @@ test('buildPageDepthScanFindings flags broken text encoding while scrolling', ()
         /scrolling/i.test(finding.message) &&
         finding.hardFail === true &&
         finding.screenshotPath === '/tmp/reserve-depth-text.png'
+    )));
+});
+
+test('buildPageDepthScanFindings flags low contrast text while scrolling', () => {
+    const findings = buildPageDepthScanFindings({
+        route: '/lamborghini-huracan-evo-spyder-rental-dubai.html',
+        viewportName: 'mobile-modern',
+        viewportWidth: 390,
+        state: {
+            available: true,
+            frames: [
+                {
+                    index: 3,
+                    scrollY: 1280,
+                    viewportTop: 1280,
+                    viewportBottom: 2124,
+                    screenshotPath: '/tmp/vehicle-depth-contrast.png',
+                    metric: {
+                        visibleMajorElementCount: 9,
+                        largestBlankGapRatio: 0.16,
+                        actionMetrics: [],
+                        dateControlMetrics: [],
+                        textEncodingIssues: [],
+                        textContrastIssues: [
+                            {
+                                selector: '.vehicle-pdp-gallery-card__copy h3',
+                                text: 'Motion belongs after the booking logic.',
+                                contrastRatio: 1.18,
+                                requiredRatio: 4.5,
+                                color: 'rgb(255, 255, 255)',
+                                effectiveBackground: 'rgb(250, 248, 243)'
+                            }
+                        ]
+                    }
+                }
+            ],
+            cardActionMetrics: []
+        },
+        screenshotPath: '/tmp/vehicle.png'
+    });
+
+    assert.ok(findings.some((finding) => (
+        finding.category === 'contrast' &&
+        /while scrolling/i.test(finding.message) &&
+        finding.hardFail === true &&
+        finding.screenshotPath === '/tmp/vehicle-depth-contrast.png'
     )));
 });
 

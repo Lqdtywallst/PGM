@@ -231,7 +231,10 @@ function classifyRouteProfile(route = '') {
         return 'reserve';
     }
 
-    if (normalizedRoute === '/contact.html') {
+    if (
+        normalizedRoute === '/contact.html' ||
+        normalizedRoute === '/reservation-lookup.html'
+    ) {
         return 'contact';
     }
 
@@ -269,7 +272,10 @@ function classifyRouteCohort(route = '') {
         return 'fleet';
     }
 
-    if (normalizedRoute === '/contact.html') {
+    if (
+        normalizedRoute === '/contact.html' ||
+        normalizedRoute === '/reservation-lookup.html'
+    ) {
         return 'contact';
     }
 
@@ -663,6 +669,26 @@ function evaluateMobileHeroHeadingBalance(metrics = {}, rules = {}) {
     return failures;
 }
 
+function evaluatePremiumHeaderSurface(metrics = {}, rules = {}) {
+    const headerRules = rules.headerSurface || rules;
+    const viewportWidth = Number(metrics.viewportWidth || 0);
+    const minViewportWidth = Number(headerRules.minViewportWidthPx || 1024);
+
+    if (!metrics.usesSharedLabHeader || viewportWidth < minViewportWidth || !metrics.headerRect) {
+        return [];
+    }
+
+    const failures = [];
+    const surfaceLuminance = Number(metrics.headerSurfaceLuminance);
+    const maxSurfaceLuminance = Number(headerRules.maxSurfaceLuminance ?? 0.62);
+
+    if (Number.isFinite(surfaceLuminance) && surfaceLuminance > maxSurfaceLuminance) {
+        failures.push(`headerSurfaceLuminance=${surfaceLuminance.toFixed(3)}>${maxSurfaceLuminance}`);
+    }
+
+    return failures;
+}
+
 module.exports = {
     BRAND_REFERENCE_ROUTE,
     COHORT_CONFIG,
@@ -676,6 +702,7 @@ module.exports = {
     clamp,
     createVisualFinding,
     dedupeVisualFindings,
+    evaluatePremiumHeaderSurface,
     evaluateMobileHeroHeadingBalance,
     filePathForRoute,
     getCohortConfig,

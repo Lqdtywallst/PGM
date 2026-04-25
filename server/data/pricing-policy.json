@@ -1,0 +1,46 @@
+{
+  "global": {
+    "currency": "AED",
+    "lookaheadDays": 30,
+    "recentDemandDays": 14,
+    "priceStep": 50,
+    "undercutPct": 0.025,
+    "maxChangePct": 0.08,
+    "minEffectiveChange": 25,
+    "staleCompetitorDays": 14,
+    "requireFreshCompetitorsForApply": true,
+    "defaultUnits": 1
+  },
+  "vehicles": {
+    "lamborghini-huracan-evo-spyder": {
+      "floor": 2800,
+      "ceiling": 3900,
+      "units": 1
+    },
+    "ferrari-296-gts": {
+      "floor": 3000,
+      "ceiling": 4200,
+      "units": 1
+    },
+    "porsche-992-gt3": {
+      "floor": 1800,
+      "ceiling": 2850,
+      "units": 1
+    },
+    "lamborghini-urus-sport": {
+      "floor": 3000,
+      "ceiling": 4300,
+      "units": 1
+    },
+    "mercedes-g63-amg": {
+      "floor": 1450,
+      "ceiling": 2300,
+      "units": 1
+    },
+    "rolls-royce-cullinan-black-badge": {
+      "floor": 3300,
+      "ceiling": 4800,
+      "units": 1
+    }
+  }
+}

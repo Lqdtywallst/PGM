@@ -22,7 +22,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=El+Messiri:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         /* Critical first viewport styles: keep this small and mirror reserve-shell.css. */
         :root {
@@ -31,7 +31,7 @@
             --lab-frame-gutter: clamp(24px, 5.5vw, 82px);
             --lab-frame-width: min(var(--lab-frame-max), calc(100% - (var(--lab-frame-gutter) * 2)));
             --lab-font-sans: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            --lab-font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+            --lab-font-display: 'El Messiri', 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
         }
         *, *::before, *::after { box-sizing: border-box; }
         html { background: #f6f3ee; }
@@ -539,7 +539,7 @@
                 const reserveFlowScript = document.createElement('script');
                 reserveConfigScript.src = '/config.js';
                 reserveConfigScript.onload = () => {
-                    reserveFlowScript.src = '/js/reserve-flow.js?v=20260421b';
+                    reserveFlowScript.src = '/js/reserve-flow.js?v=20260425-history2';
                     reserveFlowScript.defer = true;
                     document.body.appendChild(reserveFlowScript);
                 };
@@ -586,7 +586,7 @@
 
             installMobileToggleWake();
 
-            ['updateCalendarFromInputs', 'changeMonth', 'nextStep', 'prevStep', 'submitReservation'].forEach((handlerName) => {
+            ['updateCalendarFromInputs', 'changeMonth', 'nextStep', 'prevStep', 'clearReservationDraft', 'submitReservation'].forEach((handlerName) => {
                 if (typeof window[handlerName] !== 'function') {
                     window[handlerName] = () => {
                         wakeReserveEnhancements();
@@ -1181,7 +1181,10 @@
                     </div>
                 </div>
             </div>
-            <button onclick="nextStep()" class="btn">Continue to payment</button>
+            <div class="step-navigation step-navigation--guest">
+                <button type="button" onclick="clearReservationDraft()" class="btn-secondary reserve-clear-button">Clear details</button>
+                <button type="button" onclick="nextStep()" class="btn">Continue to payment</button>
+            </div>
         </div>
 
         </template>
@@ -1303,7 +1306,7 @@
                 <div class="site-v2-footer__top">
                     <div class="site-v2-footer__brand">
                         <span class="site-v2-footer__crest" aria-hidden="true">
-                            <img src="/icons/icon-96.png" width="96" height="96" loading="lazy" decoding="async" alt="">
+                            <img src="/images/dp-crest-cropped.png" width="96" height="96" loading="lazy" decoding="async" alt="">
                         </span>
                         <p>Dynasty Prestige combines a premium fleet with discreet coordination, clear timing and polished handovers across Dubai and the UAE.</p>
                     </div>

@@ -22,10 +22,12 @@ const requiredPublicFiles = Object.values(PUBLIC_PAGE_FILE_MAP).map((relativePat
 const requiredFiles = [
     'server/backend-example.js',
     'server/email-config.js',
+    'server/seo-audit-core.js',
     'server/server-http.js',
     'server/verificar-stripe.js',
     'vercel.json',
     'scripts/run-copy-audit.js',
+    'scripts/run-seo-agent.js',
     'app/api/reserve/route.js',
     'site/config.js',
     'site/robots.txt',
@@ -51,9 +53,11 @@ const requiredFiles = [
 const syntaxFiles = [
     'server/backend-example.js',
     'server/email-config.js',
+    'server/seo-audit-core.js',
     'server/server-http.js',
     'server/verificar-stripe.js',
     'scripts/run-copy-audit.js',
+    'scripts/run-seo-agent.js',
     'app/api/reserve/route.js',
     'site/config.js',
     'site/js/reservation-lookup.js'
@@ -736,6 +740,12 @@ async function run() {
     assert(
         envExample.includes('DATABASE_URL=') && envExample.includes('DATABASE_SSL='),
         '.env.example documents production reservation database settings'
+    );
+    assert(
+        envExample.includes('ADMIN_USER=') &&
+        envExample.includes('ADMIN_PASSWORD_HASH=') &&
+        envExample.includes('ADMIN_SESSION_SECRET='),
+        '.env.example documents private admin reservation desk settings'
     );
 
     const staticServerFile = readFile('server/server-http.js');

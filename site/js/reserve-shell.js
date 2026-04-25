@@ -212,6 +212,92 @@
             }
         }
 
+        function bindAdaptiveBackOpacity(button) {
+            const importantContentSelector = [
+                "h1",
+                "h2",
+                "h3",
+                "h4",
+                "p",
+                "li",
+                "label",
+                "legend",
+                "summary",
+                "a:not(.lab-floating-back)",
+                "button",
+                "input",
+                "select",
+                "textarea",
+                "[role='button']",
+                ".fleet-card",
+                ".vehicle-card",
+                ".service-card",
+                ".location-card",
+                ".guide-card",
+                ".reservation-summary",
+                ".reserve-shell-card",
+                ".vehicle-detail-card",
+                ".vehicle-spec-card"
+            ].join(", ");
+            const ignoredSurfaceSelector = ".lab-floating-back, .lab-header, .lab-mobile-drawer, .lab-floating-contact";
+            let frameId = 0;
+
+            function isImportantUnderlyingElement(element) {
+                if (!element || button.contains(element) || element.closest(ignoredSurfaceSelector)) {
+                    return false;
+                }
+
+                const importantElement = element.closest(importantContentSelector);
+                if (!importantElement || button.contains(importantElement) || importantElement.closest(ignoredSurfaceSelector)) {
+                    return false;
+                }
+
+                if (importantElement.matches("a, button, input, select, textarea, [role='button']")) {
+                    return true;
+                }
+
+                return (importantElement.textContent || "").replace(/\s+/g, " ").trim().length > 3;
+            }
+
+            function updateOverlapState() {
+                frameId = 0;
+
+                if (!button.isConnected || !button.classList.contains("is-visible")) {
+                    return;
+                }
+
+                const rect = button.getBoundingClientRect();
+                const samplePoints = [
+                    [rect.left + rect.width * 0.5, rect.top + rect.height * 0.5],
+                    [rect.left + rect.width * 0.28, rect.top + rect.height * 0.28],
+                    [rect.left + rect.width * 0.72, rect.top + rect.height * 0.28],
+                    [rect.left + rect.width * 0.28, rect.top + rect.height * 0.72],
+                    [rect.left + rect.width * 0.72, rect.top + rect.height * 0.72]
+                ];
+                const overlapsImportantContent = samplePoints.some(([x, y]) => (
+                    document.elementsFromPoint(x, y).some(isImportantUnderlyingElement)
+                ));
+
+                button.classList.toggle("is-over-important-content", overlapsImportantContent);
+            }
+
+            function requestOverlapUpdate() {
+                if (frameId) {
+                    return;
+                }
+
+                frameId = window.requestAnimationFrame(updateOverlapState);
+            }
+
+            window.addEventListener("scroll", requestOverlapUpdate, { capture: true, passive: true });
+            window.addEventListener("resize", requestOverlapUpdate, { passive: true });
+            window.addEventListener("orientationchange", requestOverlapUpdate, { passive: true });
+            window.setTimeout(requestOverlapUpdate, 250);
+            window.setTimeout(requestOverlapUpdate, 900);
+            requestOverlapUpdate();
+            return requestOverlapUpdate;
+        }
+
         const currentPath = normalizeInternalPath(window.location.href);
         const referrerPath = normalizeInternalPath(document.referrer);
         const storedMemory = readNavigationMemory();
@@ -266,7 +352,11 @@
         });
 
         document.body.appendChild(backButton);
-        window.requestAnimationFrame(() => backButton.classList.add("is-visible"));
+        const requestBackOverlapUpdate = bindAdaptiveBackOpacity(backButton);
+        window.requestAnimationFrame(() => {
+            backButton.classList.add("is-visible");
+            requestBackOverlapUpdate();
+        });
     }
 
     function normalizeGenericContactLinks() {
@@ -381,7 +471,7 @@
                     <div class="lab-mobile-drawer__header">
                         <div class="lab-mobile-drawer__brand">
                             <span class="lab-mobile-drawer__crest" aria-hidden="true">
-                                <img src="/icons/icon-96.png" width="96" height="96" loading="lazy" decoding="async" alt="">
+                                <img src="/images/dp-crest-cropped.png" width="192" height="192" loading="lazy" decoding="async" alt="">
                             </span>
                             <div class="lab-mobile-drawer__brand-copy">
                                 <strong>Dynasty Prestige</strong>

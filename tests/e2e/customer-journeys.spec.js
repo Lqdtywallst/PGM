@@ -335,11 +335,14 @@ test('guest completes a reservation with mocked checkout and success redirect', 
     await page.locator('#payButton').click();
 
     const successDialog = await successDialogPromise;
-    expect(successDialog.message()).toContain('Payment successful');
+    expect(successDialog.message()).toContain('Payment received');
     expect(successDialog.message()).toContain('Mercedes G63 AMG');
     await successDialog.accept();
 
     await expect(page).toHaveURL(/\/index\.html$/i);
+    await expect
+        .poll(() => page.evaluate(() => window.sessionStorage.getItem('dynastyBookingIntent')))
+        .toBeNull();
 
     expect(requestLog.reserve).not.toBeNull();
     expect(requestLog.confirm).not.toBeNull();

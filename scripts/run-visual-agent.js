@@ -23,6 +23,7 @@ const {
     classifyRouteProfile,
     createVisualFinding,
     evaluateMobileHeroHeadingBalance,
+    evaluatePremiumHeaderSurface,
     getDefaultVisualRoutes,
     getVehicleVisualRoutes,
     getProfileConfig,
@@ -282,17 +283,17 @@ const PROFILE_SELECTORS = Object.freeze({
         priceSelectors: ['#selectedCarRate', '#reserveMobileRate']
     },
     contact: {
-        heroSelectors: ['.hero-grid', '.form-layout'],
-        cropSelectors: ['#contactForm', '.hero-grid'],
-        primaryCtaSelectors: ['#contactForm button[type="submit"]'],
-        firstUsefulSelectors: ['h1', '#contactForm'],
+        heroSelectors: ['.hero-grid', '.form-layout', '.lookup-hero__shell'],
+        cropSelectors: ['#contactForm', '.lookup-form', '.hero-grid'],
+        primaryCtaSelectors: ['.lookup-hero__actions .contact-button--primary', '#contactForm button[type="submit"]', '.lookup-form button[type="submit"]'],
+        firstUsefulSelectors: ['h1', '#contactForm', '.lookup-card'],
         headerSelectors: ['header'],
         navSelectors: ['nav[aria-label="Main navigation"]', 'header nav', 'nav'],
         mediaSelectors: [],
-        keySelectors: ['h1', '#contactForm label', '#contactForm input', '#contactForm textarea', '#contactForm button', '#contactFormStatus'],
-        clipSelectors: ['h1', '#contactForm label', '#contactForm input', '#contactForm textarea', '#contactForm button', '#contactFormStatus'],
-        formSelectors: ['#contactForm'],
-        statusSelectors: ['#contactFormStatus', '[role="status"]'],
+        keySelectors: ['h1', '#contactForm label', '#contactForm input', '#contactForm textarea', '#contactForm button', '.lookup-form label', '.lookup-form input', '.lookup-form button', '#contactFormStatus', '#reservationLookupStatus'],
+        clipSelectors: ['h1', '#contactForm label', '#contactForm input', '#contactForm textarea', '#contactForm button', '.lookup-form label', '.lookup-form input', '.lookup-form button', '#contactFormStatus', '#reservationLookupStatus'],
+        formSelectors: ['#contactForm', '.lookup-form'],
+        statusSelectors: ['#contactFormStatus', '#reservationLookupStatus', '[role="status"]'],
         priceSelectors: []
     },
     legal: {
@@ -850,12 +851,17 @@ function createNetworkTracker(page) {
 
     page.on('requestfailed', (request) => {
         const resourceType = request.resourceType();
+        const failureText = request.failure()?.errorText || 'request_failed';
+
+        if (resourceType === 'media' && /ERR_ABORTED/i.test(failureText)) {
+            return;
+        }
 
         if (['document', 'stylesheet', 'script', 'image', 'media', 'xhr', 'fetch'].includes(resourceType)) {
             requestFailures.push({
                 url: request.url(),
                 resourceType,
-                failureText: request.failure()?.errorText || 'request_failed'
+                failureText
             });
         }
     });
@@ -2245,6 +2251,16 @@ function buildFleetMobileFilterFindings({ route, viewportName, viewportWidth, st
                 return Number(rect.width || 0) < contract.minUsefulControlWidthPx;
             }
 
+            const isCompactIconControl = /(?:close--top|icon|toggle)$/i.test(String(control.key || '')) ||
+                /fleet-filter-close--top/i.test(String(control.key || ''));
+            if (
+                isCompactIconControl &&
+                Number(rect.width || 0) >= Number(contract.minTapTargetPx || 0) &&
+                Number(rect.height || 0) >= Number(contract.minTapTargetPx || 0)
+            ) {
+                return false;
+            }
+
             return Number(rect.width || 0) < contract.minTapTargetPx ||
                 Number(rect.height || 0) < contract.minTapTargetPx ||
                 (
@@ -3175,7 +3191,7 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                 const rgbaMatch = text.match(/rgba?\(([^)]+)\)/i);
 
                 if (!rgbaMatch) {
-                    return { alpha: 1, luminance: 0 };
+                    return { channels: null, alpha: 1, luminance: 0 };
                 }
 
                 const parts = rgbaMatch[1]
@@ -3195,9 +3211,137 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                 const luminance = (0.2126 * normalize(red)) + (0.7152 * normalize(green)) + (0.0722 * normalize(blue));
 
                 return {
+                    channels: [red, green, blue],
                     alpha: Number(alpha.toFixed(3)),
                     luminance: Number(luminance.toFixed(3))
                 };
+            }
+
+            function parseColorChannels(value) {
+                return parseCssColor(value).channels;
+            }
+
+            function toLinearChannel(channel) {
+                const normalized = Math.max(0, Math.min(255, channel)) / 255;
+                return normalized <= 0.03928
+                    ? normalized / 12.92
+                    : ((normalized + 0.055) / 1.055) ** 2.4;
+            }
+
+            function relativeLuminance(channels) {
+                if (!channels) {
+                    return 0;
+                }
+
+                const [red, green, blue] = channels;
+                return (
+                    (0.2126 * toLinearChannel(red)) +
+                    (0.7152 * toLinearChannel(green)) +
+                    (0.0722 * toLinearChannel(blue))
+                );
+            }
+
+            function contrastRatio(foregroundChannels, backgroundChannels) {
+                if (!foregroundChannels || !backgroundChannels) {
+                    return 0;
+                }
+
+                const foreground = relativeLuminance(foregroundChannels);
+                const background = relativeLuminance(backgroundChannels);
+                const lighter = Math.max(foreground, background);
+                const darker = Math.min(foreground, background);
+                return (lighter + 0.05) / (darker + 0.05);
+            }
+
+            function blendChannels(foregroundChannels, alpha, backgroundChannels) {
+                if (!foregroundChannels || !backgroundChannels) {
+                    return foregroundChannels || backgroundChannels || null;
+                }
+
+                const boundedAlpha = Math.max(0, Math.min(1, Number(alpha)));
+                return foregroundChannels.map((channel, index) => (
+                    (channel * boundedAlpha) + (backgroundChannels[index] * (1 - boundedAlpha))
+                ));
+            }
+
+            function parseBackgroundImageChannels(value) {
+                const matches = Array.from(String(value || '').matchAll(/rgba?\(([^)]+)\)/ig));
+
+                if (matches.length === 0) {
+                    return null;
+                }
+
+                const totals = [0, 0, 0];
+                let totalWeight = 0;
+
+                for (const match of matches) {
+                    const color = parseCssColor(`rgba(${match[1]})`);
+
+                    if (!color.channels || color.alpha <= 0.04) {
+                        continue;
+                    }
+
+                    const weight = Math.max(color.alpha, 0.12);
+                    totals[0] += color.channels[0] * weight;
+                    totals[1] += color.channels[1] * weight;
+                    totals[2] += color.channels[2] * weight;
+                    totalWeight += weight;
+                }
+
+                return totalWeight > 0
+                    ? totals.map((total) => total / totalWeight)
+                    : null;
+            }
+
+            function effectiveBackgroundChannels(element) {
+                let current = element instanceof HTMLElement ? element : null;
+
+                while (current) {
+                    const style = window.getComputedStyle(current);
+                    const color = parseCssColor(style.backgroundColor);
+
+                    if (color.channels && color.alpha > 0.92) {
+                        return color.channels;
+                    }
+
+                    if (color.channels && color.alpha > 0.08) {
+                        return blendChannels(color.channels, color.alpha, effectiveBackgroundChannels(current.parentElement));
+                    }
+
+                    const backgroundImage = String(style.backgroundImage || '').toLowerCase();
+                    if (backgroundImage && backgroundImage !== 'none') {
+                        const gradientChannels = parseBackgroundImageChannels(backgroundImage);
+
+                        if (gradientChannels) {
+                            return gradientChannels;
+                        }
+
+                        if (current.matches('.fleet-date-prompt, .fleet-card, .fleet-card__booking, .fleet-browser__empty, .fleet-page-main, .fleet-browser, .fleet-browser__shell, .fleet-results, .reserve-page-panel, .schedule-card, .delivery-card, .reservation-summary, .step2-main, .step2-side, .contact-hero, .contact-band, .contact-form-card, .contact-trust-list li, .contact-methods-grid .info-card, .vehicle-page--mother-base, .vehicle-main--mother-base, .vehicle-page--mother-base .vehicle-booking, .vehicle-page--mother-base .model-card, .vehicle-page--mother-base .vehicle-metric, .vehicle-page--mother-base .vehicle-pdp-summary-support, .vehicle-page--mother-base .vehicle-pdp-car-note, .vehicle-page--mother-base .vehicle-pdp-gallery-card, .vehicle-page--mother-base .vehicle-pdp-use__card, .service-detail-page-main, .service-detail-hero__copy, .service-detail-hero__panel, .service-detail-card, .service-detail-trust__item, .service-detail-faq__item, .service-detail-cta, .service-detail-related__card')) {
+                            return [255, 250, 243];
+                        }
+                    }
+
+                    current = current.parentElement;
+                }
+
+                return parseColorChannels(window.getComputedStyle(document.body).backgroundColor) || [255, 255, 255];
+            }
+
+            function fontWeightNumber(style) {
+                const rawWeight = String(style?.fontWeight || '').toLowerCase();
+
+                if (rawWeight === 'bold') {
+                    return 700;
+                }
+
+                const parsed = Number.parseInt(rawWeight, 10);
+                return Number.isFinite(parsed) ? parsed : 400;
+            }
+
+            function isLargeReadableText(style) {
+                const fontSize = Number.parseFloat(String(style?.fontSize || '').replace('px', '')) || 0;
+                const fontWeight = fontWeightNumber(style);
+                return fontSize >= 24 || (fontSize >= 18.66 && fontWeight >= 600);
             }
 
             function collectFormBorderStyleMetrics() {
@@ -3310,6 +3454,100 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                 }
 
                 return issues;
+            }
+
+            function collectVisibleTextContrastIssues() {
+                const minTextContrastRatio = 4.5;
+                const minLargeTextContrastRatio = 3;
+                const selectors = [
+                    'main h1',
+                    'main h2',
+                    'main h3',
+                    'main p',
+                    'main li',
+                    'main label',
+                    'main small',
+                    'main strong',
+                    'main dt',
+                    'main dd',
+                    'main summary',
+                    'main button',
+                    'main a[href]',
+                    'main input:not([type="hidden"])',
+                    'main select',
+                    'main textarea',
+                    'main span',
+                    'footer p',
+                    'footer a[href]',
+                    'footer strong',
+                    '.reserve-mobile-bar a',
+                    '.reserve-mobile-bar button'
+                ];
+                const seen = new Set();
+                const issues = [];
+
+                for (const selector of selectors) {
+                    for (const element of Array.from(document.querySelectorAll(selector))) {
+                        if (!(element instanceof HTMLElement) || seen.has(element) || !isVisible(element)) {
+                            continue;
+                        }
+
+                        seen.add(element);
+
+                        if (element.closest('[aria-hidden="true"], .lab-nav__panel, header, nav, svg')) {
+                            continue;
+                        }
+
+                        const rect = element.getBoundingClientRect();
+                        const visibleIntersectionHeight = Math.max(0, Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0));
+                        const visibleIntersectionWidth = Math.max(0, Math.min(rect.right, viewportWidth) - Math.max(rect.left, 0));
+
+                        if (
+                            visibleIntersectionHeight < 8 ||
+                            visibleIntersectionWidth < 8 ||
+                            rect.width < 24 ||
+                            rect.height < 8
+                        ) {
+                            continue;
+                        }
+
+                        const text = element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement
+                            ? (element.value || element.placeholder || '')
+                            : element instanceof HTMLSelectElement
+                                ? (element.selectedOptions[0]?.textContent || element.value || '')
+                                : textFor(element);
+
+                        if (String(text || '').replace(/\s+/g, ' ').trim().length < 2) {
+                            continue;
+                        }
+
+                        const style = window.getComputedStyle(element);
+                        const foregroundChannels = parseColorChannels(style.color);
+                        const backgroundChannels = effectiveBackgroundChannels(element);
+                        const ratio = contrastRatio(foregroundChannels, backgroundChannels);
+                        const requiredRatio = isLargeReadableText(style)
+                            ? minLargeTextContrastRatio
+                            : minTextContrastRatio;
+
+                        if (ratio > 0 && ratio < requiredRatio) {
+                            issues.push({
+                                selector: selectorLabel(element),
+                                text: textFor(element).slice(0, 90),
+                                contrastRatio: Number(ratio.toFixed(2)),
+                                requiredRatio,
+                                color: style.color,
+                                effectiveBackground: `rgb(${backgroundChannels.map((channel) => Math.round(channel)).join(', ')})`,
+                                rect: rectData(element)
+                            });
+                        }
+
+                        if (issues.length >= 16) {
+                            return issues.sort((left, right) => left.contrastRatio - right.contrastRatio);
+                        }
+                    }
+                }
+
+                return issues.sort((left, right) => left.contrastRatio - right.contrastRatio);
             }
 
             const actionElements = Array.from(document.querySelectorAll('main a[href], main button, main [role="button"], .reserve-mobile-bar a, .reserve-mobile-bar button'))
@@ -3708,7 +3946,8 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                 actionGroupWidthMetrics: collectActionGroupWidthMetrics(),
                 dateControlMetrics,
                 formBorderStyleMetrics: collectFormBorderStyleMetrics(),
-                textEncodingIssues: collectVisibleTextEncodingIssues()
+                textEncodingIssues: collectVisibleTextEncodingIssues(),
+                textContrastIssues: collectVisibleTextContrastIssues()
             };
         });
 
@@ -3920,6 +4159,13 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                     Math.min(secondaryLeftGapPx, contactRowLeftGapPx),
                     Math.min(secondaryRightGapPx, contactRowRightGapPx)
                 );
+                const splitContactOverflowPx = Math.max(
+                    0,
+                    contactRowRect ? cardRect.left - contactRowRect.left : 0,
+                    contactRowRect ? contactRowRect.right - cardRect.right : 0,
+                    secondaryGroupRect ? cardRect.left - secondaryGroupRect.left : 0,
+                    secondaryGroupRect ? secondaryGroupRect.right - cardRect.right : 0
+                );
                 const primaryMaxHeight = primaryRects.length
                     ? Math.max(...primaryRects.map((rect) => Number(rect?.height || 0)))
                     : 0;
@@ -3952,6 +4198,7 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                     secondaryMaxButtonWidthRatio: Number((secondaryMaxButtonWidth / cardWidth).toFixed(3)),
                     splitContactGroupWidthRatio: Number((splitContactGroupWidth / cardWidth).toFixed(3)),
                     splitContactSideGapPx: Number(splitContactSideGapPx.toFixed(2)),
+                    splitContactOverflowPx: Number(splitContactOverflowPx.toFixed(2)),
                     secondaryLeftGapPx: Number(secondaryLeftGapPx.toFixed(2)),
                     secondaryRightGapPx: Number(secondaryRightGapPx.toFixed(2)),
                     contactRowLeftGapPx: Number(contactRowLeftGapPx.toFixed(2)),
@@ -4166,6 +4413,25 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
                     evidence: `${frameEvidence}; text="${textIssue.text}"`,
                     likelyCause: 'A UTF-8 symbol was saved or served through the wrong encoding, so the browser renders mojibake instead of readable copy.',
                     hardFail: true,
+                    screenshotPath: frameScreenshotPath,
+                    source: 'page_depth_scan'
+                }));
+            }
+
+            for (const textIssue of frameMetric.textContrastIssues || []) {
+                const contrastRatioValue = Number(textIssue.contrastRatio || 0);
+                const severeContrast = contrastRatioValue > 0 && contrastRatioValue < 3;
+
+                findings.push(createVisualFinding({
+                    route,
+                    viewport: viewportName,
+                    severity: severeContrast ? 'high' : 'medium',
+                    category: 'contrast',
+                    selector: textIssue.selector,
+                    message: 'Visible text loses contrast while scrolling the page.',
+                    evidence: `${frameEvidence}; text="${textIssue.text}"; contrastRatio=${textIssue.contrastRatio}; requiredRatio=${textIssue.requiredRatio}; color=${textIssue.color}; effectiveBackground=${textIssue.effectiveBackground}`,
+                    likelyCause: 'A section-specific text color is too close to its card, image, or page background outside the first viewport.',
+                    hardFail: severeContrast,
                     screenshotPath: frameScreenshotPath,
                     source: 'page_depth_scan'
                 }));
@@ -4400,6 +4666,9 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
             .slice(0, 4);
         return `affectedCards=${metrics.length}; examples=${labels.join(', ')}`;
     };
+    const isDesktopCardViewport = Number(viewportWidth || 0) >= 900;
+    const cardPatternLabel = isDesktopCardViewport ? 'desktop card pattern' : 'mobile card pattern';
+    const cardWidthLabel = isDesktopCardViewport ? 'desktop card width' : 'mobile card width';
     const isSingleRowSplitContact = (metric) => (
         metric.isVehicleActionCard !== false &&
         Number(metric.secondaryCount || 0) >= 2 &&
@@ -4442,6 +4711,11 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
             Number(metric.splitContactSideGapPx || 0) > Number(cardContract.maxSplitContactSideGapPx || 0)
         )
     ));
+    const overflowingSplitContactCards = cardMetrics.filter((metric) => (
+        Boolean(cardContract.requireSingleRowContactSplit) &&
+        isSingleRowSplitContact(metric) &&
+        Number(metric.splitContactOverflowPx || 0) > Number(cardContract.maxSplitContactOverflowPx || 0)
+    ));
     const inconsistentButtonShapeCards = cardMetrics.filter((metric) => (
         metric.isVehicleActionCard !== false &&
         Number(metric.primaryCount || 0) > 0 &&
@@ -4458,7 +4732,7 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
             viewport: viewportName,
             severity: 'high',
             category: 'cta_hierarchy',
-            message: 'A repeated mobile card pattern makes stacked contact buttons too narrow to read as one clean group.',
+            message: `A repeated ${cardPatternLabel} makes stacked contact buttons too narrow to read as one clean group.`,
             evidence: `${summarizeCardLabels(narrowStackedContactCards)}; minSecondaryButtonWidthRatio=${Math.min(...narrowStackedContactCards.map((metric) => Number(metric.secondaryMaxButtonWidthRatio || 0))).toFixed(3)}; min=${cardContract.minStackedContactButtonWidthRatio}`,
             likelyCause: 'The shared card action layout is shrinking contact CTAs instead of letting them span the card content width evenly.',
             hardFail: true,
@@ -4473,7 +4747,7 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
             viewport: viewportName,
             severity: 'high',
             category: 'spacing',
-            message: 'A repeated mobile card pattern lets contact buttons touch the card edge across the page.',
+            message: `A repeated ${cardPatternLabel} lets contact buttons touch the card edge across the page.`,
             evidence: `${summarizeCardLabels(edgeTouchingCards)}; minInlinePaddingPx=${Math.min(...edgeTouchingCards.map((metric) => Number(metric.secondaryInlinePaddingPx || 0))).toFixed(2)}; min=${cardContract.minCardInlinePaddingPx}`,
             likelyCause: 'The shared card CTA group is escaping the card padding, so the problem will reappear on every card using this component.',
             hardFail: true,
@@ -4488,7 +4762,7 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
             viewport: viewportName,
             severity: 'high',
             category: 'cta_hierarchy',
-            message: 'A repeated mobile card pattern makes the action group dominate several cards.',
+            message: `A repeated ${cardPatternLabel} makes the action group dominate several cards.`,
             evidence: `${summarizeCardLabels(dominantActionCards)}; maxActionGroupHeightRatio=${Math.max(...dominantActionCards.map((metric) => Number(metric.actionGroupHeightRatio || 0))).toFixed(3)}; max=${cardContract.maxActionGroupHeightRatio}`,
             likelyCause: 'The reusable card layout is letting booking and contact controls outweigh the vehicle name, price, and product content.',
             hardFail: true,
@@ -4503,7 +4777,7 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
             viewport: viewportName,
             severity: 'high',
             category: 'cta_hierarchy',
-            message: 'A repeated mobile card pattern uses side-by-side contact buttons instead of one clean vertical mobile group.',
+            message: `A repeated ${cardPatternLabel} uses side-by-side contact buttons instead of one clean vertical group.`,
             evidence: `${summarizeCardLabels(splitContactCards)}; requireStackedContactActions=true`,
             likelyCause: 'Call and WhatsApp are being squeezed into a desktop-style row, which becomes harder to scan and tap across varied mobile widths.',
             hardFail: true,
@@ -4518,7 +4792,7 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
             viewport: viewportName,
             severity: 'high',
             category: 'cta_hierarchy',
-            message: 'A repeated mobile card pattern stacks Call and WhatsApp instead of using one split bottom bar.',
+            message: `A repeated ${cardPatternLabel} stacks Call and WhatsApp instead of using one split bottom bar.`,
             evidence: `${summarizeCardLabels(stackedContactCards)}; requireSingleRowContactSplit=true`,
             likelyCause: 'The shared card action layout regressed from the approved bottom strip into separate stacked buttons.',
             hardFail: true,
@@ -4533,7 +4807,7 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
             viewport: viewportName,
             severity: 'medium',
             category: 'cta_hierarchy',
-            message: 'A repeated mobile card pattern makes the split contact bar too thin to feel intentional.',
+            message: `A repeated ${cardPatternLabel} makes the split contact bar too thin to feel intentional.`,
             evidence: `${summarizeCardLabels(thinContactStripCards)}; minSecondaryActionHeightRatio=${Math.min(...thinContactStripCards.map((metric) => Number(metric.secondaryActionHeightRatio || 0))).toFixed(3)}; min=${cardContract.minSplitContactStripHeightRatio}`,
             likelyCause: 'Call and WhatsApp are present, but the bottom contact strip reads like a cramped afterthought rather than a useful mobile control.',
             screenshotPath: screenshotForScanMetric(state, thinContactStripCards[0], screenshotPath),
@@ -4547,11 +4821,26 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
             viewport: viewportName,
             severity: 'high',
             category: 'spacing',
-            message: 'A repeated mobile card pattern leaves side gutters around the split Call and WhatsApp bar.',
+            message: `A repeated ${cardPatternLabel} leaves side gutters around the split Call and WhatsApp bar.`,
             evidence: `${summarizeCardLabels(narrowSplitContactCards)}; minSplitContactGroupWidthRatio=${Math.min(...narrowSplitContactCards.map((metric) => Number(metric.splitContactGroupWidthRatio || 0))).toFixed(3)}; min=${cardContract.minSplitContactGroupWidthRatio}; maxSideGapPx=${Math.max(...narrowSplitContactCards.map((metric) => Number(metric.splitContactSideGapPx || 0))).toFixed(2)}; max=${cardContract.maxSplitContactSideGapPx}`,
             likelyCause: 'The contact row is still constrained by the card content padding instead of spanning the full bottom edge of the vehicle card.',
             hardFail: true,
             screenshotPath: screenshotForScanMetric(state, narrowSplitContactCards[0], screenshotPath),
+            source: 'page_depth_scan'
+        }));
+    }
+
+    if (overflowingSplitContactCards.length > 1) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'spacing',
+            message: `A repeated ${cardPatternLabel} lets the split Call and WhatsApp bar overflow outside the card shell.`,
+            evidence: `${summarizeCardLabels(overflowingSplitContactCards)}; maxSplitContactOverflowPx=${Math.max(...overflowingSplitContactCards.map((metric) => Number(metric.splitContactOverflowPx || 0))).toFixed(2)}; max=${cardContract.maxSplitContactOverflowPx}`,
+            likelyCause: 'The bottom contact row is escaping the card container instead of being clipped by the card radius.',
+            hardFail: true,
+            screenshotPath: screenshotForScanMetric(state, overflowingSplitContactCards[0], screenshotPath),
             source: 'page_depth_scan'
         }));
     }
@@ -4718,9 +5007,28 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
                 viewport: viewportName,
                 severity: 'high',
                 category: 'spacing',
-                message: 'The split Call and WhatsApp bar does not occupy the full mobile card width.',
+                message: `The split Call and WhatsApp bar does not occupy the full ${cardWidthLabel}.`,
                 evidence: `${labelEvidence}; splitContactGroupWidthRatio=${metric.splitContactGroupWidthRatio}; min=${cardContract.minSplitContactGroupWidthRatio}; splitContactSideGapPx=${metric.splitContactSideGapPx}; max=${cardContract.maxSplitContactSideGapPx}`,
                 likelyCause: 'The bottom contact row is still inside the card content padding instead of running edge-to-edge across the card.',
+                hardFail: true,
+                screenshotPath: metricScreenshotPath,
+                source: 'page_depth_scan'
+            }));
+        }
+
+        if (
+            Boolean(cardContract.requireSingleRowContactSplit) &&
+            isSingleRowSplitContact(metric) &&
+            Number(metric.splitContactOverflowPx || 0) > Number(cardContract.maxSplitContactOverflowPx || 0)
+        ) {
+            findings.push(createVisualFinding({
+                route,
+                viewport: viewportName,
+                severity: 'high',
+                category: 'spacing',
+                message: 'The split Call and WhatsApp bar overflows outside the mobile card shell.',
+                evidence: `${labelEvidence}; splitContactOverflowPx=${metric.splitContactOverflowPx}; max=${cardContract.maxSplitContactOverflowPx}`,
+                likelyCause: 'A full-bleed contact row is wider than the card, so it visually detaches from the vehicle card and can lose the bottom radius.',
                 hardFail: true,
                 screenshotPath: metricScreenshotPath,
                 source: 'page_depth_scan'
@@ -5626,6 +5934,68 @@ async function collectVisualMetrics(page, profile) {
                 .slice(0, 16);
         }
 
+        function collectHeaderTextContrastIssues(headerElement) {
+            if (!(headerElement instanceof HTMLElement)) {
+                return [];
+            }
+
+            const minTextContrastRatio = Number(auditRules?.minTextContrastRatio || 4.5);
+            const minLargeTextContrastRatio = Number(auditRules?.minLargeTextContrastRatio || 3);
+            const selectors = [
+                '.lab-brand__copy strong',
+                '.lab-brand__copy span',
+                '.lab-nav > a',
+                '.lab-nav__trigger',
+                '.lab-header__utility-link',
+                '.lab-reserve'
+            ];
+            const seen = new Set();
+            const issues = [];
+
+            for (const selector of selectors) {
+                for (const element of Array.from(headerElement.querySelectorAll(selector))) {
+                    if (!(element instanceof HTMLElement) || seen.has(element) || !isVisible(element)) {
+                        continue;
+                    }
+
+                    seen.add(element);
+
+                    const label = normalizeText(
+                        element.innerText ||
+                        element.getAttribute('aria-label') ||
+                        element.textContent ||
+                        ''
+                    );
+
+                    if (label.length < 2 && !element.querySelector('svg')) {
+                        continue;
+                    }
+
+                    const style = window.getComputedStyle(element);
+                    const foregroundChannels = parseColorChannels(style.color);
+                    const backgroundChannels = effectiveBackgroundChannels(element);
+                    const ratio = contrastRatio(foregroundChannels, backgroundChannels);
+                    const threshold = isLargeReadableText(style) ? minLargeTextContrastRatio : minTextContrastRatio;
+
+                    if (ratio > 0 && ratio < threshold) {
+                        issues.push({
+                            selectorLabel: buildLabel(element),
+                            text: label.slice(0, 70) || element.getAttribute('aria-label') || element.tagName.toLowerCase(),
+                            contrastRatio: Number(ratio.toFixed(2)),
+                            requiredRatio: threshold,
+                            color: style.color,
+                            effectiveBackground: `rgb(${backgroundChannels.map((channel) => Math.round(channel)).join(', ')})`,
+                            rect: rectData(element)
+                        });
+                    }
+                }
+            }
+
+            return issues
+                .sort((left, right) => left.contrastRatio - right.contrastRatio)
+                .slice(0, 10);
+        }
+
         function collectTextEncodingIssues() {
             const brokenEncodingPattern = /[\u00c2\u00c3\u00e2\ufffd]/;
             const textSelectors = [
@@ -5692,6 +6062,53 @@ async function collectVisualMetrics(page, profile) {
                         });
                     }
                 }
+            }
+
+            return issues.slice(0, 20);
+        }
+
+        function collectForcedLightTextIssues() {
+            const bodyClasses = String(document.body?.className || '');
+            const isLightVehiclePage = /\bvehicle-page--(?:mother-base|premium-pilot)\b/.test(bodyClasses);
+
+            if (!isLightVehiclePage) {
+                return [];
+            }
+
+            const forcedLightPattern = /color\s*:\s*(?:#fff(?:fff)?\b|white\b|rgba?\(\s*255\s*,\s*255\s*,\s*255)/i;
+            const allowedDarkSurfaceSelector = [
+                '.vehicle-hero__copy',
+                '.vehicle-pdp-gallery-top__thumb-copy',
+                '.vehicle-pdp-gallery-card--story-main',
+                '.vehicle-pdp-gallery-card__media',
+                '.vehicle-pdp-film',
+                '.lab-header',
+                '.lab-mobile-drawer',
+                '.lab-nav__panel'
+            ].join(',');
+            const issues = [];
+
+            for (const element of Array.from(document.querySelectorAll('main [style]'))) {
+                if (!(element instanceof HTMLElement) || !isVisible(element)) {
+                    continue;
+                }
+
+                const styleAttribute = element.getAttribute('style') || '';
+
+                if (!forcedLightPattern.test(styleAttribute)) {
+                    continue;
+                }
+
+                if (element.closest(allowedDarkSurfaceSelector)) {
+                    continue;
+                }
+
+                issues.push({
+                    selectorLabel: buildLabel(element),
+                    text: normalizeText(element.innerText || element.textContent || '').slice(0, 90),
+                    style: styleAttribute,
+                    rect: rectData(element)
+                });
             }
 
             return issues.slice(0, 20);
@@ -5885,6 +6302,7 @@ async function collectVisualMetrics(page, profile) {
             .slice(0, 16);
         const textContrastIssues = collectTextContrastIssues();
         const textEncodingIssues = collectTextEncodingIssues();
+        const forcedLightTextIssues = collectForcedLightTextIssues();
         const internalGapIssues = collectInternalGapIssues();
         const brokenMedia = brokenMediaDetails(mediaElements);
         const cardHeights = cardElements.map((card) => Number(card.getBoundingClientRect().height.toFixed(2)));
@@ -5955,9 +6373,9 @@ async function collectVisualMetrics(page, profile) {
         const homeContentBox = firstVisible(['.hero-lab__content-box']);
         const homeHeroShell = firstVisible(['.hero-lab__shell']);
         const contactIntro = firstVisible(['.contact-hero__intro']);
-        const contactFormCard = firstVisible(['.contact-form-card']);
+        const contactFormCard = firstVisible(['.contact-form-card', '.lookup-card']);
         const contactHeroShell = firstVisible(['.contact-hero__shell']);
-        const contactHeroAction = firstVisible(['.contact-hero__actions a', '.contact-hero__actions button']);
+        const contactHeroAction = firstVisible(['.contact-hero__actions a', '.contact-hero__actions button', '.lookup-hero__actions a', '.lookup-hero__actions button']);
         const reserveStep1Layout = firstVisible([
             '#step1.step-content.active .step2-layout',
             '#step1 .step2-layout',
@@ -5992,6 +6410,10 @@ async function collectVisualMetrics(page, profile) {
         const fleetFirstRowMetrics = collectFleetFirstRowMetrics();
         const mainNav = firstVisible(['nav[aria-label="Main navigation"]', '.lab-header .lab-nav']);
         const headerBrand = firstVisible(['.lab-brand', '.header-brand']);
+        const headerBrandStrong = firstVisible(['.lab-brand__copy strong', '.header-brand strong']);
+        const headerBrandSub = firstVisible(['.lab-brand__copy span', '.header-brand span']);
+        const headerCrest = firstVisible(['.lab-brand__crest', '.header-brand img', '.site-logo']);
+        const headerCrestImage = firstVisible(['.lab-brand__crest img', '.header-brand img', '.site-logo img']);
         const headerUtilityTargets = header
             ? Array.from(header.querySelectorAll('.lab-header__utility-link')).filter((element) => isVisible(element)).slice(0, 8)
             : [];
@@ -6003,8 +6425,13 @@ async function collectVisualMetrics(page, profile) {
         const headerNavRowCount = headerPrimaryNavTargets.length > 0
             ? [...new Set(headerPrimaryNavTargets.map((element) => Math.round(element.getBoundingClientRect().top)))].length
             : 0;
+        const headerStyle = header ? window.getComputedStyle(header) : null;
+        const headerSurfaceChannels = header ? effectiveBackgroundChannels(header) : null;
         const headerBrandStyle = headerBrand ? window.getComputedStyle(headerBrand) : null;
         const headerPrimaryNavStyle = headerPrimaryNavTargets[0] ? window.getComputedStyle(headerPrimaryNavTargets[0]) : null;
+        const headerTextContrastIssues = collectHeaderTextContrastIssues(header);
+        const headerBrandStrongLineMetrics = collectHeadingLineMetrics(headerBrandStrong);
+        const headerBrandSubLineMetrics = collectHeadingLineMetrics(headerBrandSub);
         const buttonElements = selectorElements([
             '.hero-lab__actions a',
             '.hero-lab__actions button',
@@ -6017,6 +6444,9 @@ async function collectVisualMetrics(page, profile) {
             '.contact-hero__actions a',
             '#contactForm button',
             '#contactForm a',
+            '.lookup-hero__actions a',
+            '.lookup-form button',
+            '.lookup-form a',
             '.reserve-container button',
             '.reserve-container a[href]',
             'main a.btn',
@@ -6129,6 +6559,7 @@ async function collectVisualMetrics(page, profile) {
             clippedElements,
             textContrastIssues,
             textEncodingIssues,
+            forcedLightTextIssues,
             internalGapIssues,
             overlaps: overlapDetails(keyElements.slice(0, 12)),
             brokenMedia,
@@ -6140,6 +6571,20 @@ async function collectVisualMetrics(page, profile) {
             headerFamily,
             headerVariant,
             headerSignature: classSignature(header),
+            headerRect: rectData(header),
+            headerBackground: headerStyle?.backgroundColor || '',
+            headerBackgroundImage: headerStyle?.backgroundImage || '',
+            headerBoxShadow: headerStyle?.boxShadow || '',
+            headerBackdropFilter: headerStyle?.backdropFilter || headerStyle?.webkitBackdropFilter || '',
+            headerSurfaceLuminance: Number(relativeLuminance(headerSurfaceChannels).toFixed(4)),
+            headerBrandRect: rectData(headerBrand),
+            headerBrandStrongRect: rectData(headerBrandStrong),
+            headerBrandSubRect: rectData(headerBrandSub),
+            headerCrestRect: rectData(headerCrest),
+            headerCrestImageRect: rectData(headerCrestImage),
+            headerBrandStrongLineMetrics,
+            headerBrandSubLineMetrics,
+            headerTextContrastIssues,
             headerBrandFontFamily: normalizedFontFamily(headerBrandStyle?.fontFamily || ''),
             headerPrimaryNavFontFamily: normalizedFontFamily(headerPrimaryNavStyle?.fontFamily || ''),
             headerPrimaryNavLabels,
@@ -6577,9 +7022,10 @@ function buildDeterministicFindings({ route, viewport, profile, metrics, console
     const viewportName = viewport.name;
     const screenshotPath = artifacts.viewportScreenshot;
     const normalizedRoute = normalizeRoute(route);
+    const cohort = classifyRouteCohort(normalizedRoute);
     const firstViewportContract = getFirstViewportContract({
         route: normalizedRoute,
-        cohort: classifyRouteCohort(normalizedRoute),
+        cohort,
         viewportName,
         viewportWidth: metrics.viewportWidth
     });
@@ -7278,6 +7724,93 @@ function buildDeterministicFindings({ route, viewport, profile, metrics, console
         }));
     }
 
+    for (const issue of metrics.headerTextContrastIssues || []) {
+        const severeContrast = Number(issue.contrastRatio || 0) > 0 && Number(issue.contrastRatio) < 3;
+
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: severeContrast ? 'high' : 'medium',
+            category: 'contrast',
+            selector: issue.selectorLabel,
+            message: 'Header text or icon contrast is too weak for the active header surface.',
+            evidence: `text="${issue.text}"; contrastRatio=${issue.contrastRatio}; requiredRatio=${issue.requiredRatio}; color=${issue.color}; effectiveBackground=${issue.effectiveBackground}`,
+            likelyCause: 'The header is mixing a light page surface with pale icon or text colors, making navigation and contact controls look washed out.',
+            hardFail: severeContrast,
+            screenshotPath
+        }));
+    }
+
+    if (['brand_landing', 'vehicle_pdp'].includes(cohort)) {
+        const headerSurfaceIssues = evaluatePremiumHeaderSurface(metrics, {
+            minViewportWidthPx: 1024,
+            maxSurfaceLuminance: 0.62
+        });
+
+        if (headerSurfaceIssues.length > 0) {
+            findings.push(createVisualFinding({
+                route,
+                viewport: viewportName,
+                severity: 'high',
+                category: 'header_consistency',
+                message: 'The premium SEO header surface is too bright and flat compared with the approved home header.',
+                evidence: [
+                    headerSurfaceIssues.join('; '),
+                    `background=${metrics.headerBackground || 'n/a'}`,
+                    `backgroundImage=${String(metrics.headerBackgroundImage || 'none').slice(0, 180)}`
+                ].join('; '),
+                likelyCause: 'A vehicle or brand page is using a white sticky header that weakens the premium brand lockup instead of the darker Dynasty shell.',
+                hardFail: true,
+                screenshotPath
+            }));
+        }
+    }
+
+    if (metrics.usesSharedLabHeader && Number(metrics.viewportWidth || 0) >= 900) {
+        const headerPresentationIssues = [];
+        const crestWidth = Number(metrics.headerCrestRect?.width || 0);
+        const crestImageWidth = Number(metrics.headerCrestImageRect?.width || 0);
+        const brandStrongLines = Number(metrics.headerBrandStrongLineMetrics?.lineCount || 0);
+        const brandSubLines = Number(metrics.headerBrandSubLineMetrics?.lineCount || 0);
+        const brandStrongWidth = Number(metrics.headerBrandStrongRect?.width || 0);
+
+        if (!metrics.headerCrestRect) {
+            headerPresentationIssues.push('header crest missing');
+        } else if (crestWidth < 48) {
+            headerPresentationIssues.push(`headerCrestWidth=${crestWidth}px expected>=48px`);
+        }
+
+        if (metrics.headerCrestImageRect && crestImageWidth < 36) {
+            headerPresentationIssues.push(`headerCrestImageWidth=${crestImageWidth}px expected>=36px`);
+        }
+
+        if (brandStrongLines > 1) {
+            headerPresentationIssues.push(`headerBrandStrongLineCount=${brandStrongLines} expected=1`);
+        }
+
+        if (brandSubLines > 1) {
+            headerPresentationIssues.push(`headerBrandSubLineCount=${brandSubLines} expected<=1`);
+        }
+
+        if (brandStrongWidth > 0 && brandStrongWidth < 140) {
+            headerPresentationIssues.push(`headerBrandStrongWidth=${brandStrongWidth}px expected>=140px`);
+        }
+
+        if (headerPresentationIssues.length > 0) {
+            findings.push(createVisualFinding({
+                route,
+                viewport: viewportName,
+                severity: 'high',
+                category: 'header_consistency',
+                message: 'The shared header brand block is visually cramped or too small on desktop.',
+                evidence: headerPresentationIssues.join('; '),
+                likelyCause: 'The header is allowing the navigation row to squeeze the logo and brand copy instead of preserving a stable brand lockup.',
+                hardFail: true,
+                screenshotPath
+            }));
+        }
+    }
+
     for (const issue of metrics.textEncodingIssues || []) {
         findings.push(createVisualFinding({
             route,
@@ -7288,6 +7821,21 @@ function buildDeterministicFindings({ route, viewport, profile, metrics, console
             message: 'Visible customer-facing text contains broken encoding artifacts.',
             evidence: `text="${issue.text}"`,
             likelyCause: 'A UTF-8 symbol was saved or served through the wrong encoding, so the browser renders mojibake instead of readable copy.',
+            hardFail: true,
+            screenshotPath
+        }));
+    }
+
+    for (const issue of metrics.forcedLightTextIssues || []) {
+        findings.push(createVisualFinding({
+            route,
+            viewport: viewportName,
+            severity: 'high',
+            category: 'contrast',
+            selector: issue.selectorLabel,
+            message: 'Light-page copy forces white text through inline styling.',
+            evidence: `text="${issue.text}"; style="${issue.style}"`,
+            likelyCause: 'Legacy dark-template inline color styles were left inside a modern light vehicle page, so customer copy can become grey or white on white.',
             hardFail: true,
             screenshotPath
         }));

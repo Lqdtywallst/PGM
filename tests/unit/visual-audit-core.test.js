@@ -9,6 +9,7 @@ const {
     createVisualFinding,
     dedupeVisualFindings,
     evaluateMobileHeroHeadingBalance,
+    evaluatePremiumHeaderSurface,
     getDefaultVisualRoutes,
     getVehicleVisualRoutes,
     scoreVisualPage,
@@ -81,6 +82,34 @@ test('evaluateMobileHeroHeadingBalance accepts centered balanced mobile headline
             maxCenterOffsetRatio: 0.12,
             maxBlockCenterOffsetRatio: 0.1
         }
+    });
+
+    assert.deepEqual(failures, []);
+});
+
+test('evaluatePremiumHeaderSurface catches whitewashed premium desktop headers', () => {
+    const failures = evaluatePremiumHeaderSurface({
+        viewportWidth: 1440,
+        usesSharedLabHeader: true,
+        headerRect: { width: 1440, height: 88 },
+        headerSurfaceLuminance: 0.94
+    }, {
+        minViewportWidthPx: 1024,
+        maxSurfaceLuminance: 0.62
+    });
+
+    assert.deepEqual(failures, ['headerSurfaceLuminance=0.940>0.62']);
+});
+
+test('evaluatePremiumHeaderSurface accepts dark premium desktop headers', () => {
+    const failures = evaluatePremiumHeaderSurface({
+        viewportWidth: 1440,
+        usesSharedLabHeader: true,
+        headerRect: { width: 1440, height: 88 },
+        headerSurfaceLuminance: 0.04
+    }, {
+        minViewportWidthPx: 1024,
+        maxSurfaceLuminance: 0.62
     });
 
     assert.deepEqual(failures, []);

@@ -50,7 +50,7 @@ test.describe('Services to reserve funnels', () => {
             dropoffTime: '18:00'
         });
 
-        await expect(page.locator('#step2')).toContainText('Who is booking?');
+        await expect(page.locator('#step2')).toContainText('Add guest details.');
         await expectNoConsoleErrors(consoleErrors, 'chauffeur service reserve handoff');
     });
 

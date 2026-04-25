@@ -1,0 +1,24 @@
+{
+  "generatedAt": "2026-04-25T00:00:00.000Z",
+  "currency": "AED",
+  "source": "manual-snapshot",
+  "notes": "Copy this file to competitor-prices.json and replace the sample entries with fresh observed prices before applying recommendations.",
+  "prices": [
+    {
+      "vehicleId": "mercedes-g63-amg",
+      "company": "Example Luxury Rental Co",
+      "dailyPrice": 1800,
+      "availability": "available",
+      "capturedAt": "2026-04-25T00:00:00.000Z",
+      "url": "https://example.com/mercedes-g63-rental-dubai"
+    },
+    {
+      "vehicleId": "lamborghini-urus-sport",
+      "company": "Example Supercar Hire",
+      "dailyPrice": 3700,
+      "availability": "available",
+      "capturedAt": "2026-04-25T00:00:00.000Z",
+      "url": "https://example.com/lamborghini-urus-rental-dubai"
+    }
+  ]
+}

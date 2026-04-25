@@ -334,8 +334,12 @@ test.describe('Mobile friction points', () => {
 
         const contactBarMetrics = await card.evaluate((element) => {
             const cardRect = element.getBoundingClientRect();
+            const primary = element.querySelector('.fleet-card__primary');
+            const primaryRect = primary?.getBoundingClientRect();
             const row = element.querySelector('.fleet-card__contact-row');
             const rowRect = row?.getBoundingClientRect();
+            const floating = document.querySelector('.lab-floating-contact');
+            const floatingStyle = floating ? window.getComputedStyle(floating) : null;
             const buttons = Array.from(row?.querySelectorAll('.fleet-card__secondary') || [])
                 .map((button) => {
                     const rect = button.getBoundingClientRect();
@@ -355,11 +359,15 @@ test.describe('Mobile friction points', () => {
                 rowWidth: rowRect?.width || 0,
                 rowLeftGapPx: rowRect ? rowRect.left - cardRect.left : 999,
                 rowRightGapPx: rowRect ? cardRect.right - rowRect.right : 999,
+                gapFromPrimaryPx: rowRect && primaryRect ? rowRect.top - primaryRect.bottom : 0,
+                floatingOpacity: floatingStyle ? Number.parseFloat(floatingStyle.opacity) : null,
+                floatingOverCardActions: floating ? floating.classList.contains('is-over-card-actions') : false,
                 buttons
             };
         });
 
         expect(contactBarMetrics.buttons.map((button) => button.text)).toEqual(['Call', 'WhatsApp']);
+        expect(contactBarMetrics.gapFromPrimaryPx).toBeGreaterThanOrEqual(8);
         expect(Math.abs(contactBarMetrics.rowLeftGapPx)).toBeLessThanOrEqual(2);
         expect(Math.abs(contactBarMetrics.rowRightGapPx)).toBeLessThanOrEqual(2);
         expect(contactBarMetrics.rowWidth / contactBarMetrics.cardWidth).toBeGreaterThanOrEqual(0.985);
@@ -370,6 +378,8 @@ test.describe('Mobile friction points', () => {
             expect(button.width / contactBarMetrics.rowWidth).toBeLessThanOrEqual(0.51);
             expect(button.height).toBeGreaterThanOrEqual(44);
         }
+        expect(contactBarMetrics.floatingOverCardActions).toBe(true);
+        expect(contactBarMetrics.floatingOpacity).toBeLessThanOrEqual(0.05);
 
         await expectNoConsoleErrors(consoleErrors, 'fleet mobile card contact bar');
     });
