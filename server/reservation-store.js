@@ -543,8 +543,18 @@ async function deleteReservationRecord(recordKey) {
     deleteLocalReservationRecord(recordKey);
 }
 
+async function closeReservationStore() {
+    if (pgPool) {
+        await pgPool.end();
+    }
+
+    pgPool = null;
+    databaseReadyPromise = null;
+}
+
 module.exports = {
     buildReservationId,
+    closeReservationStore,
     deleteReservationRecord,
     findReservationForLookup,
     getReservationRecordPath,

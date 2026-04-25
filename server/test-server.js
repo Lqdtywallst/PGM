@@ -27,6 +27,7 @@ const requiredFiles = [
     'server/verificar-stripe.js',
     'vercel.json',
     'scripts/run-copy-audit.js',
+    'scripts/seed-demo-reservation.js',
     'scripts/run-seo-agent.js',
     'app/api/reserve/route.js',
     'site/config.js',
@@ -57,6 +58,7 @@ const syntaxFiles = [
     'server/server-http.js',
     'server/verificar-stripe.js',
     'scripts/run-copy-audit.js',
+    'scripts/seed-demo-reservation.js',
     'scripts/run-seo-agent.js',
     'app/api/reserve/route.js',
     'site/config.js',
@@ -746,6 +748,12 @@ async function run() {
         envExample.includes('ADMIN_PASSWORD_HASH=') &&
         envExample.includes('ADMIN_SESSION_SECRET='),
         '.env.example documents private admin reservation desk settings'
+    );
+    assert(
+        envExample.includes('TEST_DATABASE_URL=') &&
+        packageJson.scripts['test:db'] &&
+        packageJson.scripts['admin:seed-demo'],
+        'PostgreSQL reservation storage can be tested and locally seeded'
     );
 
     const staticServerFile = readFile('server/server-http.js');
