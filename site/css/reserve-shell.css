@@ -448,6 +448,7 @@ textarea {
     position: absolute;
     inset: 0 0 auto;
     z-index: 20;
+    line-height: normal;
     background: linear-gradient(180deg, rgba(4, 4, 6, 0.88) 0%, rgba(4, 4, 6, 0.56) 58%, rgba(4, 4, 6, 0) 100%);
 }
 
@@ -514,8 +515,6 @@ textarea {
     display: inline-flex;
     align-items: center;
     gap: 0.95rem;
-    flex: 0 0 auto;
-    min-width: 0;
     font-family: var(--lab-font-sans);
 }
 
@@ -541,7 +540,6 @@ textarea {
 .lab-brand__copy {
     display: grid;
     gap: 0.2rem;
-    min-width: 0;
 }
 
 .lab-brand__copy strong {
@@ -552,6 +550,7 @@ textarea {
 }
 
 .lab-brand__copy span {
+    display: block;
     color: var(--lab-muted-soft);
     font-size: 0.64rem;
     letter-spacing: 0.18em;
@@ -1635,15 +1634,15 @@ body.lab-mobile-nav-open {
     overflow: hidden;
 }
 
-@media (max-width: 1440px) {
+@media (max-width: 1420px) {
     .lab-brand__crest {
         width: 54px;
         border-radius: 14px;
     }
 
     .lab-brand__copy strong {
-        font-size: 0.82rem;
-        letter-spacing: 0.13em;
+        font-size: 0.9rem;
+        letter-spacing: 0.18em;
     }
 
     .lab-brand__copy span {
@@ -1661,20 +1660,33 @@ body.lab-mobile-nav-open {
     }
 
     .lab-nav {
-        gap: 0.78rem;
+        gap: 1rem;
     }
 
     .lab-nav > a,
     .lab-nav__trigger {
-        font-size: 0.65rem;
-        letter-spacing: 0.1em;
+        padding: 0.16rem 0;
+        font-size: 0.67rem;
+        letter-spacing: 0.13em;
     }
 
     .lab-reserve {
-        min-height: 48px;
-        padding: 0 1rem;
-        font-size: 0.66rem;
-        letter-spacing: 0.11em;
+        min-height: 52px;
+        padding: 0 1.28rem;
+        font-size: 0.7rem;
+        letter-spacing: 0.14em;
+    }
+}
+
+@media (min-width: 861px) and (max-width: 1420px) {
+    .lab-brand {
+        gap: 0.78rem;
+    }
+
+    .lab-brand__crest {
+        flex: 0 0 42px;
+        width: 42px;
+        border-radius: 12px;
     }
 }
 
@@ -1801,6 +1813,7 @@ body.lab-mobile-nav-open {
     }
 
     .lab-brand__crest {
+        flex: 0 0 50px;
         width: 50px;
         border-radius: 8px;
     }

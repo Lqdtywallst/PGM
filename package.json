@@ -39,6 +39,7 @@
     "agent:homogeneity": "node scripts/run-homogeneity-agent.js",
     "agent:visual": "node scripts/run-visual-agent.js",
     "audit:homogeneity": "node scripts/run-homogeneity-agent.js --strict",
+    "audit:homogeneity:headers": "node scripts/run-header-homogeneity-guard.js",
     "agent:pricing": "node scripts/run-pricing-agent.js",
     "agent:pricing:apply": "node scripts/run-pricing-agent.js --apply",
     "audit:pricing": "node scripts/run-pricing-agent.js --strict",

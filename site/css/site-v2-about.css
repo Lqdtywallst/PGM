@@ -4,7 +4,8 @@
     font-family: var(--lab-font-sans);
 }
 
-.about-page .lab-shell {
+.about-page-main .lab-shell,
+.about-page .site-v2-footer .lab-shell {
     width: min(100% - clamp(1rem, 1.8vw, 2rem), 100rem);
 }
 
@@ -526,7 +527,8 @@
 }
 
 @media (max-width: 760px) {
-    .about-page .lab-shell {
+    .about-page-main .lab-shell,
+    .about-page .site-v2-footer .lab-shell {
         width: min(100% - 2rem, 98rem);
     }
 
@@ -616,7 +618,8 @@
 }
 
 @media (max-width: 380px) {
-    .about-page .lab-shell {
+    .about-page-main .lab-shell,
+    .about-page .site-v2-footer .lab-shell {
         width: min(100% - 1.5rem, 98rem);
     }
 

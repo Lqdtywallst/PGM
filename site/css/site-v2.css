@@ -836,6 +836,7 @@ select {
     position: absolute;
     inset: 0 0 auto;
     z-index: 20;
+    line-height: normal;
     background: linear-gradient(180deg, rgba(4, 4, 6, 0.88) 0%, rgba(4, 4, 6, 0.56) 58%, rgba(4, 4, 6, 0) 100%);
 }
 

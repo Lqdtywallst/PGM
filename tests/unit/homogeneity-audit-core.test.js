@@ -12,6 +12,12 @@ const {
     normalizeAssetPath,
     summarizeHomogeneityFindings
 } = require('../../server/homogeneity-audit-core');
+const {
+    parseArgs: parseHeaderGuardArgs,
+    resolveGuardRoutes,
+    resolveGuardViewports,
+    summarizeByCategory
+} = require('../../scripts/run-header-homogeneity-guard');
 
 const homeBrand = {
     exists: true,
@@ -307,4 +313,36 @@ test('summarizeHomogeneityFindings groups severity counts', () => {
     assert.equal(summary.high, 1);
     assert.equal(summary.medium, 2);
     assert.equal(summary.byCategory.drawer_brand_drift, 2);
+});
+
+test('header homogeneity guard defaults to template routes and header viewports', () => {
+    const args = parseHeaderGuardArgs([]);
+
+    assert.ok(resolveGuardRoutes(args).includes('/lamborghini-rental-dubai.html'));
+    assert.ok(resolveGuardRoutes(args).includes('/app/reserve/page.html'));
+    assert.deepEqual(resolveGuardViewports(args), [
+        'desktop-wide',
+        'desktop-standard',
+        'laptop',
+        'tablet-portrait',
+        'mobile-modern'
+    ]);
+});
+
+test('header homogeneity guard can run exhaustive page coverage', () => {
+    const args = parseHeaderGuardArgs(['--all', '--viewport', 'mobile-modern']);
+    const routes = resolveGuardRoutes(args);
+
+    assert.ok(routes.includes('/'));
+    assert.ok(routes.includes('/terms-and-conditions.html'));
+    assert.ok(routes.includes('/lamborghini-huracan-evo-spyder-rental-dubai.html'));
+    assert.deepEqual(resolveGuardViewports(args), ['mobile-modern']);
+    assert.deepEqual(summarizeByCategory([
+        { category: 'header_navigation_shift' },
+        { category: 'header_navigation_shift' },
+        { category: 'header_surface_drift' }
+    ]), {
+        header_navigation_shift: 2,
+        header_surface_drift: 1
+    });
 });

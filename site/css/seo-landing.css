@@ -66,22 +66,19 @@ body {
 }
 
 .vehicle-page .lab-header .lab-shell {
-    width: min(94rem, calc(100% - (clamp(28px, 4.6vw, 72px) * 2)));
+    width: var(--lab-frame-width);
 }
 
 .vehicle-page .lab-header__inner {
-    gap: clamp(1.5rem, 1.65vw, 2rem);
-    padding: 0.95rem 0;
+    gap: 2rem;
+    padding: 1.15rem 0;
 }
 
 .vehicle-page .lab-brand {
-    flex: 0 0 auto;
-    min-width: 0;
     gap: 0.95rem;
 }
 
 .vehicle-page .lab-brand__crest {
-    flex: 0 0 62px;
     width: 62px;
     border-radius: 18px;
     border-color: rgba(241, 226, 189, 0.22);
@@ -100,24 +97,21 @@ body {
 }
 
 .vehicle-page .lab-brand__copy {
-    min-width: 0;
     gap: 0.2rem;
 }
 
 .vehicle-page .lab-brand__copy strong {
     color: #fffaf2;
     font-size: 0.9rem;
-    line-height: 1.12;
+    line-height: normal;
     letter-spacing: 0.18em;
-    white-space: nowrap;
 }
 
 .vehicle-page .lab-brand__copy span {
     color: rgba(255, 250, 242, 0.58);
     font-size: 0.64rem;
-    line-height: 1.25;
+    line-height: normal;
     letter-spacing: 0.18em;
-    white-space: nowrap;
 }
 
 @media (min-width: 861px) and (max-width: 1420px) {
@@ -126,12 +120,52 @@ body {
     }
 
     .vehicle-page .lab-brand__crest {
-        flex-basis: 42px;
+        flex: 0 0 42px;
         width: 42px;
         border-radius: 12px;
     }
 
     .vehicle-page .lab-brand__copy span {
+        display: none;
+    }
+}
+
+@media (max-width: 860px) {
+    .vehicle-page .lab-header__inner {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.82rem 0;
+    }
+
+    .vehicle-page .lab-header__utility {
+        display: none;
+    }
+
+    .vehicle-page .lab-brand {
+        width: auto;
+        min-width: 0;
+        justify-content: flex-start;
+        gap: 0.95rem;
+    }
+
+    .vehicle-page .lab-brand__crest {
+        flex: 0 0 50px;
+        width: 50px;
+        border-radius: 8px;
+    }
+
+    .vehicle-page .lab-brand__copy strong {
+        font-size: 0.78rem;
+        letter-spacing: 0.12em;
+    }
+
+    .vehicle-page .lab-brand__copy span {
+        display: none;
+    }
+
+    .vehicle-page .lab-header__nav {
         display: none;
     }
 }
@@ -163,24 +197,24 @@ body {
 }
 
 .vehicle-page .lab-header__nav {
-    flex: 1 1 auto;
-    justify-content: flex-end;
-    gap: clamp(0.9rem, 1vw, 1.2rem);
-    min-width: 0;
+    flex: 0 1 auto;
+    justify-content: flex-start;
+    gap: 1rem;
+    min-width: auto;
 }
 
 .vehicle-page .lab-nav {
-    flex: 1 1 auto;
-    justify-content: flex-end;
-    gap: clamp(0.72rem, 0.82vw, 1.08rem);
-    min-width: 0;
+    flex: 0 1 auto;
+    justify-content: flex-start;
+    gap: clamp(1.2rem, 1.45vw, 2rem);
+    min-width: auto;
 }
 
 .vehicle-page .lab-nav > a,
 .vehicle-page .lab-nav__trigger {
     color: rgba(255, 250, 242, 0.72);
-    font-size: 0.66rem;
-    letter-spacing: 0.12em;
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
 }
 
 .vehicle-page .lab-nav__chevron {
@@ -209,11 +243,76 @@ body {
 }
 
 .vehicle-page .lab-reserve {
-    min-height: 52px;
-    padding: 0 1.28rem;
+    min-height: 56px;
+    padding: 0 1.5rem;
+    font-size: 0.74rem;
+    letter-spacing: 0.18em;
     background: linear-gradient(135deg, #efd581 0%, #d6ad55 100%);
     color: #15110a;
     box-shadow: 0 16px 34px rgba(160, 121, 48, 0.18);
+}
+
+@media (min-width: 861px) and (max-width: 1420px) {
+    .vehicle-page .lab-nav {
+        gap: 1rem;
+    }
+
+    .vehicle-page .lab-nav > a,
+    .vehicle-page .lab-nav__trigger {
+        padding: 0.16rem 0;
+        font-size: 0.67rem;
+        letter-spacing: 0.13em;
+    }
+
+    .vehicle-page .lab-reserve {
+        min-height: 52px;
+        padding: 0 1.28rem;
+        font-size: 0.7rem;
+        letter-spacing: 0.14em;
+    }
+}
+
+@media (min-width: 861px) and (max-width: 1080px) {
+    .vehicle-page .lab-header__inner {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.85rem;
+    }
+
+    .vehicle-page .lab-brand,
+    .vehicle-page .lab-header__nav {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .vehicle-page .lab-header__utility {
+        margin-left: auto;
+    }
+
+    .vehicle-page .lab-header__nav,
+    .vehicle-page .lab-nav {
+        flex-wrap: wrap;
+    }
+
+    .vehicle-page .lab-nav {
+        justify-content: center;
+        gap: 0.6rem 1.05rem;
+    }
+
+    .vehicle-page .lab-nav__item {
+        position: static;
+    }
+
+    .vehicle-page .lab-nav__panel {
+        left: 0;
+        width: 100%;
+        transform: translateY(0.8rem) scale(0.985);
+    }
+
+    .vehicle-page .lab-nav__item:focus-within .lab-nav__panel,
+    .vehicle-page .lab-nav__item.is-open .lab-nav__panel {
+        transform: translateY(0) scale(1);
+    }
 }
 
 .vehicle-page .lab-nav__panel {
