@@ -4,6 +4,8 @@ const assert = require('node:assert/strict');
 const {
     buildHomogeneityFindings,
     compareBrandSurfaces,
+    compareHeaderLayout,
+    compareHeaderSurface,
     compareHeaderSystems,
     compareTypographySurfaces,
     normalizeAssetPath,
@@ -26,6 +28,35 @@ const homeTypography = {
     lead: { exists: true, fontFamily: 'Manrope, sans-serif' },
     body: { exists: true, fontFamily: 'Manrope, sans-serif' },
     cta: { exists: true, fontFamily: 'Manrope, sans-serif' }
+};
+
+const homeHeaderLayout = {
+    exists: true,
+    mode: 'desktop',
+    headerHeightPx: 106,
+    orderSignature: 'brand|utility|nav|reserve',
+    brandToUtilityGapPx: 32,
+    utilityToNavGapPx: 32,
+    navToReserveGapPx: 16,
+    verticalCenterSpreadPx: 2,
+    horizontalOverflowPx: 0
+};
+
+const servicesHeaderLayout = {
+    ...homeHeaderLayout,
+    headerHeightPx: 104,
+    brandToUtilityGapPx: 34,
+    utilityToNavGapPx: 31,
+    navToReserveGapPx: 18
+};
+
+const homeHeaderSurface = {
+    exists: true,
+    position: 'absolute',
+    surfaceTone: 'dark-gradient',
+    backgroundLuminance: 0.003,
+    backgroundAlpha: 0.88,
+    hasGradient: true
 };
 
 test('normalizeAssetPath compares public logo assets without host noise', () => {
@@ -65,6 +96,36 @@ test('compareHeaderSystems flags header family and nav signature drift', () => {
         'headerVariant',
         'primaryNavSignature'
     ]);
+});
+
+test('compareHeaderLayout flags cramped header spacing against approved rhythm', () => {
+    const mismatches = compareHeaderLayout(homeHeaderLayout, {
+        ...homeHeaderLayout,
+        brandToUtilityGapPx: 18,
+        utilityToNavGapPx: 19,
+        navToReserveGapPx: 8
+    });
+
+    assert.deepEqual(mismatches.map((entry) => entry.field), [
+        'brandToUtilityGapPx',
+        'utilityToNavGapPx',
+        'navToReserveGapPx'
+    ]);
+    assert.equal(mismatches[0].severity, 'medium');
+});
+
+test('compareHeaderSurface flags white headers against dark approved references', () => {
+    const mismatches = compareHeaderSurface(homeHeaderSurface, {
+        ...homeHeaderSurface,
+        position: 'sticky',
+        surfaceTone: 'light',
+        backgroundLuminance: 0.94,
+        backgroundAlpha: 0.98,
+        hasGradient: false
+    });
+
+    assert.ok(mismatches.some((entry) => entry.field === 'surfaceTone' && entry.severity === 'high'));
+    assert.ok(mismatches.some((entry) => entry.field === 'backgroundLuminance' && entry.severity === 'high'));
 });
 
 test('compareTypographySurfaces flags text font family drift', () => {
@@ -144,6 +205,62 @@ test('buildHomogeneityFindings catches typography drift against home', () => {
 
     assert.ok(findings.some((finding) => finding.category === 'typography_system_drift'));
     assert.ok(findings.some((finding) => finding.category === 'typography_sprawl'));
+});
+
+test('buildHomogeneityFindings uses home and services as approved header references', () => {
+    const sharedPage = {
+        headerFamily: 'lab-header',
+        headerVariant: 'lab_mega_utility',
+        primaryNavSignature: 'Home|Fleet|Services|Contact',
+        headerBrand: homeBrand,
+        typography: homeTypography,
+        typographyInventory: {
+            uniqueFontFamilies: ['el messiri', 'manrope']
+        }
+    };
+    const findings = buildHomogeneityFindings([
+        {
+            ...sharedPage,
+            route: '/',
+            viewport: 'desktop-wide',
+            headerLayout: homeHeaderLayout,
+            headerSurface: homeHeaderSurface
+        },
+        {
+            ...sharedPage,
+            route: '/services.html',
+            viewport: 'desktop-wide',
+            headerLayout: servicesHeaderLayout,
+            headerSurface: {
+                ...homeHeaderSurface,
+                position: 'sticky'
+            }
+        },
+        {
+            ...sharedPage,
+            route: '/lamborghini-rental-dubai.html',
+            viewport: 'desktop-wide',
+            headerLayout: {
+                ...homeHeaderLayout,
+                brandToUtilityGapPx: 18,
+                utilityToNavGapPx: 18,
+                navToReserveGapPx: 7
+            },
+            headerSurface: {
+                ...homeHeaderSurface,
+                surfaceTone: 'light',
+                backgroundLuminance: 0.91,
+                hasGradient: false
+            }
+        }
+    ]);
+
+    assert.equal(
+        findings.some((finding) => finding.route === '/services.html' && finding.category === 'header_layout_drift'),
+        false
+    );
+    assert.ok(findings.some((finding) => finding.route === '/lamborghini-rental-dubai.html' && finding.category === 'header_layout_drift'));
+    assert.ok(findings.some((finding) => finding.route === '/lamborghini-rental-dubai.html' && finding.category === 'header_surface_drift'));
 });
 
 test('summarizeHomogeneityFindings groups severity counts', () => {

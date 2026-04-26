@@ -5621,6 +5621,18 @@ a.brand-marquee__item:focus-visible img {
     }
 }
 
+@media (min-width: 861px) and (max-width: 1420px) {
+    .lab-brand {
+        gap: 0.78rem;
+    }
+
+    .lab-brand__crest {
+        flex: 0 0 42px;
+        width: 42px;
+        border-radius: 12px;
+    }
+}
+
 @media (max-width: 1080px) {
     :root {
         --lab-header-offset: 132px;

@@ -463,7 +463,7 @@ textarea {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1.2rem;
+    gap: 2rem;
     padding: 1.15rem 0;
 }
 

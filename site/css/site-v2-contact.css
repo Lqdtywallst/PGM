@@ -9,29 +9,39 @@
     position: sticky;
     top: 0;
     z-index: 60;
-    background: rgba(248, 249, 251, 0.94);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    box-shadow: 0 10px 28px rgba(15, 21, 31, 0.06);
+    background:
+        radial-gradient(circle at 8% 0%, rgba(241, 226, 189, 0.12), rgba(241, 226, 189, 0) 34%),
+        linear-gradient(180deg, rgba(7, 8, 10, 0.965), rgba(12, 13, 16, 0.94));
+    backdrop-filter: blur(18px) saturate(145%);
+    -webkit-backdrop-filter: blur(18px) saturate(145%);
+    border-bottom: 1px solid rgba(241, 226, 189, 0.12);
+    box-shadow:
+        0 18px 44px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.045);
 }
 
 .contact-page .lab-header::after {
-    background: linear-gradient(90deg, rgba(15, 21, 31, 0), rgba(15, 21, 31, 0.1), rgba(15, 21, 31, 0));
+    background: linear-gradient(90deg, rgba(241, 226, 189, 0), rgba(241, 226, 189, 0.14), rgba(241, 226, 189, 0));
 }
 
 .contact-page .lab-brand__crest {
-    border-color: rgba(18, 24, 33, 0.08);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(242, 244, 247, 0.98));
+    border-color: rgba(241, 226, 189, 0.22);
+    background:
+        radial-gradient(circle at 50% 24%, rgba(241, 226, 189, 0.18), rgba(241, 226, 189, 0) 52%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025));
+    box-shadow:
+        0 10px 24px rgba(0, 0, 0, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .contact-page .lab-brand__copy strong,
 .contact-page .lab-nav > a,
 .contact-page .lab-nav__trigger {
-    color: rgba(21, 24, 33, 0.78);
+    color: rgba(255, 250, 242, 0.78);
 }
 
 .contact-page .lab-brand__copy span {
-    color: rgba(21, 24, 33, 0.5);
+    color: rgba(255, 250, 242, 0.58);
 }
 
 .contact-page .lab-nav > a:hover,
@@ -39,7 +49,7 @@
 .contact-page .lab-nav__trigger:hover,
 .contact-page .lab-nav__trigger:focus-visible,
 .contact-page .lab-nav > a[aria-current="page"] {
-    color: #171921;
+    color: #fffaf2;
 }
 
 .contact-page-main {

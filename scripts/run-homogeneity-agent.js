@@ -253,6 +253,205 @@ async function collectIdentityMetrics(page) {
                 : '';
         }
 
+        function firstVisibleWithin(root, selectors) {
+            if (!(root instanceof HTMLElement)) {
+                return null;
+            }
+
+            for (const selector of selectors) {
+                const element = Array.from(root.querySelectorAll(selector)).find(isVisible);
+                if (element) {
+                    return element;
+                }
+            }
+
+            return null;
+        }
+
+        function gapBetween(left, right) {
+            if (!left || !right) {
+                return null;
+            }
+
+            return Number((right.left - left.right).toFixed(2));
+        }
+
+        function centerY(value) {
+            return value ? value.top + (value.height / 2) : null;
+        }
+
+        function parseCssColor(value) {
+            const raw = String(value || '').trim();
+
+            if (!raw || raw === 'transparent') {
+                return { red: 0, green: 0, blue: 0, alpha: 0, luminance: 0 };
+            }
+
+            const match = raw.match(/rgba?\(([^)]+)\)/i);
+            if (!match) {
+                return null;
+            }
+
+            const parts = match[1]
+                .split(/[\s,\/]+/)
+                .map((part) => part.trim())
+                .filter(Boolean);
+            const red = Number.parseFloat(parts[0]);
+            const green = Number.parseFloat(parts[1]);
+            const blue = Number.parseFloat(parts[2]);
+            const alpha = parts[3] === undefined ? 1 : Number.parseFloat(parts[3]);
+
+            if (![red, green, blue, alpha].every(Number.isFinite)) {
+                return null;
+            }
+
+            const channels = [red, green, blue].map((channel) => {
+                const normalized = channel / 255;
+                return normalized <= 0.03928
+                    ? normalized / 12.92
+                    : ((normalized + 0.055) / 1.055) ** 2.4;
+            });
+            const luminance = (0.2126 * channels[0]) + (0.7152 * channels[1]) + (0.0722 * channels[2]);
+
+            return {
+                red,
+                green,
+                blue,
+                alpha,
+                luminance: Number(luminance.toFixed(4))
+            };
+        }
+
+        function extractCssColors(value) {
+            return (String(value || '').match(/rgba?\([^)]+\)/gi) || [])
+                .map(parseCssColor)
+                .filter(Boolean);
+        }
+
+        function surfaceTone(color, hasGradient) {
+            if (!color || color.alpha < 0.18) {
+                return hasGradient ? 'transparent-gradient' : 'transparent';
+            }
+
+            if (color.luminance <= 0.32) {
+                return hasGradient ? 'dark-gradient' : 'dark';
+            }
+
+            if (color.luminance >= 0.72) {
+                return 'light';
+            }
+
+            return 'muted';
+        }
+
+        function collectHeaderSurface(header) {
+            if (!(header instanceof HTMLElement)) {
+                return { exists: false };
+            }
+
+            const style = window.getComputedStyle(header);
+            const backgroundColor = parseCssColor(style.backgroundColor);
+            const imageColors = extractCssColors(style.backgroundImage);
+            const dominantColor = (
+                backgroundColor && backgroundColor.alpha >= 0.18
+                    ? backgroundColor
+                    : imageColors.find((color) => color.alpha >= 0.18) || backgroundColor
+            );
+            const hasGradient = /gradient/i.test(style.backgroundImage || '');
+            const backdropFilter = `${style.backdropFilter || ''} ${style.webkitBackdropFilter || ''}`;
+
+            return {
+                exists: true,
+                position: style.position || '',
+                backgroundColor: style.backgroundColor || '',
+                backgroundImage: style.backgroundImage === 'none' ? '' : String(style.backgroundImage || '').slice(0, 220),
+                backgroundAlpha: dominantColor ? Number(dominantColor.alpha.toFixed(3)) : null,
+                backgroundLuminance: dominantColor ? dominantColor.luminance : null,
+                surfaceTone: surfaceTone(dominantColor, hasGradient),
+                hasGradient,
+                hasBackdropBlur: /blur\((?!0(?:px)?\))/i.test(backdropFilter),
+                borderBottomWidthPx: Number(parsePx(style.borderBottomWidth).toFixed(2)),
+                borderBottomColor: style.borderBottomColor || '',
+                boxShadow: style.boxShadow && style.boxShadow !== 'none',
+                rect: rect(header)
+            };
+        }
+
+        function collectHeaderLayout(header) {
+            if (!(header instanceof HTMLElement)) {
+                return { exists: false };
+            }
+
+            const headerRect = rect(header);
+            const inner = firstVisibleWithin(header, ['.lab-header__inner', '.site-header__inner']) || header;
+            const brand = firstVisibleWithin(header, ['.lab-brand', '.header-brand']);
+            const utility = firstVisibleWithin(header, ['.lab-header__utility']);
+            const navWrap = firstVisibleWithin(header, ['.lab-header__nav']);
+            const nav = firstVisibleWithin(header, ['.lab-nav', 'nav[aria-label="Main navigation"]']);
+            const reserve = firstVisibleWithin(header, ['.lab-reserve', 'a[href*="reserve"]']);
+            const toggle = firstVisibleWithin(header, ['.lab-mobile-toggle', '[aria-controls="lab-mobile-drawer"]']);
+            const innerRect = rect(inner);
+            const brandRect = rect(brand);
+            const utilityRect = rect(utility);
+            const navWrapRect = rect(navWrap);
+            const navRect = rect(nav);
+            const reserveRect = rect(reserve);
+            const toggleRect = rect(toggle);
+            const mode = (toggleRect || !navRect || window.innerWidth <= 860) ? 'mobile' : 'desktop';
+            const orderedComponents = [
+                ['brand', brandRect],
+                ['utility', utilityRect],
+                ['nav', navRect],
+                ['reserve', reserveRect],
+                ['toggle', toggleRect]
+            ]
+                .filter(([, value]) => value)
+                .sort((left, right) => left[1].left - right[1].left)
+                .map(([name]) => name);
+            const centers = [brandRect, utilityRect, navRect, reserveRect, toggleRect]
+                .map(centerY)
+                .filter(Number.isFinite);
+            const minCenter = centers.length > 0 ? Math.min(...centers) : null;
+            const maxCenter = centers.length > 0 ? Math.max(...centers) : null;
+            const componentRights = [brandRect, utilityRect, navWrapRect, navRect, reserveRect, toggleRect]
+                .filter(Boolean)
+                .map((value) => value.right);
+            const componentLefts = [brandRect, utilityRect, navWrapRect, navRect, reserveRect, toggleRect]
+                .filter(Boolean)
+                .map((value) => value.left);
+            const overflowRight = componentRights.length > 0 ? Math.max(0, Math.max(...componentRights) - window.innerWidth) : 0;
+            const overflowLeft = componentLefts.length > 0 ? Math.max(0, 0 - Math.min(...componentLefts)) : 0;
+
+            return {
+                exists: true,
+                mode,
+                headerRect,
+                innerRect,
+                brandRect,
+                utilityRect,
+                navWrapRect,
+                navRect,
+                reserveRect,
+                toggleRect,
+                headerHeightPx: headerRect?.height ?? null,
+                innerHeightPx: innerRect?.height ?? null,
+                orderSignature: orderedComponents.join('|'),
+                brandToUtilityGapPx: gapBetween(brandRect, utilityRect),
+                utilityToNavGapPx: gapBetween(utilityRect, navWrapRect || navRect),
+                navToReserveGapPx: gapBetween(navRect, reserveRect),
+                brandToNavGapPx: gapBetween(brandRect, navWrapRect || navRect),
+                brandToToggleGapPx: gapBetween(brandRect, toggleRect),
+                leftInsetPx: brandRect && innerRect ? Number((brandRect.left - innerRect.left).toFixed(2)) : null,
+                rightInsetPx: innerRect && componentRights.length > 0
+                    ? Number((innerRect.right - Math.max(...componentRights)).toFixed(2))
+                    : null,
+                verticalCenterSpreadPx: minCenter !== null && maxCenter !== null
+                    ? Number((maxCenter - minCenter).toFixed(2))
+                    : null,
+                horizontalOverflowPx: Number(Math.max(overflowLeft, overflowRight).toFixed(2))
+            };
+        }
+
         function brandSurface(root) {
             if (!(root instanceof HTMLElement)) {
                 return { exists: false };
@@ -456,6 +655,8 @@ async function collectIdentityMetrics(page) {
             headerClassSignature: classSignature(header),
             primaryNavLabels: navLabels,
             primaryNavSignature: navSignature(navLabels),
+            headerSurface: collectHeaderSurface(header),
+            headerLayout: collectHeaderLayout(header),
             headerBrand: brandSurface(headerBrandRoot),
             drawerBrand: brandSurface(drawerBrandRoot),
             typography: {

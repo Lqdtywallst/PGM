@@ -7,6 +7,21 @@ const DEFAULT_BRAND_POLICY = Object.freeze({
     maxTextFontFamiliesPerPage: 2
 });
 
+const DEFAULT_HEADER_POLICY = Object.freeze({
+    approvedHeaderReferenceRoutes: Object.freeze(['/', '/services.html']),
+    maxHeaderHeightDeltaPx: 24,
+    maxHeaderHeightDeltaRatio: 0.24,
+    maxMobileHeaderHeightDeltaPx: 18,
+    minDesktopClusterGapPx: 24,
+    minDesktopNavReserveGapPx: 14,
+    minMobileBrandToggleGapPx: 12,
+    maxClusterGapDeltaPx: 18,
+    maxClusterGapDeltaRatio: 0.45,
+    maxVerticalCenterSpreadPx: 10,
+    maxHorizontalOverflowPx: 2,
+    maxSurfaceLuminanceDelta: 0.34
+});
+
 function normalizeRoute(route = '') {
     const pathname = String(route || '/').split(/[?#]/)[0] || '/';
     return pathname === '/index.html' ? '/' : pathname;
@@ -45,6 +60,18 @@ function normalizeFontToken(value = '') {
 function numberOrNull(value) {
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : null;
+}
+
+function formatEvidenceValue(value) {
+    if (value === null || value === undefined || value === '') {
+        return 'n/a';
+    }
+
+    if (typeof value === 'number') {
+        return Number(value.toFixed(2));
+    }
+
+    return String(value);
 }
 
 function relativeDelta(left, right) {
@@ -222,6 +249,244 @@ function compareHeaderSystems(reference = {}, actual = {}) {
     return mismatches;
 }
 
+function compareHeaderLayout(reference = {}, actual = {}, options = {}) {
+    const policy = { ...DEFAULT_HEADER_POLICY, ...(options.policy || {}) };
+    const mismatches = [];
+
+    if (!reference.exists || !actual.exists) {
+        pushMismatch(mismatches, {
+            field: 'exists',
+            severity: 'high',
+            message: 'Header layout metrics are missing on one side of the comparison.',
+            reference: Boolean(reference.exists),
+            actual: Boolean(actual.exists)
+        });
+        return mismatches;
+    }
+
+    if (reference.mode && actual.mode && reference.mode !== actual.mode) {
+        pushMismatch(mismatches, {
+            field: 'mode',
+            severity: 'high',
+            message: 'Header switches between desktop/mobile structural modes for the same viewport.',
+            reference: reference.mode,
+            actual: actual.mode
+        });
+    }
+
+    if (
+        reference.orderSignature &&
+        actual.orderSignature &&
+        reference.mode === 'desktop' &&
+        actual.mode === 'desktop' &&
+        reference.orderSignature !== actual.orderSignature
+    ) {
+        pushMismatch(mismatches, {
+            field: 'orderSignature',
+            severity: 'high',
+            message: 'Header component order differs from the approved reference.',
+            reference: reference.orderSignature,
+            actual: actual.orderSignature
+        });
+    }
+
+    const actualOverflow = numberOrNull(actual.horizontalOverflowPx);
+    if (actualOverflow !== null && actualOverflow > policy.maxHorizontalOverflowPx) {
+        pushMismatch(mismatches, {
+            field: 'horizontalOverflowPx',
+            severity: 'high',
+            message: 'Header content overflows horizontally.',
+            reference: `<=${policy.maxHorizontalOverflowPx}`,
+            actual: actualOverflow
+        });
+    }
+
+    const referenceHeight = numberOrNull(reference.headerHeightPx);
+    const actualHeight = numberOrNull(actual.headerHeightPx);
+    const heightDeltaPx = Math.abs(Number(referenceHeight || 0) - Number(actualHeight || 0));
+    const heightDeltaRatio = relativeDelta(referenceHeight, actualHeight);
+    const heightLimit = actual.mode === 'mobile'
+        ? policy.maxMobileHeaderHeightDeltaPx
+        : policy.maxHeaderHeightDeltaPx;
+
+    if (
+        referenceHeight !== null &&
+        actualHeight !== null &&
+        heightDeltaPx > heightLimit &&
+        heightDeltaRatio > policy.maxHeaderHeightDeltaRatio
+    ) {
+        pushMismatch(mismatches, {
+            field: 'headerHeightPx',
+            severity: actual.mode === 'mobile' ? 'medium' : 'high',
+            message: 'Header height drifts enough to feel like a different component.',
+            reference: referenceHeight,
+            actual: actualHeight
+        });
+    }
+
+    const centerSpread = numberOrNull(actual.verticalCenterSpreadPx);
+    if (centerSpread !== null && centerSpread > policy.maxVerticalCenterSpreadPx) {
+        pushMismatch(mismatches, {
+            field: 'verticalCenterSpreadPx',
+            severity: 'medium',
+            message: 'Header items are not vertically aligned on the same optical line.',
+            reference: `<=${policy.maxVerticalCenterSpreadPx}`,
+            actual: centerSpread
+        });
+    }
+
+    if (actual.mode === 'mobile' || reference.mode === 'mobile') {
+        const mobileGap = numberOrNull(actual.brandToToggleGapPx);
+        const referenceGap = numberOrNull(reference.brandToToggleGapPx);
+
+        if (
+            mobileGap !== null &&
+            referenceGap !== null &&
+            referenceGap >= policy.minMobileBrandToggleGapPx &&
+            mobileGap < policy.minMobileBrandToggleGapPx
+        ) {
+            pushMismatch(mismatches, {
+                field: 'brandToToggleGapPx',
+                severity: 'medium',
+                message: 'Mobile header brand and menu toggle are too cramped.',
+                reference: referenceGap,
+                actual: mobileGap
+            });
+        }
+
+        return mismatches;
+    }
+
+    const desktopGapFields = [
+        ['brandToUtilityGapPx', policy.minDesktopClusterGapPx, 'Brand to quick-contact spacing is too tight.'],
+        ['utilityToNavGapPx', policy.minDesktopClusterGapPx, 'Quick-contact to navigation spacing is too tight.'],
+        ['navToReserveGapPx', policy.minDesktopNavReserveGapPx, 'Navigation to Reserve spacing is too tight.']
+    ];
+
+    for (const [field, minimum, message] of desktopGapFields) {
+        const referenceGap = numberOrNull(reference[field]);
+        const actualGap = numberOrNull(actual[field]);
+
+        if (referenceGap === null || actualGap === null) {
+            continue;
+        }
+
+        if (referenceGap >= minimum && actualGap < minimum) {
+            pushMismatch(mismatches, {
+                field,
+                severity: actualGap < minimum * 0.72 ? 'high' : 'medium',
+                message,
+                reference: referenceGap,
+                actual: actualGap
+            });
+            continue;
+        }
+
+        if (
+            actualGap < referenceGap &&
+            Math.abs(referenceGap - actualGap) > policy.maxClusterGapDeltaPx &&
+            relativeDelta(referenceGap, actualGap) > policy.maxClusterGapDeltaRatio
+        ) {
+            pushMismatch(mismatches, {
+                field,
+                severity: 'low',
+                message: 'Header spacing rhythm differs from the approved reference.',
+                reference: referenceGap,
+                actual: actualGap
+            });
+        }
+    }
+
+    return mismatches;
+}
+
+function isDarkHeaderTone(value = '') {
+    return ['dark', 'dark-gradient', 'transparent-dark'].includes(String(value || '').toLowerCase());
+}
+
+function compareHeaderSurface(reference = {}, actual = {}, options = {}) {
+    const policy = { ...DEFAULT_HEADER_POLICY, ...(options.policy || {}) };
+    const mismatches = [];
+
+    if (!reference.exists || !actual.exists) {
+        pushMismatch(mismatches, {
+            field: 'exists',
+            severity: 'high',
+            message: 'Header surface metrics are missing on one side of the comparison.',
+            reference: Boolean(reference.exists),
+            actual: Boolean(actual.exists)
+        });
+        return mismatches;
+    }
+
+    const referenceTone = String(reference.surfaceTone || '').toLowerCase();
+    const actualTone = String(actual.surfaceTone || '').toLowerCase();
+    const referenceIsDark = isDarkHeaderTone(referenceTone);
+    const actualIsDark = isDarkHeaderTone(actualTone);
+
+    if (referenceIsDark && actualTone === 'light') {
+        pushMismatch(mismatches, {
+            field: 'surfaceTone',
+            severity: 'high',
+            message: 'Header background is light while the approved references use a dark premium surface.',
+            reference: reference.surfaceTone,
+            actual: actual.surfaceTone
+        });
+    } else if (referenceTone && actualTone && referenceTone !== actualTone && !(referenceIsDark && actualIsDark)) {
+        pushMismatch(mismatches, {
+            field: 'surfaceTone',
+            severity: 'medium',
+            message: 'Header background tone differs from the approved reference.',
+            reference: reference.surfaceTone,
+            actual: actual.surfaceTone
+        });
+    }
+
+    const referenceLuminance = numberOrNull(reference.backgroundLuminance);
+    const actualLuminance = numberOrNull(actual.backgroundLuminance);
+    if (
+        referenceIsDark &&
+        referenceLuminance !== null &&
+        actualLuminance !== null &&
+        actualLuminance - referenceLuminance > policy.maxSurfaceLuminanceDelta
+    ) {
+        pushMismatch(mismatches, {
+            field: 'backgroundLuminance',
+            severity: 'high',
+            message: 'Header surface is visibly brighter than the approved dark header system.',
+            reference: referenceLuminance,
+            actual: actualLuminance
+        });
+    }
+
+    if (reference.hasGradient && !actual.hasGradient && referenceIsDark && actual.surfaceTone !== 'dark') {
+        pushMismatch(mismatches, {
+            field: 'hasGradient',
+            severity: 'medium',
+            message: 'Header lost the dark gradient surface used by the approved reference.',
+            reference: true,
+            actual: Boolean(actual.hasGradient)
+        });
+    }
+
+    if (
+        reference.position &&
+        actual.position &&
+        reference.position !== actual.position &&
+        !['sticky', 'fixed'].includes(actual.position)
+    ) {
+        pushMismatch(mismatches, {
+            field: 'position',
+            severity: 'low',
+            message: 'Header positioning differs from the approved reference.',
+            reference: reference.position,
+            actual: actual.position
+        });
+    }
+
+    return mismatches;
+}
+
 function compareTypographySurfaces(reference = {}, actual = {}) {
     const mismatches = [];
     const surfaces = [
@@ -303,12 +568,40 @@ function highestSeverity(mismatches = []) {
 
 function formatMismatchEvidence(mismatches = []) {
     return mismatches
-        .map((entry) => `${entry.field}: ${entry.reference || 'n/a'} -> ${entry.actual || 'n/a'}`)
+        .map((entry) => `${entry.field}: ${formatEvidenceValue(entry.reference)} -> ${formatEvidenceValue(entry.actual)}`)
         .join('; ');
+}
+
+function severityScore(mismatches = []) {
+    return mismatches.reduce((score, mismatch) => {
+        if (mismatch.severity === 'high') {
+            return score + 100;
+        }
+
+        if (mismatch.severity === 'medium') {
+            return score + 10;
+        }
+
+        return score + 1;
+    }, 0);
+}
+
+function bestReferenceComparison(referencePages = [], actualPage = {}, compare) {
+    const comparisons = referencePages
+        .filter((referencePage) => referencePage && referencePage.route !== actualPage.route)
+        .map((referencePage) => ({
+            referenceRoute: referencePage.route,
+            mismatches: compare(referencePage, actualPage)
+        }))
+        .sort((left, right) => severityScore(left.mismatches) - severityScore(right.mismatches));
+
+    return comparisons[0] || { referenceRoute: '', mismatches: [] };
 }
 
 function buildHomogeneityFindings(pages = [], options = {}) {
     const findings = [];
+    const policy = { ...DEFAULT_HEADER_POLICY, ...(options.policy || {}) };
+    const headerReferenceRoutes = options.headerReferenceRoutes || policy.approvedHeaderReferenceRoutes || ['/'];
     const normalizedPages = pages.map((page) => ({
         ...page,
         route: normalizeRoute(page.route)
@@ -328,6 +621,11 @@ function buildHomogeneityFindings(pages = [], options = {}) {
             continue;
         }
 
+        const headerReferences = headerReferenceRoutes
+            .map((route) => group.find((page) => page.route === normalizeRoute(route)))
+            .filter(Boolean);
+        const approvedHeaderReferences = headerReferences.length > 0 ? headerReferences : [home];
+
         for (const page of group) {
             if (page.route !== home.route) {
                 const headerMismatches = compareHeaderSystems(home, page);
@@ -346,6 +644,56 @@ function buildHomogeneityFindings(pages = [], options = {}) {
                         recommendation: 'Review whether this route should use the same brand mark, type scale and nav signature as home.',
                         screenshotPath: page.headerScreenshotPath || page.viewportScreenshotPath || ''
                     }));
+                }
+
+                if (!headerReferenceRoutes.map(normalizeRoute).includes(page.route)) {
+                    const layoutComparison = bestReferenceComparison(
+                        approvedHeaderReferences,
+                        page,
+                        (referencePage, actualPage) => compareHeaderLayout(
+                            referencePage.headerLayout,
+                            actualPage.headerLayout,
+                            { policy }
+                        )
+                    );
+
+                    if (layoutComparison.mismatches.length > 0) {
+                        findings.push(createFinding({
+                            route: page.route,
+                            viewport,
+                            area: 'header',
+                            severity: highestSeverity(layoutComparison.mismatches),
+                            category: 'header_layout_drift',
+                            message: 'This page header layout drifts from the approved home/services header rhythm.',
+                            evidence: `reference ${layoutComparison.referenceRoute}: ${formatMismatchEvidence(layoutComparison.mismatches)}`,
+                            recommendation: 'Keep the brand, contact icons, navigation and Reserve CTA aligned with the approved header spacing and order.',
+                            screenshotPath: page.headerScreenshotPath || page.viewportScreenshotPath || ''
+                        }));
+                    }
+
+                    const surfaceComparison = bestReferenceComparison(
+                        approvedHeaderReferences,
+                        page,
+                        (referencePage, actualPage) => compareHeaderSurface(
+                            referencePage.headerSurface,
+                            actualPage.headerSurface,
+                            { policy }
+                        )
+                    );
+
+                    if (surfaceComparison.mismatches.length > 0) {
+                        findings.push(createFinding({
+                            route: page.route,
+                            viewport,
+                            area: 'header',
+                            severity: highestSeverity(surfaceComparison.mismatches),
+                            category: 'header_surface_drift',
+                            message: 'This page header surface does not match the approved dark premium header treatment.',
+                            evidence: `reference ${surfaceComparison.referenceRoute}: ${formatMismatchEvidence(surfaceComparison.mismatches)}`,
+                            recommendation: 'Use the same dark/gradient header surface as home or services; avoid white headers and low-contrast brand/navigation text.',
+                            screenshotPath: page.headerScreenshotPath || page.viewportScreenshotPath || ''
+                        }));
+                    }
                 }
 
                 const typographyMismatches = compareTypographySurfaces(home.typography, page.typography);
@@ -437,8 +785,11 @@ function summarizeHomogeneityFindings(findings = []) {
 
 module.exports = {
     DEFAULT_BRAND_POLICY,
+    DEFAULT_HEADER_POLICY,
     buildHomogeneityFindings,
     compareBrandSurfaces,
+    compareHeaderLayout,
+    compareHeaderSurface,
     compareHeaderSystems,
     compareTypographySurfaces,
     normalizeAssetPath,
