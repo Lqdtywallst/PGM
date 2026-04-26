@@ -5,6 +5,7 @@ const {
     buildHomogeneityFindings,
     compareBrandSurfaces,
     compareHeaderLayout,
+    compareHeaderNavigationMotion,
     compareHeaderSurface,
     compareHeaderSystems,
     compareTypographySurfaces,
@@ -128,6 +129,32 @@ test('compareHeaderSurface flags white headers against dark approved references'
     assert.ok(mismatches.some((entry) => entry.field === 'backgroundLuminance' && entry.severity === 'high'));
 });
 
+test('compareHeaderNavigationMotion flags visible jumps between header tabs', () => {
+    const mismatches = compareHeaderNavigationMotion(
+        {
+            route: '/',
+            headerLayout: homeHeaderLayout,
+            headerBrand: homeBrand
+        },
+        {
+            route: '/about.html',
+            headerLayout: {
+                ...homeHeaderLayout,
+                headerHeightPx: 116,
+                brandToUtilityGapPx: 162
+            },
+            headerBrand: {
+                ...homeBrand,
+                logoRect: { width: 62, height: 62 }
+            }
+        }
+    );
+
+    assert.ok(mismatches.some((entry) => entry.field === 'headerHeightPx'));
+    assert.ok(mismatches.some((entry) => entry.field === 'logoWidthPx'));
+    assert.ok(mismatches.some((entry) => entry.field === 'brandToUtilityGapPx' && entry.severity === 'high'));
+});
+
 test('compareTypographySurfaces flags text font family drift', () => {
     const mismatches = compareTypographySurfaces(homeTypography, {
         heading: { exists: true, fontFamily: 'Cormorant Garamond, serif' },
@@ -242,9 +269,14 @@ test('buildHomogeneityFindings uses home and services as approved header referen
             viewport: 'desktop-wide',
             headerLayout: {
                 ...homeHeaderLayout,
+                headerHeightPx: 94,
                 brandToUtilityGapPx: 18,
                 utilityToNavGapPx: 18,
                 navToReserveGapPx: 7
+            },
+            headerBrand: {
+                ...homeBrand,
+                logoRect: { width: 62, height: 62 }
             },
             headerSurface: {
                 ...homeHeaderSurface,
@@ -261,6 +293,7 @@ test('buildHomogeneityFindings uses home and services as approved header referen
     );
     assert.ok(findings.some((finding) => finding.route === '/lamborghini-rental-dubai.html' && finding.category === 'header_layout_drift'));
     assert.ok(findings.some((finding) => finding.route === '/lamborghini-rental-dubai.html' && finding.category === 'header_surface_drift'));
+    assert.ok(findings.some((finding) => finding.route === '/lamborghini-rental-dubai.html' && finding.category === 'header_navigation_shift'));
 });
 
 test('summarizeHomogeneityFindings groups severity counts', () => {

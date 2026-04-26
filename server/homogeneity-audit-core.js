@@ -19,7 +19,11 @@ const DEFAULT_HEADER_POLICY = Object.freeze({
     maxClusterGapDeltaRatio: 0.45,
     maxVerticalCenterSpreadPx: 10,
     maxHorizontalOverflowPx: 2,
-    maxSurfaceLuminanceDelta: 0.34
+    maxSurfaceLuminanceDelta: 0.34,
+    maxNavigationHeaderHeightShiftPx: 4,
+    maxNavigationLogoSizeShiftPx: 6,
+    maxNavigationClusterGapShiftPx: 18,
+    highNavigationClusterGapShiftPx: 56
 });
 
 function normalizeRoute(route = '') {
@@ -487,6 +491,87 @@ function compareHeaderSurface(reference = {}, actual = {}, options = {}) {
     return mismatches;
 }
 
+function compareHeaderNavigationMotion(referencePage = {}, actualPage = {}, options = {}) {
+    const policy = { ...DEFAULT_HEADER_POLICY, ...(options.policy || {}) };
+    const reference = referencePage.headerLayout || {};
+    const actual = actualPage.headerLayout || {};
+    const mismatches = [];
+
+    if (!reference.exists || !actual.exists) {
+        pushMismatch(mismatches, {
+            field: 'exists',
+            severity: 'high',
+            message: 'Header motion metrics are missing on one side of the comparison.',
+            reference: Boolean(reference.exists),
+            actual: Boolean(actual.exists)
+        });
+        return mismatches;
+    }
+
+    if (reference.mode !== actual.mode) {
+        pushMismatch(mismatches, {
+            field: 'mode',
+            severity: 'high',
+            message: 'Header changes structural mode between route clicks.',
+            reference: reference.mode,
+            actual: actual.mode
+        });
+        return mismatches;
+    }
+
+    const heightDelta = Math.abs(Number(reference.headerHeightPx || 0) - Number(actual.headerHeightPx || 0));
+    if (heightDelta > policy.maxNavigationHeaderHeightShiftPx) {
+        pushMismatch(mismatches, {
+            field: 'headerHeightPx',
+            severity: heightDelta > policy.maxNavigationHeaderHeightShiftPx * 2 ? 'high' : 'medium',
+            message: 'Header height changes enough to be visible when navigating from the header.',
+            reference: reference.headerHeightPx,
+            actual: actual.headerHeightPx
+        });
+    }
+
+    const referenceLogoWidth = numberOrNull(referencePage.headerBrand?.logoRect?.width);
+    const actualLogoWidth = numberOrNull(actualPage.headerBrand?.logoRect?.width);
+    const logoDelta = Math.abs(Number(referenceLogoWidth || 0) - Number(actualLogoWidth || 0));
+    if (referenceLogoWidth !== null && actualLogoWidth !== null && logoDelta > policy.maxNavigationLogoSizeShiftPx) {
+        pushMismatch(mismatches, {
+            field: 'logoWidthPx',
+            severity: logoDelta > policy.maxNavigationLogoSizeShiftPx * 1.8 ? 'high' : 'medium',
+            message: 'Brand logo size changes enough to make the header jump between tabs.',
+            reference: referenceLogoWidth,
+            actual: actualLogoWidth
+        });
+    }
+
+    const gapFields = [
+        ['brandToUtilityGapPx', 'Brand-to-contact spacing changes between header tabs.'],
+        ['utilityToNavGapPx', 'Contact-to-navigation spacing changes between header tabs.'],
+        ['navToReserveGapPx', 'Navigation-to-reserve spacing changes between header tabs.']
+    ];
+
+    for (const [field, message] of gapFields) {
+        const referenceGap = numberOrNull(reference[field]);
+        const actualGap = numberOrNull(actual[field]);
+
+        if (referenceGap === null || actualGap === null) {
+            continue;
+        }
+
+        const gapDelta = Math.abs(referenceGap - actualGap);
+        if (gapDelta > policy.maxNavigationClusterGapShiftPx) {
+            pushMismatch(mismatches, {
+                field,
+                severity: gapDelta > policy.highNavigationClusterGapShiftPx ? 'high' : 'medium',
+                message,
+                reference: referenceGap,
+                actual: actualGap
+            });
+        }
+    }
+
+    return mismatches;
+}
+
 function compareTypographySurfaces(reference = {}, actual = {}) {
     const mismatches = [];
     const surfaces = [
@@ -694,6 +779,30 @@ function buildHomogeneityFindings(pages = [], options = {}) {
                             screenshotPath: page.headerScreenshotPath || page.viewportScreenshotPath || ''
                         }));
                     }
+
+                    const motionComparison = bestReferenceComparison(
+                        approvedHeaderReferences,
+                        page,
+                        (referencePage, actualPage) => compareHeaderNavigationMotion(
+                            referencePage,
+                            actualPage,
+                            { policy }
+                        )
+                    );
+
+                    if (motionComparison.mismatches.length > 0) {
+                        findings.push(createFinding({
+                            route: page.route,
+                            viewport,
+                            area: 'header',
+                            severity: highestSeverity(motionComparison.mismatches),
+                            category: 'header_navigation_shift',
+                            message: 'Clicking into this route would visibly move the header compared with the approved home/services header.',
+                            evidence: `reference ${motionComparison.referenceRoute}: ${formatMismatchEvidence(motionComparison.mismatches)}`,
+                            recommendation: 'Keep header height, logo scale and brand/contact/nav spacing stable across route clicks so the navigation feels fixed in place.',
+                            screenshotPath: page.headerScreenshotPath || page.viewportScreenshotPath || ''
+                        }));
+                    }
                 }
 
                 const typographyMismatches = compareTypographySurfaces(home.typography, page.typography);
@@ -789,6 +898,7 @@ module.exports = {
     buildHomogeneityFindings,
     compareBrandSurfaces,
     compareHeaderLayout,
+    compareHeaderNavigationMotion,
     compareHeaderSurface,
     compareHeaderSystems,
     compareTypographySurfaces,
