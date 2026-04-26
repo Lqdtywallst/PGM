@@ -215,7 +215,7 @@ function renderAdminReservationsPage() {
             --green: #1f8f54;
             --red: #b64035;
             --amber: #b47825;
-            --shadow: 0 22px 70px rgba(52, 38, 21, 0.14);
+            --shadow: 0 16px 46px rgba(52, 38, 21, 0.11);
         }
         * { box-sizing: border-box; }
         body {
@@ -235,8 +235,8 @@ function renderAdminReservationsPage() {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 16px;
-            padding: 16px clamp(16px, 4vw, 36px);
+            gap: 14px;
+            padding: 10px clamp(16px, 3vw, 30px);
             border-bottom: 1px solid var(--line);
             background: rgba(13, 13, 15, 0.92);
             color: #fff8e7;
@@ -245,15 +245,15 @@ function renderAdminReservationsPage() {
         .brand {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
         }
         .brand-mark {
-            width: 46px;
-            height: 46px;
+            width: 40px;
+            height: 40px;
             display: grid;
             place-items: center;
             border: 1px solid rgba(247, 223, 149, 0.58);
-            border-radius: 13px;
+            border-radius: 12px;
             color: var(--gold-soft);
             font: 800 0.86rem Georgia, serif;
         }
@@ -261,7 +261,7 @@ function renderAdminReservationsPage() {
             display: block;
             letter-spacing: 0.12em;
             text-transform: uppercase;
-            font-size: 0.88rem;
+            font-size: 0.82rem;
         }
         .brand span {
             display: block;
@@ -269,11 +269,11 @@ function renderAdminReservationsPage() {
             color: rgba(255, 248, 231, 0.66);
             letter-spacing: 0.13em;
             text-transform: uppercase;
-            font-size: 0.68rem;
+            font-size: 0.64rem;
         }
         .logout {
-            min-height: 42px;
-            padding: 0 18px;
+            min-height: 38px;
+            padding: 0 16px;
             border: 1px solid rgba(255, 255, 255, 0.16);
             border-radius: 13px;
             background: transparent;
@@ -285,73 +285,74 @@ function renderAdminReservationsPage() {
         }
         .layout {
             display: grid;
-            grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.7fr);
-            gap: 22px;
-            width: min(1480px, 100%);
+            grid-template-columns: minmax(0, 1.08fr) minmax(380px, 0.74fr);
+            gap: 18px;
+            width: min(1680px, 100%);
             margin: 0 auto;
-            padding: clamp(18px, 4vw, 36px);
+            padding: clamp(14px, 2.4vw, 26px);
         }
         .hero {
             grid-column: 1 / -1;
             display: flex;
             justify-content: space-between;
-            gap: 24px;
-            align-items: end;
-            padding: 28px;
+            gap: 20px;
+            align-items: center;
+            padding: 18px 22px;
             border: 1px solid var(--line);
-            border-radius: 30px;
+            border-radius: 24px;
             background: rgba(255, 255, 255, 0.62);
             box-shadow: var(--shadow);
         }
         h1 {
             margin: 0;
-            max-width: 760px;
+            max-width: 960px;
             font-family: Georgia, "Times New Roman", serif;
-            font-size: clamp(2.3rem, 6vw, 5rem);
-            line-height: 0.92;
-            letter-spacing: -0.05em;
+            font-size: clamp(1.85rem, 2.5vw, 2.85rem);
+            line-height: 1;
+            letter-spacing: -0.045em;
         }
         .hero p {
-            max-width: 470px;
-            margin: 14px 0 0;
+            max-width: 520px;
+            margin: 6px 0 0;
             color: var(--muted);
-            line-height: 1.55;
+            font-size: 0.94rem;
+            line-height: 1.45;
         }
         .toolbar,
         .list-panel,
         .detail-panel {
             border: 1px solid var(--line);
-            border-radius: 26px;
+            border-radius: 22px;
             background: var(--panel);
             box-shadow: var(--shadow);
         }
         .toolbar {
-            padding: 18px;
-            margin-bottom: 18px;
+            padding: 14px;
+            margin-bottom: 14px;
         }
         .search-row {
             display: grid;
             grid-template-columns: minmax(0, 1fr) auto;
-            gap: 12px;
-            margin-bottom: 14px;
+            gap: 10px;
+            margin-bottom: 12px;
         }
         input,
         textarea {
             width: 100%;
             border: 1px solid var(--line);
-            border-radius: 15px;
+            border-radius: 13px;
             background: #fff;
             color: var(--ink);
-            font: 600 0.98rem Arial, sans-serif;
+            font: 600 0.92rem Arial, sans-serif;
             outline: none;
         }
         input {
-            min-height: 48px;
-            padding: 0 15px;
+            min-height: 42px;
+            padding: 0 14px;
         }
         textarea {
-            min-height: 112px;
-            padding: 14px;
+            min-height: 92px;
+            padding: 12px;
             resize: vertical;
         }
         input:focus,
@@ -362,18 +363,18 @@ function renderAdminReservationsPage() {
         .button,
         .filter,
         .action {
-            min-height: 44px;
+            min-height: 40px;
             border: 1px solid var(--line);
-            border-radius: 14px;
+            border-radius: 13px;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            padding: 0 15px;
+            padding: 0 14px;
             background: #fff;
             color: var(--ink);
-            font: 900 0.75rem Arial, sans-serif;
+            font: 900 0.7rem Arial, sans-serif;
             letter-spacing: 0.08em;
             text-decoration: none;
             text-transform: uppercase;
@@ -394,7 +395,7 @@ function renderAdminReservationsPage() {
         .filters {
             display: flex;
             flex-wrap: wrap;
-            gap: 9px;
+            gap: 8px;
         }
         .filter.is-active {
             background: var(--black);
@@ -407,24 +408,24 @@ function renderAdminReservationsPage() {
             display: flex;
             justify-content: space-between;
             gap: 12px;
-            padding: 18px 18px 0;
+            padding: 14px 16px 0;
             color: var(--muted);
-            font-size: 0.88rem;
+            font-size: 0.82rem;
         }
         .cards {
             display: grid;
-            gap: 12px;
-            padding: 18px;
+            gap: 10px;
+            padding: 14px;
         }
         .reservation-card {
             width: 100%;
             text-align: left;
             display: grid;
             grid-template-columns: minmax(0, 1fr) auto;
-            gap: 12px;
-            padding: 16px;
+            gap: 10px;
+            padding: 13px 14px;
             border: 1px solid var(--line);
-            border-radius: 20px;
+            border-radius: 17px;
             background: #fffaf2;
             color: var(--ink);
             cursor: pointer;
@@ -434,26 +435,26 @@ function renderAdminReservationsPage() {
             box-shadow: 0 0 0 4px rgba(220, 180, 88, 0.15);
         }
         .reservation-title {
-            margin: 0 0 7px;
+            margin: 0 0 6px;
             font-family: Georgia, "Times New Roman", serif;
-            font-size: 1.32rem;
+            font-size: 1.1rem;
             line-height: 1.05;
         }
         .reservation-meta {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px 14px;
+            gap: 6px 12px;
             color: var(--muted);
-            font-size: 0.88rem;
-            line-height: 1.45;
+            font-size: 0.82rem;
+            line-height: 1.35;
         }
         .status {
             align-self: start;
-            padding: 8px 10px;
+            padding: 6px 9px;
             border-radius: 999px;
             background: rgba(117, 107, 97, 0.12);
             color: var(--muted);
-            font: 900 0.66rem Arial, sans-serif;
+            font: 900 0.6rem Arial, sans-serif;
             letter-spacing: 0.08em;
             text-transform: uppercase;
             white-space: nowrap;
@@ -463,62 +464,62 @@ function renderAdminReservationsPage() {
         .status.failed { background: rgba(182, 64, 53, 0.12); color: var(--red); }
         .detail-panel {
             position: sticky;
-            top: 92px;
+            top: 72px;
             align-self: start;
-            max-height: calc(100vh - 116px);
+            max-height: calc(100vh - 92px);
             overflow: auto;
-            padding: 22px;
+            padding: 18px;
         }
         .detail-empty {
-            padding: 60px 12px;
+            padding: 42px 12px;
             text-align: center;
             color: var(--muted);
         }
         .detail-title {
             margin: 0;
             font-family: Georgia, "Times New Roman", serif;
-            font-size: 2.25rem;
-            line-height: 0.98;
+            font-size: clamp(1.55rem, 2.2vw, 2rem);
+            line-height: 1;
             letter-spacing: -0.04em;
         }
         .detail-subtitle {
-            margin: 10px 0 18px;
+            margin: 8px 0 14px;
             color: var(--muted);
             line-height: 1.45;
         }
         .detail-actions {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px;
-            margin: 18px 0;
+            gap: 8px;
+            margin: 14px 0;
         }
         .section {
-            padding: 18px 0;
+            padding: 14px 0;
             border-top: 1px solid var(--line);
         }
         .section h2 {
-            margin: 0 0 12px;
-            font-size: 0.78rem;
+            margin: 0 0 10px;
+            font-size: 0.7rem;
             letter-spacing: 0.13em;
             text-transform: uppercase;
         }
         .field-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 12px;
+            gap: 10px;
         }
         .field {
             min-width: 0;
-            padding: 12px;
+            padding: 10px;
             border: 1px solid var(--line);
-            border-radius: 15px;
+            border-radius: 13px;
             background: rgba(255, 255, 255, 0.7);
         }
         .field span {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             color: var(--muted);
-            font-size: 0.68rem;
+            font-size: 0.62rem;
             font-weight: 900;
             letter-spacing: 0.1em;
             text-transform: uppercase;
@@ -526,10 +527,10 @@ function renderAdminReservationsPage() {
         .field strong {
             display: block;
             overflow-wrap: anywhere;
-            font-size: 0.96rem;
+            font-size: 0.88rem;
         }
         .empty {
-            padding: 28px;
+            padding: 22px;
             color: var(--muted);
             text-align: center;
         }
