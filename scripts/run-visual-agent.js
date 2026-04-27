@@ -3264,6 +3264,18 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                 ));
             }
 
+            function effectiveForegroundChannels(value, backgroundChannels) {
+                const color = parseCssColor(value);
+
+                if (!color.channels) {
+                    return null;
+                }
+
+                return color.alpha < 0.995
+                    ? blendChannels(color.channels, color.alpha, backgroundChannels)
+                    : color.channels;
+            }
+
             function parseBackgroundImageChannels(value) {
                 const matches = Array.from(String(value || '').matchAll(/rgba?\(([^)]+)\)/ig));
 
@@ -3319,6 +3331,13 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                         if (current.matches('.fleet-date-prompt, .fleet-card, .fleet-card__booking, .fleet-browser__empty, .fleet-page-main, .fleet-browser, .fleet-browser__shell, .fleet-results, .reserve-page-panel, .schedule-card, .delivery-card, .reservation-summary, .step2-main, .step2-side, .contact-hero, .contact-band, .contact-form-card, .contact-trust-list li, .contact-methods-grid .info-card, .vehicle-page--mother-base, .vehicle-main--mother-base, .vehicle-page--mother-base .vehicle-booking, .vehicle-page--mother-base .model-card, .vehicle-page--mother-base .vehicle-metric, .vehicle-page--mother-base .vehicle-pdp-summary-support, .vehicle-page--mother-base .vehicle-pdp-car-note, .vehicle-page--mother-base .vehicle-pdp-gallery-card, .vehicle-page--mother-base .vehicle-pdp-use__card, .service-detail-page-main, .service-detail-hero__copy, .service-detail-hero__panel, .service-detail-card, .service-detail-trust__item, .service-detail-faq__item, .service-detail-cta, .service-detail-related__card')) {
                             return [255, 250, 243];
                         }
+                    }
+
+                    if (
+                        current.matches('.service-scene, .service-scene__content, .fleet-editorial__panel--video, .fleet-editorial__panel--photo, .fleet-editorial__panel--detail, .fleet-editorial__panel-copy, .fleet-visual-card__media, .vehicle-pdp-gallery-card') &&
+                        (current.querySelector('img, picture, video, .service-scene__shade, .fleet-visual-card__shade') || current.closest('.service-scene, .fleet-editorial__panel--video, .fleet-editorial__panel--photo, .fleet-editorial__panel--detail, .fleet-visual-card__media'))
+                    ) {
+                        return [22, 22, 22];
                     }
 
                     current = current.parentElement;
@@ -3521,13 +3540,21 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                             continue;
                         }
 
+                        const normalizedText = String(text || '').replace(/\s+/g, ' ').trim();
                         const style = window.getComputedStyle(element);
-                        const foregroundChannels = parseColorChannels(style.color);
                         const backgroundChannels = effectiveBackgroundChannels(element);
+                        const foregroundChannels = effectiveForegroundChannels(style.color, backgroundChannels);
                         const ratio = contrastRatio(foregroundChannels, backgroundChannels);
-                        const requiredRatio = isLargeReadableText(style)
+                        const baseRequiredRatio = isLargeReadableText(style)
                             ? minLargeTextContrastRatio
                             : minTextContrastRatio;
+                        const color = parseCssColor(style.color);
+                        const washedOutAlphaText = relativeLuminance(backgroundChannels) > 0.78 &&
+                            color.alpha < 0.86 &&
+                            normalizedText.length >= 16;
+                        const requiredRatio = washedOutAlphaText
+                            ? Math.max(baseRequiredRatio, 6.4)
+                            : baseRequiredRatio;
 
                         if (ratio > 0 && ratio < requiredRatio) {
                             issues.push({
@@ -5408,6 +5435,18 @@ async function collectVisualMetrics(page, profile) {
             ));
         }
 
+        function effectiveForegroundChannels(value, backgroundChannels) {
+            const color = parseColorParts(value);
+
+            if (!color?.channels) {
+                return null;
+            }
+
+            return color.alpha < 0.995
+                ? blendChannels(color.channels, color.alpha, backgroundChannels)
+                : color.channels;
+        }
+
         function parseBackgroundImageChannels(value) {
             const matches = Array.from(String(value || '').matchAll(/rgba?\(([^)]+)\)/ig));
 
@@ -5480,6 +5519,13 @@ async function collectVisualMetrics(page, profile) {
                     if (current.matches('.fleet-sidebar')) {
                         return [230, 212, 186];
                     }
+                }
+
+                if (
+                    current.matches('.service-scene, .service-scene__content, .fleet-editorial__panel--video, .fleet-editorial__panel--photo, .fleet-editorial__panel--detail, .fleet-editorial__panel-copy, .fleet-visual-card__media, .vehicle-pdp-gallery-card') &&
+                    (current.querySelector('img, picture, video, .service-scene__shade, .fleet-visual-card__shade') || current.closest('.service-scene, .fleet-editorial__panel--video, .fleet-editorial__panel--photo, .fleet-editorial__panel--detail, .fleet-visual-card__media'))
+                ) {
+                    return [22, 22, 22];
                 }
 
                 current = current.parentElement;
@@ -5909,10 +5955,17 @@ async function collectVisualMetrics(page, profile) {
                     }
 
                     const style = window.getComputedStyle(element);
-                    const foregroundChannels = parseColorChannels(style.color);
                     const backgroundChannels = effectiveBackgroundChannels(element);
+                    const foregroundChannels = effectiveForegroundChannels(style.color, backgroundChannels);
                     const ratio = contrastRatio(foregroundChannels, backgroundChannels);
-                    const threshold = isLargeReadableText(style) ? minLargeTextContrastRatio : minTextContrastRatio;
+                    const baseThreshold = isLargeReadableText(style) ? minLargeTextContrastRatio : minTextContrastRatio;
+                    const color = parseColorParts(style.color);
+                    const washedOutAlphaText = relativeLuminance(backgroundChannels) > 0.78 &&
+                        Number(color?.alpha || 1) < 0.86 &&
+                        normalizedText.length >= 16;
+                    const threshold = washedOutAlphaText
+                        ? Math.max(baseThreshold, 6.4)
+                        : baseThreshold;
 
                     if (ratio > 0 && ratio < threshold) {
                         issues.push({
@@ -5972,8 +6025,8 @@ async function collectVisualMetrics(page, profile) {
                     }
 
                     const style = window.getComputedStyle(element);
-                    const foregroundChannels = parseColorChannels(style.color);
                     const backgroundChannels = effectiveBackgroundChannels(element);
+                    const foregroundChannels = effectiveForegroundChannels(style.color, backgroundChannels);
                     const ratio = contrastRatio(foregroundChannels, backgroundChannels);
                     const threshold = isLargeReadableText(style) ? minLargeTextContrastRatio : minTextContrastRatio;
 
@@ -7741,10 +7794,11 @@ function buildDeterministicFindings({ route, viewport, profile, metrics, console
         }));
     }
 
-    if (['brand_landing', 'vehicle_pdp'].includes(cohort)) {
+    if (metrics.usesSharedLabHeader) {
         const headerSurfaceIssues = evaluatePremiumHeaderSurface(metrics, {
-            minViewportWidthPx: 1024,
-            maxSurfaceLuminance: 0.62
+            minViewportWidthPx: 900,
+            maxSurfaceLuminance: 0.62,
+            minSurfaceAlpha: 0.42
         });
 
         if (headerSurfaceIssues.length > 0) {
@@ -7753,13 +7807,13 @@ function buildDeterministicFindings({ route, viewport, profile, metrics, console
                 viewport: viewportName,
                 severity: 'high',
                 category: 'header_consistency',
-                message: 'The premium SEO header surface is too bright and flat compared with the approved home header.',
+                message: 'The shared header surface does not provide enough premium contrast.',
                 evidence: [
                     headerSurfaceIssues.join('; '),
                     `background=${metrics.headerBackground || 'n/a'}`,
                     `backgroundImage=${String(metrics.headerBackgroundImage || 'none').slice(0, 180)}`
                 ].join('; '),
-                likelyCause: 'A vehicle or brand page is using a white sticky header that weakens the premium brand lockup instead of the darker Dynasty shell.',
+                likelyCause: 'The header is too light or too transparent, so brand, navigation and contact controls look washed out over the page below.',
                 hardFail: true,
                 screenshotPath
             }));

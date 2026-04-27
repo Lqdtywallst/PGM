@@ -131,6 +131,17 @@ const VIEWPORT_COVERAGE_MATRIX = Object.freeze([
     intent: 'Standard desktop viewport for ordinary external displays.',
   }),
   Object.freeze({
+    name: 'laptop-large',
+    tier: 'laptop',
+    width: 1536,
+    height: 864,
+    isMobile: false,
+    hasTouch: false,
+    deviceScaleFactor: 1,
+    coverage: Object.freeze(['responsive', 'desktop']),
+    intent: 'High-density laptop viewport common on 15-inch Windows laptops and scaled displays.',
+  }),
+  Object.freeze({
     name: 'desktop-wide',
     tier: 'desktop',
     width: 1707,
@@ -140,6 +151,17 @@ const VIEWPORT_COVERAGE_MATRIX = Object.freeze([
     deviceScaleFactor: 1,
     coverage: Object.freeze(['critical', 'responsive', 'firstViewport', 'visualAgent', 'desktop']),
     intent: 'Wide desktop viewport used for premium composition and nav/header checks.',
+  }),
+  Object.freeze({
+    name: 'desktop-large',
+    tier: 'desktop',
+    width: 1920,
+    height: 1080,
+    isMobile: false,
+    hasTouch: false,
+    deviceScaleFactor: 1,
+    coverage: Object.freeze(['responsive', 'desktop']),
+    intent: 'Full HD desktop viewport to guard large-screen spacing, frame width and floating controls.',
   }),
 ]);
 

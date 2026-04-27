@@ -8,7 +8,9 @@
 }
 
 .fleet-page .lab-header {
-    background: linear-gradient(180deg, rgba(4, 4, 6, 0.88) 0%, rgba(4, 4, 6, 0.56) 58%, rgba(4, 4, 6, 0) 100%);
+    background: linear-gradient(180deg, rgba(4, 4, 6, 0.97) 0%, rgba(4, 4, 6, 0.88) 64%, rgba(4, 4, 6, 0.62) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .fleet-page-hero {
@@ -336,7 +338,7 @@
 
 .fleet-results__eyebrow {
     grid-column: 1 / -1;
-    color: rgba(126, 98, 63, 0.9);
+    color: #6f5433;
     font-family: 'Montserrat', sans-serif;
     font-size: 0.6rem;
     font-weight: 700;
@@ -348,7 +350,7 @@
     grid-column: 1 / 2;
     margin: 0;
     max-width: 40rem;
-    color: rgba(87, 73, 59, 0.82);
+    color: #4b3a2b;
     font-size: 1rem;
     line-height: 1.72;
 }
@@ -362,7 +364,7 @@
 }
 
 .fleet-results__guides a {
-    color: rgba(126, 98, 63, 0.92);
+    color: #6f5433;
     font-family: 'Montserrat', sans-serif;
     font-size: 0.6rem;
     font-weight: 700;
@@ -379,7 +381,7 @@
     align-items: center;
     align-self: end;
     white-space: nowrap;
-    color: rgba(87, 73, 59, 0.94);
+    color: #2f261f;
     font-family: 'Montserrat', sans-serif;
     font-size: 0.68rem;
     font-weight: 700;
@@ -457,7 +459,7 @@
     border: 1px solid rgba(196, 157, 88, 0.24);
     border-radius: 999px;
     background: rgba(241, 226, 189, 0.42);
-    color: #8e6740;
+    color: #74512d;
     font-family: 'Montserrat', sans-serif;
     font-size: 0.56rem;
     font-weight: 700;
@@ -471,7 +473,7 @@
     justify-self: end;
     gap: 0.4rem;
     min-width: 0;
-    color: rgba(92, 78, 64, 0.64);
+    color: #6a523a;
     font-family: 'Montserrat', sans-serif;
     font-size: 0.52rem;
     font-weight: 600;
@@ -506,7 +508,7 @@
     min-height: 0;
     padding: 0;
     border: 0;
-    color: #8e6740;
+    color: #74512d;
     font-family: 'Montserrat', sans-serif;
     font-size: 0.56rem;
     font-weight: 700;
@@ -518,7 +520,7 @@
 .fleet-card__accent {
     justify-self: end;
     min-width: 0;
-    color: rgba(92, 78, 64, 0.74);
+    color: #5c4732;
     font-family: 'Montserrat', sans-serif;
     font-size: 0.52rem;
     font-weight: 600;
@@ -567,7 +569,7 @@
 .fleet-card__description {
     margin: 0;
     height: calc(0.88rem * 1.56 * 4);
-    color: rgba(84, 73, 61, 0.8);
+    color: #43362b;
     font-size: 0.88rem;
     line-height: 1.56;
     display: -webkit-box;
@@ -579,7 +581,7 @@
 .fleet-card__sales-line {
     margin: 0.72rem 0 0;
     height: calc(0.52rem * 1.48 * 2);
-    color: #8e6740;
+    color: #74512d;
     font-family: 'Montserrat', sans-serif;
     font-size: 0.52rem;
     font-weight: 700;
@@ -609,7 +611,7 @@
     border: 1px solid rgba(139, 118, 93, 0.14);
     border-radius: 0.8rem;
     background: #f4eee5;
-    color: rgba(92, 78, 64, 0.9);
+    color: #43362b;
     font-family: 'Montserrat', sans-serif;
     font-size: 0.5rem;
     font-weight: 600;
@@ -650,7 +652,7 @@
 
 .fleet-card__price-kicker {
     display: block;
-    color: rgba(92, 78, 64, 0.72);
+    color: #5f4930;
     font-family: 'Montserrat', sans-serif;
     font-size: 0.58rem;
     font-weight: 700;
@@ -679,7 +681,7 @@
     border: 1px solid rgba(196, 157, 88, 0.22);
     border-radius: 999px;
     background: rgba(241, 226, 189, 0.4);
-    color: #8e6740;
+    color: #74512d;
     font-family: 'Montserrat', sans-serif;
     font-size: 0.56rem;
     font-weight: 700;
@@ -739,7 +741,7 @@
     border: 0;
     border-radius: 0;
     background: #cfad61;
-    color: #fffdf8;
+    color: #171412;
     letter-spacing: 0;
     text-transform: none;
 }
@@ -764,7 +766,7 @@
 }
 
 .fleet-card__secondary--wa {
-    background: #4c8f2f;
+    background: #23751f;
     color: #fff;
 }
 
@@ -798,6 +800,7 @@
     box-shadow:
         0 24px 58px rgba(35, 25, 16, 0.12),
         inset 0 1px 0 rgba(255, 255, 255, 0.42);
+    color: #171412;
 }
 
 .fleet-sidebar__topbar,
@@ -870,7 +873,7 @@
 
 .fleet-sidebar__label,
 .fleet-sidebar__field span {
-    color: rgba(77, 55, 32, 0.84);
+    color: #5f4930;
     font-family: 'Montserrat', sans-serif;
     font-size: 0.56rem;
     font-weight: 700;
@@ -922,12 +925,13 @@
 }
 
 .fleet-sidebar__select option:disabled {
-    color: rgba(86, 74, 64, 0.48);
+    color: #856f58;
 }
 
 .fleet-sidebar__select-shell {
     position: relative;
     display: block;
+    color: #171412;
 }
 
 .fleet-sidebar__select-shell::after {
@@ -1099,7 +1103,7 @@
 
 .fleet-sidebar__note {
     margin: 0;
-    color: rgba(104, 93, 84, 0.72);
+    color: #5b4c40;
     font-size: 0.64rem;
     line-height: 1.4;
 }
@@ -1228,7 +1232,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    color: rgba(77, 55, 32, 0.9);
+    color: #4f351f;
     font-family: 'Inter', sans-serif;
     font-size: 0.74rem;
     font-weight: 650;
@@ -1339,7 +1343,7 @@
 .fleet-browser__empty p {
     margin: 0;
     max-width: 42rem;
-    color: rgba(84, 73, 61, 0.82);
+    color: #43362b;
     line-height: 1.68;
 }
 
@@ -1593,7 +1597,7 @@
 .fleet-date-prompt span {
     display: block;
     margin-top: 0.28rem;
-    color: rgba(84, 73, 61, 0.78);
+    color: #43362b;
     font-size: 0.82rem;
     line-height: 1.45;
 }
@@ -1696,7 +1700,7 @@
     }
 
     .fleet-mobile-chip__eyebrow {
-        color: rgba(84, 73, 61, 0.66);
+        color: #5f4930;
         font-size: 0.52rem;
         font-weight: 800;
         letter-spacing: 0.14em;
@@ -1769,7 +1773,7 @@
     }
 
     .fleet-filter-sheet-head__copy span {
-        color: rgba(72, 58, 41, 0.72);
+        color: #5f4930;
         font-family: "Montserrat", sans-serif;
         font-size: 0.64rem;
         font-weight: 800;
@@ -2067,7 +2071,7 @@
 
     .fleet-card__secondary--wa {
         border-color: rgba(39, 111, 31, 0.22);
-        background: linear-gradient(135deg, #3e8b2d, #2f7324);
+        background: linear-gradient(135deg, #26771f, #1d5f19);
         color: #fff;
     }
 

@@ -4,7 +4,9 @@
 }
 
 .services-page .lab-header {
-    background: linear-gradient(180deg, rgba(4, 4, 6, 0.88) 0%, rgba(4, 4, 6, 0.56) 58%, rgba(4, 4, 6, 0) 100%);
+    background: linear-gradient(180deg, rgba(4, 4, 6, 0.97) 0%, rgba(4, 4, 6, 0.88) 64%, rgba(4, 4, 6, 0.62) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .services-hero {
@@ -108,7 +110,7 @@
 }
 
 .services-kicker--dark {
-    color: #8a6d3c;
+    color: #6f5433;
 }
 
 .services-hero h1,
@@ -769,7 +771,7 @@
 }
 
 .services-section__head p {
-    color: rgba(70, 61, 55, 0.76);
+    color: #3f3328;
 }
 
 .services-directory__layout {
@@ -811,7 +813,7 @@
 .services-directory__eyebrow {
     display: inline-flex;
     align-items: center;
-    color: rgba(89, 73, 58, 0.8);
+    color: #80613a;
     font-size: 0.72rem;
     font-weight: 800;
     text-transform: uppercase;
@@ -827,7 +829,7 @@
 .services-directory__copy {
     margin: 0;
     max-width: 34rem;
-    color: rgba(70, 61, 55, 0.8);
+    color: #3f3328;
     line-height: 1.56;
     font-weight: 500;
 }
@@ -929,13 +931,13 @@
 }
 
 .services-lane-trust {
-    color: rgba(73, 62, 51, 0.74);
+    color: #5f4930;
     font-size: 0.62rem;
     font-weight: 700;
 }
 
 .services-lane-card__eyebrow {
-    color: rgba(89, 73, 58, 0.8);
+    color: #80613a;
 }
 
 .services-lane-card h3 {
@@ -945,7 +947,7 @@
 }
 
 .services-lane-card p {
-    color: rgba(70, 61, 55, 0.8);
+    color: #3f3328;
 }
 
 .services-lane-card__list {
@@ -953,7 +955,7 @@
     gap: 0.45rem;
     margin: 0;
     padding-left: 1rem;
-    color: rgba(70, 61, 55, 0.76);
+    color: #3f3328;
 }
 
 .services-lane-card__actions {
@@ -1101,7 +1103,7 @@
 }
 
 .services-local-card span {
-    color: rgba(89, 73, 58, 0.8);
+    color: #80613a;
 }
 
 .services-local-card h3,
@@ -1125,7 +1127,7 @@
 
 .services-local-card p,
 .services-flow__item p {
-    color: rgba(70, 61, 55, 0.78);
+    color: #3f3328;
 }
 
 .services-private {
@@ -1218,7 +1220,7 @@
 }
 
 .services-flow__item strong {
-    color: #8a6d3c;
+    color: #6f5433;
     font-size: 0.82rem;
     font-weight: 800;
 }
@@ -1255,7 +1257,7 @@
 
 .services-faq__item p {
     padding: 0 1.2rem 1.2rem;
-    color: rgba(70, 61, 55, 0.78);
+    color: #3f3328;
 }
 
 .services-faq__cta {

@@ -81,10 +81,12 @@ test('viewport coverage matrix defines the canonical responsive device bands', (
             'laptop-compact',
             'laptop',
             'desktop-standard',
-            'desktop-wide'
+            'laptop-large',
+            'desktop-wide',
+            'desktop-large'
         ]
     );
-    assert.equal(responsiveViewports.length, 12);
+    assert.equal(responsiveViewports.length, 14);
     assert.ok(firstViewportNames.includes('mobile-tiny'));
     assert.ok(firstViewportNames.includes('mobile-short'));
     assert.ok(firstViewportNames.includes('laptop-compact'));
@@ -258,7 +260,7 @@ test('visual smoke viewport groups keep mobile, tablet and desktop audits separa
     );
     assert.deepEqual(
         VISUAL_SMOKE_VIEWPORT_GROUPS.desktop,
-        ['laptop-compact', 'laptop', 'desktop-standard', 'desktop-wide']
+        ['laptop-compact', 'laptop', 'desktop-standard', 'laptop-large', 'desktop-wide', 'desktop-large']
     );
     assert.deepEqual(
         VISUAL_SMOKE_VIEWPORT_GROUPS.responsive,
@@ -274,7 +276,9 @@ test('visual smoke viewport groups keep mobile, tablet and desktop audits separa
             'laptop-compact',
             'laptop',
             'desktop-standard',
-            'desktop-wide'
+            'laptop-large',
+            'desktop-wide',
+            'desktop-large'
         ]
     );
 });
@@ -1011,6 +1015,54 @@ test('buildDeterministicFindings flags weak visible text contrast on light panel
     )));
 });
 
+test('buildDeterministicFindings treats near-matching foreground and background as a contrast failure', () => {
+    const findings = buildDeterministicFindings({
+        route: '/ferrari-rental-dubai.html',
+        viewport: { name: 'desktop-wide' },
+        profile: 'vehicle_pdp',
+        metrics: {
+            horizontalOverflowPx: 0,
+            visibleH1Count: 1,
+            viewportWidth: 1440,
+            viewportHeight: 900,
+            heroActionCount: 1,
+            hasVisualMedia: true,
+            hasNav: true,
+            headerOcclusionPx: 0,
+            clippedElements: [],
+            textContrastIssues: [
+                {
+                    selectorLabel: 'li :: WhatsApp response and availability confirmation.',
+                    text: 'WhatsApp response and availability confirmation.',
+                    contrastRatio: 1.08,
+                    requiredRatio: 4.5,
+                    color: 'rgba(238, 239, 240, 0.82)',
+                    effectiveBackground: 'rgb(251, 250, 248)'
+                }
+            ],
+            internalGapIssues: [],
+            overlaps: [],
+            brokenMedia: []
+        },
+        consoleErrors: [],
+        networkErrors: {
+            requestFailures: [],
+            criticalResponses: [],
+            pageErrors: []
+        },
+        artifacts: {
+            viewportScreenshot: '/tmp/ferrari-near-matching-copy.png'
+        }
+    });
+
+    assert.ok(findings.some((finding) => (
+        finding.category === 'contrast' &&
+        /not have enough contrast/i.test(finding.message) &&
+        /effectiveBackground=rgb\(251, 250, 248\)/i.test(finding.evidence) &&
+        finding.hardFail === true
+    )));
+});
+
 test('buildDeterministicFindings flags inline white copy on light premium pages', () => {
     const findings = buildDeterministicFindings({
         route: '/lamborghini-rental-dubai.html',
@@ -1210,7 +1262,7 @@ test('buildDeterministicFindings flags whitewashed premium SEO headers', () => {
 
     assert.ok(findings.some((finding) => (
         finding.category === 'header_consistency' &&
-        /too bright and flat/i.test(finding.message) &&
+        /does not provide enough premium contrast/i.test(finding.message) &&
         finding.hardFail === true
     )));
 });

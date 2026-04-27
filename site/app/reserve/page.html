@@ -62,7 +62,9 @@
             inset: 0 0 auto;
             z-index: 20;
             line-height: normal;
-            background: rgba(4, 4, 6, 0.9);
+            background: linear-gradient(180deg, rgba(4, 4, 6, 0.97) 0%, rgba(4, 4, 6, 0.9) 64%, rgba(4, 4, 6, 0.68) 100%);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
         }
         .lab-header__inner {
             display: flex;
@@ -75,6 +77,7 @@
             display: inline-flex;
             align-items: center;
             gap: 0.95rem;
+            flex: 0 0 auto;
             color: #f5f1e8;
         }
         .lab-brand__crest {
@@ -96,11 +99,16 @@
         .lab-brand__copy {
             display: grid;
             gap: 0.2rem;
+            min-width: max-content;
         }
         .lab-brand__copy strong {
+            color: #fffaf2;
             font-size: 0.9rem;
             letter-spacing: 0.18em;
+            line-height: 1.08;
             text-transform: uppercase;
+            text-shadow: 0 1px 10px rgba(0, 0, 0, 0.42);
+            white-space: nowrap;
         }
         .lab-brand__copy span,
         .lab-header__utility,
@@ -313,7 +321,7 @@
             :root { --lab-header-offset: 84px; }
             .lab-header {
                 position: fixed;
-                background: rgba(4, 4, 6, 0.94);
+                background: linear-gradient(180deg, rgba(4, 4, 6, 0.98) 0%, rgba(4, 4, 6, 0.92) 70%, rgba(4, 4, 6, 0.78) 100%);
             }
             .lab-header__inner {
                 display: grid;

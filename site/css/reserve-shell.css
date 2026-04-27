@@ -2,7 +2,7 @@
     --lab-bg: #07080a;
     --lab-text: #f5f1e8;
     --lab-muted: rgba(245, 241, 232, 0.76);
-    --lab-muted-soft: rgba(245, 241, 232, 0.6);
+    --lab-muted-soft: #d8c8a8;
     --lab-border: rgba(255, 255, 255, 0.09);
     --lab-accent: #e3f655;
     --lab-accent-soft: #f1ff9d;
@@ -31,16 +31,25 @@
 
 html {
     background: #f6f3ee;
+    overflow-x: clip;
 }
 
 body.reserve-page {
     min-height: 100vh;
     margin: 0;
     padding: 0;
+    overflow-x: clip;
     background: #f6f3ee;
     color: #17120d;
     font-family: var(--lab-font-sans);
     display: block;
+}
+
+@supports not (overflow: clip) {
+    html,
+    body.reserve-page {
+        overflow-x: hidden;
+    }
 }
 
 a {
@@ -132,13 +141,13 @@ textarea {
 
 .reserve-page .reserve-page-breadcrumb {
     margin-bottom: 0.75rem;
-    color: rgba(64, 48, 31, 0.58);
+    color: #6d5130;
     font-size: 0.8rem;
 }
 
 .reserve-page .reserve-page-kicker,
 .reserve-page .reserve-page-panel__eyebrow {
-    color: #8f6c42;
+    color: #6f4b28;
     font-size: 0.74rem;
     font-weight: 700;
     letter-spacing: 0.16em;
@@ -209,7 +218,7 @@ textarea {
 }
 
 .reserve-page .step-pill-meta {
-    color: rgba(84, 66, 43, 0.56);
+    color: #6d5130;
     font-size: 0.68rem;
     letter-spacing: 0.03em;
     text-transform: uppercase;
@@ -360,7 +369,7 @@ textarea {
 }
 
 .reserve-page .input::placeholder {
-    color: rgba(92, 72, 49, 0.45);
+    color: #85653f;
 }
 
 .reserve-page .field-error {
@@ -402,7 +411,7 @@ textarea {
     gap: 1rem;
     padding: 0.85rem 0;
     border-bottom: 1px solid rgba(92, 72, 49, 0.08);
-    color: rgba(52, 43, 32, 0.76);
+    color: #3f3328;
 }
 
 .reserve-page .summary-row:last-child {
@@ -412,7 +421,7 @@ textarea {
 
 .reserve-page .summary-value,
 .reserve-page .summary-value.gold {
-    color: #8f6c42;
+    color: #6f4b28;
     font-weight: 600;
 }
 
@@ -449,7 +458,9 @@ textarea {
     inset: 0 0 auto;
     z-index: 20;
     line-height: normal;
-    background: linear-gradient(180deg, rgba(4, 4, 6, 0.88) 0%, rgba(4, 4, 6, 0.56) 58%, rgba(4, 4, 6, 0) 100%);
+    background: linear-gradient(180deg, rgba(4, 4, 6, 0.97) 0%, rgba(4, 4, 6, 0.9) 64%, rgba(4, 4, 6, 0.68) 100%);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
 }
 
 .lab-header::after {
@@ -485,8 +496,8 @@ textarea {
     padding: 0;
     border: 1px solid rgba(241, 226, 189, 0.42);
     border-radius: 999px;
-    background: rgba(12, 13, 16, 0.22);
-    color: #f1e2bd;
+    background: rgba(8, 9, 11, 0.78);
+    color: #fff1c9;
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -515,6 +526,7 @@ textarea {
     display: inline-flex;
     align-items: center;
     gap: 0.95rem;
+    flex: 0 0 auto;
     font-family: var(--lab-font-sans);
 }
 
@@ -540,13 +552,18 @@ textarea {
 .lab-brand__copy {
     display: grid;
     gap: 0.2rem;
+    min-width: max-content;
 }
 
 .lab-brand__copy strong {
+    color: #fffaf2;
     font-size: 0.9rem;
     font-weight: 700;
     letter-spacing: 0.18em;
+    line-height: 1.08;
     text-transform: uppercase;
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.42);
+    white-space: nowrap;
 }
 
 .lab-brand__copy span {
@@ -554,7 +571,10 @@ textarea {
     color: var(--lab-muted-soft);
     font-size: 0.64rem;
     letter-spacing: 0.18em;
+    line-height: 1.25;
     text-transform: uppercase;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+    white-space: nowrap;
 }
 
 .lab-header__nav {
@@ -580,13 +600,14 @@ textarea {
     padding: 0.16rem 0;
     border: 0;
     background: transparent;
-    color: rgba(245, 241, 232, 0.78);
+    color: #f8f3e8;
     cursor: pointer;
     font-family: var(--lab-font-sans);
     font-size: 0.72rem;
     font-weight: 600;
     letter-spacing: 0.16em;
     line-height: 1;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.38);
     overflow: visible;
     position: relative;
     text-transform: uppercase;
@@ -1634,7 +1655,15 @@ body.lab-mobile-nav-open {
     overflow: hidden;
 }
 
-@media (max-width: 1420px) {
+@media (max-width: 1540px) {
+    .lab-header__inner {
+        gap: 1.25rem;
+    }
+
+    .lab-header__nav {
+        gap: 0.75rem;
+    }
+
     .lab-brand__crest {
         width: 54px;
         border-radius: 14px;
@@ -1678,7 +1707,13 @@ body.lab-mobile-nav-open {
     }
 }
 
-@media (min-width: 861px) and (max-width: 1420px) {
+@media (min-width: 1081px) and (max-width: 1320px) {
+    .lab-header__utility {
+        display: none;
+    }
+}
+
+@media (min-width: 861px) and (max-width: 1540px) {
     .lab-brand {
         gap: 0.78rem;
     }
@@ -1763,7 +1798,7 @@ body.lab-mobile-nav-open {
 
     .lab-header {
         position: fixed;
-        background: linear-gradient(180deg, rgba(4, 4, 6, 0.94) 0%, rgba(4, 4, 6, 0.76) 70%, rgba(4, 4, 6, 0.18) 100%);
+        background: linear-gradient(180deg, rgba(4, 4, 6, 0.98) 0%, rgba(4, 4, 6, 0.92) 70%, rgba(4, 4, 6, 0.78) 100%);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
     }

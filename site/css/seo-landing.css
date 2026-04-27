@@ -51,8 +51,8 @@ body {
     inset: auto;
     z-index: 220;
     background:
-        radial-gradient(circle at 8% 0%, rgba(241, 226, 189, 0.12), rgba(241, 226, 189, 0) 34%),
-        linear-gradient(180deg, rgba(7, 8, 10, 0.965), rgba(12, 13, 16, 0.94));
+        radial-gradient(circle at 8% 0%, rgba(241, 226, 189, 0.14), rgba(241, 226, 189, 0) 34%),
+        linear-gradient(180deg, rgba(5, 6, 8, 0.985), rgba(8, 9, 12, 0.965));
     backdrop-filter: blur(18px) saturate(145%);
     -webkit-backdrop-filter: blur(18px) saturate(145%);
     border-bottom: 1px solid rgba(241, 226, 189, 0.12);
@@ -98,6 +98,7 @@ body {
 
 .vehicle-page .lab-brand__copy {
     gap: 0.2rem;
+    min-width: max-content;
 }
 
 .vehicle-page .lab-brand__copy strong {
@@ -105,16 +106,20 @@ body {
     font-size: 0.9rem;
     line-height: normal;
     letter-spacing: 0.18em;
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.42);
+    white-space: nowrap;
 }
 
 .vehicle-page .lab-brand__copy span {
-    color: rgba(255, 250, 242, 0.58);
+    color: #d8c8a8;
     font-size: 0.64rem;
     line-height: normal;
     letter-spacing: 0.18em;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+    white-space: nowrap;
 }
 
-@media (min-width: 861px) and (max-width: 1420px) {
+@media (min-width: 861px) and (max-width: 1540px) {
     .vehicle-page .lab-brand {
         gap: 0.78rem;
     }
@@ -212,9 +217,10 @@ body {
 
 .vehicle-page .lab-nav > a,
 .vehicle-page .lab-nav__trigger {
-    color: rgba(255, 250, 242, 0.72);
+    color: #f8f3e8;
     font-size: 0.72rem;
     letter-spacing: 0.16em;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.38);
 }
 
 .vehicle-page .lab-nav__chevron {
@@ -252,7 +258,7 @@ body {
     box-shadow: 0 16px 34px rgba(160, 121, 48, 0.18);
 }
 
-@media (min-width: 861px) and (max-width: 1420px) {
+@media (min-width: 861px) and (max-width: 1540px) {
     .vehicle-page .lab-nav {
         gap: 1rem;
     }
@@ -269,6 +275,12 @@ body {
         padding: 0 1.28rem;
         font-size: 0.7rem;
         letter-spacing: 0.14em;
+    }
+}
+
+@media (min-width: 1081px) and (max-width: 1320px) {
+    .vehicle-page .lab-header__utility {
+        display: none;
     }
 }
 
@@ -343,7 +355,7 @@ body {
 }
 
 .vehicle-page .lab-nav__card-copy span {
-    color: rgba(23, 23, 23, 0.58);
+    color: #5f4930;
 }
 
 .vehicle-page .lab-nav__card--brand .lab-nav__card-copy strong,
@@ -1386,7 +1398,7 @@ body.vehicle-page--mother-base {
 }
 
 .vehicle-page--mother-base .header-brand {
-    color: rgba(23, 23, 23, 0.72);
+    color: #3f3328;
 }
 
 .vehicle-page--mother-base .header-brand strong {
@@ -1417,7 +1429,7 @@ body.vehicle-page--mother-base {
 .vehicle-page--mother-base .btn-ghost {
     background: rgba(23, 23, 23, 0.04);
     border-color: rgba(23, 23, 23, 0.08);
-    color: rgba(23, 23, 23, 0.72);
+    color: #3f3328;
 }
 
 .vehicle-page--mother-base .vehicle-metric {
@@ -1428,7 +1440,7 @@ body.vehicle-page--mother-base {
 }
 
 .vehicle-page--mother-base .vehicle-metric__label {
-    color: rgba(23, 23, 23, 0.48);
+    color: #7a5f3a;
 }
 
 .vehicle-page--mother-base .vehicle-metric__value {
@@ -1436,7 +1448,7 @@ body.vehicle-page--mother-base {
 }
 
 .vehicle-page--mother-base .breadcrumb {
-    color: rgba(23, 23, 23, 0.54);
+    color: #6b5436;
 }
 
 .vehicle-page--mother-base .breadcrumb a {
@@ -1464,7 +1476,7 @@ body.vehicle-page--mother-base {
 }
 
 .vehicle-return-link span {
-    color: rgba(23, 23, 23, 0.58);
+    color: #5f4930;
     font-size: 0.62rem;
     font-weight: 800;
     letter-spacing: 0.15em;
@@ -1497,7 +1509,7 @@ body.vehicle-page--mother-base {
 }
 
 .vehicle-page--mother-base .vehicle-pdp-intro__subline {
-    color: rgba(52, 60, 72, 0.82);
+    color: #303a47;
 }
 
 .vehicle-page--mother-base .vehicle-pdp-gallery-top__eyebrow,
@@ -1505,7 +1517,7 @@ body.vehicle-page--mother-base {
 .vehicle-page--mother-base .vehicle-pdp-use__eyebrow,
 .vehicle-page--mother-base .section-kicker,
 .vehicle-page--mother-base .vehicle-booking__kicker {
-    color: rgba(52, 60, 72, 0.82);
+    color: #303a47;
 }
 
 .vehicle-page--mother-base .section-kicker::before,
@@ -1550,11 +1562,11 @@ body.vehicle-page--mother-base {
 .vehicle-page--mother-base .vehicle-section__copy p,
 .vehicle-page--mother-base .page-foot,
 .vehicle-page--mother-base .page-foot p {
-    color: rgba(23, 23, 23, 0.68);
+    color: #46382b;
 }
 
 .vehicle-page--mother-base .vehicle-booking__field span {
-    color: rgba(23, 23, 23, 0.48);
+    color: #7a5f3a;
 }
 
 .vehicle-page--mother-base .vehicle-booking__input {
@@ -1598,7 +1610,7 @@ body.vehicle-page--mother-base {
 }
 
 .vehicle-page--mother-base .faq-list .faq-a {
-    color: rgba(23, 23, 23, 0.66);
+    color: #4b3c2f;
 }
 
 .vehicle-page--mother-base .related-grid a,
@@ -1607,7 +1619,7 @@ body.vehicle-page--mother-base {
 }
 
 .vehicle-page--mother-base .related-grid a {
-    color: rgba(23, 23, 23, 0.72);
+    color: #3f3328;
 }
 
 .vehicle-page--mother-base .related-grid a:hover,
@@ -1636,7 +1648,7 @@ body.vehicle-page--mother-base {
 .vehicle-page--mother-base .vehicle-story-card p,
 .vehicle-page--mother-base .vehicle-checklist li,
 .vehicle-page--mother-base .vehicle-spec-panel__grid dd {
-    color: rgba(23, 23, 23, 0.72);
+    color: #3f3328;
 }
 
 .vehicle-page--mother-base .spec-grid {
@@ -1647,7 +1659,13 @@ body.vehicle-page--mother-base {
 .vehicle-page--mother-base .spec-grid dt,
 .vehicle-page--mother-base .vehicle-story-card__eyebrow,
 .vehicle-page--mother-base .vehicle-spec-panel__grid dt {
-    color: rgba(54, 64, 75, 0.72);
+    color: #5d5142;
+}
+
+.vehicle-page--mother-base .vehicle-spec-panel__chips span {
+    border-color: rgba(52, 60, 72, 0.14);
+    background: rgba(54, 64, 75, 0.08);
+    color: #3f3328;
 }
 
 .vehicle-page--mother-base .price-tag {
@@ -1656,7 +1674,7 @@ body.vehicle-page--mother-base {
 
 .vehicle-page--mother-base .price-tag small,
 .vehicle-page--mother-base .text-link {
-    color: rgba(54, 64, 75, 0.82);
+    color: #3d4650;
 }
 
 .vehicle-page--mother-base .text-link:hover {
@@ -1694,11 +1712,11 @@ body.vehicle-page--mother-base {
 
 .vehicle-page--mother-base .price-table th {
     background: rgba(54, 64, 75, 0.08);
-    color: rgba(23, 23, 23, 0.82);
+    color: #2b241f;
 }
 
 .vehicle-page--mother-base .price-table td {
-    color: rgba(23, 23, 23, 0.72);
+    color: #3f3328;
 }
 
 .vehicle-page--mother-base .vehicle-pdp-summary-support {
@@ -1742,7 +1760,7 @@ body.vehicle-page--premium-pilot {
 }
 
 .vehicle-page--premium-pilot .header-brand {
-    color: rgba(23, 23, 23, 0.72);
+    color: #3f3328;
 }
 
 .vehicle-page--premium-pilot .header-brand strong {
@@ -1773,7 +1791,7 @@ body.vehicle-page--premium-pilot {
 .vehicle-page--premium-pilot .btn-ghost {
     background: rgba(23, 23, 23, 0.04);
     border-color: rgba(23, 23, 23, 0.08);
-    color: rgba(23, 23, 23, 0.72);
+    color: #3f3328;
 }
 
 .vehicle-page--premium-pilot .vehicle-metric {
@@ -1784,7 +1802,7 @@ body.vehicle-page--premium-pilot {
 }
 
 .vehicle-page--premium-pilot .vehicle-metric__label {
-    color: rgba(23, 23, 23, 0.48);
+    color: #7a5f3a;
 }
 
 .vehicle-page--premium-pilot .vehicle-metric__value {
@@ -1792,7 +1810,7 @@ body.vehicle-page--premium-pilot {
 }
 
 .vehicle-page--premium-pilot .breadcrumb {
-    color: rgba(23, 23, 23, 0.54);
+    color: #6b5436;
 }
 
 .vehicle-page--premium-pilot .breadcrumb a {
@@ -1818,7 +1836,7 @@ body.vehicle-page--premium-pilot {
     padding: 0.5rem 0.75rem;
     border: 1px solid rgba(23, 23, 23, 0.08);
     background: rgba(255, 255, 255, 0.9);
-    color: rgba(23, 23, 23, 0.72);
+    color: #3f3328;
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.16em;
@@ -1845,7 +1863,7 @@ body.vehicle-page--premium-pilot {
 .vehicle-pdp-intro__lead {
     max-width: 52rem;
     margin: 0;
-    color: rgba(23, 23, 23, 0.7);
+    color: #43362b;
     font-size: 1.06rem;
 }
 
@@ -1859,7 +1877,7 @@ body.vehicle-page--premium-pilot {
     padding: 0.5rem 0.7rem;
     border: 1px solid rgba(23, 23, 23, 0.08);
     background: rgba(255, 255, 255, 0.94);
-    color: rgba(23, 23, 23, 0.82);
+    color: #2b241f;
     font-size: 0.8rem;
     font-weight: 600;
 }
@@ -2364,7 +2382,7 @@ body.vehicle-page--premium-pilot {
 
 .vehicle-pdp-film__copy p {
     margin: 0;
-    color: rgba(23, 23, 23, 0.66);
+    color: #4b3c2f;
     font-size: 0.94rem;
 }
 
@@ -2389,7 +2407,7 @@ body.vehicle-page--premium-pilot {
     padding: 0.42rem 0.65rem;
     border: 1px solid rgba(23, 23, 23, 0.08);
     background: rgba(255, 255, 255, 0.82);
-    color: rgba(23, 23, 23, 0.78);
+    color: #2f2923;
     font-size: 0.75rem;
     font-weight: 600;
 }
@@ -2411,7 +2429,7 @@ body.vehicle-page--premium-pilot {
 .vehicle-pdp-facts span {
     display: block;
     margin-bottom: 0.35rem;
-    color: rgba(23, 23, 23, 0.48);
+    color: #7a5f3a;
     font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.16em;
@@ -2447,7 +2465,7 @@ body.vehicle-page--premium-pilot {
 
 .vehicle-pdp-summary-support p {
     margin: 0;
-    color: rgba(23, 23, 23, 0.68);
+    color: #46382b;
     font-size: 0.95rem;
 }
 
@@ -2467,7 +2485,7 @@ body.vehicle-page--premium-pilot {
 }
 
 .vehicle-pdp-summary-support__eyebrow {
-    color: rgba(23, 23, 23, 0.5);
+    color: #6f5433;
     font-size: 0.66rem;
     font-weight: 700;
     letter-spacing: 0.18em;
@@ -2482,7 +2500,7 @@ body.vehicle-page--premium-pilot {
 }
 
 .vehicle-pdp-summary-support__item p {
-    color: rgba(23, 23, 23, 0.68);
+    color: #46382b;
     font-size: 0.9rem;
     line-height: 1.6;
 }
@@ -2493,7 +2511,7 @@ body.vehicle-page--premium-pilot {
 }
 
 .vehicle-pdp-summary-support .vehicle-checklist li {
-    color: rgba(23, 23, 23, 0.78);
+    color: #2f2923;
     font-size: 0.93rem;
 }
 
@@ -2550,7 +2568,7 @@ body.vehicle-page--premium-pilot {
 }
 
 .vehicle-pdp-car-note__eyebrow {
-    color: rgba(23, 23, 23, 0.5);
+    color: #6f5433;
     font-size: 0.66rem;
     font-weight: 700;
     letter-spacing: 0.18em;
@@ -2639,7 +2657,7 @@ body.vehicle-page--premium-pilot {
 
 .vehicle-pdp-gallery-card__copy p {
     margin: 0;
-    color: rgba(23, 23, 23, 0.66);
+    color: #4b3c2f;
     font-size: 0.93rem;
 }
 
@@ -2722,7 +2740,7 @@ body.vehicle-page--premium-pilot {
 }
 
 .vehicle-pdp-gallery-panel__item figcaption {
-    color: rgba(23, 23, 23, 0.78);
+    color: #2f2923;
     font-size: 0.78rem;
     font-weight: 600;
     line-height: 1.35;
@@ -2762,7 +2780,7 @@ body.vehicle-page--premium-pilot {
 .vehicle-pdp-use__card p,
 .vehicle-pdp-panel p {
     margin: 0;
-    color: rgba(23, 23, 23, 0.68);
+    color: #46382b;
     font-size: 0.95rem;
 }
 
@@ -2785,7 +2803,7 @@ body.vehicle-page--premium-pilot {
 
 .vehicle-pdp-review__meta {
     margin: 0;
-    color: rgba(23, 23, 23, 0.5);
+    color: #6f5433;
     font-size: 0.74rem;
     font-weight: 700;
     letter-spacing: 0.14em;
@@ -2800,7 +2818,7 @@ body.vehicle-page--premium-pilot {
 }
 
 .vehicle-pdp-term-list dt {
-    color: rgba(23, 23, 23, 0.5);
+    color: #6f5433;
     font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 0.16em;
@@ -2816,7 +2834,7 @@ body.vehicle-page--premium-pilot {
 
 .vehicle-page--premium-pilot .related-grid a {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 244, 238, 0.98));
-    color: rgba(23, 23, 23, 0.72);
+    color: #3f3328;
 }
 
 .vehicle-page--premium-pilot .related-grid a:hover,
@@ -2829,9 +2847,12 @@ body.vehicle-page--premium-pilot {
     background: rgba(255, 255, 255, 0.86);
 }
 
+.vehicle-page--premium-pilot .vehicle-pdp-gallery-top__eyebrow,
+.vehicle-page--premium-pilot .vehicle-pdp-gallery-card__eyebrow,
+.vehicle-page--premium-pilot .vehicle-pdp-use__eyebrow,
 .vehicle-page--premium-pilot .section-kicker,
 .vehicle-page--premium-pilot .vehicle-booking__kicker {
-    color: rgba(138, 22, 33, 0.84);
+    color: #8a1621;
 }
 
 .vehicle-page--premium-pilot .section-kicker::before,
@@ -2850,11 +2871,15 @@ body.vehicle-page--premium-pilot {
 .vehicle-page--premium-pilot .vehicle-section__copy p,
 .vehicle-page--premium-pilot .page-foot,
 .vehicle-page--premium-pilot .page-foot p {
-    color: rgba(23, 23, 23, 0.64);
+    color: #4b3c2f;
 }
 
 .vehicle-page--premium-pilot .vehicle-booking__field span {
-    color: rgba(23, 23, 23, 0.56);
+    color: #6b5436;
+}
+
+.vehicle-page--premium-pilot .vehicle-checklist li {
+    color: #4b3c2f;
 }
 
 .vehicle-page--premium-pilot .vehicle-booking__input {
@@ -2885,7 +2910,7 @@ body.vehicle-page--premium-pilot {
 }
 
 .vehicle-page--premium-pilot .faq-list .faq-a {
-    color: rgba(23, 23, 23, 0.68);
+    color: #46382b;
 }
 
 .vehicle-page--premium-pilot footer.page-foot {

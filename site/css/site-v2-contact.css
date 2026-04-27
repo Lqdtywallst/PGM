@@ -10,8 +10,8 @@
     top: 0;
     z-index: 60;
     background:
-        radial-gradient(circle at 8% 0%, rgba(241, 226, 189, 0.12), rgba(241, 226, 189, 0) 34%),
-        linear-gradient(180deg, rgba(7, 8, 10, 0.965), rgba(12, 13, 16, 0.94));
+        radial-gradient(circle at 8% 0%, rgba(241, 226, 189, 0.14), rgba(241, 226, 189, 0) 34%),
+        linear-gradient(180deg, rgba(5, 6, 8, 0.985), rgba(8, 9, 12, 0.965));
     backdrop-filter: blur(18px) saturate(145%);
     -webkit-backdrop-filter: blur(18px) saturate(145%);
     border-bottom: 1px solid rgba(241, 226, 189, 0.12);
@@ -37,11 +37,13 @@
 .contact-page .lab-brand__copy strong,
 .contact-page .lab-nav > a,
 .contact-page .lab-nav__trigger {
-    color: rgba(255, 250, 242, 0.78);
+    color: #f8f3e8;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.38);
 }
 
 .contact-page .lab-brand__copy span {
-    color: rgba(255, 250, 242, 0.58);
+    color: #d8c8a8;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
 }
 
 .contact-page .lab-nav > a:hover,
@@ -81,7 +83,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.6rem;
-    color: rgba(37, 43, 52, 0.6);
+    color: #5b6370;
     font-size: 0.84rem;
 }
 
@@ -150,7 +152,7 @@
 .contact-coverage__copy > p {
     margin: 0;
     max-width: 38rem;
-    color: rgba(37, 43, 52, 0.74);
+    color: #303a47;
     font-size: 1rem;
     line-height: 1.62;
 }
@@ -202,7 +204,7 @@
     border-color: rgba(255, 255, 255, 0.16);
     background:
         radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 28%),
-        linear-gradient(135deg, #22c762 0%, #12a64a 56%, #087f37 100%);
+        linear-gradient(135deg, #0b7f3b 0%, #086b32 58%, #064f27 100%);
     color: #ffffff;
     box-shadow:
         0 18px 38px rgba(18, 166, 74, 0.24),
@@ -257,7 +259,7 @@
 }
 
 .contact-trust-list span {
-    color: rgba(37, 43, 52, 0.72);
+    color: #344050;
     font-size: 0.95rem;
     line-height: 1.5;
 }
@@ -318,7 +320,7 @@
 
 .contact-page input::placeholder,
 .contact-page textarea::placeholder {
-    color: rgba(37, 43, 52, 0.46);
+    color: #727b88;
 }
 
 .contact-page input:focus,
@@ -332,7 +334,7 @@
 
 .status {
     min-height: 0;
-    color: rgba(37, 43, 52, 0.68);
+    color: #4f5966;
     font-size: 0.92rem;
     line-height: 1.4;
 }
@@ -395,7 +397,7 @@
 
 .info-card p {
     margin: 0;
-    color: rgba(37, 43, 52, 0.72);
+    color: #344050;
     font-size: 0.96rem;
     line-height: 1.6;
 }
@@ -457,7 +459,7 @@
 }
 
 .contact-coverage__facts span {
-    color: rgba(37, 43, 52, 0.72);
+    color: #344050;
     font-size: 0.95rem;
     line-height: 1.58;
 }
@@ -486,7 +488,7 @@
 
 .contact-media-card figcaption {
     padding: 0.95rem 1rem;
-    color: rgba(37, 43, 52, 0.74);
+    color: #303a47;
     font-size: 0.96rem;
     line-height: 1.5;
 }

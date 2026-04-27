@@ -328,6 +328,19 @@ async function collectIdentityMetrics(page) {
                 .filter(Boolean);
         }
 
+        function extractLastLinearGradientMinAlpha(value) {
+            const source = String(value || '');
+            const linearStart = source.toLowerCase().lastIndexOf('linear-gradient');
+            const alphaSource = linearStart >= 0 ? source.slice(linearStart) : source;
+            const alphas = (alphaSource.match(/rgba?\([^)]+\)/gi) || [])
+                .map(parseCssColor)
+                .filter(Boolean)
+                .map((color) => color.alpha)
+                .filter(Number.isFinite);
+
+            return alphas.length > 0 ? Number(Math.min(...alphas).toFixed(3)) : null;
+        }
+
         function surfaceTone(color, hasGradient) {
             if (!color || color.alpha < 0.18) {
                 return hasGradient ? 'transparent-gradient' : 'transparent';
@@ -366,6 +379,7 @@ async function collectIdentityMetrics(page) {
                 backgroundColor: style.backgroundColor || '',
                 backgroundImage: style.backgroundImage === 'none' ? '' : String(style.backgroundImage || '').slice(0, 220),
                 backgroundAlpha: dominantColor ? Number(dominantColor.alpha.toFixed(3)) : null,
+                backgroundMinAlpha: extractLastLinearGradientMinAlpha(style.backgroundImage || style.backgroundColor || ''),
                 backgroundLuminance: dominantColor ? dominantColor.luminance : null,
                 surfaceTone: surfaceTone(dominantColor, hasGradient),
                 hasGradient,

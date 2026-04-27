@@ -8,9 +8,9 @@
         radial-gradient(circle at 84% 16%, rgba(227, 246, 85, 0.06), rgba(227, 246, 85, 0) 26%),
         linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(247, 242, 235, 1) 100%);
     --guide-text: #181311;
-    --guide-text-soft: #5c5045;
-    --guide-text-muted: #746657;
-    --guide-kicker: #8a6d3c;
+    --guide-text-soft: #4d3f32;
+    --guide-text-muted: #5f4b37;
+    --guide-kicker: #6f5433;
     --guide-chip-bg: #f8f1e6;
     --guide-chip-border: rgba(170, 138, 91, 0.2);
     min-height: 100vh;
@@ -22,7 +22,9 @@
 }
 
 .local-guide-page .lab-header {
-    background: linear-gradient(180deg, rgba(7, 8, 10, 0.9) 0%, rgba(7, 8, 10, 0.64) 58%, rgba(7, 8, 10, 0) 100%);
+    background: linear-gradient(180deg, rgba(7, 8, 10, 0.97) 0%, rgba(7, 8, 10, 0.9) 64%, rgba(7, 8, 10, 0.68) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .local-guide-page--abu-dhabi {
@@ -188,6 +190,35 @@
 
 .local-guide-breadcrumb span {
     color: var(--guide-kicker);
+}
+
+.local-guide-page .hero-lab__eyebrow {
+    color: var(--guide-kicker);
+    text-shadow: none;
+}
+
+.local-guide-page .hero-lab__eyebrow::before {
+    background: linear-gradient(90deg, rgba(111, 84, 51, 0), rgba(111, 84, 51, 0.88));
+}
+
+.local-guide-section:not(.local-guide-section--soft) .local-guide-section__intro {
+    color: #f8f1e6;
+}
+
+.local-guide-section:not(.local-guide-section--soft) .local-guide-section__intro h2 {
+    color: #fff8ec;
+}
+
+.local-guide-section:not(.local-guide-section--soft) .local-guide-section__intro p {
+    color: rgba(248, 241, 230, 0.82);
+}
+
+.local-guide-section:not(.local-guide-section--soft) .local-guide-section__intro .hero-lab__eyebrow {
+    color: #d8bc78;
+}
+
+.local-guide-section:not(.local-guide-section--soft) .local-guide-section__intro .hero-lab__eyebrow::before {
+    background: linear-gradient(90deg, rgba(216, 188, 120, 0), rgba(216, 188, 120, 0.88));
 }
 
 .local-guide-hero__mark {

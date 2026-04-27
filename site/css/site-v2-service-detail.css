@@ -8,9 +8,9 @@
     --service-detail-shadow: rgba(57, 42, 27, 0.1);
     --service-detail-shadow-strong: rgba(57, 42, 27, 0.14);
     --service-detail-text: #181311;
-    --service-detail-text-soft: #5c5045;
-    --service-detail-text-muted: #746657;
-    --service-detail-kicker: #8a6d3c;
+    --service-detail-text-soft: #4d3f32;
+    --service-detail-text-muted: #5f4b37;
+    --service-detail-kicker: #6f5433;
     --service-detail-line: rgba(170, 138, 91, 0.7);
     --service-detail-chip-bg: #f8f1e6;
     --service-detail-chip-border: rgba(170, 138, 91, 0.2);
@@ -25,7 +25,9 @@
 }
 
 .service-detail-page .lab-header {
-    background: linear-gradient(180deg, rgba(7, 8, 10, 0.9) 0%, rgba(7, 8, 10, 0.64) 56%, rgba(7, 8, 10, 0) 100%);
+    background: linear-gradient(180deg, rgba(7, 8, 10, 0.97) 0%, rgba(7, 8, 10, 0.9) 64%, rgba(7, 8, 10, 0.68) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .service-detail-hero,

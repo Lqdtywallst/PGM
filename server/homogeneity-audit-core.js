@@ -20,6 +20,7 @@ const DEFAULT_HEADER_POLICY = Object.freeze({
     maxVerticalCenterSpreadPx: 10,
     maxHorizontalOverflowPx: 2,
     maxSurfaceLuminanceDelta: 0.34,
+    minHeaderSurfaceAlpha: 0.42,
     maxNavigationHeaderHeightShiftPx: 4,
     maxNavigationLogoSizeShiftPx: 6,
     maxNavigationClusterGapShiftPx: 18,
@@ -460,6 +461,17 @@ function compareHeaderSurface(reference = {}, actual = {}, options = {}) {
             message: 'Header surface is visibly brighter than the approved dark header system.',
             reference: referenceLuminance,
             actual: actualLuminance
+        });
+    }
+
+    const actualMinAlpha = numberOrNull(actual.backgroundMinAlpha ?? actual.backgroundAlpha);
+    if (referenceIsDark && actualMinAlpha !== null && actualMinAlpha < policy.minHeaderSurfaceAlpha) {
+        pushMismatch(mismatches, {
+            field: 'backgroundMinAlpha',
+            severity: 'high',
+            message: 'Header surface fades too transparent, reducing contrast over the page below.',
+            reference: `>=${policy.minHeaderSurfaceAlpha}`,
+            actual: actualMinAlpha
         });
     }
 

@@ -681,9 +681,25 @@ function evaluatePremiumHeaderSurface(metrics = {}, rules = {}) {
     const failures = [];
     const surfaceLuminance = Number(metrics.headerSurfaceLuminance);
     const maxSurfaceLuminance = Number(headerRules.maxSurfaceLuminance ?? 0.62);
+    const minSurfaceAlpha = Number(headerRules.minSurfaceAlpha ?? NaN);
 
     if (Number.isFinite(surfaceLuminance) && surfaceLuminance > maxSurfaceLuminance) {
         failures.push(`headerSurfaceLuminance=${surfaceLuminance.toFixed(3)}>${maxSurfaceLuminance}`);
+    }
+
+    if (Number.isFinite(minSurfaceAlpha)) {
+        const backgroundSource = `${metrics.headerBackground || ''} ${metrics.headerBackgroundImage || ''}`;
+        const linearStart = backgroundSource.toLowerCase().lastIndexOf('linear-gradient');
+        const alphaSource = linearStart >= 0 ? backgroundSource.slice(linearStart) : backgroundSource;
+        const alphaValues = [...alphaSource.matchAll(/rgba?\(([^)]+)\)/gi)]
+            .map((match) => match[1].split(',').map((part) => Number.parseFloat(part.trim())))
+            .map((parts) => (Number.isFinite(parts[3]) ? parts[3] : 1))
+            .filter(Number.isFinite);
+        const lowestAlpha = alphaValues.length > 0 ? Math.min(...alphaValues) : 1;
+
+        if (lowestAlpha < minSurfaceAlpha) {
+            failures.push(`headerSurfaceMinAlpha=${lowestAlpha.toFixed(2)}<${minSurfaceAlpha}`);
+        }
     }
 
     return failures;
