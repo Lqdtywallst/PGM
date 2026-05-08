@@ -55,9 +55,7 @@ const archivedEntries = [
     'docs/previews/fleet-card-preview.css',
     'docs/previews/vehicle-template-base.html',
     'docs/previews/vehicle-template-premium.html',
-    'docs/archive/3d-lab/site-v2-3d.js',
-    'docs/archive/3d-lab/vendor/three/three.module.js',
-    'docs/archive/3d-lab/media/models/ignition-car.glb'
+    'docs/archive/README.md'
 ];
 
 const publicAuditPaths = [

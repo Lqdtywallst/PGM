@@ -7,8 +7,7 @@ This repository keeps only active working documentation under `docs/` so the pro
 - `audit/`: current audit, remediation checklist, and technical review status
 - `architecture/`: target site structure, migration decisions, and implementation backlog
 - `previews/`: non-public HTML working previews and component references kept outside `site/`
-- `archive/`: archived experiments removed from the public tree but preserved for reference
-- `archive/root-cleanup/`: old root-level reports and external screenshots kept out of the working tree entrance
+- `archive/`: small archived notes only; heavy experiments and generated exports should not live in git
 
 ## Active Documents
 
@@ -63,5 +62,5 @@ This repository keeps only active working documentation under `docs/` so the pro
 - Keep audit findings and remediation state under `docs/audit/`
 - Keep future-state site structure and migration plans under `docs/architecture/`
 - Keep non-public previews under `docs/previews/`
-- Keep retired experiments under `docs/archive/`
+- Keep only lightweight retired notes under `docs/archive/`; delete heavy labs, generated exports, and external screenshots
 - Delete generic or superseded Markdown files instead of leaving them mixed with active working docs

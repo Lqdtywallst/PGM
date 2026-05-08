@@ -30,6 +30,7 @@ artifacts/
 # Exportes locales pesados de auditoria
 docs/audit/INVENTARIO-RELACIONAL-*.csv
 docs/audit/INVENTARIO-RELACIONAL-*.json
+docs/audit/INVENTARIO-RELACIONAL-RESUMEN-*.md
 
 # Capturas locales que no deben vivir en la superficie publica
 site/home-*.png
