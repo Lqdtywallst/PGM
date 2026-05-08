@@ -3820,19 +3820,19 @@ a.brand-marquee__item:focus-visible img {
     overflow: hidden;
 }
 
-.guest-reviews .review-card__avatar--kashif {
+.guest-reviews .review-card__avatar--handover {
     background: linear-gradient(135deg, #3e3227 0%, #8c6b43 100%);
     color: #f5efe6;
 }
 
-.guest-reviews .review-card__avatar--hassan {
-    background: linear-gradient(135deg, #0f78ce 0%, #19a4f3 100%);
-    color: #eff8ff;
+.guest-reviews .review-card__avatar--support {
+    background: linear-gradient(135deg, #183f2a 0%, #2fae57 100%);
+    color: #f1fff5;
 }
 
-.guest-reviews .review-card__avatar--roy {
-    background: linear-gradient(135deg, #aa0f60 0%, #d92a7f 100%);
-    color: #fff1f7;
+.guest-reviews .review-card__avatar--delivery {
+    background: linear-gradient(135deg, #151a24 0%, #627188 100%);
+    color: #f3f7ff;
 }
 
 .guest-reviews .review-card__header strong {
@@ -3856,8 +3856,8 @@ a.brand-marquee__item:focus-visible img {
     height: 1.8rem;
     border-radius: 999px;
     background:
-        conic-gradient(#4285f4 0 25%, #34a853 25% 50%, #fbbc05 50% 75%, #ea4335 75% 100%);
-    color: #ffffff;
+        linear-gradient(135deg, #181512 0%, #3d3327 55%, #cfad65 100%);
+    color: #fff7df;
     font-size: 0.78rem;
     font-weight: 800;
     line-height: 1;

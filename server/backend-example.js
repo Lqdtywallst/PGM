@@ -177,7 +177,10 @@ async function persistBackendReservation(record, contextLabel, options = {}) {
 const exactAllowedOrigins = new Set([
     'https://prestigegoalmotion.com',
     'https://www.prestigegoalmotion.com',
+    'https://staging.prestigegoalmotion.com',
+    'https://preprod.prestigegoalmotion.com',
     'https://pgm-production.up.railway.app',
+    'https://pgm-staging.up.railway.app',
     ...String(process.env.ALLOWED_ORIGINS || '')
         .split(',')
         .map((value) => value.trim())

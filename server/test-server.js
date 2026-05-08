@@ -370,19 +370,76 @@ async function run() {
         'development backend points to localhost:3000'
     );
 
-    const remoteBrowserConfig = loadConfigModuleForWindow({
+    const productionBrowserConfig = loadConfigModuleForWindow({
         location: {
             protocol: 'https:',
             hostname: 'prestigegoalmotion.com'
         }
     });
     assert(
-        remoteBrowserConfig.STRIPE_CONFIG && remoteBrowserConfig.STRIPE_CONFIG.isDevelopment === false,
-        'config.js switches to production on a remote browser hostname'
+        productionBrowserConfig.STRIPE_CONFIG &&
+        productionBrowserConfig.STRIPE_CONFIG.environment === 'production' &&
+        productionBrowserConfig.STRIPE_CONFIG.isProduction === true,
+        'config.js switches public custom domains to production'
     );
     assert(
-        remoteBrowserConfig.STRIPE_CONFIG.backendUrl === remoteBrowserConfig.PROD_CONFIG_DUBAI.backendUrl,
-        'remote browser runtime points to the production backend'
+        productionBrowserConfig.STRIPE_CONFIG.backendUrl === productionBrowserConfig.PROD_CONFIG_DUBAI.backendUrl,
+        'production browser runtime points to the production backend'
+    );
+
+    const previewBrowserConfig = loadConfigModuleForWindow({
+        location: {
+            protocol: 'https:',
+            hostname: 'pgm-git-staging-lqdtywallst.vercel.app'
+        }
+    });
+    assert(
+        previewBrowserConfig.STRIPE_CONFIG &&
+        previewBrowserConfig.STRIPE_CONFIG.environment === 'staging' &&
+        previewBrowserConfig.STRIPE_CONFIG.isStaging === true,
+        'config.js switches Vercel preview hostnames to staging'
+    );
+    assert(
+        previewBrowserConfig.STRIPE_CONFIG.backendUrl === previewBrowserConfig.STAGING_CONFIG_DUBAI.backendUrl &&
+        previewBrowserConfig.STRIPE_CONFIG.backendUrl !== previewBrowserConfig.PROD_CONFIG_DUBAI.backendUrl,
+        'Vercel preview runtime points to the staging backend instead of production'
+    );
+
+    const stagingDomainConfig = loadConfigModuleForWindow({
+        location: {
+            protocol: 'https:',
+            hostname: 'staging.prestigegoalmotion.com'
+        }
+    });
+    assert(
+        stagingDomainConfig.STRIPE_CONFIG &&
+        stagingDomainConfig.STRIPE_CONFIG.environment === 'staging' &&
+        stagingDomainConfig.STRIPE_CONFIG.backendUrl === stagingDomainConfig.STAGING_CONFIG_DUBAI.backendUrl,
+        'staging custom domain points to the staging backend'
+    );
+
+    const runtimeOverrideConfig = loadConfigModuleForWindow({
+        PGM_RUNTIME_CONFIG: {
+            backendUrl: 'https://runtime-staging.example.com',
+            publishableKey: 'pk_test_runtime'
+        },
+        location: {
+            protocol: 'https:',
+            hostname: 'staging.prestigegoalmotion.com'
+        }
+    });
+    assert(
+        runtimeOverrideConfig.STRIPE_CONFIG.backendUrl === 'https://runtime-staging.example.com' &&
+        runtimeOverrideConfig.STRIPE_CONFIG.publishableKey === 'pk_test_runtime',
+        'runtime config can override staging backend and Stripe publishable key'
+    );
+
+    const cspHeader = JSON.stringify(vercelConfig.headers || []);
+    assert(
+        cspHeader.includes('https://pgm-staging.up.railway.app') &&
+        cspHeader.includes('https://staging.prestigegoalmotion.com') &&
+        cspHeader.includes('https://preprod.prestigegoalmotion.com'),
+        'Vercel CSP allows the staging backend and staging domains'
     );
 
     const reserveRoute = readFile('app/api/reserve/route.js');
@@ -484,6 +541,16 @@ async function run() {
         indexPage.includes('./dubai-airport-luxury-car-rental.html') &&
         indexPage.includes('./monthly-luxury-car-rental-dubai.html'),
         'home page links into the locations hub, priority guides and service-guide layer'
+    );
+    assert(
+        indexPage.includes('Dynasty Prestige reviews') &&
+        indexPage.includes('Dynasty Prestige Google feedback') &&
+        !indexPage.includes('Luxury Supercars Rental LLC') &&
+        !indexPage.includes('Kashif Dogar') &&
+        !indexPage.includes('Hassan Khreis') &&
+        !indexPage.includes('roy ashkar') &&
+        !indexPage.includes('ChIJZTglPZZpXz4R2NFpN-mV594'),
+        'home reviews belong to Dynasty Prestige and do not expose third-party review profiles'
     );
 
     const fleetPage = readPublicPage('/fleet.html');
