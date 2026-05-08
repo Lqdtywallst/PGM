@@ -1578,6 +1578,191 @@ function initSiteV2() {
         });
     }
 
+    function initGoogleReviews() {
+        const reviewsSection = document.querySelector("[data-google-reviews]");
+
+        if (!(reviewsSection instanceof HTMLElement)) {
+            return;
+        }
+
+        const grid = reviewsSection.querySelector("[data-google-reviews-grid]");
+        const placeNameElement = reviewsSection.querySelector("[data-google-place-name]");
+        const ratingElement = reviewsSection.querySelector("[data-google-rating]");
+        const countElement = reviewsSection.querySelector("[data-google-review-count]");
+        const reviewsLink = reviewsSection.querySelector("[data-google-reviews-link]");
+        const writeReviewLink = reviewsSection.querySelector("[data-google-write-review-link]");
+        const fallbackReviewsUrl = reviewsSection.getAttribute("data-google-reviews-url") || "https://www.google.com/maps/search/?api=1&query=Dynasty%20Prestige%20Luxury%20Car%20Rental%20Dubai";
+
+        function setLink(element, href) {
+            if (element instanceof HTMLAnchorElement && href) {
+                element.href = href;
+            }
+        }
+
+        function escapeHtml(value) {
+            return String(value || "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function getBackendBaseUrl() {
+            if (typeof window.getConfiguredBackendUrl === "function") {
+                return normalizeBookingValue(window.getConfiguredBackendUrl()).replace(/\/+$/, "");
+            }
+
+            return "";
+        }
+
+        function renderStatusCard(title, subtitle, message) {
+            if (!grid) {
+                return;
+            }
+
+            grid.innerHTML = `
+                <article class="review-card review-card--google review-card--status">
+                    <div class="review-card__topline">
+                        <div class="review-card__header">
+                            <span class="review-card__avatar review-card__avatar--google" aria-hidden="true">G</span>
+                            <div>
+                                <strong>${escapeHtml(title)}</strong>
+                                <span>${escapeHtml(subtitle)}</span>
+                            </div>
+                        </div>
+                        <span class="review-card__source" aria-label="Google review source">G</span>
+                    </div>
+                    <span class="review-card__stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                    <p>${escapeHtml(message)}</p>
+                </article>
+            `;
+        }
+
+        function starsForRating(rating) {
+            const safeRating = Number.isFinite(Number(rating)) ? Number(rating) : 0;
+            const rounded = Math.max(0, Math.min(5, Math.round(safeRating)));
+            return `${"&#9733;".repeat(rounded)}${"&#9734;".repeat(5 - rounded)}`;
+        }
+
+        function renderReviewCard(review) {
+            const authorName = normalizeBookingValue(review.authorName) || "Google reviewer";
+            const authorInitial = authorName.slice(0, 1).toUpperCase() || "G";
+            const reviewText = normalizeBookingValue(review.text) || "This Google review did not include written feedback.";
+            const relativeTime = normalizeBookingValue(review.relativeTimeDescription) || "Google review";
+            const rating = Number.isFinite(Number(review.rating)) ? Number(review.rating).toFixed(1) : "5.0";
+
+            return `
+                <article class="review-card review-card--google">
+                    <div class="review-card__topline">
+                        <div class="review-card__header">
+                            <span class="review-card__avatar review-card__avatar--google" aria-hidden="true">${escapeHtml(authorInitial)}</span>
+                            <div>
+                                <strong>${escapeHtml(authorName)}</strong>
+                                <span>${escapeHtml(relativeTime)}</span>
+                            </div>
+                        </div>
+                        <a class="review-card__source" href="${escapeHtml(reviewsLink?.href || fallbackReviewsUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Open Google reviews">G</a>
+                    </div>
+                    <span class="review-card__stars" aria-label="${escapeHtml(rating)} out of 5">${starsForRating(review.rating)}</span>
+                    <p>${escapeHtml(reviewText)}</p>
+                </article>
+            `;
+        }
+
+        async function loadGoogleReviews() {
+            const backendBaseUrl = getBackendBaseUrl();
+            const endpoint = backendBaseUrl ? `${backendBaseUrl}/api/reviews/google` : "/api/reviews/google";
+            const response = await fetch(endpoint, {
+                headers: {
+                    Accept: "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Google reviews request failed with ${response.status}`);
+            }
+
+            return response.json();
+        }
+
+        setLink(reviewsLink, fallbackReviewsUrl);
+        setLink(writeReviewLink, fallbackReviewsUrl);
+
+        const runtimeConfig = window.PGM_RUNTIME_CONFIG && typeof window.PGM_RUNTIME_CONFIG === "object"
+            ? window.PGM_RUNTIME_CONFIG
+            : {};
+        const skipLocalFetch = window.STRIPE_CONFIG?.isDevelopment && runtimeConfig.enableGoogleReviewsFetch !== true;
+
+        if (skipLocalFetch) {
+            if (countElement) {
+                countElement.textContent = "Official Google profile link ready; live review loading runs in staging and production.";
+            }
+
+            renderStatusCard(
+                "Google profile ready",
+                "Live loading disabled locally",
+                "In staging and production, this section loads reviews from the backend Google Places endpoint. Locally, we skip the request to avoid false console errors when the API server is not running."
+            );
+            return;
+        }
+
+        loadGoogleReviews()
+            .then((payload) => {
+                const place = payload?.place || {};
+                const reviews = Array.isArray(payload?.reviews) ? payload.reviews : [];
+                const reviewsUrl = normalizeBookingValue(place.reviewsUrl) || fallbackReviewsUrl;
+                const writeReviewUrl = normalizeBookingValue(place.writeReviewUrl) || reviewsUrl;
+                const rating = Number(place.rating);
+                const totalReviews = Number(place.totalReviews);
+
+                setLink(reviewsLink, reviewsUrl);
+                setLink(writeReviewLink, writeReviewUrl);
+
+                if (placeNameElement && place.name) {
+                    placeNameElement.textContent = place.name;
+                }
+
+                if (ratingElement) {
+                    ratingElement.textContent = Number.isFinite(rating) ? rating.toFixed(1) : "Google";
+                }
+
+                if (countElement) {
+                    countElement.textContent = Number.isFinite(totalReviews)
+                        ? `Based on ${totalReviews.toLocaleString("en-GB")} Google reviews`
+                        : "Based on the official Google Business profile";
+                }
+
+                if (!reviews.length) {
+                    renderStatusCard(
+                        payload?.configured ? "Google profile connected" : "Google profile pending",
+                        payload?.configured ? "No written reviews returned" : "Place ID not configured",
+                        payload?.message || "Open the official Google profile to read the latest public reviews."
+                    );
+                    return;
+                }
+
+                if (grid) {
+                    grid.innerHTML = reviews.slice(0, 3).map(renderReviewCard).join("");
+                }
+            })
+            .catch(() => {
+                if (ratingElement) {
+                    ratingElement.textContent = "Google";
+                }
+
+                if (countElement) {
+                    countElement.textContent = "Open the official Google profile for the latest reviews.";
+                }
+
+                renderStatusCard(
+                    "Google reviews unavailable",
+                    "Official profile link remains available",
+                    "We could not load live Google review data right now, so we are not showing copied or sample testimonials."
+                );
+            });
+    }
+
     enhanceHeaderConsistency();
     normalizeGenericContactLinks();
     initServicesLaneSelector();
@@ -1589,6 +1774,7 @@ function initSiteV2() {
     initMobileHeaderDrawer();
     initMobileActionBar();
     initHomeBookingBar();
+    initGoogleReviews();
 
     window.addEventListener("scroll", setHeaderScrollState, { passive: true });
 

@@ -30,6 +30,11 @@ const {
 const {
     createAdminReservationsRouter
 } = require('./admin-reservations');
+const {
+    fetchGoogleReviews,
+    getGoogleReviewsConfig,
+    buildGoogleReviewsUnavailablePayload
+} = require('./google-reviews');
 
 const stripeConfigured = Boolean(
     process.env.STRIPE_SECRET_KEY &&
@@ -380,6 +385,20 @@ app.use('/api/admin', requireAdminSession(), createAdminReservationsRouter());
 
 app.use('/api/reserve', reserveRoutes);
 
+app.get('/api/reviews/google', async (req, res) => {
+    res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=3600');
+
+    try {
+        const payload = await fetchGoogleReviews();
+        return res.status(200).json(payload);
+    } catch (error) {
+        console.error('[GOOGLE REVIEWS] Error loading Google reviews:', error.message);
+        return res.status(502).json(
+            buildGoogleReviewsUnavailablePayload(getGoogleReviewsConfig(), 'google_reviews_failed')
+        );
+    }
+});
+
 // Compatibility endpoint for creating a Stripe payment intent.
 app.post('/api/create-payment-intent', async (req, res) => {
     try {
@@ -719,7 +738,8 @@ app.get('/', (req, res) => {
             createPaymentIntent: '/api/create-payment-intent',
             confirmPayment: '/api/confirm-payment-intent',
             contact: '/api/contact',
-            webhook: '/api/webhook'
+            webhook: '/api/webhook',
+            googleReviews: '/api/reviews/google'
         },
         timestamp: new Date().toISOString()
     });

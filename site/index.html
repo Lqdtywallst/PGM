@@ -61,7 +61,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=El+Messiri:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="preload" href="./media/hero-dubai-sunset.mp4" as="video" type="video/mp4" media="(min-width: 861px)">
     <link rel="stylesheet" href="./css/site-v2.css?v=20260426-header1">
-    <script src="./js/site-v2.js?v=20260424-backnav1" defer></script>
+    <script src="./config.js?v=20260508-staging1"></script>
+    <script src="./js/site-v2.js?v=20260508-google-reviews1" defer></script>
 </head>
 <body class="home-page">
     <!-- Editorial home experience for Dynasty Prestige: hero, booking overlay and curated fleet routing. -->
@@ -792,26 +793,31 @@
                 <span class="guest-reviews__bg-shade"></span>
             </div>
 
-            <section class="guest-reviews" id="guest-reviews">
+            <section
+                class="guest-reviews"
+                id="guest-reviews"
+                data-google-reviews
+                data-google-reviews-url="https://www.google.com/maps/search/?api=1&amp;query=Dynasty%20Prestige%20Luxury%20Car%20Rental%20Dubai"
+            >
                 <div class="lab-shell guest-reviews__shell">
                     <div class="guest-reviews__intro">
-                        <span class="hero-lab__eyebrow guest-reviews__eyebrow">Dynasty Prestige reviews</span>
-                        <h2>What guests value after a Dynasty Prestige handover.</h2>
+                        <span class="hero-lab__eyebrow guest-reviews__eyebrow">Google reviews</span>
+                        <h2>Real guest feedback, loaded from our Google profile.</h2>
                     </div>
 
                     <div class="guest-reviews__body">
                         <div class="guest-reviews__summary">
-                            <span class="guest-reviews__brand">Dynasty Prestige</span>
+                            <span class="guest-reviews__brand" data-google-place-name>Dynasty Prestige</span>
 
                             <div class="guest-reviews__rating">
-                                <span class="guest-reviews__score">5.0</span>
+                                <span class="guest-reviews__score" data-google-rating>Google</span>
                                 <span class="guest-reviews__stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
                             </div>
 
-                            <p class="guest-reviews__count">Based on Dynasty Prestige Google feedback</p>
+                            <p class="guest-reviews__count" data-google-review-count>Loading official Google review data...</p>
 
                             <p class="guest-reviews__powered">
-                                client confidence signal from
+                                Verified source:
                                 <span class="google-wordmark">
                                     <span class="google-wordmark__g1">G</span><span class="google-wordmark__o1">o</span><span class="google-wordmark__o2">o</span><span class="google-wordmark__g2">g</span><span class="google-wordmark__l">l</span><span class="google-wordmark__e">e</span>
                                 </span>
@@ -820,72 +826,40 @@
                             <div class="guest-reviews__actions">
                                 <a
                                     class="guest-reviews__google-button"
-                                    href="https://wa.me/971586122568?text=Hi%2C%20I%20would%20like%20to%20share%20feedback%20about%20my%20Dynasty%20Prestige%20experience."
+                                    href="https://www.google.com/maps/search/?api=1&amp;query=Dynasty%20Prestige%20Luxury%20Car%20Rental%20Dubai"
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    data-google-reviews-link
                                 >
-                                    Share feedback
+                                    Read Google reviews
                                 </a>
 
                                 <a
                                     class="guest-reviews__google-link"
-                                    href="./contact.html"
+                                    href="https://www.google.com/maps/search/?api=1&amp;query=Dynasty%20Prestige%20Luxury%20Car%20Rental%20Dubai"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    data-google-write-review-link
                                 >
-                                    Contact the team
+                                    Leave a Google review
                                 </a>
                             </div>
                         </div>
 
-                        <div class="guest-reviews__grid">
-                            <article class="review-card review-card--google">
+                        <div class="guest-reviews__grid" data-google-reviews-grid>
+                            <article class="review-card review-card--google review-card--status" data-google-reviews-status>
                                 <div class="review-card__topline">
                                     <div class="review-card__header">
-                                        <span class="review-card__avatar review-card__avatar--handover" aria-hidden="true">DP</span>
+                                        <span class="review-card__avatar review-card__avatar--google" aria-hidden="true">G</span>
                                         <div>
-                                            <strong>Handover feedback</strong>
-                                            <span>Dynasty Prestige guests</span>
+                                            <strong>Connecting to Google</strong>
+                                            <span>Official profile only</span>
                                         </div>
                                     </div>
-                                    <span class="review-card__source" aria-label="Dynasty Prestige feedback source">
-                                        <span aria-hidden="true">D</span>
-                                    </span>
+                                    <span class="review-card__source" aria-label="Google review source">G</span>
                                 </div>
                                 <span class="review-card__stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-                                <p>Guests highlight clean vehicle presentation, clear timing and a calmer key handover than the usual rental desk experience.</p>
-                            </article>
-
-                            <article class="review-card review-card--google">
-                                <div class="review-card__topline">
-                                    <div class="review-card__header">
-                                        <span class="review-card__avatar review-card__avatar--support" aria-hidden="true">24</span>
-                                        <div>
-                                            <strong>WhatsApp support</strong>
-                                            <span>Before and during the rental</span>
-                                        </div>
-                                    </div>
-                                    <span class="review-card__source" aria-label="Dynasty Prestige feedback source">
-                                        <span aria-hidden="true">D</span>
-                                    </span>
-                                </div>
-                                <span class="review-card__stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-                                <p>The strongest feedback is about fast replies, practical guidance and the same team staying reachable from enquiry to return.</p>
-                            </article>
-
-                            <article class="review-card review-card--google">
-                                <div class="review-card__topline">
-                                    <div class="review-card__header">
-                                        <span class="review-card__avatar review-card__avatar--delivery" aria-hidden="true">DXB</span>
-                                        <div>
-                                            <strong>Dubai delivery</strong>
-                                            <span>Hotel, villa and airport plans</span>
-                                        </div>
-                                    </div>
-                                    <span class="review-card__source" aria-label="Dynasty Prestige feedback source">
-                                        <span aria-hidden="true">D</span>
-                                    </span>
-                                </div>
-                                <span class="review-card__stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-                                <p>Clients repeatedly care about punctual delivery, transparent confirmation and not having to chase the team for basic details.</p>
+                                <p>Google reviews load here from the official Dynasty Prestige Google Business profile. We do not display written reviews unless Google returns them directly.</p>
                             </article>
                         </div>
                     </div>

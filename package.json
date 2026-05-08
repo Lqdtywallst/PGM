@@ -72,7 +72,7 @@
     "verify": "node server/verificar-stripe.js",
     "test:smoke": "node server/test-server.js",
     "test:core": "npm run test:smoke && npm run audit:repo",
-    "test:visual": "node --test tests/unit/audit-memory-core.test.js tests/unit/visual-audit-core.test.js tests/unit/visual-agent-runner.test.js tests/unit/view-connectivity-agent.test.js tests/unit/customer-journey-contract.test.js tests/unit/functional-audit-core.test.js tests/unit/navigation-audit-core.test.js tests/unit/seo-audit-core.test.js tests/unit/pricing-agent-core.test.js tests/unit/pricing-agent-runner.test.js tests/unit/homogeneity-audit-core.test.js tests/unit/admin-auth.test.js tests/unit/admin-reservations.test.js tests/unit/reservation-lookup-security.test.js",
+    "test:visual": "node --test tests/unit/audit-memory-core.test.js tests/unit/visual-audit-core.test.js tests/unit/visual-agent-runner.test.js tests/unit/view-connectivity-agent.test.js tests/unit/customer-journey-contract.test.js tests/unit/functional-audit-core.test.js tests/unit/navigation-audit-core.test.js tests/unit/seo-audit-core.test.js tests/unit/pricing-agent-core.test.js tests/unit/pricing-agent-runner.test.js tests/unit/homogeneity-audit-core.test.js tests/unit/admin-auth.test.js tests/unit/admin-reservations.test.js tests/unit/google-reviews.test.js tests/unit/reservation-lookup-security.test.js",
     "test:db": "node --test tests/integration/reservation-store-postgres.test.js",
     "test:e2e": "playwright test",
     "test:regression": "npm run audit:regression",

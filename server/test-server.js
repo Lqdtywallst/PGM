@@ -22,6 +22,7 @@ const requiredPublicFiles = Object.values(PUBLIC_PAGE_FILE_MAP).map((relativePat
 const requiredFiles = [
     'server/backend-example.js',
     'server/email-config.js',
+    'server/google-reviews.js',
     'server/seo-audit-core.js',
     'server/server-http.js',
     'server/verificar-stripe.js',
@@ -54,6 +55,7 @@ const requiredFiles = [
 const syntaxFiles = [
     'server/backend-example.js',
     'server/email-config.js',
+    'server/google-reviews.js',
     'server/seo-audit-core.js',
     'server/server-http.js',
     'server/verificar-stripe.js',
@@ -543,14 +545,19 @@ async function run() {
         'home page links into the locations hub, priority guides and service-guide layer'
     );
     assert(
-        indexPage.includes('Dynasty Prestige reviews') &&
-        indexPage.includes('Dynasty Prestige Google feedback') &&
+        indexPage.includes('data-google-reviews') &&
+        readFile('site/js/site-v2.js').includes('/api/reviews/google') &&
+        indexPage.includes('Read Google reviews') &&
+        indexPage.includes('Google reviews load here from the official Dynasty Prestige Google Business profile') &&
+        !indexPage.includes('Handover feedback') &&
+        !indexPage.includes('WhatsApp support') &&
+        !indexPage.includes('Dubai delivery</strong>') &&
         !indexPage.includes('Luxury Supercars Rental LLC') &&
         !indexPage.includes('Kashif Dogar') &&
         !indexPage.includes('Hassan Khreis') &&
         !indexPage.includes('roy ashkar') &&
         !indexPage.includes('ChIJZTglPZZpXz4R2NFpN-mV594'),
-        'home reviews belong to Dynasty Prestige and do not expose third-party review profiles'
+        'home reviews load from the official Google profile and do not hardcode fake or third-party testimonials'
     );
 
     const fleetPage = readPublicPage('/fleet.html');

@@ -43,6 +43,10 @@ The staging service must use separate variables:
 - `ADMIN_USER=<staging admin user>`
 - `ADMIN_PASSWORD_HASH=<hash generated with npm run admin:hash-password>`
 - `ADMIN_SESSION_SECRET=<different strong secret from production>`
+- `GOOGLE_PLACES_API_KEY=<Google Places API key restricted to Places Details>`
+- `GOOGLE_PLACE_ID=<Dynasty Prestige Google Business place id>`
+- `GOOGLE_REVIEWS_URL=<official Google Maps review/profile URL>`
+- `GOOGLE_WRITE_REVIEW_URL=<official Google write-review URL, optional if place id is set>`
 - `ALLOWED_ORIGINS=https://staging.prestigegoalmotion.com,https://preprod.prestigegoalmotion.com,https://your-preview.vercel.app`
 
 Never reuse the production `DATABASE_URL`, live Stripe secret key, or admin
@@ -83,5 +87,6 @@ Then test on staging:
 - CRM admin shows the staging reservation.
 - Find booking finds the staging reservation only with matching email.
 - Contact/WhatsApp/call links point to the intended business numbers.
+- Home reviews either load from `/api/reviews/google` or show the honest Google connection state; no hardcoded fake review text.
 
 Only merge `staging` into `main` after this passes.
