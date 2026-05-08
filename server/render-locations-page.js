@@ -129,7 +129,14 @@ function renderGuideCard(item) {
 }
 
 function renderZoneCard(card) {
-    const actionsMarkup = card.actions.map((action) => `                            <a href="${escapeHtml(action.href)}">${escapeHtml(action.label)}</a>`).join('\n');
+    const actionsMarkup = card.actions.map((action) => {
+        const isWhatsApp = /^https:\/\/wa\.me\//i.test(action.href);
+        const attributes = isWhatsApp
+            ? ' target="_blank" rel="noopener noreferrer" data-analytics-event="location_whatsapp_click" data-analytics-cluster="locations" data-analytics-location="locations_hub" data-analytics-placement="zone_card" data-analytics-channel="whatsapp"'
+            : '';
+
+        return `                            <a href="${escapeHtml(action.href)}"${attributes}>${escapeHtml(action.label)}</a>`;
+    }).join('\n');
 
     return [
         '                    <article class="locations-zone-card">',
