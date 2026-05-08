@@ -23,15 +23,20 @@
 
 ## Page Structure
 
-- Keep the trunk pages in the `site/` root:
+- Keep only the homepage and web metadata in the `site/` root:
   - `index.html`
+  - `robots.txt`, `sitemap.xml`, `manifest.json`, `sw.js`, `_redirects`, `.htaccess`, `favicon.ico`
+  - `logo-dp-transparent.png` remains here as a public compatibility asset for OG/social previews.
+- Keep the trunk pages under `site/pages/core/` while preserving their public URLs through routing:
   - `fleet.html`
   - `locations.html`
   - `services.html`
   - `about.html`
   - `contact.html`
+  - `reservation-lookup.html`
 - Keep the reservation flow in `site/app/reserve/`
 - Group leaf public pages under `site/pages/` by intent:
+  - `site/pages/core/`
   - `site/pages/guides/`
   - `site/pages/services/`
   - `site/pages/brands/`

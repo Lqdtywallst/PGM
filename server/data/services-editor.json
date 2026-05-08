@@ -1,0 +1,108 @@
+{
+  "lanes": [
+    {
+      "navLabel": "Airport",
+      "navMeta": "DXB and DWC",
+      "href": "./airport-concierge-dubai.html",
+      "imageSrc": "./images/service-handover.png",
+      "imageAlt": "Airport concierge handover",
+      "cardKicker": "Arrival-first lane",
+      "cardTitle": "Airport concierge",
+      "cardCopy": "Meet-and-greet, flight tracking and onward routing from DXB or DWC before the city even starts.",
+      "pointOne": "Flight tracking before touchdown",
+      "pointTwo": "Meet-and-greet with onward routing",
+      "pointThree": "Hotel, villa or city continuation planned early",
+      "buttonLabel": "Explore airport concierge",
+      "analyticsService": "airport_concierge",
+      "isActive": true
+    },
+    {
+      "navLabel": "Chauffeur",
+      "navMeta": "Private movement",
+      "href": "./chauffeur-service-dubai.html",
+      "imageSrc": "./images/fleet/rolls-royce-cullinan-black-badge/02-exterior-front.png",
+      "imageAlt": "VIP chauffeur movement",
+      "cardKicker": "Movement lane",
+      "cardTitle": "VIP chauffeur",
+      "cardCopy": "Private driver support for meetings, dinners and city schedules where the guest should not think about parking or routing.",
+      "pointOne": "Hotel, office and event movement",
+      "pointTwo": "Half-day and full-day planning",
+      "pointThree": "Dubai and Abu Dhabi routes without driving",
+      "buttonLabel": "Explore chauffeur service",
+      "analyticsService": "chauffeur_service",
+      "isActive": false
+    },
+    {
+      "navLabel": "Delivery",
+      "navMeta": "Hotel and villa",
+      "href": "./hotel-villa-airport-delivery-dubai.html",
+      "imageSrc": "./images/service-detail.png",
+      "imageAlt": "Tailored delivery service",
+      "cardKicker": "Handover lane",
+      "cardTitle": "Tailored delivery",
+      "cardCopy": "Timed handover for hotels, villas and residences where the car should appear ready at the property, not after another round of calls.",
+      "pointOne": "Hotel and villa delivery windows",
+      "pointTwo": "Property-led handover planning",
+      "pointThree": "Cleaner arrival for branded residences",
+      "buttonLabel": "Explore tailored delivery",
+      "analyticsService": "tailored_delivery",
+      "isActive": false
+    },
+    {
+      "navLabel": "Monthly",
+      "navMeta": "Longer stay",
+      "href": "./monthly-luxury-car-rental-dubai.html",
+      "imageSrc": "./images/fleet/rolls-royce-cullinan-black-badge/05-interior-rear-seats.png",
+      "imageAlt": "Monthly luxury rental",
+      "cardKicker": "Longer-stay lane",
+      "cardTitle": "Monthly luxury rental",
+      "cardCopy": "Longer support for relocation, seasonal use and repeat movement where comfort and steadier coordination matter more than a single handover.",
+      "pointOne": "Cleaner month-by-month planning",
+      "pointTwo": "Flexible vehicle matching for the stay",
+      "pointThree": "Comfort-first support for repeat use",
+      "buttonLabel": "Explore monthly rental",
+      "analyticsService": "monthly_luxury_rental",
+      "isActive": false
+    }
+  ],
+  "additionalRoutes": [
+    {
+      "eyebrow": "Event-led",
+      "title": "Wedding and event rental",
+      "copy": "Statement arrivals for proposals, shoots and private occasions where the car is part of the scene.",
+      "href": "./wedding-event-car-rental-dubai.html"
+    },
+    {
+      "eyebrow": "Executive",
+      "title": "Business mobility",
+      "copy": "Office, hotel and delegation-led movement when the schedule matters more than browsing every model.",
+      "href": "./business-car-rental-dubai.html"
+    }
+  ],
+  "guideRoutes": [
+    {
+      "eyebrow": "Airport handover",
+      "title": "DXB and DWC arrival guide",
+      "copy": "Flight timing, premium pickup logic and the route into the city.",
+      "href": "./dubai-airport-luxury-car-rental.html"
+    },
+    {
+      "eyebrow": "Hotel and villa",
+      "title": "Palm Jumeirah guide",
+      "copy": "Resort stays, villas and branded residences where handover quality leads.",
+      "href": "./palm-jumeirah-luxury-car-rental.html"
+    },
+    {
+      "eyebrow": "Waterfront stay",
+      "title": "Dubai Marina guide",
+      "copy": "Hotel towers, JBR movement and shorter plans needing lighter routing.",
+      "href": "./dubai-marina-luxury-car-rental.html"
+    },
+    {
+      "eyebrow": "Executive route",
+      "title": "Abu Dhabi guide",
+      "copy": "Capital visits, meetings and longer routes needing steadier timing.",
+      "href": "./abu-dhabi-luxury-car-rental.html"
+    }
+  ]
+}

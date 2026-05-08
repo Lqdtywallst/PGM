@@ -2,12 +2,12 @@ const path = require('path');
 
 const PUBLIC_PAGE_FILE_MAP = Object.freeze({
     '/': 'index.html',
-    '/about.html': 'about.html',
-    '/contact.html': 'contact.html',
-    '/fleet.html': 'fleet.html',
-    '/locations.html': 'locations.html',
-    '/reservation-lookup.html': 'reservation-lookup.html',
-    '/services.html': 'services.html',
+    '/about.html': 'pages/core/about.html',
+    '/contact.html': 'pages/core/contact.html',
+    '/fleet.html': 'pages/core/fleet.html',
+    '/locations.html': 'pages/core/locations.html',
+    '/reservation-lookup.html': 'pages/core/reservation-lookup.html',
+    '/services.html': 'pages/core/services.html',
     '/luxury-car-rental-dubai.html': 'pages/guides/luxury-car-rental-dubai.html',
     '/abu-dhabi-luxury-car-rental.html': 'pages/guides/abu-dhabi-luxury-car-rental.html',
     '/dubai-airport-luxury-car-rental.html': 'pages/guides/dubai-airport-luxury-car-rental.html',

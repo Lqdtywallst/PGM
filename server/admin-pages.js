@@ -271,6 +271,28 @@ function renderAdminReservationsPage() {
             text-transform: uppercase;
             font-size: 0.64rem;
         }
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .topbar-link {
+            min-height: 38px;
+            padding: 0 16px;
+            border: 1px solid rgba(247, 223, 149, 0.26);
+            border-radius: 13px;
+            background: rgba(247, 223, 149, 0.08);
+            color: #fff8e7;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
         .logout {
             min-height: 38px;
             padding: 0 16px;
@@ -317,6 +339,13 @@ function renderAdminReservationsPage() {
             color: var(--muted);
             font-size: 0.94rem;
             line-height: 1.45;
+        }
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
         }
         .toolbar,
         .list-panel,
@@ -580,7 +609,10 @@ function renderAdminReservationsPage() {
                 <span>Private reservations desk</span>
             </div>
         </div>
-        <button class="logout" id="logoutButton" type="button">Logout</button>
+        <div class="topbar-actions">
+            <a class="topbar-link" href="/admin/content.html">Content editor</a>
+            <button class="logout" id="logoutButton" type="button">Logout</button>
+        </div>
     </header>
     <main class="layout">
         <section class="hero" aria-labelledby="pageTitle">
@@ -588,7 +620,10 @@ function renderAdminReservationsPage() {
                 <h1 id="pageTitle">Reservations, clients and handovers.</h1>
                 <p>Track every booking from checkout to confirmed handover, with quick contact actions and private admin notes.</p>
             </div>
-            <button class="button primary" id="exportCsvButton" type="button">Export CSV</button>
+            <div class="hero-actions">
+                <a class="button" href="/admin/content.html">Open content editor</a>
+                <button class="button primary" id="exportCsvButton" type="button">Export CSV</button>
+            </div>
         </section>
 
         <section>

@@ -67,6 +67,30 @@
       "destination": "/site/index.html"
     },
     {
+      "source": "/about.html",
+      "destination": "/site/pages/core/about.html"
+    },
+    {
+      "source": "/contact.html",
+      "destination": "/site/pages/core/contact.html"
+    },
+    {
+      "source": "/fleet.html",
+      "destination": "/site/pages/core/fleet.html"
+    },
+    {
+      "source": "/locations.html",
+      "destination": "/site/pages/core/locations.html"
+    },
+    {
+      "source": "/reservation-lookup.html",
+      "destination": "/site/pages/core/reservation-lookup.html"
+    },
+    {
+      "source": "/services.html",
+      "destination": "/site/pages/core/services.html"
+    },
+    {
       "source": "/luxury-car-rental-dubai.html",
       "destination": "/site/pages/guides/luxury-car-rental-dubai.html"
     },

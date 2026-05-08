@@ -4,7 +4,10 @@
     "variant": "experience-led",
     "brandKey": "lamborghini",
     "brand": "Lamborghini",
-    "types": ["convertible", "sports"],
+    "types": [
+      "convertible",
+      "sports"
+    ],
     "pricePerDay": 3200,
     "href": "./lamborghini-huracan-evo-spyder-rental-dubai.html",
     "image": {
@@ -23,7 +26,11 @@
       "title": "Huracan EVO Spyder",
       "description": "The loudest emotional booking in the fleet: short, visible, roof-down and built for guests who want the car to shape the memory, not just the route.",
       "salesLine": "Best for Palm, Marina and after-dark arrivals where theatre matters more than luggage.",
-      "specs": ["Convertible", "2 seats", "High-visibility"]
+      "specs": [
+        "Convertible",
+        "2 seats",
+        "High-visibility"
+      ]
     },
     "booking": {
       "priceNote": "Celebration-led stays",
@@ -38,7 +45,10 @@
     "variant": "experience-led",
     "brandKey": "ferrari",
     "brand": "Ferrari",
-    "types": ["convertible", "sports"],
+    "types": [
+      "convertible",
+      "sports"
+    ],
     "pricePerDay": 3400,
     "href": "./ferrari-rental-dubai.html",
     "image": {
@@ -57,7 +67,11 @@
       "title": "296 GTS",
       "description": "A more polished Ferrari reading for couples, dinner routes and guests who want Maranello presence without the rawer Lamborghini tone.",
       "salesLine": "Best for Marina dinners, resort arrivals and two-person stays with visible elegance.",
-      "specs": ["Convertible", "2 seats", "Couple-led"]
+      "specs": [
+        "Convertible",
+        "2 seats",
+        "Couple-led"
+      ]
     },
     "booking": {
       "priceNote": "Elegant city runs",
@@ -72,7 +86,9 @@
     "variant": "driver-led",
     "brandKey": "porsche",
     "brand": "Porsche",
-    "types": ["sports"],
+    "types": [
+      "sports"
+    ],
     "pricePerDay": 2100,
     "href": "./porsche-rental-dubai.html",
     "image": {
@@ -91,7 +107,11 @@
       "title": "992 GT3",
       "description": "The least theatrical model in the line-up and the most driver-led: built for guests who care about feel, balance and road connection before valet impact.",
       "salesLine": "Best for enthusiasts, cleaner highway movement and bookings led by the drive itself.",
-      "specs": ["Sports", "2 seats", "Purist"]
+      "specs": [
+        "Sports",
+        "2 seats",
+        "Purist"
+      ]
     },
     "booking": {
       "priceNote": "Pure driver focus",
@@ -106,7 +126,10 @@
     "variant": "premium-utility-led",
     "brandKey": "lamborghini",
     "brand": "Lamborghini",
-    "types": ["suv", "luxury"],
+    "types": [
+      "suv",
+      "luxury"
+    ],
     "pricePerDay": 3500,
     "href": "./lamborghini-urus-rental-dubai.html",
     "image": {
@@ -125,7 +148,11 @@
       "title": "Urus Sport",
       "description": "The Lamborghini answer for stays that still need presence but cannot sacrifice cabin room, luggage ease or a more flexible daily rhythm.",
       "salesLine": "Best for airport arrivals, villa stays and guest-led schedules that still need drama.",
-      "specs": ["Luxury SUV", "Up to 5", "Luggage-ready"]
+      "specs": [
+        "Luxury SUV",
+        "Up to 5",
+        "Luggage-ready"
+      ]
     },
     "booking": {
       "priceNote": "High-presence daily use",
@@ -140,7 +167,10 @@
     "variant": "premium-utility-led",
     "brandKey": "mercedes",
     "brand": "Mercedes",
-    "types": ["suv", "luxury"],
+    "types": [
+      "suv",
+      "luxury"
+    ],
     "pricePerDay": 1650,
     "href": "./mercedes-g63-amg-rental-dubai.html",
     "image": {
@@ -159,7 +189,11 @@
       "title": "G63 AMG",
       "description": "A stronger daily booking than most supercars: easier access, upright comfort and enough status to carry hotels, meetings and dinners without changing tone.",
       "salesLine": "Best for business stays, longer hotel runs and guests who want visible comfort.",
-      "specs": ["Luxury SUV", "Up to 5", "All-day ease"]
+      "specs": [
+        "Luxury SUV",
+        "Up to 5",
+        "All-day ease"
+      ]
     },
     "booking": {
       "priceNote": "Hotel-to-meeting rhythm",
@@ -174,7 +208,10 @@
     "variant": "premium-utility-led",
     "brandKey": "rolls-royce",
     "brand": "Rolls-Royce",
-    "types": ["suv", "luxury"],
+    "types": [
+      "suv",
+      "luxury"
+    ],
     "pricePerDay": 3750,
     "href": "./rolls-royce-cullinan-black-badge-rental-dubai.html",
     "image": {
@@ -193,7 +230,11 @@
       "title": "Cullinan Black Badge",
       "description": "The most ceremonial car in the fleet: softer, quieter and more elevated, built for guests who want the arrival to feel composed, rare and unmistakably premium.",
       "salesLine": "Best for villas, VIP hotels, airport reception and executive guest care.",
-      "specs": ["Luxury SUV", "Up to 5", "Ceremony-led"]
+      "specs": [
+        "Luxury SUV",
+        "Up to 5",
+        "Ceremony-led"
+      ]
     },
     "booking": {
       "priceNote": "Ultimate arrival tone",

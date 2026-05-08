@@ -28,8 +28,20 @@ const {
     renderAdminReservationsPage
 } = require('./admin-pages');
 const {
+    renderAdminContentEditorPage
+} = require('./admin-content-page');
+const {
     createAdminReservationsRouter
 } = require('./admin-reservations');
+const {
+    readEditorState,
+    saveHomeEditorState,
+    saveFleetCards,
+    saveServicesContent,
+    saveLocationsContent,
+    readEditablePage,
+    saveEditablePage
+} = require('./content-editor');
 const {
     fetchGoogleReviews,
     getGoogleReviewsConfig,
@@ -379,6 +391,94 @@ app.get('/api/admin/session', (req, res) => {
 app.get('/admin/reservations.html', requireAdminSession({ redirectToLogin: true }), (req, res) => {
     setAdminNoIndexHeaders(res);
     res.type('html').send(renderAdminReservationsPage());
+});
+
+app.get('/admin/content.html', requireAdminSession({ redirectToLogin: true }), (req, res) => {
+    setAdminNoIndexHeaders(res);
+    res.type('html').send(renderAdminContentEditorPage());
+});
+
+app.get('/api/admin/content', requireAdminSession(), (req, res) => {
+    setAdminNoIndexHeaders(res);
+
+    try {
+        res.json(readEditorState());
+    } catch (error) {
+        console.error('[ADMIN CONTENT] Error loading editor state:', error.message);
+        res.status(500).json({ error: 'Could not load the current editable content.' });
+    }
+});
+
+app.put('/api/admin/content/home', requireAdminSession(), (req, res) => {
+    setAdminNoIndexHeaders(res);
+
+    try {
+        const home = saveHomeEditorState(req.body || {});
+        res.json({ ok: true, home });
+    } catch (error) {
+        console.error('[ADMIN CONTENT] Error saving home hero:', error.message);
+        res.status(400).json({ error: error.message || 'Could not save the home hero.' });
+    }
+});
+
+app.put('/api/admin/content/fleet', requireAdminSession(), (req, res) => {
+    setAdminNoIndexHeaders(res);
+
+    try {
+        const fleet = saveFleetCards(req.body?.cards || []);
+        res.json({ ok: true, fleet });
+    } catch (error) {
+        console.error('[ADMIN CONTENT] Error saving fleet cards:', error.message);
+        res.status(400).json({ error: error.message || 'Could not save the fleet cards.' });
+    }
+});
+
+app.put('/api/admin/content/services', requireAdminSession(), (req, res) => {
+    setAdminNoIndexHeaders(res);
+
+    try {
+        const services = saveServicesContent(req.body || {});
+        res.json({ ok: true, services });
+    } catch (error) {
+        console.error('[ADMIN CONTENT] Error saving services content:', error.message);
+        res.status(400).json({ error: error.message || 'Could not save the services content.' });
+    }
+});
+
+app.put('/api/admin/content/locations', requireAdminSession(), (req, res) => {
+    setAdminNoIndexHeaders(res);
+
+    try {
+        const locations = saveLocationsContent(req.body || {});
+        res.json({ ok: true, locations });
+    } catch (error) {
+        console.error('[ADMIN CONTENT] Error saving locations content:', error.message);
+        res.status(400).json({ error: error.message || 'Could not save the locations content.' });
+    }
+});
+
+app.get('/api/admin/content/page', requireAdminSession(), (req, res) => {
+    setAdminNoIndexHeaders(res);
+
+    try {
+        const page = readEditablePage(req.query.path || '/');
+        res.json({ ok: true, page });
+    } catch (error) {
+        console.error('[ADMIN CONTENT] Error loading full page source:', error.message);
+        res.status(400).json({ error: error.message || 'Could not load that page source.' });
+    }
+});
+
+app.put('/api/admin/content/page', requireAdminSession(), (req, res) => {
+    setAdminNoIndexHeaders(res);
+
+    try {
+        const page = saveEditablePage(req.body?.path, req.body?.source);
+        res.json({ ok: true, page });
+    } catch (error) {
+        console.error('[ADMIN CONTENT] Error saving full page source:', error.message);
+        res.status(400).json({ error: error.message || 'Could not save that page source.' });
+    }
 });
 
 app.use('/api/admin', requireAdminSession(), createAdminReservationsRouter());

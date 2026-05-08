@@ -8,9 +8,12 @@ This repository keeps only active working documentation under `docs/` so the pro
 - `architecture/`: target site structure, migration decisions, and implementation backlog
 - `previews/`: non-public HTML working previews and component references kept outside `site/`
 - `archive/`: archived experiments removed from the public tree but preserved for reference
+- `archive/root-cleanup/`: old root-level reports and external screenshots kept out of the working tree entrance
 
 ## Active Documents
 
+- [MANUAL-EDITING-GUIDE.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/MANUAL-EDITING-GUIDE.md)
+  - low-risk manual editing map: what to change directly, what to avoid, and how to preview safely without affecting unrelated parts
 - [ALCANCE-AUDITORIA-FRONTEND-2026-04-21.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/audit/ALCANCE-AUDITORIA-FRONTEND-2026-04-21.md)
   - documented scope for the frontend cleanup pass: HTML, unused CSS pruning, JS optimization, and validation rules before edits
 - [MAPA-AUDITORIA-FRONTEND-ASSETS-2026-04-21.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/audit/MAPA-AUDITORIA-FRONTEND-ASSETS-2026-04-21.md)

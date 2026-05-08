@@ -5,7 +5,7 @@ const { escapeHtml } = require("./html-utils");
 const PHONE_E164 = "971586122568";
 const PHONE_DISPLAY = "+971586122568";
 const cardsPath = path.join(__dirname, "data", "fleet-cards.json");
-const fleetHtmlPath = path.join(__dirname, "..", "site", "fleet.html");
+const fleetHtmlPath = path.join(__dirname, "..", "site", "pages", "core", "fleet.html");
 
 function formatAed(value) {
     return `${Number(value).toLocaleString("en-US")} AED`;
@@ -118,44 +118,84 @@ function replaceFleetCards(html, cardsMarkup, newline) {
     const endMarker = "<!-- FLEET_CARDS_END -->";
 
     if (html.includes(startMarker) && html.includes(endMarker)) {
-        return html.replace(
-            new RegExp(`([ \\t]*${startMarker}[\\s\\S]*?[ \\t]*${endMarker})`, "m"),
-            [
-                `                            ${startMarker}`,
-                cardsMarkup,
-                `                            ${endMarker}`
-            ].join(newline)
-        );
+        return {
+            found: true,
+            html: html.replace(
+                new RegExp(`([ \\t]*${startMarker}[\\s\\S]*?[ \\t]*${endMarker})`, "m"),
+                [
+                    `                            ${startMarker}`,
+                    cardsMarkup,
+                    `                            ${endMarker}`
+                ].join(newline)
+            )
+        };
     }
 
     const pattern = /([ \t]*<div class="fleet-results__list js-fleet-grid">[\r\n]+)([\s\S]*?)([ \t]*<\/div>[\r\n]+[ \t]*<div class="fleet-browser__empty js-fleet-empty")/m;
 
-    return html.replace(
-        pattern,
-        [
-            `$1`,
-            `                            ${startMarker}`,
-            cardsMarkup,
-            `                            ${endMarker}`,
-            `$3`
-        ].join(newline)
-    );
+    if (!pattern.test(html)) {
+        return {
+            found: false,
+            html
+        };
+    }
+
+    return {
+        found: true,
+        html: html.replace(
+            pattern,
+            [
+                `$1`,
+                `                            ${startMarker}`,
+                cardsMarkup,
+                `                            ${endMarker}`,
+                `$3`
+            ].join(newline)
+        )
+    };
 }
 
-function main() {
+function syncFleetHtmlFromData() {
     const rawCards = fs.readFileSync(cardsPath, "utf8");
     const cards = JSON.parse(rawCards);
     const html = fs.readFileSync(fleetHtmlPath, "utf8");
     const newline = html.includes("\r\n") ? "\r\n" : "\n";
     const cardsMarkup = renderCards(cards).replace(/\n/g, newline);
-    const nextHtml = replaceFleetCards(html, cardsMarkup, newline);
+    const replacement = replaceFleetCards(html, cardsMarkup, newline);
 
-    if (nextHtml === html) {
+    if (!replacement.found) {
         throw new Error("Could not locate the fleet cards block in fleet.html.");
     }
 
-    fs.writeFileSync(fleetHtmlPath, nextHtml, "utf8");
-    console.log(`Rendered ${cards.length} fleet cards into ${fleetHtmlPath}`);
+    if (replacement.html !== html) {
+        fs.writeFileSync(fleetHtmlPath, replacement.html, "utf8");
+    }
+
+    return {
+        count: cards.length,
+        fleetHtmlPath,
+        cardsPath,
+        changed: replacement.html !== html
+    };
 }
 
-main();
+function main() {
+    const result = syncFleetHtmlFromData();
+    console.log(
+        `Rendered ${result.count} fleet cards into ${result.fleetHtmlPath}` +
+        (result.changed ? "" : " (already up to date)")
+    );
+}
+
+if (require.main === module) {
+    main();
+}
+
+module.exports = {
+    formatAed,
+    validateCard,
+    renderCard,
+    renderCards,
+    replaceFleetCards,
+    syncFleetHtmlFromData
+};

@@ -5,6 +5,12 @@
 /available-stock-for-sale /#fleet 301
 /exclusive-collection /#fleet 301
 /exclusive-collection/ /#fleet 301
+/about.html /pages/core/about.html 200
+/contact.html /pages/core/contact.html 200
+/fleet.html /pages/core/fleet.html 200
+/locations.html /pages/core/locations.html 200
+/reservation-lookup.html /pages/core/reservation-lookup.html 200
+/services.html /pages/core/services.html 200
 /luxury-car-rental-dubai.html /pages/guides/luxury-car-rental-dubai.html 200
 /abu-dhabi-luxury-car-rental.html /pages/guides/abu-dhabi-luxury-car-rental.html 200
 /dubai-airport-luxury-car-rental.html /pages/guides/dubai-airport-luxury-car-rental.html 200

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const { siteFileForPublicPath } = require('../server/public-page-map');
+const { PUBLIC_PAGE_FILE_MAP, siteFileForPublicPath } = require('../server/public-page-map');
 
 const projectRoot = path.resolve(__dirname, '..');
 const auditRoot = path.join(projectRoot, 'docs', 'audit');
@@ -41,6 +41,9 @@ const archivePrefixes = [
     'site/media/models/',
     'site/vendor/three/'
 ];
+const publicPageFiles = new Set(
+    Object.values(PUBLIC_PAGE_FILE_MAP).map((relativePath) => `site/${relativePath}`)
+);
 const candidateDeletePaths = new Set([
     'app.lnk',
     'filter_review_focus.png',
@@ -318,7 +321,7 @@ function classifyFile(relativePath, exists, incomingCount, sitemapEntries) {
     }
 
     if (relativePath.startsWith('site/')) {
-        if (sitemapEntries.has(relativePath) || relativePath === 'site/index.html' || relativePath === 'site/contact.html' || relativePath === 'site/app/reserve/page.html' || relativePath === 'site/robots.txt' || relativePath === 'site/sitemap.xml' || relativePath === 'site/manifest.json' || relativePath === 'site/favicon.ico' || relativePath === 'site/sw.js' || relativePath === 'site/_redirects' || relativePath === 'site/.htaccess') {
+        if (sitemapEntries.has(relativePath) || publicPageFiles.has(relativePath) || relativePath === 'site/robots.txt' || relativePath === 'site/sitemap.xml' || relativePath === 'site/manifest.json' || relativePath === 'site/favicon.ico' || relativePath === 'site/sw.js' || relativePath === 'site/_redirects' || relativePath === 'site/.htaccess') {
             return {
                 category: 'produccion',
                 state: 'produccion',

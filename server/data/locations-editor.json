@@ -1,0 +1,144 @@
+{
+  "heroZones": [
+    {
+      "label": "Dubai",
+      "title": "Citywide flagship",
+      "copy": "Downtown, Business Bay, Palm, Marina and JBR stays.",
+      "href": "./luxury-car-rental-dubai.html"
+    },
+    {
+      "label": "Abu Dhabi",
+      "title": "Capital and resort routes",
+      "copy": "Corniche, Yas, Saadiyat and longer intercity planning.",
+      "href": "./abu-dhabi-luxury-car-rental.html"
+    },
+    {
+      "label": "Dubai Airport",
+      "title": "DXB and DWC arrivals",
+      "copy": "Flight timing, terminal access and onward hotel delivery.",
+      "href": "./dubai-airport-luxury-car-rental.html"
+    },
+    {
+      "label": "Palm Jumeirah",
+      "title": "Resorts and villas",
+      "copy": "Branded residences, beach hotels and calmer premium handovers.",
+      "href": "./palm-jumeirah-luxury-car-rental.html"
+    },
+    {
+      "label": "Dubai Marina",
+      "title": "Waterfront stays",
+      "copy": "Towers, hotels, JBR and faster city-waterfront movement.",
+      "href": "./dubai-marina-luxury-car-rental.html"
+    }
+  ],
+  "guideCards": [
+    {
+      "label": "Capital",
+      "title": "Abu Dhabi",
+      "copy": "For executive schedules, calmer luxury, resort stays and longer intercity planning.",
+      "href": "./abu-dhabi-luxury-car-rental.html"
+    },
+    {
+      "label": "Arrival",
+      "title": "Dubai Airport",
+      "copy": "For DXB and DWC timing, flight coordination and onward hotel delivery.",
+      "href": "./dubai-airport-luxury-car-rental.html"
+    },
+    {
+      "label": "Resort",
+      "title": "Palm Jumeirah",
+      "copy": "For villas, branded residences, hotels and quieter premium handovers.",
+      "href": "./palm-jumeirah-luxury-car-rental.html"
+    },
+    {
+      "label": "Waterfront",
+      "title": "Dubai Marina",
+      "copy": "For towers, hotels, JBR stays and faster waterfront routing.",
+      "href": "./dubai-marina-luxury-car-rental.html"
+    }
+  ],
+  "zoneCards": [
+    {
+      "label": "Dubai",
+      "title": "City stays and business movement",
+      "copy": "The broadest route for hotels, residences, resorts and executive meetings across the city.",
+      "actions": [
+        {
+          "label": "Open Dubai guide",
+          "href": "./luxury-car-rental-dubai.html"
+        },
+        {
+          "label": "Business mobility",
+          "href": "./business-car-rental-dubai.html"
+        }
+      ]
+    },
+    {
+      "label": "Abu Dhabi",
+      "title": "Capital arrivals and longer routes",
+      "copy": "Best when the booking stretches beyond Dubai and needs calmer intercity planning.",
+      "actions": [
+        {
+          "label": "Open Abu Dhabi guide",
+          "href": "./abu-dhabi-luxury-car-rental.html"
+        },
+        {
+          "label": "Chauffeur service",
+          "href": "./chauffeur-service-dubai.html"
+        }
+      ]
+    },
+    {
+      "label": "DXB / DWC",
+      "title": "Airport arrival handovers",
+      "copy": "Built around flight timing, terminal access and the transition into the hotel or residence.",
+      "actions": [
+        {
+          "label": "Open airport guide",
+          "href": "./dubai-airport-luxury-car-rental.html"
+        },
+        {
+          "label": "Airport concierge",
+          "href": "./airport-concierge-dubai.html"
+        },
+        {
+          "label": "Request timing",
+          "href": "https://wa.me/971586122568?text=Hi%2C%20I%20need%20airport%20delivery%20at%20DXB%20or%20DWC.%20Please%20share%20availability."
+        }
+      ]
+    },
+    {
+      "label": "Hotels / residences",
+      "title": "Resort, villa and branded residence delivery",
+      "copy": "Especially relevant across Palm Jumeirah, Dubai Marina, JBR and central premium districts.",
+      "actions": [
+        {
+          "label": "Open Palm guide",
+          "href": "./palm-jumeirah-luxury-car-rental.html"
+        },
+        {
+          "label": "Tailored delivery",
+          "href": "./hotel-villa-airport-delivery-dubai.html"
+        },
+        {
+          "label": "Plan handover",
+          "href": "https://wa.me/971586122568?text=Hi%2C%20I%20need%20hotel%20or%20residence%20delivery%20in%20Dubai."
+        }
+      ]
+    }
+  ],
+  "processSteps": [
+    {
+      "title": "Choose the city or airport",
+      "copy": "Start with Dubai, Abu Dhabi, DXB or DWC before worrying about the final street-level detail."
+    },
+    {
+      "title": "Share the handover style",
+      "copy": "Hotel, residence, resort, terminal or business address changes the best delivery route."
+    },
+    {
+      "title": "Let one team coordinate the timing",
+      "copy": "That keeps the route, documents and return plan consistent from the first contact."
+    }
+  ]
+}

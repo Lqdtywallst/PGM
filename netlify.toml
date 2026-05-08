@@ -74,6 +74,42 @@
   force = true
 
 [[redirects]]
+  from = "/about.html"
+  to = "/pages/core/about.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/contact.html"
+  to = "/pages/core/contact.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/fleet.html"
+  to = "/pages/core/fleet.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/locations.html"
+  to = "/pages/core/locations.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/reservation-lookup.html"
+  to = "/pages/core/reservation-lookup.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/services.html"
+  to = "/pages/core/services.html"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/luxury-car-rental-dubai.html"
   to = "/pages/guides/luxury-car-rental-dubai.html"
   status = 200

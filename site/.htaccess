@@ -57,6 +57,12 @@
     RewriteRule ^exclusive-collection/?$ /#fleet [R=301,L]
 
     # Internal page organization rewrites
+    RewriteRule ^about\.html$ /pages/core/about.html [L]
+    RewriteRule ^contact\.html$ /pages/core/contact.html [L]
+    RewriteRule ^fleet\.html$ /pages/core/fleet.html [L]
+    RewriteRule ^locations\.html$ /pages/core/locations.html [L]
+    RewriteRule ^reservation-lookup\.html$ /pages/core/reservation-lookup.html [L]
+    RewriteRule ^services\.html$ /pages/core/services.html [L]
     RewriteRule ^luxury-car-rental-dubai\.html$ /pages/guides/luxury-car-rental-dubai.html [L]
     RewriteRule ^abu-dhabi-luxury-car-rental\.html$ /pages/guides/abu-dhabi-luxury-car-rental.html [L]
     RewriteRule ^dubai-airport-luxury-car-rental\.html$ /pages/guides/dubai-airport-luxury-car-rental.html [L]

@@ -59,7 +59,7 @@ Solo aplica si hay cambios recomendados y no estan bloqueados por falta de datos
 npm run agent:pricing:apply
 ```
 
-El apply actualiza `server/data/fleet-cards.json`, regenera `site/fleet.html` y sincroniza de forma best-effort textos/precios en paginas estaticas de marcas y vehiculos.
+El apply actualiza `server/data/fleet-cards.json`, regenera `site/pages/core/fleet.html` y sincroniza de forma best-effort textos/precios en paginas estaticas de marcas y vehiculos.
 
 Si alguna vez necesitas probar escenarios sin competencia fresca, existe:
 

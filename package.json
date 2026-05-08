@@ -8,6 +8,7 @@
     "dev": "node server/backend-example.js",
     "build:fleet": "node server/render-fleet-cards.js",
     "audit:inventory": "node scripts/audit-inventory.js",
+    "audit:structure": "node scripts/run-structure-audit.js",
     "audit:connectivity:views": "node scripts/run-view-connectivity-audit.js",
     "audit:connectivity:views:strict": "node scripts/run-view-connectivity-audit.js --strict",
     "audit:repo": "node server/audit-site.js",
