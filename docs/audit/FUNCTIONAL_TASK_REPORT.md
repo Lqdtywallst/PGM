@@ -175,3 +175,93 @@ Additional useful follow-up tests after the fix:
 - Boundary check: new pickup exactly at previous reservation dropoff time should be available.
 - Cancelled/failed reservations should remain non-blocking in the UI, not only in unit tests.
 - Mobile version of `FLEET-FILTER-001` should be explicitly retested after the fix.
+
+## Task 2026-05-09 15:03 - Fleet card actions and vehicle destinations
+
+### Scope
+Alejandro requested a functional audit of Fleet vehicle cards: press each card action, confirm every button performs the correct action, and confirm clicking the card takes the customer to the corresponding vehicle page.
+
+Rama: `agent/functional-audit`
+Carpeta: `C:\Users\aleja\Documents\GLOBALTECH\pagina-web-Santi\PGM-functional-audit`
+Puerto: `8081`
+URL exacta probada: `http://localhost:8081/fleet.html`
+
+### Tested Routes
+- `http://localhost:8081/fleet.html`
+- `http://localhost:8081/lamborghini-huracan-evo-spyder-rental-dubai.html`
+- `http://localhost:8081/ferrari-296-gts-rental-dubai.html`
+- `http://localhost:8081/porsche-992-gt3-rental-dubai.html`
+- `http://localhost:8081/lamborghini-urus-rental-dubai.html`
+- `http://localhost:8081/mercedes-g63-amg-rental-dubai.html`
+- `http://localhost:8081/rolls-royce-cullinan-black-badge-rental-dubai.html`
+- `http://localhost:8081/app/reserve/page.html`
+- `tel:+971586122568`
+- `https://wa.me/971586122568`
+
+### Test Steps
+- Confirmed frontend was live at `http://localhost:8081/fleet.html`.
+- Desktop viewport `1440x920`: opened Fleet and tested all 6 visible vehicle cards.
+- Mobile viewport `393x852`: opened Fleet and tested all 6 visible vehicle cards.
+- For each card, clicked the image/media link and verified the resulting path.
+- For each card, clicked the title link and verified the resulting path.
+- For each card, clicked a visible non-button card body area and checked whether it navigated to the expected vehicle page.
+- For each card, clicked Reserve and verified `/app/reserve/page.html` opened with the expected selected car and daily rate.
+- For each card, verified Call href points to `tel:+971586122568`.
+- For each card, verified WhatsApp href points to `wa.me/971586122568` and includes the corresponding car name in the message.
+
+### Findings
+- ID: FLEET-CARD-001
+- Severity: High
+- Route: `http://localhost:8081/fleet.html`
+- Viewport: Desktop and mobile
+- Steps to reproduce: Open Fleet and click the Ferrari 296 GTS card image/media link or title link.
+- Actual result: Navigates to `/ferrari-rental-dubai.html`, which is the Ferrari brand landing.
+- Expected result: Should navigate to the specific vehicle page `/ferrari-296-gts-rental-dubai.html`.
+- Evidence: `artifacts/functional-task-audit/fleet-card-actions-screenshots/desktop-fleet-card-002.png`, `artifacts/functional-task-audit/fleet-card-actions-screenshots/desktop-fleet-card-003.png`, `artifacts/functional-task-audit/fleet-card-actions-screenshots/mobile-fleet-card-012.png`, `artifacts/functional-task-audit/fleet-card-actions-screenshots/mobile-fleet-card-013.png`
+- Suggested owner: functional
+
+- ID: FLEET-CARD-002
+- Severity: High
+- Route: `http://localhost:8081/fleet.html`
+- Viewport: Desktop and mobile
+- Steps to reproduce: Open Fleet and click the Porsche 992 GT3 card image/media link or title link.
+- Actual result: Navigates to `/porsche-rental-dubai.html`, which is the Porsche brand landing.
+- Expected result: Should navigate to the specific vehicle page `/porsche-992-gt3-rental-dubai.html`.
+- Evidence: `artifacts/functional-task-audit/fleet-card-actions-screenshots/desktop-fleet-card-005.png`, `artifacts/functional-task-audit/fleet-card-actions-screenshots/desktop-fleet-card-006.png`, `artifacts/functional-task-audit/fleet-card-actions-screenshots/mobile-fleet-card-015.png`, `artifacts/functional-task-audit/fleet-card-actions-screenshots/mobile-fleet-card-016.png`
+- Suggested owner: functional
+
+- ID: FLEET-CARD-003
+- Severity: Medium
+- Route: `http://localhost:8081/fleet.html`
+- Viewport: Desktop and mobile
+- Steps to reproduce: Open Fleet and click a non-button body/content area in any of the 6 cards: Lamborghini Huracan EVO Spyder, Ferrari 296 GTS, Porsche 992 GT3, Lamborghini Urus Sport, Mercedes G63 AMG or Rolls-Royce Cullinan Black Badge.
+- Actual result: The URL stays on `/fleet.html`; the body of the card does not navigate.
+- Expected result: Because the requested contract is "if you press the card, it goes to the corresponding car", clicking the card body should navigate to that vehicle page while Reserve, Call and WhatsApp keep their own actions.
+- Evidence: `artifacts/functional-task-audit/fleet-card-actions-screenshots/desktop-fleet-card-001.png`, `artifacts/functional-task-audit/fleet-card-actions-screenshots/desktop-fleet-card-004.png`, `artifacts/functional-task-audit/fleet-card-actions-screenshots/desktop-fleet-card-007.png`, `artifacts/functional-task-audit/fleet-card-actions-screenshots/desktop-fleet-card-008.png`, `artifacts/functional-task-audit/fleet-card-actions-screenshots/desktop-fleet-card-009.png`, `artifacts/functional-task-audit/fleet-card-actions-screenshots/desktop-fleet-card-010.png`, `artifacts/functional-task-audit/fleet-card-actions-screenshots/mobile-fleet-card-011.png`, `artifacts/functional-task-audit/fleet-card-actions-screenshots/mobile-fleet-card-014.png`, `artifacts/functional-task-audit/fleet-card-actions-screenshots/mobile-fleet-card-017.png`, `artifacts/functional-task-audit/fleet-card-actions-screenshots/mobile-fleet-card-018.png`, `artifacts/functional-task-audit/fleet-card-actions-screenshots/mobile-fleet-card-019.png`, `artifacts/functional-task-audit/fleet-card-actions-screenshots/mobile-fleet-card-020.png`
+- Suggested owner: functional
+
+### Passed Checks
+- 72 total card-action checks executed.
+- 52 checks passed.
+- Reserve button works for all 6 cards on desktop and mobile.
+- Reserve opens `/app/reserve/page.html` with the expected selected car and AED daily rate.
+- Call action href is correct for all 6 cards on desktop and mobile.
+- WhatsApp action href is correct for all 6 cards on desktop and mobile and includes the selected car name.
+- Lamborghini Huracan EVO Spyder image and title open `/lamborghini-huracan-evo-spyder-rental-dubai.html`.
+- Lamborghini Urus Sport image and title open `/lamborghini-urus-rental-dubai.html`.
+- Mercedes G63 AMG image and title open `/mercedes-g63-amg-rental-dubai.html`.
+- Rolls-Royce Cullinan Black Badge image and title open `/rolls-royce-cullinan-black-badge-rental-dubai.html`.
+
+Evidence:
+- `artifacts/functional-task-audit/fleet-card-actions-audit-results.json`
+- `artifacts/functional-task-audit/fleet-card-actions-audit.mjs`
+- `artifacts/functional-task-audit/fleet-card-actions-screenshots/`
+
+### Notes For Implementer
+The customer-critical issue is not contact or reserve actions; those are working. The broken path is vehicle discovery/details: Ferrari and Porsche go to brand landings from image/title, and card body clicks do nothing for every Fleet vehicle.
+
+Recommended implementation:
+- Update the Ferrari 296 GTS Fleet card destination to `/ferrari-296-gts-rental-dubai.html`.
+- Update the Porsche 992 GT3 Fleet card destination to `/porsche-992-gt3-rental-dubai.html`.
+- Add full-card navigation for non-interactive card areas, but do not hijack Reserve, Call, WhatsApp, image/title links or keyboard accessibility.
+- After the fix, add an enforcing Playwright regression for Fleet card destinations. Creating it before the fix would intentionally fail CI, so this audit records the failing contract first.
