@@ -24,8 +24,17 @@ Website and reservation stack for Dynasty Prestige, focused on luxury car rental
 - `npm install`: install dependencies
 - `npm start`: start the backend
 - `npm run http`: serve the public site locally
-- `npm test`: run repo and site smoke tests
+- `npm run audit:quick`: fast local confidence check for auditor contracts, navigation sanity and visual smoke on Home, Fleet and Contact
+- `npm run audit:strict`: deeper pre-merge gate for navigation, visual robustness and functional journeys
+- `npm run audit:ci`: full CI audit suite, alias of `npm run audit`
+- `npm test`: run the full audit suite
 - `npm run verify`: run Stripe configuration checks
+
+## Audit Command Levels
+
+- `test:*`: deterministic test suites and Playwright specs.
+- `agent:*`: exploratory or report-generating auditors.
+- `audit:*`: human-facing gates. Prefer `audit:quick`, `audit:strict` or `audit:ci` before reaching for specialist commands.
 
 ## Environment
 

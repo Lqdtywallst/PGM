@@ -143,12 +143,14 @@
 .about-inline-actions {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 0.8rem;
 }
 
 .about-hero__actions {
     position: relative;
     z-index: 3;
+    align-self: start;
 }
 
 .about-button {
@@ -158,10 +160,11 @@
     min-height: 3.2rem;
     padding: 0 1.2rem;
     border: 1px solid transparent;
-    border-radius: 8px;
+    border-radius: 12px;
     font-family: var(--lab-font-sans);
-    font-size: 0.76rem;
+    font-size: 0.78rem;
     font-weight: 700;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     transition:
         transform 180ms ease,
@@ -342,10 +345,20 @@
 }
 
 .about-inline-actions a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.7rem;
+    padding: 0 1rem;
+    border: 1px solid rgba(23, 22, 21, 0.14);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.52);
+    box-shadow: 0 10px 22px rgba(23, 16, 10, 0.045);
     color: #171615;
     font-family: var(--lab-font-sans);
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     font-weight: 700;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
 }
 
@@ -578,7 +591,7 @@
 
     .about-button {
         width: 100%;
-        min-height: 2.9rem;
+        min-height: 3rem;
     }
 
     .about-proof-strip {
@@ -590,7 +603,8 @@
     .about-section-head h2,
     .about-cta__copy h2 {
         max-width: 100%;
-        font-size: 2.55rem;
+        font-size: clamp(2rem, 8.2vw, 2.28rem);
+        line-height: 1;
     }
 
     .about-proof-strip__grid,
@@ -622,6 +636,15 @@
 
     .about-cta__copy {
         padding: 1.7rem 1.4rem;
+    }
+
+    .about-inline-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .about-inline-actions a {
+        width: 100%;
     }
 }
 
@@ -660,11 +683,17 @@
     }
 
     .about-button {
-        min-height: 2.72rem;
+        min-height: 2.9rem;
     }
 
     .about-button--secondary {
         display: none;
+    }
+
+    .about-proof-strip__head h2,
+    .about-section-head h2,
+    .about-cta__copy h2 {
+        font-size: clamp(1.92rem, 8.6vw, 2.12rem);
     }
 }
 
