@@ -1,4 +1,4 @@
-/* Dynasty Prestige — shared SEO landing layout (alineado con index.html) */
+﻿/* Dynasty Prestige â€” shared SEO landing layout (alineado con index.html) */
 :root {
     --bg-primary: #050506;
     --bg-secondary: #0a0a0c;
@@ -265,7 +265,7 @@ body {
     border-radius: var(--editor-button-radius, 999px);
     background: var(--editor-button-background, var(--lab-accent));
     color: var(--editor-button-text, #101010);
-    box-shadow: 0 14px 34px rgba(227, 246, 85, 0.18);
+    box-shadow: 0 14px 34px rgba(var(--dp-color-gold-rgb), 0.18);
 }
 
 @media (min-width: 861px) and (max-width: 1540px) {
@@ -698,7 +698,7 @@ table.price-table {
     font-size: 1.25rem;
     font-weight: 400;
 }
-.faq-list details[open] summary::after { content: "−"; }
+.faq-list details[open] summary::after { content: "âˆ’"; }
 .faq-list .faq-a {
     padding: 0 1.15rem 1.1rem;
     color: var(--silver);

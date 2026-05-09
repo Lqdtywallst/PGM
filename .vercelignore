@@ -1,0 +1,17 @@
+.git/
+.codex/
+.playwright-mcp/
+.vercel/
+node_modules/
+output/
+artifacts/
+temp/
+test-results/
+playwright-report/
+docs/audit/INVENTARIO-RELACIONAL-*.csv
+docs/audit/INVENTARIO-RELACIONAL-*.json
+docs/audit/INVENTARIO-RELACIONAL-RESUMEN-*.md
+*.log
+.env
+.env.local
+.env.*.local

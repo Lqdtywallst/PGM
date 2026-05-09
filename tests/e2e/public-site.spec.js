@@ -136,17 +136,15 @@ test.describe('Public site quality gate', () => {
         });
     }
 
-    test('desktop navigation exposes mega menu and booking overlay', async ({ page }, testInfo) => {
+    test('desktop navigation exposes mega menu and booking surfaces', async ({ page }, testInfo) => {
         test.skip(testInfo.project.name !== 'desktop-chromium', 'Desktop-only navigation audit');
 
         const consoleErrors = createConsoleTracker(page);
         await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-        await page.getByRole('button', { name: 'Rent a luxury car' }).click();
-        await expect(page.locator('#hero-lab-overlay')).toHaveAttribute('aria-hidden', 'false');
-        await expect(page.locator('#hero-lab-pickup-date')).toBeVisible();
-        await page.keyboard.press('Escape');
-        await expect(page.locator('#hero-lab-overlay')).toHaveAttribute('aria-hidden', 'true');
+        await expect(page.locator('#home-booking')).toBeVisible();
+        await expect(page.locator('#home-pickup-date')).toBeVisible();
+        await expect(page.locator('#home-return-date')).toBeVisible();
 
         await page.getByRole('button', { name: 'Cars Brands' }).click();
         await expect(page.getByRole('link', { name: /Lamborghini/i }).first()).toBeVisible();

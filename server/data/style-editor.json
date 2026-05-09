@@ -2,10 +2,10 @@
   "global": {
     "fontSans": "'Manrope', system-ui, sans-serif",
     "fontDisplay": "'El Messiri', 'Cormorant Garamond', serif",
-    "accentColor": "#e3f655",
+    "accentColor": "#d8b45f",
     "headerBackground": "#08090c",
-    "buttonBackground": "#e3f655",
-    "buttonTextColor": "#101010",
+    "buttonBackground": "#d8b45f",
+    "buttonTextColor": "#17120d",
     "buttonRadiusPx": 999,
     "cardRadiusPx": 8
   },

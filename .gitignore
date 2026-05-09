@@ -26,6 +26,7 @@ playwright-report/
 artifacts/
 .codex/
 .playwright-mcp/
+.vercel/
 
 # Exportes locales pesados de auditoria
 docs/audit/INVENTARIO-RELACIONAL-*.csv
@@ -52,3 +53,4 @@ output/runtime-reservations/
 
 
 
+.vercel

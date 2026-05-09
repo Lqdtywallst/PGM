@@ -1,4 +1,4 @@
-.about-page-main {
+﻿.about-page-main {
     background: #f6f3ee;
     color: #171615;
     font-family: var(--lab-font-sans);
@@ -173,7 +173,7 @@
 .about-button--primary {
     background: linear-gradient(135deg, var(--lab-accent-soft), var(--lab-accent));
     color: #11130d;
-    box-shadow: 0 16px 32px rgba(227, 246, 85, 0.18);
+    box-shadow: 0 16px 32px rgba(var(--dp-color-gold-rgb), 0.18);
 }
 
 .about-button--secondary {

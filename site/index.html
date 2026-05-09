@@ -61,8 +61,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=El+Messiri:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="preload" href="./media/home-hero-city-streets.mp4" as="video" type="video/mp4" media="(min-width: 861px)">
-    <link rel="stylesheet" href="./css/site-v2.css?v=20260509-homevideo1">
-    <link rel="stylesheet" href="/css/admin-style-overrides.css?v=20260508-style-editor">
+    <link rel="stylesheet" href="./css/site-v2.css?v=20260510-brand-tokens1">
+    <link rel="stylesheet" href="/css/admin-style-overrides.css?v=20260510-brand-tokens1">
     <script src="./config.js?v=20260508-staging1"></script>
     <script src="./js/site-v2.js?v=20260509-homevideo1" defer></script>
 </head>
@@ -269,20 +269,34 @@
                             <p class="hero-lab__lead">Curated supercars and SUVs, coordinated around hotels, villas, airports and the way your stay actually moves.</p>
                         </div>
 
-                        <div class="hero-lab__launcher">
-                            <h2>Reserve around the stay</h2>
-                            <p>Choose the rental window once, then browse the cars that fit your dates and handover plan.</p>
-                            <div class="hero-lab__actions">
-                                <button
-                                    type="button"
-                                    class="hero-lab__cta hero-lab__cta--primary js-booking-open"
-                                    aria-haspopup="dialog"
-                                    aria-controls="hero-lab-overlay"
-                                    aria-expanded="false"
-                                >Rent a luxury car</button>
-                                <a href="./fleet.html" class="hero-lab__cta hero-lab__cta--secondary">View fleet</a>
+                        <section class="home-booking home-booking--hero" id="home-booking" aria-labelledby="home-booking-title">
+                            <div class="home-booking__shell">
+                                <div class="home-booking__intro">
+                                    <span class="home-booking__eyebrow">Choose your dates</span>
+                                    <h2 id="home-booking-title">Set the rental window first.</h2>
+                                    <p>Your dates carry through Fleet and Reserve, so every car stays tied to the trip.</p>
+                                </div>
+                                <form class="home-booking__form js-home-booking-form">
+                                    <label class="home-booking__field">
+                                        <span>Pickup date</span>
+                                        <input id="home-pickup-date" name="pickupDate" type="date" required>
+                                    </label>
+                                    <label class="home-booking__field">
+                                        <span>Return date</span>
+                                        <input id="home-return-date" name="returnDate" type="date" required>
+                                    </label>
+                                    <label class="home-booking__field">
+                                        <span>Pickup time</span>
+                                        <select id="home-pickup-time" name="pickupTime" required></select>
+                                    </label>
+                                    <label class="home-booking__field">
+                                        <span>Return time</span>
+                                        <select id="home-return-time" name="returnTime" required></select>
+                                    </label>
+                                    <button type="submit" class="home-booking__submit">See available cars</button>
+                                </form>
                             </div>
-                        </div>
+                        </section>
                     </div>
                 </div>
             </div>
@@ -300,35 +314,6 @@
                 </svg>
             </a>
         </nav>
-
-        <section class="home-booking" id="home-booking" aria-labelledby="home-booking-title">
-            <div class="lab-shell home-booking__shell">
-                <div class="home-booking__intro">
-                    <span class="home-booking__eyebrow">Choose your dates</span>
-                    <h2 id="home-booking-title">Choose the dates. Keep the fleet relevant.</h2>
-                    <p>Your rental window carries through browsing and reserve, so every car decision stays tied to the trip.</p>
-                </div>
-                <form class="home-booking__form js-home-booking-form">
-                    <label class="home-booking__field">
-                        <span>Pickup date</span>
-                        <input id="home-pickup-date" name="pickupDate" type="date" required>
-                    </label>
-                    <label class="home-booking__field">
-                        <span>Return date</span>
-                        <input id="home-return-date" name="returnDate" type="date" required>
-                    </label>
-                    <label class="home-booking__field">
-                        <span>Pickup time</span>
-                        <select id="home-pickup-time" name="pickupTime" required></select>
-                    </label>
-                    <label class="home-booking__field">
-                        <span>Return time</span>
-                        <select id="home-return-time" name="returnTime" required></select>
-                    </label>
-                    <button type="submit" class="home-booking__submit">See available cars</button>
-                </form>
-            </div>
-        </section>
 
         <section class="home-trust-strip" aria-label="Dynasty Prestige service promises">
             <div class="lab-shell home-trust-strip__shell">

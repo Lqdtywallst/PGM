@@ -1,0 +1,104 @@
+:root {
+    /*
+       Dynasty Prestige brand tokens.
+       This is the single source for global colour, typography and shared UI rhythm.
+       Page CSS can keep local composition rules, but brand values should come from here.
+    */
+
+    /* Core palette */
+    --dp-color-obsidian: #050506;
+    --dp-color-ink: #0b0c0e;
+    --dp-color-carbon: #111214;
+    --dp-color-graphite: #1a1b1e;
+    --dp-color-ivory: #f5f1e8;
+    --dp-color-warm-white: #fbf8f2;
+    --dp-color-sand: #f4efe8;
+    --dp-color-sand-strong: #efe7da;
+    --dp-color-text: #17120d;
+    --dp-color-text-soft: #4f4034;
+    --dp-color-muted: #6f675d;
+
+    /* Metallic accents */
+    --dp-color-champagne: #f1e2bd;
+    --dp-color-gold: #d8b45f;
+    --dp-color-gold-rgb: 216, 180, 95;
+    --dp-color-gold-soft: #efd793;
+    --dp-color-gold-soft-rgb: 239, 215, 147;
+    --dp-color-gold-deep: #a97933;
+    --dp-color-gold-border: rgba(216, 180, 95, 0.28);
+
+    /* Intent colours */
+    --dp-color-whatsapp: #25d366;
+    --dp-color-whatsapp-deep: #108e34;
+    --dp-color-danger: #b42318;
+    --dp-color-success: #1f8f54;
+    --dp-color-google-blue: #4285f4;
+    --dp-color-google-red: #ea4335;
+    --dp-color-google-yellow: #fbbc05;
+    --dp-color-google-green: #34a853;
+
+    /*
+       Legacy attention accent.
+       Keep it available while we migrate older lime CTAs into champagne/gold.
+    */
+    --dp-color-attention: #e3f655;
+    --dp-color-attention-soft: #f1ff9d;
+
+    /* Transparent surfaces */
+    --dp-surface-dark: rgba(8, 9, 11, 0.92);
+    --dp-surface-dark-soft: rgba(12, 13, 16, 0.78);
+    --dp-surface-glass: rgba(255, 255, 255, 0.055);
+    --dp-surface-light: rgba(255, 251, 245, 0.86);
+    --dp-border-dark: rgba(255, 255, 255, 0.09);
+    --dp-border-light: rgba(58, 48, 41, 0.12);
+    --dp-shadow-soft: 0 18px 48px rgba(71, 50, 26, 0.08);
+    --dp-shadow-dark: 0 24px 64px rgba(0, 0, 0, 0.24);
+
+    /* Typography */
+    --dp-font-sans: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --dp-font-display: 'El Messiri', 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+    --dp-font-serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+
+    /* Layout rhythm */
+    --dp-radius-sm: 8px;
+    --dp-radius-md: 14px;
+    --dp-radius-lg: 20px;
+    --dp-radius-xl: 30px;
+    --dp-header-offset: 96px;
+    --dp-frame-max: 90rem;
+    --dp-frame-gutter: clamp(24px, 5.5vw, 82px);
+    --dp-frame-width: min(var(--dp-frame-max), calc(100% - (var(--dp-frame-gutter) * 2)));
+
+    /*
+       Compatibility aliases for the current codebase.
+       New CSS should prefer --dp-* tokens; old CSS can keep working with --lab-*.
+    */
+    --lab-bg: #07080a;
+    --lab-text: var(--dp-color-ivory);
+    --lab-muted: rgba(245, 241, 232, 0.76);
+    --lab-muted-soft: #d8c8a8;
+    --lab-border: var(--dp-border-dark);
+    --lab-accent: var(--dp-color-gold);
+    --lab-accent-soft: var(--dp-color-gold-soft);
+    --lab-champagne: var(--dp-color-champagne);
+    --lab-cool-highlight: #d9e7f6;
+    --lab-cool-fill-soft: rgba(162, 188, 218, 0.1);
+    --lab-cool-fill: rgba(151, 178, 209, 0.14);
+    --lab-cool-border: rgba(166, 196, 227, 0.34);
+    --lab-cool-outline: rgba(177, 208, 239, 0.3);
+    --lab-cool-panel-start: rgba(18, 29, 44, 0.48);
+    --lab-cool-panel-end: rgba(8, 15, 25, 0.58);
+    --lab-cool-glass-top: rgba(245, 250, 255, 0.24);
+    --lab-cool-glass-mid: rgba(165, 190, 220, 0.14);
+    --lab-cool-glass-bottom: rgba(56, 87, 123, 0.14);
+    --lab-cool-lens-edge: rgba(223, 236, 250, 0.26);
+    --lab-cool-lens-shadow: rgba(3, 8, 14, 0.34);
+    --lab-cool-card-idle: rgba(255, 255, 255, 0.024);
+    --lab-cool-card-hover: rgba(162, 188, 218, 0.11);
+    --lab-header-offset: var(--dp-header-offset);
+    --lab-frame-max: var(--dp-frame-max);
+    --lab-frame-gutter: var(--dp-frame-gutter);
+    --lab-frame-width: var(--dp-frame-width);
+    --lab-font-sans: var(--dp-font-sans);
+    --lab-font-display: var(--dp-font-display);
+}

@@ -1,12 +1,14 @@
+﻿@import url("./brand-tokens.css");
+
 :root {
-    --lab-bg: #07080a;
-    --lab-text: #f5f1e8;
+    --lab-bg: var(--dp-color-ink);
+    --lab-text: var(--dp-color-ivory);
     --lab-muted: rgba(245, 241, 232, 0.76);
     --lab-muted-soft: #d8c8a8;
-    --lab-border: rgba(255, 255, 255, 0.09);
-    --lab-accent: #e3f655;
-    --lab-accent-soft: #f1ff9d;
-    --lab-champagne: #f1e2bd;
+    --lab-border: var(--dp-border-dark);
+    --lab-accent: var(--dp-color-gold);
+    --lab-accent-soft: var(--dp-color-gold-soft);
+    --lab-champagne: var(--dp-color-champagne);
     --lab-cool-highlight: #d9e7f6;
     --lab-cool-panel-start: rgba(18, 29, 44, 0.48);
     --lab-cool-panel-end: rgba(8, 15, 25, 0.58);
@@ -15,12 +17,12 @@
     --lab-cool-lens-shadow: rgba(3, 8, 14, 0.34);
     --lab-cool-card-idle: rgba(255, 255, 255, 0.024);
     --lab-cool-card-hover: rgba(162, 188, 218, 0.11);
-    --lab-header-offset: 96px;
-    --lab-frame-max: 90rem;
-    --lab-frame-gutter: clamp(24px, 5.5vw, 82px);
-    --lab-frame-width: min(var(--lab-frame-max), calc(100% - (var(--lab-frame-gutter) * 2)));
-    --lab-font-sans: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --lab-font-display: 'El Messiri', 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+    --lab-header-offset: var(--dp-header-offset);
+    --lab-frame-max: var(--dp-frame-max);
+    --lab-frame-gutter: var(--dp-frame-gutter);
+    --lab-frame-width: var(--dp-frame-width);
+    --lab-font-sans: var(--dp-font-sans);
+    --lab-font-display: var(--dp-font-display);
 }
 
 *,
@@ -519,8 +521,8 @@ textarea {
 .lab-header__utility-link:hover,
 .lab-header__utility-link:focus-visible {
     transform: translateY(-1px);
-    border-color: rgba(227, 246, 85, 0.48);
-    background: rgba(227, 246, 85, 0.12);
+    border-color: rgba(var(--dp-color-gold-rgb), 0.48);
+    background: rgba(var(--dp-color-gold-rgb), 0.12);
 }
 
 .lab-header__utility-link svg {
@@ -822,13 +824,13 @@ textarea {
     border: 1px solid color-mix(in srgb, var(--editor-button-background, var(--lab-accent)) 78%, #ffffff 22%);
     border-radius: var(--editor-button-radius, 999px);
     background: var(--editor-button-background, var(--lab-accent));
-    color: var(--editor-button-text, #101010);
+    color: var(--editor-button-text, var(--dp-color-text));
     font-family: var(--lab-font-sans);
     font-size: 0.74rem;
     font-weight: 700;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    box-shadow: 0 14px 34px rgba(227, 246, 85, 0.18);
+    box-shadow: 0 14px 34px rgba(216, 180, 95, 0.18);
 }
 
 .lab-mobile-toggle,
@@ -890,7 +892,7 @@ textarea {
 .lab-floating-back:hover,
 .lab-floating-back:focus-visible {
     opacity: 0.96;
-    border-color: rgba(227, 246, 85, 0.46);
+    border-color: rgba(var(--dp-color-gold-rgb), 0.46);
     background:
         linear-gradient(180deg, rgba(31, 33, 38, 0.82), rgba(8, 9, 11, 0.76));
     color: rgba(248, 238, 214, 0.98);
@@ -901,7 +903,7 @@ textarea {
 .lab-floating-back.is-visible.is-over-important-content:hover,
 .lab-floating-back.is-visible.is-over-important-content:focus-visible {
     opacity: 0.96;
-    border-color: rgba(227, 246, 85, 0.46);
+    border-color: rgba(var(--dp-color-gold-rgb), 0.46);
     background:
         linear-gradient(180deg, rgba(31, 33, 38, 0.82), rgba(8, 9, 11, 0.76));
     color: rgba(248, 238, 214, 0.98);
@@ -1298,7 +1300,7 @@ textarea {
 .lab-mobile-drawer__quick-link:hover,
 .lab-mobile-drawer__quick-link:focus-visible {
     transform: translateY(-1px);
-    border-color: rgba(227, 246, 85, 0.24);
+    border-color: rgba(var(--dp-color-gold-rgb), 0.24);
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(11, 12, 16, 0.92));
     color: #ffffff;
 }
@@ -1365,8 +1367,8 @@ textarea {
 }
 
 .lab-mobile-drawer__links a[aria-current="page"] {
-    border-color: rgba(227, 246, 85, 0.34);
-    background: rgba(227, 246, 85, 0.08);
+    border-color: rgba(var(--dp-color-gold-rgb), 0.34);
+    background: rgba(var(--dp-color-gold-rgb), 0.08);
     color: #f8fbd4;
 }
 
@@ -1399,7 +1401,7 @@ textarea {
 
 .lab-mobile-drawer__action--primary {
     background: linear-gradient(135deg, var(--lab-accent-soft), var(--lab-accent));
-    color: #101010;
+    color: var(--dp-color-text);
 }
 
 .lab-mobile-drawer__action--secondary {

@@ -1,13 +1,15 @@
+@import url("./brand-tokens.css");
+
 :root {
-    --bg: #050506;
-    --bg2: #0b0b0d;
-    --panel: #101014;
-    --gold: #d6f03c;
-    --gold-soft: #f4ff95;
-    --text: #fff;
-    --muted: #b5b5b5;
-    --border: rgba(255, 255, 255, 0.08);
-    --shadow: 0 28px 90px rgba(0, 0, 0, 0.42);
+    --bg: var(--dp-color-obsidian);
+    --bg2: var(--dp-color-ink);
+    --panel: var(--dp-color-carbon);
+    --gold: var(--dp-color-gold);
+    --gold-soft: var(--dp-color-gold-soft);
+    --text: var(--dp-color-ivory);
+    --muted: rgba(245, 241, 232, 0.72);
+    --border: var(--dp-border-dark);
+    --shadow: var(--dp-shadow-dark);
 }
 
 * {
@@ -17,7 +19,7 @@
 }
 
 body {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: var(--dp-font-sans);
     background: linear-gradient(180deg, #040405 0%, #09090b 35%, #050506 100%);
     color: var(--text);
     line-height: 1.6;

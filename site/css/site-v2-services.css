@@ -1,4 +1,4 @@
-.services-page-main {
+﻿.services-page-main {
     background: linear-gradient(180deg, #f7f3ee 0%, #fbfaf7 28%, #f6f2ec 100%);
     color: #171412;
 }
@@ -497,7 +497,7 @@
         transform: translateY(-0.26rem);
         box-shadow:
             0 28px 56px rgba(0, 0, 0, 0.22),
-            0 0 0 1px rgba(227, 246, 85, 0.18);
+            0 0 0 1px rgba(var(--dp-color-gold-rgb), 0.18);
     }
 
     100% {

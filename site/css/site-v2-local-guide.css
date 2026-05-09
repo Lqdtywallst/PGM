@@ -1,11 +1,11 @@
-.local-guide-page {
-    --guide-glow: rgba(227, 246, 85, 0.1);
+﻿.local-guide-page {
+    --guide-glow: rgba(var(--dp-color-gold-rgb), 0.1);
     --guide-glow-soft: rgba(151, 178, 209, 0.12);
     --guide-border: rgba(135, 109, 77, 0.16);
     --guide-panel:
         linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 245, 238, 0.98) 100%);
     --guide-panel-strong:
-        radial-gradient(circle at 84% 16%, rgba(227, 246, 85, 0.06), rgba(227, 246, 85, 0) 26%),
+        radial-gradient(circle at 84% 16%, rgba(var(--dp-color-gold-rgb), 0.06), rgba(var(--dp-color-gold-rgb), 0) 26%),
         linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(247, 242, 235, 1) 100%);
     --guide-text: #181311;
     --guide-text-soft: #4d3f32;
@@ -16,7 +16,7 @@
     min-height: 100vh;
     color: var(--guide-text);
     background:
-        radial-gradient(circle at 12% 6%, var(--guide-glow), rgba(227, 246, 85, 0) 24%),
+        radial-gradient(circle at 12% 6%, var(--guide-glow), rgba(var(--dp-color-gold-rgb), 0) 24%),
         radial-gradient(circle at 88% 8%, var(--guide-glow-soft), rgba(151, 178, 209, 0) 26%),
         linear-gradient(180deg, #f6f1ea 0%, #fcfaf6 34%, #efe6d8 100%);
 }
@@ -28,22 +28,22 @@
 }
 
 .local-guide-page--abu-dhabi {
-    --guide-glow: rgba(227, 246, 85, 0.12);
+    --guide-glow: rgba(var(--dp-color-gold-rgb), 0.12);
     --guide-glow-soft: rgba(171, 206, 191, 0.16);
 }
 
 .local-guide-page--airport {
-    --guide-glow: rgba(227, 246, 85, 0.14);
+    --guide-glow: rgba(var(--dp-color-gold-rgb), 0.14);
     --guide-glow-soft: rgba(132, 162, 255, 0.18);
 }
 
 .local-guide-page--palm {
-    --guide-glow: rgba(227, 246, 85, 0.12);
+    --guide-glow: rgba(var(--dp-color-gold-rgb), 0.12);
     --guide-glow-soft: rgba(82, 180, 162, 0.16);
 }
 
 .local-guide-page--marina {
-    --guide-glow: rgba(227, 246, 85, 0.11);
+    --guide-glow: rgba(var(--dp-color-gold-rgb), 0.11);
     --guide-glow-soft: rgba(105, 177, 227, 0.2);
 }
 
@@ -71,7 +71,7 @@
     left: -8rem;
     width: 21rem;
     height: 21rem;
-    background: radial-gradient(circle, rgba(227, 246, 85, 0.14), rgba(227, 246, 85, 0) 72%);
+    background: radial-gradient(circle, rgba(var(--dp-color-gold-rgb), 0.14), rgba(var(--dp-color-gold-rgb), 0) 72%);
 }
 
 .local-guide-hero::after {
@@ -161,7 +161,7 @@
     pointer-events: none;
     background:
         linear-gradient(125deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0) 32%),
-        radial-gradient(circle at 78% 18%, rgba(227, 246, 85, 0.05), rgba(227, 246, 85, 0) 24%);
+        radial-gradient(circle at 78% 18%, rgba(var(--dp-color-gold-rgb), 0.05), rgba(var(--dp-color-gold-rgb), 0) 24%);
 }
 
 .local-guide-breadcrumb {
@@ -304,7 +304,7 @@
 }
 
 .local-guide-button--primary {
-    background: linear-gradient(135deg, rgba(227, 246, 85, 0.96), rgba(196, 218, 57, 0.92));
+    background: linear-gradient(135deg, rgba(var(--dp-color-gold-rgb), 0.96), rgba(var(--dp-color-gold-rgb), 0.92));
     color: #090b0d;
     box-shadow: 0 12px 24px rgba(62, 48, 24, 0.14);
 }
@@ -380,7 +380,7 @@
     height: 0.48rem;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--lab-accent-soft), var(--lab-accent));
-    box-shadow: 0 0 12px rgba(227, 246, 85, 0.24);
+    box-shadow: 0 0 12px rgba(var(--dp-color-gold-rgb), 0.24);
 }
 
 .local-guide-hero__aside h2,
@@ -597,7 +597,7 @@
     gap: 1.5rem;
     align-items: center;
     background:
-        radial-gradient(circle at 82% 18%, rgba(227, 246, 85, 0.07), rgba(227, 246, 85, 0) 28%),
+        radial-gradient(circle at 82% 18%, rgba(var(--dp-color-gold-rgb), 0.07), rgba(var(--dp-color-gold-rgb), 0) 28%),
         var(--guide-panel-strong);
 }
 
@@ -612,7 +612,7 @@
 .local-guide-car-card__actions a:focus-visible,
 .local-guide-related-card__link:focus-visible,
 .local-guide-breadcrumb a:focus-visible {
-    outline: 2px solid rgba(227, 246, 85, 0.82);
+    outline: 2px solid rgba(var(--dp-color-gold-rgb), 0.82);
     outline-offset: 3px;
 }
 
