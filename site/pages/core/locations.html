@@ -25,9 +25,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=El+Messiri:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./css/site-v2.css?v=20260426-header1">
-    <link rel="stylesheet" href="./css/site-v2-locations.css?v=20260509-mapmarkers2">
+    <link rel="stylesheet" href="./css/site-v2-locations.css?v=20260509-locationcopy1">
     <link rel="stylesheet" href="/css/admin-style-overrides.css?v=20260508-style-editor">
-    <script src="./js/site-v2.js?v=20260509-mapmarkers2" defer></script>
+    <script src="./js/site-v2.js?v=20260424-backnav1" defer></script>
     <script type="application/ld+json">
     {"@context":"https://schema.org","@graph":[
       {"@type":"WebPage","name":"Dynasty Prestige Locations","url":"https://prestigegoalmotion.com/locations.html","description":"Luxury car rental coverage from a Palm Jumeirah coordination base across Dubai, Abu Dhabi, DXB, DWC, hotels, residences and premium districts.","inLanguage":"en-AE"},
@@ -223,8 +223,8 @@
                             <span aria-current="page">Locations</span>
                         </nav>
                         <span class="locations-kicker locations-kicker--dark">Map and guides</span>
-                        <h1>Luxury car rental locations across Dubai, Abu Dhabi, Palm and airport arrivals.</h1>
-                        <p class="locations-hero__lead">Start with the real Palm Jumeirah base, then choose the guide that matches the stay, city route or arrival point.</p>
+                        <h1>Luxury car rental across Dubai, Abu Dhabi, Palm and airport arrivals.</h1>
+                        <p class="locations-hero__lead">Use the Palm Jumeirah base as the starting point, then choose the city, airport or district guide that fits your handover.</p>
 
                         <div class="locations-hero__actions">
                             <a href="./app/reserve/page.html" class="locations-button locations-button--primary" data-analytics-event="location_reservation_click" data-analytics-cluster="locations" data-analytics-location="locations_hub" data-analytics-placement="hero_map" data-analytics-channel="reservation">Start reservation</a>
@@ -237,31 +237,31 @@
                         <a class="locations-hero__zone" href="./luxury-car-rental-dubai.html">
                             <span>Dubai</span>
                             <strong>Citywide flagship</strong>
-                            <p>Downtown, Business Bay, Palm, Marina and JBR stays.</p>
+                            <p>Hotels, residences, Palm, Marina, Downtown, Business Bay and JBR.</p>
                         </a>
 
                         <a class="locations-hero__zone" href="./abu-dhabi-luxury-car-rental.html">
                             <span>Abu Dhabi</span>
                             <strong>Capital and resort routes</strong>
-                            <p>Corniche, Yas, Saadiyat and longer intercity planning.</p>
+                            <p>Capital meetings, resorts, Yas, Saadiyat and intercity transfers.</p>
                         </a>
 
                         <a class="locations-hero__zone" href="./dubai-airport-luxury-car-rental.html">
                             <span>Dubai Airport</span>
                             <strong>DXB and DWC arrivals</strong>
-                            <p>Flight timing, terminal access and onward hotel delivery.</p>
+                            <p>DXB and DWC timing, terminal access and hotel handover.</p>
                         </a>
 
                         <a class="locations-hero__zone" href="./palm-jumeirah-luxury-car-rental.html">
                             <span>Palm Jumeirah</span>
                             <strong>Resorts and villas</strong>
-                            <p>Branded residences, beach hotels and calmer premium handovers.</p>
+                            <p>Villas, branded residences, beach hotels and discreet handovers.</p>
                         </a>
 
                         <a class="locations-hero__zone" href="./dubai-marina-luxury-car-rental.html">
                             <span>Dubai Marina</span>
                             <strong>Waterfront stays</strong>
-                            <p>Towers, hotels, JBR and faster city-waterfront movement.</p>
+                            <p>Towers, JBR, waterfront hotels and fast city access.</p>
                         </a>
                         <!-- LOCATIONS_HERO_ZONES_END -->
 
@@ -271,42 +271,49 @@
                 <div class="locations-map-card">
                     <div class="locations-map-card__head">
                         <span class="locations-kicker locations-kicker--dark">Map view</span>
-                        <p>Base on the map. Priority guides on the left. Use the map to understand the real starting point before opening the local page.</p>
+                        <p>See the Palm Jumeirah base and priority handover points before choosing a local guide.</p>
                         <a class="locations-map-card__action" href="https://www.google.com/maps/search/?api=1&amp;query=Palm+Jumeirah+Dubai" target="_blank" rel="noopener noreferrer" aria-label="Open Palm Jumeirah base in Google Maps">Open live map</a>
                     </div>
 
-                    <div class="locations-map-card__frame" data-locations-map aria-label="Map showing Dynasty Prestige priority service locations across Dubai and Abu Dhabi">
-                        <div class="locations-map-card__tile-layer" data-locations-map-tiles aria-hidden="true"></div>
+                    <div class="locations-map-card__frame" aria-label="Map showing Dynasty Prestige priority service locations across Dubai and Abu Dhabi">
+                        <iframe
+                            class="locations-map-card__iframe"
+                            title="Map showing Palm Jumeirah, Dubai Marina, DXB, DWC and Abu Dhabi"
+                            src="https://www.openstreetmap.org/export/embed.html?bbox=54.18%2C24.28%2C55.66%2C25.42&amp;layer=mapnik"
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"
+                            tabindex="-1">
+                        </iframe>
                         <div class="locations-map-card__marker-layer" data-locations-map-markers>
-                            <a class="locations-map-card__marker locations-map-card__marker--base" href="./palm-jumeirah-luxury-car-rental.html" data-location-marker data-lat="25.1124" data-lng="55.1390">
+                            <a class="locations-map-card__marker locations-map-card__marker--base locations-map-card__marker--palm" href="./palm-jumeirah-luxury-car-rental.html">
                                 <span class="locations-map-card__marker-dot" aria-hidden="true"></span>
                                 <span class="locations-map-card__marker-label">
                                     <strong>Palm</strong>
                                     <small>Base</small>
                                 </span>
                             </a>
-                            <a class="locations-map-card__marker locations-map-card__marker--label-bottom" href="./dubai-marina-luxury-car-rental.html" data-location-marker data-lat="25.0804" data-lng="55.1405">
+                            <a class="locations-map-card__marker locations-map-card__marker--label-bottom locations-map-card__marker--marina" href="./dubai-marina-luxury-car-rental.html">
                                 <span class="locations-map-card__marker-dot" aria-hidden="true"></span>
                                 <span class="locations-map-card__marker-label">
                                     <strong>Marina</strong>
                                     <small>Waterfront</small>
                                 </span>
                             </a>
-                            <a class="locations-map-card__marker locations-map-card__marker--label-top" href="./dubai-airport-luxury-car-rental.html" data-location-marker data-lat="25.2532" data-lng="55.3657">
+                            <a class="locations-map-card__marker locations-map-card__marker--label-top locations-map-card__marker--dxb" href="./dubai-airport-luxury-car-rental.html">
                                 <span class="locations-map-card__marker-dot" aria-hidden="true"></span>
                                 <span class="locations-map-card__marker-label">
                                     <strong>DXB</strong>
                                     <small>Airport</small>
                                 </span>
                             </a>
-                            <a class="locations-map-card__marker locations-map-card__marker--label-right" href="./dubai-airport-luxury-car-rental.html" data-location-marker data-lat="24.8964" data-lng="55.1614">
+                            <a class="locations-map-card__marker locations-map-card__marker--label-right locations-map-card__marker--dwc" href="./dubai-airport-luxury-car-rental.html">
                                 <span class="locations-map-card__marker-dot" aria-hidden="true"></span>
                                 <span class="locations-map-card__marker-label">
                                     <strong>DWC</strong>
                                     <small>Airport</small>
                                 </span>
                             </a>
-                            <a class="locations-map-card__marker locations-map-card__marker--label-right" href="./abu-dhabi-luxury-car-rental.html" data-location-marker data-lat="24.4539" data-lng="54.3773">
+                            <a class="locations-map-card__marker locations-map-card__marker--label-right locations-map-card__marker--abu-dhabi" href="./abu-dhabi-luxury-car-rental.html">
                                 <span class="locations-map-card__marker-dot" aria-hidden="true"></span>
                                 <span class="locations-map-card__marker-label">
                                     <strong>Abu Dhabi</strong>
@@ -320,7 +327,7 @@
                     <section class="locations-map-card__foot" aria-label="Coverage essentials">
                         <div>
                             <span>Base</span>
-                            <strong>Palm Jumeirah, Dubai UAE</strong>
+                            <strong>Palm Jumeirah, Dubai, UAE</strong>
                         </div>
                         <div>
                             <span>Coverage</span>
@@ -328,7 +335,7 @@
                         </div>
                         <div>
                             <span>Service-area model</span>
-                            <strong>One real base. District guides explain delivery logic, not separate offices.</strong>
+                            <strong>One base, coordinated delivery across priority districts.</strong>
                         </div>
                     </section>
                 </div>
@@ -340,9 +347,9 @@
                 <div class="locations-section__head">
                     <div class="locations-section__intro">
                         <span class="locations-kicker locations-kicker--dark">Priority guides</span>
-                        <h2 id="locations-guides-title">Start with the five places that actually change the booking.</h2>
+                        <h2 id="locations-guides-title">Choose the guide that matches the handover.</h2>
                     </div>
-                    <p>These are the core local pages because they match the strongest intent and the clearest operational difference. Each guide goes deeper into booking logic, delivery style, car fit, FAQ and next step.</p>
+                    <p>Each local guide explains when the area changes timing, delivery style, vehicle fit and the next booking step.</p>
                 </div>
 
                 <div class="locations-guides__grid">
@@ -353,10 +360,10 @@
                         <div class="locations-guide-feature__copy">
                             <span>Citywide flagship</span>
                             <h3>Dubai</h3>
-                            <p>The main city guide for Palm, Marina, Downtown, Business Bay, JBR and the wider hotel, residence and business stay pattern.</p>
+                            <p>Use Dubai for citywide hotel, residence and business movement across Palm, Marina, Downtown, Business Bay and JBR.</p>
                             <ul>
-                                <li>Broadest city intent and the strongest local demand</li>
-                                <li>Best entry point before drilling into Palm or Marina</li>
+                                <li>Best default guide for mixed city routes</li>
+                                <li>Use before narrowing into Palm or Marina</li>
                             </ul>
                             <div class="locations-guide-feature__actions">
                                 <a href="./luxury-car-rental-dubai.html">Open Dubai guide</a>
@@ -368,28 +375,28 @@
                     <article class="locations-guide-card">
                         <span>Capital</span>
                         <h3>Abu Dhabi</h3>
-                        <p>For executive schedules, calmer luxury, resort stays and longer intercity planning.</p>
+                        <p>For capital meetings, resort stays, Yas Island, Saadiyat and planned intercity movement.</p>
                         <a href="./abu-dhabi-luxury-car-rental.html">Open Abu Dhabi guide</a>
                     </article>
 
                     <article class="locations-guide-card">
                         <span>Arrival</span>
                         <h3>Dubai Airport</h3>
-                        <p>For DXB and DWC timing, flight coordination and onward hotel delivery.</p>
+                        <p>For DXB and DWC arrivals, flight tracking, terminal access and onward delivery.</p>
                         <a href="./dubai-airport-luxury-car-rental.html">Open Dubai Airport guide</a>
                     </article>
 
                     <article class="locations-guide-card">
                         <span>Resort</span>
                         <h3>Palm Jumeirah</h3>
-                        <p>For villas, branded residences, hotels and quieter premium handovers.</p>
+                        <p>For villas, branded residences, beach hotels and quieter premium handovers.</p>
                         <a href="./palm-jumeirah-luxury-car-rental.html">Open Palm Jumeirah guide</a>
                     </article>
 
                     <article class="locations-guide-card">
                         <span>Waterfront</span>
                         <h3>Dubai Marina</h3>
-                        <p>For towers, hotels, JBR stays and faster waterfront routing.</p>
+                        <p>For towers, JBR, waterfront hotels and fast access back into the city.</p>
                         <a href="./dubai-marina-luxury-car-rental.html">Open Dubai Marina guide</a>
                     </article>
                     <!-- LOCATIONS_GUIDE_CARDS_END -->
@@ -403,9 +410,9 @@
                 <div class="locations-section__head">
                     <div class="locations-section__intro">
                         <span class="locations-kicker locations-kicker--dark">Related services</span>
-                        <h2 id="locations-zones-title">Once the location is clear, choose the delivery route.</h2>
+                        <h2 id="locations-zones-title">Match the location to the delivery route.</h2>
                     </div>
-                    <p>These blocks connect the location guides to the service layer: airport arrivals, business movement, intercity schedules and hotel or residence handovers.</p>
+                    <p>Use these service routes to connect the guide with airport arrivals, business movement, intercity timing or hotel delivery.</p>
                 </div>
 
                 <div class="locations-zone-grid">
@@ -413,7 +420,7 @@
                     <article class="locations-zone-card">
                         <span>Dubai</span>
                         <h3>City stays and business movement</h3>
-                        <p>The broadest route for hotels, residences, resorts and executive meetings across the city.</p>
+                        <p>For city hotels, residences, resorts and executive meeting schedules.</p>
                         <div class="locations-zone-card__actions">
                             <a href="./luxury-car-rental-dubai.html">Open Dubai guide</a>
                             <a href="./business-car-rental-dubai.html">Business mobility</a>
@@ -423,7 +430,7 @@
                     <article class="locations-zone-card">
                         <span>Abu Dhabi</span>
                         <h3>Capital arrivals and longer routes</h3>
-                        <p>Best when the booking stretches beyond Dubai and needs calmer intercity planning.</p>
+                        <p>For bookings beyond Dubai that need planned intercity timing.</p>
                         <div class="locations-zone-card__actions">
                             <a href="./abu-dhabi-luxury-car-rental.html">Open Abu Dhabi guide</a>
                             <a href="./chauffeur-service-dubai.html">Chauffeur service</a>
@@ -433,7 +440,7 @@
                     <article class="locations-zone-card">
                         <span>DXB / DWC</span>
                         <h3>Airport arrival handovers</h3>
-                        <p>Built around flight timing, terminal access and the transition into the hotel or residence.</p>
+                        <p>For flight-led handovers from DXB or DWC into hotels or residences.</p>
                         <div class="locations-zone-card__actions">
                             <a href="./dubai-airport-luxury-car-rental.html">Open airport guide</a>
                             <a href="./airport-concierge-dubai.html">Airport concierge</a>
@@ -444,7 +451,7 @@
                     <article class="locations-zone-card">
                         <span>Hotels / residences</span>
                         <h3>Resort, villa and branded residence delivery</h3>
-                        <p>Especially relevant across Palm Jumeirah, Dubai Marina, JBR and central premium districts.</p>
+                        <p>For Palm, Marina, JBR and premium districts where handover details matter.</p>
                         <div class="locations-zone-card__actions">
                             <a href="./palm-jumeirah-luxury-car-rental.html">Open Palm guide</a>
                             <a href="./hotel-villa-airport-delivery-dubai.html">Tailored delivery</a>
@@ -464,7 +471,7 @@
                         <span class="locations-kicker locations-kicker--dark">Booking flow</span>
                         <h2 id="locations-process-title">Keep the location decision simple.</h2>
                     </div>
-                    <p>The team only needs three things early: dates, city or arrival point, and the type of handover the stay requires.</p>
+                    <p>Start with dates, arrival point and preferred handover style; the team handles the route details.</p>
                 </div>
 
                 <ol class="locations-process__list">
@@ -472,19 +479,19 @@
                     <li class="locations-process__item">
                         <strong>01</strong>
                         <h3>Choose the city or airport</h3>
-                        <p>Start with Dubai, Abu Dhabi, DXB or DWC before worrying about the final street-level detail.</p>
+                        <p>Start with Dubai, Abu Dhabi, DXB or DWC before choosing the exact handover address.</p>
                     </li>
 
                     <li class="locations-process__item">
                         <strong>02</strong>
                         <h3>Share the handover style</h3>
-                        <p>Hotel, residence, resort, terminal or business address changes the best delivery route.</p>
+                        <p>Hotel, residence, resort, terminal or business address shapes the delivery plan.</p>
                     </li>
 
                     <li class="locations-process__item">
                         <strong>03</strong>
-                        <h3>Let one team coordinate the timing</h3>
-                        <p>That keeps the route, documents and return plan consistent from the first contact.</p>
+                        <h3>Confirm timing through one team</h3>
+                        <p>One team keeps the route, documents and return plan consistent from the first contact.</p>
                     </li>
                     <!-- LOCATIONS_PROCESS_STEPS_END -->
 
@@ -498,9 +505,9 @@
                     <div class="locations-section__head">
                         <div class="locations-section__intro">
                             <span class="locations-kicker locations-kicker--dark">FAQ</span>
-                            <h2 id="locations-faq-title">The practical questions that matter before booking.</h2>
+                            <h2 id="locations-faq-title">Practical location questions before booking.</h2>
                         </div>
-                        <p>These are the decisions that usually matter more than another long district paragraph.</p>
+                        <p>Clear answers on the base, priority guides, airport starts and hotel or residence handovers.</p>
                     </div>
 
                     <div class="locations-faq-list">
@@ -510,11 +517,11 @@
                         </details>
                         <details class="locations-faq-item">
                             <summary>Which locations have dedicated local guides right now?</summary>
-                            <p>The first-wave location guides are Dubai, Abu Dhabi, Dubai airport, Palm Jumeirah and Dubai Marina because they carry the strongest booking intent and the clearest operational differences.</p>
+                            <p>Dubai, Abu Dhabi, Dubai Airport, Palm Jumeirah and Dubai Marina are prioritised because they change timing, route planning and delivery details.</p>
                         </details>
                         <details class="locations-faq-item">
                             <summary>Should I use a city guide or wait for a district guide?</summary>
-                            <p>Use the Dubai guide for Downtown Dubai, Business Bay and other central city patterns, use the Dubai Marina guide for JBR-adjacent waterfront stays, and use the Abu Dhabi guide for Yas Island and Saadiyat until more specific guides are justified.</p>
+                            <p>Use Dubai for central city stays, Dubai Marina for JBR waterfront movement, Palm Jumeirah for resorts and Abu Dhabi for Yas, Saadiyat or capital schedules.</p>
                         </details>
                         <details class="locations-faq-item">
                             <summary>Can the booking start at the airport and finish at a hotel, villa or residence?</summary>
@@ -525,8 +532,8 @@
 
                 <aside class="locations-faq__cta">
                     <span class="locations-kicker locations-kicker--dark">Next step</span>
-                    <h3>Pick the city, then move straight into fleet or reservation.</h3>
-                    <p>The location hub should shorten the decision, not slow it down. Once the area is clear, the rest belongs in the fleet and booking flow.</p>
+                    <h3>Choose the guide, then move into fleet or reservation.</h3>
+                    <p>The location hub should shorten the decision. Once the area is clear, continue to the fleet or reserve with the right handover context.</p>
                     <div class="locations-faq__cta-actions">
                         <a href="./fleet.html" class="locations-button locations-button--primary">Browse the fleet</a>
                         <a href="./app/reserve/page.html" class="locations-button locations-button--ghost" data-analytics-event="location_reservation_click" data-analytics-cluster="locations" data-analytics-location="locations_hub" data-analytics-placement="final_cta" data-analytics-channel="reservation">Start reservation</a>
