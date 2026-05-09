@@ -69,7 +69,7 @@ Usar esta opcion solo si:
 
 ### En la web
 
-- [locations.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/locations.html) como hub geografico oficial
+- [locations.html](../../site/pages/core/locations.html) como hub geografico oficial
 - una sola base visible en Palm Jumeirah
 - copy consistente en footer y bloques operativos
 - schema sin `LocalBusiness` por distrito

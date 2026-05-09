@@ -15,8 +15,8 @@ Fecha de trabajo: `2026-04-18`
 
 La pagina madre actual de ubicaciones ya va en la direccion correcta como hub editorial:
 
-- tiene `title`, meta description y canonical propios en [site/locations.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/locations.html)
-- enlaza con `a href` a las cinco guias locales principales en [site/locations.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/locations.html)
+- tiene `title`, meta description y canonical propios en [site/locations.html](../../site/pages/core/locations.html)
+- enlaza con `a href` a las cinco guias locales principales en [site/locations.html](../../site/pages/core/locations.html)
 - y esas cinco guias ya existen en sitemap y ya usan `Service` + `BreadcrumbList` + `FAQPage`
 
 Pero todavia le faltan varias piezas que las paginas fuertes suelen resolver mejor:
@@ -110,13 +110,13 @@ Leccion para Dynasty:
 
 ### Fortalezas ya presentes
 
-- [site/locations.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/locations.html#L9) ya tiene un `title` propio
-- [site/locations.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/locations.html#L10) ya tiene meta description propia
-- [site/locations.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/locations.html#L26) ya incluye `WebPage` + `BreadcrumbList`
-- [site/locations.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/locations.html#L200) ya usa un `H1` claro
-- [site/locations.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/locations.html#L237) enlaza a cinco guias clave
-- [site/sitemap.xml](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/sitemap.xml#L19) y [site/sitemap.xml](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/sitemap.xml#L44) ya incluyen la madre y sus guias principales
-- las guias locales ya tienen `Service`, `BreadcrumbList` y `FAQPage`, por ejemplo [site/luxury-car-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/luxury-car-rental-dubai.html#L26)
+- [site/locations.html](../../site/pages/core/locations.html#L9) ya tiene un `title` propio
+- [site/locations.html](../../site/pages/core/locations.html#L10) ya tiene meta description propia
+- [site/locations.html](../../site/pages/core/locations.html#L26) ya incluye `WebPage` + `BreadcrumbList`
+- [site/locations.html](../../site/pages/core/locations.html#L200) ya usa un `H1` claro
+- [site/locations.html](../../site/pages/core/locations.html#L237) enlaza a cinco guias clave
+- [site/sitemap.xml](/sitemap.xml#L19) y [site/sitemap.xml](/sitemap.xml#L44) ya incluyen la madre y sus guias principales
+- las guias locales ya tienen `Service`, `BreadcrumbList` y `FAQPage`, por ejemplo [site/luxury-car-rental-dubai.html](../../site/pages/guides/luxury-car-rental-dubai.html#L26)
 
 ### Gaps principales
 
@@ -124,7 +124,7 @@ Leccion para Dynasty:
 - falta un bloque operativo visible con base, ciudades servidas, politica de entrega, tiempos de coordinacion y acceso rapido a mapa/contacto
 - la jerarquia actual menciona `Downtown`, `Business Bay` y `JBR`, pero la pagina madre todavia no las trabaja como segundo anillo estructurado
 - no hay un criterio escrito para decidir cuando crear una nueva landing local y cuando no
-- la prueba de negocio local esta mas concentrada en [site/contact.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/contact.html#L270) que en la arquitectura de `locations`
+- la prueba de negocio local esta mas concentrada en [site/contact.html](../../site/pages/core/contact.html#L270) que en la arquitectura de `locations`
 
 ## Arquitectura Objetivo Para Locations
 

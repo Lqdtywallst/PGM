@@ -15,13 +15,13 @@ Dejar en un solo sitio:
 
 El cluster `services` queda definido solo por estas 7 URLs:
 
-- [services.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/services.html)
-- [chauffeur-service-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/chauffeur-service-dubai.html)
-- [airport-concierge-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/airport-concierge-dubai.html)
-- [hotel-villa-airport-delivery-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/hotel-villa-airport-delivery-dubai.html)
-- [wedding-event-car-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/wedding-event-car-rental-dubai.html)
-- [business-car-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/business-car-rental-dubai.html)
-- [monthly-luxury-car-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/monthly-luxury-car-rental-dubai.html)
+- [services.html](../../site/pages/core/services.html)
+- [chauffeur-service-dubai.html](../../site/pages/services/chauffeur-service-dubai.html)
+- [airport-concierge-dubai.html](../../site/pages/services/airport-concierge-dubai.html)
+- [hotel-villa-airport-delivery-dubai.html](../../site/pages/services/hotel-villa-airport-delivery-dubai.html)
+- [wedding-event-car-rental-dubai.html](../../site/pages/services/wedding-event-car-rental-dubai.html)
+- [business-car-rental-dubai.html](../../site/pages/services/business-car-rental-dubai.html)
+- [monthly-luxury-car-rental-dubai.html](../../site/pages/services/monthly-luxury-car-rental-dubai.html)
 
 Todo lo demas queda fuera de este cluster y no debe usarse para evaluar su estado.
 
@@ -31,8 +31,8 @@ Todo lo demas queda fuera de este cluster y no debe usarse para evaluar su estad
 
 Completado en:
 
-- [services.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/services.html)
-- [site-v2-services.css](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/css/site-v2-services.css)
+- [services.html](../../site/pages/core/services.html)
+- [site-v2-services.css](/css/site-v2-services.css)
 
 Resultado:
 
@@ -47,13 +47,13 @@ Resultado:
 
 Completado en:
 
-- [chauffeur-service-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/chauffeur-service-dubai.html)
-- [airport-concierge-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/airport-concierge-dubai.html)
-- [hotel-villa-airport-delivery-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/hotel-villa-airport-delivery-dubai.html)
-- [wedding-event-car-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/wedding-event-car-rental-dubai.html)
-- [business-car-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/business-car-rental-dubai.html)
-- [monthly-luxury-car-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/monthly-luxury-car-rental-dubai.html)
-- [site-v2-service-detail.css](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/css/site-v2-service-detail.css)
+- [chauffeur-service-dubai.html](../../site/pages/services/chauffeur-service-dubai.html)
+- [airport-concierge-dubai.html](../../site/pages/services/airport-concierge-dubai.html)
+- [hotel-villa-airport-delivery-dubai.html](../../site/pages/services/hotel-villa-airport-delivery-dubai.html)
+- [wedding-event-car-rental-dubai.html](../../site/pages/services/wedding-event-car-rental-dubai.html)
+- [business-car-rental-dubai.html](../../site/pages/services/business-car-rental-dubai.html)
+- [monthly-luxury-car-rental-dubai.html](../../site/pages/services/monthly-luxury-car-rental-dubai.html)
+- [site-v2-service-detail.css](/css/site-v2-service-detail.css)
 
 Resultado:
 
@@ -69,10 +69,10 @@ Resultado:
 
 Completado en:
 
-- [services.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/services.html)
+- [services.html](../../site/pages/core/services.html)
 - las 6 detail pages del cluster
-- [locations.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/locations.html)
-- [sitemap.xml](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/sitemap.xml)
+- [locations.html](../../site/pages/core/locations.html)
+- [sitemap.xml](/sitemap.xml)
 
 Resultado:
 
@@ -86,9 +86,9 @@ Resultado:
 
 Completado en:
 
-- [SERVICES-SEO-ROADMAP.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/architecture/SERVICES-SEO-ROADMAP.md)
-- [SERVICES-MEASUREMENT-SETUP.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/architecture/SERVICES-MEASUREMENT-SETUP.md)
-- [test-server.js](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/server/test-server.js)
+- [SERVICES-SEO-ROADMAP.md](SERVICES-SEO-ROADMAP.md)
+- [SERVICES-MEASUREMENT-SETUP.md](SERVICES-MEASUREMENT-SETUP.md)
+- [test-server.js](../../server/test-server.js)
 
 Resultado:
 
@@ -101,8 +101,8 @@ Resultado:
 Completado en:
 
 - eliminada la carpeta archivada anterior del sitio
-- limpiadas referencias en [test-server.js](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/server/test-server.js)
-- limpiada la ruta desactivada de webhook en [backend-example.js](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/server/backend-example.js)
+- limpiadas referencias en [test-server.js](../../server/test-server.js)
+- limpiada la ruta desactivada de webhook en [backend-example.js](../../server/backend-example.js)
 
 Resultado:
 
@@ -117,14 +117,12 @@ Resultado:
 Hecho:
 
 - `npm test` en verde tras los cambios
-- validacion de metadata y schema del cluster en [test-server.js](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/server/test-server.js)
+- validacion de metadata y schema del cluster en [test-server.js](../../server/test-server.js)
 - comprobacion de alcance oficial del cluster y exclusiones de analytics
 
 ### Validacion visual local
 
-Capturas generadas en:
-
-- [services-final-qa](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/output/services-final-qa)
+Capturas generadas en ejecucion local durante la validacion original (`output/services-final-qa`, no conservado como evidencia activa en repo).
 
 Incluye:
 

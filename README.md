@@ -4,63 +4,58 @@ Website and reservation stack for Dynasty Prestige, focused on luxury car rental
 
 ## Project Areas
 
-- `site/`: public website, home, SEO landings, assets, sitemap, robots, manifest, and legal pages
-- `site/app/reserve/page.html`: reservation and payment flow
-- `server/`: backend entrypoint, local static server, smoke tests, and Stripe verification helpers
-- `app/api/reserve/route.js`: reservation routes mounted by the backend
-- `docs/`: active project documentation, audit work, and target architecture
+- `site/`: public website, landing pages, assets, sitemap, robots, manifest and legal pages.
+- `site/app/reserve/page.html`: reservation and payment flow.
+- `server/`: backend entrypoint, local static server, smoke tests and helpers.
+- `app/api/reserve/route.js`: reservation routes mounted by the backend.
+- `docs/`: active project documentation only.
 
-## Structure
+## Core Commands
 
-- `site/index.html`: main brand website
-- `site/config.js`: frontend runtime environment detection
-- `server/backend-example.js`: backend entrypoint used by `npm start`
-- `server/server-http.js`: local static server for previewing `site/`
-- `server/test-server.js`: smoke test covering syntax, routes, sitemap, and key markup
-- `server/verificar-stripe.js`: Stripe configuration verification helper
+- `npm install`: install dependencies.
+- `npm start`: start the backend/API on `PORT` or `3000`.
+- `npm run http`: serve the static site locally.
+- `npm run qa:manual:db`: run the manual QA environment with required `DATABASE_URL`.
+- `npm run qa:test:manual`: test the running manual QA environment.
+- `npm run build:site`: render fleet cards and public runtime config.
+- `npm run test:smoke`: run the repo smoke baseline.
+- `npm test`: run the full configured audit/test suite.
 
-## Commands
+## Release QA
 
-- `npm install`: install dependencies
-- `npm start`: start the backend
-- `npm run http`: serve the public site locally
-- `npm test`: run repo and site smoke tests
-- `npm run verify`: run Stripe configuration checks
+Use [docs/MANUAL_FUNCTIONAL_QA.md](docs/MANUAL_FUNCTIONAL_QA.md) when you need to test like a real customer:
+
+1. Reserve a car.
+2. Confirm it is stored in the active backend storage/CRM.
+3. Check the same car is hidden in Fleet for overlapping dates.
+4. Check it appears for non-overlapping dates.
+5. Verify Find Booking, WhatsApp and call actions.
+
+Use [docs/PREPRODUCTION.md](docs/PREPRODUCTION.md) for Vercel-ready staging and production migration.
 
 ## Environment
 
-1. Copy `.env.example` to `.env`
-2. Set `STRIPE_SECRET_KEY`
-3. Optionally set `STRIPE_WEBHOOK_SECRET`
-4. Set mail delivery using either `EMAIL_*` or generic `SMTP_*` variables
-5. Optionally extend `ALLOWED_ORIGINS`
-6. Only enable `SMTP_ALLOW_SELF_SIGNED=true` if your mail setup truly needs it
-7. Use `CONTACT_FORM_LOG_ONLY=true` only for local previews where you want contact submissions logged instead of sent
+Copy `.env.example` to `.env` and set the variables needed for the task:
 
-## Contact Form Notes
-
-- `site/index.html` and `site/contact.html` now share the same contact form runtime helper in `site/js/contact-form.js`
-- the backend contact route lives in `server/backend-example.js` at `/api/contact`
-- the backend can now boot without Stripe so the contact flow can still be tested locally
-- production contact delivery still requires valid mail credentials in `.env` or Railway variables
+- `STRIPE_SECRET_KEY`: backend Stripe secret, test key for QA/staging.
+- `PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY`: browser-visible Stripe publishable key.
+- `DATABASE_URL`: PostgreSQL reservation storage.
+- `DATABASE_SSL`: set `false` for local Postgres.
+- `ALLOWED_ORIGINS`: frontend origins allowed to call the backend.
+- `ADMIN_USER`, `ADMIN_PASSWORD_HASH`, `ADMIN_SESSION_SECRET`: CRM/admin login.
+- `CONTACT_FORM_LOG_ONLY=true`: local contact-form testing without email delivery.
 
 ## Active Documentation
 
-- [AUDITORIA-INICIAL-2026-03-30.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/audit/AUDITORIA-INICIAL-2026-03-30.md)
-- [CHECKLIST-REMEDIACION-2026-03-30.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/audit/CHECKLIST-REMEDIACION-2026-03-30.md)
-- [ARQUITECTURA-OBJETIVO-SITIO.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/architecture/ARQUITECTURA-OBJETIVO-SITIO.md)
-- [BACKLOG-EVOLUCION-SITIO.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/architecture/BACKLOG-EVOLUCION-SITIO.md)
+- [docs/README.md](docs/README.md): documentation map and cleanup policy.
+- [docs/audit/README.md](docs/audit/README.md): active audit docs.
+- [docs/architecture/README.md](docs/architecture/README.md): architecture map.
+- [docs/admin-reservations.md](docs/admin-reservations.md): CRM setup.
+- [docs/MANUAL-EDITING-GUIDE.md](docs/MANUAL-EDITING-GUIDE.md): safe manual edits.
 
-## Current Focus
+## Documentation Policy
 
-- validate deployed routing so public landings serve their own HTML in production
-- validate Stripe webhook and a full test payment flow
-- keep growing the site from a landing-heavy structure into a more professional brand website without losing SEO traction
-
-## Notes
-
-- `npm test` covers the local technical baseline before SEO work
-- the next product layer lives in `docs/architecture/`, not in ad-hoc Markdown files at the repo root
+Keep docs current and lean. Old closed audit reports, stale screenshots and superseded checklists should be deleted, not archived. Git history keeps the record.
 
 ## License
 

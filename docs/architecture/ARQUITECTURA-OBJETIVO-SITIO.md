@@ -13,17 +13,17 @@ Definir como pasar del sitio actual, muy apoyado en landings SEO, a una web mas 
 
 ## Base Actual Aprovechable
 
-La home actual en [index.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/index.html) ya contiene piezas reutilizables para la futura web profesional:
+La home actual en [index.html](../../site/index.html) ya contiene piezas reutilizables para la futura web profesional:
 
-- bloque hero y propuesta de valor en [index.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/index.html#L2936)
-- seccion de flota en [index.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/index.html#L2986)
-- seccion de experiencia en [index.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/index.html#L3259)
-- bloque de reserva en [index.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/index.html#L3289)
-- seccion de argumentos diferenciales en [index.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/index.html#L3333)
-- seccion de delivery por zonas en [index.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/index.html#L3357)
-- reviews en [index.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/index.html#L3411)
-- about en [index.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/index.html#L3443)
-- contact en [index.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/index.html#L3463)
+- bloque hero y propuesta de valor en [index.html](../../site/index.html#L2936)
+- seccion de flota en [index.html](../../site/index.html#L2986)
+- seccion de experiencia en [index.html](../../site/index.html#L3259)
+- bloque de reserva en [index.html](../../site/index.html#L3289)
+- seccion de argumentos diferenciales en [index.html](../../site/index.html#L3333)
+- seccion de delivery por zonas en [index.html](../../site/index.html#L3357)
+- reviews en [index.html](../../site/index.html#L3411)
+- about en [index.html](../../site/index.html#L3443)
+- contact en [index.html](../../site/index.html#L3463)
 
 Esto significa que la futura web profesional no parte de cero: parte de ordenar, profundizar y separar mejor lo que ya existe.
 
@@ -95,79 +95,79 @@ Las landings SEO no tienen por que ir todas al menu principal. Muchas deben vivi
 
 ### Core del sitio
 
-- [index.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/index.html)
+- [index.html](../../site/index.html)
   - decision: mantener y reforzar
   - futuro rol: home premium de marca
 
-- [page.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/app/reserve/page.html)
+- [page.html](../../site/app/reserve/page.html)
   - decision: mantener y mejorar
   - futuro rol: checkout principal
 
-- [terms-and-conditions.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/terms-and-conditions.html)
+- [terms-and-conditions.html](../../site/pages/legal/terms-and-conditions.html)
   - decision: mantener
   - futuro rol: legal general
 
-- [terms-and-conditions-uae.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/terms-and-conditions-uae.html)
+- [terms-and-conditions-uae.html](../../site/pages/legal/terms-and-conditions-uae.html)
   - decision: mantener
   - futuro rol: legal especifico UAE
 
 ### Landings que conviene mantener y subir de nivel
 
-- [luxury-car-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/luxury-car-rental-dubai.html)
+- [luxury-car-rental-dubai.html](../../site/pages/guides/luxury-car-rental-dubai.html)
   - decision: mantener y reescribir
   - futuro rol: landing categoria principal
 
-- [supercar-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/supercar-rental-dubai.html)
+- [supercar-rental-dubai.html](../../site/pages/guides/supercar-rental-dubai.html)
   - decision: mantener y reescribir
   - futuro rol: landing categoria secundaria, mas enfocada a performance
 
-- [lamborghini-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/lamborghini-rental-dubai.html)
+- [lamborghini-rental-dubai.html](../../site/pages/brands/lamborghini-rental-dubai.html)
   - decision: mantener y reescribir
   - futuro rol: landing principal de marca
 
-- [ferrari-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/ferrari-rental-dubai.html)
+- [ferrari-rental-dubai.html](../../site/pages/brands/ferrari-rental-dubai.html)
   - decision: mantener y reescribir
   - futuro rol: landing principal de marca
 
-- [g63-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/g63-rental-dubai.html)
+- [g63-rental-dubai.html](/g63-rental-dubai.html)
   - decision: mantener y reescribir
   - futuro rol: landing principal de modelo
 
-- [mercedes-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/mercedes-rental-dubai.html)
+- [mercedes-rental-dubai.html](../../site/pages/brands/mercedes-rental-dubai.html)
   - decision: mantener por ahora
   - futuro rol: landing de marca, pendiente diferenciar bien frente a G63
 
-- [porsche-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/porsche-rental-dubai.html)
+- [porsche-rental-dubai.html](../../site/pages/brands/porsche-rental-dubai.html)
   - decision: mantener y reescribir
   - futuro rol: landing principal de marca
 
-- [rolls-royce-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/rolls-royce-rental-dubai.html)
+- [rolls-royce-rental-dubai.html](../../site/pages/brands/rolls-royce-rental-dubai.html)
   - decision: mantener y reescribir
   - futuro rol: landing principal de marca
 
-- [palm-jumeirah-luxury-car-rental.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/palm-jumeirah-luxury-car-rental.html)
+- [palm-jumeirah-luxury-car-rental.html](../../site/pages/guides/palm-jumeirah-luxury-car-rental.html)
   - decision: mantener y reescribir
   - futuro rol: landing principal de ubicacion
 
-- [dubai-marina-luxury-car-rental.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/dubai-marina-luxury-car-rental.html)
+- [dubai-marina-luxury-car-rental.html](../../site/pages/guides/dubai-marina-luxury-car-rental.html)
   - decision: mantener y reescribir
   - futuro rol: landing principal de ubicacion
 
-- [downtown-dubai-supercar-rental.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/downtown-dubai-supercar-rental.html)
+- [downtown-dubai-supercar-rental.html](/downtown-dubai-supercar-rental.html)
   - decision: mantener y reescribir
   - futuro rol: landing principal de ubicacion/categoria
 
 ### Landings que conviene conservar de momento, pero revisar luego
 
-- [lamborghini-rental-palm-jumeirah.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/lamborghini-rental-palm-jumeirah.html)
+- [lamborghini-rental-palm-jumeirah.html](/lamborghini-rental-palm-jumeirah.html)
   - decision: conservar por ahora
   - futuro rol: candidata a fusion con Lamborghini Dubai o Palm Jumeirah si el contenido queda demasiado fino
 
-- [ferrari-rental-downtown-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/ferrari-rental-downtown-dubai.html)
+- [ferrari-rental-downtown-dubai.html](/ferrari-rental-downtown-dubai.html)
   - decision: conservar por ahora
   - futuro rol: candidata a fusion si no logra diferenciarse bien
 
-- [g63-rental-dubai-marina.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/g63-rental-dubai-marina.html)
+- [g63-rental-dubai-marina.html](/g63-rental-dubai-marina.html)
   - decision: conservar por ahora
   - futuro rol: candidata a fusion si repite demasiado contenido
 
@@ -244,4 +244,4 @@ Traducir esta arquitectura a un backlog de implementacion:
 
 Documento asociado:
 
-- [BACKLOG-EVOLUCION-SITIO.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/architecture/BACKLOG-EVOLUCION-SITIO.md)
+- [BACKLOG-EVOLUCION-SITIO.md](BACKLOG-EVOLUCION-SITIO.md)
