@@ -251,10 +251,10 @@ test.describe('Fleet rental period availability and filters', () => {
 
         await fillFleetSchedule(page, overlapSchedule);
         const blockedCard = page.locator(`.js-fleet-card[data-id="${blockedVehicleId}"]`);
-        await expect(blockedCard.locator('.fleet-card__availability')).toHaveText('Unavailable for these dates');
-        await expect(blockedCard.locator('.fleet-card__reserve')).toHaveText('Unavailable');
-        await expect(blockedCard.locator('.fleet-card__reserve')).toHaveAttribute('aria-disabled', 'true');
-        await expect(blockedCard.locator('.fleet-card__reserve')).not.toHaveAttribute('href', /reserve/i);
+        await expect(blockedCard).toBeHidden();
+        await expect(page.locator('.js-fleet-results-count')).toContainText('5 models visible');
+        let visible = await visibleFleetState(page);
+        expect(visible.map((card) => card.id)).not.toContain(blockedVehicleId);
 
         const lastAvailabilityRequest = availabilityRequests.at(-1);
         expect(lastAvailabilityRequest.searchParams.get('startDate')).toBe(overlapSchedule.startDate);
@@ -263,6 +263,7 @@ test.describe('Fleet rental period availability and filters', () => {
         expect(lastAvailabilityRequest.searchParams.get('dropoffTime')).toBe(overlapSchedule.dropoffTime);
 
         await fillFleetSchedule(page, clearSchedule);
+        await expect(blockedCard).toBeVisible();
         await expect(blockedCard.locator('.fleet-card__availability')).toHaveText('Available for these dates');
         await expect(blockedCard.locator('.fleet-card__reserve')).toHaveText('Reserve');
         await expect(blockedCard.locator('.fleet-card__reserve')).toHaveAttribute('href', /startDate=2026-11-20/i);
@@ -270,14 +271,16 @@ test.describe('Fleet rental period availability and filters', () => {
         await page.locator('#fleet-pickup-date').fill('2026-11-25');
         await page.locator('#fleet-pickup-date').dispatchEvent('change');
         await expect(page.locator('#fleet-return-date')).toHaveValue('2026-11-26');
+        await expect(blockedCard).toBeVisible();
         await expect(blockedCard.locator('.fleet-card__availability')).toHaveText('Available for these dates');
         expect(invalidAvailabilityRequests).toEqual([]);
         await fillFleetSchedule(page, clearSchedule);
+        await expect(blockedCard).toBeVisible();
         await expect(blockedCard.locator('.fleet-card__availability')).toHaveText('Available for these dates');
 
         await page.locator('.js-fleet-brand-select').selectOption('lamborghini');
         await expect(page.locator('.js-fleet-results-count')).toContainText('2 models visible');
-        let visible = await visibleFleetState(page);
+        visible = await visibleFleetState(page);
         expect(visible.every((card) => card.brand === 'lamborghini')).toBe(true);
 
         await page.locator('.js-fleet-type-select').selectOption('suv');
@@ -322,10 +325,12 @@ test.describe('Fleet rental period availability and filters', () => {
         await fillFleetSchedule(page, overlapSchedule);
 
         const blockedCard = page.locator(`.js-fleet-card[data-id="${blockedVehicleId}"]`);
-        await expect(blockedCard.locator('.fleet-card__availability')).toHaveText('Unavailable for these dates');
+        await expect(blockedCard).toBeHidden();
+        await expect(page.locator('.js-fleet-results-count')).toContainText('5 models visible');
         await page.locator('.fleet-filter-apply').click();
         await expect(page.locator('.js-fleet-browser')).not.toHaveClass(/fleet-filters-open/);
         await expect(page.locator('.js-fleet-mobile-dates')).toContainText('11 Nov - 13 Nov');
+        await expect(blockedCard).toBeHidden();
 
         await page.locator('.fleet-mobile-filter-toggle').click();
         await page.locator('.js-fleet-brand-select').selectOption('lamborghini');

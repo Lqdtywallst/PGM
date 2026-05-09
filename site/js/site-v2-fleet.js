@@ -259,6 +259,17 @@ document.addEventListener("DOMContentLoaded", () => {
         return availabilityByVehicleId.get(card.dataset.id || "");
     }
 
+    function cardIsAvailableForCurrentSchedule(card) {
+        const schedule = getCurrentSchedule();
+
+        if (!isScheduleRangeValid(schedule) || availabilityStatus !== "loaded") {
+            return true;
+        }
+
+        const availability = availabilityForCard(card);
+        return !availability || availability.available !== false;
+    }
+
     function ensureAvailabilityNode(card) {
         let node = card.querySelector(".fleet-card__availability");
         if (node) {
@@ -511,8 +522,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const typeMatch = state.type === "all" || types.includes(state.type);
         const vehicleMatch = state.vehicle === "all" || vehicle === state.vehicle;
         const priceMatch = Number.isFinite(price) && price >= state.priceMin && price <= state.priceMax;
+        const availabilityMatch = cardIsAvailableForCurrentSchedule(card);
 
-        return brandMatch && typeMatch && vehicleMatch && priceMatch;
+        return brandMatch && typeMatch && vehicleMatch && priceMatch && availabilityMatch;
     }
 
     function sortCards(sortedCards) {
@@ -752,12 +764,14 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!hasSchedule(schedule)) {
             availabilityStatus = "idle";
             syncCardActions();
+            render();
             return;
         }
 
         if (!isScheduleRangeValid(schedule)) {
             availabilityStatus = "idle";
             syncCardActions();
+            render();
             return;
         }
 
@@ -765,11 +779,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!availabilityUrl) {
             availabilityStatus = "error";
             syncCardActions();
+            render();
             return;
         }
 
         availabilityStatus = "loading";
         syncCardActions();
+        render();
 
         try {
             const response = await fetch(availabilityUrl, {
@@ -802,6 +818,7 @@ document.addEventListener("DOMContentLoaded", () => {
             availabilityStatus = "error";
         }
 
+        render();
         syncCardActions();
     }
 
