@@ -233,10 +233,16 @@ test.describe('Fleet rental period availability and filters', () => {
         await useTestBackend(page);
         const consoleErrors = createConsoleTracker(page);
         const availabilityRequests = [];
+        const invalidAvailabilityRequests = [];
 
         page.on('request', (request) => {
             if (request.url().includes('/api/availability')) {
-                availabilityRequests.push(new URL(request.url()));
+                const url = new URL(request.url());
+                availabilityRequests.push(url);
+
+                if (url.searchParams.get('startDate') > url.searchParams.get('endDate')) {
+                    invalidAvailabilityRequests.push(url.toString());
+                }
             }
         });
 
@@ -260,6 +266,14 @@ test.describe('Fleet rental period availability and filters', () => {
         await expect(blockedCard.locator('.fleet-card__availability')).toHaveText('Available for these dates');
         await expect(blockedCard.locator('.fleet-card__reserve')).toHaveText('Reserve');
         await expect(blockedCard.locator('.fleet-card__reserve')).toHaveAttribute('href', /startDate=2026-11-20/i);
+
+        await page.locator('#fleet-pickup-date').fill('2026-11-25');
+        await page.locator('#fleet-pickup-date').dispatchEvent('change');
+        await expect(page.locator('#fleet-return-date')).toHaveValue('2026-11-26');
+        await expect(blockedCard.locator('.fleet-card__availability')).toHaveText('Available for these dates');
+        expect(invalidAvailabilityRequests).toEqual([]);
+        await fillFleetSchedule(page, clearSchedule);
+        await expect(blockedCard.locator('.fleet-card__availability')).toHaveText('Available for these dates');
 
         await page.locator('.js-fleet-brand-select').selectOption('lamborghini');
         await expect(page.locator('.js-fleet-results-count')).toContainText('2 models visible');

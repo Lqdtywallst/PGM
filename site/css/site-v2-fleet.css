@@ -504,10 +504,16 @@
         0 1px 0 rgba(255, 255, 255, 0.92) inset;
     overflow: hidden;
     height: 100%;
+    cursor: pointer;
 }
 
 .fleet-card[hidden] {
     display: none !important;
+}
+
+.fleet-card:focus-visible {
+    outline: 3px solid rgba(196, 157, 88, 0.58);
+    outline-offset: 4px;
 }
 
 .fleet-card__media {

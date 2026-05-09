@@ -197,6 +197,28 @@ document.addEventListener("DOMContentLoaded", () => {
         return Boolean(normalizeValue(intent?.startDate) && normalizeValue(intent?.endDate));
     }
 
+    function isScheduleRangeValid(schedule) {
+        if (!hasSchedule(schedule)) {
+            return false;
+        }
+
+        if (!isValidDateInputValue(schedule.startDate) || !isValidDateInputValue(schedule.endDate)) {
+            return false;
+        }
+
+        if (schedule.startDate > schedule.endDate) {
+            return false;
+        }
+
+        if (schedule.startDate === schedule.endDate) {
+            const pickupTime = normalizeValue(schedule.pickupTime || "12:00");
+            const dropoffTime = normalizeValue(schedule.dropoffTime || "12:00");
+            return !pickupTime || !dropoffTime || dropoffTime > pickupTime;
+        }
+
+        return true;
+    }
+
     function getBackendBaseUrl() {
         if (typeof window.getBackendUrl === "function") {
             return window.getBackendUrl();
@@ -322,6 +344,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let scheduleCaptured = hasSchedule(getIncomingBookingIntent());
 
+    function normalizeScheduleInputs(changedInput = null) {
+        const pickupDate = pickupDateInput?.value || "";
+
+        if (!returnDateInput) {
+            return;
+        }
+
+        const minimumReturnDate = pickupDate || getDubaiDateString(0);
+        returnDateInput.min = minimumReturnDate;
+
+        if (pickupDate && returnDateInput.value && returnDateInput.value < pickupDate) {
+            returnDateInput.value = changedInput === pickupDateInput
+                ? addDaysToDateInputValue(pickupDate, 1)
+                : pickupDate;
+        }
+    }
+
     function syncDateDefaults() {
         const incomingIntent = getIncomingBookingIntent();
         const today = getDubaiDateString(0);
@@ -349,9 +388,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (pickupDateInput && returnDateInput && pickupDateInput.value && returnDateInput.value < pickupDateInput.value) {
-            returnDateInput.value = pickupDateInput.value;
+            returnDateInput.value = addDaysToDateInputValue(pickupDateInput.value, 1);
         }
 
+        normalizeScheduleInputs();
         storeBookingIntent(getCurrentSchedule());
     }
 
@@ -563,6 +603,35 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    function isInteractiveCardTarget(target) {
+        return Boolean(target?.closest?.([
+            "a",
+            "button",
+            "input",
+            "select",
+            "textarea",
+            "label",
+            "[role='button']",
+            "[data-no-card-nav]"
+        ].join(",")));
+    }
+
+    function getCardDetailHref(card) {
+        return normalizeValue(
+            card.dataset.detailHref ||
+            card.querySelector(".fleet-card__title a")?.getAttribute("href") ||
+            card.querySelector(".fleet-card__media")?.getAttribute("href")
+        );
+    }
+
+    function navigateToCardDetail(card) {
+        const href = getCardDetailHref(card);
+
+        if (href) {
+            window.location.href = href;
+        }
+    }
+
     function syncCardActions() {
         cards.forEach((card, index) => {
             const title = normalizeValue(card.querySelector(".fleet-card__title a")?.textContent);
@@ -578,6 +647,43 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (specs.length > 3) {
                 specs.slice(3).forEach((spec) => spec.remove());
+            }
+
+            const detailHref = getCardDetailHref(card);
+
+            if (detailHref) {
+                card.dataset.detailHref = detailHref;
+            }
+
+            if (card.dataset.fleetCardNavBound !== "true") {
+                card.dataset.fleetCardNavBound = "true";
+                card.addEventListener("click", (event) => {
+                    if (
+                        event.defaultPrevented ||
+                        event.button !== 0 ||
+                        event.metaKey ||
+                        event.ctrlKey ||
+                        event.shiftKey ||
+                        event.altKey ||
+                        isInteractiveCardTarget(event.target)
+                    ) {
+                        return;
+                    }
+
+                    navigateToCardDetail(card);
+                });
+
+                card.addEventListener("keydown", (event) => {
+                    if (
+                        isInteractiveCardTarget(event.target) ||
+                        (event.key !== "Enter" && event.key !== " ")
+                    ) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    navigateToCardDetail(card);
+                });
             }
 
             if (reserveLink) {
@@ -628,6 +734,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function persistSchedule() {
+        normalizeScheduleInputs(document.activeElement);
         scheduleCaptured = hasSchedule(getCurrentSchedule());
         storeBookingIntent(getCurrentSchedule());
         syncCardActions();
@@ -643,6 +750,12 @@ document.addEventListener("DOMContentLoaded", () => {
         availabilityByVehicleId.clear();
 
         if (!hasSchedule(schedule)) {
+            availabilityStatus = "idle";
+            syncCardActions();
+            return;
+        }
+
+        if (!isScheduleRangeValid(schedule)) {
             availabilityStatus = "idle";
             syncCardActions();
             return;
@@ -1059,6 +1172,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     fieldInputs.forEach((input) => {
         const sync = () => {
+            normalizeScheduleInputs(input);
             syncFieldDisplays();
             persistSchedule();
         };
