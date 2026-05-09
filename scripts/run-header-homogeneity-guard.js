@@ -99,6 +99,12 @@ function summarizeByCategory(findings = []) {
     }, {});
 }
 
+function isHeaderGuardFinding(finding = {}) {
+    return finding.area === 'header' ||
+        finding.area === 'header_cta' ||
+        finding.area === 'header_dropdown';
+}
+
 async function main() {
     const args = parseArgs(process.argv.slice(2));
     const routes = resolveGuardRoutes(args);
@@ -111,7 +117,7 @@ async function main() {
         outputDir
     });
 
-    const headerFindings = report.findings.filter((finding) => finding.area === 'header');
+    const headerFindings = report.findings.filter(isHeaderGuardFinding);
     const byCategory = summarizeByCategory(headerFindings);
 
     console.log(`Header homogeneity guard completed: ${runDir}`);
@@ -149,5 +155,6 @@ module.exports = {
     parseArgs,
     resolveGuardRoutes,
     resolveGuardViewports,
+    isHeaderGuardFinding,
     summarizeByCategory
 };

@@ -24,7 +24,6 @@ const forbiddenRootEntries = [
     'server-http.out.log',
     'services-redesign-http.err.log',
     'services-redesign-http.out.log',
-    'output',
     'temp',
     'test-results'
 ];
@@ -104,6 +103,17 @@ async function run() {
             `${relativePath} is absent from the repo root`
         );
     });
+
+    const outputDir = path.join(projectRoot, 'output');
+    if (fs.existsSync(outputDir)) {
+        const outputEntries = fs.readdirSync(outputDir).sort();
+        assert(
+            outputEntries.every((entry) => entry === 'runtime-reservations'),
+            'output only contains approved local runtime reservation data'
+        );
+    } else {
+        assert(true, 'output is absent or limited to approved local runtime data');
+    }
 
     forbiddenPublicEntries.forEach((relativePath) => {
         assert(

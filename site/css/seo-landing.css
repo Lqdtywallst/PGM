@@ -120,6 +120,10 @@ body {
 }
 
 @media (min-width: 861px) and (max-width: 1540px) {
+    .vehicle-page .lab-header__inner {
+        gap: 1.25rem;
+    }
+
     .vehicle-page .lab-brand {
         gap: 0.78rem;
     }
@@ -132,6 +136,10 @@ body {
 
     .vehicle-page .lab-brand__copy span {
         display: none;
+    }
+
+    .vehicle-page .lab-header__nav {
+        gap: 0.75rem;
     }
 }
 
@@ -253,9 +261,11 @@ body {
     padding: 0 1.5rem;
     font-size: 0.74rem;
     letter-spacing: 0.18em;
-    background: linear-gradient(135deg, #efd581 0%, #d6ad55 100%);
-    color: #15110a;
-    box-shadow: 0 16px 34px rgba(160, 121, 48, 0.18);
+    border-color: color-mix(in srgb, var(--editor-button-background, var(--lab-accent)) 78%, #ffffff 22%);
+    border-radius: var(--editor-button-radius, 999px);
+    background: var(--editor-button-background, var(--lab-accent));
+    color: var(--editor-button-text, #101010);
+    box-shadow: 0 14px 34px rgba(227, 246, 85, 0.18);
 }
 
 @media (min-width: 861px) and (max-width: 1540px) {
@@ -328,21 +338,26 @@ body {
 }
 
 .vehicle-page .lab-nav__panel {
-    border: 1px solid rgba(23, 23, 23, 0.08);
+    border: 1px solid var(--lab-cool-lens-edge);
     background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(247, 245, 239, 0.98)),
-        radial-gradient(circle at 18% -10%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 34%);
+        linear-gradient(180deg, rgba(34, 34, 35, 0.96) 0%, rgba(38, 26, 20, 0.96) 100%),
+        radial-gradient(circle at 18% -10%, rgba(245, 250, 255, 0.18), rgba(255, 255, 255, 0) 34%),
+        radial-gradient(circle at 100% 12%, rgba(165, 190, 220, 0.1), rgba(255, 255, 255, 0) 30%),
+        radial-gradient(circle at 15% 112%, rgba(56, 87, 123, 0.1), rgba(255, 255, 255, 0) 42%);
     box-shadow:
-        0 26px 64px rgba(24, 24, 24, 0.12),
-        0 12px 26px rgba(24, 24, 24, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(20px) saturate(145%);
-    -webkit-backdrop-filter: blur(20px) saturate(145%);
+        0 26px 64px var(--lab-cool-lens-shadow),
+        0 12px 26px rgba(23, 43, 69, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.22),
+        inset 0 -1px 0 rgba(156, 182, 212, 0.08);
+    backdrop-filter: blur(22px) saturate(150%) brightness(1.04) contrast(1.04);
+    -webkit-backdrop-filter: blur(22px) saturate(150%) brightness(1.04) contrast(1.04);
 }
 
 .vehicle-page .lab-nav__card,
 .vehicle-page .lab-nav a.lab-nav__card {
-    color: #171717;
+    border-color: rgba(198, 220, 243, 0.05);
+    background: linear-gradient(180deg, var(--lab-cool-card-idle), rgba(255, 255, 255, 0.008));
+    color: var(--lab-text);
 }
 
 .vehicle-page .lab-nav__card:hover,
@@ -351,11 +366,11 @@ body {
 .vehicle-page .lab-nav__card--brand:focus-visible,
 .vehicle-page .lab-nav__card--type:hover,
 .vehicle-page .lab-nav__card--type:focus-visible {
-    color: var(--vehicle-header-accent, #36404b);
+    color: var(--lab-cool-highlight);
 }
 
 .vehicle-page .lab-nav__card-copy span {
-    color: #5f4930;
+    color: rgba(245, 241, 232, 0.68);
 }
 
 .vehicle-page .lab-nav__card--brand .lab-nav__card-copy strong,
@@ -3116,7 +3131,12 @@ body.vehicle-page--premium-pilot {
     }
 
     .vehicle-return-link {
-        display: none;
+        display: flex;
+        width: 100%;
+        min-height: 44px;
+        margin: 0 0 0.72rem;
+        padding: 0.7rem 0.82rem;
+        border-radius: 14px;
     }
 
     .vehicle-pdp-hero-shell {

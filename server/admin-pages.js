@@ -163,6 +163,25 @@ function renderAdminLoginPage() {
         </div>
     </main>
     <script>
+        function getSafeNextPath() {
+            var nextPath = new URLSearchParams(window.location.search).get('next') || '/admin/reservations.html';
+
+            try {
+                var url = new URL(nextPath, window.location.origin);
+                var isSameOrigin = url.origin === window.location.origin;
+                var isAllowedAdminPage = url.pathname === '/admin/reservations.html' ||
+                    url.pathname === '/admin/content.html';
+
+                if (isSameOrigin && isAllowedAdminPage) {
+                    return url.pathname + url.search + url.hash;
+                }
+            } catch (error) {
+                return '/admin/reservations.html';
+            }
+
+            return '/admin/reservations.html';
+        }
+
         document.getElementById('loginForm').addEventListener('submit', async function (event) {
             event.preventDefault();
             var message = document.getElementById('message');
@@ -184,7 +203,7 @@ function renderAdminLoginPage() {
                     return;
                 }
 
-                window.location.href = '/admin/reservations.html';
+                window.location.href = getSafeNextPath();
             } catch (error) {
                 message.textContent = 'The admin desk is not reachable right now.';
             }

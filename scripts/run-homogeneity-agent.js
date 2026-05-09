@@ -194,6 +194,250 @@ async function captureIfVisible(locator, outputPath) {
     }
 }
 
+function safeFileSlug(value = '') {
+    return String(value || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 40) || 'dropdown';
+}
+
+async function collectHeaderDropdownStates(page, pageDir) {
+    const dropdowns = [];
+    const triggers = page.locator('.lab-header .lab-nav__item--has-panel .lab-nav__trigger');
+    const triggerCount = Math.min(await triggers.count(), 6);
+
+    for (let index = 0; index < triggerCount; index += 1) {
+        const trigger = triggers.nth(index);
+
+        if (!(await trigger.isVisible().catch(() => false))) {
+            continue;
+        }
+
+        const label = (await trigger.innerText().catch(() => '')).replace(/\s+/g, ' ').trim();
+        const panelId = await trigger.getAttribute('aria-controls').catch(() => '');
+
+        await trigger.click();
+        await page.waitForTimeout(180);
+
+        const panelLocator = panelId
+            ? page.locator(`#${panelId}`).first()
+            : trigger.locator('xpath=..').locator('.lab-nav__panel').first();
+        const screenshotPath = await captureIfVisible(
+            panelLocator,
+            path.join(pageDir, `dropdown-${index + 1}-${safeFileSlug(label)}.png`)
+        );
+
+        const metrics = await page.evaluate(({ triggerIndex, label: fallbackLabel, panelId: controlledPanelId }) => {
+            function isVisible(element) {
+                if (!(element instanceof HTMLElement)) {
+                    return false;
+                }
+
+                const style = window.getComputedStyle(element);
+                const rect = element.getBoundingClientRect();
+                return style.display !== 'none' &&
+                    style.visibility !== 'hidden' &&
+                    Number(style.opacity || 1) > 0 &&
+                    rect.width > 0 &&
+                    rect.height > 0;
+            }
+
+            function text(element) {
+                return (element?.textContent || '').replace(/\s+/g, ' ').trim();
+            }
+
+            function rect(element) {
+                if (!(element instanceof Element)) {
+                    return null;
+                }
+
+                const value = element.getBoundingClientRect();
+                return {
+                    bottom: Number(value.bottom.toFixed(2)),
+                    height: Number(value.height.toFixed(2)),
+                    left: Number(value.left.toFixed(2)),
+                    right: Number(value.right.toFixed(2)),
+                    top: Number(value.top.toFixed(2)),
+                    width: Number(value.width.toFixed(2))
+                };
+            }
+
+            function parsePx(value) {
+                const parsed = Number.parseFloat(String(value || '').replace('px', ''));
+                return Number.isFinite(parsed) ? parsed : 0;
+            }
+
+            function classSignature(element) {
+                return element instanceof HTMLElement
+                    ? String(element.className || '').split(/\s+/).filter(Boolean).slice(0, 8).join('.')
+                    : '';
+            }
+
+            function parseCssColor(value) {
+                const raw = String(value || '').trim();
+
+                if (!raw || raw === 'transparent') {
+                    return { red: 0, green: 0, blue: 0, alpha: 0, luminance: 0 };
+                }
+
+                const match = raw.match(/rgba?\(([^)]+)\)/i);
+                if (!match) {
+                    return null;
+                }
+
+                const parts = match[1]
+                    .split(/[\s,\/]+/)
+                    .map((part) => part.trim())
+                    .filter(Boolean);
+                const red = Number.parseFloat(parts[0]);
+                const green = Number.parseFloat(parts[1]);
+                const blue = Number.parseFloat(parts[2]);
+                const alpha = parts[3] === undefined ? 1 : Number.parseFloat(parts[3]);
+
+                if (![red, green, blue, alpha].every(Number.isFinite)) {
+                    return null;
+                }
+
+                const channels = [red, green, blue].map((channel) => {
+                    const normalized = channel / 255;
+                    return normalized <= 0.03928
+                        ? normalized / 12.92
+                        : ((normalized + 0.055) / 1.055) ** 2.4;
+                });
+                const luminance = (0.2126 * channels[0]) + (0.7152 * channels[1]) + (0.0722 * channels[2]);
+
+                return {
+                    red,
+                    green,
+                    blue,
+                    alpha,
+                    luminance: Number(luminance.toFixed(4))
+                };
+            }
+
+            function extractCssColors(value) {
+                return (String(value || '').match(/rgba?\([^)]+\)/gi) || [])
+                    .map(parseCssColor)
+                    .filter(Boolean);
+            }
+
+            function surfaceTone(color, hasGradient) {
+                if (!color || color.alpha < 0.18) {
+                    return hasGradient ? 'transparent-gradient' : 'transparent';
+                }
+
+                if (color.luminance <= 0.32) {
+                    return hasGradient ? 'dark-gradient' : 'dark';
+                }
+
+                if (color.luminance >= 0.72) {
+                    return 'light';
+                }
+
+                return 'muted';
+            }
+
+            function contrastRatio(left, right) {
+                if (!left || !right) {
+                    return null;
+                }
+
+                const lighter = Math.max(left.luminance, right.luminance);
+                const darker = Math.min(left.luminance, right.luminance);
+                return Number(((lighter + 0.05) / (darker + 0.05)).toFixed(2));
+            }
+
+            const triggers = Array.from(document.querySelectorAll('.lab-header .lab-nav__item--has-panel .lab-nav__trigger'));
+            const trigger = triggers[triggerIndex] || null;
+            const panel = controlledPanelId
+                ? document.getElementById(controlledPanelId)
+                : trigger?.closest('.lab-nav__item')?.querySelector('.lab-nav__panel');
+
+            if (!(panel instanceof HTMLElement)) {
+                return {
+                    exists: false,
+                    label: fallbackLabel
+                };
+            }
+
+            const header = document.querySelector('.lab-header, .site-header, header');
+            const style = window.getComputedStyle(panel);
+            const backgroundColor = parseCssColor(style.backgroundColor);
+            const imageColors = extractCssColors(style.backgroundImage);
+            const dominantColor = (
+                backgroundColor && backgroundColor.alpha >= 0.18
+                    ? backgroundColor
+                    : imageColors.find((color) => color.alpha >= 0.18) || backgroundColor
+            );
+            const hasGradient = /gradient/i.test(style.backgroundImage || '');
+            const backdropFilter = `${style.backdropFilter || ''} ${style.webkitBackdropFilter || ''}`;
+            const textCandidates = Array.from(panel.querySelectorAll('a, button, strong, span, p'))
+                .filter((element) => element instanceof HTMLElement)
+                .filter(isVisible)
+                .filter((element) => text(element));
+            const contrastValues = textCandidates
+                .map((element) => parseCssColor(window.getComputedStyle(element).color))
+                .map((color) => contrastRatio(color, dominantColor))
+                .filter(Number.isFinite);
+            const panelRect = rect(panel);
+            const triggerRect = rect(trigger);
+            const headerRect = rect(header);
+
+            return {
+                exists: true,
+                label: text(trigger) || fallbackLabel,
+                triggerLabel: text(trigger) || fallbackLabel,
+                panelId: panel.id || controlledPanelId || '',
+                classSignature: classSignature(panel),
+                cardCount: panel.querySelectorAll('.lab-nav__card, a[href], button').length,
+                linkCount: panel.querySelectorAll('a[href]').length,
+                imageCount: panel.querySelectorAll('img, svg').length,
+                backgroundColor: style.backgroundColor || '',
+                backgroundImage: style.backgroundImage === 'none' ? '' : String(style.backgroundImage || '').slice(0, 220),
+                backgroundAlpha: dominantColor ? Number(dominantColor.alpha.toFixed(3)) : null,
+                backgroundLuminance: dominantColor ? dominantColor.luminance : null,
+                surfaceTone: surfaceTone(dominantColor, hasGradient),
+                hasGradient,
+                hasBackdropBlur: /blur\((?!0(?:px)?\))/i.test(backdropFilter),
+                borderRadiusPx: Number(parsePx(style.borderTopLeftRadius).toFixed(2)),
+                borderColor: style.borderColor || '',
+                boxShadow: style.boxShadow && style.boxShadow !== 'none',
+                minTextContrastRatio: contrastValues.length > 0 ? Number(Math.min(...contrastValues).toFixed(2)) : null,
+                panelRect,
+                triggerRect,
+                topOffsetFromHeaderPx: panelRect && headerRect ? Number((panelRect.top - headerRect.bottom).toFixed(2)) : null,
+                triggerToPanelGapPx: panelRect && triggerRect ? Number((panelRect.top - triggerRect.bottom).toFixed(2)) : null
+            };
+        }, {
+            triggerIndex: index,
+            label,
+            panelId
+        });
+
+        dropdowns.push({
+            ...metrics,
+            screenshotPath
+        });
+
+        await page.keyboard.press('Escape').catch(() => {});
+        await page.mouse.click(1, 1).catch(() => {});
+        await page.waitForTimeout(80);
+    }
+
+    await page.evaluate(() => {
+        document.querySelectorAll('.lab-header .js-nav-mega.is-open').forEach((item) => {
+            item.classList.remove('is-open');
+            const trigger = item.querySelector('.lab-nav__trigger');
+            if (trigger) {
+                trigger.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }).catch(() => {});
+
+    return dropdowns;
+}
+
 async function collectIdentityMetrics(page) {
     return page.evaluate(() => {
         function isVisible(element) {
@@ -504,6 +748,31 @@ async function collectIdentityMetrics(page) {
             };
         }
 
+        function actionSurface(root) {
+            if (!(root instanceof HTMLElement) || !isVisible(root)) {
+                return { exists: false };
+            }
+
+            const style = window.getComputedStyle(root);
+
+            return {
+                exists: true,
+                text: text(root),
+                classSignature: classSignature(root),
+                rect: rect(root),
+                fontFamily: style.fontFamily || '',
+                fontSizePx: Number(parsePx(style.fontSize).toFixed(2)),
+                fontWeight: style.fontWeight || '',
+                letterSpacingPx: Number(parsePx(style.letterSpacing).toFixed(2)),
+                color: style.color || '',
+                backgroundColor: style.backgroundColor || '',
+                backgroundImage: style.backgroundImage === 'none' ? '' : String(style.backgroundImage || '').slice(0, 220),
+                borderRadiusPx: Number(parsePx(style.borderTopLeftRadius).toFixed(2)),
+                minHeightPx: Number(parsePx(style.minHeight || style.height).toFixed(2)),
+                boxShadow: style.boxShadow && style.boxShadow !== 'none'
+            };
+        }
+
         function textSurface(element) {
             if (!(element instanceof HTMLElement)) {
                 return { exists: false };
@@ -582,6 +851,10 @@ async function collectIdentityMetrics(page) {
 
             return Array.from(nav.querySelectorAll('a[href], button'))
                 .filter((element) => {
+                    if (element.closest('.lab-nav__panel')) {
+                        return false;
+                    }
+
                     const parentItem = element.closest('.lab-nav__item');
                     return isVisible(element) && (!parentItem || parentItem.parentElement === nav);
                 })
@@ -628,6 +901,7 @@ async function collectIdentityMetrics(page) {
         const headerBrandRoot = firstVisible(['.lab-brand', '.header-brand']);
         const drawerBrandRoot = firstVisible(['.lab-mobile-drawer.is-open .lab-mobile-drawer__brand', '.lab-mobile-drawer__brand']);
         const mainNav = firstVisible(['nav[aria-label="Main navigation"]', '.lab-header .lab-nav']);
+        const headerReserve = header ? firstVisibleWithin(header, ['.lab-reserve', 'a[href*="reserve"]']) : null;
         const heading = firstVisible(['main h1', 'h1']);
         const lead = firstVisible([
             '.hero-lab__lead',
@@ -672,6 +946,7 @@ async function collectIdentityMetrics(page) {
             headerSurface: collectHeaderSurface(header),
             headerLayout: collectHeaderLayout(header),
             headerBrand: brandSurface(headerBrandRoot),
+            headerCta: actionSurface(headerReserve),
             drawerBrand: brandSurface(drawerBrandRoot),
             typography: {
                 heading: textSurface(heading),
@@ -720,6 +995,8 @@ async function auditRouteViewport({ browser, baseUrl, route, viewport, runDir })
             path.join(pageDir, 'header.png')
         );
 
+        const headerDropdowns = await collectHeaderDropdownStates(page, pageDir);
+
         let drawerScreenshotPath = '';
         const toggle = page.locator('.lab-mobile-toggle, [aria-controls="lab-mobile-drawer"]').first();
         if (await toggle.count() > 0 && await toggle.isVisible()) {
@@ -740,6 +1017,8 @@ async function auditRouteViewport({ browser, baseUrl, route, viewport, runDir })
             ...metrics,
             viewportScreenshotPath,
             headerScreenshotPath,
+            headerDropdowns,
+            headerDropdownScreenshotPath: headerDropdowns.find((entry) => entry.screenshotPath)?.screenshotPath || '',
             drawerScreenshotPath
         };
     } finally {

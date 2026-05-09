@@ -16,8 +16,13 @@ async function openBrandLandingFromMegaMenu(page, landingPathname) {
     await primeHomeAnimations(page);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await settlePage(page);
-    await page.getByRole('button', { name: 'Cars Brands' }).click();
-    await page.locator(`#lab-nav-brands-panel a[href$="${landingPathname}"]`).click();
+    const brandsButton = page.getByRole('button', { name: /Cars Brands/i }).first();
+    await brandsButton.click();
+    await expect(brandsButton).toHaveAttribute('aria-expanded', 'true');
+    const panelId = await brandsButton.getAttribute('aria-controls');
+    const brandsPanel = page.locator(panelId ? `#${panelId}` : '.lab-nav__panel--brands').first();
+    await expect(brandsPanel).toBeVisible();
+    await brandsPanel.locator(`a[href$="${landingPathname}"]`).click();
 }
 
 async function fillVehicleAvailabilityWindow(page, bookingWindow) {
@@ -136,6 +141,29 @@ const directBrandAvailabilityJourneys = [
     }
 ];
 
+const carTypeFleetJourneys = [
+    {
+        label: 'Luxury Cars',
+        type: 'luxury',
+        titles: ['Urus Sport', 'G63 AMG', 'Cullinan Black Badge']
+    },
+    {
+        label: 'Convertible Cars',
+        type: 'convertible',
+        titles: ['Huracan EVO Spyder', '296 GTS']
+    },
+    {
+        label: 'Sports Cars',
+        type: 'sports',
+        titles: ['Huracan EVO Spyder', '296 GTS', '992 GT3']
+    },
+    {
+        label: 'SUV Cars',
+        type: 'suv',
+        titles: ['Urus Sport', 'G63 AMG', 'Cullinan Black Badge']
+    }
+];
+
 test('guest explores tabs and opens the Mercedes SEO landing from the mega menu', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'desktop-chromium', 'Mega menu journey is desktop-first');
 
@@ -167,6 +195,38 @@ test('guest explores tabs and opens the Mercedes SEO landing from the mega menu'
     await expect(page.locator('h1')).toContainText('Mercedes G63 AMG');
 
     await expectNoConsoleErrors(consoleErrors, 'customer browsing tabs and brands');
+});
+
+test('guest opens each Cars Types card into Fleet with a real non-empty type filter', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop-chromium', 'Mega menu journey is desktop-first');
+
+    await primeHomeAnimations(page);
+    const consoleErrors = createConsoleTracker(page);
+
+    for (const journey of carTypeFleetJourneys) {
+        await page.goto('/', { waitUntil: 'domcontentloaded' });
+        await settlePage(page);
+
+        const typesButton = page.getByRole('button', { name: /Cars Types/i }).first();
+        await typesButton.click();
+        await expect(typesButton).toHaveAttribute('aria-expanded', 'true');
+
+        const panelId = await typesButton.getAttribute('aria-controls');
+        const typesPanel = page.locator(panelId ? `#${panelId}` : '.lab-nav__panel--types').first();
+        await expect(typesPanel).toBeVisible();
+        await expect(typesPanel.getByRole('link', { name: /Electric Cars/i })).toHaveCount(0);
+
+        const typeLink = typesPanel.getByRole('link', { name: new RegExp(journey.label, 'i') }).first();
+        await expect(typeLink).toHaveAttribute('href', new RegExp(`/fleet\\.html\\?type=${journey.type}$`));
+        await typeLink.click();
+
+        await expect(page).toHaveURL(new RegExp(`/fleet\\.html\\?type=${journey.type}$`, 'i'));
+        await expect(page.locator('.js-fleet-type-select')).toHaveValue(journey.type);
+        await expect(page.locator('.js-fleet-results-count')).toContainText(`${journey.titles.length} models visible`);
+        expect(await getVisibleFleetTitles(page)).toEqual(journey.titles);
+    }
+
+    await expectNoConsoleErrors(consoleErrors, 'cars types menu to filtered fleet');
 });
 
 for (const journey of directBrandAvailabilityJourneys) {

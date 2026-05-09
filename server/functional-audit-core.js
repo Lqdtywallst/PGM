@@ -1,11 +1,32 @@
 const FUNCTIONAL_HUMAN_REVIEW_RULES = Object.freeze([
     Object.freeze({
+        id: 'realistic_customer_missions',
+        label: 'Functional tests must represent real customer missions',
+        checks: Object.freeze([
+            'critical actions are tied to a named persona, customer intent and measurable acceptance criteria',
+            'tests use realistic cars, dates, times, contact details, services and booking paths',
+            'a click is only accepted when the resulting page, state, API call and visible evidence match the mission'
+        ])
+    }),
+    Object.freeze({
         id: 'intent_continuity',
         label: 'Business intent must survive the journey',
         checks: Object.freeze([
             'car, price, dates, times and pickup context survive internal handoffs',
+            'home-to-fleet actions preserve category filters as well as dates and times',
+            'home featured vehicle CTAs open exact vehicle landing pages, not generic fleet listings',
+            'availability claims are backed by /api/availability before Reserve is enabled or disabled',
             'a booking CTA must land on the expected booking surface',
             'back, reload and switching paths must not silently lose intent'
+        ])
+    }),
+    Object.freeze({
+        id: 'data_and_api_truth',
+        label: 'Visible business claims must match backend truth',
+        checks: Object.freeze([
+            'availability, reservation, contact and payment states are verified against API responses or explicit mocks',
+            'backend failures preserve typed data and show a useful recovery path',
+            'business logic cannot be bypassed from the UI, including unavailable cars, invalid schedules and duplicate submits'
         ])
     }),
     Object.freeze({
@@ -27,12 +48,22 @@ const FUNCTIONAL_HUMAN_REVIEW_RULES = Object.freeze([
         ])
     }),
     Object.freeze({
+        id: 'accessible_interactions',
+        label: 'Customer missions must remain usable with assistive interaction patterns',
+        checks: Object.freeze([
+            'forms, menus, drawers and booking steps have visible focus and keyboard-reachable controls',
+            'inputs have understandable labels, required-state cues and text error messages',
+            'dynamic result counts, availability changes and success/error states are exposed as status-like feedback'
+        ])
+    }),
+    Object.freeze({
         id: 'technical_confidence',
         label: 'Runtime confidence must stay clean',
         checks: Object.freeze([
             'no console errors during customer-like actions',
             'no broken document, script, stylesheet, fetch or XHR requests',
-            'call and WhatsApp paths must use the approved number and context-aware message'
+            'call and WhatsApp paths must use the approved number and context-aware message',
+            'critical pages stay responsive enough for real users and avoid disruptive layout shifts'
         ])
     }),
     Object.freeze({
@@ -40,6 +71,7 @@ const FUNCTIONAL_HUMAN_REVIEW_RULES = Object.freeze([
         label: 'Interactive controls must prove their destination or state change',
         checks: Object.freeze([
             'visible buttons are clicked in functional audits',
+            'home category CTAs are tested as Fleet filter handoffs and featured vehicle CTAs as landing handoffs',
             'navigation buttons must reach the expected destination',
             'state buttons must visibly open, close, reset, validate or change UI state'
         ])

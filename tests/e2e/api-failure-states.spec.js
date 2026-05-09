@@ -118,7 +118,7 @@ test('reserve shows a backend error when reservation creation fails before payme
     await page.locator('#payButton').click();
 
     await expect(page.locator('#paymentStatus')).toContainText(
-        'Error processing payment: Reservation service unavailable.'
+        'We could not complete payment. Reservation service unavailable.'
     );
     await expect(page.locator('#payButton')).toBeEnabled();
 });

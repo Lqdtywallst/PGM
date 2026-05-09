@@ -13,7 +13,7 @@
       "pointTwo": "Meet-and-greet with onward routing",
       "pointThree": "Hotel, villa or city continuation planned early",
       "buttonLabel": "Explore airport concierge",
-      "analyticsService": "airport_concierge",
+      "analyticsService": "airport",
       "isActive": true,
       "id": "services-lane-tab-airport",
       "ariaLabel": "Open airport concierge service"
@@ -31,7 +31,7 @@
       "pointTwo": "Half-day and full-day planning",
       "pointThree": "Dubai and Abu Dhabi routes without driving",
       "buttonLabel": "Explore chauffeur service",
-      "analyticsService": "chauffeur_service",
+      "analyticsService": "chauffeur",
       "isActive": false,
       "id": "services-lane-tab-chauffeur",
       "ariaLabel": "Open vip chauffeur service"
@@ -49,7 +49,7 @@
       "pointTwo": "Property-led handover planning",
       "pointThree": "Cleaner arrival for branded residences",
       "buttonLabel": "Explore tailored delivery",
-      "analyticsService": "tailored_delivery",
+      "analyticsService": "delivery",
       "isActive": false,
       "id": "services-lane-tab-delivery",
       "ariaLabel": "Open tailored delivery service"
@@ -67,7 +67,7 @@
       "pointTwo": "Flexible vehicle matching for the stay",
       "pointThree": "Comfort-first support for repeat use",
       "buttonLabel": "Explore monthly rental",
-      "analyticsService": "monthly_luxury_rental",
+      "analyticsService": "monthly",
       "isActive": false,
       "id": "services-lane-tab-monthly",
       "ariaLabel": "Open monthly luxury rental service"

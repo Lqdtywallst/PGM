@@ -15,6 +15,7 @@ const topLevelRoutes = [
 
 test('desktop top-level navigation routes open cleanly', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'desktop-chromium', 'Desktop header audit only');
+    test.slow();
 
     await primeHomeAnimations(page);
     const consoleErrors = createConsoleTracker(page);

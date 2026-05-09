@@ -587,7 +587,7 @@
 
         const lookupLink = document.createElement("a");
         lookupLink.href = HEADER_LOOKUP_HREF;
-        lookupLink.textContent = "Find booking";
+        lookupLink.textContent = "Find Booking";
         if (pathsMatch(window.location.pathname, HEADER_LOOKUP_HREF)) {
             lookupLink.setAttribute("aria-current", "page");
         }

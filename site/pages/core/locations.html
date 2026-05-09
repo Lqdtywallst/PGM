@@ -8,6 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <title>Luxury Car Rental Locations Dubai &amp; Abu Dhabi | Dynasty Prestige</title>
     <meta name="description" content="Explore Dynasty Prestige's Palm Jumeirah-based luxury car rental coverage across Dubai, Abu Dhabi, DXB, DWC, hotels, villas and premium districts.">
+    <link rel="icon" href="/favicon.ico">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://prestigegoalmotion.com/locations.html">
     <meta property="og:type" content="website">
@@ -24,8 +25,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=El+Messiri:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./css/site-v2.css?v=20260426-header1">
-    <link rel="stylesheet" href="./css/site-v2-locations.css?v=20260424-responsive1">
-    <script src="./js/site-v2.js?v=20260424-backnav1" defer></script>
+    <link rel="stylesheet" href="./css/site-v2-locations.css?v=20260509-mapmarkers2">
+    <link rel="stylesheet" href="/css/admin-style-overrides.css?v=20260508-style-editor">
+    <script src="./js/site-v2.js?v=20260509-mapmarkers2" defer></script>
     <script type="application/ld+json">
     {"@context":"https://schema.org","@graph":[
       {"@type":"WebPage","name":"Dynasty Prestige Locations","url":"https://prestigegoalmotion.com/locations.html","description":"Luxury car rental coverage from a Palm Jumeirah coordination base across Dubai, Abu Dhabi, DXB, DWC, hotels, residences and premium districts.","inLanguage":"en-AE"},
@@ -55,28 +57,23 @@
 
             <nav class="lab-header__utility" aria-label="Quick contact">
                 <a class="lab-header__utility-link" href="tel:+971586122568" aria-label="Call Dynasty Prestige">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path fill="currentColor" d="M6.62 10.79a15.47 15.47 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.07 21 3 13.93 3 5c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.24.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2Z"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.62 10.79a15.47 15.47 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.07 21 3 13.93 3 5c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.24.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2Z"/></svg>
                     <span>Call</span>
                 </a>
                 <a class="lab-header__utility-link" href="mailto:prestigegoalmotion@gmail.com" aria-label="Email Dynasty Prestige">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path fill="currentColor" d="M20 5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm-.4 2-6.54 5.23a1.7 1.7 0 0 1-2.12 0L4.4 7h15.2ZM4 17V9.05l5.69 4.56a3.7 3.7 0 0 0 4.62 0L20 9.05V17H4Z"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm-.4 2-6.54 5.23a1.7 1.7 0 0 1-2.12 0L4.4 7h15.2ZM4 17V9.05l5.69 4.56a3.7 3.7 0 0 0 4.62 0L20 9.05V17H4Z"/></svg>
                     <span>Email</span>
                 </a>
-                <a class="lab-header__utility-link" href="https://wa.me/971586122568" target="_blank" rel="noopener" aria-label="Open WhatsApp">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path fill="currentColor" d="M19.05 4.91A9.82 9.82 0 0 0 12 2a9.94 9.94 0 0 0-8.54 15.02L2 22l5.13-1.35A9.94 9.94 0 1 0 19.05 4.91Zm-7.05 14.1c-1.53 0-3.04-.41-4.36-1.19l-.31-.18-3.04.8.81-2.96-.2-.31a8 8 0 1 1 7.1 3.84Zm4.39-5.91c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.93-1.18-.71-.63-1.2-1.41-1.34-1.65-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.48-.4-.41-.54-.41l-.46-.01c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.09 3.61.57.25 1.01.39 1.36.49.57.18 1.09.15 1.5.09.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"/>
-                    </svg>
+                <a class="lab-header__utility-link" href="https://wa.me/971586122568" aria-label="Open WhatsApp" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19.05 4.91A9.82 9.82 0 0 0 12 2a9.94 9.94 0 0 0-8.54 15.02L2 22l5.13-1.35A9.94 9.94 0 1 0 19.05 4.91Zm-7.05 14.1c-1.53 0-3.04-.41-4.36-1.19l-.31-.18-3.04.8.81-2.96-.2-.31a8 8 0 1 1 7.1 3.84Zm4.39-5.91c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.93-1.18-.71-.63-1.2-1.41-1.34-1.65-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.48-.4-.41-.54-.41l-.46-.01c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.09 3.61.57.25 1.01.39 1.36.49.57.18 1.09.15 1.5.09.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"/></svg>
                     <span>WhatsApp</span>
                 </a>
             </nav>
 
             <div class="lab-header__nav">
                 <nav class="lab-nav" aria-label="Main navigation">
-                    <a href="/index.html">Home</a>
+                    <a href="/">Home</a>
+
                     <a href="/fleet.html">Fleet</a>
 
                     <div class="lab-nav__item lab-nav__item--has-panel js-nav-mega">
@@ -84,13 +81,13 @@
                             type="button"
                             class="lab-nav__trigger"
                             aria-expanded="false"
-                            aria-controls="lab-nav-brands-panel"
+                            aria-controls="lab-nav-dynamic-panel-3"
                         >
                             <span>Cars Brands</span>
                             <span class="lab-nav__chevron" aria-hidden="true"></span>
                         </button>
 
-                        <div class="lab-nav__panel lab-nav__panel--brands" id="lab-nav-brands-panel">
+                        <div class="lab-nav__panel lab-nav__panel--brands" id="lab-nav-dynamic-panel-3">
                             <div class="lab-nav__panel-grid lab-nav__panel-grid--brands">
                                 <a class="lab-nav__card lab-nav__card--brand" href="/lamborghini-rental-dubai.html">
                                     <span class="lab-nav__card-media lab-nav__card-media--brand">
@@ -150,15 +147,15 @@
                             type="button"
                             class="lab-nav__trigger"
                             aria-expanded="false"
-                            aria-controls="lab-nav-types-panel"
+                            aria-controls="lab-nav-dynamic-panel-4"
                         >
                             <span>Cars Types</span>
                             <span class="lab-nav__chevron" aria-hidden="true"></span>
                         </button>
 
-                        <div class="lab-nav__panel lab-nav__panel--types" id="lab-nav-types-panel">
+                        <div class="lab-nav__panel lab-nav__panel--types" id="lab-nav-dynamic-panel-4">
                             <div class="lab-nav__panel-grid lab-nav__panel-grid--types">
-                                <a class="lab-nav__card lab-nav__card--type" href="/luxury-car-rental-dubai.html">
+                                <a class="lab-nav__card lab-nav__card--type" href="/fleet.html?type=luxury">
                                     <span class="lab-nav__card-media lab-nav__card-media--type">
                                         <img src="/images/categories/mock-fastpng/luxury-stage.png" alt="">
                                     </span>
@@ -168,7 +165,7 @@
                                     </span>
                                 </a>
 
-                                <a class="lab-nav__card lab-nav__card--type" href="/ferrari-rental-dubai.html">
+                                <a class="lab-nav__card lab-nav__card--type" href="/fleet.html?type=convertible">
                                     <span class="lab-nav__card-media lab-nav__card-media--type">
                                         <img src="/images/categories/mock-fastpng/convertible-stage.png" alt="">
                                     </span>
@@ -178,7 +175,7 @@
                                     </span>
                                 </a>
 
-                                <a class="lab-nav__card lab-nav__card--type" href="/supercar-rental-dubai.html">
+                                <a class="lab-nav__card lab-nav__card--type" href="/fleet.html?type=sports">
                                     <span class="lab-nav__card-media lab-nav__card-media--type">
                                         <img src="/images/categories/mock-fastpng/sports-stage.png" alt="">
                                     </span>
@@ -188,17 +185,7 @@
                                     </span>
                                 </a>
 
-                                <a class="lab-nav__card lab-nav__card--type" href="/fleet.html">
-                                    <span class="lab-nav__card-media lab-nav__card-media--type">
-                                        <img src="/images/categories/mock-fastpng/electric-stage.png" alt="">
-                                    </span>
-                                    <span class="lab-nav__card-copy">
-                                        <strong>Electric Cars</strong>
-                                        <span>Quiet torque for cleaner city routes.</span>
-                                    </span>
-                                </a>
-
-                                <a class="lab-nav__card lab-nav__card--type" href="/luxury-car-rental-dubai.html">
+                                <a class="lab-nav__card lab-nav__card--type" href="/fleet.html?type=suv">
                                     <span class="lab-nav__card-media lab-nav__card-media--type">
                                         <img src="/images/categories/mock-fastpng/suv-stage.png" alt="">
                                     </span>
@@ -212,8 +199,13 @@
                     </div>
 
                     <a href="/services.html">Services</a>
+
                     <a href="/locations.html" aria-current="page">Locations</a>
+
                     <a href="/about.html">About Us</a>
+
+                    <a href="/reservation-lookup.html">Find Booking</a>
+
                     <a href="/contact.html">Contact</a>
                 </nav>
             <a href="/app/reserve/page.html" class="lab-reserve">Reserve</a>
@@ -241,7 +233,7 @@
                     </div>
 
                     <nav class="locations-hero__zone-list" aria-label="Priority location guides">
-                                                                        <!-- LOCATIONS_HERO_ZONES_START -->
+                                                                                                <!-- LOCATIONS_HERO_ZONES_START -->
                         <a class="locations-hero__zone" href="./luxury-car-rental-dubai.html">
                             <span>Dubai</span>
                             <strong>Citywide flagship</strong>
@@ -280,16 +272,49 @@
                     <div class="locations-map-card__head">
                         <span class="locations-kicker locations-kicker--dark">Map view</span>
                         <p>Base on the map. Priority guides on the left. Use the map to understand the real starting point before opening the local page.</p>
+                        <a class="locations-map-card__action" href="https://www.google.com/maps/search/?api=1&amp;query=Palm+Jumeirah+Dubai" target="_blank" rel="noopener noreferrer" aria-label="Open Palm Jumeirah base in Google Maps">Open live map</a>
                     </div>
 
-                    <div class="locations-map-card__frame">
-                        <div class="locations-map-card__canvas" role="img" aria-label="Stylized service map showing the Palm Jumeirah base, Dubai Marina, Downtown and airport coverage"></div>
-                        <div class="locations-map-card__pins" aria-hidden="true">
-                            <span class="locations-map-card__pin locations-map-card__pin--base">Palm Jumeirah base</span>
-                            <span class="locations-map-card__pin locations-map-card__pin--waterfront">Marina / JBR</span>
-                            <span class="locations-map-card__pin locations-map-card__pin--city">Downtown / Business Bay</span>
-                            <span class="locations-map-card__pin locations-map-card__pin--airport">DXB / DWC</span>
+                    <div class="locations-map-card__frame" data-locations-map aria-label="Map showing Dynasty Prestige priority service locations across Dubai and Abu Dhabi">
+                        <div class="locations-map-card__tile-layer" data-locations-map-tiles aria-hidden="true"></div>
+                        <div class="locations-map-card__marker-layer" data-locations-map-markers>
+                            <a class="locations-map-card__marker locations-map-card__marker--base" href="./palm-jumeirah-luxury-car-rental.html" data-location-marker data-lat="25.1124" data-lng="55.1390">
+                                <span class="locations-map-card__marker-dot" aria-hidden="true"></span>
+                                <span class="locations-map-card__marker-label">
+                                    <strong>Palm</strong>
+                                    <small>Base</small>
+                                </span>
+                            </a>
+                            <a class="locations-map-card__marker locations-map-card__marker--label-bottom" href="./dubai-marina-luxury-car-rental.html" data-location-marker data-lat="25.0804" data-lng="55.1405">
+                                <span class="locations-map-card__marker-dot" aria-hidden="true"></span>
+                                <span class="locations-map-card__marker-label">
+                                    <strong>Marina</strong>
+                                    <small>Waterfront</small>
+                                </span>
+                            </a>
+                            <a class="locations-map-card__marker locations-map-card__marker--label-top" href="./dubai-airport-luxury-car-rental.html" data-location-marker data-lat="25.2532" data-lng="55.3657">
+                                <span class="locations-map-card__marker-dot" aria-hidden="true"></span>
+                                <span class="locations-map-card__marker-label">
+                                    <strong>DXB</strong>
+                                    <small>Airport</small>
+                                </span>
+                            </a>
+                            <a class="locations-map-card__marker locations-map-card__marker--label-right" href="./dubai-airport-luxury-car-rental.html" data-location-marker data-lat="24.8964" data-lng="55.1614">
+                                <span class="locations-map-card__marker-dot" aria-hidden="true"></span>
+                                <span class="locations-map-card__marker-label">
+                                    <strong>DWC</strong>
+                                    <small>Airport</small>
+                                </span>
+                            </a>
+                            <a class="locations-map-card__marker locations-map-card__marker--label-right" href="./abu-dhabi-luxury-car-rental.html" data-location-marker data-lat="24.4539" data-lng="54.3773">
+                                <span class="locations-map-card__marker-dot" aria-hidden="true"></span>
+                                <span class="locations-map-card__marker-label">
+                                    <strong>Abu Dhabi</strong>
+                                    <small>Capital</small>
+                                </span>
+                            </a>
                         </div>
+                        <span class="locations-map-card__credit">Map tiles &copy; OpenStreetMap contributors</span>
                     </div>
 
                     <section class="locations-map-card__foot" aria-label="Coverage essentials">
@@ -339,7 +364,7 @@
                             </div>
                         </div>
                     </article>
-                                                            <!-- LOCATIONS_GUIDE_CARDS_START -->
+                                                                                <!-- LOCATIONS_GUIDE_CARDS_START -->
                     <article class="locations-guide-card">
                         <span>Capital</span>
                         <h3>Abu Dhabi</h3>
@@ -384,7 +409,7 @@
                 </div>
 
                 <div class="locations-zone-grid">
-                                                            <!-- LOCATIONS_ZONE_CARDS_START -->
+                                                                                <!-- LOCATIONS_ZONE_CARDS_START -->
                     <article class="locations-zone-card">
                         <span>Dubai</span>
                         <h3>City stays and business movement</h3>
@@ -443,7 +468,7 @@
                 </div>
 
                 <ol class="locations-process__list">
-                                                            <!-- LOCATIONS_PROCESS_STEPS_START -->
+                                                                                <!-- LOCATIONS_PROCESS_STEPS_START -->
                     <li class="locations-process__item">
                         <strong>01</strong>
                         <h3>Choose the city or airport</h3>

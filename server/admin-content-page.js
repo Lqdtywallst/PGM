@@ -259,6 +259,11 @@ function renderAdminContentEditorPage() {
         .field select {
             min-height: 52px;
         }
+        .field input[type="color"] {
+            min-height: 52px;
+            padding: 6px;
+            cursor: pointer;
+        }
         .field input:focus,
         .field textarea:focus,
         .field select:focus {
@@ -465,6 +470,321 @@ function renderAdminContentEditorPage() {
             font-size: 0.84rem;
             line-height: 1.55;
         }
+        .style-preview {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);
+            gap: 14px;
+            margin-top: 16px;
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            background: #fffdf9;
+        }
+        .style-preview-hero {
+            position: relative;
+            min-height: 220px;
+            overflow: hidden;
+            border-radius: 14px;
+            color: #fff;
+            background:
+                linear-gradient(135deg, rgba(10, 12, 15, 0.2), rgba(10, 12, 15, 0.84)),
+                radial-gradient(circle at 74% 34%, rgba(220, 180, 88, 0.55), transparent 16rem),
+                linear-gradient(135deg, #1e252c, #07080a);
+        }
+        .style-preview-hero__shade {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.82));
+        }
+        .style-preview-hero__copy {
+            position: absolute;
+            inset: auto 0 0;
+            z-index: 1;
+            padding: 18px;
+        }
+        .style-preview-hero__tag {
+            display: inline-flex;
+            margin-bottom: 10px;
+            padding: 6px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 999px;
+            background: rgba(8, 10, 12, 0.48);
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+        .style-preview-hero h3 {
+            margin: 0 0 8px;
+            max-width: 12ch;
+            font-size: 2.5rem;
+            line-height: 0.92;
+            letter-spacing: -0.04em;
+        }
+        .style-preview-hero p {
+            margin: 0 0 14px;
+            max-width: 30rem;
+            color: rgba(255, 255, 255, 0.82);
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+        .style-preview-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            padding: 0 16px;
+            border-radius: 8px;
+            background: #15191f;
+            color: #fff;
+            font-size: 0.78rem;
+            font-weight: 800;
+            text-decoration: none;
+        }
+        .style-preview-card {
+            display: grid;
+            align-content: start;
+            gap: 12px;
+            padding: 18px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: linear-gradient(180deg, #ffffff, #f5f2ea);
+        }
+        .style-preview-card span {
+            color: #7a5f3a;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+        .style-preview-card strong {
+            display: block;
+            color: #171717;
+            font-size: 2rem;
+            line-height: 1;
+        }
+        .style-preview-card p {
+            margin: 0;
+            color: #514336;
+            line-height: 1.5;
+        }
+        .favicon-picker {
+            display: grid;
+            gap: 14px;
+            padding: 16px;
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.72);
+        }
+        .favicon-current {
+            display: grid;
+            grid-template-columns: 74px minmax(0, 1fr);
+            gap: 14px;
+            align-items: center;
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: #fffdf9;
+        }
+        .favicon-current__media {
+            width: 74px;
+            height: 74px;
+            display: grid;
+            place-items: center;
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            background:
+                linear-gradient(45deg, rgba(23, 18, 13, 0.04) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(23, 18, 13, 0.04) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, rgba(23, 18, 13, 0.04) 75%),
+                linear-gradient(-45deg, transparent 75%, rgba(23, 18, 13, 0.04) 75%);
+            background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+            background-size: 16px 16px;
+        }
+        .favicon-current__media img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+        }
+        .favicon-current strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 1rem;
+        }
+        .favicon-current span {
+            display: block;
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.45;
+            word-break: break-word;
+        }
+        .favicon-option-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+            gap: 10px;
+        }
+        .favicon-option {
+            min-height: 126px;
+            padding: 12px;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: #fffdf9;
+            color: var(--ink);
+            cursor: pointer;
+            display: grid;
+            justify-items: center;
+            align-content: start;
+            gap: 9px;
+            text-align: center;
+            transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+        }
+        .favicon-option:hover,
+        .favicon-option:focus-visible {
+            border-color: rgba(220, 180, 88, 0.68);
+            box-shadow: 0 10px 24px rgba(52, 38, 21, 0.1);
+            outline: none;
+            transform: translateY(-1px);
+        }
+        .favicon-option.is-selected {
+            border-color: rgba(220, 180, 88, 0.95);
+            background: linear-gradient(180deg, #fffdf9, rgba(247, 223, 149, 0.24));
+            box-shadow: 0 0 0 4px rgba(220, 180, 88, 0.14);
+        }
+        .favicon-option__media {
+            width: 52px;
+            height: 52px;
+            display: grid;
+            place-items: center;
+            border-radius: 14px;
+            border: 1px solid rgba(23, 18, 13, 0.1);
+            background: rgba(255, 255, 255, 0.82);
+        }
+        .favicon-option__media img {
+            max-width: 38px;
+            max-height: 38px;
+            object-fit: contain;
+        }
+        .favicon-option strong {
+            display: block;
+            width: 100%;
+            overflow: hidden;
+            color: #2f271f;
+            font-size: 0.78rem;
+            line-height: 1.25;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .favicon-option span {
+            display: block;
+            width: 100%;
+            overflow: hidden;
+            color: var(--muted);
+            font-size: 0.72rem;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .favicon-path-field {
+            margin-top: 14px;
+        }
+        .browser-tab-preview {
+            display: grid;
+            grid-template-columns: 32px minmax(0, 1fr);
+            gap: 12px;
+            align-items: center;
+            max-width: 560px;
+            min-height: 58px;
+            margin-top: 16px;
+            padding: 12px 16px;
+            border: 1px solid var(--line);
+            border-radius: 14px 14px 0 0;
+            background: #fffdf9;
+            box-shadow: 0 10px 20px rgba(52, 38, 21, 0.08);
+        }
+        .browser-tab-preview img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+        }
+        .browser-tab-preview span {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            font-size: 0.88rem;
+        }
+        .audit-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+        }
+        .audit-metric {
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fffdf9;
+        }
+        .audit-metric span {
+            display: block;
+            color: var(--muted);
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .audit-metric strong {
+            display: block;
+            margin-top: 8px;
+            font-size: 1.42rem;
+            line-height: 1;
+        }
+        .audit-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .audit-finding {
+            display: grid;
+            gap: 6px;
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.72);
+        }
+        .audit-finding strong {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 0.92rem;
+        }
+        .audit-finding span,
+        .audit-finding p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.86rem;
+            line-height: 1.5;
+        }
+        .audit-severity {
+            display: inline-flex;
+            align-items: center;
+            min-height: 24px;
+            padding: 0 8px;
+            border-radius: 999px;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .audit-severity--high {
+            background: rgba(182, 64, 53, 0.12);
+            color: var(--danger);
+        }
+        .audit-severity--medium {
+            background: rgba(220, 180, 88, 0.16);
+            color: #6b4a0b;
+        }
+        .audit-severity--low {
+            background: rgba(31, 143, 84, 0.11);
+            color: var(--success);
+        }
         .source-editor {
             min-height: 520px;
             resize: vertical;
@@ -493,6 +813,22 @@ function renderAdminContentEditorPage() {
             top: 86px;
             display: grid;
             gap: 18px;
+            max-height: calc(100vh - 104px);
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            padding-right: 6px;
+            scrollbar-gutter: stable;
+        }
+        .preview-column::-webkit-scrollbar {
+            width: 10px;
+        }
+        .preview-column::-webkit-scrollbar-track {
+            background: rgba(23, 18, 13, 0.06);
+            border-radius: 999px;
+        }
+        .preview-column::-webkit-scrollbar-thumb {
+            background: rgba(116, 104, 93, 0.34);
+            border-radius: 999px;
         }
         .preview-panel {
             border: 1px solid var(--line);
@@ -713,6 +1049,9 @@ function renderAdminContentEditorPage() {
             }
             .preview-column {
                 position: static;
+                max-height: none;
+                overflow: visible;
+                padding-right: 0;
             }
         }
         @media (max-width: 900px) {
@@ -726,6 +1065,12 @@ function renderAdminContentEditorPage() {
             }
             .editor-grid {
                 grid-template-columns: 1fr;
+            }
+            .style-preview {
+                grid-template-columns: 1fr;
+            }
+            .audit-summary-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
             .topbar {
                 align-items: flex-start;
@@ -763,16 +1108,307 @@ function renderAdminContentEditorPage() {
             <aside class="note-card">
                 <strong>What is easy right now</strong>
                 <p>No HTML needed for the sections below:</p>
-                <p>1. Home main message and buttons.</p>
-                <p>2. Fleet cars, prices and sales copy.</p>
-                <p>3. Services cards and route links.</p>
-                <p>4. Locations cards and booking steps.</p>
+                <p>1. Global header tabs, categories and reserve button.</p>
+                <p>2. Visual style controls for colors, fonts and brand pages.</p>
+                <p>3. Home main message and buttons.</p>
+                <p>4. Fleet cars, prices and sales copy.</p>
+                <p>5. Services cards, locations cards and booking steps.</p>
                 <p>Start <code>npm run http</code> if you want the preview on the right to show the live public page.</p>
             </aside>
         </section>
 
         <section class="workspace">
             <div class="stack">
+                <article class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <strong>Global header and navigation</strong>
+                            <span>Add, remove and reorder top navigation links, dropdown categories, quick contact buttons and the main reserve button.</span>
+                        </div>
+                        <span class="panel-kicker">Simple editor</span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="collection-stack">
+                            <div id="headerUtilityLinks"></div>
+                            <div id="headerNavItems"></div>
+                            <div id="headerPrimaryButton"></div>
+                        </div>
+                        <div class="panel-actions">
+                            <button class="button button-primary" id="saveHeaderButton" type="button">Save global header</button>
+                            <button class="button button-secondary" id="reloadHeaderButton" type="button">Reload current values</button>
+                            <a class="button button-secondary" href="http://localhost:8080/index.html" target="_blank" rel="noopener">Open site preview</a>
+                            <div class="status" id="headerStatus" role="status" aria-live="polite"></div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <strong>Browser tab and favicon</strong>
+                            <span>Change the tab title for each page, the SEO description and the favicon used across the site.</span>
+                        </div>
+                        <span class="panel-kicker">Simple editor</span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="field-grid">
+                            <div class="field field--full">
+                                <label for="appearancePageSelect">Page</label>
+                                <select id="appearancePageSelect"></select>
+                            </div>
+                            <div class="field field--full">
+                                <label for="appearanceTitle">Browser tab title</label>
+                                <input id="appearanceTitle" required>
+                            </div>
+                            <div class="field field--full">
+                                <label for="appearanceDescription">SEO description</label>
+                                <textarea id="appearanceDescription" required></textarea>
+                            </div>
+                            <div class="field field--full">
+                                <label>Favicon image</label>
+                                <div class="favicon-picker">
+                                    <div class="favicon-current">
+                                        <div class="favicon-current__media">
+                                            <img id="appearanceFaviconLargePreview" src="/favicon.ico" alt="">
+                                        </div>
+                                        <div>
+                                            <strong id="appearanceFaviconNamePreview">Current favicon</strong>
+                                            <span id="appearanceFaviconPathPreview">/favicon.ico</span>
+                                        </div>
+                                    </div>
+                                    <div class="favicon-option-grid" id="faviconOptionGrid"></div>
+                                    <p class="helper-text">Click one of these images to choose the favicon. The path field below is only for advanced/manual paths.</p>
+                                </div>
+                            </div>
+                            <div class="field field--full favicon-path-field">
+                                <label for="appearanceFaviconHref">Advanced favicon path</label>
+                                <input id="appearanceFaviconHref" list="faviconOptions" required>
+                                <datalist id="faviconOptions"></datalist>
+                            </div>
+                        </div>
+                        <div class="browser-tab-preview" aria-hidden="true">
+                            <img id="appearanceFaviconPreview" src="/favicon.ico" alt="">
+                            <span id="appearanceTitlePreview"></span>
+                        </div>
+                        <div class="panel-actions">
+                            <button class="button button-secondary" id="loadAppearanceButton" type="button">Load selected page</button>
+                            <button class="button button-primary" id="saveAppearanceButton" type="button">Save tab and favicon</button>
+                            <div class="status" id="appearanceStatus" role="status" aria-live="polite"></div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <strong>Consistency audit</strong>
+                            <span>Check whether pages share the same header, favicon, font imports, titles, descriptions and H1 structure.</span>
+                        </div>
+                        <span class="panel-kicker">Quality check</span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="audit-summary-grid" id="auditSummaryGrid">
+                            <div class="audit-metric">
+                                <span>Pages</span>
+                                <strong>-</strong>
+                            </div>
+                            <div class="audit-metric">
+                                <span>Findings</span>
+                                <strong>-</strong>
+                            </div>
+                            <div class="audit-metric">
+                                <span>High</span>
+                                <strong>-</strong>
+                            </div>
+                            <div class="audit-metric">
+                                <span>Medium</span>
+                                <strong>-</strong>
+                            </div>
+                        </div>
+                        <div class="audit-list" id="auditFindingsList">
+                            <p class="helper-text">Run the audit to see whether the public pages are coherent.</p>
+                        </div>
+                        <div class="panel-actions">
+                            <button class="button button-primary" id="runConsistencyAuditButton" type="button">Run consistency audit</button>
+                            <div class="status" id="auditStatus" role="status" aria-live="polite"></div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <strong>Style editor</strong>
+                            <span>Change global look and brand-page proportions from safe controls. The generated CSS includes desktop, tablet and mobile rules.</span>
+                        </div>
+                        <span class="panel-kicker">Visual editor</span>
+                    </div>
+                    <div class="panel-body">
+                        <form id="styleForm">
+                            <div class="collection-stack">
+                                <section class="collection-section">
+                                    <div class="collection-head">
+                                        <div>
+                                            <strong>Global appearance</strong>
+                                            <span>Fonts, accent color, header background, button color and basic corner radius across the public website.</span>
+                                        </div>
+                                    </div>
+                                    <div class="field-grid">
+                                        <div class="field">
+                                            <label for="styleFontSans">Main font</label>
+                                            <select id="styleFontSans">
+                                                <option value="'Manrope', system-ui, sans-serif">Manrope</option>
+                                                <option value="'Inter', system-ui, sans-serif">Inter</option>
+                                                <option value="'Montserrat', system-ui, sans-serif">Montserrat</option>
+                                            </select>
+                                        </div>
+                                        <div class="field">
+                                            <label for="styleFontDisplay">Title font</label>
+                                            <select id="styleFontDisplay">
+                                                <option value="'El Messiri', 'Cormorant Garamond', serif">El Messiri</option>
+                                                <option value="'Cormorant Garamond', Georgia, serif">Cormorant Garamond</option>
+                                                <option value="'Montserrat', system-ui, sans-serif">Montserrat</option>
+                                                <option value="Georgia, 'Times New Roman', serif">Georgia</option>
+                                            </select>
+                                        </div>
+                                        <div class="field">
+                                            <label for="styleAccentColor">Accent color</label>
+                                            <input id="styleAccentColor" type="color">
+                                        </div>
+                                        <div class="field">
+                                            <label for="styleHeaderBackground">Header background</label>
+                                            <input id="styleHeaderBackground" type="color">
+                                        </div>
+                                        <div class="field">
+                                            <label for="styleButtonBackground">Button background</label>
+                                            <input id="styleButtonBackground" type="color">
+                                        </div>
+                                        <div class="field">
+                                            <label for="styleButtonTextColor">Button text</label>
+                                            <input id="styleButtonTextColor" type="color">
+                                        </div>
+                                        <div class="field">
+                                            <label for="styleButtonRadiusPx">Button roundness px</label>
+                                            <input id="styleButtonRadiusPx" type="number" min="0" max="999" step="1">
+                                        </div>
+                                        <div class="field">
+                                            <label for="styleCardRadiusPx">Card roundness px</label>
+                                            <input id="styleCardRadiusPx" type="number" min="0" max="42" step="1">
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <section class="collection-section">
+                                    <div class="collection-head">
+                                        <div>
+                                            <strong>Brand pages</strong>
+                                            <span>Controls for Lamborghini, Ferrari, Mercedes, Porsche and Rolls-Royce landing pages. Mobile values are separate so a big desktop edit does not crush the phone layout.</span>
+                                        </div>
+                                    </div>
+                                    <div class="field-grid">
+                                        <div class="field">
+                                            <label for="styleHeroHeightWideRem">Hero image height desktop rem</label>
+                                            <input id="styleHeroHeightWideRem" type="number" min="18" max="44" step="0.1">
+                                        </div>
+                                        <div class="field">
+                                            <label for="styleHeroHeightLaptopRem">Hero image height laptop rem</label>
+                                            <input id="styleHeroHeightLaptopRem" type="number" min="16" max="38" step="0.1">
+                                        </div>
+                                        <div class="field">
+                                            <label for="styleHeroHeightMobileRem">Hero image height mobile rem</label>
+                                            <input id="styleHeroHeightMobileRem" type="number" min="18" max="38" step="0.1">
+                                        </div>
+                                        <div class="field">
+                                            <label for="styleHeroGapRem">Hero gap rem</label>
+                                            <input id="styleHeroGapRem" type="number" min="0.4" max="3" step="0.1">
+                                        </div>
+                                        <div class="field">
+                                            <label for="styleHeroTitleDesktopRem">Hero title desktop rem</label>
+                                            <input id="styleHeroTitleDesktopRem" type="number" min="1.7" max="5" step="0.1">
+                                        </div>
+                                        <div class="field">
+                                            <label for="styleHeroTitleMobileRem">Hero title mobile rem</label>
+                                            <input id="styleHeroTitleMobileRem" type="number" min="1.8" max="4.4" step="0.1">
+                                        </div>
+                                        <div class="field">
+                                            <label for="styleHeroLeadSizeRem">Subtitle size rem</label>
+                                            <input id="styleHeroLeadSizeRem" type="number" min="0.72" max="1.35" step="0.01">
+                                        </div>
+                                        <div class="field">
+                                            <label for="styleBookingMinWidthPx">Booking card width px</label>
+                                            <input id="styleBookingMinWidthPx" type="number" min="260" max="460" step="1">
+                                        </div>
+                                        <div class="field">
+                                            <label for="styleBookingPaddingRem">Booking padding rem</label>
+                                            <input id="styleBookingPaddingRem" type="number" min="0.8" max="2.4" step="0.05">
+                                        </div>
+                                        <div class="field">
+                                            <label for="styleBookingPriceSizeRem">Price size rem</label>
+                                            <input id="styleBookingPriceSizeRem" type="number" min="1.8" max="4.4" step="0.1">
+                                        </div>
+                                        <div class="field">
+                                            <label for="styleBrandBorderRadiusPx">Brand page roundness px</label>
+                                            <input id="styleBrandBorderRadiusPx" type="number" min="0" max="40" step="1">
+                                        </div>
+                                        <div class="field">
+                                            <label for="styleBrandButtonBackground">Brand button background</label>
+                                            <input id="styleBrandButtonBackground" type="color">
+                                        </div>
+                                        <div class="field">
+                                            <label for="styleBrandButtonTextColor">Brand button text</label>
+                                            <input id="styleBrandButtonTextColor" type="color">
+                                        </div>
+                                        <div class="field">
+                                            <label for="styleOverlayDarkness">Image darkness</label>
+                                            <input id="styleOverlayDarkness" type="number" min="0.35" max="0.95" step="0.01">
+                                        </div>
+                                        <div class="field">
+                                            <label>Hero button</label>
+                                            <div class="checkbox-field">
+                                                <input id="styleShowHeroCta" type="checkbox">
+                                                <span>Show hero CTA button</span>
+                                            </div>
+                                        </div>
+                                        <div class="field">
+                                            <label>Secondary booking button</label>
+                                            <div class="checkbox-field">
+                                                <input id="styleShowBookingSecondary" type="checkbox">
+                                                <span>Show secondary booking action</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+
+                            <div class="style-preview" id="stylePreview" aria-hidden="true">
+                                <div class="style-preview-hero" id="stylePreviewHero">
+                                    <div class="style-preview-hero__shade" id="stylePreviewShade"></div>
+                                    <div class="style-preview-hero__copy">
+                                        <span class="style-preview-hero__tag" id="stylePreviewTag">Lamborghini in Dubai</span>
+                                        <h3 id="stylePreviewTitle">Rent a Lamborghini in Dubai</h3>
+                                        <p id="stylePreviewLead">Fast visual preview of the hero title, overlay, radius and button style.</p>
+                                        <span class="style-preview-button" id="stylePreviewButton">Check availability</span>
+                                    </div>
+                                </div>
+                                <div class="style-preview-card" id="stylePreviewCard">
+                                    <span>From per day</span>
+                                    <strong id="stylePreviewPrice">3,200 AED</strong>
+                                    <p>Booking card preview. Desktop and mobile values are saved together.</p>
+                                    <span class="style-preview-button" id="stylePreviewCardButton">Check availability</span>
+                                    <span class="style-preview-button style-preview-button--secondary" id="stylePreviewSecondaryButton">WhatsApp confirmation</span>
+                                </div>
+                            </div>
+
+                            <div class="panel-actions">
+                                <button class="button button-primary" id="saveStyleButton" type="button">Save style editor</button>
+                                <button class="button button-secondary" id="reloadStyleButton" type="button">Reload current values</button>
+                                <a class="button button-secondary" href="http://localhost:8080/lamborghini-rental-dubai.html" target="_blank" rel="noopener">Open brand preview</a>
+                                <div class="status" id="styleStatus" role="status" aria-live="polite"></div>
+                            </div>
+                        </form>
+                    </div>
+                </article>
+
                 <article class="panel">
                     <div class="panel-header">
                         <div class="panel-title">
@@ -1002,6 +1638,9 @@ function renderAdminContentEditorPage() {
     <script>
         (function () {
             var state = {
+                header: null,
+                appearance: null,
+                style: null,
                 home: null,
                 fleet: [],
                 services: null,
@@ -1044,6 +1683,150 @@ function renderAdminContentEditorPage() {
 
             function cloneData(value) {
                 return JSON.parse(JSON.stringify(value));
+            }
+
+            var styleDefaults = {
+                global: {
+                    fontSans: "'Manrope', system-ui, sans-serif",
+                    fontDisplay: "'El Messiri', 'Cormorant Garamond', serif",
+                    accentColor: '#e3f655',
+                    headerBackground: '#08090c',
+                    buttonBackground: '#e3f655',
+                    buttonTextColor: '#101010',
+                    buttonRadiusPx: 999,
+                    cardRadiusPx: 8
+                },
+                brandPages: {
+                    heroHeightWideRem: 26.5,
+                    heroHeightLaptopRem: 22.4,
+                    heroHeightMobileRem: 25,
+                    heroGapRem: 1,
+                    heroTitleDesktopRem: 3.05,
+                    heroTitleMobileRem: 3.2,
+                    heroLeadSizeRem: 0.9,
+                    bookingMinWidthPx: 300,
+                    bookingPaddingRem: 1.25,
+                    bookingPriceSizeRem: 2.75,
+                    borderRadiusPx: 8,
+                    buttonBackground: '#15191f',
+                    buttonTextColor: '#ffffff',
+                    overlayDarkness: 0.9,
+                    showHeroCta: true,
+                    showBookingSecondary: false
+                }
+            };
+
+            function setInputValue(id, value) {
+                document.getElementById(id).value = value == null ? '' : value;
+            }
+
+            function readNumberInput(id, fallback) {
+                var value = Number.parseFloat(document.getElementById(id).value);
+                return Number.isFinite(value) ? value : fallback;
+            }
+
+            function readColorInput(id, fallback) {
+                var value = document.getElementById(id).value.trim();
+                return value || fallback;
+            }
+
+            function renderStyleForm(style) {
+                var safeStyle = style || styleDefaults;
+                var global = Object.assign({}, styleDefaults.global, safeStyle.global || {});
+                var brandPages = Object.assign({}, styleDefaults.brandPages, safeStyle.brandPages || {});
+
+                state.style = { global: global, brandPages: brandPages };
+                setInputValue('styleFontSans', global.fontSans);
+                setInputValue('styleFontDisplay', global.fontDisplay);
+                setInputValue('styleAccentColor', global.accentColor);
+                setInputValue('styleHeaderBackground', global.headerBackground);
+                setInputValue('styleButtonBackground', global.buttonBackground);
+                setInputValue('styleButtonTextColor', global.buttonTextColor);
+                setInputValue('styleButtonRadiusPx', global.buttonRadiusPx);
+                setInputValue('styleCardRadiusPx', global.cardRadiusPx);
+                setInputValue('styleHeroHeightWideRem', brandPages.heroHeightWideRem);
+                setInputValue('styleHeroHeightLaptopRem', brandPages.heroHeightLaptopRem);
+                setInputValue('styleHeroHeightMobileRem', brandPages.heroHeightMobileRem);
+                setInputValue('styleHeroGapRem', brandPages.heroGapRem);
+                setInputValue('styleHeroTitleDesktopRem', brandPages.heroTitleDesktopRem);
+                setInputValue('styleHeroTitleMobileRem', brandPages.heroTitleMobileRem);
+                setInputValue('styleHeroLeadSizeRem', brandPages.heroLeadSizeRem);
+                setInputValue('styleBookingMinWidthPx', brandPages.bookingMinWidthPx);
+                setInputValue('styleBookingPaddingRem', brandPages.bookingPaddingRem);
+                setInputValue('styleBookingPriceSizeRem', brandPages.bookingPriceSizeRem);
+                setInputValue('styleBrandBorderRadiusPx', brandPages.borderRadiusPx);
+                setInputValue('styleBrandButtonBackground', brandPages.buttonBackground);
+                setInputValue('styleBrandButtonTextColor', brandPages.buttonTextColor);
+                setInputValue('styleOverlayDarkness', brandPages.overlayDarkness);
+                document.getElementById('styleShowHeroCta').checked = Boolean(brandPages.showHeroCta);
+                document.getElementById('styleShowBookingSecondary').checked = Boolean(brandPages.showBookingSecondary);
+                updateStylePreview();
+            }
+
+            function getStyleValues() {
+                return {
+                    global: {
+                        fontSans: document.getElementById('styleFontSans').value,
+                        fontDisplay: document.getElementById('styleFontDisplay').value,
+                        accentColor: readColorInput('styleAccentColor', styleDefaults.global.accentColor),
+                        headerBackground: readColorInput('styleHeaderBackground', styleDefaults.global.headerBackground),
+                        buttonBackground: readColorInput('styleButtonBackground', styleDefaults.global.buttonBackground),
+                        buttonTextColor: readColorInput('styleButtonTextColor', styleDefaults.global.buttonTextColor),
+                        buttonRadiusPx: readNumberInput('styleButtonRadiusPx', styleDefaults.global.buttonRadiusPx),
+                        cardRadiusPx: readNumberInput('styleCardRadiusPx', styleDefaults.global.cardRadiusPx)
+                    },
+                    brandPages: {
+                        heroHeightWideRem: readNumberInput('styleHeroHeightWideRem', styleDefaults.brandPages.heroHeightWideRem),
+                        heroHeightLaptopRem: readNumberInput('styleHeroHeightLaptopRem', styleDefaults.brandPages.heroHeightLaptopRem),
+                        heroHeightMobileRem: readNumberInput('styleHeroHeightMobileRem', styleDefaults.brandPages.heroHeightMobileRem),
+                        heroGapRem: readNumberInput('styleHeroGapRem', styleDefaults.brandPages.heroGapRem),
+                        heroTitleDesktopRem: readNumberInput('styleHeroTitleDesktopRem', styleDefaults.brandPages.heroTitleDesktopRem),
+                        heroTitleMobileRem: readNumberInput('styleHeroTitleMobileRem', styleDefaults.brandPages.heroTitleMobileRem),
+                        heroLeadSizeRem: readNumberInput('styleHeroLeadSizeRem', styleDefaults.brandPages.heroLeadSizeRem),
+                        bookingMinWidthPx: readNumberInput('styleBookingMinWidthPx', styleDefaults.brandPages.bookingMinWidthPx),
+                        bookingPaddingRem: readNumberInput('styleBookingPaddingRem', styleDefaults.brandPages.bookingPaddingRem),
+                        bookingPriceSizeRem: readNumberInput('styleBookingPriceSizeRem', styleDefaults.brandPages.bookingPriceSizeRem),
+                        borderRadiusPx: readNumberInput('styleBrandBorderRadiusPx', styleDefaults.brandPages.borderRadiusPx),
+                        buttonBackground: readColorInput('styleBrandButtonBackground', styleDefaults.brandPages.buttonBackground),
+                        buttonTextColor: readColorInput('styleBrandButtonTextColor', styleDefaults.brandPages.buttonTextColor),
+                        overlayDarkness: readNumberInput('styleOverlayDarkness', styleDefaults.brandPages.overlayDarkness),
+                        showHeroCta: document.getElementById('styleShowHeroCta').checked,
+                        showBookingSecondary: document.getElementById('styleShowBookingSecondary').checked
+                    }
+                };
+            }
+
+            function updateStylePreview() {
+                var style = getStyleValues();
+                var global = style.global;
+                var brandPages = style.brandPages;
+                var overlaySoft = Math.max(0.08, brandPages.overlayDarkness - 0.78);
+                var overlayMid = Math.max(0.22, brandPages.overlayDarkness - 0.42);
+
+                document.getElementById('stylePreviewHero').style.minHeight = Math.round(brandPages.heroHeightWideRem * 8) + 'px';
+                document.getElementById('stylePreviewHero').style.borderRadius = brandPages.borderRadiusPx + 'px';
+                document.getElementById('stylePreviewShade').style.background =
+                    'linear-gradient(180deg, rgba(0,0,0,' + overlaySoft + '), rgba(0,0,0,' + brandPages.overlayDarkness + '))';
+                document.getElementById('stylePreviewTitle').style.fontFamily = global.fontDisplay;
+                document.getElementById('stylePreviewTitle').style.fontSize = brandPages.heroTitleDesktopRem + 'rem';
+                document.getElementById('stylePreviewLead').style.fontSize = brandPages.heroLeadSizeRem + 'rem';
+                document.getElementById('stylePreviewTag').style.color = global.accentColor;
+                document.getElementById('stylePreviewCard').style.borderRadius = brandPages.borderRadiusPx + 'px';
+                document.getElementById('stylePreviewCard').style.padding = brandPages.bookingPaddingRem + 'rem';
+                document.getElementById('stylePreviewPrice').style.fontSize = brandPages.bookingPriceSizeRem + 'rem';
+                document.querySelectorAll('.style-preview-button').forEach(function (button) {
+                    var isSecondaryBookingButton = button.id === 'stylePreviewSecondaryButton';
+                    var isBrandButton = button.id === 'stylePreviewButton' || button.id === 'stylePreviewCardButton' || isSecondaryBookingButton;
+                    button.style.background = isSecondaryBookingButton ? 'transparent' : (isBrandButton ? brandPages.buttonBackground : global.buttonBackground);
+                    button.style.color = isSecondaryBookingButton ? brandPages.buttonBackground : (isBrandButton ? brandPages.buttonTextColor : global.buttonTextColor);
+                    button.style.border = isSecondaryBookingButton ? '1px solid ' + brandPages.buttonBackground : '1px solid transparent';
+                    button.style.borderRadius = (isBrandButton ? brandPages.borderRadiusPx : global.buttonRadiusPx) + 'px';
+                    button.style.display =
+                        (button.id === 'stylePreviewButton' && !brandPages.showHeroCta) ||
+                        (isSecondaryBookingButton && !brandPages.showBookingSecondary)
+                            ? 'none'
+                            : 'inline-flex';
+                });
             }
 
             var servicesLaneFields = [
@@ -1092,6 +1875,20 @@ function renderAdminContentEditorPage() {
                                 '<input type="checkbox" data-field="' + escapeHtml(field.key) + '"' + (value ? ' checked' : '') + '>',
                                 '<span>' + escapeHtml(field.label) + '</span>',
                             '</div>',
+                        '</div>'
+                    ].join('');
+                }
+
+                if (field.type === 'select') {
+                    return [
+                        '<div class="' + wrapperClass + '">',
+                            '<label>' + escapeHtml(field.label) + '</label>',
+                            '<select data-field="' + escapeHtml(field.key) + '">',
+                                (field.options || []).map(function (option) {
+                                    var selected = String(option.value) === String(value) ? ' selected' : '';
+                                    return '<option value="' + escapeHtml(option.value) + '"' + selected + '>' + escapeHtml(option.label) + '</option>';
+                                }).join(''),
+                            '</select>',
                         '</div>'
                     ].join('');
                 }
@@ -1176,7 +1973,7 @@ function renderAdminContentEditorPage() {
             }
 
             function getFlatCollectionValues(rootId, fields) {
-                return Array.from(document.querySelectorAll('#' + rootId + ' [data-item-index]')).map(function (itemElement) {
+                return Array.from(document.querySelectorAll('#' + rootId + ' details[data-item-index]')).map(function (itemElement) {
                     var nextItem = {};
 
                     fields.forEach(function (field) {
@@ -1242,7 +2039,7 @@ function renderAdminContentEditorPage() {
             }
 
             function getZoneCardCollectionValues(rootId) {
-                return Array.from(document.querySelectorAll('#' + rootId + ' [data-item-index]')).map(function (itemElement) {
+                return Array.from(document.querySelectorAll('#' + rootId + ' details[data-item-index]')).map(function (itemElement) {
                     function read(key) {
                         var field = itemElement.querySelector('[data-field="' + key + '"]');
                         return field ? field.value.trim() : '';
@@ -1301,6 +2098,37 @@ function renderAdminContentEditorPage() {
                 }
 
                 return nextItems;
+            }
+
+            function openCollectionItem(rootId, itemIndex) {
+                var item = document.querySelector('#' + rootId + ' details[data-item-index="' + itemIndex + '"]');
+                if (item) {
+                    item.open = true;
+                }
+            }
+
+            function collectionOpenIndex(action, index, beforeLength, afterLength) {
+                if (action === 'add') {
+                    return Math.max(0, afterLength - 1);
+                }
+
+                if (action === 'duplicate') {
+                    return Math.min(index + 1, afterLength - 1);
+                }
+
+                if (action === 'move-up') {
+                    return Math.max(0, index - 1);
+                }
+
+                if (action === 'move-down') {
+                    return Math.min(afterLength - 1, index + 1);
+                }
+
+                if (action === 'delete') {
+                    return Math.min(index, afterLength - 1);
+                }
+
+                return Math.min(index, Math.max(0, beforeLength - 1));
             }
 
             function bindCollectionInteractions(rootId, onAction, statusId, dirtyMessage) {
@@ -1418,6 +2246,11 @@ function renderAdminContentEditorPage() {
 
             function mutateServicesCollection(collectionKey, action, index) {
                 state.services = getServicesValues();
+                var rootIds = {
+                    lanes: 'servicesLanes',
+                    additionalRoutes: 'servicesAdditionalRoutes',
+                    guideRoutes: 'servicesGuideRoutes'
+                };
                 var blanks = {
                     lanes: {
                         navLabel: '',
@@ -1438,13 +2271,22 @@ function renderAdminContentEditorPage() {
                     guideRoutes: { eyebrow: '', title: '', copy: '', href: './services.html' }
                 };
 
+                var beforeLength = (state.services[collectionKey] || []).length;
                 state.services[collectionKey] = reorderCollection(state.services[collectionKey], action, index, blanks[collectionKey]);
+                var openIndex = collectionOpenIndex(action, index, beforeLength, state.services[collectionKey].length);
                 renderServicesEditor(state.services);
                 bindServicesEditor();
+                openCollectionItem(rootIds[collectionKey], openIndex);
             }
 
             function mutateLocationsCollection(collectionKey, action, index) {
                 state.locations = getLocationsValues();
+                var rootIds = {
+                    heroZones: 'locationsHeroZones',
+                    guideCards: 'locationsGuideCards',
+                    zoneCards: 'locationsZoneCards',
+                    processSteps: 'locationsProcessSteps'
+                };
                 var blanks = {
                     heroZones: { label: '', title: '', copy: '', href: './locations.html' },
                     guideCards: { label: '', title: '', copy: '', href: './locations.html' },
@@ -1457,9 +2299,12 @@ function renderAdminContentEditorPage() {
                     processSteps: { title: '', copy: '' }
                 };
 
+                var beforeLength = (state.locations[collectionKey] || []).length;
                 state.locations[collectionKey] = reorderCollection(state.locations[collectionKey], action, index, blanks[collectionKey]);
+                var openIndex = collectionOpenIndex(action, index, beforeLength, state.locations[collectionKey].length);
                 renderLocationsEditor(state.locations);
                 bindLocationsEditor();
+                openCollectionItem(rootIds[collectionKey], openIndex);
             }
 
             function bindServicesEditor() {
@@ -1487,6 +2332,492 @@ function renderAdminContentEditorPage() {
                 bindCollectionInteractions('locationsProcessSteps', function (action, index) {
                     mutateLocationsCollection('processSteps', action, index);
                 }, 'locationsStatus', 'Locations changed locally but not saved yet.');
+            }
+
+            var headerUtilityFields = [
+                {
+                    key: 'kind',
+                    label: 'Button type',
+                    type: 'select',
+                    options: [
+                        { value: 'call', label: 'Call' },
+                        { value: 'email', label: 'Email' },
+                        { value: 'whatsapp', label: 'WhatsApp' },
+                        { value: 'custom', label: 'Custom' }
+                    ]
+                },
+                { key: 'label', label: 'Button label' },
+                { key: 'href', label: 'Button link', full: true },
+                { key: 'ariaLabel', label: 'Accessibility label', full: true },
+                { key: 'visible', label: 'Visible', type: 'checkbox' }
+            ];
+
+            var quickButtonDefaults = {
+                phoneDigits: '971586122568',
+                email: 'prestigegoalmotion@gmail.com'
+            };
+
+            function extractQuickButtonPhoneDigits(value) {
+                var digits = String(value || '').replace(/\\D/g, '');
+                return digits || quickButtonDefaults.phoneDigits;
+            }
+
+            function extractQuickButtonEmail(value) {
+                var match = String(value || '').match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/i);
+                return match ? match[0] : quickButtonDefaults.email;
+            }
+
+            function quickButtonPreset(kind, href) {
+                if (kind === 'call') {
+                    return {
+                        label: 'Call',
+                        href: 'tel:+' + extractQuickButtonPhoneDigits(href),
+                        ariaLabel: 'Call Dynasty Prestige'
+                    };
+                }
+
+                if (kind === 'email') {
+                    return {
+                        label: 'Email',
+                        href: 'mailto:' + extractQuickButtonEmail(href),
+                        ariaLabel: 'Email Dynasty Prestige'
+                    };
+                }
+
+                if (kind === 'whatsapp') {
+                    return {
+                        label: 'WhatsApp',
+                        href: 'https://wa.me/' + extractQuickButtonPhoneDigits(href),
+                        ariaLabel: 'Open WhatsApp'
+                    };
+                }
+
+                return {
+                    label: '',
+                    href: 'https://',
+                    ariaLabel: ''
+                };
+            }
+
+            function applyQuickButtonPreset(itemElement, nextKind) {
+                var labelField = itemElement.querySelector('[data-field="label"]');
+                var hrefField = itemElement.querySelector('[data-field="href"]');
+                var ariaField = itemElement.querySelector('[data-field="ariaLabel"]');
+                var preset = quickButtonPreset(nextKind, hrefField ? hrefField.value : '');
+
+                if (labelField && nextKind !== 'custom') {
+                    labelField.value = preset.label;
+                }
+
+                if (hrefField && nextKind !== 'custom') {
+                    hrefField.value = preset.href;
+                } else if (hrefField && !hrefField.value.trim()) {
+                    hrefField.value = preset.href;
+                }
+
+                if (ariaField && nextKind !== 'custom') {
+                    ariaField.value = preset.ariaLabel;
+                }
+
+                itemElement.setAttribute('data-current-kind', nextKind);
+
+                var summaryTitle = itemElement.querySelector('summary strong');
+                var summaryMeta = itemElement.querySelector('summary span');
+                if (summaryTitle && labelField) {
+                    summaryTitle.textContent = labelField.value || 'Button';
+                }
+                if (summaryMeta) {
+                    summaryMeta.textContent = nextKind || 'Choose a button type';
+                }
+            }
+
+            var headerPrimaryFields = [
+                { key: 'label', label: 'Button label' },
+                { key: 'href', label: 'Button link' },
+                { key: 'visible', label: 'Visible', type: 'checkbox', full: true }
+            ];
+
+            var headerNavTypeField = {
+                key: 'itemType',
+                label: 'Navigation type',
+                type: 'select',
+                options: [
+                    { value: 'link', label: 'Simple tab' },
+                    { value: 'mega', label: 'Dropdown category' }
+                ]
+            };
+
+            var headerPanelVariantField = {
+                key: 'panelVariant',
+                label: 'Dropdown style',
+                type: 'select',
+                options: [
+                    { value: 'brands', label: 'Brands' },
+                    { value: 'types', label: 'Types' }
+                ]
+            };
+
+            var headerCardVariantField = {
+                key: 'cardVariant',
+                label: 'Card style',
+                type: 'select',
+                options: [
+                    { value: 'brand', label: 'Brand card' },
+                    { value: 'type', label: 'Type card' }
+                ]
+            };
+
+            function renderHeaderEditor(data) {
+                renderFlatCollection('headerUtilityLinks', {
+                    title: 'Quick contact buttons',
+                    description: 'These are the small top buttons. Choose Call, Email or WhatsApp and the editor keeps the label and link matched.',
+                    addLabel: 'quick button',
+                    itemLabel: 'Button',
+                    items: data.utilityLinks || [],
+                    fields: headerUtilityFields,
+                    getTitle: function (item, index) { return item.label || ('Button ' + (index + 1)); },
+                    getMeta: function (item) { return item.kind || 'Choose a button type'; }
+                });
+
+                renderHeaderNavItems(data.navItems || []);
+                renderHeaderPrimaryButton(data.primaryButton || { label: '', href: '', visible: true });
+            }
+
+            function renderHeaderPrimaryButton(button) {
+                var root = document.getElementById('headerPrimaryButton');
+                root.innerHTML = [
+                    '<section class="collection-section">',
+                        '<div class="collection-head">',
+                            '<div>',
+                                '<strong>Main reserve button</strong>',
+                                '<span>This is the highlighted button on the right side of the header.</span>',
+                            '</div>',
+                        '</div>',
+                        '<div class="editor-grid">',
+                            headerPrimaryFields.map(function (field) {
+                                return fieldMarkup(field, button[field.key]);
+                            }).join(''),
+                        '</div>',
+                    '</section>'
+                ].join('');
+            }
+
+            function renderHeaderNavItems(items) {
+                var root = document.getElementById('headerNavItems');
+                root.innerHTML = [
+                    '<section class="collection-section">',
+                        '<div class="collection-head">',
+                            '<div>',
+                                '<strong>Main navigation</strong>',
+                                '<span>Add or remove simple tabs and dropdown categories. Drag is not needed: use move up and move down.</span>',
+                            '</div>',
+                        '</div>',
+                        '<div class="collection-toolbar">',
+                            '<div class="collection-count">' + escapeHtml(items.length + ' item' + (items.length === 1 ? '' : 's')) + '</div>',
+                            '<button class="mini-button" type="button" data-header-nav-action="add-item">Add navigation item</button>',
+                        '</div>',
+                        '<div class="collection-list">',
+                            (items.map(function (item, index) {
+                                var cards = Array.isArray(item.cards) ? item.cards : [];
+                                var isMega = item.itemType === 'mega';
+                                var openAttribute = index === 0 ? ' open' : '';
+                                return [
+                                    '<details class="editor-item" data-header-nav-item="' + index + '"' + openAttribute + '>',
+                                        '<summary>',
+                                            '<div>',
+                                                '<strong>' + escapeHtml(item.label || ('Navigation item ' + (index + 1))) + '</strong>',
+                                                '<span>' + escapeHtml((isMega ? 'Dropdown category' : 'Simple tab') + (item.href ? ' | ' + item.href : '')) + '</span>',
+                                            '</div>',
+                                            '<span>' + escapeHtml('Item ' + (index + 1)) + '</span>',
+                                        '</summary>',
+                                        '<div class="editor-item-body">',
+                                            '<div class="editor-grid">',
+                                                fieldMarkup(headerNavTypeField, item.itemType || 'link'),
+                                                fieldMarkup({ key: 'label', label: 'Label' }, item.label),
+                                                fieldMarkup({ key: 'href', label: 'Link', full: true }, item.href),
+                                                fieldMarkup({ key: 'visible', label: 'Visible', type: 'checkbox' }, item.visible !== false),
+                                                fieldMarkup(headerPanelVariantField, item.panelVariant || 'brands'),
+                                                fieldMarkup(headerCardVariantField, item.cardVariant || 'brand'),
+                                            '</div>',
+                                            '<div class="item-actions">',
+                                                '<button class="mini-button" type="button" data-header-nav-action="duplicate-item" data-item-index="' + index + '">Duplicate</button>',
+                                                '<button class="mini-button" type="button" data-header-nav-action="move-item-up" data-item-index="' + index + '">Move up</button>',
+                                                '<button class="mini-button" type="button" data-header-nav-action="move-item-down" data-item-index="' + index + '">Move down</button>',
+                                                '<button class="mini-button mini-button--danger" type="button" data-header-nav-action="delete-item" data-item-index="' + index + '">Delete</button>',
+                                            '</div>',
+                                            (isMega ? [
+                                                '<div class="collection-toolbar" style="margin-top:16px;">',
+                                                    '<div class="collection-count">' + escapeHtml(cards.length + ' dropdown card' + (cards.length === 1 ? '' : 's')) + '</div>',
+                                                    '<button class="mini-button" type="button" data-header-nav-action="add-card" data-item-index="' + index + '">Add dropdown card</button>',
+                                                '</div>',
+                                                '<div class="collection-list">',
+                                                    (cards.map(function (card, cardIndex) {
+                                                        return [
+                                                            '<details class="editor-item" data-header-nav-card="' + cardIndex + '" open>',
+                                                                '<summary>',
+                                                                    '<div>',
+                                                                        '<strong>' + escapeHtml(card.title || ('Card ' + (cardIndex + 1))) + '</strong>',
+                                                                        '<span>' + escapeHtml(card.href || 'Set the card link and image') + '</span>',
+                                                                    '</div>',
+                                                                    '<span>' + escapeHtml('Card ' + (cardIndex + 1)) + '</span>',
+                                                                '</summary>',
+                                                                '<div class="editor-item-body">',
+                                                                    '<div class="editor-grid">',
+                                                                        fieldMarkup({ key: 'card-title', label: 'Title' }, card.title),
+                                                                        fieldMarkup({ key: 'card-href', label: 'Link' }, card.href),
+                                                                        fieldMarkup({ key: 'card-description', label: 'Description', type: 'textarea', full: true }, card.description),
+                                                                        fieldMarkup({ key: 'card-imageSrc', label: 'Image path', full: true }, card.imageSrc),
+                                                                        fieldMarkup({ key: 'card-imageAlt', label: 'Image alt text', full: true }, card.imageAlt),
+                                                                        fieldMarkup({ key: 'card-visible', label: 'Visible', type: 'checkbox' }, card.visible !== false),
+                                                                    '</div>',
+                                                                    '<div class="item-actions">',
+                                                                        '<button class="mini-button" type="button" data-header-nav-action="duplicate-card" data-item-index="' + index + '" data-card-index="' + cardIndex + '">Duplicate card</button>',
+                                                                        '<button class="mini-button" type="button" data-header-nav-action="move-card-up" data-item-index="' + index + '" data-card-index="' + cardIndex + '">Move up</button>',
+                                                                        '<button class="mini-button" type="button" data-header-nav-action="move-card-down" data-item-index="' + index + '" data-card-index="' + cardIndex + '">Move down</button>',
+                                                                        '<button class="mini-button mini-button--danger" type="button" data-header-nav-action="delete-card" data-item-index="' + index + '" data-card-index="' + cardIndex + '">Delete card</button>',
+                                                                    '</div>',
+                                                                '</div>',
+                                                            '</details>'
+                                                        ].join('');
+                                                    }).join('')) || '<p class="helper-text">This dropdown is empty. Add the first card.</p>',
+                                                '</div>'
+                                            ].join('') : '<p class="helper-text" style="margin-top:14px;">Simple tabs only need label, link and visibility.</p>'),
+                                        '</div>',
+                                    '</details>'
+                                ].join('');
+                            }).join('')) || '<p class="helper-text">No navigation items yet. Add one to start building the header.</p>',
+                        '</div>',
+                    '</section>'
+                ].join('');
+            }
+
+            function getHeaderValues() {
+                return {
+                    utilityLinks: getFlatCollectionValues('headerUtilityLinks', headerUtilityFields),
+                    navItems: Array.from(document.querySelectorAll('#headerNavItems [data-header-nav-item]')).map(function (itemElement) {
+                        var itemIndex = Number(itemElement.getAttribute('data-header-nav-item'));
+                        function read(fieldName) {
+                            var field = itemElement.querySelector('[data-field="' + fieldName + '"]');
+                            if (!field) {
+                                return '';
+                            }
+                            if (field.type === 'checkbox') {
+                                return Boolean(field.checked);
+                            }
+                            return field.value.trim();
+                        }
+
+                        var itemType = read('itemType') || 'link';
+                        var cards = Array.from(itemElement.querySelectorAll('[data-header-nav-card]')).map(function (cardElement) {
+                            function cardRead(name) {
+                                var field = cardElement.querySelector('[data-field="' + name + '"]');
+                                if (!field) {
+                                    return '';
+                                }
+                                if (field.type === 'checkbox') {
+                                    return Boolean(field.checked);
+                                }
+                                return field.value.trim();
+                            }
+
+                            return {
+                                title: cardRead('card-title'),
+                                href: cardRead('card-href'),
+                                description: cardRead('card-description'),
+                                imageSrc: cardRead('card-imageSrc'),
+                                imageAlt: cardRead('card-imageAlt'),
+                                visible: cardRead('card-visible')
+                            };
+                        });
+                        var nextItem = {
+                            itemType: itemType,
+                            label: read('label'),
+                            href: read('href'),
+                            visible: read('visible'),
+                            panelVariant: read('panelVariant') || 'brands',
+                            cardVariant: read('cardVariant') || 'brand',
+                            cards: cards
+                        };
+
+                        return nextItem;
+                    }),
+                    primaryButton: {
+                        label: document.querySelector('#headerPrimaryButton [data-field="label"]').value.trim(),
+                        href: document.querySelector('#headerPrimaryButton [data-field="href"]').value.trim(),
+                        visible: Boolean(document.querySelector('#headerPrimaryButton [data-field="visible"]').checked)
+                    }
+                };
+            }
+
+            function blankHeaderDropdownCard() {
+                return {
+                    title: '',
+                    href: '/new-page.html',
+                    description: '',
+                    imageSrc: '/images/brands/lamborghini-mark.png',
+                    imageAlt: '',
+                    visible: true
+                };
+            }
+
+            function openHeaderNavItem(itemIndex) {
+                var item = document.querySelector('#headerNavItems [data-header-nav-item="' + itemIndex + '"]');
+                if (item) {
+                    item.open = true;
+                }
+            }
+
+            function applyHeaderNavTypeChange(itemElement, nextType) {
+                if (!itemElement) {
+                    return;
+                }
+
+                var itemIndex = Number(itemElement.getAttribute('data-header-nav-item'));
+                var previousItem = state.header && state.header.navItems
+                    ? cloneData(state.header.navItems[itemIndex] || {})
+                    : {};
+
+                state.header = getHeaderValues();
+
+                if (!state.header.navItems[itemIndex]) {
+                    return;
+                }
+
+                state.header.navItems[itemIndex].itemType = nextType;
+
+                if (nextType === 'mega') {
+                    var existingCards = state.header.navItems[itemIndex].cards.length
+                        ? state.header.navItems[itemIndex].cards
+                        : (Array.isArray(previousItem.cards) ? previousItem.cards : []);
+                    state.header.navItems[itemIndex].cards = existingCards.length ? existingCards : [blankHeaderDropdownCard()];
+                }
+
+                renderHeaderEditor(state.header);
+                bindHeaderEditor();
+                openHeaderNavItem(itemIndex);
+            }
+
+            function mutateHeaderNav(action, itemIndex, cardIndex) {
+                state.header = getHeaderValues();
+                var openIndex = itemIndex;
+
+                if (action === 'add-item') {
+                    state.header.navItems.push({
+                        itemType: 'link',
+                        label: '',
+                        href: '/new-page.html',
+                        visible: true,
+                        panelVariant: 'brands',
+                        cardVariant: 'brand',
+                        cards: []
+                    });
+                    openIndex = state.header.navItems.length - 1;
+                } else if (action === 'duplicate-item' && itemIndex >= 0) {
+                    state.header.navItems.splice(itemIndex + 1, 0, cloneData(state.header.navItems[itemIndex]));
+                    openIndex = itemIndex + 1;
+                } else if (action === 'delete-item' && itemIndex >= 0) {
+                    state.header.navItems.splice(itemIndex, 1);
+                    openIndex = Math.min(itemIndex, state.header.navItems.length - 1);
+                } else if (action === 'move-item-up' && itemIndex > 0) {
+                    var previousItem = state.header.navItems[itemIndex - 1];
+                    state.header.navItems[itemIndex - 1] = state.header.navItems[itemIndex];
+                    state.header.navItems[itemIndex] = previousItem;
+                    openIndex = itemIndex - 1;
+                } else if (action === 'move-item-down' && itemIndex >= 0 && itemIndex < state.header.navItems.length - 1) {
+                    var nextItem = state.header.navItems[itemIndex + 1];
+                    state.header.navItems[itemIndex + 1] = state.header.navItems[itemIndex];
+                    state.header.navItems[itemIndex] = nextItem;
+                    openIndex = itemIndex + 1;
+                } else if (action === 'add-card' && itemIndex >= 0) {
+                    state.header.navItems[itemIndex].itemType = 'mega';
+                    state.header.navItems[itemIndex].cards = state.header.navItems[itemIndex].cards || [];
+                    state.header.navItems[itemIndex].cards.push(blankHeaderDropdownCard());
+                } else if (cardIndex >= 0 && itemIndex >= 0) {
+                    var cards = state.header.navItems[itemIndex].cards || [];
+                    if (action === 'duplicate-card') {
+                        cards.splice(cardIndex + 1, 0, cloneData(cards[cardIndex]));
+                    } else if (action === 'delete-card') {
+                        cards.splice(cardIndex, 1);
+                    } else if (action === 'move-card-up' && cardIndex > 0) {
+                        var previousCard = cards[cardIndex - 1];
+                        cards[cardIndex - 1] = cards[cardIndex];
+                        cards[cardIndex] = previousCard;
+                    } else if (action === 'move-card-down' && cardIndex < cards.length - 1) {
+                        var nextCard = cards[cardIndex + 1];
+                        cards[cardIndex + 1] = cards[cardIndex];
+                        cards[cardIndex] = nextCard;
+                    }
+                }
+
+                renderHeaderEditor(state.header);
+                bindHeaderEditor();
+                if (openIndex >= 0) {
+                    openHeaderNavItem(openIndex);
+                }
+            }
+
+            function bindHeaderEditor() {
+                bindCollectionInteractions('headerUtilityLinks', function (action, index) {
+                    state.header = getHeaderValues();
+                    var beforeLength = state.header.utilityLinks.length;
+                    state.header.utilityLinks = reorderCollection(state.header.utilityLinks, action, index, {
+                        kind: 'custom',
+                        label: '',
+                        href: 'https://',
+                        ariaLabel: '',
+                        visible: true
+                    });
+                    var openIndex = collectionOpenIndex(action, index, beforeLength, state.header.utilityLinks.length);
+                    renderHeaderEditor(state.header);
+                    bindHeaderEditor();
+                    openCollectionItem('headerUtilityLinks', openIndex);
+                }, 'headerStatus', 'Header changed locally but not saved yet.');
+
+                var utilityRoot = document.getElementById('headerUtilityLinks');
+                Array.from(utilityRoot.querySelectorAll('[data-item-index]')).forEach(function (itemElement) {
+                    var kindField = itemElement.querySelector('[data-field="kind"]');
+                    itemElement.setAttribute('data-current-kind', kindField ? kindField.value : 'custom');
+                });
+                utilityRoot.onchange = function (event) {
+                    var kindField = event.target.closest('[data-field="kind"]');
+                    if (kindField) {
+                        applyQuickButtonPreset(kindField.closest('[data-item-index]'), kindField.value);
+                    }
+                    setStatus('headerStatus', 'Header changed locally but not saved yet.');
+                };
+
+                var navRoot = document.getElementById('headerNavItems');
+                navRoot.onclick = function (event) {
+                    var button = event.target.closest('[data-header-nav-action]');
+                    if (!button) {
+                        return;
+                    }
+
+                    mutateHeaderNav(
+                        button.getAttribute('data-header-nav-action'),
+                        Number(button.getAttribute('data-item-index')),
+                        Number(button.getAttribute('data-card-index'))
+                    );
+                    setStatus('headerStatus', 'Header changed locally but not saved yet.');
+                };
+                navRoot.oninput = function () {
+                    setStatus('headerStatus', 'Header changed locally but not saved yet.');
+                };
+                navRoot.onchange = function (event) {
+                    var typeField = event.target.closest('[data-field="itemType"]');
+                    if (typeField) {
+                        applyHeaderNavTypeChange(typeField.closest('[data-header-nav-item]'), typeField.value);
+                    }
+                    setStatus('headerStatus', 'Header changed locally but not saved yet.');
+                };
+
+                var primaryRoot = document.getElementById('headerPrimaryButton');
+                primaryRoot.oninput = function () {
+                    setStatus('headerStatus', 'Header changed locally but not saved yet.');
+                };
+                primaryRoot.onchange = function () {
+                    setStatus('headerStatus', 'Header changed locally but not saved yet.');
+                };
             }
 
             function getHomeValues() {
@@ -1660,6 +2991,115 @@ function renderAdminContentEditorPage() {
                 }).join('');
             }
 
+            function renderAppearancePageOptions(pages) {
+                var select = document.getElementById('appearancePageSelect');
+                select.innerHTML = pages.map(function (page) {
+                    return '<option value="' + escapeHtml(page.publicPath) + '">' +
+                        escapeHtml(page.label + ' | ' + page.publicPath) +
+                        '</option>';
+                }).join('');
+            }
+
+            function renderFaviconOptions(options) {
+                var list = document.getElementById('faviconOptions');
+                var grid = document.getElementById('faviconOptionGrid');
+                var selectedHref = document.getElementById('appearanceFaviconHref').value || '/favicon.ico';
+
+                list.innerHTML = (options || []).map(function (option) {
+                    return '<option value="' + escapeHtml(option.href) + '">' + escapeHtml(option.label) + '</option>';
+                }).join('');
+
+                grid.innerHTML = (options || []).map(function (option) {
+                    var selectedClass = option.href === selectedHref ? ' is-selected' : '';
+                    return [
+                        '<button class="favicon-option' + selectedClass + '" type="button" data-favicon-option="' + escapeHtml(option.href) + '">',
+                            '<span class="favicon-option__media">',
+                                '<img src="' + escapeHtml(option.href) + '" alt="">',
+                            '</span>',
+                            '<strong>' + escapeHtml(option.label || option.href) + '</strong>',
+                            '<span>' + escapeHtml(option.href) + '</span>',
+                        '</button>'
+                    ].join('');
+                }).join('');
+            }
+
+            function getAppearanceValues() {
+                return {
+                    publicPath: document.getElementById('appearancePageSelect').value || '/',
+                    settings: {
+                        faviconHref: document.getElementById('appearanceFaviconHref').value.trim()
+                    },
+                    page: {
+                        title: document.getElementById('appearanceTitle').value.trim(),
+                        description: document.getElementById('appearanceDescription').value.trim()
+                    }
+                };
+            }
+
+            function updateAppearancePreview() {
+                var faviconHref = document.getElementById('appearanceFaviconHref').value.trim() || '/favicon.ico';
+                var title = document.getElementById('appearanceTitle').value.trim();
+                var faviconName = faviconHref.split('/').filter(Boolean).pop() || faviconHref;
+                document.getElementById('appearanceFaviconPreview').setAttribute('src', faviconHref);
+                document.getElementById('appearanceFaviconLargePreview').setAttribute('src', faviconHref);
+                document.getElementById('appearanceFaviconNamePreview').textContent = faviconName;
+                document.getElementById('appearanceFaviconPathPreview').textContent = faviconHref;
+                document.getElementById('appearanceTitlePreview').textContent = title || 'Browser tab title';
+                document.querySelectorAll('[data-favicon-option]').forEach(function (button) {
+                    button.classList.toggle('is-selected', button.getAttribute('data-favicon-option') === faviconHref);
+                });
+            }
+
+            function renderAppearanceForm(appearance) {
+                state.appearance = appearance;
+                document.getElementById('appearancePageSelect').value = appearance.page.publicPath || '/';
+                document.getElementById('appearanceTitle').value = appearance.page.title || '';
+                document.getElementById('appearanceDescription').value = appearance.page.description || '';
+                document.getElementById('appearanceFaviconHref').value = appearance.settings.faviconHref || '/favicon.ico';
+                renderFaviconOptions(appearance.faviconOptions || []);
+                updateAppearancePreview();
+            }
+
+            function renderAuditResults(audit) {
+                var summary = audit.summary || { total: 0, bySeverity: {} };
+                var metrics = [
+                    { label: 'Pages', value: audit.pageCount || 0 },
+                    { label: 'Findings', value: summary.total || 0 },
+                    { label: 'High', value: summary.bySeverity.high || 0 },
+                    { label: 'Medium', value: summary.bySeverity.medium || 0 }
+                ];
+                var grid = document.getElementById('auditSummaryGrid');
+                var list = document.getElementById('auditFindingsList');
+
+                grid.innerHTML = metrics.map(function (metric) {
+                    return [
+                        '<div class="audit-metric">',
+                            '<span>' + escapeHtml(metric.label) + '</span>',
+                            '<strong>' + escapeHtml(metric.value) + '</strong>',
+                        '</div>'
+                    ].join('');
+                }).join('');
+
+                if (!audit.findings || audit.findings.length === 0) {
+                    list.innerHTML = '<p class="helper-text">No consistency issues found in the quick audit.</p>';
+                    return;
+                }
+
+                list.innerHTML = audit.findings.slice(0, 18).map(function (finding) {
+                    var severity = finding.severity || 'low';
+                    return [
+                        '<article class="audit-finding">',
+                            '<strong>',
+                                '<span>' + escapeHtml(finding.route || 'Unknown route') + '</span>',
+                                '<span class="audit-severity audit-severity--' + escapeHtml(severity) + '">' + escapeHtml(severity) + '</span>',
+                            '</strong>',
+                            '<span>' + escapeHtml(finding.category || 'general') + '</span>',
+                            '<p>' + escapeHtml(finding.message || '') + '</p>',
+                        '</article>'
+                    ].join('');
+                }).join('');
+            }
+
             function updatePageSourceMeta() {
                 var source = document.getElementById('pageSource').value || '';
                 var lineCount = source ? source.split(/\\r\\n|\\r|\\n/).length : 0;
@@ -1728,6 +3168,84 @@ function renderAdminContentEditorPage() {
                 }
             }
 
+            async function loadAppearancePage() {
+                var selectedPath = document.getElementById('appearancePageSelect').value || '/';
+                setStatus('appearanceStatus', 'Loading browser tab settings...');
+
+                try {
+                    var response = await api('/api/admin/content/appearance/page?path=' + encodeURIComponent(selectedPath));
+                    var payload = await response.json().catch(function () { return {}; });
+                    if (!response.ok) {
+                        throw new Error(payload.error || 'Could not load the browser tab settings.');
+                    }
+
+                    renderAppearanceForm(payload.appearance);
+                    setStatus('appearanceStatus', 'Browser tab settings loaded.', 'success');
+                } catch (error) {
+                    setStatus('appearanceStatus', error.message || 'Could not load the browser tab settings.', 'error');
+                }
+            }
+
+            async function saveAppearance() {
+                setStatus('appearanceStatus', 'Saving browser tab and favicon...');
+
+                try {
+                    var response = await api('/api/admin/content/appearance', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(getAppearanceValues())
+                    });
+                    var payload = await response.json().catch(function () { return {}; });
+                    if (!response.ok) {
+                        throw new Error(payload.error || 'Could not save the browser tab settings.');
+                    }
+
+                    renderAppearanceForm(payload.appearance);
+                    setStatus('appearanceStatus', 'Browser tab and favicon saved.', 'success');
+                } catch (error) {
+                    setStatus('appearanceStatus', error.message || 'Could not save the browser tab settings.', 'error');
+                }
+            }
+
+            async function saveStyle() {
+                setStatus('styleStatus', 'Saving visual style rules...');
+
+                try {
+                    var response = await api('/api/admin/content/style', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(getStyleValues())
+                    });
+                    var payload = await response.json().catch(function () { return {}; });
+                    if (!response.ok) {
+                        throw new Error(payload.error || 'Could not save the style editor settings.');
+                    }
+
+                    state.style = payload.style;
+                    renderStyleForm(state.style);
+                    setStatus('styleStatus', 'Styles saved into generated CSS and linked across the site.', 'success');
+                } catch (error) {
+                    setStatus('styleStatus', error.message || 'Could not save the style editor settings.', 'error');
+                }
+            }
+
+            async function runConsistencyAudit() {
+                setStatus('auditStatus', 'Running consistency audit...');
+
+                try {
+                    var response = await api('/api/admin/content/audit');
+                    var payload = await response.json().catch(function () { return {}; });
+                    if (!response.ok) {
+                        throw new Error(payload.error || 'Could not run the consistency audit.');
+                    }
+
+                    renderAuditResults(payload.audit);
+                    setStatus('auditStatus', 'Audit complete.', 'success');
+                } catch (error) {
+                    setStatus('auditStatus', error.message || 'Could not run the consistency audit.', 'error');
+                }
+            }
+
             async function loadEditorState() {
                 var response = await api('/api/admin/content');
                 if (!response.ok) {
@@ -1735,12 +3253,24 @@ function renderAdminContentEditorPage() {
                 }
 
                 var payload = await response.json();
+                state.header = payload.header;
+                state.appearance = payload.appearance;
+                state.style = payload.style;
                 state.home = payload.home;
                 state.fleet = payload.fleet;
                 state.services = payload.services;
                 state.locations = payload.locations;
                 state.pages = Array.isArray(payload.pages) ? payload.pages : [];
 
+                renderHeaderEditor(state.header || { utilityLinks: [], navItems: [], primaryButton: { label: '', href: '', visible: true } });
+                bindHeaderEditor();
+                renderAppearancePageOptions(state.pages);
+                renderAppearanceForm(state.appearance || {
+                    settings: { faviconHref: '/favicon.ico' },
+                    faviconOptions: [],
+                    page: { publicPath: '/', title: '', description: '' }
+                });
+                renderStyleForm(state.style || styleDefaults);
                 renderHomeForm(state.home);
                 renderFleetEditor(state.fleet);
                 renderServicesEditor(state.services || { lanes: [], additionalRoutes: [], guideRoutes: [] });
@@ -1748,6 +3278,9 @@ function renderAdminContentEditorPage() {
                 renderLocationsEditor(state.locations || { heroZones: [], guideCards: [], zoneCards: [], processSteps: [] });
                 bindLocationsEditor();
                 renderPageOptions(state.pages);
+                setStatus('headerStatus', '');
+                setStatus('appearanceStatus', '');
+                setStatus('styleStatus', '');
                 setStatus('homeStatus', '');
                 setStatus('fleetStatus', '');
                 setStatus('servicesStatus', '');
@@ -1783,6 +3316,29 @@ function renderAdminContentEditorPage() {
                     setStatus('homeStatus', 'Home hero saved into site/index.html.', 'success');
                 } catch (error) {
                     setStatus('homeStatus', error.message || 'The home hero could not be saved.', 'error');
+                }
+            }
+
+            async function saveHeader() {
+                setStatus('headerStatus', 'Saving global header...');
+
+                try {
+                    var response = await api('/api/admin/content/header', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(getHeaderValues())
+                    });
+                    var payload = await response.json().catch(function () { return {}; });
+                    if (!response.ok) {
+                        throw new Error(payload.error || 'The global header could not be saved.');
+                    }
+
+                    state.header = payload.header;
+                    renderHeaderEditor(state.header);
+                    bindHeaderEditor();
+                    setStatus('headerStatus', 'Global header saved across the site pages.', 'success');
+                } catch (error) {
+                    setStatus('headerStatus', error.message || 'The global header could not be saved.', 'error');
                 }
             }
 
@@ -1863,6 +3419,11 @@ function renderAdminContentEditorPage() {
                 document.getElementById('pagePreviewFrame').setAttribute('src', previewUrl + '?t=' + Date.now());
             }
 
+            document.getElementById('saveHeaderButton').addEventListener('click', saveHeader);
+            document.getElementById('loadAppearanceButton').addEventListener('click', loadAppearancePage);
+            document.getElementById('saveAppearanceButton').addEventListener('click', saveAppearance);
+            document.getElementById('saveStyleButton').addEventListener('click', saveStyle);
+            document.getElementById('runConsistencyAuditButton').addEventListener('click', runConsistencyAudit);
             document.getElementById('homeForm').addEventListener('submit', saveHome);
             document.getElementById('saveFleetButton').addEventListener('click', saveFleet);
             document.getElementById('saveServicesButton').addEventListener('click', saveServices);
@@ -1874,6 +3435,19 @@ function renderAdminContentEditorPage() {
                 if (state.home) {
                     renderHomeForm(state.home);
                     setStatus('homeStatus', 'Home hero reloaded from the latest saved state.');
+                }
+            });
+            document.getElementById('reloadHeaderButton').addEventListener('click', function () {
+                if (state.header) {
+                    renderHeaderEditor(state.header);
+                    bindHeaderEditor();
+                    setStatus('headerStatus', 'Header editor reloaded from the latest saved state.');
+                }
+            });
+            document.getElementById('reloadStyleButton').addEventListener('click', function () {
+                if (state.style) {
+                    renderStyleForm(state.style);
+                    setStatus('styleStatus', 'Style editor reloaded from the latest saved state.');
                 }
             });
             document.getElementById('reloadFleetButton').addEventListener('click', function () {
@@ -1898,6 +3472,38 @@ function renderAdminContentEditorPage() {
             });
             document.getElementById('syncHomePreviewButton').addEventListener('click', updateHomePreview);
             document.getElementById('syncFleetPreviewButton').addEventListener('click', updateFleetPreview);
+            document.getElementById('appearancePageSelect').addEventListener('change', function () {
+                setStatus('appearanceStatus', 'Selected page changed. Load it to edit the tab title.', '');
+            });
+            document.getElementById('appearanceTitle').addEventListener('input', function () {
+                updateAppearancePreview();
+                setStatus('appearanceStatus', 'Browser tab settings changed locally but not saved yet.', '');
+            });
+            document.getElementById('appearanceDescription').addEventListener('input', function () {
+                setStatus('appearanceStatus', 'Browser tab settings changed locally but not saved yet.', '');
+            });
+            document.getElementById('appearanceFaviconHref').addEventListener('input', function () {
+                updateAppearancePreview();
+                setStatus('appearanceStatus', 'Favicon changed locally but not saved yet.', '');
+            });
+            document.getElementById('faviconOptionGrid').addEventListener('click', function (event) {
+                var button = event.target.closest('[data-favicon-option]');
+                if (!button) {
+                    return;
+                }
+
+                document.getElementById('appearanceFaviconHref').value = button.getAttribute('data-favicon-option');
+                updateAppearancePreview();
+                setStatus('appearanceStatus', 'Favicon selected visually but not saved yet.', '');
+            });
+            document.getElementById('styleForm').addEventListener('input', function () {
+                updateStylePreview();
+                setStatus('styleStatus', 'Style settings changed locally but not saved yet.', '');
+            });
+            document.getElementById('styleForm').addEventListener('change', function () {
+                updateStylePreview();
+                setStatus('styleStatus', 'Style settings changed locally but not saved yet.', '');
+            });
             document.getElementById('pageSelect').addEventListener('change', function () {
                 var selectedPath = document.getElementById('pageSelect').value || '/';
                 var selectedPage = state.pages.find(function (page) {
@@ -1928,6 +3534,9 @@ function renderAdminContentEditorPage() {
             });
 
             loadEditorState().catch(function (error) {
+                setStatus('headerStatus', error.message || 'The editor could not be loaded.', 'error');
+                setStatus('appearanceStatus', error.message || 'The editor could not be loaded.', 'error');
+                setStatus('styleStatus', error.message || 'The editor could not be loaded.', 'error');
                 setStatus('homeStatus', error.message || 'The editor could not be loaded.', 'error');
                 setStatus('fleetStatus', error.message || 'The editor could not be loaded.', 'error');
                 setStatus('servicesStatus', error.message || 'The editor could not be loaded.', 'error');

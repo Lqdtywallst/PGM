@@ -6,6 +6,40 @@ const {
     settlePage
 } = require('./support/site-helpers');
 
+async function installStripeMock(page) {
+    await page.addInitScript(() => {
+        window.Stripe = function StripeMock() {
+            return {
+                elements() {
+                    return {
+                        create() {
+                            return {
+                                mount(selector) {
+                                    const container = document.querySelector(selector);
+                                    if (container) {
+                                        container.setAttribute('data-mock-stripe', 'mounted');
+                                    }
+                                },
+                                on() {}
+                            };
+                        }
+                    };
+                },
+                async confirmCardPayment() {
+                    return {
+                        error: null,
+                        paymentIntent: {
+                            id: 'pi_mock_persistence',
+                            status: 'succeeded',
+                            amount: 165000
+                        }
+                    };
+                }
+            };
+        };
+    });
+}
+
 test('reserve keeps URL schedule but clears typed delivery details after reload', async ({ page }) => {
     const consoleErrors = createConsoleTracker(page);
 
@@ -66,6 +100,7 @@ test('reserve clears guest details and returns to the schedule step after reload
 
 test('reserve browser back moves between steps without losing in-page details', async ({ page }) => {
     const consoleErrors = createConsoleTracker(page);
+    await installStripeMock(page);
 
     await page.goto(
         '/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1650&startDate=2026-09-14&endDate=2026-09-16&pickupTime=11:00&dropoffTime=17:00',
@@ -95,6 +130,7 @@ test('reserve browser back moves between steps without losing in-page details', 
 
     await page.locator('#step2').getByRole('button', { name: /Continue to Payment/i }).click();
     await expect(page.locator('#step3')).toHaveClass(/active/);
+    await expect(page.locator('#card-element')).toHaveAttribute('data-mock-stripe', 'mounted');
 
     await page.goBack();
     await expect(page.locator('#step2')).toHaveClass(/active/);

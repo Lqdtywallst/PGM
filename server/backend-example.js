@@ -4,6 +4,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const {
     EMAIL_CONFIG,
     createEmailTransporter,
@@ -12,8 +13,14 @@ const {
 } = require('./email-config');
 const {
     buildReservationId,
+    listReservationRecords,
     saveReservationRecord
 } = require('./reservation-store');
+const {
+    buildAvailability,
+    buildPublicAvailabilityPayload,
+    loadFleetCards
+} = require('./availability-core');
 const {
     clearAdminSessionCookie,
     createAdminSessionToken,
@@ -34,9 +41,16 @@ const {
     createAdminReservationsRouter
 } = require('./admin-reservations');
 const {
+    runContentConsistencyAudit
+} = require('./content-consistency-audit');
+const {
     readEditorState,
     saveHomeEditorState,
     saveFleetCards,
+    saveGlobalHeaderContent,
+    readAppearanceEditorState,
+    saveAppearanceEditorState,
+    saveStyleEditorState,
     saveServicesContent,
     saveLocationsContent,
     readEditablePage,
@@ -70,6 +84,19 @@ const stripe = stripeConfigured
     : null;
 
 const app = express();
+const siteRoot = path.resolve(__dirname, '..', 'site');
+
+function serveSiteAsset(relativePath) {
+    return (req, res) => {
+        res.setHeader('Cache-Control', 'public, max-age=300');
+        res.sendFile(path.join(siteRoot, relativePath));
+    };
+}
+
+app.get('/favicon.ico', serveSiteAsset('favicon.ico'));
+app.get('/logo-dp-transparent.png', serveSiteAsset('logo-dp-transparent.png'));
+app.use('/icons', express.static(path.join(siteRoot, 'icons'), { fallthrough: true }));
+app.use('/images', express.static(path.join(siteRoot, 'images'), { fallthrough: true }));
 
 // Import reservation routes
 let reserveRoutes;
@@ -233,6 +260,16 @@ function setAdminNoIndexHeaders(res) {
     res.setHeader('X-Robots-Tag', 'noindex, nofollow');
 }
 
+function safeAdminRedirectPath(value) {
+    const candidate = String(value || '').trim();
+
+    if (/^\/admin\/(?:reservations|content)\.html(?:[?#].*)?$/i.test(candidate)) {
+        return candidate;
+    }
+
+    return '/admin/reservations.html';
+}
+
 async function handleStripeWebhook(req, res) {
     if (!stripe) {
         return res.status(503).send('Stripe is not configured');
@@ -334,7 +371,7 @@ app.get('/admin/login.html', (req, res) => {
     const session = adminConfig.configured ? getAdminSessionFromRequest(req) : null;
 
     if (session) {
-        return res.redirect('/admin/reservations.html');
+        return res.redirect(safeAdminRedirectPath(req.query.next));
     }
 
     return res.type('html').send(renderAdminLoginPage());
@@ -433,6 +470,54 @@ app.put('/api/admin/content/fleet', requireAdminSession(), (req, res) => {
     }
 });
 
+app.put('/api/admin/content/header', requireAdminSession(), (req, res) => {
+    setAdminNoIndexHeaders(res);
+
+    try {
+        const header = saveGlobalHeaderContent(req.body || {});
+        res.json({ ok: true, header });
+    } catch (error) {
+        console.error('[ADMIN CONTENT] Error saving global header:', error.message);
+        res.status(400).json({ error: error.message || 'Could not save the global header.' });
+    }
+});
+
+app.get('/api/admin/content/appearance/page', requireAdminSession(), (req, res) => {
+    setAdminNoIndexHeaders(res);
+
+    try {
+        const appearance = readAppearanceEditorState(req.query.path || '/');
+        res.json({ ok: true, appearance });
+    } catch (error) {
+        console.error('[ADMIN CONTENT] Error loading browser tab appearance:', error.message);
+        res.status(400).json({ error: error.message || 'Could not load the browser tab appearance.' });
+    }
+});
+
+app.put('/api/admin/content/appearance', requireAdminSession(), (req, res) => {
+    setAdminNoIndexHeaders(res);
+
+    try {
+        const appearance = saveAppearanceEditorState(req.body || {});
+        res.json({ ok: true, appearance });
+    } catch (error) {
+        console.error('[ADMIN CONTENT] Error saving browser tab appearance:', error.message);
+        res.status(400).json({ error: error.message || 'Could not save the browser tab appearance.' });
+    }
+});
+
+app.put('/api/admin/content/style', requireAdminSession(), (req, res) => {
+    setAdminNoIndexHeaders(res);
+
+    try {
+        const style = saveStyleEditorState(req.body || {});
+        res.json({ ok: true, style });
+    } catch (error) {
+        console.error('[ADMIN CONTENT] Error saving style editor settings:', error.message);
+        res.status(400).json({ error: error.message || 'Could not save the style editor settings.' });
+    }
+});
+
 app.put('/api/admin/content/services', requireAdminSession(), (req, res) => {
     setAdminNoIndexHeaders(res);
 
@@ -454,6 +539,18 @@ app.put('/api/admin/content/locations', requireAdminSession(), (req, res) => {
     } catch (error) {
         console.error('[ADMIN CONTENT] Error saving locations content:', error.message);
         res.status(400).json({ error: error.message || 'Could not save the locations content.' });
+    }
+});
+
+app.get('/api/admin/content/audit', requireAdminSession(), (req, res) => {
+    setAdminNoIndexHeaders(res);
+
+    try {
+        const audit = runContentConsistencyAudit();
+        res.json({ ok: true, audit });
+    } catch (error) {
+        console.error('[ADMIN CONTENT] Error running content consistency audit:', error.message);
+        res.status(500).json({ error: error.message || 'Could not run the content consistency audit.' });
     }
 });
 
@@ -482,6 +579,35 @@ app.put('/api/admin/content/page', requireAdminSession(), (req, res) => {
 });
 
 app.use('/api/admin', requireAdminSession(), createAdminReservationsRouter());
+
+app.get('/api/availability', async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
+
+    try {
+        const availability = buildAvailability({
+            fleetCards: loadFleetCards(),
+            reservations: await listReservationRecords({ limit: 5000 }),
+            schedule: {
+                startDate: req.query.startDate,
+                endDate: req.query.endDate,
+                pickupTime: req.query.pickupTime,
+                dropoffTime: req.query.dropoffTime
+            }
+        });
+
+        if (availability.status === 'missing_schedule') {
+            return res.status(400).json({
+                error: 'A valid startDate and endDate are required.',
+                ...buildPublicAvailabilityPayload(availability)
+            });
+        }
+
+        return res.json(buildPublicAvailabilityPayload(availability));
+    } catch (error) {
+        console.error('[AVAILABILITY] Error building availability:', error.message);
+        return res.status(500).json({ error: 'Availability could not be loaded.' });
+    }
+});
 
 app.use('/api/reserve', reserveRoutes);
 
@@ -834,6 +960,7 @@ app.get('/', (req, res) => {
         endpoints: {
             health: '/health',
             test: '/api/test',
+            availability: '/api/availability',
             reserve: '/api/reserve',
             createPaymentIntent: '/api/create-payment-intent',
             confirmPayment: '/api/confirm-payment-intent',

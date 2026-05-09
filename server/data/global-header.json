@@ -1,0 +1,187 @@
+{
+  "utilityLinks": [
+    {
+      "kind": "call",
+      "label": "Call",
+      "href": "tel:+971586122568",
+      "ariaLabel": "Call Dynasty Prestige",
+      "visible": true
+    },
+    {
+      "kind": "email",
+      "label": "Email",
+      "href": "mailto:prestigegoalmotion@gmail.com",
+      "ariaLabel": "Email Dynasty Prestige",
+      "visible": true
+    },
+    {
+      "kind": "whatsapp",
+      "label": "WhatsApp",
+      "href": "https://wa.me/971586122568",
+      "ariaLabel": "Open WhatsApp",
+      "visible": true
+    }
+  ],
+  "navItems": [
+    {
+      "itemType": "link",
+      "label": "Home",
+      "href": "/",
+      "visible": true,
+      "panelVariant": "brands",
+      "cardVariant": "brand",
+      "cards": []
+    },
+    {
+      "itemType": "link",
+      "label": "Fleet",
+      "href": "/fleet.html",
+      "visible": true,
+      "panelVariant": "brands",
+      "cardVariant": "brand",
+      "cards": []
+    },
+    {
+      "itemType": "mega",
+      "label": "Cars Brands",
+      "href": "",
+      "visible": true,
+      "panelVariant": "brands",
+      "cardVariant": "brand",
+      "cards": [
+        {
+          "title": "Lamborghini",
+          "description": "Huracan and Urus selection.",
+          "href": "/lamborghini-rental-dubai.html",
+          "imageSrc": "/images/brands/lamborghini-mark.png",
+          "imageAlt": "",
+          "visible": true
+        },
+        {
+          "title": "Ferrari",
+          "description": "Convertible-led flagship moments.",
+          "href": "/ferrari-rental-dubai.html",
+          "imageSrc": "/images/brands/ferrari-mark.png",
+          "imageAlt": "",
+          "visible": true
+        },
+        {
+          "title": "Mercedes",
+          "description": "G-Class and executive balance.",
+          "href": "/mercedes-rental-dubai.html",
+          "imageSrc": "/images/brands/mercedes-mark.png",
+          "imageAlt": "",
+          "visible": true
+        },
+        {
+          "title": "Porsche",
+          "description": "Focused driver-first delivery.",
+          "href": "/porsche-rental-dubai.html",
+          "imageSrc": "/images/brands/porsche-mark.png",
+          "imageAlt": "",
+          "visible": true
+        },
+        {
+          "title": "Rolls-Royce",
+          "description": "Arrival-first quiet authority.",
+          "href": "/rolls-royce-rental-dubai.html",
+          "imageSrc": "/images/brands/rolls-royce-mark.png",
+          "imageAlt": "",
+          "visible": true
+        }
+      ]
+    },
+    {
+      "itemType": "mega",
+      "label": "Cars Types",
+      "href": "",
+      "visible": true,
+      "panelVariant": "types",
+      "cardVariant": "type",
+      "cards": [
+        {
+          "title": "Luxury Cars",
+          "description": "Comfort-first arrivals and city stays.",
+          "href": "/fleet.html?type=luxury",
+          "imageSrc": "/images/categories/mock-fastpng/luxury-stage.png",
+          "imageAlt": "",
+          "visible": true
+        },
+        {
+          "title": "Convertible Cars",
+          "description": "Open-top Dubai movement with presence.",
+          "href": "/fleet.html?type=convertible",
+          "imageSrc": "/images/categories/mock-fastpng/convertible-stage.png",
+          "imageAlt": "",
+          "visible": true
+        },
+        {
+          "title": "Sports Cars",
+          "description": "Sharper performance-led picks.",
+          "href": "/fleet.html?type=sports",
+          "imageSrc": "/images/categories/mock-fastpng/sports-stage.png",
+          "imageAlt": "",
+          "visible": true
+        },
+        {
+          "title": "SUV Cars",
+          "description": "Room, height and hotel-ready comfort.",
+          "href": "/fleet.html?type=suv",
+          "imageSrc": "/images/categories/mock-fastpng/suv-stage.png",
+          "imageAlt": "",
+          "visible": true
+        }
+      ]
+    },
+    {
+      "itemType": "link",
+      "label": "Services",
+      "href": "/services.html",
+      "visible": true,
+      "panelVariant": "brands",
+      "cardVariant": "brand",
+      "cards": []
+    },
+    {
+      "itemType": "link",
+      "label": "Locations",
+      "href": "/locations.html",
+      "visible": true,
+      "panelVariant": "brands",
+      "cardVariant": "brand",
+      "cards": []
+    },
+    {
+      "itemType": "link",
+      "label": "About Us",
+      "href": "/about.html",
+      "visible": true,
+      "panelVariant": "brands",
+      "cardVariant": "brand",
+      "cards": []
+    },
+    {
+      "itemType": "link",
+      "label": "Find Booking",
+      "href": "/reservation-lookup.html",
+      "visible": true,
+      "panelVariant": "brands",
+      "cardVariant": "brand",
+      "cards": []
+    },
+    {
+      "itemType": "link",
+      "label": "Contact",
+      "href": "/contact.html",
+      "visible": true,
+      "panelVariant": "brands",
+      "cardVariant": "brand",
+      "cards": []
+    }
+  ],
+  "primaryButton": {
+    "label": "Reserve",
+    "href": "/app/reserve/page.html",
+    "visible": true
+  }
+}

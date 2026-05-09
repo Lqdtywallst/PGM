@@ -724,9 +724,10 @@ async function run() {
     const fleetCss = readFile('site/css/site-v2-fleet.css');
     assert(
         fleetScript.includes('fleet-filter-close__icon') &&
-        fleetScript.includes('Close filters and return to car results') &&
-        !fleetScript.includes('Back to cars'),
-        'fleet mobile filter sheet uses a close icon instead of a competing back button'
+        fleetScript.includes('Back to cars and close filters') &&
+        fleetScript.includes('fleet-filter-apply') &&
+        !fleetScript.includes('fleet-filter-close--inline'),
+        'fleet mobile filter sheet exposes one top return control plus one clear results action'
     );
     const mobileToolbarBlocks = [...fleetCss.matchAll(/\.fleet-mobile-toolbar\s*\{([\s\S]*?)\n\s*\}/g)].map((match) => match[1]);
     assert(

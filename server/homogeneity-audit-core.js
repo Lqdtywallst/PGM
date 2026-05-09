@@ -22,9 +22,14 @@ const DEFAULT_HEADER_POLICY = Object.freeze({
     maxSurfaceLuminanceDelta: 0.34,
     minHeaderSurfaceAlpha: 0.42,
     maxNavigationHeaderHeightShiftPx: 4,
-    maxNavigationLogoSizeShiftPx: 6,
-    maxNavigationClusterGapShiftPx: 18,
-    highNavigationClusterGapShiftPx: 56
+    maxNavigationLogoSizeShiftPx: 3,
+    maxNavigationClusterGapShiftPx: 8,
+    highNavigationClusterGapShiftPx: 56,
+    maxDropdownSurfaceLuminanceDelta: 0.28,
+    maxDropdownTopOffsetDeltaPx: 22,
+    maxDropdownWidthDeltaRatio: 0.24,
+    maxDropdownBorderRadiusDeltaPx: 8,
+    minDropdownTextContrastRatio: 4.5
 });
 
 function normalizeRoute(route = '') {
@@ -475,13 +480,31 @@ function compareHeaderSurface(reference = {}, actual = {}, options = {}) {
         });
     }
 
-    if (reference.hasGradient && !actual.hasGradient && referenceIsDark && actual.surfaceTone !== 'dark') {
+    if (Boolean(reference.hasGradient) !== Boolean(actual.hasGradient)) {
+        pushMismatch(mismatches, {
+            field: 'hasGradient',
+            severity: 'medium',
+            message: 'Header background treatment changes between solid and gradient surfaces.',
+            reference: Boolean(reference.hasGradient),
+            actual: Boolean(actual.hasGradient)
+        });
+    } else if (reference.hasGradient && !actual.hasGradient && referenceIsDark && actual.surfaceTone !== 'dark') {
         pushMismatch(mismatches, {
             field: 'hasGradient',
             severity: 'medium',
             message: 'Header lost the dark gradient surface used by the approved reference.',
             reference: true,
             actual: Boolean(actual.hasGradient)
+        });
+    }
+
+    if (Boolean(reference.boxShadow) !== Boolean(actual.boxShadow)) {
+        pushMismatch(mismatches, {
+            field: 'boxShadow',
+            severity: 'medium',
+            message: 'Header shadow treatment differs from the approved reference.',
+            reference: Boolean(reference.boxShadow),
+            actual: Boolean(actual.boxShadow)
         });
     }
 
@@ -577,6 +600,257 @@ function compareHeaderNavigationMotion(referencePage = {}, actualPage = {}, opti
                 message,
                 reference: referenceGap,
                 actual: actualGap
+            });
+        }
+    }
+
+    return mismatches;
+}
+
+function compareHeaderCtaSurface(reference = {}, actual = {}, options = {}) {
+    const policy = { ...DEFAULT_HEADER_POLICY, ...(options.policy || {}) };
+    const mismatches = [];
+
+    if (!reference.exists && !actual.exists) {
+        return mismatches;
+    }
+
+    if (!reference.exists || !actual.exists) {
+        pushMismatch(mismatches, {
+            field: 'exists',
+            severity: 'high',
+            message: 'Header primary CTA is missing on one side of the comparison.',
+            reference: Boolean(reference.exists),
+            actual: Boolean(actual.exists)
+        });
+        return mismatches;
+    }
+
+    const referenceText = normalizeText(reference.text);
+    const actualText = normalizeText(actual.text);
+    if (referenceText && actualText && referenceText !== actualText) {
+        pushMismatch(mismatches, {
+            field: 'text',
+            severity: 'medium',
+            message: 'Header primary CTA label differs.',
+            reference: reference.text,
+            actual: actual.text
+        });
+    }
+
+    const referenceBackground = normalizeText(`${reference.backgroundColor || ''} ${reference.backgroundImage || ''}`);
+    const actualBackground = normalizeText(`${actual.backgroundColor || ''} ${actual.backgroundImage || ''}`);
+    if (referenceBackground && actualBackground && referenceBackground !== actualBackground) {
+        pushMismatch(mismatches, {
+            field: 'background',
+            severity: 'high',
+            message: 'Header primary CTA background treatment differs from the approved reference.',
+            reference: reference.backgroundImage || reference.backgroundColor,
+            actual: actual.backgroundImage || actual.backgroundColor
+        });
+    }
+
+    const referenceColor = normalizeText(reference.color);
+    const actualColor = normalizeText(actual.color);
+    if (referenceColor && actualColor && referenceColor !== actualColor) {
+        pushMismatch(mismatches, {
+            field: 'color',
+            severity: 'medium',
+            message: 'Header primary CTA text color differs.',
+            reference: reference.color,
+            actual: actual.color
+        });
+    }
+
+    const referenceHeight = numberOrNull(reference.rect?.height || reference.minHeightPx);
+    const actualHeight = numberOrNull(actual.rect?.height || actual.minHeightPx);
+    if (
+        referenceHeight !== null &&
+        actualHeight !== null &&
+        Math.abs(referenceHeight - actualHeight) > policy.maxNavigationHeaderHeightShiftPx
+    ) {
+        pushMismatch(mismatches, {
+            field: 'heightPx',
+            severity: 'medium',
+            message: 'Header primary CTA height differs enough to affect header rhythm.',
+            reference: referenceHeight,
+            actual: actualHeight
+        });
+    }
+
+    const referenceRadius = numberOrNull(reference.borderRadiusPx);
+    const actualRadius = numberOrNull(actual.borderRadiusPx);
+    if (
+        referenceRadius !== null &&
+        actualRadius !== null &&
+        Math.abs(referenceRadius - actualRadius) > policy.maxDropdownBorderRadiusDeltaPx
+    ) {
+        pushMismatch(mismatches, {
+            field: 'borderRadiusPx',
+            severity: 'low',
+            message: 'Header primary CTA corner radius differs.',
+            reference: referenceRadius,
+            actual: actualRadius
+        });
+    }
+
+    return mismatches;
+}
+
+function dropdownKey(dropdown = {}) {
+    return normalizeText(dropdown.label || dropdown.triggerLabel || dropdown.panelId || '');
+}
+
+function dropdownsByKey(dropdowns = []) {
+    return (Array.isArray(dropdowns) ? dropdowns : []).reduce((map, dropdown) => {
+        const key = dropdownKey(dropdown);
+        if (key && dropdown.exists !== false && !map.has(key)) {
+            map.set(key, dropdown);
+        }
+        return map;
+    }, new Map());
+}
+
+function compareHeaderDropdownSystems(referencePage = {}, actualPage = {}, options = {}) {
+    const policy = { ...DEFAULT_HEADER_POLICY, ...(options.policy || {}) };
+    const mismatches = [];
+    const referenceDropdowns = dropdownsByKey(referencePage.headerDropdowns);
+    const actualDropdowns = dropdownsByKey(actualPage.headerDropdowns);
+
+    if (referenceDropdowns.size === 0 && actualDropdowns.size === 0) {
+        return mismatches;
+    }
+
+    if (referenceDropdowns.size > 0 && actualDropdowns.size === 0) {
+        pushMismatch(mismatches, {
+            field: 'dropdowns',
+            severity: 'high',
+            message: 'Header dropdown states are missing on the actual page.',
+            reference: [...referenceDropdowns.keys()].join('|'),
+            actual: ''
+        });
+        return mismatches;
+    }
+
+    for (const [key, reference] of referenceDropdowns.entries()) {
+        const actual = actualDropdowns.get(key);
+
+        if (!actual) {
+            pushMismatch(mismatches, {
+                field: `${key}.exists`,
+                severity: 'high',
+                message: 'A header dropdown from the approved reference is missing on this page.',
+                reference: key,
+                actual: ''
+            });
+            continue;
+        }
+
+        const referenceTone = String(reference.surfaceTone || '').toLowerCase();
+        const actualTone = String(actual.surfaceTone || '').toLowerCase();
+        const referenceIsDark = isDarkHeaderTone(referenceTone);
+        const actualIsDark = isDarkHeaderTone(actualTone);
+
+        if (referenceIsDark && actualTone === 'light') {
+            pushMismatch(mismatches, {
+                field: `${key}.surfaceTone`,
+                severity: 'high',
+                message: 'Dropdown background switched from the approved dark premium treatment to a light panel.',
+                reference: reference.surfaceTone,
+                actual: actual.surfaceTone
+            });
+        } else if (referenceTone && actualTone && referenceTone !== actualTone && !(referenceIsDark && actualIsDark)) {
+            pushMismatch(mismatches, {
+                field: `${key}.surfaceTone`,
+                severity: 'medium',
+                message: 'Dropdown background tone differs from the approved header dropdown.',
+                reference: reference.surfaceTone,
+                actual: actual.surfaceTone
+            });
+        }
+
+        const referenceLuminance = numberOrNull(reference.backgroundLuminance);
+        const actualLuminance = numberOrNull(actual.backgroundLuminance);
+        if (
+            referenceLuminance !== null &&
+            actualLuminance !== null &&
+            Math.abs(referenceLuminance - actualLuminance) > policy.maxDropdownSurfaceLuminanceDelta
+        ) {
+            pushMismatch(mismatches, {
+                field: `${key}.backgroundLuminance`,
+                severity: referenceIsDark && actualLuminance > referenceLuminance ? 'high' : 'medium',
+                message: 'Dropdown surface brightness differs enough to read as a different component.',
+                reference: referenceLuminance,
+                actual: actualLuminance
+            });
+        }
+
+        const actualContrast = numberOrNull(actual.minTextContrastRatio);
+        if (actualContrast !== null && actualContrast < policy.minDropdownTextContrastRatio) {
+            pushMismatch(mismatches, {
+                field: `${key}.minTextContrastRatio`,
+                severity: actualContrast < 3 ? 'high' : 'medium',
+                message: 'Dropdown text contrast is too weak against its panel background.',
+                reference: `>=${policy.minDropdownTextContrastRatio}`,
+                actual: actualContrast
+            });
+        }
+
+        const referenceTopOffset = numberOrNull(reference.topOffsetFromHeaderPx);
+        const actualTopOffset = numberOrNull(actual.topOffsetFromHeaderPx);
+        if (
+            referenceTopOffset !== null &&
+            actualTopOffset !== null &&
+            Math.abs(referenceTopOffset - actualTopOffset) > policy.maxDropdownTopOffsetDeltaPx
+        ) {
+            pushMismatch(mismatches, {
+                field: `${key}.topOffsetFromHeaderPx`,
+                severity: 'medium',
+                message: 'Dropdown vertical placement differs from the approved header rhythm.',
+                reference: referenceTopOffset,
+                actual: actualTopOffset
+            });
+        }
+
+        const referenceWidth = numberOrNull(reference.panelRect?.width);
+        const actualWidth = numberOrNull(actual.panelRect?.width);
+        if (
+            referenceWidth !== null &&
+            actualWidth !== null &&
+            relativeDelta(referenceWidth, actualWidth) > policy.maxDropdownWidthDeltaRatio
+        ) {
+            pushMismatch(mismatches, {
+                field: `${key}.panelWidthPx`,
+                severity: 'medium',
+                message: 'Dropdown width differs from the approved header component.',
+                reference: referenceWidth,
+                actual: actualWidth
+            });
+        }
+
+        const referenceRadius = numberOrNull(reference.borderRadiusPx);
+        const actualRadius = numberOrNull(actual.borderRadiusPx);
+        if (
+            referenceRadius !== null &&
+            actualRadius !== null &&
+            Math.abs(referenceRadius - actualRadius) > policy.maxDropdownBorderRadiusDeltaPx
+        ) {
+            pushMismatch(mismatches, {
+                field: `${key}.borderRadiusPx`,
+                severity: 'low',
+                message: 'Dropdown corner radius differs from the approved component.',
+                reference: referenceRadius,
+                actual: actualRadius
+            });
+        }
+
+        if (reference.cardCount !== undefined && actual.cardCount !== undefined && reference.cardCount !== actual.cardCount) {
+            pushMismatch(mismatches, {
+                field: `${key}.cardCount`,
+                severity: 'medium',
+                message: 'Dropdown item count differs from the approved navigation surface.',
+                reference: reference.cardCount,
+                actual: actual.cardCount
             });
         }
     }
@@ -815,6 +1089,54 @@ function buildHomogeneityFindings(pages = [], options = {}) {
                             screenshotPath: page.headerScreenshotPath || page.viewportScreenshotPath || ''
                         }));
                     }
+
+                    const ctaComparison = bestReferenceComparison(
+                        approvedHeaderReferences,
+                        page,
+                        (referencePage, actualPage) => compareHeaderCtaSurface(
+                            referencePage.headerCta,
+                            actualPage.headerCta,
+                            { policy }
+                        )
+                    );
+
+                    if (ctaComparison.mismatches.length > 0) {
+                        findings.push(createFinding({
+                            route: page.route,
+                            viewport,
+                            area: 'header_cta',
+                            severity: highestSeverity(ctaComparison.mismatches),
+                            category: 'header_cta_drift',
+                            message: 'The header Reserve CTA drifts from the approved home/services treatment.',
+                            evidence: `reference ${ctaComparison.referenceRoute}: ${formatMismatchEvidence(ctaComparison.mismatches)}`,
+                            recommendation: 'Keep the same primary Reserve button treatment across public headers unless a different state is intentionally documented.',
+                            screenshotPath: page.headerScreenshotPath || page.viewportScreenshotPath || ''
+                        }));
+                    }
+
+                    const dropdownComparison = bestReferenceComparison(
+                        approvedHeaderReferences,
+                        page,
+                        (referencePage, actualPage) => compareHeaderDropdownSystems(
+                            referencePage,
+                            actualPage,
+                            { policy }
+                        )
+                    );
+
+                    if (dropdownComparison.mismatches.length > 0) {
+                        findings.push(createFinding({
+                            route: page.route,
+                            viewport,
+                            area: 'header_dropdown',
+                            severity: highestSeverity(dropdownComparison.mismatches),
+                            category: 'header_dropdown_drift',
+                            message: 'An opened header dropdown drifts from the approved home/services dropdown system.',
+                            evidence: `reference ${dropdownComparison.referenceRoute}: ${formatMismatchEvidence(dropdownComparison.mismatches)}`,
+                            recommendation: 'Keep mega-menu panels visually identical across routes: same dark premium surface, contrast, spacing, radius and item structure.',
+                            screenshotPath: page.headerDropdownScreenshotPath || page.headerScreenshotPath || page.viewportScreenshotPath || ''
+                        }));
+                    }
                 }
 
                 const typographyMismatches = compareTypographySurfaces(home.typography, page.typography);
@@ -909,6 +1231,8 @@ module.exports = {
     DEFAULT_HEADER_POLICY,
     buildHomogeneityFindings,
     compareBrandSurfaces,
+    compareHeaderCtaSurface,
+    compareHeaderDropdownSystems,
     compareHeaderLayout,
     compareHeaderNavigationMotion,
     compareHeaderSurface,

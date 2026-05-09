@@ -13,7 +13,11 @@ function initSiteV2() {
     const mobileViewport = window.matchMedia("(max-width: 860px)");
     const dataSaverConnection = typeof navigator !== "undefined" ? navigator.connection : null;
     const shouldBypassHeroIntro = document.body.classList.contains("home-page") || coarsePointer.matches || mobileViewport.matches;
-    const shouldSkipHeroVideo = prefersReducedMotion.matches || Boolean(dataSaverConnection?.saveData);
+    // Solo respetamos reduced motion como hard stop.
+    // saveData resultaba demasiado agresivo para el hero de Home:
+    // algunos navegadores o perfiles lo reportan y el usuario acababa viendo
+    // un poster estatico aunque esperaba un hero en movimiento.
+    const shouldSkipHeroVideo = prefersReducedMotion.matches;
     const introMemoryKey = "__siteV2HeroIntroSeen";
     const BOOKING_INTENT_KEY = "dynastyBookingIntent";
     const CONTACT_PHONE_HREF = "tel:+971586122568";
@@ -26,7 +30,6 @@ function initSiteV2() {
         "luxury cars": "luxury",
         "convertible cars": "convertible",
         "sports cars": "sports",
-        "electric cars": "electric",
         "suv cars": "suv"
     };
     const heroIntroTimings = {
@@ -111,9 +114,21 @@ function initSiteV2() {
         return params;
     }
 
-    function buildFleetFilterHref(filterKey, filterValue) {
+    function appendBookingParams(params, bookingIntent) {
+        buildBookingQuery(bookingIntent).forEach((value, key) => {
+            params.set(key, value);
+        });
+
+        return params;
+    }
+
+    function buildFleetFilterHref(filterKey, filterValue, bookingIntent = null) {
         const params = new URLSearchParams();
         params.set(filterKey, filterValue);
+        if (bookingIntent) {
+            appendBookingParams(params, bookingIntent);
+        }
+
         return `./fleet.html?${params.toString()}`;
     }
 
@@ -376,6 +391,29 @@ function initSiteV2() {
 
         function bindFloatingContactCollision(contactNav) {
             const collisionSelector = [
+                ".home-booking",
+                ".home-booking__shell",
+                ".home-booking__intro",
+                ".home-booking__field",
+                ".home-booking__submit",
+                ".home-booking input",
+                ".home-booking select",
+                ".lookup-card",
+                ".lookup-form",
+                ".lookup-form__actions",
+                ".lookup-form input",
+                ".lookup-form button",
+                ".lookup-form a",
+                ".fleet-category",
+                ".fleet-category__media",
+                ".fleet-category__copy",
+                ".fleet-card",
+                ".fleet-card__content",
+                ".fleet-visual-card",
+                ".fleet-visual-card__body",
+                ".fleet-visual-card__description",
+                ".fleet-visual-card__sales-line",
+                ".fleet-visual-card__spec-list",
                 ".fleet-card__primary",
                 ".fleet-card__contact-row",
                 ".fleet-visual-card__primary",
@@ -386,6 +424,7 @@ function initSiteV2() {
                 ".reserve-page .btn-secondary"
             ].join(", ");
             const ignoredSurfaceSelector = ".lab-floating-contact, .lab-floating-back, .lab-header, .lab-mobile-drawer";
+            const collisionSafeGapPx = 18;
             let frameId = 0;
 
             function isCollisionElement(element) {
@@ -394,6 +433,38 @@ function initSiteV2() {
                 }
 
                 return Boolean(element.closest(collisionSelector));
+            }
+
+            function rectTouchesExpandedTarget(sourceRect, targetRect) {
+                return (
+                    sourceRect.right > targetRect.left - collisionSafeGapPx &&
+                    sourceRect.left < targetRect.right + collisionSafeGapPx &&
+                    sourceRect.bottom > targetRect.top - collisionSafeGapPx &&
+                    sourceRect.top < targetRect.bottom + collisionSafeGapPx
+                );
+            }
+
+            function isVisibleCollisionTarget(element) {
+                const targetRect = element.getBoundingClientRect();
+
+                return (
+                    targetRect.width > 0 &&
+                    targetRect.height > 0 &&
+                    targetRect.bottom >= 0 &&
+                    targetRect.top <= window.innerHeight &&
+                    targetRect.right >= 0 &&
+                    targetRect.left <= window.innerWidth
+                );
+            }
+
+            function hasRectCollision(contactRect) {
+                return Array.from(document.querySelectorAll(collisionSelector)).some((element) => (
+                    element instanceof HTMLElement &&
+                    !contactNav.contains(element) &&
+                    !element.closest(ignoredSurfaceSelector) &&
+                    isVisibleCollisionTarget(element) &&
+                    rectTouchesExpandedTarget(contactRect, element.getBoundingClientRect())
+                ));
             }
 
             function updateCollisionState() {
@@ -413,7 +484,7 @@ function initSiteV2() {
                 ];
                 const overlapsCardActions = samplePoints.some(([x, y]) => (
                     document.elementsFromPoint(x, y).some(isCollisionElement)
-                ));
+                )) || hasRectCollision(rect);
 
                 contactNav.classList.toggle("is-over-card-actions", overlapsCardActions);
             }
@@ -559,7 +630,7 @@ function initSiteV2() {
         if (!hasLookupLink) {
             const lookupLink = document.createElement("a");
             lookupLink.href = HEADER_LOOKUP_HREF;
-            lookupLink.textContent = "Find booking";
+            lookupLink.textContent = "Find Booking";
             if (pathsMatch(getCurrentPagePath(), HEADER_LOOKUP_HREF)) {
                 lookupLink.setAttribute("aria-current", "page");
             }
@@ -588,6 +659,49 @@ function initSiteV2() {
             if (type) {
                 link.setAttribute("href", buildFleetFilterHref("type", type));
             }
+        });
+    }
+
+    function getHomeBookingIntentFromControls(overrides = {}) {
+        if (!homePickupDateInput || !homeReturnDateInput || !homePickupTimeInput || !homeReturnTimeInput) {
+            return null;
+        }
+
+        return {
+            ...overrides,
+            startDate: homePickupDateInput.value,
+            endDate: homeReturnDateInput.value,
+            pickupTime: homePickupTimeInput.value,
+            dropoffTime: homeReturnTimeInput.value
+        };
+    }
+
+    function initHomeFleetFilterLinks() {
+        const links = Array.from(document.querySelectorAll("[data-home-fleet-filter-key][data-home-fleet-filter-value]"));
+
+        links.forEach((link) => {
+            const filterKey = normalizeBookingValue(link.dataset.homeFleetFilterKey);
+            const filterValue = normalizeBookingValue(link.dataset.homeFleetFilterValue);
+
+            if (!filterKey || !filterValue) {
+                return;
+            }
+
+            link.setAttribute("href", buildFleetFilterHref(filterKey, filterValue));
+            link.addEventListener("click", (event) => {
+                const bookingIntent = getHomeBookingIntentFromControls({
+                    car: link.dataset.homeFleetCar,
+                    price: link.dataset.homeFleetPrice
+                });
+
+                if (!bookingIntent) {
+                    return;
+                }
+
+                event.preventDefault();
+                storeBookingIntent(bookingIntent);
+                window.location.href = buildFleetFilterHref(filterKey, filterValue, bookingIntent);
+            });
         });
     }
 
@@ -1157,6 +1271,175 @@ function initSiteV2() {
             });
 
             window.location.href = `./fleet.html${queryString ? `?${queryString}` : ""}`;
+        });
+    }
+
+    function initLocationsMap() {
+        const maps = Array.from(document.querySelectorAll("[data-locations-map]"));
+
+        if (!maps.length) {
+            return;
+        }
+
+        const tileSize = 256;
+        const minLatitude = -85.05112878;
+        const maxLatitude = 85.05112878;
+
+        function clampLatitude(latitude) {
+            return Math.max(minLatitude, Math.min(maxLatitude, latitude));
+        }
+
+        function projectCoordinate(latitude, longitude, zoom) {
+            const scale = tileSize * 2 ** zoom;
+            const safeLatitude = clampLatitude(latitude);
+            const sinLatitude = Math.sin((safeLatitude * Math.PI) / 180);
+
+            return {
+                x: ((longitude + 180) / 360) * scale,
+                y: (0.5 - Math.log((1 + sinLatitude) / (1 - sinLatitude)) / (4 * Math.PI)) * scale
+            };
+        }
+
+        function getMarkerCoordinates(markers) {
+            return markers
+                .map((marker) => ({
+                    element: marker,
+                    latitude: Number(marker.dataset.lat),
+                    longitude: Number(marker.dataset.lng)
+                }))
+                .filter((marker) => Number.isFinite(marker.latitude) && Number.isFinite(marker.longitude));
+        }
+
+        function chooseZoomLevel(coordinates, width, height) {
+            const maxZoom = width < 520 ? 8 : 9;
+            const minZoom = 6;
+            const padding = width < 520 ? 56 : 92;
+
+            for (let zoom = maxZoom; zoom >= minZoom; zoom -= 1) {
+                const points = coordinates.map((coordinate) => projectCoordinate(coordinate.latitude, coordinate.longitude, zoom));
+                const xs = points.map((point) => point.x);
+                const ys = points.map((point) => point.y);
+                const spanX = Math.max(...xs) - Math.min(...xs);
+                const spanY = Math.max(...ys) - Math.min(...ys);
+
+                if (spanX <= Math.max(1, width - padding * 2) && spanY <= Math.max(1, height - padding * 2)) {
+                    return zoom;
+                }
+            }
+
+            return minZoom;
+        }
+
+        function getProjectedBounds(coordinates, zoom) {
+            const points = coordinates.map((coordinate) => projectCoordinate(coordinate.latitude, coordinate.longitude, zoom));
+            const xs = points.map((point) => point.x);
+            const ys = points.map((point) => point.y);
+
+            return {
+                minX: Math.min(...xs),
+                maxX: Math.max(...xs),
+                minY: Math.min(...ys),
+                maxY: Math.max(...ys)
+            };
+        }
+
+        function createTileImage(zoom, tileX, tileY, left, top) {
+            const tileCount = 2 ** zoom;
+
+            if (tileY < 0 || tileY >= tileCount) {
+                return null;
+            }
+
+            const wrappedTileX = ((tileX % tileCount) + tileCount) % tileCount;
+            const image = document.createElement("img");
+            image.className = "locations-map-card__tile";
+            image.alt = "";
+            image.decoding = "async";
+            image.loading = "lazy";
+            image.referrerPolicy = "no-referrer-when-downgrade";
+            image.src = `https://tile.openstreetmap.org/${zoom}/${wrappedTileX}/${tileY}.png`;
+            image.style.left = `${left}px`;
+            image.style.top = `${top}px`;
+            image.addEventListener("load", () => {
+                image.classList.add("is-loaded");
+            }, { once: true });
+
+            return image;
+        }
+
+        function renderMap(map) {
+            const tileLayer = map.querySelector("[data-locations-map-tiles]");
+            const markerElements = Array.from(map.querySelectorAll("[data-location-marker]"));
+            const coordinates = getMarkerCoordinates(markerElements);
+
+            if (!tileLayer || !coordinates.length) {
+                return;
+            }
+
+            const rect = map.getBoundingClientRect();
+            const width = Math.round(rect.width);
+            const height = Math.round(rect.height);
+
+            if (width <= 0 || height <= 0) {
+                return;
+            }
+
+            const zoom = chooseZoomLevel(coordinates, width, height);
+            const bounds = getProjectedBounds(coordinates, zoom);
+            const center = {
+                x: (bounds.minX + bounds.maxX) / 2,
+                y: (bounds.minY + bounds.maxY) / 2
+            };
+            const startTileX = Math.floor((center.x - width / 2) / tileSize);
+            const endTileX = Math.floor((center.x + width / 2) / tileSize);
+            const startTileY = Math.floor((center.y - height / 2) / tileSize);
+            const endTileY = Math.floor((center.y + height / 2) / tileSize);
+            const fragment = document.createDocumentFragment();
+
+            for (let tileX = startTileX; tileX <= endTileX; tileX += 1) {
+                for (let tileY = startTileY; tileY <= endTileY; tileY += 1) {
+                    const left = Math.round(tileX * tileSize - center.x + width / 2);
+                    const top = Math.round(tileY * tileSize - center.y + height / 2);
+                    const tile = createTileImage(zoom, tileX, tileY, left, top);
+
+                    if (tile) {
+                        fragment.appendChild(tile);
+                    }
+                }
+            }
+
+            tileLayer.replaceChildren(fragment);
+            coordinates.forEach((coordinate) => {
+                const point = projectCoordinate(coordinate.latitude, coordinate.longitude, zoom);
+                const left = point.x - center.x + width / 2;
+                const top = point.y - center.y + height / 2;
+                const edgeBuffer = width < 520 ? 104 : 126;
+                const nearLeft = left < edgeBuffer;
+                const nearRight = left > width - edgeBuffer;
+                const nearSide = nearLeft || nearRight;
+
+                coordinate.element.style.left = `${left}px`;
+                coordinate.element.style.top = `${top}px`;
+                coordinate.element.classList.toggle("is-near-left", nearLeft);
+                coordinate.element.classList.toggle("is-near-right", nearRight);
+                coordinate.element.classList.toggle("is-near-top", !nearSide && top < 58);
+                coordinate.element.classList.toggle("is-near-bottom", !nearSide && top > height - 58);
+            });
+            map.classList.add("is-rendered");
+            map.dataset.mapZoom = String(zoom);
+        }
+
+        maps.forEach((map) => {
+            renderMap(map);
+
+            if (typeof ResizeObserver === "function") {
+                const resizeObserver = new ResizeObserver(() => {
+                    window.requestAnimationFrame(() => renderMap(map));
+                });
+                resizeObserver.observe(map);
+            } else {
+                window.addEventListener("resize", () => renderMap(map), { passive: true });
+            }
         });
     }
 
@@ -1768,12 +2051,14 @@ function initSiteV2() {
     initServicesLaneSelector();
     initVehicleMediaLightbox();
     initFleetFilterLinks();
+    initHomeFleetFilterLinks();
     initFloatingBackButton();
     initFloatingContactButtons();
     setHeaderScrollState();
     initMobileHeaderDrawer();
     initMobileActionBar();
     initHomeBookingBar();
+    initLocationsMap();
     initGoogleReviews();
 
     window.addEventListener("scroll", setHeaderScrollState, { passive: true });

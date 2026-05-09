@@ -2,6 +2,8 @@
 
 La memoria de auditoria guarda garantias que ya fueron aprobadas en un run limpio. En runs posteriores, si una garantia que antes pasaba vuelve a fallar o desaparece dentro del mismo scope auditado, el auditor lo marca como regresion.
 
+La metodologia funcional viva esta en `docs/audit/PROFESSIONAL-FUNCTIONAL-AUDIT-PLAYBOOK.md`: el auditor debe probar misiones de cliente completas, no clicks aislados.
+
 ## Flujo
 
 1. Arreglar el problema.
@@ -28,6 +30,42 @@ npm run test:regression
 ```
 
 Ese comando ejecuta los tests unitarios del auditor y despues el guardia visual con memoria.
+
+## Gate funcional pre-produccion
+
+Antes de entregar al socio o subir a produccion, el cierre funcional de alquiler/reserva debe ejecutarse con:
+
+```bash
+npm run audit:functional:production
+```
+
+Este gate cubre discovery, disponibilidad real, filtros, landings exactas de coche, reserva, recuperacion, doble submit, mobile friction, lookup y el agente funcional en rutas criticas. Su metodologia esta documentada en `docs/audit/PRODUCTION-FUNCTIONAL-RENTAL-GATE.md`.
+
+## Funcional: Home -> Fleet
+
+El auditor debe tratar Home como una entrada real de booking, no como una pagina de enlaces. Cada CTA importante de Home tiene que demostrar que conserva la intencion del cliente hasta Fleet:
+
+- `See available cars` rellena fechas y horas, abre Fleet, conserva esos campos y obliga a consultar `/api/availability`
+- si el CRM marca un coche como no disponible, Fleet debe mostrarlo como unavailable y bloquear su `Reserve`
+- las tarjetas de categoria de Home abren Fleet con el filtro `type` correcto y las fechas/horas elegidas
+- los coches destacados de Home abren la landing/ficha exacta del coche, no Fleet
+- la landing del coche debe mostrar el heading correcto y su panel de booking
+
+Acciones obligatorias del auditor funcional:
+
+- `home-booking-bar-availability`
+- `home-category-filter`
+- `home-cars-types-filter-menu`
+- `home-featured-vehicle-landing`
+
+La pestaña `Cars Types` es una entrada de categoria, no de coche concreto: cada tarjeta debe abrir `Fleet` con `type=<categoria>` y resultados reales. El auditor debe fallar si aparece una categoria sin inventario real, por ejemplo un tipo que aterrice en `0 models visible`.
+
+Pruebas enfocadas para esta zona:
+
+```bash
+npx playwright test tests/e2e/public-site.spec.js tests/e2e/customer-journeys.spec.js --grep "home category cards|home featured car cards|home date search applies CRM availability|Cars Types card"
+node scripts/run-functional-agent.js --route / --viewport laptop --viewport mobile-modern
+```
 
 ## Navegacion
 
@@ -71,6 +109,7 @@ La memoria visual protege, entre otras cosas:
 - findings visuales `high` o `hardFail`
 - regiones de baseline que desaparecen
 - regresiones de layout movil, como filtros recortados, drawers desalineados y grupos de botones con anchuras distintas
+- regresiones de homogeneidad del header, incluyendo dropdowns y CTAs que cambian de superficie, contraste, posicion o tratamiento visual entre paginas
 
 Para crear o actualizar la memoria visual, primero deja el run limpio y despues ejecuta:
 

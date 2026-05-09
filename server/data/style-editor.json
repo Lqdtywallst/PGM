@@ -1,0 +1,30 @@
+{
+  "global": {
+    "fontSans": "'Manrope', system-ui, sans-serif",
+    "fontDisplay": "'El Messiri', 'Cormorant Garamond', serif",
+    "accentColor": "#e3f655",
+    "headerBackground": "#08090c",
+    "buttonBackground": "#e3f655",
+    "buttonTextColor": "#101010",
+    "buttonRadiusPx": 999,
+    "cardRadiusPx": 8
+  },
+  "brandPages": {
+    "heroHeightWideRem": 26.5,
+    "heroHeightLaptopRem": 22.4,
+    "heroHeightMobileRem": 25,
+    "heroGapRem": 1,
+    "heroTitleDesktopRem": 3.05,
+    "heroTitleMobileRem": 3.2,
+    "heroLeadSizeRem": 0.9,
+    "bookingMinWidthPx": 300,
+    "bookingPaddingRem": 1.25,
+    "bookingPriceSizeRem": 2.75,
+    "borderRadiusPx": 8,
+    "buttonBackground": "#15191f",
+    "buttonTextColor": "#ffffff",
+    "overlayDarkness": 0.9,
+    "showHeroCta": true,
+    "showBookingSecondary": false
+  }
+}

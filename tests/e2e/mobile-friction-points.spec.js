@@ -50,6 +50,40 @@ async function clickVisibleFilterScrim(page) {
     await page.mouse.click(point.x, point.y);
 }
 
+async function installStripeMock(page) {
+    await page.addInitScript(() => {
+        window.Stripe = function StripeMock() {
+            return {
+                elements() {
+                    return {
+                        create() {
+                            return {
+                                mount(selector) {
+                                    const container = document.querySelector(selector);
+                                    if (container) {
+                                        container.setAttribute('data-mock-stripe', 'mounted');
+                                    }
+                                },
+                                on() {}
+                            };
+                        }
+                    };
+                },
+                async confirmCardPayment() {
+                    return {
+                        error: null,
+                        paymentIntent: {
+                            id: 'pi_mock_mobile_reload',
+                            status: 'succeeded',
+                            amount: 165000
+                        }
+                    };
+                }
+            };
+        };
+    });
+}
+
 test.describe('Mobile friction points', () => {
     test.beforeEach(({}, testInfo) => {
         test.skip(
@@ -384,8 +418,9 @@ test.describe('Mobile friction points', () => {
         await expectNoConsoleErrors(consoleErrors, 'fleet mobile card contact bar');
     });
 
-    test('mobile reserve preserves guest progress after reload in step two and still reaches payment', async ({ page }) => {
+    test('mobile reserve clears private details after reload while preserving schedule', async ({ page }) => {
         const consoleErrors = createConsoleTracker(page);
+        await installStripeMock(page);
 
         await page.goto(
             '/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1650&startDate=2026-12-30&endDate=2027-01-02&pickupTime=10:00&dropoffTime=18:00',
@@ -405,15 +440,28 @@ test.describe('Mobile friction points', () => {
         await page.reload({ waitUntil: 'domcontentloaded' });
         await settlePage(page);
 
+        await expect(page.locator('#step1')).toHaveClass(/active/);
+        await expect(page.locator('#startDate')).toHaveValue('2026-12-30');
+        await expect(page.locator('#endDate')).toHaveValue('2027-01-02');
+        await expect(page.locator('#pickupTime')).toHaveValue('10:00');
+        await expect(page.locator('#dropoffTime')).toHaveValue('18:00');
+        await expect(page.locator('#pickupLocation')).toHaveValue('');
+        await expect(page.locator('#fullName')).toHaveValue('');
+        await expect(page.locator('#passport')).toHaveValue('');
+        await expect(page.locator('#phone')).toHaveValue('');
+        await expect(page.locator('#email')).toHaveValue('');
+
+        await page.locator('#pickupLocation').fill(reservationGuest.pickupLocation);
+        await page.locator('#continueToPaymentBtn').click();
         await expect(page.locator('#step2')).toHaveClass(/active/);
-        await expect(page.locator('#fullName')).toHaveValue(reservationGuest.name);
-        await expect(page.locator('#passport')).toHaveValue(reservationGuest.passport);
-        await expect(page.locator('#phone')).toHaveValue(reservationGuest.phone);
-        await expect(page.locator('#email')).toHaveValue(reservationGuest.email);
+        await page.locator('#fullName').fill(reservationGuest.name);
+        await page.locator('#passport').fill(reservationGuest.passport);
+        await page.locator('#phone').fill(reservationGuest.phone);
+        await page.locator('#email').fill(reservationGuest.email);
 
         await page.locator('#step2').getByRole('button', { name: /Continue to Payment/i }).click();
         await expect(page.locator('#step3')).toHaveClass(/active/);
-        await expect(page.locator('#payButton')).toBeVisible();
+        await expect(page.locator('#card-element')).toHaveAttribute('data-mock-stripe', 'mounted');
         await expectNoConsoleErrors(consoleErrors, 'mobile reserve reload recovery');
     });
 });

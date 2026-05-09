@@ -31,6 +31,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const pickupTimeInput = document.getElementById("fleet-pickup-time");
     const returnDateInput = document.getElementById("fleet-return-date");
     const returnTimeInput = document.getElementById("fleet-return-time");
+    const availabilityByVehicleId = new Map();
+    let availabilityStatus = "idle";
+    let availabilityRequestId = 0;
 
     if (!resultsList || !priceMinInput || !priceMaxInput) {
         return;
@@ -47,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const defaultState = {
         brand: "all",
         type: "all",
+        vehicle: "all",
         sort: "featured",
         priceMin: catalogMin,
         priceMax: catalogMax
@@ -191,6 +195,59 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function hasSchedule(intent) {
         return Boolean(normalizeValue(intent?.startDate) && normalizeValue(intent?.endDate));
+    }
+
+    function getBackendBaseUrl() {
+        if (typeof window.getBackendUrl === "function") {
+            return window.getBackendUrl();
+        }
+
+        if (typeof window.getConfiguredBackendUrl === "function") {
+            return window.getConfiguredBackendUrl();
+        }
+
+        if (typeof window.BACKEND_URL === "string" && window.BACKEND_URL.trim()) {
+            return window.BACKEND_URL.trim();
+        }
+
+        if (window.STRIPE_CONFIG && typeof window.STRIPE_CONFIG.backendUrl === "string") {
+            return window.STRIPE_CONFIG.backendUrl.trim();
+        }
+
+        return "";
+    }
+
+    function buildAvailabilityUrl(schedule) {
+        const backendBaseUrl = getBackendBaseUrl();
+        if (!backendBaseUrl) {
+            return "";
+        }
+
+        const params = new URLSearchParams({
+            startDate: schedule.startDate,
+            endDate: schedule.endDate,
+            pickupTime: schedule.pickupTime || "12:00",
+            dropoffTime: schedule.dropoffTime || "12:00"
+        });
+
+        return `${backendBaseUrl.replace(/\/+$/, "")}/api/availability?${params.toString()}`;
+    }
+
+    function availabilityForCard(card) {
+        return availabilityByVehicleId.get(card.dataset.id || "");
+    }
+
+    function ensureAvailabilityNode(card) {
+        let node = card.querySelector(".fleet-card__availability");
+        if (node) {
+            return node;
+        }
+
+        node = document.createElement("span");
+        node.className = "fleet-card__availability";
+        node.setAttribute("aria-live", "polite");
+        card.querySelector(".fleet-card__booking")?.appendChild(node);
+        return node;
     }
 
     function tokenList(attributeValue) {
@@ -359,6 +416,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
         const incomingBrand = normalizeFilterValue(searchParams.get("brand"));
         const incomingType = normalizeFilterValue(searchParams.get("type"));
+        const incomingVehicle = normalizeFilterValue(searchParams.get("vehicle") || searchParams.get("model"));
 
         if (incomingBrand && availableBrands.has(incomingBrand)) {
             state.brand = incomingBrand;
@@ -366,6 +424,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (incomingType && availableTypes.has(incomingType)) {
             state.type = incomingType;
+        }
+
+        if (incomingVehicle && cards.some((card) => normalizeFilterValue(card.dataset.id) === incomingVehicle)) {
+            state.vehicle = incomingVehicle;
         }
     }
 
@@ -402,13 +464,15 @@ document.addEventListener("DOMContentLoaded", () => {
     function cardMatches(card) {
         const brand = (card.dataset.brand || "").toLowerCase();
         const types = tokenList(card.dataset.type);
+        const vehicle = normalizeFilterValue(card.dataset.id);
         const price = Number(card.dataset.price);
 
         const brandMatch = state.brand === "all" || brand === state.brand;
         const typeMatch = state.type === "all" || types.includes(state.type);
+        const vehicleMatch = state.vehicle === "all" || vehicle === state.vehicle;
         const priceMatch = Number.isFinite(price) && price >= state.priceMin && price <= state.priceMax;
 
-        return brandMatch && typeMatch && priceMatch;
+        return brandMatch && typeMatch && vehicleMatch && priceMatch;
     }
 
     function sortCards(sortedCards) {
@@ -450,6 +514,55 @@ document.addEventListener("DOMContentLoaded", () => {
         return `./app/reserve/page.html?${params.toString()}`;
     }
 
+    function applyReserveAvailability(card, reserveLink, availability) {
+        const statusNode = ensureAvailabilityNode(card);
+        const schedule = getCurrentSchedule();
+        const hasRentalWindow = hasSchedule(schedule);
+
+        card.classList.remove("fleet-card--available", "fleet-card--unavailable", "fleet-card--availability-error");
+        reserveLink?.removeAttribute("aria-disabled");
+        reserveLink?.removeAttribute("tabindex");
+
+        if (!hasRentalWindow) {
+            statusNode.hidden = true;
+            return;
+        }
+
+        statusNode.hidden = false;
+
+        if (availabilityStatus === "loading") {
+            statusNode.textContent = "Checking CRM availability...";
+            return;
+        }
+
+        if (availabilityStatus === "error") {
+            card.classList.add("fleet-card--availability-error");
+            statusNode.textContent = "Availability check unavailable. The team will confirm.";
+            return;
+        }
+
+        if (!availability || availability.available === null) {
+            statusNode.textContent = "Availability not checked yet.";
+            return;
+        }
+
+        if (availability.available) {
+            card.classList.add("fleet-card--available");
+            statusNode.textContent = "Available for these dates";
+            return;
+        }
+
+        card.classList.add("fleet-card--unavailable");
+        statusNode.textContent = "Unavailable for these dates";
+
+        if (reserveLink) {
+            reserveLink.textContent = "Unavailable";
+            reserveLink.removeAttribute("href");
+            reserveLink.setAttribute("aria-disabled", "true");
+            reserveLink.setAttribute("tabindex", "-1");
+        }
+    }
+
     function syncCardActions() {
         cards.forEach((card, index) => {
             const title = normalizeValue(card.querySelector(".fleet-card__title a")?.textContent);
@@ -459,7 +572,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const specs = Array.from(card.querySelectorAll(".fleet-card__spec"));
 
             if (image) {
-                image.loading = index === 0 ? "eager" : "lazy";
+                image.loading = "eager";
                 image.decoding = "async";
             }
 
@@ -471,32 +584,45 @@ document.addEventListener("DOMContentLoaded", () => {
                 reserveLink.textContent = "Reserve";
                 reserveLink.setAttribute("href", buildReserveHref(card));
                 reserveLink.classList.add("fleet-card__reserve");
-                reserveLink.addEventListener("click", () => {
-                    const schedule = getCurrentSchedule();
-                    storeBookingIntent({
-                        car: title,
-                        price: card.dataset.price,
-                        ...schedule
-                    });
+                applyReserveAvailability(card, reserveLink, availabilityForCard(card));
+                if (reserveLink.dataset.fleetReserveBound !== "true") {
+                    reserveLink.dataset.fleetReserveBound = "true";
+                    reserveLink.addEventListener("click", (event) => {
+                        if (reserveLink.getAttribute("aria-disabled") === "true") {
+                            event.preventDefault();
+                            return;
+                        }
 
-                    emitAnalyticsEvent("fleet_reserve_click", {
-                        car: title,
-                        price: normalizeValue(card.dataset.price),
-                        start_date: schedule.startDate,
-                        end_date: schedule.endDate,
-                        page_path: normalizeValue(window.location.pathname)
+                        const schedule = getCurrentSchedule();
+                        storeBookingIntent({
+                            car: title,
+                            price: card.dataset.price,
+                            ...schedule
+                        });
+
+                        emitAnalyticsEvent("fleet_reserve_click", {
+                            car: title,
+                            price: normalizeValue(card.dataset.price),
+                            start_date: schedule.startDate,
+                            end_date: schedule.endDate,
+                            page_path: normalizeValue(window.location.pathname)
+                        });
                     });
-                });
+                }
             }
 
             if (whatsappLink) {
-                whatsappLink.addEventListener("click", () => {
-                    emitAnalyticsEvent("fleet_whatsapp_click", {
-                        car: title,
-                        price: normalizeValue(card.dataset.price),
-                        page_path: normalizeValue(window.location.pathname)
+                if (whatsappLink.dataset.fleetWhatsappBound !== "true") {
+                    whatsappLink.dataset.fleetWhatsappBound = "true";
+                    whatsappLink.addEventListener("click", () => {
+                        const currentTitle = normalizeValue(card.querySelector(".fleet-card__title a")?.textContent);
+                        emitAnalyticsEvent("fleet_whatsapp_click", {
+                            car: currentTitle,
+                            price: normalizeValue(card.dataset.price),
+                            page_path: normalizeValue(window.location.pathname)
+                        });
                     });
-                });
+                }
             }
         });
     }
@@ -507,6 +633,63 @@ document.addEventListener("DOMContentLoaded", () => {
         syncCardActions();
         updateDatePrompts();
         updateFilterChips();
+        refreshAvailability();
+    }
+
+    async function refreshAvailability() {
+        const schedule = getCurrentSchedule();
+        const requestId = availabilityRequestId + 1;
+        availabilityRequestId = requestId;
+        availabilityByVehicleId.clear();
+
+        if (!hasSchedule(schedule)) {
+            availabilityStatus = "idle";
+            syncCardActions();
+            return;
+        }
+
+        const availabilityUrl = buildAvailabilityUrl(schedule);
+        if (!availabilityUrl) {
+            availabilityStatus = "error";
+            syncCardActions();
+            return;
+        }
+
+        availabilityStatus = "loading";
+        syncCardActions();
+
+        try {
+            const response = await fetch(availabilityUrl, {
+                headers: { Accept: "application/json" },
+                cache: "no-store"
+            });
+
+            if (!response.ok) {
+                throw new Error(`Availability returned ${response.status}`);
+            }
+
+            const payload = await response.json();
+
+            if (requestId !== availabilityRequestId) {
+                return;
+            }
+
+            (payload.vehicles || []).forEach((vehicle) => {
+                if (vehicle?.id) {
+                    availabilityByVehicleId.set(vehicle.id, vehicle);
+                }
+            });
+
+            availabilityStatus = "loaded";
+        } catch (error) {
+            if (requestId !== availabilityRequestId) {
+                return;
+            }
+
+            availabilityStatus = "error";
+        }
+
+        syncCardActions();
     }
 
     let mobileControls = null;
@@ -661,6 +844,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const activeFilterCount = [
             state.brand !== defaultState.brand,
             state.type !== defaultState.type,
+            state.vehicle !== defaultState.vehicle,
             state.priceMin !== defaultState.priceMin,
             state.priceMax !== defaultState.priceMax,
             state.sort !== defaultState.sort
@@ -709,18 +893,11 @@ document.addEventListener("DOMContentLoaded", () => {
         closeTopButton.className = "fleet-filter-close fleet-filter-close--top";
         closeTopButton.innerHTML = `
             <span class="fleet-filter-close__icon" aria-hidden="true"></span>
-            <span class="fleet-filter-close__label">Close filters</span>
+            <span class="fleet-filter-close__label">Back to cars</span>
         `;
-        closeTopButton.setAttribute("aria-label", "Close filters and return to car results");
+        closeTopButton.setAttribute("aria-label", "Back to cars and close filters");
         sheetHeader.appendChild(closeTopButton);
         sidebar.insertBefore(sheetHeader, sidebar.firstChild);
-
-        const closeButton = document.createElement("button");
-        closeButton.type = "button";
-        closeButton.className = "fleet-filter-close fleet-filter-close--inline";
-        closeButton.textContent = "Show cars";
-        closeButton.setAttribute("aria-label", "Show car results");
-        sidebarTopbar?.appendChild(closeButton);
 
         const sheetFooter = document.createElement("div");
         sheetFooter.className = "fleet-filter-sheet-footer";
@@ -738,7 +915,7 @@ document.addEventListener("DOMContentLoaded", () => {
             dates: toolbar.querySelector(".js-fleet-mobile-dates"),
             toggle: toolbar.querySelector(".fleet-mobile-filter-toggle"),
             closeTop: closeTopButton,
-            closeInline: closeButton,
+            closeInline: null,
             apply: applyButton
         };
 
@@ -781,6 +958,25 @@ document.addEventListener("DOMContentLoaded", () => {
         topDatePrompt = createPromptButton("top");
         resultsHeader.insertAdjacentElement("afterend", topDatePrompt);
         updateDatePrompts();
+    }
+
+    function initHeroActions() {
+        const heroDateButtons = Array.from(browser.querySelectorAll(".js-fleet-open-dates"));
+
+        heroDateButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                if (window.matchMedia("(max-width: 960px)").matches) {
+                    setFilterSheetState(true);
+                    pickupDateInput?.focus();
+                    return;
+                }
+
+                sidebar?.scrollIntoView({ behavior: "smooth", block: "start" });
+                window.requestAnimationFrame(() => {
+                    pickupDateInput?.focus({ preventScroll: true });
+                });
+            });
+        });
     }
 
     function render() {
@@ -872,18 +1068,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     window.addEventListener("pageshow", () => {
-        syncStateFromControls();
-        syncFieldDisplays();
-        persistSchedule();
-        render();
+        window.requestAnimationFrame(() => {
+            syncStateFromControls();
+            syncFieldDisplays();
+            persistSchedule();
+            render();
+        });
     });
 
+    syncStateFromControls();
     applyIncomingFleetFilters();
     syncDateDefaults();
     syncFieldDisplays();
     syncCardActions();
     initMobileFilters();
     initDatePrompts();
-    syncStateFromControls();
+    initHeroActions();
     render();
+    refreshAvailability();
 });

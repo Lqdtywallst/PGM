@@ -3827,6 +3827,137 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                 return groups;
             }
 
+            function rectOverlap(leftRect, rightRect) {
+                if (!leftRect || !rightRect) {
+                    return null;
+                }
+
+                const overlapWidth = Math.min(leftRect.right, rightRect.right) - Math.max(leftRect.left, rightRect.left);
+                const overlapHeight = Math.min(leftRect.bottom, rightRect.bottom) - Math.max(leftRect.top, rightRect.top);
+
+                if (overlapWidth <= 0 || overlapHeight <= 0) {
+                    return null;
+                }
+
+                return {
+                    width: Number(overlapWidth.toFixed(2)),
+                    height: Number(overlapHeight.toFixed(2)),
+                    area: Number((overlapWidth * overlapHeight).toFixed(2))
+                };
+            }
+
+            function collectFloatingCriticalOverlapMetrics() {
+                const floatingSafeGapPx = 18;
+                const floatingElements = Array.from(document.querySelectorAll([
+                    '.lab-floating-contact.is-visible:not(.is-over-card-actions) .lab-floating-contact__button',
+                    '.hero-floating-actions__link'
+                ].join(','))).filter((element) => (
+                    element instanceof HTMLElement &&
+                    isVisible(element)
+                ));
+                const criticalElements = Array.from(document.querySelectorAll([
+                    '.home-booking',
+                    '.home-booking__shell',
+                    '.home-booking__intro',
+                    '.home-booking__field',
+                    '.home-booking__submit',
+                    '.home-booking input:not([type="hidden"])',
+                    '.home-booking select',
+                    '.lookup-card',
+                    '.lookup-form',
+                    '.lookup-form__actions',
+                    '.lookup-form input:not([type="hidden"])',
+                    '.lookup-form button',
+                    '.lookup-form a',
+                    '.fleet-category',
+                    '.fleet-category__media',
+                    '.fleet-category__copy',
+                    '.fleet-card',
+                    '.fleet-card__content',
+                    '.fleet-visual-card',
+                    '.fleet-visual-card__body',
+                    '.fleet-visual-card__description',
+                    '.fleet-visual-card__sales-line',
+                    '.fleet-visual-card__spec-list',
+                    '.fleet-card__primary',
+                    '.fleet-card__contact-row',
+                    '.fleet-visual-card__primary',
+                    '.fleet-visual-card__contact-row',
+                    '.vehicle-booking__submit',
+                    '.vehicle-booking__secondary',
+                    '.reserve-page .btn',
+                    '.reserve-page .btn-secondary'
+                ].join(','))).filter((element) => element instanceof HTMLElement && isVisible(element));
+                const overlaps = [];
+
+                function rectProximity(leftRect, rightRect) {
+                    const overlap = rectOverlap(leftRect, rightRect);
+
+                    if (overlap) {
+                        return {
+                            ...overlap,
+                            isNearMiss: false,
+                            horizontalGap: 0,
+                            verticalGap: 0
+                        };
+                    }
+
+                    const horizontalGap = Math.max(rightRect.left - leftRect.right, leftRect.left - rightRect.right, 0);
+                    const verticalGap = Math.max(rightRect.top - leftRect.bottom, leftRect.top - rightRect.bottom, 0);
+
+                    if (horizontalGap > floatingSafeGapPx || verticalGap > floatingSafeGapPx) {
+                        return null;
+                    }
+
+                    return {
+                        width: 0,
+                        height: 0,
+                        area: 0,
+                        isNearMiss: true,
+                        horizontalGap: Number(horizontalGap.toFixed(2)),
+                        verticalGap: Number(verticalGap.toFixed(2))
+                    };
+                }
+
+                for (const floating of floatingElements) {
+                    const floatingRect = rectData(floating);
+
+                    for (const critical of criticalElements) {
+                        if (floating.contains(critical) || critical.contains(floating)) {
+                            continue;
+                        }
+
+                        const criticalRect = rectData(critical);
+                        const overlap = rectProximity(floatingRect, criticalRect);
+
+                        if (!overlap || (!overlap.isNearMiss && (overlap.width < 8 || overlap.height < 8))) {
+                            continue;
+                        }
+
+                        overlaps.push({
+                            floatingSelector: selectorLabel(floating),
+                            criticalSelector: selectorLabel(critical),
+                            criticalText: textFor(critical).slice(0, 80),
+                            floatingRect,
+                            criticalRect,
+                            isNearMiss: overlap.isNearMiss,
+                            safeGapPx: floatingSafeGapPx,
+                            horizontalGap: overlap.horizontalGap,
+                            verticalGap: overlap.verticalGap,
+                            overlapWidth: overlap.width,
+                            overlapHeight: overlap.height,
+                            overlapArea: overlap.area
+                        });
+
+                        if (overlaps.length >= 10) {
+                            return overlaps;
+                        }
+                    }
+                }
+
+                return overlaps;
+            }
+
             function labelForDateElement(element) {
                 if (!(element instanceof HTMLElement)) {
                     return '';
@@ -3971,6 +4102,7 @@ async function collectPageDepthScanState(page, pageDir, viewport) {
                 actionMetrics: actionMetrics.slice(0, 40),
                 surfaceWidthMetrics: collectSurfaceWidthMetrics(),
                 actionGroupWidthMetrics: collectActionGroupWidthMetrics(),
+                floatingCriticalOverlapMetrics: collectFloatingCriticalOverlapMetrics(),
                 dateControlMetrics,
                 formBorderStyleMetrics: collectFormBorderStyleMetrics(),
                 textEncodingIssues: collectVisibleTextEncodingIssues(),
@@ -4402,6 +4534,25 @@ function buildPageDepthScanFindings({ route, viewportName, viewportWidth, state,
                         }));
                     }
                 }
+            }
+
+            for (const overlap of frameMetric.floatingCriticalOverlapMetrics || []) {
+                const geometryEvidence = overlap.isNearMiss
+                    ? `nearMissGapX=${overlap.horizontalGap}; nearMissGapY=${overlap.verticalGap}; safeGap=${overlap.safeGapPx}`
+                    : `overlapWidth=${overlap.overlapWidth}; overlapHeight=${overlap.overlapHeight}`;
+                findings.push(createVisualFinding({
+                    route,
+                    viewport: viewportName,
+                    severity: 'high',
+                    category: 'overlap',
+                    selector: `${overlap.floatingSelector} <> ${overlap.criticalSelector}`,
+                    message: 'A floating contact control overlaps or crowds critical first-viewport content.',
+                    evidence: `${frameEvidence}; critical="${overlap.criticalText || overlap.criticalSelector}"; ${geometryEvidence}`,
+                    likelyCause: 'The floating call/WhatsApp stack is not hiding or moving away when forms, cards, or primary actions enter the viewport.',
+                    hardFail: true,
+                    screenshotPath: frameScreenshotPath,
+                    source: 'page_depth_scan'
+                }));
             }
         }
     }
@@ -7453,6 +7604,31 @@ function buildDeterministicFindings({ route, viewport, profile, metrics, console
             maxRatio: firstViewportContract.maxUsefulTopRatio,
             required: Boolean(firstViewportContract.usefulRectKey)
         });
+
+        if (
+            usefulRect &&
+            Number.isFinite(firstViewportContract.maxUsefulBottomRatio) &&
+            viewportHeight > 0
+        ) {
+            const usefulBottomRatio = Number(usefulRect.bottom || 0) / viewportHeight;
+            const usefulLabel = firstViewportContract.usefulLabel || firstViewportContract.usefulRectKey || 'usefulContent';
+
+            if (usefulBottomRatio > firstViewportContract.maxUsefulBottomRatio) {
+                mobileUsefulFailures.push(`${usefulLabel}BottomRatio=${usefulBottomRatio.toFixed(3)}>${firstViewportContract.maxUsefulBottomRatio}`);
+            }
+        }
+
+        if (
+            ctaRect &&
+            Number.isFinite(firstViewportContract.maxPrimaryCtaBottomRatio) &&
+            viewportHeight > 0
+        ) {
+            const ctaBottomRatio = Number(ctaRect.bottom || 0) / viewportHeight;
+
+            if (ctaBottomRatio > firstViewportContract.maxPrimaryCtaBottomRatio) {
+                mobileUsefulFailures.push(`primaryCtaBottomRatio=${ctaBottomRatio.toFixed(3)}>${firstViewportContract.maxPrimaryCtaBottomRatio}`);
+            }
+        }
 
         if (
             ctaRect &&

@@ -16,18 +16,22 @@ const REDIRECTS = {
     '/g63-rental-dubai-marina.html': '/mercedes-g63-amg-rental-dubai.html',
     '/lamborghini-rental-palm-jumeirah.html': '/lamborghini-rental-dubai.html'
 };
+const FRAME_ANCESTORS = String(
+    process.env.PREVIEW_FRAME_ANCESTORS ||
+    "'none'"
+).trim();
 const CONTENT_SECURITY_POLICY = [
     "default-src 'self'",
     "base-uri 'self'",
     "object-src 'none'",
-    "frame-ancestors 'none'",
+    `frame-ancestors ${FRAME_ANCESTORS}`,
     "form-action 'self'",
     "img-src 'self' data: https:",
     "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
     "script-src 'self' 'unsafe-inline' https://js.stripe.com https://www.googletagmanager.com",
     "connect-src 'self' http://127.0.0.1:3000 http://localhost:3000 https://api.stripe.com https://pgm-production.up.railway.app https://pgm-staging.up.railway.app https://prestigegoalmotion.com https://www.prestigegoalmotion.com https://staging.prestigegoalmotion.com https://preprod.prestigegoalmotion.com https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com",
-    "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://www.openstreetmap.org",
+    "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://www.openstreetmap.org https://www.google.com",
     "media-src 'self' https:",
     "manifest-src 'self'",
     "worker-src 'self' blob:"
@@ -78,13 +82,18 @@ function buildCacheHeaders(filePath) {
 }
 
 function buildSecurityHeaders() {
-    return {
+    const headers = {
         'Content-Security-Policy': CONTENT_SECURITY_POLICY,
         'Referrer-Policy': 'strict-origin-when-cross-origin',
         'Permissions-Policy': 'camera=(), geolocation=(), microphone=()',
-        'X-Content-Type-Options': 'nosniff',
-        'X-Frame-Options': 'DENY'
+        'X-Content-Type-Options': 'nosniff'
     };
+
+    if (FRAME_ANCESTORS === "'none'") {
+        headers['X-Frame-Options'] = 'DENY';
+    }
+
+    return headers;
 }
 
 function getPreferredCompression(requestHeaders = {}, contentType = '', contentLength = 0) {

@@ -458,7 +458,7 @@ textarea {
     inset: 0 0 auto;
     z-index: 20;
     line-height: normal;
-    background: linear-gradient(180deg, rgba(4, 4, 6, 0.97) 0%, rgba(4, 4, 6, 0.9) 64%, rgba(4, 4, 6, 0.68) 100%);
+    background: var(--editor-header-background, #08090c);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
 }
@@ -477,6 +477,16 @@ textarea {
     justify-content: space-between;
     gap: 2rem;
     padding: 1.15rem 0;
+}
+
+@media (min-width: 861px) {
+    .reserve-page .lab-header__inner {
+        justify-content: flex-start;
+    }
+
+    .reserve-page .lab-header__utility {
+        margin-left: 0;
+    }
 }
 
 .lab-header__utility {
@@ -686,7 +696,7 @@ textarea {
     width: min(var(--lab-nav-panel-width), calc(100vw - 4rem));
     padding: 0.98rem 1.05rem 1.02rem;
     border: 1px solid var(--lab-cool-lens-edge);
-    border-radius: 1.2rem;
+    border-radius: var(--editor-card-radius, 8px);
     background:
         linear-gradient(180deg, var(--lab-cool-panel-start) 0%, var(--lab-cool-panel-end) 100%),
         radial-gradient(circle at 18% -10%, rgba(245, 250, 255, 0.24), transparent 34%),
@@ -809,9 +819,10 @@ textarea {
     justify-content: center;
     min-height: 56px;
     padding: 0 1.5rem;
-    border-radius: 999px;
-    background: linear-gradient(135deg, var(--lab-accent-soft), var(--lab-accent));
-    color: #101010;
+    border: 1px solid color-mix(in srgb, var(--editor-button-background, var(--lab-accent)) 78%, #ffffff 22%);
+    border-radius: var(--editor-button-radius, 999px);
+    background: var(--editor-button-background, var(--lab-accent));
+    color: var(--editor-button-text, #101010);
     font-family: var(--lab-font-sans);
     font-size: 0.74rem;
     font-weight: 700;
@@ -1798,7 +1809,7 @@ body.lab-mobile-nav-open {
 
     .lab-header {
         position: fixed;
-        background: linear-gradient(180deg, rgba(4, 4, 6, 0.98) 0%, rgba(4, 4, 6, 0.92) 70%, rgba(4, 4, 6, 0.78) 100%);
+        background: var(--editor-header-background, #08090c);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
     }

@@ -42,7 +42,21 @@ const VISUAL_RISK_GROUPS = Object.freeze([
     Object.freeze({
         key: 'surfaceQuality',
         label: 'surface quality',
-        categories: Object.freeze(['font_drift', 'surface_drift', 'shape_drift', 'button_variant_sprawl', 'header_consistency', 'border_weight_drift', 'visual_affordance'])
+        categories: Object.freeze([
+            'font_drift',
+            'surface_drift',
+            'shape_drift',
+            'button_variant_sprawl',
+            'header_consistency',
+            'header_identity_drift',
+            'header_surface_drift',
+            'header_cta_drift',
+            'header_dropdown_drift',
+            'drawer_brand_drift',
+            'drawer_system_drift',
+            'border_weight_drift',
+            'visual_affordance'
+        ])
     }),
     Object.freeze({
         key: 'readability',

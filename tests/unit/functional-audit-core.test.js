@@ -32,12 +32,23 @@ const COMPLETE_DEEP_SCOPE = Object.freeze({
 test('functional human review defines real customer judgement rules', () => {
     const ids = FUNCTIONAL_HUMAN_REVIEW_RULES.map((rule) => rule.id);
 
+    assert.ok(ids.includes('realistic_customer_missions'));
     assert.ok(ids.includes('intent_continuity'));
+    assert.ok(ids.includes('data_and_api_truth'));
     assert.ok(ids.includes('visible_recovery'));
     assert.ok(ids.includes('mobile_unblocked'));
+    assert.ok(ids.includes('accessible_interactions'));
     assert.ok(ids.includes('technical_confidence'));
     assert.ok(ids.includes('interaction_contract'));
     assert.ok(ids.includes('journey_evidence'));
+
+    const checks = FUNCTIONAL_HUMAN_REVIEW_RULES.flatMap((rule) => [...rule.checks]).join(' ');
+    assert.match(checks, /persona, customer intent and measurable acceptance criteria/i);
+    assert.match(checks, /availability, reservation, contact and payment states/i);
+    assert.match(checks, /visible focus and keyboard-reachable controls/i);
+    assert.match(checks, /home-to-fleet actions preserve category filters/i);
+    assert.match(checks, /home featured vehicle CTAs open exact vehicle landing pages/i);
+    assert.match(checks, /availability claims are backed by \/api\/availability/i);
 });
 
 test('functional human review marks important action failures as bad', () => {

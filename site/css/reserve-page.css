@@ -1839,14 +1839,16 @@
         }
 
         .reserve-page .lab-header {
-            background: linear-gradient(180deg, rgba(4, 4, 6, 0.97) 0%, rgba(4, 4, 6, 0.9) 64%, rgba(4, 4, 6, 0.68) 100%);
+            background: var(--editor-header-background, #08090c);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
-            box-shadow: none;
+            border-bottom: 0;
+            box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
         }
 
         .reserve-page .lab-header::after {
-            background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
+            opacity: 1;
+            background: linear-gradient(90deg, rgba(241, 226, 189, 0), rgba(241, 226, 189, 0.12), rgba(241, 226, 189, 0));
         }
 
         .reserve-page .lab-mobile-toggle {
@@ -2471,7 +2473,21 @@
         /* Final reserve cleanup */
         .reserve-page .lab-header__inner {
             justify-content: space-between;
-            gap: 1.2rem;
+            gap: 2rem;
+        }
+
+        .reserve-page .lab-header__utility {
+            margin-left: auto;
+        }
+
+        @media (min-width: 861px) and (max-width: 1540px) {
+            .reserve-page .lab-header__inner {
+                gap: 1.25rem;
+            }
+
+            .reserve-page .lab-header__nav {
+                gap: 0.75rem;
+            }
         }
 
         .reserve-page-shell {

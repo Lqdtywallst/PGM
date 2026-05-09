@@ -118,7 +118,7 @@ test.describe('Adversarial functional audit', () => {
         await openPaymentStep(page);
         await page.locator('#payButton').dblclick();
 
-        await expect(page.locator('#paymentStatus')).toContainText('Payment successful! Processing reservation...');
+        await expect(page.locator('#paymentStatus')).toContainText('Payment received. Finalising your reservation...');
         await expect(page).toHaveURL(/\/index\.html$/i, { timeout: 10000 });
         expect(reserveCalls).toBe(1);
         expect(confirmCalls).toBe(1);
@@ -194,14 +194,14 @@ test.describe('Adversarial functional audit', () => {
         await page.locator('#payButton').click();
 
         await expect(page.locator('#paymentStatus')).toContainText(
-            'Error processing payment: Reservation service unavailable.'
+            'We could not complete payment. Reservation service unavailable.'
         );
         await expect(page.locator('#payButton')).toBeEnabled();
         await expect(page.locator('#step3')).toHaveClass(/active/);
 
         await page.locator('#payButton').click();
 
-        await expect(page.locator('#paymentStatus')).toContainText('Payment successful! Processing reservation...');
+        await expect(page.locator('#paymentStatus')).toContainText('Payment received. Finalising your reservation...');
         await expect(page).toHaveURL(/\/index\.html$/i, { timeout: 10000 });
         expect(reserveCalls).toBe(2);
         expect(dialogs).toBe(1);
@@ -258,12 +258,12 @@ test.describe('Adversarial functional audit', () => {
         await page.locator('.fleet-mobile-filter-toggle').click();
         await page.locator('.js-fleet-brand-select').selectOption('lamborghini');
         await expect(page.locator('.js-fleet-results-count')).toContainText('2 models visible');
-        await page.locator('.fleet-filter-close').click();
+        await page.locator('.fleet-filter-apply').click();
 
         await page.locator('.fleet-mobile-filter-toggle').click();
         await page.locator('.js-fleet-brand-select').selectOption('ferrari');
         await expect(page.locator('.js-fleet-results-count')).toContainText('1 model visible');
-        await page.locator('.fleet-filter-close').click();
+        await page.locator('.fleet-filter-apply').click();
 
         await page.locator('.js-fleet-card:not([hidden]) .fleet-card__reserve').first().click();
 

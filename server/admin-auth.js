@@ -257,7 +257,8 @@ function requireAdminSession(options = {}) {
         const session = getAdminSessionFromRequest(req, options);
         if (!session) {
             if (options.redirectToLogin) {
-                return res.redirect('/admin/login.html');
+                const nextPath = encodeURIComponent(req.originalUrl || req.url || '/admin/reservations.html');
+                return res.redirect(`/admin/login.html?next=${nextPath}`);
             }
 
             return res.status(401).json({ error: 'Admin session required' });

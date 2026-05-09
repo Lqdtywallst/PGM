@@ -4,6 +4,8 @@ const assert = require('node:assert/strict');
 const {
     buildHomogeneityFindings,
     compareBrandSurfaces,
+    compareHeaderCtaSurface,
+    compareHeaderDropdownSystems,
     compareHeaderLayout,
     compareHeaderNavigationMotion,
     compareHeaderSurface,
@@ -13,6 +15,7 @@ const {
     summarizeHomogeneityFindings
 } = require('../../server/homogeneity-audit-core');
 const {
+    isHeaderGuardFinding,
     parseArgs: parseHeaderGuardArgs,
     resolveGuardRoutes,
     resolveGuardViewports,
@@ -64,6 +67,31 @@ const homeHeaderSurface = {
     backgroundLuminance: 0.003,
     backgroundAlpha: 0.88,
     hasGradient: true
+};
+
+const homeHeaderDropdowns = [
+    {
+        exists: true,
+        label: 'Cars Brands',
+        panelId: 'lab-nav-brands-panel',
+        surfaceTone: 'dark-gradient',
+        backgroundLuminance: 0.08,
+        backgroundAlpha: 0.92,
+        borderRadiusPx: 20,
+        minTextContrastRatio: 8.4,
+        topOffsetFromHeaderPx: -30,
+        panelRect: { width: 362, height: 194 },
+        cardCount: 5
+    }
+];
+
+const homeHeaderCta = {
+    exists: true,
+    text: 'Reserve',
+    color: 'rgb(16, 16, 16)',
+    backgroundImage: 'linear-gradient(135deg, rgb(241, 255, 157), rgb(227, 246, 85))',
+    borderRadiusPx: 999,
+    rect: { width: 112, height: 56 }
 };
 
 test('normalizeAssetPath compares public logo assets without host noise', () => {
@@ -135,6 +163,85 @@ test('compareHeaderSurface flags white headers against dark approved references'
     assert.ok(mismatches.some((entry) => entry.field === 'backgroundLuminance' && entry.severity === 'high'));
 });
 
+test('compareHeaderSurface flags solid-to-gradient header treatment drift', () => {
+    const solidHeader = {
+        ...homeHeaderSurface,
+        surfaceTone: 'dark',
+        hasGradient: false,
+        boxShadow: false
+    };
+    const gradientHeader = {
+        ...solidHeader,
+        surfaceTone: 'dark-gradient',
+        hasGradient: true,
+        boxShadow: true
+    };
+
+    const mismatches = compareHeaderSurface(solidHeader, gradientHeader);
+
+    assert.ok(mismatches.some((entry) => entry.field === 'hasGradient' && entry.severity === 'medium'));
+    assert.ok(mismatches.some((entry) => entry.field === 'boxShadow' && entry.severity === 'medium'));
+});
+
+test('compareHeaderDropdownSystems flags light dropdown drift against dark approved menus', () => {
+    const mismatches = compareHeaderDropdownSystems(
+        {
+            route: '/',
+            headerDropdowns: homeHeaderDropdowns
+        },
+        {
+            route: '/lamborghini-rental-dubai.html',
+            headerDropdowns: [
+                {
+                    ...homeHeaderDropdowns[0],
+                    surfaceTone: 'light',
+                    backgroundLuminance: 0.94,
+                    borderRadiusPx: 12,
+                    minTextContrastRatio: 2.6,
+                    topOffsetFromHeaderPx: 14,
+                    panelRect: { width: 362, height: 194 }
+                }
+            ]
+        }
+    );
+
+    assert.ok(mismatches.some((entry) => entry.field === 'cars brands.surfaceTone' && entry.severity === 'high'));
+    assert.ok(mismatches.some((entry) => entry.field === 'cars brands.backgroundLuminance' && entry.severity === 'high'));
+    assert.ok(mismatches.some((entry) => entry.field === 'cars brands.minTextContrastRatio' && entry.severity === 'high'));
+    assert.ok(mismatches.some((entry) => entry.field === 'cars brands.topOffsetFromHeaderPx'));
+});
+
+test('compareHeaderDropdownSystems flags missing shared dropdowns', () => {
+    const mismatches = compareHeaderDropdownSystems(
+        {
+            route: '/',
+            headerDropdowns: homeHeaderDropdowns
+        },
+        {
+            route: '/fleet.html',
+            headerDropdowns: []
+        }
+    );
+
+    assert.equal(mismatches[0].field, 'dropdowns');
+    assert.equal(mismatches[0].severity, 'high');
+});
+
+test('compareHeaderCtaSurface flags reserve button treatment drift', () => {
+    const mismatches = compareHeaderCtaSurface(homeHeaderCta, {
+        ...homeHeaderCta,
+        backgroundImage: 'linear-gradient(135deg, rgb(239, 213, 129), rgb(214, 173, 85))',
+        color: 'rgb(21, 17, 10)'
+    });
+
+    assert.ok(mismatches.some((entry) => entry.field === 'background' && entry.severity === 'high'));
+    assert.ok(mismatches.some((entry) => entry.field === 'color'));
+});
+
+test('compareHeaderCtaSurface accepts matching reserve buttons', () => {
+    assert.deepEqual(compareHeaderCtaSurface(homeHeaderCta, { ...homeHeaderCta }), []);
+});
+
 test('compareHeaderNavigationMotion flags visible jumps between header tabs', () => {
     const mismatches = compareHeaderNavigationMotion(
         {
@@ -159,6 +266,42 @@ test('compareHeaderNavigationMotion flags visible jumps between header tabs', ()
     assert.ok(mismatches.some((entry) => entry.field === 'headerHeightPx'));
     assert.ok(mismatches.some((entry) => entry.field === 'logoWidthPx'));
     assert.ok(mismatches.some((entry) => entry.field === 'brandToUtilityGapPx' && entry.severity === 'high'));
+});
+
+test('compareHeaderNavigationMotion flags subtle logo and cluster shifts between public pages', () => {
+    const mismatches = compareHeaderNavigationMotion(
+        {
+            route: '/',
+            headerLayout: {
+                ...homeHeaderLayout,
+                headerHeightPx: 88.78,
+                brandToUtilityGapPx: 20,
+                utilityToNavGapPx: 20,
+                navToReserveGapPx: 12
+            },
+            headerBrand: {
+                ...homeBrand,
+                logoRect: { width: 48, height: 48 }
+            }
+        },
+        {
+            route: '/app/reserve/page.html',
+            headerLayout: {
+                ...homeHeaderLayout,
+                headerHeightPx: 88.78,
+                brandToUtilityGapPx: 20,
+                utilityToNavGapPx: 30,
+                navToReserveGapPx: 16
+            },
+            headerBrand: {
+                ...homeBrand,
+                logoRect: { width: 42, height: 42 }
+            }
+        }
+    );
+
+    assert.ok(mismatches.some((entry) => entry.field === 'logoWidthPx'));
+    assert.ok(mismatches.some((entry) => entry.field === 'utilityToNavGapPx'));
 });
 
 test('compareTypographySurfaces flags text font family drift', () => {
@@ -257,7 +400,9 @@ test('buildHomogeneityFindings uses home and services as approved header referen
             route: '/',
             viewport: 'desktop-wide',
             headerLayout: homeHeaderLayout,
-            headerSurface: homeHeaderSurface
+            headerSurface: homeHeaderSurface,
+            headerCta: homeHeaderCta,
+            headerDropdowns: homeHeaderDropdowns
         },
         {
             ...sharedPage,
@@ -267,7 +412,9 @@ test('buildHomogeneityFindings uses home and services as approved header referen
             headerSurface: {
                 ...homeHeaderSurface,
                 position: 'sticky'
-            }
+            },
+            headerCta: homeHeaderCta,
+            headerDropdowns: homeHeaderDropdowns
         },
         {
             ...sharedPage,
@@ -289,7 +436,20 @@ test('buildHomogeneityFindings uses home and services as approved header referen
                 surfaceTone: 'light',
                 backgroundLuminance: 0.91,
                 hasGradient: false
-            }
+            },
+            headerCta: {
+                ...homeHeaderCta,
+                backgroundImage: 'linear-gradient(135deg, rgb(239, 213, 129), rgb(214, 173, 85))'
+            },
+            headerDropdowns: [
+                {
+                    ...homeHeaderDropdowns[0],
+                    surfaceTone: 'light',
+                    backgroundLuminance: 0.92,
+                    minTextContrastRatio: 2.8,
+                    topOffsetFromHeaderPx: 18
+                }
+            ]
         }
     ]);
 
@@ -300,6 +460,8 @@ test('buildHomogeneityFindings uses home and services as approved header referen
     assert.ok(findings.some((finding) => finding.route === '/lamborghini-rental-dubai.html' && finding.category === 'header_layout_drift'));
     assert.ok(findings.some((finding) => finding.route === '/lamborghini-rental-dubai.html' && finding.category === 'header_surface_drift'));
     assert.ok(findings.some((finding) => finding.route === '/lamborghini-rental-dubai.html' && finding.category === 'header_navigation_shift'));
+    assert.ok(findings.some((finding) => finding.route === '/lamborghini-rental-dubai.html' && finding.category === 'header_cta_drift'));
+    assert.ok(findings.some((finding) => finding.route === '/lamborghini-rental-dubai.html' && finding.category === 'header_dropdown_drift'));
 });
 
 test('summarizeHomogeneityFindings groups severity counts', () => {
@@ -345,4 +507,11 @@ test('header homogeneity guard can run exhaustive page coverage', () => {
         header_navigation_shift: 2,
         header_surface_drift: 1
     });
+});
+
+test('header homogeneity guard includes interactive dropdown drift', () => {
+    assert.equal(isHeaderGuardFinding({ area: 'header' }), true);
+    assert.equal(isHeaderGuardFinding({ area: 'header_cta' }), true);
+    assert.equal(isHeaderGuardFinding({ area: 'header_dropdown' }), true);
+    assert.equal(isHeaderGuardFinding({ area: 'typography' }), false);
 });

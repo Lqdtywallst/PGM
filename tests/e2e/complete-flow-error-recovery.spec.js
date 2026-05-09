@@ -108,12 +108,12 @@ test.describe('Complete-flow error recovery', () => {
         const successDialogPromise = page.waitForEvent('dialog');
         await page.locator('#payButton').click();
 
-        await expect(page.locator('#paymentStatus')).toContainText('Payment successful! Processing reservation...');
+        await expect(page.locator('#paymentStatus')).toContainText('Payment received. Finalising your reservation...');
         const successDialog = await successDialogPromise;
-        expect(successDialog.message()).toContain('Payment successful');
+        expect(successDialog.message()).toContain('Payment received');
         await successDialog.accept();
 
-        await expect(page).toHaveURL(/\/index\.html$/i);
+        await expect(page.getByRole('heading', { name: /Dubai luxury, delivered/i })).toBeVisible();
     });
 
     test('booking surfaces a recoverable card failure when payment method is rejected', async ({ page }) => {

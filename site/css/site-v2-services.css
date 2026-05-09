@@ -1699,6 +1699,8 @@
     align-content: end;
     justify-items: center;
     gap: clamp(1.2rem, 3vh, 2.15rem);
+    justify-self: center;
+    width: min(100%, 78rem);
 }
 
 .services-hero__hub-intro {
@@ -1778,6 +1780,7 @@
         grid-template-rows: none;
         align-items: center;
         align-content: end;
+        justify-self: center;
         transform: none;
     }
 

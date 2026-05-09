@@ -2106,6 +2106,91 @@ test('buildDeterministicFindings accepts contact mobile when the form starts wit
     )), false);
 });
 
+test('buildDeterministicFindings flags reservation lookup desktop when the first viewport crops the split hero', () => {
+    const findings = buildDeterministicFindings({
+        route: '/reservation-lookup.html',
+        viewport: { name: 'laptop' },
+        profile: 'contact',
+        metrics: {
+            horizontalOverflowPx: 0,
+            visibleH1Count: 1,
+            headingRect: { top: 266, bottom: 440, width: 520, height: 174 },
+            viewportWidth: 1366,
+            viewportHeight: 768,
+            contactIntroRect: { top: 180, bottom: 769, width: 570, height: 589 },
+            contactFormCardRect: { top: 180, bottom: 769, width: 590, height: 589 },
+            contactHeroShellRect: { top: 180, bottom: 830, width: 1214, height: 650 },
+            heroActionCount: 2,
+            contactHeroActionRect: { top: 557, bottom: 604, width: 143, height: 47 },
+            primaryCtaRect: { top: 637, bottom: 697, width: 276, height: 60 },
+            headerFamily: 'lab-header',
+            visualIntent: 'modern_light_system',
+            hasVisualMedia: true,
+            hasNav: true,
+            headerOcclusionPx: 0,
+            clippedElements: [],
+            overlaps: [],
+            brokenMedia: []
+        },
+        consoleErrors: [],
+        networkErrors: {
+            requestFailures: [],
+            criticalResponses: [],
+            pageErrors: []
+        },
+        artifacts: {
+            viewportScreenshot: '/tmp/lookup-desktop-cropped.png'
+        }
+    });
+
+    assert.ok(findings.some((entry) => (
+        entry.category === 'first_viewport_layout' &&
+        /secondaryBottomRatio=1\.001/.test(entry.evidence)
+    )));
+});
+
+test('buildDeterministicFindings flags reservation lookup mobile when the form card is cut by the fold', () => {
+    const findings = buildDeterministicFindings({
+        route: '/reservation-lookup.html',
+        viewport: { name: 'mobile-modern' },
+        profile: 'contact',
+        metrics: {
+            horizontalOverflowPx: 0,
+            visibleH1Count: 1,
+            headingRect: { top: 164, bottom: 256, width: 342, height: 92 },
+            viewportWidth: 390,
+            viewportHeight: 844,
+            contactIntroRect: { top: 117, bottom: 443, width: 342, height: 326 },
+            contactFormCardRect: { top: 469, bottom: 923, width: 342, height: 454 },
+            heroActionCount: 1,
+            contactHeroActionRect: { top: 396, bottom: 443, width: 342, height: 47 },
+            primaryCtaRect: { top: 753, bottom: 805, width: 307, height: 52 },
+            headerFamily: 'lab-header',
+            visualIntent: 'modern_light_system',
+            hasVisualMedia: true,
+            hasNav: true,
+            headerOcclusionPx: 0,
+            clippedElements: [],
+            overlaps: [],
+            brokenMedia: []
+        },
+        consoleErrors: [],
+        networkErrors: {
+            requestFailures: [],
+            criticalResponses: [],
+            pageErrors: []
+        },
+        artifacts: {
+            viewportScreenshot: '/tmp/lookup-mobile-cropped.png'
+        }
+    });
+
+    assert.ok(findings.some((entry) => (
+        entry.category === 'first_viewport_layout' &&
+        /contact formBottomRatio=1\.094>0\.98/.test(entry.evidence)
+    )));
+});
+
 test('buildDeterministicFindings flags vehicle mobile when availability CTA is buried below the first view', () => {
     const findings = buildDeterministicFindings({
         route: '/ferrari-296-gts-rental-dubai.html',
@@ -3432,6 +3517,96 @@ test('buildPageDepthScanFindings flags booking date controls prefilled before to
     assert.ok(findings.some((finding) => (
         finding.category === 'date_currentness' &&
         /allows dates before today/i.test(finding.message)
+    )));
+});
+
+test('buildPageDepthScanFindings flags floating contact over home booking controls', () => {
+    const findings = buildPageDepthScanFindings({
+        route: '/',
+        viewportName: 'mobile-modern',
+        viewportWidth: 390,
+        state: {
+            available: true,
+            frames: [
+                {
+                    index: 2,
+                    scrollY: 178,
+                    viewportTop: 178,
+                    viewportBottom: 1022,
+                    screenshotPath: '/tmp/home-booking-overlap.png',
+                    metric: {
+                        visibleMajorElementCount: 10,
+                        largestBlankGapRatio: 0.18,
+                        actionMetrics: [],
+                        dateControlMetrics: [],
+                        floatingCriticalOverlapMetrics: [
+                            {
+                                floatingSelector: 'nav.lab-floating-contact.is-visible',
+                                criticalSelector: 'label.home-booking__field',
+                                criticalText: 'Return time',
+                                overlapWidth: 42,
+                                overlapHeight: 50
+                            }
+                        ]
+                    }
+                }
+            ],
+            cardActionMetrics: []
+        },
+        screenshotPath: '/tmp/home.png'
+    });
+
+    assert.ok(findings.some((finding) => (
+        finding.category === 'overlap' &&
+        /floating contact control overlaps/i.test(finding.message) &&
+        /Return time/.test(finding.evidence) &&
+        finding.hardFail === true
+    )));
+});
+
+test('buildPageDepthScanFindings flags floating contact crowding home booking controls', () => {
+    const findings = buildPageDepthScanFindings({
+        route: '/',
+        viewportName: 'tablet-portrait',
+        viewportWidth: 768,
+        state: {
+            available: true,
+            frames: [
+                {
+                    index: 2,
+                    scrollY: 180,
+                    viewportTop: 180,
+                    viewportBottom: 1204,
+                    screenshotPath: '/tmp/home-booking-near-miss.png',
+                    metric: {
+                        visibleMajorElementCount: 12,
+                        largestBlankGapRatio: 0.16,
+                        actionMetrics: [],
+                        dateControlMetrics: [],
+                        floatingCriticalOverlapMetrics: [
+                            {
+                                floatingSelector: 'a.lab-floating-contact__button--call',
+                                criticalSelector: 'button.home-booking__submit',
+                                criticalText: 'See available cars',
+                                isNearMiss: true,
+                                safeGapPx: 18,
+                                horizontalGap: 6,
+                                verticalGap: 0
+                            }
+                        ]
+                    }
+                }
+            ],
+            cardActionMetrics: []
+        },
+        screenshotPath: '/tmp/home.png'
+    });
+
+    assert.ok(findings.some((finding) => (
+        finding.category === 'overlap' &&
+        /crowds/i.test(finding.message) &&
+        /nearMissGapX=6/.test(finding.evidence) &&
+        finding.hardFail === true
     )));
 });
 

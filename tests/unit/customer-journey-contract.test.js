@@ -19,6 +19,10 @@ test('customer journey catalog covers desktop and mobile customer intent', () =>
     const ids = CUSTOMER_JOURNEY_SCENARIOS.map((scenario) => scenario.id);
 
     assert.ok(ids.includes('home_to_fleet_schedule'));
+    assert.ok(ids.includes('home_to_fleet_availability'));
+    assert.ok(ids.includes('home_category_to_filtered_fleet'));
+    assert.ok(ids.includes('cars_types_menu_to_filtered_fleet'));
+    assert.ok(ids.includes('home_featured_vehicle_to_landing'));
     assert.ok(ids.includes('mobile_navigation_confidence'));
     assert.ok(ids.includes('fleet_shortlist_and_handoff'));
     assert.ok(ids.includes('contact_support_lead'));
@@ -38,11 +42,20 @@ test('deviceFamilyForViewport groups customer devices by mobile and computer', (
 test('actionMatchesScenario supports exact and dynamic action ids', () => {
     const brandScenario = CUSTOMER_JOURNEY_SCENARIOS.find((scenario) => scenario.id === 'brand_to_vehicle_booking');
     const contactScenario = CUSTOMER_JOURNEY_SCENARIOS.find((scenario) => scenario.id === 'contact_support_lead');
+    const availabilityScenario = CUSTOMER_JOURNEY_SCENARIOS.find((scenario) => scenario.id === 'home_to_fleet_availability');
+    const categoryScenario = CUSTOMER_JOURNEY_SCENARIOS.find((scenario) => scenario.id === 'home_category_to_filtered_fleet');
+    const carsTypesScenario = CUSTOMER_JOURNEY_SCENARIOS.find((scenario) => scenario.id === 'cars_types_menu_to_filtered_fleet');
+    const featuredVehicleScenario = CUSTOMER_JOURNEY_SCENARIOS.find((scenario) => scenario.id === 'home_featured_vehicle_to_landing');
 
     assert.equal(actionMatchesScenario('model-card-book-1', brandScenario), true);
     assert.equal(actionMatchesScenario('vehicle-booking-submit', brandScenario), true);
     assert.equal(actionMatchesScenario('contact-submit', contactScenario), true);
     assert.equal(actionMatchesScenario('fleet-filter-cycle', contactScenario), false);
+    assert.equal(actionMatchesScenario('home-booking-bar-availability', availabilityScenario), true);
+    assert.equal(actionMatchesScenario('home-overlay-search', availabilityScenario), false);
+    assert.equal(actionMatchesScenario('home-category-filter', categoryScenario), true);
+    assert.equal(actionMatchesScenario('home-cars-types-filter-menu', carsTypesScenario), true);
+    assert.equal(actionMatchesScenario('home-featured-vehicle-landing', featuredVehicleScenario), true);
 });
 
 test('routeMatchesScenario keeps generic link actions inside the right customer story', () => {
@@ -77,6 +90,33 @@ test('buildCustomerJourneyCoverage reports passed, failed and missing device cov
     assert.equal(homeScenario.byDevice.desktop.passed, 1);
     assert.equal(contactScenario.status, 'failed');
     assert.equal(contactScenario.byDevice.mobile.failed, 1);
+});
+
+test('home handoff scenarios require availability, category and vehicle landing evidence', () => {
+    const coverage = buildCustomerJourneyCoverage([
+        {
+            route: '/',
+            viewport: 'laptop',
+            actions: [
+                { id: 'home-booking-bar-availability', label: 'Home availability', status: 'passed' },
+                { id: 'home-category-filter', label: 'Home category filter', status: 'passed' },
+                { id: 'home-cars-types-filter-menu', label: 'Cars Types filter menu', status: 'passed' },
+                { id: 'home-featured-vehicle-landing', label: 'Home featured vehicle landing', status: 'passed' }
+            ]
+        }
+    ]);
+    const availabilityScenario = coverage.scenarios.find((scenario) => scenario.id === 'home_to_fleet_availability');
+    const categoryScenario = coverage.scenarios.find((scenario) => scenario.id === 'home_category_to_filtered_fleet');
+    const carsTypesScenario = coverage.scenarios.find((scenario) => scenario.id === 'cars_types_menu_to_filtered_fleet');
+    const featuredVehicleScenario = coverage.scenarios.find((scenario) => scenario.id === 'home_featured_vehicle_to_landing');
+
+    assert.equal(availabilityScenario.status, 'partial');
+    assert.deepEqual(availabilityScenario.missingDevices, ['mobile']);
+    assert.equal(availabilityScenario.byDevice.desktop.passed, 1);
+    assert.equal(categoryScenario.byDevice.desktop.passed, 1);
+    assert.equal(carsTypesScenario.status, 'covered');
+    assert.equal(carsTypesScenario.byDevice.desktop.passed, 1);
+    assert.equal(featuredVehicleScenario.byDevice.desktop.passed, 1);
 });
 
 test('buildCustomerJourneyCoverage does not count contact links as services journeys', () => {

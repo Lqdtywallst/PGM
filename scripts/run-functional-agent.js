@@ -634,6 +634,31 @@ async function installCommonMocks(page, { enableStripeMock = false } = {}) {
         });
     });
 
+    await page.route('**/api/availability?**', async (route) => {
+        const requestUrl = new URL(route.request().url());
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                status: 'ok',
+                schedule: {
+                    startDate: requestUrl.searchParams.get('startDate'),
+                    endDate: requestUrl.searchParams.get('endDate'),
+                    pickupTime: requestUrl.searchParams.get('pickupTime'),
+                    dropoffTime: requestUrl.searchParams.get('dropoffTime')
+                },
+                vehicles: [
+                    { id: 'lamborghini-huracan-evo-spyder', available: true },
+                    { id: 'ferrari-296-gts', available: true },
+                    { id: 'porsche-992-gt3', available: true },
+                    { id: 'lamborghini-urus-sport', available: true },
+                    { id: 'mercedes-g63-amg', available: true },
+                    { id: 'rolls-royce-cullinan-black-badge', available: true }
+                ]
+            })
+        });
+    });
+
     if (enableStripeMock) {
         await page.addInitScript(() => {
             window.Stripe = function StripeMock() {
@@ -1355,6 +1380,7 @@ async function captureInteractionSignature(page, descriptor = {}) {
             statusText,
             visibleStates,
             dynamicText,
+            activeElement: document.activeElement ? stateLine(document.activeElement) : '',
             controlledVisible: controlled ? isVisible(controlled) : null,
             controlledAriaHidden: controlled ? controlled.getAttribute('aria-hidden') : null
         };
@@ -1418,7 +1444,27 @@ function createGenericButtonAction(descriptor) {
                 };
             }
 
+            const beforeUrl = new URL(page.url());
+            const externalNavigation = page.waitForURL((url) => url.origin !== beforeUrl.origin, {
+                timeout: 1500
+            }).catch(() => null);
+
             await locator.click({ force: true });
+            await Promise.race([
+                externalNavigation,
+                page.waitForTimeout(250)
+            ]);
+
+            const currentUrl = new URL(page.url());
+            if (currentUrl.origin !== beforeUrl.origin) {
+                return {
+                    message: `${descriptor.label} handed off to external destination ${currentUrl.href}.`,
+                    observedUrl: currentUrl.href,
+                    observedPath: '',
+                    interactionType: 'external-button-handoff'
+                };
+            }
+
             await settlePage(page, 250);
 
             const after = await captureInteractionSignature(page, descriptor);
@@ -1439,6 +1485,24 @@ function createGenericButtonAction(descriptor) {
 }
 
 function createLinkAction(descriptor) {
+    function urlMeetsExpectedInternalTarget(url, expectedUrl) {
+        if (normalizeRoute(url.pathname) !== normalizeRoute(expectedUrl.pathname)) {
+            return false;
+        }
+
+        if (url.hash !== expectedUrl.hash) {
+            return false;
+        }
+
+        const expectedParams = Array.from(expectedUrl.searchParams.entries());
+
+        if (expectedParams.length === 0) {
+            return url.search === '';
+        }
+
+        return expectedParams.every(([key, value]) => url.searchParams.get(key) === value);
+    }
+
     return {
         id: `link-${slugify(descriptor.label)}-${slugify(descriptor.href)}`,
         label: `Link: ${descriptor.label}`,
@@ -1523,8 +1587,7 @@ function createLinkAction(descriptor) {
             const expected = new URL(descriptor.absoluteHref);
             const expectedPath = `${normalizeRoute(expected.pathname)}${expected.search}${expected.hash}`;
             const reachedExpectedUrl = page.waitForURL((url) => {
-                const observedPath = `${normalizeRoute(url.pathname)}${url.search}${url.hash}`;
-                return observedPath === expectedPath;
+                return urlMeetsExpectedInternalTarget(url, expected);
             }, { timeout: 5000 }).catch(() => null);
 
             await locator.click();
@@ -1535,7 +1598,7 @@ function createLinkAction(descriptor) {
             const observed = new URL(page.url());
             const observedPath = `${normalizeRoute(observed.pathname)}${observed.search}${observed.hash}`;
 
-            if (observedPath !== expectedPath) {
+            if (!urlMeetsExpectedInternalTarget(observed, expected)) {
                 throw new Error(`Expected ${expectedPath} but landed on ${observedPath}`);
             }
 
@@ -1560,6 +1623,12 @@ function createContactProtocolLinksAction() {
             const recorder = createStepRecorder();
 
             await settlePage(page, 500);
+            await page.evaluate(() => {
+                if (typeof window.__wakeReserveEnhancements === 'function') {
+                    window.__wakeReserveEnhancements();
+                }
+            }).catch(() => null);
+            await page.locator('.lab-floating-contact').first().waitFor({ state: 'attached', timeout: 2500 }).catch(() => null);
             await page.evaluate(() => {
                 if (typeof window.__reserveOpenMobileDrawer === 'function') {
                     window.__reserveOpenMobileDrawer();
@@ -2036,9 +2105,13 @@ function createHomeMegaMenuAction() {
         kind: 'menu',
         async run(page) {
             const recorder = createStepRecorder();
-            await page.getByRole('button', { name: 'Cars Brands' }).click();
-            await expect(page.locator('#lab-nav-brands-panel')).toBeVisible();
-            const visibleLinks = await page.locator('#lab-nav-brands-panel a[href]').count();
+            const brandsButton = page.getByRole('button', { name: /cars brands/i }).first();
+            await brandsButton.click();
+            await expect(brandsButton).toHaveAttribute('aria-expanded', 'true');
+            const panelId = await brandsButton.getAttribute('aria-controls');
+            const brandsPanel = page.locator(panelId ? `#${panelId}` : '.lab-nav__panel--brands').first();
+            await expect(brandsPanel).toBeVisible();
+            const visibleLinks = await brandsPanel.locator('a[href]').count();
             if (visibleLinks < 5) {
                 throw new Error(`Expected at least 5 brand links, found ${visibleLinks}`);
             }
@@ -2050,6 +2123,68 @@ function createHomeMegaMenuAction() {
             return {
                 message: `Mega menu opened with ${visibleLinks} visible brand links.`,
                 observedUrl: page.url(),
+                steps: recorder.steps
+            };
+        }
+    };
+}
+
+function createHomeCarsTypesFilterAction() {
+    const journeys = [
+        { label: 'Luxury Cars', type: 'luxury', expectedCount: 3 },
+        { label: 'Convertible Cars', type: 'convertible', expectedCount: 2 },
+        { label: 'Sports Cars', type: 'sports', expectedCount: 3 },
+        { label: 'SUV Cars', type: 'suv', expectedCount: 3 }
+    ];
+
+    return {
+        id: 'home-cars-types-filter-menu',
+        label: 'Cars Types mega menu opens filtered fleet categories with real inventory',
+        kind: 'menu:filter-handoff',
+        async run(page) {
+            const recorder = createStepRecorder();
+            const origin = new URL(page.url()).origin;
+
+            for (const journey of journeys) {
+                await page.goto(`${origin}/`, { waitUntil: 'domcontentloaded' });
+                await settlePage(page, 250);
+
+                const typesButton = page.getByRole('button', { name: /cars types/i }).first();
+                await typesButton.click();
+                await expect(typesButton).toHaveAttribute('aria-expanded', 'true');
+                const panelId = await typesButton.getAttribute('aria-controls');
+                const typesPanel = page.locator(panelId ? `#${panelId}` : '.lab-nav__panel--types').first();
+                await expect(typesPanel).toBeVisible();
+                await expect(typesPanel.getByRole('link', { name: /electric cars/i })).toHaveCount(0);
+
+                const typeLink = typesPanel.getByRole('link', { name: new RegExp(journey.label, 'i') }).first();
+                await expect(typeLink).toHaveAttribute('href', new RegExp(`fleet\\.html\\?type=${journey.type}$`));
+                await typeLink.click();
+
+                await expect(page).toHaveURL(new RegExp(`/fleet\\.html\\?type=${journey.type}$`, 'i'));
+                await expect(page.locator('.js-fleet-type-select')).toHaveValue(journey.type);
+                await expect(page.locator('.js-fleet-results-count')).toContainText(`${journey.expectedCount} models visible`);
+                const visibleCards = await page.locator('.js-fleet-card:not([hidden])').evaluateAll((cards, type) => (
+                    cards.map((card) => ({
+                        title: card.querySelector('.fleet-card__title')?.textContent?.trim() || '',
+                        typeMatches: String(card.dataset.type || '').split(/\s+/).includes(type)
+                    }))
+                ), journey.type);
+
+                if (visibleCards.length !== journey.expectedCount || !visibleCards.every((card) => card.typeMatches)) {
+                    throw new Error(`${journey.label} did not land on a non-empty Fleet filter with only ${journey.type} cars.`);
+                }
+
+                recorder.record(`cars-types-${journey.type}-filter`, `${journey.label} opens filtered Fleet`, {
+                    expected: `${journey.expectedCount} ${journey.type} models and no Electric category`,
+                    observed: visibleCards.map((card) => card.title).join(', ')
+                });
+            }
+
+            return {
+                message: 'Cars Types menu only exposes real inventory categories and each card opens Fleet with the matching filter.',
+                observedUrl: page.url(),
+                observedPath: currentPathFromPageUrl(page.url()),
                 steps: recorder.steps
             };
         }
@@ -2092,6 +2227,158 @@ function createHomeOverlaySearchAction() {
 
             return {
                 message: 'Overlay search carried schedule into fleet.',
+                observedUrl: page.url(),
+                observedPath: currentPathFromPageUrl(page.url()),
+                steps: recorder.steps
+            };
+        }
+    };
+}
+
+function createHomeBookingBarAvailabilityAction() {
+    return {
+        id: 'home-booking-bar-availability',
+        label: 'Home booking bar submits dates and renders CRM availability in fleet',
+        kind: 'form:availability-handoff',
+        async run(page) {
+            const recorder = createStepRecorder();
+            let availabilityRequests = 0;
+
+            await page.unroute('**/api/availability?**').catch(() => null);
+            await page.route('**/api/availability?**', async (route) => {
+                availabilityRequests += 1;
+                const requestUrl = new URL(route.request().url());
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({
+                        status: 'ok',
+                        schedule: {
+                            startDate: requestUrl.searchParams.get('startDate'),
+                            endDate: requestUrl.searchParams.get('endDate'),
+                            pickupTime: requestUrl.searchParams.get('pickupTime'),
+                            dropoffTime: requestUrl.searchParams.get('dropoffTime')
+                        },
+                        vehicles: [
+                            { id: 'lamborghini-huracan-evo-spyder', available: true },
+                            { id: 'ferrari-296-gts', available: true },
+                            { id: 'porsche-992-gt3', available: true },
+                            { id: 'lamborghini-urus-sport', available: true },
+                            { id: 'mercedes-g63-amg', available: false },
+                            { id: 'rolls-royce-cullinan-black-badge', available: true }
+                        ]
+                    })
+                });
+            });
+
+            await page.locator('#home-pickup-date').fill('2026-08-07');
+            await page.locator('#home-return-date').fill('2026-08-09');
+            await page.locator('#home-pickup-time').selectOption('10:00');
+            await page.locator('#home-return-time').selectOption('18:00');
+            recorder.record('fill-home-booking-bar', 'Fill home booking bar schedule', {
+                expected: '2026-08-07 10:00 to 2026-08-09 18:00',
+                observed: '2026-08-07 10:00 to 2026-08-09 18:00'
+            });
+
+            await page.getByRole('button', { name: /see available cars/i }).click();
+            await expect(page).toHaveURL(/\/fleet\.html\?/i);
+            await expect(page.locator('#fleet-pickup-date')).toHaveValue('2026-08-07');
+            await expect(page.locator('#fleet-return-date')).toHaveValue('2026-08-09');
+            await expect(page.locator('#fleet-pickup-time')).toHaveValue('10:00');
+            await expect(page.locator('#fleet-return-time')).toHaveValue('18:00');
+            recorder.record('arrive-fleet-with-booking-bar-schedule', 'Arrive at fleet with booking bar schedule', {
+                expected: 'fleet inputs preserve dates and times',
+                observed: currentPathFromPageUrl(page.url())
+            });
+
+            await expect.poll(() => availabilityRequests).toBeGreaterThan(0);
+            const unavailableCard = page.locator('.js-fleet-card[data-id="mercedes-g63-amg"]');
+            await expect(unavailableCard.locator('.fleet-card__availability')).toHaveText(/Unavailable for these dates/i);
+            await expect(unavailableCard.locator('.fleet-card__reserve')).toHaveAttribute('aria-disabled', 'true');
+            recorder.record('crm-availability-blocks-reserve', 'CRM availability blocks unavailable car reserve CTA', {
+                expected: 'Mercedes G63 AMG unavailable and Reserve disabled',
+                observed: `${availabilityRequests} availability request(s)`
+            });
+
+            return {
+                message: 'Home booking bar carried schedule into fleet and rendered CRM availability before reserve.',
+                observedUrl: page.url(),
+                observedPath: currentPathFromPageUrl(page.url()),
+                steps: recorder.steps
+            };
+        }
+    };
+}
+
+function createHomeCategoryFilterAction() {
+    return {
+        id: 'home-category-filter',
+        label: 'Home category card opens fleet with type filter and schedule',
+        kind: 'filter-handoff',
+        async run(page) {
+            const recorder = createStepRecorder();
+            await page.locator('#home-pickup-date').fill('2026-08-14');
+            await page.locator('#home-return-date').fill('2026-08-17');
+            await page.locator('#home-pickup-time').selectOption('11:00');
+            await page.locator('#home-return-time').selectOption('19:00');
+            await page.locator('.fleet-category--sports').click();
+
+            await expect(page).toHaveURL(/\/fleet\.html\?/i);
+            await expect(page).toHaveURL(/type=sports/i);
+            await expect(page).toHaveURL(/startDate=2026-08-14/i);
+            await expect(page).toHaveURL(/endDate=2026-08-17/i);
+            await expect(page.locator('.js-fleet-results-count')).toContainText('3 models visible');
+            const allVisibleAreSports = await page.locator('.js-fleet-card:not([hidden])').evaluateAll((cards) => (
+                cards.length === 3 && cards.every((card) => String(card.dataset.type || '').split(/\s+/).includes('sports'))
+            ));
+            if (!allVisibleAreSports) {
+                throw new Error('Sports category did not leave exactly the sports fleet cards visible.');
+            }
+
+            recorder.record('home-category-filters-fleet', 'Home category applies fleet type filter', {
+                expected: 'type=sports and 3 sports cards',
+                observed: currentPathFromPageUrl(page.url())
+            });
+            await expect(page.locator('.js-fleet-card:not([hidden]) .fleet-card__reserve').first()).toHaveAttribute('href', /startDate=2026-08-14/i);
+            recorder.record('home-category-preserves-schedule', 'Home category preserves schedule in Reserve CTAs', {
+                expected: 'Reserve href includes selected dates',
+                observed: await page.locator('.js-fleet-card:not([hidden]) .fleet-card__reserve').first().getAttribute('href') || ''
+            });
+
+            return {
+                message: 'Home category opened Fleet with the selected type filter and schedule.',
+                observedUrl: page.url(),
+                observedPath: currentPathFromPageUrl(page.url()),
+                steps: recorder.steps
+            };
+        }
+    };
+}
+
+function createHomeFeaturedVehicleLandingAction() {
+    return {
+        id: 'home-featured-vehicle-landing',
+        label: 'Home featured car opens the exact vehicle landing',
+        kind: 'vehicle-landing-handoff',
+        async run(page) {
+            const recorder = createStepRecorder();
+            await page.locator('#home-pickup-date').fill('2026-08-20');
+            await page.locator('#home-return-date').fill('2026-08-22');
+            await page.locator('#home-pickup-time').selectOption('10:00');
+            await page.locator('#home-return-time').selectOption('18:00');
+            await page.getByRole('link', { name: /View Ferrari 296 GTS/i }).click();
+
+            await expect(page).toHaveURL(/\/ferrari-296-gts-rental-dubai\.html$/i);
+            await expect(page.locator('h1')).toContainText(/296 GTS/i);
+            await expect(page.locator('#vehicle-booking')).toBeVisible();
+            await expect(page.locator('#vehicle-booking input[name="car"]')).toHaveValue('Ferrari 296 GTS');
+            recorder.record('home-featured-opens-exact-vehicle-landing', 'Home featured car opens exact vehicle landing', {
+                expected: 'Ferrari 296 GTS landing with booking panel',
+                observed: currentPathFromPageUrl(page.url())
+            });
+
+            return {
+                message: 'Home featured car opened the exact vehicle landing.',
                 observedUrl: page.url(),
                 observedPath: currentPathFromPageUrl(page.url()),
                 steps: recorder.steps
@@ -2669,12 +2956,18 @@ async function buildRouteActions(route, page, options, viewport) {
     if (route === '/' && !viewport.isMobile) {
         actions.push(
             createHomeNavigationAction(),
-            createHomeMegaMenuAction()
+            createHomeMegaMenuAction(),
+            createHomeCarsTypesFilterAction()
         );
     }
 
     if (route === '/') {
-        actions.push(createHomeOverlaySearchAction());
+        actions.push(
+            createHomeOverlaySearchAction(),
+            createHomeBookingBarAvailabilityAction(),
+            createHomeCategoryFilterAction(),
+            createHomeFeaturedVehicleLandingAction()
+        );
     }
 
     if (meta.hasFleetBrowser) {

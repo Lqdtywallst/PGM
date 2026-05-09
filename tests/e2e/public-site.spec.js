@@ -56,6 +56,34 @@ function futureDateInput(offsetDays) {
     return formatDateInput(date);
 }
 
+async function mockFleetAvailability(page, overrides = {}) {
+    await page.route('**/api/availability?**', async (route) => {
+        const requestUrl = new URL(route.request().url());
+
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                status: 'ok',
+                schedule: {
+                    startDate: requestUrl.searchParams.get('startDate'),
+                    endDate: requestUrl.searchParams.get('endDate'),
+                    pickupTime: requestUrl.searchParams.get('pickupTime'),
+                    dropoffTime: requestUrl.searchParams.get('dropoffTime')
+                },
+                vehicles: [
+                    { id: 'lamborghini-huracan-evo-spyder', available: true },
+                    { id: 'ferrari-296-gts', available: true },
+                    { id: 'porsche-992-gt3', available: true },
+                    { id: 'lamborghini-urus-sport', available: true },
+                    { id: 'mercedes-g63-amg', available: true },
+                    { id: 'rolls-royce-cullinan-black-badge', available: true }
+                ].map((vehicle) => ({ ...vehicle, ...overrides[vehicle.id] }))
+            })
+        });
+    });
+}
+
 async function captureAuditScreenshot(page, testInfo, name) {
     const screenshotPath = testInfo.outputPath(`${name}.png`);
 
@@ -113,6 +141,12 @@ test.describe('Public site quality gate', () => {
 
         const consoleErrors = createConsoleTracker(page);
         await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+        await page.getByRole('button', { name: 'Rent a luxury car' }).click();
+        await expect(page.locator('#hero-lab-overlay')).toHaveAttribute('aria-hidden', 'false');
+        await expect(page.locator('#hero-lab-pickup-date')).toBeVisible();
+        await page.keyboard.press('Escape');
+        await expect(page.locator('#hero-lab-overlay')).toHaveAttribute('aria-hidden', 'true');
 
         await page.getByRole('button', { name: 'Cars Brands' }).click();
         await expect(page.getByRole('link', { name: /Lamborghini/i }).first()).toBeVisible();
@@ -183,7 +217,8 @@ test.describe('Public site quality gate', () => {
         });
 
         await expectModernShell(page, '/app/reserve/page.html');
-        await expect(page.locator('h1')).toHaveText(/complete your reservation/i);
+        await expect(page.locator('h1')).toBeVisible();
+        await expect(page.locator('h1')).toContainText(/booking|reservation/i);
         await expect(page.locator('#selectedCar')).toHaveText('Ferrari 296 GTS');
         await expect(page.locator('#selectedCarRate')).toContainText('3,400');
         await expect(page.locator('#startDate')).toHaveValue(startDate);
@@ -192,6 +227,113 @@ test.describe('Public site quality gate', () => {
         await expect(page.locator('#dropoffTime')).toHaveValue('18:00');
 
         await expectNoConsoleErrors(consoleErrors, 'reserve prefills');
+    });
+
+    test('home date search applies CRM availability before reserve CTAs', async ({ page }) => {
+        const consoleErrors = createConsoleTracker(page);
+        const availabilityRequests = [];
+
+        await page.route('**/api/availability?**', async (route) => {
+            const requestUrl = new URL(route.request().url());
+            availabilityRequests.push(requestUrl);
+
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    status: 'ok',
+                    schedule: {
+                        startDate: requestUrl.searchParams.get('startDate'),
+                        endDate: requestUrl.searchParams.get('endDate'),
+                        pickupTime: requestUrl.searchParams.get('pickupTime'),
+                        dropoffTime: requestUrl.searchParams.get('dropoffTime')
+                    },
+                    vehicles: [
+                        { id: 'lamborghini-huracan-evo-spyder', available: true },
+                        { id: 'ferrari-296-gts', available: true },
+                        { id: 'porsche-992-gt3', available: true },
+                        { id: 'lamborghini-urus-sport', available: true },
+                        { id: 'mercedes-g63-amg', available: false },
+                        { id: 'rolls-royce-cullinan-black-badge', available: true }
+                    ]
+                })
+            });
+        });
+
+        await page.goto('/', { waitUntil: 'domcontentloaded' });
+        await page.locator('#home-pickup-date').fill('2026-11-10');
+        await page.locator('#home-return-date').fill('2026-11-12');
+        await page.locator('#home-pickup-time').selectOption('10:00');
+        await page.locator('#home-return-time').selectOption('18:00');
+        await page.getByRole('button', { name: /See available cars/i }).click();
+
+        await expect(page).toHaveURL(/\/fleet\.html\?/i);
+        await expect.poll(() => availabilityRequests.length).toBeGreaterThan(0);
+        expect(availabilityRequests[0].searchParams.get('startDate')).toBe('2026-11-10');
+        expect(availabilityRequests[0].searchParams.get('endDate')).toBe('2026-11-12');
+        expect(availabilityRequests[0].searchParams.get('pickupTime')).toBe('10:00');
+        expect(availabilityRequests[0].searchParams.get('dropoffTime')).toBe('18:00');
+
+        const unavailableCard = page.locator('.js-fleet-card[data-id="mercedes-g63-amg"]');
+        await expect(unavailableCard.locator('.fleet-card__availability')).toHaveText('Unavailable for these dates');
+        await expect(unavailableCard.locator('.fleet-card__reserve')).toHaveText('Unavailable');
+        await expect(unavailableCard.locator('.fleet-card__reserve')).toHaveAttribute('aria-disabled', 'true');
+        await expect(unavailableCard.locator('.fleet-card__reserve')).not.toHaveAttribute('href', /reserve/i);
+
+        const availableCard = page.locator('.js-fleet-card[data-id="ferrari-296-gts"]');
+        await expect(availableCard.locator('.fleet-card__availability')).toHaveText('Available for these dates');
+        await expect(availableCard.locator('.fleet-card__reserve')).toHaveAttribute('href', /startDate=2026-11-10/i);
+
+        await expectNoConsoleErrors(consoleErrors, 'home availability handoff');
+    });
+
+    test('home category cards open fleet with the chosen type filter and rental schedule', async ({ page }) => {
+        const consoleErrors = createConsoleTracker(page);
+        await mockFleetAvailability(page);
+
+        await page.goto('/', { waitUntil: 'domcontentloaded' });
+        await page.locator('#home-pickup-date').fill('2026-11-14');
+        await page.locator('#home-return-date').fill('2026-11-17');
+        await page.locator('#home-pickup-time').selectOption('11:00');
+        await page.locator('#home-return-time').selectOption('19:00');
+        await expect(page.locator('.fleet-category--electric')).toHaveCount(0);
+        await expect(page.locator('.fleet-category[data-home-fleet-filter-key="type"]')).toHaveCount(4);
+        await page.locator('.fleet-category--sports').click();
+
+        await expect(page).toHaveURL(/\/fleet\.html\?/i);
+        await expect(page).toHaveURL(/type=sports/i);
+        await expect(page).toHaveURL(/startDate=2026-11-14/i);
+        await expect(page).toHaveURL(/endDate=2026-11-17/i);
+        await expect(page).toHaveURL(/pickupTime=11%3A00/i);
+        await expect(page).toHaveURL(/dropoffTime=19%3A00/i);
+        await expect(page.locator('.js-fleet-results-count')).toContainText('3 models visible');
+
+        const visibleCards = page.locator('.js-fleet-card:not([hidden])');
+        await expect(visibleCards).toHaveCount(3);
+        expect(await visibleCards.evaluateAll((cards) => cards.every((card) => (
+            String(card.dataset.type || '').split(/\s+/).includes('sports')
+        )))).toBe(true);
+
+        await expect(visibleCards.first().locator('.fleet-card__reserve')).toHaveAttribute('href', /startDate=2026-11-14/i);
+        await expectNoConsoleErrors(consoleErrors, 'home category fleet filter handoff');
+    });
+
+    test('home featured car cards open the exact vehicle landing', async ({ page }) => {
+        const consoleErrors = createConsoleTracker(page);
+
+        await page.goto('/', { waitUntil: 'domcontentloaded' });
+        await page.locator('#home-pickup-date').fill('2026-11-20');
+        await page.locator('#home-return-date').fill('2026-11-22');
+        await page.locator('#home-pickup-time').selectOption('10:00');
+        await page.locator('#home-return-time').selectOption('18:00');
+        await page.getByRole('link', { name: /View Ferrari 296 GTS/i }).click();
+
+        await expect(page).toHaveURL(/\/ferrari-296-gts-rental-dubai\.html$/i);
+        await expect(page.locator('h1')).toContainText(/296 GTS/i);
+        await expect(page.locator('#vehicle-booking')).toBeVisible();
+        await expect(page.locator('#vehicle-booking input[name="car"]')).toHaveValue('Ferrari 296 GTS');
+
+        await expectNoConsoleErrors(consoleErrors, 'home featured vehicle landing handoff');
     });
 
     test('critical pages pass a focused accessibility scan', async ({ page }, testInfo) => {

@@ -4,8 +4,7 @@
 }
 
 const HEADER_NAV_SIGNATURES = Object.freeze([
-  'Home|Fleet|Cars Brands|Cars Types|Services|Locations|About Us|Contact',
-  'Home|Fleet|Cars Brands|Cars Types|Services|Locations|About Us|Find booking|Contact',
+  'Home|Fleet|Cars Brands|Cars Types|Services|Locations|About Us|Find Booking|Contact',
 ]);
 
 const VIEWPORT_COVERAGE_MATRIX = Object.freeze([
@@ -845,6 +844,27 @@ const DESIGN_SYSTEM_CONTRACT = Object.freeze({
     }),
   }),
   pages: Object.freeze({
+    '/reservation-lookup.html': Object.freeze({
+      firstViewport: Object.freeze({
+        tiers: Object.freeze({
+          laptop: Object.freeze({
+            policy: 'locked',
+            check: 'hero_support_split',
+            maxBlockBottomRatio: 0.96,
+          }),
+          desktop: Object.freeze({
+            policy: 'locked',
+            check: 'hero_support_split',
+            maxBlockBottomRatio: 0.96,
+          }),
+          mobile: Object.freeze({
+            policy: 'locked',
+            check: 'mobile_useful_first_viewport',
+            maxUsefulBottomRatio: 0.98,
+          }),
+        }),
+      }),
+    }),
     '/about.html': Object.freeze({
       firstViewport: Object.freeze({
         tiers: Object.freeze({

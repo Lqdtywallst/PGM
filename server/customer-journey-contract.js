@@ -57,6 +57,77 @@ const CUSTOMER_JOURNEY_SCENARIOS = Object.freeze([
         ])
     }),
     Object.freeze({
+        id: 'home_to_fleet_availability',
+        persona: 'Guest checking dates before choosing a car',
+        intent: 'Start from the home booking bar and see CRM-backed fleet availability before reserving.',
+        deviceTargets: Object.freeze(['desktop', 'mobile']),
+        routes: Object.freeze(['/']),
+        actionIds: Object.freeze(['home-booking-bar-availability']),
+        actionPrefixes: Object.freeze([]),
+        e2eSpecs: Object.freeze([
+            'tests/e2e/public-site.spec.js',
+            'tests/e2e/audit-functional-surfaces.spec.js'
+        ]),
+        customerSignals: Object.freeze([
+            'home date and time choices survive navigation',
+            'fleet requests /api/availability for the selected schedule',
+            'unavailable CRM cars render unavailable and disable Reserve'
+        ])
+    }),
+    Object.freeze({
+        id: 'home_category_to_filtered_fleet',
+        persona: 'Guest choosing a car category from home',
+        intent: 'Open Fleet from a home category card with the matching type filter and the active schedule.',
+        deviceTargets: Object.freeze(['desktop', 'mobile']),
+        routes: Object.freeze(['/']),
+        actionIds: Object.freeze(['home-category-filter']),
+        actionPrefixes: Object.freeze([]),
+        e2eSpecs: Object.freeze([
+            'tests/e2e/public-site.spec.js',
+            'tests/e2e/audit-functional-surfaces.spec.js'
+        ]),
+        customerSignals: Object.freeze([
+            'home category clicks add the expected fleet type filter',
+            'only matching category cards remain visible',
+            'reserve CTAs keep the selected home schedule'
+        ])
+    }),
+    Object.freeze({
+        id: 'cars_types_menu_to_filtered_fleet',
+        persona: 'Guest browsing the Cars Types navigation tab',
+        intent: 'Open each Cars Types card into Fleet with a matching non-empty type filter.',
+        deviceTargets: Object.freeze(['desktop']),
+        routes: Object.freeze(['/']),
+        actionIds: Object.freeze(['home-cars-types-filter-menu']),
+        actionPrefixes: Object.freeze([]),
+        e2eSpecs: Object.freeze([
+            'tests/e2e/customer-journeys.spec.js'
+        ]),
+        customerSignals: Object.freeze([
+            'Cars Types cards open Fleet with the matching type query',
+            'each advertised type has real visible inventory',
+            'categories without fleet inventory are not exposed'
+        ])
+    }),
+    Object.freeze({
+        id: 'home_featured_vehicle_to_landing',
+        persona: 'Guest attracted by one featured home car',
+        intent: 'Open the exact vehicle landing from a featured home car.',
+        deviceTargets: Object.freeze(['desktop', 'mobile']),
+        routes: Object.freeze(['/']),
+        actionIds: Object.freeze(['home-featured-vehicle-landing']),
+        actionPrefixes: Object.freeze([]),
+        e2eSpecs: Object.freeze([
+            'tests/e2e/public-site.spec.js',
+            'tests/e2e/audit-functional-surfaces.spec.js'
+        ]),
+        customerSignals: Object.freeze([
+            'featured car clicks open the matching vehicle landing',
+            'the landing heading matches the clicked car',
+            'the vehicle booking panel remains immediately reachable'
+        ])
+    }),
+    Object.freeze({
         id: 'fleet_shortlist_and_handoff',
         persona: 'Guest comparing several car families',
         intent: 'Filter the fleet, shortlist a model, and open reserve with the same schedule.',
