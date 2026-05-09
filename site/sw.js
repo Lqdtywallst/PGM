@@ -2,8 +2,8 @@
 // Cache static assets for better performance
 
 // Bump the cache version when visible assets change so old caches are discarded.
-const CACHE_NAME = 'pgm-v1.1.1';
-const STATIC_CACHE = 'pgm-static-v20';
+const CACHE_NAME = 'pgm-v1.1.2';
+const STATIC_CACHE = 'pgm-static-v21';
 const DYNAMIC_CACHE = 'pgm-dynamic-v3';
 
 // Assets to cache during install
@@ -66,6 +66,15 @@ self.addEventListener('fetch', (event) => {
 
   // Do not cache backend API requests
   if (url.pathname.startsWith('/api/')) {
+    return;
+  }
+
+  if (
+    request.method === 'GET' &&
+    url.origin === self.location.origin &&
+    url.pathname.endsWith('/runtime-config.js')
+  ) {
+    event.respondWith(fetch(request, { cache: 'no-store' }));
     return;
   }
 

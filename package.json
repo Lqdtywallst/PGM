@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node server/backend-example.js",
     "dev": "node server/backend-example.js",
+    "build:site": "npm run build:fleet && node scripts/write-runtime-config.js",
     "build:fleet": "node server/render-fleet-cards.js",
     "audit:inventory": "node scripts/audit-inventory.js",
     "audit:structure": "node scripts/run-structure-audit.js",
@@ -65,6 +66,7 @@
     "audit:functional:recovery": "playwright test tests/e2e/reserve-persistence.spec.js tests/e2e/functional-resilience.spec.js tests/e2e/api-failure-states.spec.js tests/e2e/complete-flow-error-recovery.spec.js tests/e2e/mobile-friction-points.spec.js --project=desktop-chromium --project=mobile-chromium",
     "audit:functional:adversarial": "playwright test tests/e2e/adversarial-functional-audit.spec.js --project=desktop-chromium --project=mobile-chromium",
     "audit:functional:production": "node scripts/run-production-functional-gate.js",
+    "audit:preprod:functional": "node scripts/run-preprod-functional-gate.js",
     "audit:functional:deep": "node scripts/run-functional-agent.js --deep",
     "audit:functional:master": "npm run audit:functional:missions && npm run audit:functional:contracts && npm run audit:functional:recovery && npm run audit:functional:adversarial",
     "test:admin:e2e": "playwright test tests/e2e/admin-content-editor.spec.js tests/e2e/admin-reservations-crm.spec.js --project=desktop-chromium",
