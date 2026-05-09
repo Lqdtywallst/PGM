@@ -72,7 +72,21 @@
 npx playwright test tests/e2e/smoke.spec.js tests/e2e/navigation.spec.js tests/e2e/critical-flows.spec.js tests/e2e/customer-journeys.spec.js tests/e2e/visual-first-viewport.spec.js
 ```
 
-## Broader Audit Commands
+## Canonical Audit Commands
+
+```bash
+npm run audit:quick
+npm run audit:strict
+npm run audit:ci
+```
+
+- `audit:quick`: use while developing; covers auditor unit contracts, quick navigation and visual smoke on Home, Fleet and Contact.
+- `audit:strict`: use before handing work to staging; covers strict navigation, robust visual audit and functional journeys.
+- `audit:ci`: use when you need the same full suite that CI runs.
+
+## Specialist Commands
+
+Use these only when the task needs that exact surface:
 
 ```bash
 npm run test:e2e

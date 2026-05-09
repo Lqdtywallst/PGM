@@ -71,9 +71,15 @@ Summary:
 8. The visual baselines are large, but they are intentional regression memory. Do not delete them as cleanup.
 9. `docs/audits/visual/global-change-needed.md` is still relevant: `site/js/site-v2.js` keeps `initLocationsMap()`, while current `locations.html` no longer uses `data-locations-map`.
 
-## Proposed canonical taxonomy
+## Implemented canonical taxonomy
 
-Keep these as the human-facing commands:
+These commands are now the human-facing entry points:
+
+- `npm run audit:quick`: fast local confidence check. Runs auditor unit contracts, quick navigation and a scoped visual smoke on Home, Fleet and Contact.
+- `npm run audit:strict`: deeper pre-merge check. Runs strict navigation, robust visual audit and functional journey groups.
+- `npm run audit:ci`: CI-equivalent full audit suite. Alias of `npm run audit`.
+
+Supporting specialist commands remain available:
 
 - `npm run test:visual`: unit contract suite for auditors and visual logic.
 - `npm run test:e2e`: full Playwright e2e suite.
@@ -85,22 +91,39 @@ Keep these as the human-facing commands:
 - `npm run audit:functional:master`: functional grouped gate.
 - `npm run audit:final`: final composed gate.
 
-Treat the rest as aliases or specialist commands that need documentation before being exposed to Alejandro.
+Treat the rest as advanced aliases or specialist commands.
+
+## Post-consolidation validation
+
+Command:
+
+```bash
+$env:NODE_PATH='C:\Users\aleja\Documents\GLOBALTECH\pagina-web-Santi\PGM\node_modules'; npm run audit:quick
+```
+
+Result: failed honestly on the visual smoke gate.
+
+- `npm run test:visual`: pass, 225 passing and 0 failing.
+- `npm run audit:navigation:quick`: pass, status `good`, 44/44 browser back checks and 0 failed handoffs.
+- Scoped visual smoke: failed on 6/6 page-viewports for Home, Fleet and Contact because current screenshots/typography/layout differ from the approved visual contracts.
+
+Interpretation: the consolidated quick gate is concrete and usable, but the current page state still needs visual fixes or intentional baseline/memory approval before `audit:quick` can pass.
 
 ## Cleanup candidates for a later safe pass
 
 - Add npm script or doc entry for `scripts/inspect-route-metrics.js`, or remove it if no longer used.
 - Keep `scripts/sync-social-meta.js`, but document it under SEO maintenance if still valid.
-- Consolidate navigation aliases into documented levels:
-  - quick
+- Consolidate or hide advanced navigation aliases after the team confirms which levels are still needed:
   - critical
-  - strict
+  - deep
+  - matrix
+  - full
+  - surfaces
   - exhaustive
-- Consolidate visual aliases into documented levels:
-  - smoke
-  - robust
-  - memory
-  - approve/update baselines
+- Consolidate or hide advanced visual aliases after baseline ownership is clear:
+  - viewport-specific smoke aliases
+  - responsive memory aliases
+  - approve/update baseline aliases
 - Move advanced/internal commands out of the main README surface, if they are documented there later.
 
 ## Guardrail
