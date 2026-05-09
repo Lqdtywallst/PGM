@@ -40,7 +40,7 @@ No intenta meter todo en el primer pantallazo. Vende primero la sensacion de mar
 
 ### 4. Secciones con cambios suaves
 
-El contenido no “salta”. Entra por capas:
+El contenido no â€œsaltaâ€. Entra por capas:
 
 - texto principal
 - acciones
@@ -94,7 +94,7 @@ Esto da una sensacion mas cara y mas controlada.
 ### Lo Que Copiamos
 
 - texto grande y simple
-- menos “cards”
+- menos â€œcardsâ€
 - menos microelementos compitiendo
 - mas aire visual
 
@@ -137,7 +137,7 @@ Este dock debe sentirse:
 
 - separado del texto
 - pero ligado al hero
-- mas cercano a una “barra premium” que a un formulario normal
+- mas cercano a una â€œbarra premiumâ€ que a un formulario normal
 
 ### Objetivo UX
 
@@ -251,7 +251,7 @@ Debe seguir existiendo en home, pero como avance:
 - Downtown
 - Airport
 
-Con CTA a [locations.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/locations.html)
+Con CTA a [locations.html](../../site/pages/core/locations.html)
 
 ## Bloque 8. Reviews / Trust
 
@@ -321,7 +321,7 @@ Esta seria la secuencia ideal de la `home` nueva:
 ## Reducir
 
 - bloques demasiado largos antes de la flota
-- sensacion de “todo en una sola seccion”
+- sensacion de â€œtodo en una sola seccionâ€
 - texto SEO visible muy arriba
 
 ## Rehacer
@@ -378,7 +378,7 @@ Ese es nuestro diferencial funcional frente a Prestige.
 
 Esta parte no debe resolverse al final como un parche.
 
-La `home` debe diseñarse con una composicion base clara y luego adaptarse por capas:
+La `home` debe diseÃ±arse con una composicion base clara y luego adaptarse por capas:
 
 1. `desktop`
 2. `tablet`
@@ -551,7 +551,7 @@ La version correcta es:
 
 ## Siguiente Paso
 
-Aplicar este blueprint directamente en [index.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/index.html), empezando por:
+Aplicar este blueprint directamente en [index.html](../../site/index.html), empezando por:
 
 1. hero editorial mas limpio
 2. dock de fechas separado

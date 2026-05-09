@@ -1,5 +1,9 @@
 # Archive Policy
 
-This folder is reserved for small reference notes that are still useful but no longer active.
+The default policy is to delete obsolete documentation, not archive it.
 
-Do not store generated audit exports, screenshots, model files, vendored libraries, or old experiments here. If a retired artifact is heavy or reproducible, delete it instead of keeping it in git.
+Use this folder only for a small reference note that is still genuinely useful
+and cannot be regenerated from the active docs, git history or artifacts.
+
+Do not store generated audit exports, screenshots, model files, vendored
+libraries, old experiments or closed audit reports here.

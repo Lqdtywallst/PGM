@@ -11,16 +11,16 @@ Traducir la arquitectura objetivo del sitio en un backlog corto, ejecutable y or
 
 ## Estado Actual
 
-- `2026-03-30`: primera iteracion visible aplicada en [index.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/index.html)
-- `2026-03-31`: blueprint estructural de referencia creado en [PRESTIGE-HOME-BLUEPRINT.md](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/docs/architecture/PRESTIGE-HOME-BLUEPRINT.md) para rehacer la home con ritmo tipo Prestige y selector de fechas como dock principal
+- `2026-03-30`: primera iteracion visible aplicada en [index.html](../../site/index.html)
+- `2026-03-31`: blueprint estructural de referencia creado en [PRESTIGE-HOME-BLUEPRINT.md](PRESTIGE-HOME-BLUEPRINT.md) para rehacer la home con ritmo tipo Prestige y selector de fechas como dock principal
 - home reforzada como pagina de marca sin tocar slugs ni landings SEO
 - menu principal alineado con `Home`, `Fleet`, `Locations`, `Services`, `About`, `Contact` y CTA `Reserve`
 - hero, bloque de servicios, locations, about y contact ya reescritos en tono mas premium y mas coherente con la arquitectura objetivo
 - segunda iteracion aplicada sobre la misma home con jerarquia editorial, `section kickers`, mejor ritmo visual y un bloque de reserva mas fuerte
-- pagina troncal inicial de flota creada en [fleet.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/fleet.html) y ya conectada desde la home
-- pagina troncal inicial de ubicaciones creada en [locations.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/locations.html) y conectada desde home, fleet y sitemap
-- pagina troncal inicial de servicios creada en [services.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/services.html) y conectada desde home, fleet, locations y sitemap
-- paginas troncales iniciales de [about.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/about.html) y [contact.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/contact.html) creadas y conectadas desde navegacion, home y sitemap
+- pagina troncal inicial de flota creada en [fleet.html](../../site/pages/core/fleet.html) y ya conectada desde la home
+- pagina troncal inicial de ubicaciones creada en [locations.html](../../site/pages/core/locations.html) y conectada desde home, fleet y sitemap
+- pagina troncal inicial de servicios creada en [services.html](../../site/pages/core/services.html) y conectada desde home, fleet, locations y sitemap
+- paginas troncales iniciales de [about.html](../../site/pages/core/about.html) y [contact.html](../../site/pages/core/contact.html) creadas y conectadas desde navegacion, home y sitemap
 
 ## Fase 1. Base De Marca
 
@@ -74,28 +74,28 @@ Traducir la arquitectura objetivo del sitio en un backlog corto, ejecutable y or
 
 ### 7. Prioridad alta
 
-- [luxury-car-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/luxury-car-rental-dubai.html)
-- [supercar-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/supercar-rental-dubai.html)
-- [lamborghini-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/lamborghini-rental-dubai.html)
-- [ferrari-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/ferrari-rental-dubai.html)
-- [palm-jumeirah-luxury-car-rental.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/palm-jumeirah-luxury-car-rental.html)
+- [luxury-car-rental-dubai.html](../../site/pages/guides/luxury-car-rental-dubai.html)
+- [supercar-rental-dubai.html](../../site/pages/guides/supercar-rental-dubai.html)
+- [lamborghini-rental-dubai.html](../../site/pages/brands/lamborghini-rental-dubai.html)
+- [ferrari-rental-dubai.html](../../site/pages/brands/ferrari-rental-dubai.html)
+- [palm-jumeirah-luxury-car-rental.html](../../site/pages/guides/palm-jumeirah-luxury-car-rental.html)
 
 ### 8. Prioridad media
 
-- [g63-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/g63-rental-dubai.html)
-- [mercedes-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/mercedes-rental-dubai.html)
-- [porsche-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/porsche-rental-dubai.html)
-- [rolls-royce-rental-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/rolls-royce-rental-dubai.html)
-- [dubai-marina-luxury-car-rental.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/dubai-marina-luxury-car-rental.html)
-- [downtown-dubai-supercar-rental.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/downtown-dubai-supercar-rental.html)
+- [g63-rental-dubai.html](/g63-rental-dubai.html)
+- [mercedes-rental-dubai.html](../../site/pages/brands/mercedes-rental-dubai.html)
+- [porsche-rental-dubai.html](../../site/pages/brands/porsche-rental-dubai.html)
+- [rolls-royce-rental-dubai.html](../../site/pages/brands/rolls-royce-rental-dubai.html)
+- [dubai-marina-luxury-car-rental.html](../../site/pages/guides/dubai-marina-luxury-car-rental.html)
+- [downtown-dubai-supercar-rental.html](/downtown-dubai-supercar-rental.html)
 
 ## Fase 4. Landings En Observacion
 
 ### 9. Mantener sin tocar de momento, pero vigilar
 
-- [lamborghini-rental-palm-jumeirah.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/lamborghini-rental-palm-jumeirah.html)
-- [ferrari-rental-downtown-dubai.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/ferrari-rental-downtown-dubai.html)
-- [g63-rental-dubai-marina.html](C:/Users/aleja/Documents/GLOBALTECH/pagina-web-Santi/PGM/site/g63-rental-dubai-marina.html)
+- [lamborghini-rental-palm-jumeirah.html](/lamborghini-rental-palm-jumeirah.html)
+- [ferrari-rental-downtown-dubai.html](/ferrari-rental-downtown-dubai.html)
+- [g63-rental-dubai-marina.html](/g63-rental-dubai-marina.html)
 
 - revisar despues:
   - canibalizacion
@@ -107,7 +107,7 @@ Traducir la arquitectura objetivo del sitio en un backlog corto, ejecutable y or
 
 ### 10. Reglas para no perder traccion
 
-- mantener slugs actuales durante la fase de rediseño
+- mantener slugs actuales durante la fase de rediseÃ±o
 - reforzar enlazado interno desde la home y paginas madre
 - actualizar `sitemap.xml` solo cuando la nueva arquitectura este lista
 - no fusionar landings hasta tener criterio SEO suficiente

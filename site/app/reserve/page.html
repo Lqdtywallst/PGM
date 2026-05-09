@@ -541,15 +541,22 @@
                 }
                 reserveFlowRequested = true;
                 hydrateDeferredSteps();
+                const reserveRuntimeConfigScript = document.createElement('script');
                 const reserveConfigScript = document.createElement('script');
                 const reserveFlowScript = document.createElement('script');
-                reserveConfigScript.src = '/config.js';
+                const loadReserveConfig = () => {
+                    reserveConfigScript.src = '/config.js';
+                    document.body.appendChild(reserveConfigScript);
+                };
+                reserveRuntimeConfigScript.src = '/runtime-config.js?v=20260510-preprod1';
+                reserveRuntimeConfigScript.onload = loadReserveConfig;
+                reserveRuntimeConfigScript.onerror = loadReserveConfig;
                 reserveConfigScript.onload = () => {
                     reserveFlowScript.src = '/js/reserve-flow.js?v=20260425-history2';
                     reserveFlowScript.defer = true;
                     document.body.appendChild(reserveFlowScript);
                 };
-                document.body.appendChild(reserveConfigScript);
+                document.body.appendChild(reserveRuntimeConfigScript);
             };
 
             const wakeReserveEnhancements = () => {

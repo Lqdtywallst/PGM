@@ -67,6 +67,7 @@ function buildCacheHeaders(filePath) {
         normalizedPath.endsWith('.html') ||
         normalizedPath.endsWith('/sw.js') ||
         normalizedPath.endsWith('/config.js') ||
+        normalizedPath.endsWith('/runtime-config.js') ||
         normalizedPath.endsWith('/manifest.json')
     ) {
         return {
@@ -94,6 +95,75 @@ function buildSecurityHeaders() {
     }
 
     return headers;
+}
+
+function readPublicEnv(...names) {
+    for (const name of names) {
+        const value = process.env[name];
+
+        if (typeof value === 'string' && value.trim()) {
+            return value.trim();
+        }
+    }
+
+    return '';
+}
+
+function normalizeRuntimeEnvironment(value) {
+    const normalized = String(value || '').trim().toLowerCase();
+
+    if (['development', 'dev', 'local'].includes(normalized)) {
+        return 'development';
+    }
+
+    if (['staging', 'stage', 'preview', 'preprod', 'preproduction'].includes(normalized)) {
+        return 'staging';
+    }
+
+    if (['production', 'prod'].includes(normalized)) {
+        return 'production';
+    }
+
+    return '';
+}
+
+function buildDynamicRuntimeConfig() {
+    const appEnv = normalizeRuntimeEnvironment(readPublicEnv('PGM_APP_ENV', 'APP_ENV'));
+    const backendUrl = readPublicEnv('PGM_PUBLIC_BACKEND_URL', 'PUBLIC_BACKEND_URL');
+    const publishableKey = readPublicEnv(
+        'PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY',
+        'PUBLIC_STRIPE_PUBLISHABLE_KEY',
+        'STRIPE_PUBLISHABLE_KEY'
+    );
+    const runtimeConfig = {};
+
+    if (appEnv) {
+        runtimeConfig.appEnv = appEnv;
+    }
+
+    if (backendUrl) {
+        runtimeConfig.backendUrl = backendUrl.replace(/\/+$/, '');
+    }
+
+    if (/^pk_(test|live)_[A-Za-z0-9_]+$/.test(publishableKey)) {
+        runtimeConfig.publishableKey = publishableKey;
+    }
+
+    return runtimeConfig;
+}
+
+function renderDynamicRuntimeConfig() {
+    return `// Dynamic local runtime config served by server/server-http.js.
+(function () {
+    const runtimeConfig = ${JSON.stringify(buildDynamicRuntimeConfig(), null, 4)};
+
+    window.PGM_RUNTIME_CONFIG = Object.assign({}, window.PGM_RUNTIME_CONFIG || {}, runtimeConfig);
+
+    if (runtimeConfig.appEnv) {
+        window.__APP_ENV__ = runtimeConfig.appEnv;
+    }
+}());
+`;
 }
 
 function getPreferredCompression(requestHeaders = {}, contentType = '', contentLength = 0) {
@@ -162,6 +232,16 @@ const server = http.createServer((req, res) => {
             ...buildSecurityHeaders()
         });
         res.end();
+        return;
+    }
+
+    if (filePath === '/runtime-config.js' && process.env.PGM_RUNTIME_CONFIG_DYNAMIC === 'true') {
+        res.writeHead(200, {
+            'Content-Type': 'application/javascript',
+            ...buildCacheHeaders(filePath),
+            ...buildSecurityHeaders()
+        });
+        res.end(renderDynamicRuntimeConfig(), 'utf-8');
         return;
     }
 

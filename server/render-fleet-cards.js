@@ -64,7 +64,7 @@ function renderCard(card) {
         .join("\n");
 
     return [
-        `                            <article class="fleet-card js-fleet-card" data-id="${escapeHtml(card.id)}" data-brand="${escapeHtml(card.brandKey)}" data-type="${escapeHtml(typeAttr)}" data-price="${escapeHtml(card.pricePerDay)}"${variantAttr}>`,
+        `                            <article class="fleet-card js-fleet-card" data-id="${escapeHtml(card.id)}" data-brand="${escapeHtml(card.brandKey)}" data-type="${escapeHtml(typeAttr)}" data-price="${escapeHtml(card.pricePerDay)}" data-detail-href="${escapeHtml(card.href)}" tabindex="0" aria-label="View ${escapeHtml(card.brand)} ${escapeHtml(card.copy.title)} details"${variantAttr}>`,
         `                                <a class="fleet-card__media" href="${escapeHtml(card.href)}">`,
         `                                    <img src="${escapeHtml(card.image.src)}" alt="${escapeHtml(card.image.alt)}" loading="${escapeHtml(card.image.loading || "lazy")}">`,
         `                                </a>`,
