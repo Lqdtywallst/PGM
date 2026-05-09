@@ -204,6 +204,7 @@
 
 .locations-hero__actions {
     margin-top: 1.2rem;
+    justify-content: center;
 }
 
 .locations-button,
@@ -302,8 +303,10 @@
 .locations-hero__copy {
     display: grid;
     align-content: start;
+    justify-items: center;
     gap: 0.9rem;
     max-width: 39rem;
+    text-align: center;
 }
 
 .locations-hero__summary {
@@ -324,7 +327,8 @@
 
 .locations-hero__zone {
     display: grid;
-    align-content: start;
+    align-content: center;
+    justify-items: center;
     gap: 0.38rem;
     min-height: 100%;
     padding: 1rem 1rem 1.05rem;
@@ -335,6 +339,7 @@
     -webkit-backdrop-filter: blur(10px);
     box-shadow: 0 24px 52px rgba(2, 4, 8, 0.34);
     isolation: isolate;
+    text-align: center;
     transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
 }
 
@@ -381,11 +386,14 @@
     display: grid;
     grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
     gap: 1.8rem;
-    align-items: end;
+    align-items: center;
+    justify-items: center;
+    text-align: center;
 }
 
 .locations-section__intro {
     display: grid;
+    justify-items: center;
     gap: 0.8rem;
 }
 
@@ -397,7 +405,7 @@
 
 .locations-section__head p {
     max-width: 48rem;
-    justify-self: start;
+    justify-self: center;
     color: #46382b;
     font-weight: 700;
 }
@@ -406,8 +414,9 @@
 .locations-zones .locations-section__head {
     grid-template-columns: 1fr;
     gap: 0.95rem;
-    align-items: start;
+    align-items: center;
     max-width: 58rem;
+    margin-inline: auto;
 }
 
 .locations-process {
@@ -434,7 +443,8 @@
     grid-template-columns: 1fr;
     gap: 0.9rem;
     max-width: 40rem;
-    align-items: start;
+    align-items: center;
+    margin-inline: auto;
 }
 
 .locations-process .locations-section__head p {
@@ -474,8 +484,10 @@
 .locations-faq__cta {
     display: grid;
     align-content: start;
+    justify-items: center;
     gap: 0.85rem;
     padding: 1.35rem;
+    text-align: center;
 }
 
 .locations-guide-feature__copy,
@@ -495,11 +507,24 @@
     display: grid;
     gap: 0.45rem;
     margin: 0;
-    padding-left: 1rem;
+    padding-left: 0;
+    list-style-position: inside;
+    text-align: center;
 }
 
 .locations-guide-card a {
     width: fit-content;
+    margin-top: auto;
+}
+
+.locations-guide-feature__actions,
+.locations-zone-card__actions,
+.locations-faq__cta-actions {
+    justify-content: center;
+}
+
+.locations-guide-feature__actions,
+.locations-zone-card__actions {
     margin-top: auto;
 }
 
@@ -529,11 +554,13 @@
 
 .locations-map-card__head {
     display: grid;
+    justify-items: center;
     gap: 0.75rem;
+    text-align: center;
 }
 
 .locations-map-card__action {
-    justify-self: start;
+    justify-self: center;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -574,42 +601,19 @@
     min-height: clamp(36rem, 38vw, 40rem);
 }
 
-.locations-map-card__tile-layer,
+.locations-map-card__iframe,
 .locations-map-card__marker-layer {
     position: absolute;
     inset: 0;
 }
 
-.locations-map-card__tile-layer {
+.locations-map-card__iframe {
     z-index: 1;
-    background:
-        radial-gradient(circle at 22% 18%, rgba(255, 250, 242, 0.34), transparent 24rem),
-        linear-gradient(135deg, #d9e5e1 0%, #b9d7de 48%, #efe6d4 100%);
-}
-
-.locations-map-card__tile-layer::after {
-    content: "";
-    position: absolute;
-    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    filter: saturate(0.9) contrast(0.96);
     pointer-events: none;
-    background:
-        linear-gradient(180deg, rgba(255, 250, 242, 0.02), rgba(8, 10, 14, 0.12)),
-        radial-gradient(circle at 68% 32%, rgba(210, 174, 89, 0.12), transparent 22rem);
-    mix-blend-mode: multiply;
-}
-
-.locations-map-card__tile {
-    position: absolute;
-    width: 256px;
-    height: 256px;
-    max-width: none;
-    opacity: 0;
-    transition: opacity 220ms ease;
-    user-select: none;
-}
-
-.locations-map-card__tile.is-loaded {
-    opacity: 1;
 }
 
 .locations-map-card__marker-layer {
@@ -632,6 +636,31 @@
     pointer-events: auto;
     transform: translate(-50%, -50%);
     transition: transform 180ms ease;
+}
+
+.locations-map-card__marker--palm {
+    left: 63.5%;
+    top: 31.5%;
+}
+
+.locations-map-card__marker--marina {
+    left: 62%;
+    top: 35.5%;
+}
+
+.locations-map-card__marker--dxb {
+    left: 74.5%;
+    top: 22%;
+}
+
+.locations-map-card__marker--dwc {
+    left: 64.5%;
+    top: 48%;
+}
+
+.locations-map-card__marker--abu-dhabi {
+    left: 24.5%;
+    top: 75%;
 }
 
 .locations-map-card__marker:hover,
@@ -778,11 +807,13 @@
 
 .locations-map-card__foot div {
     display: grid;
+    justify-items: center;
     gap: 0.28rem;
     padding: 0.9rem 1rem;
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.06);
+    text-align: center;
 }
 
 .locations-map-card__foot span {
@@ -815,6 +846,8 @@
 .locations-faq-item p,
 .locations-faq__cta p {
     font-weight: 700;
+    max-width: 28rem;
+    margin-inline: auto;
 }
 
 .locations-operations__facts {
@@ -959,11 +992,13 @@
 
 .locations-faq__main {
     display: grid;
+    justify-items: center;
     gap: 1rem;
 }
 
 .locations-faq-list {
     display: grid;
+    width: 100%;
     gap: 0.85rem;
 }
 
@@ -977,6 +1012,7 @@
     padding: 1.1rem 1.2rem;
     font-weight: 800;
     color: #171615;
+    text-align: center;
 }
 
 .locations-faq-item summary::-webkit-details-marker {
@@ -985,6 +1021,7 @@
 
 .locations-faq-item p {
     padding: 0 1.2rem 1.2rem;
+    text-align: center;
 }
 
 .locations-faq__cta {
@@ -1084,7 +1121,7 @@
         display: -webkit-box;
         overflow: hidden;
         -webkit-box-orient: vertical;
-        -webkit-line-clamp: 1;
+        -webkit-line-clamp: 2;
     }
 
     .locations-map-card {
@@ -1180,7 +1217,7 @@
     }
 
     .locations-section__head p {
-        justify-self: start;
+        justify-self: center;
         max-width: 42rem;
     }
 
