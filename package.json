@@ -6,6 +6,9 @@
   "scripts": {
     "start": "node server/backend-example.js",
     "dev": "node server/backend-example.js",
+    "qa:manual": "node scripts/run-manual-rental-qa-env.js",
+    "qa:manual:db": "node scripts/run-manual-rental-qa-env.js --require-db",
+    "qa:test:manual": "node scripts/run-manual-rental-qa-test.js",
     "build:site": "npm run build:fleet && node scripts/write-runtime-config.js",
     "build:fleet": "node server/render-fleet-cards.js",
     "audit:inventory": "node scripts/audit-inventory.js",

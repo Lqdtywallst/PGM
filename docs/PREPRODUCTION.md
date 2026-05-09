@@ -134,6 +134,17 @@ The gate checks:
 The gate creates test reservations in the staging database. Periodically reset
 or clean staging data; do not point this gate at production.
 
+For local/manual customer-style testing before a public preview is available,
+use `docs/MANUAL_FUNCTIONAL_QA.md`. The important command is:
+
+```powershell
+npm run qa:manual:db
+```
+
+It starts the frontend on `http://localhost:8081`, the backend/API on
+`http://localhost:3000`, and lets Alejandro perform the same reserve -> CRM ->
+Fleet unavailable -> Find Booking -> WhatsApp/call checks manually.
+
 ## Manual Release Checklist
 
 Before merging `staging` into `main`:

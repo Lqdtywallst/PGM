@@ -7,14 +7,10 @@ const {
     settlePage
 } = require('./support/site-helpers');
 
-const frontendBaseUrl = String(process.env.PLAYWRIGHT_BASE_URL || '').replace(/\/+$/, '');
-const backendBaseUrl = String(process.env.PREPROD_BACKEND_URL || '').replace(/\/+$/, '');
+const backendBaseUrl = String(process.env.QA_BACKEND_URL || 'http://localhost:3000').replace(/\/+$/, '');
 const blockedVehicleId = 'mercedes-g63-amg';
-
-function requirePreprodConfig() {
-    expect(frontendBaseUrl, 'PLAYWRIGHT_BASE_URL must point to the preproduction frontend').toBeTruthy();
-    expect(backendBaseUrl, 'PREPROD_BACKEND_URL must point to the staging backend').toBeTruthy();
-}
+const contactPhoneHref = 'tel:+971586122568';
+const whatsappPattern = /^https:\/\/wa\.me\/971586122568(?:\?|$)/;
 
 function addDays(days) {
     const date = new Date();
@@ -23,7 +19,7 @@ function addDays(days) {
 }
 
 function buildSchedules() {
-    const offsetDays = 1300 + crypto.randomInt(0, 300);
+    const offsetDays = 1500 + crypto.randomInt(0, 250);
 
     return {
         seed: {
@@ -53,15 +49,15 @@ async function fetchJson(url, options) {
     return { response, body };
 }
 
-async function assertBackendHealth() {
+async function assertBackendReady() {
     const { response, body } = await fetchJson(`${backendBaseUrl}/health`, {
         headers: { Accept: 'application/json' }
     });
 
-    expect(response.ok, `Backend health should be OK: ${JSON.stringify(body)}`).toBe(true);
+    expect(response.ok, `Backend must be running before this QA test: ${JSON.stringify(body)}`).toBe(true);
 }
 
-async function seedBlockingReservation({ reservationId, email, schedule }) {
+async function createReservationInActiveStorage({ reservationId, email, schedule }) {
     const { response, body } = await fetchJson(`${backendBaseUrl}/api/reserve`, {
         method: 'POST',
         headers: {
@@ -70,7 +66,7 @@ async function seedBlockingReservation({ reservationId, email, schedule }) {
         },
         body: JSON.stringify({
             reservationId,
-            fullName: 'Preprod QA Gate',
+            fullName: 'Manual QA Customer',
             email,
             phone: '+971 58 612 2568',
             car: 'Mercedes G63 AMG',
@@ -81,7 +77,7 @@ async function seedBlockingReservation({ reservationId, email, schedule }) {
             pickupTime: schedule.pickupTime,
             dropoffTime: schedule.dropoffTime,
             durationHours: 56,
-            pickupLocation: 'Preproduction QA seeded reservation',
+            pickupLocation: 'Manual QA pickup location',
             totalAmount: 3300,
             upfrontAmount: 1650,
             remainingAmount: 1650,
@@ -89,11 +85,25 @@ async function seedBlockingReservation({ reservationId, email, schedule }) {
         })
     });
 
-    expect(response.ok, `Seed reservation should be accepted: ${JSON.stringify(body)}`).toBe(true);
+    expect(response.ok, `Reservation should be saved by the active backend storage: ${JSON.stringify(body)}`).toBe(true);
     expect(body?.success).toBe(true);
 }
 
-async function waitForBlockedAvailability(schedule) {
+async function assertReservationLookup({ reservationId, email }) {
+    const { response, body } = await fetchJson(`${backendBaseUrl}/api/reserve/lookup`, {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ reservationId, email })
+    });
+
+    expect(response.ok, `Saved reservation should be readable through lookup: ${JSON.stringify(body)}`).toBe(true);
+    expect(body?.reservation?.vehicle).toBe('Mercedes G63 AMG');
+}
+
+async function waitForUnavailable(schedule) {
     const params = new URLSearchParams(schedule);
 
     await expect.poll(async () => {
@@ -107,19 +117,9 @@ async function waitForBlockedAvailability(schedule) {
 
         return body?.vehicles?.find((vehicle) => vehicle.id === blockedVehicleId)?.available;
     }, {
-        message: 'Seeded staging reservation should block Mercedes G63 AMG availability',
+        message: 'The reservation saved in active storage should block overlapping Fleet availability',
         timeout: 15000
     }).toBe(false);
-}
-
-async function assertFrontendRuntimeConfig(page) {
-    const runtime = await page.evaluate(() => ({
-        env: window.APP_ENVIRONMENT,
-        backendUrl: window.getBackendUrl?.() || window.STRIPE_CONFIG?.backendUrl || ''
-    }));
-
-    expect(runtime.env).toBe('staging');
-    expect(String(runtime.backendUrl).replace(/\/+$/, '')).toBe(backendBaseUrl);
 }
 
 async function fillFleetSchedule(page, schedule) {
@@ -129,27 +129,39 @@ async function fillFleetSchedule(page, schedule) {
     await page.locator('#fleet-return-time').fill(schedule.dropoffTime);
 }
 
-test.describe('Preproduction functional gate', () => {
-    test('Fleet availability and Find Booking use the staging backend like a real customer', async ({ page }, testInfo) => {
+async function expectContactActions(page) {
+    const visibleCallLinks = page.locator(`a[href="${contactPhoneHref}"]:visible`);
+    const visibleWhatsappLinks = page.locator('a[href*="wa.me/971586122568"]:visible');
+
+    expect(await visibleCallLinks.count(), 'At least one visible call action should use the business phone number').toBeGreaterThan(0);
+    expect(await visibleWhatsappLinks.count(), 'At least one visible WhatsApp action should use the business WhatsApp number').toBeGreaterThan(0);
+
+    const whatsappHref = await visibleWhatsappLinks.first().getAttribute('href');
+    expect(whatsappHref).toMatch(whatsappPattern);
+}
+
+test.describe('Manual rental QA environment with real backend storage', () => {
+    test('customer-style reservation blocks Fleet dates and contact actions are actionable', async ({ page }, testInfo) => {
         test.setTimeout(60000);
-        requirePreprodConfig();
 
         const schedules = buildSchedules();
         const runId = crypto.randomBytes(5).toString('hex');
-        const reservationId = `preprod_gate_${testInfo.project.name.replace(/\W+/g, '_')}_${runId}`;
-        const email = `preprod-gate-${runId}@example.com`;
+        const reservationId = `manual_qa_${testInfo.project.name.replace(/\W+/g, '_')}_${runId}`;
+        const email = `manual-qa-${runId}@example.com`;
 
-        await assertBackendHealth();
-        await seedBlockingReservation({
+        await assertBackendReady();
+        await createReservationInActiveStorage({
             reservationId,
             email,
             schedule: schedules.seed
         });
-        await waitForBlockedAvailability(schedules.overlap);
+        await assertReservationLookup({ reservationId, email });
+        await waitForUnavailable(schedules.overlap);
 
         await primeHomeAnimations(page);
         const consoleErrors = createConsoleTracker(page);
         const availabilityRequests = [];
+
         page.on('request', (request) => {
             if (request.url().includes('/api/availability')) {
                 availabilityRequests.push(request.url());
@@ -158,30 +170,33 @@ test.describe('Preproduction functional gate', () => {
 
         await page.goto('/fleet.html', { waitUntil: 'domcontentloaded' });
         await settlePage(page);
-        await assertFrontendRuntimeConfig(page);
+        await expectContactActions(page);
 
         if (testInfo.project.name.includes('mobile')) {
             await page.locator('.js-fleet-mobile-dates').click();
             await expect(page.locator('.js-fleet-browser')).toHaveClass(/fleet-filters-open/);
         }
 
-        await fillFleetSchedule(page, schedules.overlap);
         const blockedCard = page.locator(`.js-fleet-card[data-id="${blockedVehicleId}"]`);
+        await fillFleetSchedule(page, schedules.overlap);
         await expect(blockedCard).toBeHidden({ timeout: 15000 });
         await expect(page.locator('.js-fleet-results-count')).toContainText('5 models visible');
 
         expect(
             availabilityRequests.some((url) => String(url).startsWith(`${backendBaseUrl}/api/availability`)),
-            'Fleet page should call the configured staging backend for availability'
+            'Fleet must call the backend that is saving reservations'
         ).toBe(true);
 
         await fillFleetSchedule(page, schedules.clear);
         await expect(blockedCard).toBeVisible({ timeout: 15000 });
         await expect(blockedCard.locator('.fleet-card__reserve')).toHaveAttribute('href', new RegExp(`startDate=${schedules.clear.startDate}`));
+        await expect(blockedCard.locator('.fleet-card__secondary').first()).toHaveAttribute('href', contactPhoneHref);
+        await expect(blockedCard.locator('.fleet-card__secondary--wa')).toHaveAttribute('href', whatsappPattern);
+        expect(decodeURIComponent(await blockedCard.locator('.fleet-card__secondary--wa').getAttribute('href'))).toContain('Mercedes G63 AMG');
 
         await page.goto('/reservation-lookup.html', { waitUntil: 'domcontentloaded' });
         await settlePage(page);
-        await assertFrontendRuntimeConfig(page);
+        await expectContactActions(page);
         const form = page.locator('[data-reservation-lookup-form]');
         await form.locator('#reservationLookupId').fill(reservationId);
         await form.locator('#reservationLookupEmail').fill(email);
@@ -190,6 +205,7 @@ test.describe('Preproduction functional gate', () => {
         await expect(page.locator('#reservationLookupStatus')).toContainText('Reservation found.', { timeout: 15000 });
         await expect(page.locator('#reservationLookupResult')).toBeVisible();
         await expect(page.locator('#reservationLookupResult')).toContainText('Mercedes G63 AMG');
-        await expectNoConsoleErrors(consoleErrors, `preproduction ${testInfo.project.name} flow`);
+        await expect(page.locator('#reservationLookupResult').getByRole('link', { name: /WhatsApp the team/i })).toHaveAttribute('href', new RegExp(reservationId));
+        await expectNoConsoleErrors(consoleErrors, `manual rental QA ${testInfo.project.name}`);
     });
 });
