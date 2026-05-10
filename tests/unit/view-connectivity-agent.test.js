@@ -10,7 +10,7 @@ const {
     parseArgs,
     resolveReferenceToPublicRoute,
     summarizeAudit
-} = require('../../scripts/run-view-connectivity-audit');
+} = require('../../scripts/audits/run-view-connectivity-audit');
 
 test('parseArgs reads base URL, viewport, output directory, and skip flag', () => {
     const args = parseArgs([

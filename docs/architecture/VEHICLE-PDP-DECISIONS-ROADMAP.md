@@ -111,7 +111,7 @@ This means:
 
 ## Current working assets
 
-- Template rules doc: `docs/vehicle-page-template.md`
+- Template rules doc: `docs/templates/vehicle-page-template.md`
 - Mother base preview: `docs/previews/vehicle-template-base.html`
 - Supercar variant preview: `docs/previews/vehicle-template-premium.html`
 - Current pilot page: `site/ferrari-rental-dubai.html`

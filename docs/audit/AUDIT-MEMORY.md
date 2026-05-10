@@ -64,7 +64,7 @@ Pruebas enfocadas para esta zona:
 
 ```bash
 npx playwright test tests/e2e/public-site.spec.js tests/e2e/customer-journeys.spec.js --grep "home category cards|home featured car cards|home date search applies CRM availability|Cars Types card"
-node scripts/run-functional-agent.js --route / --viewport laptop --viewport mobile-modern
+node scripts/audits/run-functional-agent.js --route / --viewport laptop --viewport mobile-modern
 ```
 
 ## Navegacion

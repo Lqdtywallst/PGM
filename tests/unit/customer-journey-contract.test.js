@@ -13,7 +13,7 @@ const {
     DEFAULT_ROUTES,
     DEFAULT_VIEWPORTS,
     parseArgs
-} = require('../../scripts/run-customer-journey-audit');
+} = require('../../scripts/audits/run-customer-journey-audit');
 
 test('customer journey catalog covers desktop and mobile customer intent', () => {
     const ids = CUSTOMER_JOURNEY_SCENARIOS.map((scenario) => scenario.id);

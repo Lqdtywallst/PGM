@@ -27,9 +27,9 @@ const requiredFiles = [
     'server/apps/static-server.js',
     'server/integrations/verify-stripe.js',
     'vercel.json',
-    'scripts/run-copy-audit.js',
-    'scripts/seed-demo-reservation.js',
-    'scripts/run-seo-agent.js',
+    'scripts/audits/run-copy-audit.js',
+    'scripts/admin/seed-demo-reservation.js',
+    'scripts/audits/run-seo-agent.js',
     'app/api/reserve/route.js',
     'site/config.js',
     'site/robots.txt',
@@ -59,9 +59,9 @@ const syntaxFiles = [
     'server/audits/seo-audit-core.js',
     'server/apps/static-server.js',
     'server/integrations/verify-stripe.js',
-    'scripts/run-copy-audit.js',
-    'scripts/seed-demo-reservation.js',
-    'scripts/run-seo-agent.js',
+    'scripts/audits/run-copy-audit.js',
+    'scripts/admin/seed-demo-reservation.js',
+    'scripts/audits/run-seo-agent.js',
     'app/api/reserve/route.js',
     'site/config.js',
     'site/js/reservation-lookup.js'
@@ -354,7 +354,7 @@ async function run() {
     report(true, 'vercel.json parses as valid JSON');
     const packageJson = JSON.parse(readFile('package.json'));
     assert(
-        packageJson.scripts && packageJson.scripts['audit:copy'] === 'node scripts/run-copy-audit.js',
+        packageJson.scripts && packageJson.scripts['audit:copy'] === 'node scripts/audits/run-copy-audit.js',
         'package.json exposes the advisory copy audit script'
     );
 
@@ -697,7 +697,7 @@ async function run() {
         'shared and reserve shells style floating previous-page and contact navigation'
     );
     const servicesCss = readFile('site/css/site-v2-services.css');
-    const functionalAgentScript = readFile('scripts/run-functional-agent.js');
+    const functionalAgentScript = readFile('scripts/audits/run-functional-agent.js');
     assert(
         siteV2Script.includes('initVehicleMediaLightbox') &&
         siteV2Script.includes('vehicle-media-lightbox') &&

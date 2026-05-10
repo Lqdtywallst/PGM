@@ -20,7 +20,7 @@ const {
     resolveGuardRoutes,
     resolveGuardViewports,
     summarizeByCategory
-} = require('../../scripts/run-header-homogeneity-guard');
+} = require('../../scripts/audits/run-header-homogeneity-guard');
 
 const homeBrand = {
     exists: true,

@@ -16,7 +16,7 @@ const {
     parseArgs: parseChangeGuardArgs,
     resolveGuardRoutes,
     resolveGuardViewports
-} = require('../../scripts/run-change-guard-audit');
+} = require('../../scripts/audits/run-change-guard-audit');
 
 function navigationReportWithLocalExit(status = 'passed') {
     return {

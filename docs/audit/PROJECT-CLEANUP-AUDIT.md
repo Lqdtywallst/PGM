@@ -1,12 +1,12 @@
 # Project Cleanup Audit
 
-Generated: 2026-05-10T01:18:02.542Z
+Generated: 2026-05-10T01:38:29.850Z
 
 ## Summary
 
-- Files scanned: 565
-- Tracked files: 563
-- Untracked files visible to git: 1
+- Files scanned: 566
+- Tracked files: 565
+- Untracked files visible to git: 0
 - Total scanned size: 272.70 MB
 - Delete-local candidates: 0
 - Review-delete candidates: 0
@@ -22,7 +22,7 @@ Generated: 2026-05-10T01:18:02.542Z
 | backend |38 |
 | audit-engine |3 |
 | docs |45 |
-| scripts |30 |
+| scripts |31 |
 | data |8 |
 | site-support |11 |
 | site-html |33 |
@@ -42,7 +42,7 @@ Generated: 2026-05-10T01:18:02.542Z
 | review-boundary |3 |
 | review-consolidate |14 |
 | keep-archived |1 |
-| review-latest-then-archive |10 |
+| review-latest-then-archive |11 |
 | review-or-archive |5 |
 | review-compress-or-delete |28 |
 | review-move-to-docs |2 |
@@ -61,7 +61,8 @@ _None._
 
 | Path |State |Action |Reason |
 | --- |--- |--- |--- |
-| docs/agentic-audit.md |support |review |Support document not classified as a live guide. |
+| docs/admin/BLOCK-EDITOR-ROADMAP.md |support |review |Support document not classified as a live guide. |
+| docs/admin/MANUAL-EDITING-GUIDE.md |support |review |Support document not classified as a live guide. |
 | docs/architecture/ARQUITECTURA-OBJETIVO-SITIO.md |architecture |review-consolidate |Architecture document; may overlap with the new mother system. |
 | docs/architecture/BACKLOG-EVOLUCION-SITIO.md |architecture |review-consolidate |Architecture document; may overlap with the new mother system. |
 | docs/architecture/FLEET-CARD-MADRE.md |architecture |review-consolidate |Architecture document; may overlap with the new mother system. |
@@ -76,6 +77,7 @@ _None._
 | docs/architecture/SERVICES-SEO-ROADMAP.md |architecture |review-consolidate |Architecture document; may overlap with the new mother system. |
 | docs/architecture/SITE-V2-CATEGORY-ASSET-SHORTLIST.md |architecture |review-consolidate |Architecture document; may overlap with the new mother system. |
 | docs/architecture/VEHICLE-PDP-DECISIONS-ROADMAP.md |architecture |review-consolidate |Architecture document; may overlap with the new mother system. |
+| docs/audit/agentic-audit.md |audit-record |review-latest-then-archive |Audit report; keep current records and archive historical ones. |
 | docs/audit/AUDIT-MEMORY.md |audit-record |review-latest-then-archive |Audit report; keep current records and archive historical ones. |
 | docs/audit/FIRST-VIEWPORT-RUBRIC.md |audit-record |review-latest-then-archive |Audit report; keep current records and archive historical ones. |
 | docs/audit/FUNCTIONAL_TASK_REPORT.md |audit-record |review-latest-then-archive |Audit report; keep current records and archive historical ones. |
@@ -86,14 +88,12 @@ _None._
 | docs/audits/visual/global-change-needed.md |audit-record |review-latest-then-archive |Audit report; keep current records and archive historical ones. |
 | docs/audits/visual/staging-handoff.md |audit-record |review-latest-then-archive |Audit report; keep current records and archive historical ones. |
 | docs/audits/visual/test-auditor-coherence.md |audit-record |review-latest-then-archive |Audit report; keep current records and archive historical ones. |
-| docs/BLOCK-EDITOR-ROADMAP.md |support |review |Support document not classified as a live guide. |
-| docs/MANUAL-EDITING-GUIDE.md |support |review |Support document not classified as a live guide. |
 | docs/previews/fleet-card-preview.css |preview |review-or-archive |Useful preview/template, but it should not mix with live documentation. |
 | docs/previews/fleet-card-preview.html |preview |review-or-archive |Useful preview/template, but it should not mix with live documentation. |
 | docs/previews/README.md |preview |review-or-archive |Useful preview/template, but it should not mix with live documentation. |
 | docs/previews/vehicle-template-base.html |preview |review-or-archive |Useful preview/template, but it should not mix with live documentation. |
 | docs/previews/vehicle-template-premium.html |preview |review-or-archive |Useful preview/template, but it should not mix with live documentation. |
-| docs/vehicle-page-template.md |support |review |Support document not classified as a live guide. |
+| docs/templates/vehicle-page-template.md |support |review |Support document not classified as a live guide. |
 
 ## Largest Site Assets
 
@@ -122,15 +122,14 @@ _None._
 
 | Path |Incoming |Reason |
 | --- |--- |--- |
-| scripts/generate-icons.py |0 |Script not detected in package.json; review before deleting because it may be manual tooling. |
-| scripts/inspect-route-metrics.js |0 |Script not detected in package.json; review before deleting because it may be manual tooling. |
-| scripts/sync-social-meta.js |0 |Script not detected in package.json; review before deleting because it may be manual tooling. |
+| scripts/build/generate-icons.py |0 |Script not detected in package.json; review before deleting because it may be manual tooling. |
+| scripts/build/sync-social-meta.js |0 |Script not detected in package.json; review before deleting because it may be manual tooling. |
+| scripts/diagnostics/inspect-route-metrics.js |0 |Script not detected in package.json; review before deleting because it may be manual tooling. |
+| scripts/README.md |0 |Script not detected in package.json; review before deleting because it may be manual tooling. |
 
 ## Untracked Files
 
-| Path |Action |Reason |
-| --- |--- |--- |
-| server/README.md |keep |Backend, API, renderers or audit core; deleting here can break reservations or tooling. |
+_None._
 
 ## Recommended Next Steps
 

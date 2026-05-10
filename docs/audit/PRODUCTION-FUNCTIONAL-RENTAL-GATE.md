@@ -83,13 +83,13 @@ npm run audit:functional:production
 Si solo quieres ver que cubre sin ejecutarlo:
 
 ```bash
-node scripts/run-production-functional-gate.js --list
+node scripts/qa/run-production-functional-gate.js --list
 ```
 
 Si el run completo es demasiado largo durante desarrollo, se puede saltar el agente exploratorio final, pero no para cierre real:
 
 ```bash
-node scripts/run-production-functional-gate.js --skip-agent
+node scripts/qa/run-production-functional-gate.js --skip-agent
 ```
 
 ## Evidencia esperada

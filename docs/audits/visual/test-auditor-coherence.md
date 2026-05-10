@@ -64,10 +64,10 @@ Summary:
 3. Navigation has the most command sprawl: quick, critical, deep, matrix, full, surfaces, exhaustive and strict.
 4. Visual audit has three concepts mixed together: smoke, robust and memory/change guard.
 5. Some utility scripts are not exposed through npm scripts:
-   - `scripts/inspect-route-metrics.js`
-   - `scripts/sync-social-meta.js`
-6. `scripts/sync-social-meta.js` is referenced by older SEO audit docs, so it should not be deleted without replacing that workflow.
-7. `scripts/inspect-route-metrics.js` looks like a manual visual debugging helper. It can either be documented or removed later after owner confirmation.
+   - `scripts/diagnostics/inspect-route-metrics.js`
+   - `scripts/build/sync-social-meta.js`
+6. `scripts/build/sync-social-meta.js` is referenced by older SEO audit docs, so it should not be deleted without replacing that workflow.
+7. `scripts/diagnostics/inspect-route-metrics.js` looks like a manual visual debugging helper. It can either be documented or removed later after owner confirmation.
 8. The visual baselines are large, but they are intentional regression memory. Do not delete them as cleanup.
 9. `docs/audits/visual/global-change-needed.md` is still relevant: `site/js/site-v2.js` keeps `initLocationsMap()`, while current `locations.html` no longer uses `data-locations-map`.
 
@@ -111,8 +111,8 @@ Interpretation: the consolidated quick gate is concrete and usable, but the curr
 
 ## Cleanup candidates for a later safe pass
 
-- Add npm script or doc entry for `scripts/inspect-route-metrics.js`, or remove it if no longer used.
-- Keep `scripts/sync-social-meta.js`, but document it under SEO maintenance if still valid.
+- Add npm script or doc entry for `scripts/diagnostics/inspect-route-metrics.js`, or remove it if no longer used.
+- Keep `scripts/build/sync-social-meta.js`, but document it under SEO maintenance if still valid.
 - Consolidate or hide advanced navigation aliases after the team confirms which levels are still needed:
   - critical
   - deep

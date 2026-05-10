@@ -33,7 +33,7 @@ const {
     parseArgs,
     resolveVisualRoutes,
     routeFileStem
-} = require('../../scripts/run-visual-agent');
+} = require('../../scripts/audits/run-visual-agent');
 const {
     DEFAULT_ROUTES: VISUAL_SMOKE_ROUTES,
     DEFAULT_VIEWPORTS: VISUAL_SMOKE_VIEWPORTS,
@@ -41,10 +41,10 @@ const {
     parseArgs: parseVisualSmokeArgs,
     resolveSmokeViewports,
     summarizeSmokeFailures
-} = require('../../scripts/run-visual-smoke-audit');
+} = require('../../scripts/audits/run-visual-smoke-audit');
 const {
     summarizeRobustFailures
-} = require('../../scripts/run-visual-robust-audit');
+} = require('../../scripts/audits/run-visual-robust-audit');
 
 test('resolveViewportTier separates mobile, laptop and desktop policies', () => {
     assert.equal(resolveViewportTier('mobile-modern', 390), 'mobile');

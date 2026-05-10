@@ -32,7 +32,7 @@ Result: no conflicts detected at the time of this handoff.
 
 - `README.md`
 - `docs/audits/visual/test-auditor-coherence.md`
-- `docs/test-plan.md`
+- `docs/qa/test-plan.md`
 - `package.json`
 - `site/css/site-v2-about.css`
 - `site/css/site-v2-contact.css`
@@ -46,7 +46,7 @@ Result: no conflicts detected at the time of this handoff.
   - `audit:quick`
   - `audit:strict`
   - `audit:ci`
-- For `README.md` and `docs/test-plan.md`, keep the command taxonomy language unless staging has a newer testing policy.
+- For `README.md` and `docs/qa/test-plan.md`, keep the command taxonomy language unless staging has a newer testing policy.
 - Do not drop `docs/audits/visual/test-auditor-coherence.md`; it explains why tracked audit runners and visual baselines were not deleted.
 
 ## Validation already run

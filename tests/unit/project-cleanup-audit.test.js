@@ -5,7 +5,7 @@ const {
     buildMarkdownReport,
     classifyFile,
     extractReferences
-} = require('../../scripts/run-project-cleanup-audit');
+} = require('../../scripts/audits/run-project-cleanup-audit');
 
 test('cleanup audit extracts repo-root references from script strings', () => {
     const refs = extractReferences('server/audits/test-server.js', `

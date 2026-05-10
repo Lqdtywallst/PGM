@@ -175,7 +175,7 @@ Para trabajar por zonas:
 
 ```bash
 npx playwright test tests/e2e/public-site.spec.js --grep "home category cards|home featured car cards|home date search applies CRM availability"
-node scripts/run-functional-agent.js --route / --viewport laptop --viewport mobile-modern
+node scripts/audits/run-functional-agent.js --route / --viewport laptop --viewport mobile-modern
 ```
 
 Para misiones funcionales:

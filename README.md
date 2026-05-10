@@ -32,7 +32,7 @@ Website and reservation stack for Dynasty Prestige, focused on luxury car rental
 - `npm test`: run the full audit suite
 - `npm run verify`: run Stripe configuration checks
 
-Use [docs/MANUAL_FUNCTIONAL_QA.md](docs/MANUAL_FUNCTIONAL_QA.md) when you need to test like a real customer:
+Use [docs/qa/MANUAL_FUNCTIONAL_QA.md](docs/qa/MANUAL_FUNCTIONAL_QA.md) when you need to test like a real customer:
 
 1. Reserve a car.
 2. Confirm it is stored in the active backend storage/CRM.
@@ -40,7 +40,7 @@ Use [docs/MANUAL_FUNCTIONAL_QA.md](docs/MANUAL_FUNCTIONAL_QA.md) when you need t
 4. Check it appears for non-overlapping dates.
 5. Verify Find Booking, WhatsApp and call actions.
 
-Use [docs/PREPRODUCTION.md](docs/PREPRODUCTION.md) for Vercel-ready staging and production migration.
+Use [docs/deployment/PREPRODUCTION.md](docs/deployment/PREPRODUCTION.md) for Vercel-ready staging and production migration.
 
 ## Audit Command Levels
 
@@ -65,8 +65,8 @@ Copy `.env.example` to `.env` and set the variables needed for the task:
 - [docs/README.md](docs/README.md): documentation map and cleanup policy.
 - [docs/audit/README.md](docs/audit/README.md): active audit docs.
 - [docs/architecture/README.md](docs/architecture/README.md): architecture map.
-- [docs/admin-reservations.md](docs/admin-reservations.md): CRM setup.
-- [docs/MANUAL-EDITING-GUIDE.md](docs/MANUAL-EDITING-GUIDE.md): safe manual edits.
+- [docs/admin/admin-reservations.md](docs/admin/admin-reservations.md): CRM setup.
+- [docs/admin/MANUAL-EDITING-GUIDE.md](docs/admin/MANUAL-EDITING-GUIDE.md): safe manual edits.
 
 ## Documentation Policy
 

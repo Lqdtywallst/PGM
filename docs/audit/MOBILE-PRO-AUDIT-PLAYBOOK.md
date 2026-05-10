@@ -40,14 +40,14 @@ npm run audit:mobile:full
 Single route:
 
 ```bash
-node scripts/run-mobile-pro-audit.js --route /services.html --route /app/reserve/page.html
+node scripts/audits/run-mobile-pro-audit.js --route /services.html --route /app/reserve/page.html
 ```
 
 Skip heavy layers while iterating:
 
 ```bash
-node scripts/run-mobile-pro-audit.js --skip-lighthouse
-node scripts/run-mobile-pro-audit.js --skip-functional
+node scripts/audits/run-mobile-pro-audit.js --skip-lighthouse
+node scripts/audits/run-mobile-pro-audit.js --skip-functional
 ```
 
 ## What The Pack Runs

@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const {
     parseArgs,
     readReservationsForPricing
-} = require('../../scripts/run-pricing-agent');
+} = require('../../scripts/pricing/run-pricing-agent');
 
 test('pricing runner parses reservation source options', () => {
     const args = parseArgs([

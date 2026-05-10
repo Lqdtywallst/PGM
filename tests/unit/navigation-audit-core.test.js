@@ -21,7 +21,7 @@ const {
     resolveReferenceToPublicRoute,
     resolveSelectedRoutes,
     summarizeReport
-} = require('../../scripts/run-navigation-agent');
+} = require('../../scripts/audits/run-navigation-agent');
 
 test('navigation agent args support scoped routes, viewports, strict mode and click caps', () => {
     const args = parseArgs([
