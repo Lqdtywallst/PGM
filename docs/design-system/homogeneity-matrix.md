@@ -163,6 +163,13 @@ Recommended new audit modes:
 - `npm run audit:homogeneity:components`: component family and variant contracts.
 - `npm run audit:visual:first-viewport`: viewport-first visual pass for mobile, tablet, laptop and desktop.
 
+Layout checks must explicitly separate mobile, laptop and monitor:
+
+- mobile: `mobile-tiny`, `mobile-short`, `mobile-small`, `mobile-modern`,
+  `mobile-wide-short`, `mobile-large`
+- laptop: `laptop-compact`, `laptop`, `laptop-large`
+- monitor: `desktop-standard`, `desktop-wide`, `desktop-large`
+
 ## Severity Model
 
 High severity:

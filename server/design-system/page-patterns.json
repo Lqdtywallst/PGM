@@ -1,0 +1,175 @@
+{
+  "version": "2026-05-10",
+  "description": "Route-to-page-pattern manifest used by layout and homogeneity auditors.",
+  "viewportGroups": {
+    "firstViewport": [
+      "mobile-tiny",
+      "mobile-short",
+      "mobile-modern",
+      "tablet-portrait",
+      "laptop-compact",
+      "laptop",
+      "desktop-wide"
+    ],
+    "computer": [
+      "laptop-compact",
+      "laptop",
+      "laptop-large",
+      "desktop-wide",
+      "desktop-large"
+    ],
+    "laptop": [
+      "laptop-compact",
+      "laptop",
+      "laptop-large"
+    ],
+    "monitor": [
+      "desktop-standard",
+      "desktop-wide",
+      "desktop-large"
+    ],
+    "mobile": [
+      "mobile-tiny",
+      "mobile-short",
+      "mobile-small",
+      "mobile-modern",
+      "mobile-wide-short",
+      "mobile-large"
+    ],
+    "tablet": [
+      "tablet-portrait",
+      "tablet-landscape"
+    ]
+  },
+  "thresholds": {
+    "maxHorizontalOverflowPx": 2,
+    "maxSharedFrameDeltaPx": 10,
+    "maxRowTopDeltaPx": 8,
+    "maxRowBottomDeltaPx": 12,
+    "maxPrimaryTaskFoldDepthRatio": 0.82,
+    "maxListingHeroHeightRatioLaptop": 0.62,
+    "maxFloatingOverlapRatio": 0.12,
+    "minTapTargetPx": 44,
+    "minHeadingContrastRatio": 3,
+    "minTextContrastRatio": 4.5,
+    "maxDesktopH1Lines": 3,
+    "maxMobileH1Lines": 5
+  },
+  "patterns": {
+    "MarketingLandingPage": {
+      "intent": "Cinematic commercial landing with a clear primary CTA.",
+      "requiredSlots": [
+        "header",
+        "hero",
+        "heroHeadline",
+        "primaryCta"
+      ],
+      "taskSlotPriority": [
+        "primaryCta",
+        "datePlanner",
+        "trustStrip"
+      ]
+    },
+    "ListingPage": {
+      "intent": "Browse/filter vehicles or collections quickly.",
+      "requiredSlots": [
+        "header",
+        "hero",
+        "datePlanner",
+        "cardGrid"
+      ],
+      "taskSlotPriority": [
+        "datePlanner",
+        "filterPanel",
+        "cardGrid"
+      ]
+    },
+    "DetailPage": {
+      "intent": "Understand one vehicle, service or brand and move to reserve.",
+      "requiredSlots": [
+        "header",
+        "hero",
+        "heroHeadline",
+        "primaryCta"
+      ],
+      "taskSlotPriority": [
+        "primaryCta",
+        "formPanel",
+        "cardGrid"
+      ]
+    },
+    "HubPage": {
+      "intent": "Choose between priority service/location/brand paths.",
+      "requiredSlots": [
+        "header",
+        "hero",
+        "heroHeadline",
+        "cardGrid"
+      ],
+      "taskSlotPriority": [
+        "cardGrid",
+        "primaryCta",
+        "datePlanner"
+      ]
+    },
+    "AppFlowPage": {
+      "intent": "Complete a customer task with a secure form.",
+      "requiredSlots": [
+        "header",
+        "heroHeadline",
+        "formPanel"
+      ],
+      "taskSlotPriority": [
+        "formPanel",
+        "primaryCta"
+      ]
+    },
+    "AdminPage": {
+      "intent": "Private operational management screen.",
+      "requiredSlots": [
+        "header"
+      ],
+      "taskSlotPriority": [
+        "filterPanel",
+        "cardGrid",
+        "formPanel"
+      ]
+    }
+  },
+  "routes": {
+    "/": "MarketingLandingPage",
+    "/index.html": "MarketingLandingPage",
+    "/fleet.html": "ListingPage",
+    "/services.html": "HubPage",
+    "/locations.html": "HubPage",
+    "/about.html": "MarketingLandingPage",
+    "/contact.html": "AppFlowPage",
+    "/reservation-lookup.html": "AppFlowPage",
+    "/app/reserve/page.html": "AppFlowPage",
+    "/luxury-car-rental-dubai.html": "MarketingLandingPage",
+    "/supercar-rental-dubai.html": "MarketingLandingPage",
+    "/abu-dhabi-luxury-car-rental.html": "HubPage",
+    "/dubai-airport-luxury-car-rental.html": "HubPage",
+    "/palm-jumeirah-luxury-car-rental.html": "HubPage",
+    "/dubai-marina-luxury-car-rental.html": "HubPage",
+    "/lamborghini-rental-dubai.html": "DetailPage",
+    "/ferrari-rental-dubai.html": "DetailPage",
+    "/mercedes-rental-dubai.html": "DetailPage",
+    "/porsche-rental-dubai.html": "DetailPage",
+    "/rolls-royce-rental-dubai.html": "DetailPage",
+    "/lamborghini-huracan-evo-spyder-rental-dubai.html": "DetailPage",
+    "/lamborghini-urus-rental-dubai.html": "DetailPage",
+    "/ferrari-296-gts-rental-dubai.html": "DetailPage",
+    "/mercedes-g63-amg-rental-dubai.html": "DetailPage",
+    "/porsche-992-gt3-rental-dubai.html": "DetailPage",
+    "/rolls-royce-cullinan-black-badge-rental-dubai.html": "DetailPage",
+    "/chauffeur-service-dubai.html": "DetailPage",
+    "/airport-concierge-dubai.html": "DetailPage",
+    "/hotel-villa-airport-delivery-dubai.html": "DetailPage",
+    "/wedding-event-car-rental-dubai.html": "DetailPage",
+    "/business-car-rental-dubai.html": "DetailPage",
+    "/monthly-luxury-car-rental-dubai.html": "DetailPage",
+    "/admin/reservations.html": "AdminPage",
+    "/admin/content.html": "AdminPage"
+  }
+}

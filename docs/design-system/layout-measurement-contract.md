@@ -80,6 +80,15 @@ Critical first-viewport checks should at minimum run on:
 - `laptop`
 - `desktop-wide`
 
+Computer checks must not collapse laptop and monitor into one generic desktop
+bucket. Measure both:
+
+- laptop: `laptop-compact`, `laptop`, `laptop-large`
+- monitor: `desktop-standard`, `desktop-wide`, `desktop-large`
+
+The common failure pattern is different: laptops reveal fold/height problems;
+monitors reveal weak composition, oversized empty space and frame drift.
+
 ## Slots To Measure
 
 Each page pattern can have different slots, but the slot names should stay
@@ -96,7 +105,7 @@ consistent.
 | `secondaryCtas` | count, size, relative emphasis | `.btn-secondary`, `.hero-actions a` |
 | `datePlanner` | label/control alignment, grid fit, stale date values | `.date-planner`, `.booking-widget` |
 | `filterPanel` | panel width, top alignment, control height | `.fleet-sidebar`, `.filters` |
-| `cardGrid` | frame alignment, row top/bottom, column gap | `.fleet-grid`, `.cards-grid` |
+| `cardGrid` | frame alignment, row top/bottom, column gap | `.js-fleet-grid`, `.fleet-results__list`, `.services-hero__selector`, `.locations-guides__grid`, `.fleet-grid`, `.cards-grid` |
 | `card` | width, height, padding, CTA area ratio, overflow | `.fleet-card`, `.dp-card` |
 | `formPanel` | first field visibility, control height, error visibility | `form`, `.dp-form-panel` |
 | `trustStrip` | chip count, vertical footprint, CTA competition | `.trust-strip`, `.stats` |
