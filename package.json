@@ -23,6 +23,7 @@
     "audit:seo:legacy": "node server/audit-seo.js",
     "agent:seo": "node scripts/run-seo-agent.js",
     "audit:copy": "node scripts/run-copy-audit.js",
+    "audit:cleanup": "node scripts/run-project-cleanup-audit.js",
     "audit:mobile:pro": "node scripts/run-mobile-pro-audit.js",
     "audit:mobile:full": "node scripts/run-mobile-pro-audit.js --scope full",
     "audit:responsive": "playwright test tests/e2e/responsive-audit.spec.js --project=desktop-chromium",
