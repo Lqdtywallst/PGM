@@ -1,4 +1,5 @@
 ﻿@import url("./brand-tokens.css");
+@import url("./dp-components.css");
 
 :root {
     --lab-bg: var(--dp-color-ink);

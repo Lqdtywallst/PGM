@@ -1,0 +1,256 @@
+/*
+   Dynasty Prestige component primitives.
+   This file is the mother layer for reusable UI rhythm. Existing page-specific
+   CSS can migrate into these classes gradually.
+*/
+
+.dp-container {
+    width: var(--dp-frame-width);
+    max-width: var(--dp-frame-max);
+    margin-inline: auto;
+}
+
+.dp-section {
+    padding-block: var(--dp-section-y-md);
+}
+
+.dp-section--compact {
+    padding-block: var(--dp-section-y-sm);
+}
+
+.dp-section--editorial {
+    padding-block: var(--dp-section-y-lg);
+}
+
+.dp-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dp-stack-gap, var(--dp-space-md));
+}
+
+.dp-cluster {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--dp-cluster-gap, var(--dp-space-sm));
+}
+
+.dp-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--dp-grid-columns, auto-fit), minmax(min(100%, var(--dp-grid-min, 16rem)), 1fr));
+    gap: var(--dp-grid-gap);
+}
+
+.dp-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65em;
+    color: var(--dp-kicker-color, var(--dp-color-gold));
+    font-family: var(--dp-font-sans);
+    font-size: var(--dp-type-kicker);
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    line-height: 1.1;
+    text-transform: uppercase;
+}
+
+.dp-kicker::before {
+    content: "";
+    width: 2.6rem;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.72;
+}
+
+.dp-title {
+    margin: 0;
+    color: var(--dp-title-color, currentColor);
+    font-family: var(--dp-font-display);
+    font-size: var(--dp-type-title);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 0.96;
+    text-wrap: balance;
+}
+
+.dp-lead {
+    max-width: var(--dp-lead-max, 46rem);
+    margin: 0;
+    color: var(--dp-lead-color, var(--dp-color-text-soft));
+    font-family: var(--dp-font-sans);
+    font-size: var(--dp-type-lead);
+    line-height: 1.58;
+}
+
+.dp-surface {
+    border: 1px solid var(--dp-surface-border, var(--dp-border-light));
+    border-radius: var(--dp-card-radius);
+    background: var(--dp-surface-bg, var(--dp-surface-light));
+    box-shadow: var(--dp-surface-shadow, var(--dp-shadow-soft));
+}
+
+.dp-surface--dark {
+    --dp-surface-bg: linear-gradient(145deg, rgba(17, 18, 20, 0.96), rgba(7, 8, 10, 0.94));
+    --dp-surface-border: var(--dp-border-dark);
+    --dp-surface-shadow: var(--dp-shadow-dark);
+    color: var(--dp-color-ivory);
+}
+
+.dp-button {
+    display: inline-flex;
+    min-height: var(--dp-button-height);
+    align-items: center;
+    justify-content: center;
+    gap: 0.62rem;
+    padding: 0.85rem 1.35rem;
+    border: 1px solid transparent;
+    border-radius: var(--dp-button-radius);
+    font-family: var(--dp-font-sans);
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    line-height: 1;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, color 180ms ease, box-shadow 180ms ease;
+}
+
+.dp-button:hover,
+.dp-button:focus-visible {
+    transform: translateY(-1px);
+}
+
+.dp-button:focus-visible {
+    outline: 3px solid rgba(var(--dp-color-gold-rgb), 0.36);
+    outline-offset: 3px;
+}
+
+.dp-button--primary {
+    background: linear-gradient(135deg, var(--dp-color-gold-soft), var(--dp-color-gold));
+    color: var(--dp-color-text);
+    box-shadow: 0 18px 36px rgba(var(--dp-color-gold-rgb), 0.22);
+}
+
+.dp-button--secondary {
+    border-color: rgba(23, 18, 13, 0.16);
+    background: rgba(255, 251, 245, 0.76);
+    color: var(--dp-color-text);
+}
+
+.dp-button--ghost {
+    border-color: rgba(245, 241, 232, 0.32);
+    background: rgba(5, 5, 6, 0.24);
+    color: var(--dp-color-ivory);
+}
+
+.dp-button--dark {
+    background: var(--dp-color-carbon);
+    color: var(--dp-color-ivory);
+}
+
+.dp-button--whatsapp {
+    background: linear-gradient(135deg, var(--dp-color-whatsapp), var(--dp-color-whatsapp-deep));
+    color: var(--dp-color-warm-white);
+}
+
+.dp-button--call {
+    background: linear-gradient(135deg, var(--dp-color-gold-soft), var(--dp-color-gold));
+    color: var(--dp-color-text);
+}
+
+.dp-card {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: var(--dp-card-gap, var(--dp-space-md));
+    padding: var(--dp-card-padding);
+    border: 1px solid var(--dp-card-border, var(--dp-border-light));
+    border-radius: var(--dp-card-radius);
+    background: var(--dp-card-bg, var(--dp-surface-light));
+    box-shadow: var(--dp-card-shadow, var(--dp-shadow-soft));
+}
+
+.dp-card--dark {
+    --dp-card-bg: linear-gradient(145deg, rgba(17, 18, 20, 0.96), rgba(7, 8, 10, 0.94));
+    --dp-card-border: var(--dp-border-dark);
+    --dp-card-shadow: var(--dp-shadow-dark);
+    color: var(--dp-color-ivory);
+}
+
+.dp-card__media {
+    position: relative;
+    overflow: hidden;
+    border-radius: calc(var(--dp-card-radius) - 6px);
+}
+
+.dp-card__media img,
+.dp-card__media video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dp-card__actions,
+.dp-cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--dp-space-sm);
+}
+
+.dp-form-panel {
+    padding: clamp(1.25rem, 1rem + 1.3vw, 2.25rem);
+    border: 1px solid var(--dp-border-light);
+    border-radius: var(--dp-radius-xl);
+    background:
+        radial-gradient(circle at 92% 12%, rgba(var(--dp-color-gold-rgb), 0.16), transparent 30%),
+        var(--dp-surface-light);
+    box-shadow: var(--dp-shadow-soft);
+}
+
+.dp-field {
+    display: grid;
+    gap: 0.45rem;
+}
+
+.dp-field__label {
+    color: var(--dp-color-text);
+    font-family: var(--dp-font-sans);
+    font-size: 0.76rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.dp-field__control {
+    min-height: 3.25rem;
+    width: 100%;
+    border: 1px solid rgba(23, 18, 13, 0.14);
+    border-radius: var(--dp-radius-md);
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--dp-color-text);
+    font: inherit;
+    padding: 0.9rem 1rem;
+}
+
+.dp-field__control:focus {
+    border-color: rgba(var(--dp-color-gold-rgb), 0.7);
+    box-shadow: 0 0 0 4px rgba(var(--dp-color-gold-rgb), 0.14);
+    outline: none;
+}
+
+@media (max-width: 760px) {
+    .dp-container {
+        width: min(100% - 2rem, var(--dp-frame-max));
+    }
+
+    .dp-button {
+        width: 100%;
+    }
+
+    .dp-card__actions,
+    .dp-cta-row {
+        flex-direction: column;
+    }
+}

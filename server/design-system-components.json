@@ -1,0 +1,235 @@
+{
+  "version": "2026-05-10",
+  "tokens": {
+    "source": "site/css/brand-tokens.css",
+    "requiredPrefixes": [
+      "--dp-"
+    ],
+    "legacyCompatibilityPrefixes": [
+      "--lab-"
+    ],
+    "forbiddenNewPatterns": [
+      "raw brand hex colors outside token files",
+      "new page-specific font stacks",
+      "WhatsApp green outside WhatsApp actions",
+      "lime/neon accents for generic brand CTAs"
+    ]
+  },
+  "geometryContracts": {
+    "maxSharedRowTopDeltaPx": 8,
+    "maxSharedRowBottomDeltaPx": 12,
+    "maxSharedFrameLeftDeltaPx": 10,
+    "maxSharedFrameRightDeltaPx": 10,
+    "maxHorizontalOverflowPx": 2,
+    "minTapTargetPx": 44,
+    "maxPrimaryTaskFoldDepthRatio": 0.82,
+    "maxFloatingControlOverlapRatio": 0.12,
+    "minTextContrastRatio": 4.5,
+    "minLargeTextContrastRatio": 3
+  },
+  "primitives": {
+    "container": {
+      "canonicalClass": "dp-container",
+      "purpose": "Shared max-width and viewport gutter frame."
+    },
+    "section": {
+      "canonicalClass": "dp-section",
+      "variants": [
+        "compact",
+        "editorial"
+      ],
+      "purpose": "Shared vertical spacing rhythm."
+    },
+    "grid": {
+      "canonicalClass": "dp-grid",
+      "purpose": "Shared responsive card/grid layout."
+    },
+    "surface": {
+      "canonicalClass": "dp-surface",
+      "variants": [
+        "dark"
+      ],
+      "purpose": "Shared premium panel surface."
+    }
+  },
+  "components": {
+    "button": {
+      "canonicalClass": "dp-button",
+      "variants": [
+        "primary",
+        "secondary",
+        "ghost",
+        "dark",
+        "whatsapp",
+        "call"
+      ],
+      "knownLegacyFamilies": [
+        "btn",
+        "btn-primary",
+        "hero-lab__cta",
+        "fleet-card__primary",
+        "fleet-card__secondary",
+        "services-button",
+        "service-detail-button",
+        "contact-button",
+        "vehicle-booking__submit"
+      ],
+      "rules": {
+        "minTargetHeightPx": 44,
+        "maxDominantCtasAboveFold": 1,
+        "whatsappGreenOnlyForWhatsapp": true
+      }
+    },
+    "card": {
+      "canonicalClass": "dp-card",
+      "variants": [
+        "vehicle",
+        "service",
+        "guide",
+        "feature",
+        "booking",
+        "result"
+      ],
+      "knownLegacyFamilies": [
+        "fleet-card",
+        "service-card",
+        "guide-card",
+        "locations-guide-card",
+        "locations-zone-card",
+        "service-detail-card",
+        "lookup-result-card",
+        "vehicle-card"
+      ],
+      "rules": {
+        "desktopRowsAlignEdges": true,
+        "mobileActionsStack": true,
+        "maxVisibleMobileContactActions": 2
+      }
+    },
+    "hero": {
+      "canonicalClass": "dp-hero",
+      "variants": [
+        "home",
+        "listing",
+        "detail",
+        "hub",
+        "form"
+      ],
+      "knownLegacyFamilies": [
+        "hero-lab",
+        "fleet-browser__hero",
+        "services-hero",
+        "local-guide-hero",
+        "service-detail-hero",
+        "contact-hero",
+        "lookup-hero"
+      ],
+      "rules": {
+        "oneMainHeadline": true,
+        "textOverMediaRequiresOverlay": true,
+        "validateLaptopShortHeight": true
+      }
+    },
+    "formPanel": {
+      "canonicalClass": "dp-form-panel",
+      "knownLegacyFamilies": [
+        "reserve-page-panel",
+        "lookup-card",
+        "contact-form-card",
+        "vehicle-booking"
+      ],
+      "rules": {
+        "visibleLabels": true,
+        "humanErrors": true,
+        "noSensitiveDataInPublicLookup": true
+      }
+    }
+  },
+  "pagePatterns": {
+    "MarketingLandingPage": {
+      "routes": [
+        "/",
+        "/luxury-car-rental-dubai.html",
+        "/supercar-rental-dubai.html"
+      ],
+      "slots": [
+        "header",
+        "hero",
+        "primaryCta",
+        "trust",
+        "curatedCards",
+        "faqOrSupport",
+        "finalCta",
+        "footer"
+      ]
+    },
+    "ListingPage": {
+      "routes": [
+        "/fleet.html"
+      ],
+      "slots": [
+        "header",
+        "listingIntro",
+        "plannerOrFilters",
+        "resultsContext",
+        "cardGrid",
+        "supportCta",
+        "footer"
+      ],
+      "rules": {
+        "primaryTaskVisibleEarly": true,
+        "decorativeHeroMustNotConsumeLaptopFold": true
+      }
+    },
+    "DetailPage": {
+      "routeGlobs": [
+        "/pages/vehicles/*.html",
+        "/pages/services/*.html",
+        "/pages/brands/*.html"
+      ],
+      "slots": [
+        "header",
+        "detailHero",
+        "factsOrBookingPanel",
+        "trust",
+        "detailsOrGallery",
+        "relatedContent",
+        "finalCta",
+        "footer"
+      ]
+    },
+    "HubPage": {
+      "routes": [
+        "/services.html",
+        "/locations.html"
+      ],
+      "slots": [
+        "header",
+        "hubIntro",
+        "priorityChoices",
+        "guideOrCardGrid",
+        "process",
+        "finalCta",
+        "footer"
+      ]
+    },
+    "AppFlowPage": {
+      "routes": [
+        "/app/reserve/page.html",
+        "/reservation-lookup.html"
+      ],
+      "slots": [
+        "header",
+        "secureIntro",
+        "formPanel",
+        "resultOrSummary",
+        "supportFallback",
+        "footer"
+      ],
+      "rules": {
+        "taskDrivenBeforeEditorial": true,
+        "safePublicDataOnly": true
+      }
+    }
+  }
+}
