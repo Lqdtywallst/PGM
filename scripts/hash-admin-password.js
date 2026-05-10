@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { hashAdminPassword } = require('../server/admin-auth');
+const { hashAdminPassword } = require('../server/admin/admin-auth');
 
 function readPasswordFromArgs() {
     const directValue = process.argv[2];

@@ -4,15 +4,15 @@ const path = require('path');
 
 const { chromium } = require('playwright');
 
-const { PUBLIC_PAGE_FILE_MAP } = require('../server/public-page-map');
-const { DESIGN_SYSTEM_CONTRACT } = require('../server/design-system-contract');
+const { PUBLIC_PAGE_FILE_MAP } = require('../server/shared/public-page-map');
+const { DESIGN_SYSTEM_CONTRACT } = require('../server/design-system/design-system-contract');
 const {
     classifyRouteCohort,
     classifyRouteProfile,
     getCohortConfig,
     normalizeRoute
-} = require('../server/visual-audit-core');
-const { startStaticServer, stopProcess } = require('../server/site-audit-utils');
+} = require('../server/audits/visual-audit-core');
+const { startStaticServer, stopProcess } = require('../server/shared/site-audit-utils');
 const { runVisualAgent } = require('./run-visual-agent');
 
 const repoRoot = path.resolve(__dirname, '..');
@@ -417,11 +417,11 @@ function applyConnectivityFindings(routeSummariesByRoute) {
             pushFinding(routeSummary, {
                 severity: 'medium',
                 type: 'cohort_drift',
-                message: 'La vista no coincide del todo con la intención visual esperada para su cohorte.',
+                message: 'La vista no coincide del todo con la intenciÃ³n visual esperada para su cohorte.',
                 evidence: `intent=${routeSummary.effectiveVisualIntent || 'unknown'}; expected=${routeSummary.expectedVisualIntents.join(', ') || 'n/a'}`,
                 recommendation: routeSummary.referenceRoute
-                    ? `Comparar esta vista con ${routeSummary.referenceRoute} y unificar shell, tipografía y superficies.`
-                    : 'Revisar shell, tipografía y superficies de esta vista.'
+                    ? `Comparar esta vista con ${routeSummary.referenceRoute} y unificar shell, tipografÃ­a y superficies.`
+                    : 'Revisar shell, tipografÃ­a y superficies de esta vista.'
             });
         }
 
@@ -429,9 +429,9 @@ function applyConnectivityFindings(routeSummariesByRoute) {
             pushFinding(routeSummary, {
                 severity: 'high',
                 type: 'broken_public_links',
-                message: 'La vista contiene enlaces HTML hacia rutas públicas que ya no existen en el mapa activo.',
+                message: 'La vista contiene enlaces HTML hacia rutas pÃºblicas que ya no existen en el mapa activo.',
                 evidence: routeSummary.brokenRoutes.join(', '),
-                recommendation: 'Corregir o redirigir estos enlaces antes de seguir ampliando la navegación.'
+                recommendation: 'Corregir o redirigir estos enlaces antes de seguir ampliando la navegaciÃ³n.'
             });
         }
 
@@ -439,7 +439,7 @@ function applyConnectivityFindings(routeSummariesByRoute) {
             pushFinding(routeSummary, {
                 severity: 'medium',
                 type: 'orphan_route',
-                message: 'La vista no recibe enlaces internos desde otras vistas públicas auditadas.',
+                message: 'La vista no recibe enlaces internos desde otras vistas pÃºblicas auditadas.',
                 evidence: 'incomingRoutes=0',
                 recommendation: 'Decidir si debe enlazarse desde otra vista viva, mantenerse solo por SEO o retirarse.'
             });
@@ -472,7 +472,7 @@ function applyConnectivityFindings(routeSummariesByRoute) {
                 pushFinding(routeSummary, {
                     severity: 'medium',
                     type: 'uncertain_connection',
-                    message: 'Esta vista enlaza hacia una vista que todavía no queda clara como formato aprobado.',
+                    message: 'Esta vista enlaza hacia una vista que todavÃ­a no queda clara como formato aprobado.',
                     evidence: `${routeSummary.route} -> ${destinationRoute}; intent=${destination.effectiveVisualIntent || 'unknown'}`,
                     recommendation: 'Revisar la vista destino antes de consolidar este handoff.'
                 });

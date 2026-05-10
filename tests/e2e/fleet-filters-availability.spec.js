@@ -7,7 +7,7 @@ const path = require('node:path');
 const {
     closeReservationStore,
     deleteReservationRecord
-} = require('../../server/reservation-store');
+} = require('../../server/reservations/reservation-store');
 const {
     createConsoleTracker,
     expectNoConsoleErrors,
@@ -75,7 +75,7 @@ async function ensureCommonBackend() {
     }
 
     backendStartedByTest = true;
-    backendProcess = childProcess.spawn(process.execPath, ['server/backend-example.js'], {
+    backendProcess = childProcess.spawn(process.execPath, ['server/apps/backend.js'], {
         cwd: repoRoot,
         env: {
             ...process.env,

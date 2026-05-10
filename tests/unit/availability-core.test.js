@@ -6,7 +6,7 @@ const {
     buildPublicAvailabilityPayload,
     buildScheduleWindow,
     vehicleMatchesReservation
-} = require('../../server/availability-core');
+} = require('../../server/reservations/availability-core');
 
 const fleetCards = [
     {

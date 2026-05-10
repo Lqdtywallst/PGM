@@ -1,4 +1,4 @@
-﻿const { chromium } = require('playwright');
+const { chromium } = require('playwright');
 
 (async () => {
   const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:8085';

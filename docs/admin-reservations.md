@@ -1,6 +1,6 @@
 # Admin Reservations Desk
 
-Private mini-CRM for Dynasty Prestige reservations. It is served by the Railway/Express backend, not by `server/server-http.js`.
+Private mini-CRM for Dynasty Prestige reservations. It is served by the Railway/Express backend, not by `server/apps/static-server.js`.
 
 ## Routes
 
@@ -30,7 +30,7 @@ The cookie is `HttpOnly`, `SameSite=Lax`, signed with `ADMIN_SESSION_SECRET`, an
 
 ## Local Preview
 
-The admin desk is served by the Express backend, not by `npm run http` / `server/server-http.js`.
+The admin desk is served by the Express backend, not by `npm run http` / `server/apps/static-server.js`.
 
 For a local preview:
 

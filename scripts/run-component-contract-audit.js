@@ -3,7 +3,7 @@ const path = require('path');
 
 const {
     buildComponentContractAudit
-} = require('../server/component-contract-audit-core');
+} = require('../server/design-system/component-contract-audit-core');
 
 const repoRoot = path.resolve(__dirname, '..');
 const siteRoot = path.join(repoRoot, 'site');

@@ -8,7 +8,7 @@ const {
     buildFunctionalReviewMarkdownSection,
     collectCoverageFindings,
     summarizeFunctionalFindings
-} = require('../../server/functional-audit-core');
+} = require('../../server/audits/functional-audit-core');
 
 const COMPLETE_DEEP_SCOPE = Object.freeze({
     mode: 'deep',

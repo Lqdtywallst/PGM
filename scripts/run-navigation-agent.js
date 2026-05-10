@@ -6,14 +6,14 @@ const { chromium } = require('@playwright/test');
 
 const {
     PUBLIC_PAGE_FILE_MAP
-} = require(path.join(__dirname, '..', 'server', 'public-page-map.js'));
+} = require(path.join(__dirname, '..', 'server', 'shared', 'public-page-map.js'));
 const {
     getViewportCoverageMatrix
-} = require(path.join(__dirname, '..', 'server', 'design-system-contract.js'));
+} = require(path.join(__dirname, '..', 'server', 'design-system', 'design-system-contract.js'));
 const {
     startStaticServer,
     stopProcess
-} = require(path.join(__dirname, '..', 'server', 'site-audit-utils.js'));
+} = require(path.join(__dirname, '..', 'server', 'shared', 'site-audit-utils.js'));
 const {
     createConsoleTracker,
     normalizeConsoleErrors,
@@ -29,11 +29,11 @@ const {
     evaluateNavigationGate,
     normalizeRoute,
     normalizeText
-} = require(path.join(__dirname, '..', 'server', 'navigation-audit-core.js'));
+} = require(path.join(__dirname, '..', 'server', 'audits', 'navigation-audit-core.js'));
 const {
     compareReportToApprovedMemory,
     formatAuditMemoryRegression
-} = require(path.join(__dirname, '..', 'server', 'audit-memory-core.js'));
+} = require(path.join(__dirname, '..', 'server', 'audits', 'audit-memory-core.js'));
 
 const repoRoot = path.resolve(__dirname, '..');
 const siteRoot = path.join(repoRoot, 'site');

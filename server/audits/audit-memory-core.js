@@ -2,7 +2,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const repoRoot = path.resolve(__dirname, '..');
+const repoRoot = path.resolve(__dirname, '..', '..');
 const DEFAULT_MEMORY_ROOT = path.join(repoRoot, 'tests', 'audit-memory');
 const MEMORY_VERSION = 1;
 

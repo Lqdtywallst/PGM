@@ -15,7 +15,7 @@ const {
 const {
     startStaticServer,
     stopProcess
-} = require(path.join(__dirname, '..', 'server', 'site-audit-utils.js'));
+} = require(path.join(__dirname, '..', 'server', 'shared', 'site-audit-utils.js'));
 const {
     BRAND_REFERENCE_ROUTE,
     VEHICLE_REFERENCE_ROUTE,
@@ -31,18 +31,18 @@ const {
     scoreVisualPage,
     shouldEscalateToVision,
     summarizeVisualFindings
-} = require(path.join(__dirname, '..', 'server', 'visual-audit-core.js'));
+} = require(path.join(__dirname, '..', 'server', 'audits', 'visual-audit-core.js'));
 const {
     DESIGN_SYSTEM_CONTRACT,
     getFirstViewportContract,
     getMobileInteractionContract,
     getSectionRhythmContract,
     getViewportCoverageMatrix
-} = require(path.join(__dirname, '..', 'server', 'design-system-contract.js'));
+} = require(path.join(__dirname, '..', 'server', 'design-system', 'design-system-contract.js'));
 const {
     compareReportToApprovedMemory,
     formatAuditMemoryRegression
-} = require(path.join(__dirname, '..', 'server', 'audit-memory-core.js'));
+} = require(path.join(__dirname, '..', 'server', 'audits', 'audit-memory-core.js'));
 
 const repoRoot = path.resolve(__dirname, '..');
 const artifactsRoot = path.join(repoRoot, 'artifacts', 'visual-agent');

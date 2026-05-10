@@ -5,7 +5,7 @@ const {
     closeReservationStore,
     getReservationStoreMode,
     saveReservationRecord
-} = require('../server/reservation-store');
+} = require('../server/reservations/reservation-store');
 
 function addDaysIso(days) {
     const date = new Date();

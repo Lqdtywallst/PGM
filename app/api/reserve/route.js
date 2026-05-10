@@ -6,13 +6,13 @@ const express = require('express');
 const {
     EMAIL_CONFIG,
     createEmailTransporter
-} = require('../../../server/email-config');
+} = require('../../../server/integrations/email-config');
 const {
     buildReservationId,
     findReservationForLookup,
     readReservationRecord,
     saveReservationRecord
-} = require('../../../server/reservation-store');
+} = require('../../../server/reservations/reservation-store');
 
 // Verify that STRIPE_SECRET_KEY is configured
 if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('tu_clave')) {

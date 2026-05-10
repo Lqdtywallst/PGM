@@ -10,17 +10,17 @@ const {
     createEmailTransporter,
     getEmailDiagnostics,
     isEmailConfigured
-} = require('./email-config');
+} = require('../integrations/email-config');
 const {
     buildReservationId,
     listReservationRecords,
     saveReservationRecord
-} = require('./reservation-store');
+} = require('../reservations/reservation-store');
 const {
     buildAvailability,
     buildPublicAvailabilityPayload,
     loadFleetCards
-} = require('./availability-core');
+} = require('../reservations/availability-core');
 const {
     clearAdminSessionCookie,
     createAdminSessionToken,
@@ -29,20 +29,20 @@ const {
     requireAdminSession,
     setAdminSessionCookie,
     verifyAdminCredentials
-} = require('./admin-auth');
+} = require('../admin/admin-auth');
 const {
     renderAdminLoginPage,
     renderAdminReservationsPage
-} = require('./admin-pages');
+} = require('../admin/admin-pages');
 const {
     renderAdminContentEditorPage
-} = require('./admin-content-page');
+} = require('../admin/admin-content-page');
 const {
     createAdminReservationsRouter
-} = require('./admin-reservations');
+} = require('../admin/admin-reservations');
 const {
     runContentConsistencyAudit
-} = require('./content-consistency-audit');
+} = require('../admin/content-consistency-audit');
 const {
     readEditorState,
     saveHomeEditorState,
@@ -55,12 +55,12 @@ const {
     saveLocationsContent,
     readEditablePage,
     saveEditablePage
-} = require('./content-editor');
+} = require('../admin/content-editor');
 const {
     fetchGoogleReviews,
     getGoogleReviewsConfig,
     buildGoogleReviewsUnavailablePayload
-} = require('./google-reviews');
+} = require('../integrations/google-reviews');
 
 const stripeConfigured = Boolean(
     process.env.STRIPE_SECRET_KEY &&
@@ -84,7 +84,7 @@ const stripe = stripeConfigured
     : null;
 
 const app = express();
-const siteRoot = path.resolve(__dirname, '..', 'site');
+const siteRoot = path.resolve(__dirname, '..', '..', 'site');
 
 function serveSiteAsset(relativePath) {
     return (req, res) => {
@@ -101,7 +101,7 @@ app.use('/images', express.static(path.join(siteRoot, 'images'), { fallthrough: 
 // Import reservation routes
 let reserveRoutes;
 try {
-    reserveRoutes = require('../app/api/reserve/route');
+    reserveRoutes = require('../../app/api/reserve/route');
     console.log('[OK] Reservation routes loaded');
 } catch (error) {
     console.error('[WARN] Error loading routes:', error.message);

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
-const { PUBLIC_PAGE_FILE_MAP } = require('./public-page-map');
+const { PUBLIC_PAGE_FILE_MAP } = require('../shared/public-page-map');
 const {
     countMatches,
     extractTagValue,
@@ -11,21 +11,21 @@ const {
     siteFileForPath: resolveSiteFileForPath,
     startStaticServer: launchStaticServer,
     stopProcess
-} = require('./site-audit-utils');
+} = require('../shared/site-audit-utils');
 
-const projectRoot = path.resolve(__dirname, '..');
+const projectRoot = path.resolve(__dirname, '..', '..');
 const siteRoot = path.join(projectRoot, 'site');
 const staticServerPort = Number(process.env.TEST_STATIC_PORT || (8400 + Math.floor(Math.random() * 200)));
 const staticBaseUrl = `http://127.0.0.1:${staticServerPort}`;
 const requiredPublicFiles = Object.values(PUBLIC_PAGE_FILE_MAP).map((relativePath) => `site/${relativePath}`);
 
 const requiredFiles = [
-    'server/backend-example.js',
-    'server/email-config.js',
-    'server/google-reviews.js',
-    'server/seo-audit-core.js',
-    'server/server-http.js',
-    'server/verificar-stripe.js',
+    'server/apps/backend.js',
+    'server/integrations/email-config.js',
+    'server/integrations/google-reviews.js',
+    'server/audits/seo-audit-core.js',
+    'server/apps/static-server.js',
+    'server/integrations/verify-stripe.js',
     'vercel.json',
     'scripts/run-copy-audit.js',
     'scripts/seed-demo-reservation.js',
@@ -53,12 +53,12 @@ const requiredFiles = [
 ];
 
 const syntaxFiles = [
-    'server/backend-example.js',
-    'server/email-config.js',
-    'server/google-reviews.js',
-    'server/seo-audit-core.js',
-    'server/server-http.js',
-    'server/verificar-stripe.js',
+    'server/apps/backend.js',
+    'server/integrations/email-config.js',
+    'server/integrations/google-reviews.js',
+    'server/audits/seo-audit-core.js',
+    'server/apps/static-server.js',
+    'server/integrations/verify-stripe.js',
     'scripts/run-copy-audit.js',
     'scripts/seed-demo-reservation.js',
     'scripts/run-seo-agent.js',
@@ -454,11 +454,11 @@ async function run() {
         'reservation backend no longer references unsupported wallet method types'
     );
     assert(
-        reserveRoute.includes("require('../../../server/email-config')"),
+        reserveRoute.includes("require('../../../server/integrations/email-config')"),
         'reservation route reuses the shared email configuration helper'
     );
     assert(
-        reserveRoute.includes("require('../../../server/reservation-store')") &&
+        reserveRoute.includes("require('../../../server/reservations/reservation-store')") &&
         reserveRoute.includes('saveReservationRecord') &&
         reserveRoute.includes('reservationId'),
         'reservation backend persists each booking with a stable reservation id'
@@ -469,7 +469,7 @@ async function run() {
         reserveRoute.includes('findReservationForLookup'),
         'reservation backend exposes a safe customer lookup endpoint without raw customer records'
     );
-    const reservationStore = readFile('server/reservation-store.js');
+    const reservationStore = readFile('server/reservations/reservation-store.js');
     assert(
         reservationStore.includes('CREATE TABLE IF NOT EXISTS reservations') &&
         reservationStore.includes('DATABASE_URL') &&
@@ -793,9 +793,9 @@ async function run() {
         });
     });
 
-    const backendFile = readFile('server/backend-example.js');
+    const backendFile = readFile('server/apps/backend.js');
     assert(
-        backendFile.includes("require('../app/api/reserve/route')"),
+        backendFile.includes("require('../../app/api/reserve/route')"),
         'backend loads reservation routes from the backend app directory'
     );
     assert(
@@ -803,12 +803,12 @@ async function run() {
         'backend CORS uses an allowlist and disables credentials'
     );
     assert(
-        backendFile.includes("require('./email-config')") &&
+        backendFile.includes("require('../integrations/email-config')") &&
         backendFile.includes('Stripe-dependent routes will return 503'),
         'backend reuses shared email config and no longer hard-fails without Stripe'
     );
     assert(
-        backendFile.includes("require('./reservation-store')") &&
+        backendFile.includes("require('../reservations/reservation-store')") &&
         backendFile.includes('buildReservationRecordFromPaymentIntent') &&
         backendFile.includes('stripe webhook payment succeeded'),
         'backend records reservation state from legacy payment intents and Stripe webhooks'
@@ -831,9 +831,9 @@ async function run() {
         'PostgreSQL reservation storage can be tested and locally seeded'
     );
 
-    const staticServerFile = readFile('server/server-http.js');
+    const staticServerFile = readFile('server/apps/static-server.js');
     assert(
-        staticServerFile.includes("path.resolve(__dirname, '../site')"),
+        staticServerFile.includes("path.resolve(__dirname, '..', '..', 'site')"),
         'local static server serves the /site directory'
     );
     assert(

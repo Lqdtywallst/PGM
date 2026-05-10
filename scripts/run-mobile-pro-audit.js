@@ -3,9 +3,9 @@ const net = require('net');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
-const { PUBLIC_PAGE_FILE_MAP } = require(path.join(__dirname, '..', 'server', 'public-page-map.js'));
-const { getViewportCoverageMatrix } = require(path.join(__dirname, '..', 'server', 'design-system-contract.js'));
-const { startStaticServer, stopProcess } = require(path.join(__dirname, '..', 'server', 'site-audit-utils.js'));
+const { PUBLIC_PAGE_FILE_MAP } = require(path.join(__dirname, '..', 'server', 'shared', 'public-page-map.js'));
+const { getViewportCoverageMatrix } = require(path.join(__dirname, '..', 'server', 'design-system', 'design-system-contract.js'));
+const { startStaticServer, stopProcess } = require(path.join(__dirname, '..', 'server', 'shared', 'site-audit-utils.js'));
 const { runVisualAgent } = require(path.join(__dirname, 'run-visual-agent.js'));
 const { runFunctionalAgent } = require(path.join(__dirname, 'run-functional-agent.js'));
 

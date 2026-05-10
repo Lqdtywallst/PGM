@@ -1,13 +1,13 @@
 # Project Cleanup Audit
 
-Generated: 2026-05-10T00:54:38.233Z
+Generated: 2026-05-10T01:18:02.542Z
 
 ## Summary
 
-- Files scanned: 564
-- Tracked files: 560
-- Untracked files visible to git: 3
-- Total scanned size: 272.69 MB
+- Files scanned: 565
+- Tracked files: 563
+- Untracked files visible to git: 1
+- Total scanned size: 272.70 MB
 - Delete-local candidates: 0
 - Review-delete candidates: 0
 - Asset review candidates: 28
@@ -19,7 +19,7 @@ Generated: 2026-05-10T00:54:38.233Z
 | local-env |1 |
 | root-config |12 |
 | unknown |1 |
-| backend |37 |
+| backend |38 |
 | audit-engine |3 |
 | docs |45 |
 | scripts |30 |
@@ -37,7 +37,7 @@ Generated: 2026-05-10T00:54:38.233Z
 | Action |Count |
 | --- |--- |
 | keep-local-never-commit |1 |
-| keep |491 |
+| keep |492 |
 | review |9 |
 | review-boundary |3 |
 | review-consolidate |14 |
@@ -130,9 +130,7 @@ _None._
 
 | Path |Action |Reason |
 | --- |--- |--- |
-| docs/audit/PROJECT-CLEANUP-AUDIT.md |keep |Live document or current operating guide. |
-| scripts/run-project-cleanup-audit.js |keep |Script referenced by package.json or an operating workflow. |
-| tests/unit/project-cleanup-audit.test.js |keep |Test coverage; do not clean without checking the scripts that run it. |
+| server/README.md |keep |Backend, API, renderers or audit core; deleting here can break reservations or tooling. |
 
 ## Recommended Next Steps
 
@@ -140,5 +138,5 @@ _None._
 2. Move stale audit/history docs into `docs/archive/` or merge them into current docs.
 3. Review orphan CSS/JS/HTML one by one before deleting because static detection can miss dynamic references.
 4. Compress or replace large active assets only after checking visual quality.
-5. Re-run `node server/test-server.js`, `npm run audit:homogeneity`, `npm run audit:homogeneity:components`, and `npm run audit:seo` after any tracked deletion.
+5. Re-run `node server/audits/test-server.js`, `npm run audit:homogeneity`, `npm run audit:homogeneity:components`, and `npm run audit:seo` after any tracked deletion.
 

@@ -10,7 +10,7 @@ const {
     getMobileInteractionContract,
     getViewportCoverageMatrix,
     resolveViewportTier
-} = require('../../server/design-system-contract');
+} = require('../../server/design-system/design-system-contract');
 
 const {
     approveBaselinesFromRun,

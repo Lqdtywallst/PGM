@@ -11,7 +11,7 @@ const {
     closeReservationStore,
     deleteReservationRecord,
     saveReservationRecord
-} = require('../../server/reservation-store');
+} = require('../../server/reservations/reservation-store');
 
 function createLookupServer() {
     const app = express();

@@ -88,7 +88,7 @@ Completado en:
 
 - [SERVICES-SEO-ROADMAP.md](SERVICES-SEO-ROADMAP.md)
 - [SERVICES-MEASUREMENT-SETUP.md](SERVICES-MEASUREMENT-SETUP.md)
-- [test-server.js](../../server/test-server.js)
+- [test-server.js](../../server/audits/test-server.js)
 
 Resultado:
 
@@ -101,8 +101,8 @@ Resultado:
 Completado en:
 
 - eliminada la carpeta archivada anterior del sitio
-- limpiadas referencias en [test-server.js](../../server/test-server.js)
-- limpiada la ruta desactivada de webhook en [backend-example.js](../../server/backend-example.js)
+- limpiadas referencias en [test-server.js](../../server/audits/test-server.js)
+- limpiada la ruta desactivada de webhook en [backend-example.js](../../server/apps/backend.js)
 
 Resultado:
 
@@ -117,7 +117,7 @@ Resultado:
 Hecho:
 
 - `npm test` en verde tras los cambios
-- validacion de metadata y schema del cluster en [test-server.js](../../server/test-server.js)
+- validacion de metadata y schema del cluster en [test-server.js](../../server/audits/test-server.js)
 - comprobacion de alcance oficial del cluster y exclusiones de analytics
 
 ### Validacion visual local

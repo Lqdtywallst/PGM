@@ -6,19 +6,19 @@ const { chromium } = require('@playwright/test');
 
 const {
     PUBLIC_PAGE_FILE_MAP
-} = require('../server/public-page-map');
+} = require('../server/shared/public-page-map');
 const {
     getViewportCoverageMatrix
-} = require('../server/design-system-contract');
+} = require('../server/design-system/design-system-contract');
 const {
     startStaticServer,
     stopProcess
-} = require('../server/site-audit-utils');
+} = require('../server/shared/site-audit-utils');
 const {
     buildHomogeneityFindings,
     normalizeRoute,
     summarizeHomogeneityFindings
-} = require('../server/homogeneity-audit-core');
+} = require('../server/audits/homogeneity-audit-core');
 
 const repoRoot = path.resolve(__dirname, '..');
 const artifactsRoot = path.join(repoRoot, 'artifacts', 'homogeneity-agent');

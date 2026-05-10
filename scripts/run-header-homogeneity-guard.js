@@ -1,7 +1,7 @@
 const path = require('path');
 
-const { PUBLIC_PAGE_FILE_MAP } = require('../server/public-page-map');
-const { normalizeRoute } = require('../server/homogeneity-audit-core');
+const { PUBLIC_PAGE_FILE_MAP } = require('../server/shared/public-page-map');
+const { normalizeRoute } = require('../server/audits/homogeneity-audit-core');
 const { runHomogeneityAgent } = require('./run-homogeneity-agent');
 
 const repoRoot = path.resolve(__dirname, '..');

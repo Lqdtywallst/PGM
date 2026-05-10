@@ -9,8 +9,8 @@ Scope: technical homogeneity inventory only. No production CSS, JS, HTML, data, 
 - `site/**/*.html`: public pages, reserve shell page, brand landings, vehicle PDPs, service detail pages, local guide pages, legal pages.
 - `site/css/**/*.css`: global `site-v2.css`, cohort CSS files, reserve CSS, SEO landing CSS, admin overrides, preview CSS.
 - `server/data/*.json`: `global-header.json`, `fleet-cards.json`, `services-editor.json`, `locations-editor.json`, pricing/style/appearance data.
-- `server/render-fleet-cards.js`: fleet card data-to-HTML renderer and validation contract.
-- Relevant audit/tooling scripts: `scripts/run-homogeneity-agent.js`, `scripts/run-header-homogeneity-guard.js`, `scripts/audit-inventory.js`, `server/homogeneity-audit-core.js`, `server/design-system-contract.js`.
+- `server/renderers/render-fleet-cards.js`: fleet card data-to-HTML renderer and validation contract.
+- Relevant audit/tooling scripts: `scripts/run-homogeneity-agent.js`, `scripts/run-header-homogeneity-guard.js`, `scripts/audit-inventory.js`, `server/audits/homogeneity-audit-core.js`, `server/design-system/design-system-contract.js`.
 
 Note: I inspected audit scripts but did not execute scripts that write reports/screenshots, because the allowed write scope is this document only.
 
@@ -25,7 +25,7 @@ Note: I inspected audit scripts but did not execute scripts that write reports/s
 
 | Family | Current evidence | Classification | Notes |
 | --- | --- | --- | --- |
-| `lab-header`, `lab-brand`, `lab-nav`, `lab-reserve`, `lab-mobile-*` | Present across most public HTML; `server/data/global-header.json` defines utility links, nav items, mega panels and primary button; `server/render-global-header.js` normalizes and renders it. | canonical candidate | This is the strongest current component contract. `server/design-system-contract.js` explicitly expects `lab_mega_utility` header variants and the homogeneity guard compares header layout, surface, CTA, dropdowns and navigation shift. |
+| `lab-header`, `lab-brand`, `lab-nav`, `lab-reserve`, `lab-mobile-*` | Present across most public HTML; `server/data/global-header.json` defines utility links, nav items, mega panels and primary button; `server/renderers/render-global-header.js` normalizes and renders it. | canonical candidate | This is the strongest current component contract. `server/design-system/design-system-contract.js` explicitly expects `lab_mega_utility` header variants and the homogeneity guard compares header layout, surface, CTA, dropdowns and navigation shift. |
 | `site-header`, `.header-brand` legacy fallback selectors | Used as fallback selectors in homogeneity tooling and reserve/admin overrides. | risky duplicate | Keep only as compatibility surface until all pages/components are confirmed on `lab-header`. Do not refactor blindly because tooling still probes it. |
 | Header overrides in `admin-style-overrides.css`, `reserve-shell.css`, `reserve-page.css` | Multiple page-scoped overrides for header, panels, reserve CTA, utility links. | alias/migratable | Likely accumulated to stabilize visual drift. Good target for token extraction after visual guard is green across templates. |
 | Mobile drawer/action bar `lab-mobile-drawer`, `lab-mobile-action-bar`, `lab-floating-*` | Shared names in `site-v2.css`; mobile nav policy in `design-system-contract.js`. | canonical candidate | Treat as part of header system, not independent CTAs. Fragile because it interacts with body state classes and floating contact/back controls. |
@@ -39,7 +39,7 @@ Note: I inspected audit scripts but did not execute scripts that write reports/s
 | Generic SEO landing buttons `.btn`, `.btn-primary`, `.btn-outline`, `.btn-ghost` | Defined in `seo-landing.css`; used by brand and vehicle pages. | alias/migratable | Can become an alias to shared button tokens, but vehicle/brand pages rely on SEO layout and booking forms. |
 | Hub/reserve generic buttons `.btn`, `.btn-secondary`, `.btn-home` | `hub-pages.css` and `reserve-page.css` define their own button systems. | risky duplicate | Same class names have different context-specific meanings. Avoid global edits to `.btn` until namespace and cascade are audited. |
 | Page-specific CTA families `about-button`, `contact-button`, `locations-button`, `services-button` | Defined in their page CSS files with primary/secondary/ghost variants. | alias/migratable | Structurally similar: inline-flex, uppercase/letter-spaced, primary plus ghost/secondary variants. Good low-risk candidates for token-level migration, not class renaming first. |
-| Fleet card actions `fleet-card__primary`, `fleet-card__secondary`, `fleet-card__secondary--wa` | Rendered from `server/render-fleet-cards.js`; governed by mobile card action policy in `design-system-contract.js`. | canonical candidate for fleet cards | Renderer is a strong contract. Do not change mobile stacking/contact behavior without browser validation across required viewports. |
+| Fleet card actions `fleet-card__primary`, `fleet-card__secondary`, `fleet-card__secondary--wa` | Rendered from `server/renderers/render-fleet-cards.js`; governed by mobile card action policy in `design-system-contract.js`. | canonical candidate for fleet cards | Renderer is a strong contract. Do not change mobile stacking/contact behavior without browser validation across required viewports. |
 | Home visual fleet actions `fleet-visual-card__primary`, `fleet-visual-card__contact-link` | Home feature cards in `site-v2.css`. | risky duplicate | Purpose overlaps with fleet cards, but markup and visual treatment differ. Do not merge into fleet cards until card roles are separated. |
 | Reserve booking actions `reserve-page-action`, `.step-navigation .btn`, `reserve-mobile-bar__primary/secondary` | Reserve page has its own booking flow CTA system. | page-specific exception | Booking state, validation, mobile sticky bar and step navigation make this high risk. |
 | Floating contact actions `lab-floating-contact__button--call/--wa`, `hero-floating-actions__link` | Shared floating contact in `site-v2.css`; hero floating actions appear as separate family. | risky duplicate | Both represent contact affordances. Consolidate behavior/visibility later, not visual CSS first. |
@@ -48,7 +48,7 @@ Note: I inspected audit scripts but did not execute scripts that write reports/s
 
 | Family | Current evidence | Classification | Notes |
 | --- | --- | --- | --- |
-| Fleet listing cards `fleet-card*` | `server/data/fleet-cards.json` drives content; `server/render-fleet-cards.js` validates required fields and renders card markup into `fleet.html`; styles in `site-v2-fleet.css`. | canonical candidate | Best card contract in repo. It has data, renderer, selectors, and audit policy coverage for mobile actions. |
+| Fleet listing cards `fleet-card*` | `server/data/fleet-cards.json` drives content; `server/renderers/render-fleet-cards.js` validates required fields and renders card markup into `fleet.html`; styles in `site-v2-fleet.css`. | canonical candidate | Best card contract in repo. It has data, renderer, selectors, and audit policy coverage for mobile actions. |
 | Home fleet visual cards `fleet-visual-card*` | Home showcase cards in `site-v2.css`. | risky duplicate | Similar vehicle/purchase intent to `fleet-card`, but visual storytelling card, not a listing card. Should not be merged without preserving first-viewport/home composition. |
 | Header mega menu cards `lab-nav__card*` | Rendered from `global-header.json`; styled in `site-v2.css` and reserve shell. | canonical candidate | Keep as part of header navigation contract. Card count/shape is inspected by homogeneity tooling. |
 | Vehicle booking cards `vehicle-booking*` | Used on brand/vehicle SEO pages; includes form fields and submit/secondary actions. | page-specific exception | Revenue-critical booking surface. It is close to forms/cards but tied to vehicle intent and SEO landing layout. |
@@ -101,7 +101,7 @@ Note: I inspected audit scripts but did not execute scripts that write reports/s
 
 - Global header/nav/drawer: `lab-header`, `lab-brand`, `lab-nav`, `lab-reserve`, `lab-mobile-*`.
 - Home dark hero CTA style: `hero-lab__cta--primary/secondary` for dark first viewport use only.
-- Fleet listing card contract: `fleet-card*` plus `server/data/fleet-cards.json` and `server/render-fleet-cards.js`.
+- Fleet listing card contract: `fleet-card*` plus `server/data/fleet-cards.json` and `server/renderers/render-fleet-cards.js`.
 - Header mega menu cards: `lab-nav__card*`.
 - Contact form visual baseline: `contact-form-*` for non-booking forms.
 - Cohort-level heroes: `local-guide-hero*`, `service-detail-hero*`, `vehicle-hero*` within their own cohorts.
@@ -150,8 +150,8 @@ Note: I inspected audit scripts but did not execute scripts that write reports/s
 
 - `site/css/reserve-page.css` booking flow CTAs, form fields, sticky/mobile summary and step navigation.
 - `vehicle-pdp-*` gallery, lightbox, booking panel and hero shell in `seo-landing.css`.
-- `server/render-fleet-cards.js` output structure and `fleet-card__contact-row` behavior without full mobile card validation.
-- `server/render-global-header.js`, `server/data/global-header.json`, and `lab-nav__panel` markup without header guard plus dropdown screenshots.
+- `server/renderers/render-fleet-cards.js` output structure and `fleet-card__contact-row` behavior without full mobile card validation.
+- `server/renderers/render-global-header.js`, `server/data/global-header.json`, and `lab-nav__panel` markup without header guard plus dropdown screenshots.
 - Home `hero-lab*` intro/launcher/overlay states, because it owns the highest-priority above-the-fold experience.
 - Broad `.btn` selectors in `hub-pages.css`, `reserve-page.css`, and `seo-landing.css` until cascade ownership is mapped.
 - `admin-style-overrides.css` header/card/button overrides until each override is traced to a specific current visual defect or editor requirement.

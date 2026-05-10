@@ -8,17 +8,17 @@ const {
 } = require('../../scripts/run-project-cleanup-audit');
 
 test('cleanup audit extracts repo-root references from script strings', () => {
-    const refs = extractReferences('server/test-server.js', `
+    const refs = extractReferences('server/audits/test-server.js', `
         const requiredFiles = [
             'site/css/hub-pages.css',
-            'server/server-http.js',
+            'server/apps/static-server.js',
             './local-helper.js'
         ];
     `);
 
     assert.ok(refs.includes('site/css/hub-pages.css'));
-    assert.ok(refs.includes('server/server-http.js'));
-    assert.ok(refs.includes('server/local-helper.js'));
+    assert.ok(refs.includes('server/apps/static-server.js'));
+    assert.ok(refs.includes('server/audits/local-helper.js'));
 });
 
 test('cleanup audit treats markdown in site pages as documentation, not orphan HTML', () => {

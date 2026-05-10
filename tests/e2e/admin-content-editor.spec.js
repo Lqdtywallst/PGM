@@ -6,7 +6,7 @@ const path = require('node:path');
 
 const {
     hashAdminPassword
-} = require('../../server/admin-auth');
+} = require('../../server/admin/admin-auth');
 
 const repoRoot = path.resolve(__dirname, '../..');
 const adminUser = 'owner';
@@ -64,7 +64,7 @@ test.describe('Private admin content editor', () => {
     test.beforeAll(async () => {
         const port = await getFreePort();
         adminBaseUrl = `http://127.0.0.1:${port}`;
-        backendProcess = childProcess.spawn(process.execPath, ['server/backend-example.js'], {
+        backendProcess = childProcess.spawn(process.execPath, ['server/apps/backend.js'], {
             cwd: repoRoot,
             env: {
                 ...process.env,

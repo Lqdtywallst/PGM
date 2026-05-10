@@ -541,7 +541,7 @@ function asyncRoute(handler) {
 }
 
 function createAdminReservationsRouter(dependencies = {}) {
-    const store = dependencies.store || require('./reservation-store');
+    const store = dependencies.store || require('../reservations/reservation-store');
     const router = express.Router();
 
     router.use((req, res, next) => {

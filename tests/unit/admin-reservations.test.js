@@ -8,7 +8,7 @@ const {
     collectReservationFilters,
     filterAdminReservationSummaries,
     toReservationCsv
-} = require('../../server/admin-reservations');
+} = require('../../server/admin/admin-reservations');
 
 const now = '2026-04-25T12:00:00.000Z';
 

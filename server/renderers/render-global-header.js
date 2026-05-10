@@ -1,11 +1,11 @@
 const fs = require('fs');
 const path = require('path');
-const { escapeHtml } = require('./html-utils');
-const { publicPathForSiteFile } = require('./public-page-map');
+const { escapeHtml } = require('../shared/html-utils');
+const { publicPathForSiteFile } = require('../shared/public-page-map');
 
-const projectRoot = path.resolve(__dirname, '..');
+const projectRoot = path.resolve(__dirname, '..', '..');
 const siteRoot = path.join(projectRoot, 'site');
-const dataPath = path.join(__dirname, 'data', 'global-header.json');
+const dataPath = path.join(__dirname, '..', 'data', 'global-header.json');
 
 function readUtf8(filePath) {
     return fs.readFileSync(filePath, 'utf8');

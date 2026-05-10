@@ -34,11 +34,11 @@ time.
 
 - `site/css/brand-tokens.css` is the central brand token layer.
 - `docs/design-system-brand.md` documents core color and typography usage.
-- `server/data/fleet-cards.json` plus `server/render-fleet-cards.js` already
+- `server/data/fleet-cards.json` plus `server/renderers/render-fleet-cards.js` already
   works like a real component renderer for fleet cards.
 - `server/data/services-editor.json` and `server/data/locations-editor.json`
   already hold structured content that can become renderer-driven.
-- `server/design-system-contract.js` and `server/homogeneity-audit-core.js`
+- `server/design-system/design-system-contract.js` and `server/audits/homogeneity-audit-core.js`
   already define a good base for visual contracts and homogeneity checks.
 
 ### Still fragmented
@@ -409,7 +409,7 @@ The output should tell us:
 
 Create a component manifest:
 
-- `server/design-system-components.json`
+- `server/design-system/design-system-components.json`
 
 It should list approved component families, variants, required selectors and
 forbidden duplicate patterns.
@@ -605,7 +605,7 @@ Do not redesign the whole website from zero.
 Best next step:
 
 1. Add `dp-components.css`.
-2. Add `server/design-system-components.json`.
+2. Add `server/design-system/design-system-components.json`.
 3. Normalize all buttons first.
 4. Normalize fleet/service/location cards second.
 5. Extend the homogeneity auditor to enforce those component contracts.

@@ -16,7 +16,7 @@ const {
     listReservationRecords,
     readReservationRecord,
     saveReservationRecord
-} = require('../../server/reservation-store');
+} = require('../../server/reservations/reservation-store');
 
 test('reservation store writes, reads, updates and lists PostgreSQL reservations', {
     skip: shouldRun ? false : 'Set TEST_DATABASE_URL to run PostgreSQL integration storage tests.'

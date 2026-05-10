@@ -10,14 +10,14 @@ const require = createRequire(import.meta.url);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const { PUBLIC_PAGE_FILE_MAP } = require(path.resolve(__dirname, "../server/public-page-map.js"));
+const { PUBLIC_PAGE_FILE_MAP } = require(path.resolve(__dirname, "../server/shared/public-page-map.js"));
 const {
   VISUAL_FINDING_CATEGORIES,
   classifyRouteProfile,
   createVisualFinding,
   scoreVisualPage,
   summarizeVisualFindings
-} = require(path.resolve(__dirname, "../server/visual-audit-core.js"));
+} = require(path.resolve(__dirname, "../server/audits/visual-audit-core.js"));
 const CUSTOMER_MISSIONS = require(path.resolve(__dirname, "../test-data/customer-missions.json"));
 
 const MAIN_NAV_ROUTES = new Map([

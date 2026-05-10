@@ -6,12 +6,12 @@ const {
     canApproveAuditMemory,
     compareAuditMemory,
     writeApprovedAuditMemory
-} = require('../../server/audit-memory-core');
+} = require('../../server/audits/audit-memory-core');
 const {
     formatVisualChangeGuardFailure,
     summarizeVisualIntelligence,
     summarizeVisualChangeGuard
-} = require('../../server/change-guard-core');
+} = require('../../server/audits/change-guard-core');
 const {
     parseArgs: parseChangeGuardArgs,
     resolveGuardRoutes,

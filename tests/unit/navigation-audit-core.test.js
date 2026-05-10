@@ -10,7 +10,7 @@ const {
     labelDestinationAlignment,
     normalizeRoute,
     reachableRoutesFrom
-} = require('../../server/navigation-audit-core');
+} = require('../../server/audits/navigation-audit-core');
 const {
     DEFAULT_ROUTES,
     DEFAULT_VIEWPORTS,

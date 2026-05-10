@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { URL } = require('url');
-const { siteFileForPublicPath } = require('../server/public-page-map');
+const { siteFileForPublicPath } = require('../server/shared/public-page-map');
 
 const projectRoot = path.resolve(__dirname, '..');
 const siteRoot = path.join(projectRoot, 'site');
@@ -41,7 +41,7 @@ function decodeHtmlEntities(value) {
         '&lt;': '<',
         '&gt;': '>',
         '&nbsp;': ' ',
-        '&middot;': '·',
+        '&middot;': 'Â·',
         '&ndash;': '-',
         '&mdash;': '-'
     };

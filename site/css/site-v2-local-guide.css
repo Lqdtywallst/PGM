@@ -1,4 +1,4 @@
-﻿.local-guide-page {
+.local-guide-page {
     --guide-glow: rgba(var(--dp-color-gold-rgb), 0.1);
     --guide-glow-soft: rgba(151, 178, 209, 0.12);
     --guide-border: rgba(135, 109, 77, 0.16);

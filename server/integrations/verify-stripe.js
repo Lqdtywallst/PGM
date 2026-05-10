@@ -1,11 +1,11 @@
 // Stripe configuration verification script
-// Run: node server/verificar-stripe.js
+// Run: node server/integrations/verify-stripe.js
 
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 
-const projectRoot = path.resolve(__dirname, '..');
+const projectRoot = path.resolve(__dirname, '..', '..');
 
 function readProjectFile(relativePath) {
     return fs.readFileSync(path.join(projectRoot, relativePath), 'utf8');
@@ -94,10 +94,10 @@ if (fs.existsSync(path.join(projectRoot, 'node_modules'))) {
 }
 
 console.log('\n4. Checking backend...');
-if (fs.existsSync(path.join(projectRoot, 'server/backend-example.js'))) {
-    success.push('server/backend-example.js exists');
+if (fs.existsSync(path.join(projectRoot, 'server/apps/backend.js'))) {
+    success.push('server/apps/backend.js exists');
 } else {
-    errors.push('server/backend-example.js does not exist');
+    errors.push('server/apps/backend.js does not exist');
 }
 
 console.log('\n' + '='.repeat(60));
@@ -123,7 +123,7 @@ if (errors.length > 0) {
     console.log('='.repeat(60));
     console.log('CONFIGURATION INCOMPLETE');
     console.log('='.repeat(60));
-    console.log('\nReview .env.example, site/config.js, and server/backend-example.js before retrying.\n');
+    console.log('\nReview .env.example, site/config.js, and server/apps/backend.js before retrying.\n');
     process.exit(1);
 }
 

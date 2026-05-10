@@ -20,7 +20,7 @@ module.exports = defineConfig({
         video: 'off'
     },
     webServer: process.env.PLAYWRIGHT_BASE_URL ? undefined : {
-        command: 'node server/server-http.js',
+        command: 'node server/apps/static-server.js',
         cwd: __dirname,
         url: `${baseURL}/`,
         reuseExistingServer: true,

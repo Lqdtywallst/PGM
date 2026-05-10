@@ -1,6 +1,1 @@
-web: node server/backend-example.js
-
-
-
-
-
+web: node server/apps/backend.js

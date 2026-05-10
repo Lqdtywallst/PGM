@@ -1,14 +1,14 @@
 // Simple HTTP server to serve static files
-// Usage: node server/server-http.js
+// Usage: node server/apps/static-server.js
 
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
-const { siteFileForPublicPath } = require('./public-page-map');
+const { siteFileForPublicPath } = require('../shared/public-page-map');
 
 const PORT = Number(process.env.PORT || 8080);
-const siteRoot = path.resolve(__dirname, '../site');
+const siteRoot = path.resolve(__dirname, '..', '..', 'site');
 const REDIRECTS = {
     '/downtown-dubai-supercar-rental.html': '/supercar-rental-dubai.html',
     '/ferrari-rental-downtown-dubai.html': '/ferrari-rental-dubai.html',
@@ -153,7 +153,7 @@ function buildDynamicRuntimeConfig() {
 }
 
 function renderDynamicRuntimeConfig() {
-    return `// Dynamic local runtime config served by server/server-http.js.
+    return `// Dynamic local runtime config served by server/apps/static-server.js.
 (function () {
     const runtimeConfig = ${JSON.stringify(buildDynamicRuntimeConfig(), null, 4)};
 

@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
-const runtimeReservationDir = path.resolve(__dirname, '../output/runtime-reservations');
+const runtimeReservationDir = path.resolve(__dirname, '..', '..', 'output', 'runtime-reservations');
 
 const CREATE_RESERVATIONS_TABLE_SQL = `
 CREATE TABLE IF NOT EXISTS reservations (

@@ -6,7 +6,7 @@ const {
     matchVehicleId,
     normalizeCompetitorSnapshot,
     roundToStep
-} = require('../../server/pricing-agent-core');
+} = require('../../server/pricing/pricing-agent-core');
 
 const fleetCards = [
     {

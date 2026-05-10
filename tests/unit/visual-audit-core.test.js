@@ -15,7 +15,7 @@ const {
     scoreVisualPage,
     shouldEscalateToVision,
     summarizeVisualFindings
-} = require('../../server/visual-audit-core');
+} = require('../../server/audits/visual-audit-core');
 
 test('classifyRouteProfile maps key public routes to explicit visual profiles', () => {
     assert.equal(classifyRouteProfile('/'), 'home');

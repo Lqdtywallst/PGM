@@ -1,4 +1,4 @@
-﻿// Service Worker for Dynasty Prestige
+// Service Worker for Dynasty Prestige
 // Cache static assets for better performance
 
 // Bump the cache version when visible assets change so old caches are discarded.

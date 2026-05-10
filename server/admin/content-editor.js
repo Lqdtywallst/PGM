@@ -1,28 +1,28 @@
 const fs = require('fs');
 const path = require('path');
-const { escapeHtml } = require('./html-utils');
-const { syncFleetHtmlFromData } = require('./render-fleet-cards');
-const { normalizeHeaderConfig, syncGlobalHeaderHtml } = require('./render-global-header');
-const { normalizeServicesContent, syncServicesHtmlFromData } = require('./render-services-page');
-const { normalizeLocationsContent, syncLocationsHtmlFromData } = require('./render-locations-page');
+const { escapeHtml } = require('../shared/html-utils');
+const { syncFleetHtmlFromData } = require('../renderers/render-fleet-cards');
+const { normalizeHeaderConfig, syncGlobalHeaderHtml } = require('../renderers/render-global-header');
+const { normalizeServicesContent, syncServicesHtmlFromData } = require('../renderers/render-services-page');
+const { normalizeLocationsContent, syncLocationsHtmlFromData } = require('../renderers/render-locations-page');
 const {
     STYLE_OVERRIDES_RELATIVE_PATH,
     applyStyleOverridesLink,
     normalizeStyleEditorState,
     renderStyleOverridesCss
-} = require('./render-style-overrides');
-const { PUBLIC_PAGE_FILE_MAP, siteFileForPublicPath } = require('./public-page-map');
+} = require('../renderers/render-style-overrides');
+const { PUBLIC_PAGE_FILE_MAP, siteFileForPublicPath } = require('../shared/public-page-map');
 
-const projectRoot = path.resolve(__dirname, '..');
+const projectRoot = path.resolve(__dirname, '..', '..');
 const siteRoot = path.join(projectRoot, 'site');
 const homeHtmlPath = path.join(projectRoot, 'site', 'index.html');
-const fleetCardsPath = path.join(__dirname, 'data', 'fleet-cards.json');
-const globalHeaderPath = path.join(__dirname, 'data', 'global-header.json');
-const siteAppearancePath = path.join(__dirname, 'data', 'site-appearance.json');
-const styleEditorPath = path.join(__dirname, 'data', 'style-editor.json');
+const fleetCardsPath = path.join(__dirname, '..', 'data', 'fleet-cards.json');
+const globalHeaderPath = path.join(__dirname, '..', 'data', 'global-header.json');
+const siteAppearancePath = path.join(__dirname, '..', 'data', 'site-appearance.json');
+const styleEditorPath = path.join(__dirname, '..', 'data', 'style-editor.json');
 const styleOverridesPath = path.join(siteRoot, STYLE_OVERRIDES_RELATIVE_PATH);
-const servicesContentPath = path.join(__dirname, 'data', 'services-editor.json');
-const locationsContentPath = path.join(__dirname, 'data', 'locations-editor.json');
+const servicesContentPath = path.join(__dirname, '..', 'data', 'services-editor.json');
+const locationsContentPath = path.join(__dirname, '..', 'data', 'locations-editor.json');
 
 function readUtf8(filePath) {
     return fs.readFileSync(filePath, 'utf8');

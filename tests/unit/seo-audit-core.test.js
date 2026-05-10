@@ -7,7 +7,7 @@ const path = require('path');
 const {
     assessPage,
     parseJsonLdBlocks
-} = require('../../server/seo-audit-core');
+} = require('../../server/audits/seo-audit-core');
 
 function createTempSite() {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'pgm-seo-audit-'));

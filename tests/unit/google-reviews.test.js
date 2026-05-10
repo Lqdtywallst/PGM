@@ -7,7 +7,7 @@ const {
     fetchGoogleReviews,
     getGoogleReviewsConfig,
     normalizeGooglePlaceDetails
-} = require('../../server/google-reviews');
+} = require('../../server/integrations/google-reviews');
 
 test('google reviews config supports place id, review URLs and safe defaults', () => {
     const config = getGoogleReviewsConfig({

@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { getViewportCoverageMatrix } = require('../../server/design-system-contract');
+const { getViewportCoverageMatrix } = require('../../server/design-system/design-system-contract');
 
 const responsiveViewports = getViewportCoverageMatrix('responsive');
 

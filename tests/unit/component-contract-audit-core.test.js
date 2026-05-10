@@ -8,7 +8,7 @@ const {
     findPagePatternMarkers,
     findRawHexColorsInCss,
     isBrandTokensPath
-} = require('../../server/component-contract-audit-core');
+} = require('../../server/design-system/component-contract-audit-core');
 
 test('raw hex colors are detected in CSS outside brand tokens', () => {
     const findings = findRawHexColorsInCss({

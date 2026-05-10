@@ -1,9 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-const { escapeHtml } = require('./html-utils');
+const { escapeHtml } = require('../shared/html-utils');
 
-const dataPath = path.join(__dirname, 'data', 'services-editor.json');
-const pagePath = path.join(__dirname, '..', 'site', 'pages', 'core', 'services.html');
+const dataPath = path.join(__dirname, '..', 'data', 'services-editor.json');
+const pagePath = path.join(__dirname, '..', '..', 'site', 'pages', 'core', 'services.html');
 
 function readUtf8(filePath) {
     return fs.readFileSync(filePath, 'utf8');

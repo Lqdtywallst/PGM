@@ -4,10 +4,10 @@ const path = require('path');
 const { runVisualAgent } = require(path.join(__dirname, 'run-visual-agent.js'));
 const {
     getViewportCoverageMatrix
-} = require(path.join(__dirname, '..', 'server', 'design-system-contract.js'));
+} = require(path.join(__dirname, '..', 'server', 'design-system', 'design-system-contract.js'));
 const {
     formatAuditMemoryRegression
-} = require(path.join(__dirname, '..', 'server', 'audit-memory-core.js'));
+} = require(path.join(__dirname, '..', 'server', 'audits', 'audit-memory-core.js'));
 
 const repoRoot = path.resolve(__dirname, '..');
 const artifactsRoot = path.join(repoRoot, 'artifacts', 'visual-smoke-audit');

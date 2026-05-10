@@ -13,7 +13,7 @@ const {
     compareTypographySurfaces,
     normalizeAssetPath,
     summarizeHomogeneityFindings
-} = require('../../server/homogeneity-audit-core');
+} = require('../../server/audits/homogeneity-audit-core');
 const {
     isHeaderGuardFinding,
     parseArgs: parseHeaderGuardArgs,

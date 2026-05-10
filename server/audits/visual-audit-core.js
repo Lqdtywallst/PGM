@@ -1,4 +1,4 @@
-const { PUBLIC_PAGE_FILE_MAP } = require('./public-page-map');
+const { PUBLIC_PAGE_FILE_MAP } = require('../shared/public-page-map');
 
 const SCORE_WEIGHTS = Object.freeze({
     layoutIntegrity: 35,

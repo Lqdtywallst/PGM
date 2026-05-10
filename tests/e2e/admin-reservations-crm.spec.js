@@ -7,10 +7,10 @@ const path = require('node:path');
 const {
     deleteReservationRecord,
     saveReservationRecord
-} = require('../../server/reservation-store');
+} = require('../../server/reservations/reservation-store');
 const {
     hashAdminPassword
-} = require('../../server/admin-auth');
+} = require('../../server/admin/admin-auth');
 
 const repoRoot = path.resolve(__dirname, '../..');
 const adminUser = 'owner';
@@ -99,7 +99,7 @@ test.describe('Private admin reservations CRM', () => {
 
         const port = await getFreePort();
         adminBaseUrl = `http://127.0.0.1:${port}`;
-        backendProcess = childProcess.spawn(process.execPath, ['server/backend-example.js'], {
+        backendProcess = childProcess.spawn(process.execPath, ['server/apps/backend.js'], {
             cwd: repoRoot,
             env: {
                 ...process.env,

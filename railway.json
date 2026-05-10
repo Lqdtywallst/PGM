@@ -4,13 +4,8 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "node server/backend-example.js",
+    "startCommand": "node server/apps/backend.js",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
 }
-
-
-
-
-

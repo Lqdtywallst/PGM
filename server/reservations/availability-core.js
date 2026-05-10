@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const fleetCardsPath = path.join(__dirname, 'data', 'fleet-cards.json');
+const fleetCardsPath = path.join(__dirname, '..', 'data', 'fleet-cards.json');
 
 const NON_BLOCKING_STATUS_PATTERNS = [
     /cancel/i,

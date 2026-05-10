@@ -1,4 +1,4 @@
-﻿function normalizeRouteToken(route = '') {
+function normalizeRouteToken(route = '') {
   const pathname = String(route || '/').split(/[?#]/)[0] || '/';
   return pathname === '/index.html' ? '/' : pathname;
 }

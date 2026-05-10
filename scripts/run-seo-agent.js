@@ -6,12 +6,12 @@ const {
     buildSeoAuditReport,
     DEFAULT_PUBLIC_ORIGIN,
     normalizeRoute
-} = require('../server/seo-audit-core');
+} = require('../server/audits/seo-audit-core');
 const {
     fetchUrl,
     startStaticServer,
     stopProcess
-} = require('../server/site-audit-utils');
+} = require('../server/shared/site-audit-utils');
 
 const projectRoot = path.resolve(__dirname, '..');
 const siteRoot = path.join(projectRoot, 'site');

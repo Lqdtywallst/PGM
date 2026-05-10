@@ -10,13 +10,13 @@ const {
 const {
     formatVisualChangeGuardFailure,
     summarizeVisualChangeGuard
-} = require('../server/change-guard-core');
+} = require('../server/audits/change-guard-core');
 const {
     DEFAULT_MEMORY_ROOT,
     writeApprovedAuditMemory,
     buildAuditMemory,
     canApproveAuditMemory
-} = require('../server/audit-memory-core');
+} = require('../server/audits/audit-memory-core');
 
 const repoRoot = path.resolve(__dirname, '..');
 const artifactsRoot = path.join(repoRoot, 'artifacts', 'change-guard-audit');

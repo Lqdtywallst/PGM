@@ -9,9 +9,9 @@ const {
     siteFileForPath,
     startStaticServer: launchStaticServer,
     stopProcess
-} = require('./site-audit-utils');
+} = require('../shared/site-audit-utils');
 
-const projectRoot = path.resolve(__dirname, '..');
+const projectRoot = path.resolve(__dirname, '..', '..');
 const siteRoot = path.join(projectRoot, 'site');
 const reportPath = path.join(projectRoot, 'docs/audit/MATRIZ-SEO-FINAL-2026-04-18.md');
 const seoPort = Number(process.env.SEO_STATIC_PORT || (8600 + Math.floor(Math.random() * 200)));

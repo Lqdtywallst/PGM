@@ -4,13 +4,13 @@ const path = require('path');
 
 const {
     buildPricingReport
-} = require('../server/pricing-agent-core');
+} = require('../server/pricing/pricing-agent-core');
 const {
     getReservationStoreMode,
     isDatabaseConfigured,
     listReservationRecords,
     runtimeReservationDir
-} = require('../server/reservation-store');
+} = require('../server/reservations/reservation-store');
 
 const repoRoot = path.resolve(__dirname, '..');
 const fleetCardsPath = path.join(repoRoot, 'server', 'data', 'fleet-cards.json');

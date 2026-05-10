@@ -8,7 +8,7 @@ const {
     buildCustomerJourneyMarkdownSection,
     deviceFamilyForViewport,
     routeMatchesScenario
-} = require('../../server/customer-journey-contract');
+} = require('../../server/audits/customer-journey-contract');
 const {
     DEFAULT_ROUTES,
     DEFAULT_VIEWPORTS,

@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { PUBLIC_PAGE_FILE_MAP } = require('../server/public-page-map');
+const { PUBLIC_PAGE_FILE_MAP } = require('../server/shared/public-page-map');
 
 const projectRoot = path.resolve(__dirname, '..');
 const siteRoot = path.join(projectRoot, 'site');

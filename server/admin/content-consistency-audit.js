@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
-const { PUBLIC_PAGE_FILE_MAP, siteFileForPublicPath } = require('./public-page-map');
+const { PUBLIC_PAGE_FILE_MAP, siteFileForPublicPath } = require('../shared/public-page-map');
 
-const projectRoot = path.resolve(__dirname, '..');
+const projectRoot = path.resolve(__dirname, '..', '..');
 const siteRoot = path.join(projectRoot, 'site');
 
 function readUtf8(filePath) {

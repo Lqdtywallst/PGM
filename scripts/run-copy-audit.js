@@ -11,11 +11,11 @@ const scanTargets = [
 ];
 
 const explicitFiles = [
-    path.join(projectRoot, 'server/backend-example.js')
+    path.join(projectRoot, 'server/apps/backend.js')
 ];
 
 const ignoredFiles = new Set([
-    path.normalize(path.join(projectRoot, 'server/test-server.js')),
+    path.normalize(path.join(projectRoot, 'server/audits/test-server.js')),
     path.normalize(path.join(projectRoot, 'scripts/run-copy-audit.js'))
 ]);
 
@@ -23,7 +23,7 @@ const rules = [
     {
         id: 'mojibake',
         severity: 'high',
-        pattern: /(?:â|Ã|ðŸ|�)/,
+        pattern: /(?:Ã¢|Ãƒ|Ã°Å¸|ï¿½)/,
         message: 'Broken encoding or mojibake appears in customer-facing copy.'
     },
     {

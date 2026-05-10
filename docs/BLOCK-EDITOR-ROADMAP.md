@@ -11,7 +11,7 @@ Let the admin add cards and other repeatable content blocks without hand-editing
 This is the best current candidate.
 
 - data source: `server/data/fleet-cards.json`
-- renderer: `server/render-fleet-cards.js`
+- renderer: `server/renderers/render-fleet-cards.js`
 - page target: `site/pages/core/fleet.html`
 
 This means fleet cards are already close to a real CMS pattern:
@@ -64,7 +64,7 @@ File:
 
 - `site/pages/core/reservation-lookup.html`
 
-This page is less “card collection” oriented and more application-like.
+This page is less â€œcard collectionâ€ oriented and more application-like.
 It is a worse first candidate for arbitrary block adding.
 
 ## What is risky right now
@@ -87,7 +87,7 @@ Best path:
 
 ### Arbitrary freeform DOM builder
 
-“Add any element” sounds attractive, but in this project it would be fragile fast.
+â€œAdd any elementâ€ sounds attractive, but in this project it would be fragile fast.
 
 Why:
 
@@ -98,8 +98,8 @@ Why:
 
 So the safer path is:
 
-- not “add any HTML node”
-- but “add one supported block type”
+- not â€œadd any HTML nodeâ€
+- but â€œadd one supported block typeâ€
 
 ## Best architecture for your site
 
@@ -134,7 +134,7 @@ These match the current site well:
 8. `media_text_split`
 9. `stat_list`
 
-## What “add card easily” should mean
+## What â€œadd card easilyâ€ should mean
 
 In admin, for supported sections, you should be able to:
 

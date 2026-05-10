@@ -44,7 +44,7 @@ function runBuildIfNeeded() {
         return;
     }
 
-    const result = spawnSync(process.execPath, ['server/render-fleet-cards.js'], {
+    const result = spawnSync(process.execPath, ['server/renderers/render-fleet-cards.js'], {
         cwd: repoRoot,
         env: process.env,
         stdio: 'inherit'
@@ -156,8 +156,8 @@ console.log(`[qa-manual] Branch-safe ports: frontend ${frontendPort}, backend ${
 console.log(`[qa-manual] Reservation storage: ${hasDatabase ? 'PostgreSQL DATABASE_URL' : 'local JSON fallback'}`);
 console.log(`[qa-manual] Stripe test checkout: ${hasStripeSecret && hasStripePublishable ? 'configured' : 'not fully configured'}`);
 
-children.push(spawnService('backend', process.execPath, ['server/backend-example.js'], backendEnv));
-children.push(spawnService('frontend', process.execPath, ['server/server-http.js'], frontendEnv));
+children.push(spawnService('backend', process.execPath, ['server/apps/backend.js'], backendEnv));
+children.push(spawnService('frontend', process.execPath, ['server/apps/static-server.js'], frontendEnv));
 
 process.on('SIGINT', () => shutdown(0));
 process.on('SIGTERM', () => shutdown(0));

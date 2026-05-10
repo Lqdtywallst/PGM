@@ -10,7 +10,7 @@ const {
     inferAuditKind,
     readApprovedAuditMemory,
     writeApprovedAuditMemory
-} = require('../server/audit-memory-core');
+} = require('../server/audits/audit-memory-core');
 
 const repoRoot = path.resolve(__dirname, '..');
 

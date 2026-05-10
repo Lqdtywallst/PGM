@@ -9,7 +9,7 @@ const {
     verifyAdminCredentials,
     verifyAdminSessionToken,
     verifyPasswordHash
-} = require('../../server/admin-auth');
+} = require('../../server/admin/admin-auth');
 
 test('admin password hashes verify with PBKDF2 and reject wrong passwords', () => {
     const passwordHash = hashAdminPassword('safe-password', {

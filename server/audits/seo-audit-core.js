@@ -7,7 +7,7 @@ const {
     parseSitemapPaths,
     publicPathForFile,
     siteFileForPath
-} = require('./site-audit-utils');
+} = require('../shared/site-audit-utils');
 
 const DEFAULT_PUBLIC_ORIGIN = 'https://prestigegoalmotion.com';
 const BROKEN_ENCODING_PATTERN = /(?:Ã‚|Ãƒ.|Ã¢â‚¬â€|Ã¢â‚¬â€œ|Ã¢â‚¬|ï¿½)/;

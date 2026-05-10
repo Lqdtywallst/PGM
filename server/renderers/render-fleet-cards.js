@@ -1,11 +1,11 @@
 const fs = require("fs");
 const path = require("path");
-const { escapeHtml } = require("./html-utils");
+const { escapeHtml } = require("../shared/html-utils");
 
 const PHONE_E164 = "971586122568";
 const PHONE_DISPLAY = "+971586122568";
-const cardsPath = path.join(__dirname, "data", "fleet-cards.json");
-const fleetHtmlPath = path.join(__dirname, "..", "site", "pages", "core", "fleet.html");
+const cardsPath = path.join(__dirname, "..", "data", "fleet-cards.json");
+const fleetHtmlPath = path.join(__dirname, "..", "..", "site", "pages", "core", "fleet.html");
 
 function formatAed(value) {
     return `${Number(value).toLocaleString("en-US")} AED`;

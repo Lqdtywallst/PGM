@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const { PUBLIC_PAGE_FILE_MAP, siteFileForPublicPath } = require('../server/public-page-map');
+const { PUBLIC_PAGE_FILE_MAP, siteFileForPublicPath } = require('../server/shared/public-page-map');
 
 const projectRoot = path.resolve(__dirname, '..');
 const auditRoot = path.join(projectRoot, 'docs', 'audit');

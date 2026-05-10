@@ -4,7 +4,7 @@ const path = require('path');
 const repoRoot = path.resolve(__dirname, '..');
 const missionsPath = path.join(repoRoot, 'test-data', 'customer-missions.json');
 const artifactsDir = path.join(repoRoot, 'artifacts', 'agentic-audit');
-const { PUBLIC_PAGE_FILE_MAP } = require(path.join(repoRoot, 'server', 'public-page-map.js'));
+const { PUBLIC_PAGE_FILE_MAP } = require(path.join(repoRoot, 'server', 'shared', 'public-page-map.js'));
 
 function loadMissions() {
     return JSON.parse(fs.readFileSync(missionsPath, 'utf8'));

@@ -3,7 +3,7 @@ const test = require('node:test');
 
 const {
     normalizeHeaderConfig
-} = require('../../server/render-global-header');
+} = require('../../server/renderers/render-global-header');
 
 function baseHeaderConfig(utilityLink) {
     return {

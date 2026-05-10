@@ -48,7 +48,7 @@ function stopProcess(child) {
 }
 
 async function startStaticServer({ projectRoot, port, baseUrl, label = 'Static server' }) {
-    const child = spawn(process.execPath, [path.join(projectRoot, 'server/server-http.js')], {
+    const child = spawn(process.execPath, [path.join(projectRoot, 'server', 'apps', 'static-server.js')], {
         cwd: projectRoot,
         env: {
             ...process.env,

@@ -1,4 +1,4 @@
-﻿        // Region (Dubai-only site, AED currency)
+        // Region (Dubai-only site, AED currency)
         const urlParams = new URLSearchParams(window.location.search);
         const BOOKING_INTENT_KEY = 'dynastyBookingIntent';
         const RESERVE_HISTORY_STEP_KEY = 'dynastyReserveStep';

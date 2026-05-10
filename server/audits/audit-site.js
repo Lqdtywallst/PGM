@@ -8,9 +8,9 @@ const {
     siteFileForPath,
     startStaticServer: launchStaticServer,
     stopProcess
-} = require('./site-audit-utils');
+} = require('../shared/site-audit-utils');
 
-const projectRoot = path.resolve(__dirname, '..');
+const projectRoot = path.resolve(__dirname, '..', '..');
 const siteRoot = path.join(projectRoot, 'site');
 const auditPort = Number(process.env.AUDIT_STATIC_PORT || (8200 + Math.floor(Math.random() * 200)));
 const auditBaseUrl = `http://127.0.0.1:${auditPort}`;

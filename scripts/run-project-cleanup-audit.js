@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const { PUBLIC_PAGE_FILE_MAP } = require('../server/public-page-map');
+const { PUBLIC_PAGE_FILE_MAP } = require('../server/shared/public-page-map');
 
 const repoRoot = path.resolve(__dirname, '..');
 const siteRoot = path.join(repoRoot, 'site');
@@ -298,10 +298,10 @@ function buildActiveRootSet(packageJson) {
         'site/_redirects',
         'site/.htaccess',
         'app/api/reserve/route.js',
-        'server/backend-example.js',
-        'server/server-http.js',
-        'server/public-page-map.js',
-        'server/design-system-components.json'
+        'server/apps/backend.js',
+        'server/apps/static-server.js',
+        'server/shared/public-page-map.js',
+        'server/design-system/design-system-components.json'
     ].forEach((filePath) => active.add(filePath));
 
     for (const filePath of packageScriptReferences(packageJson)) {
@@ -689,7 +689,7 @@ function buildMarkdownReport(report) {
         '2. Move stale audit/history docs into `docs/archive/` or merge them into current docs.',
         '3. Review orphan CSS/JS/HTML one by one before deleting because static detection can miss dynamic references.',
         '4. Compress or replace large active assets only after checking visual quality.',
-        '5. Re-run `node server/test-server.js`, `npm run audit:homogeneity`, `npm run audit:homogeneity:components`, and `npm run audit:seo` after any tracked deletion.',
+        '5. Re-run `node server/audits/test-server.js`, `npm run audit:homogeneity`, `npm run audit:homogeneity:components`, and `npm run audit:seo` after any tracked deletion.',
         ''
     ].join('\n');
 }

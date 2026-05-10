@@ -4,7 +4,7 @@ const {
     expectNoConsoleErrors,
     settlePage
 } = require('./support/site-helpers');
-const { getViewportCoverageMatrix } = require('../../server/design-system-contract');
+const { getViewportCoverageMatrix } = require('../../server/design-system/design-system-contract');
 
 const firstViewportMatrix = getViewportCoverageMatrix('firstViewport');
 
