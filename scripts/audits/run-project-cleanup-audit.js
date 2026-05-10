@@ -68,6 +68,7 @@ const ACTIVE_DOCS = new Set([
     'docs/admin/admin-reservations.md',
     'docs/design-system/design-system-brand.md',
     'docs/design-system/design-system-component-inventory.md',
+    'docs/design-system/homogeneity-matrix.md',
     'docs/design-system/design-system-patterns-plan.md',
     'docs/content/premium-copy-guide.md',
     'docs/pricing/pricing-agent.md',

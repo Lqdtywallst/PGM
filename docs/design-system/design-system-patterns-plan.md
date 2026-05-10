@@ -11,6 +11,10 @@ This is not a full rebuild. The safer approach is progressive consolidation:
 standardize the repeatable families first, then migrate page-specific CSS over
 time.
 
+For the operating matrix that turns these ideas into page assignments,
+component families, audit checks and implementation phases, use
+[`homogeneity-matrix.md`](homogeneity-matrix.md).
+
 ## Research Principles
 
 - Design tokens should be the shared vocabulary for visual decisions. The W3C
