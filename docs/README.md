@@ -21,6 +21,7 @@ being carried forever.
 - [deployment/](deployment/PREPRODUCTION.md): staging, Vercel and backend release setup.
 - [design-system/](design-system/design-system-patterns-plan.md): brand tokens, component contracts and layout patterns.
 - [homogeneity matrix](design-system/homogeneity-matrix.md): page patterns, component families, audit rules and implementation phases.
+- [layout measurement contract](design-system/layout-measurement-contract.md): viewport geometry, slot measurements and mathematical thresholds.
 - [pricing/](pricing/pricing-agent.md): pricing agent workflow and guardrails.
 - [qa/](qa/MANUAL_FUNCTIONAL_QA.md): manual and automated QA operating guides.
 - [templates/](templates/vehicle-page-template.md): reusable page templates and structural rules.

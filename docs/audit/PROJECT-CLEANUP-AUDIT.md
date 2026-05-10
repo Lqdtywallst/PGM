@@ -1,13 +1,13 @@
 # Project Cleanup Audit
 
-Generated: 2026-05-10T01:45:31.119Z
+Generated: 2026-05-10T12:10:09.259Z
 
 ## Summary
 
-- Files scanned: 567
-- Tracked files: 565
+- Files scanned: 568
+- Tracked files: 566
 - Untracked files visible to git: 1
-- Total scanned size: 272.72 MB
+- Total scanned size: 272.73 MB
 - Delete-local candidates: 0
 - Review-delete candidates: 0
 - Asset review candidates: 28
@@ -21,7 +21,7 @@ Generated: 2026-05-10T01:45:31.119Z
 | unknown |1 |
 | backend |38 |
 | audit-engine |3 |
-| docs |46 |
+| docs |47 |
 | scripts |31 |
 | data |8 |
 | site-support |11 |
@@ -37,7 +37,7 @@ Generated: 2026-05-10T01:45:31.119Z
 | Action |Count |
 | --- |--- |
 | keep-local-never-commit |1 |
-| keep |493 |
+| keep |494 |
 | review |9 |
 | review-boundary |3 |
 | review-consolidate |14 |
@@ -131,7 +131,7 @@ _None._
 
 | Path |Action |Reason |
 | --- |--- |--- |
-| docs/design-system/homogeneity-matrix.md |keep |Live document or current operating guide. |
+| docs/design-system/layout-measurement-contract.md |keep |Live document or current operating guide. |
 
 ## Recommended Next Steps
 

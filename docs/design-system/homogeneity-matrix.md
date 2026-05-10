@@ -18,6 +18,9 @@ This document defines:
 - the audit matrix that tells agents what to detect
 - the implementation phases
 
+For the exact geometry rules, viewport list, slot measurements and layout
+thresholds, use [`layout-measurement-contract.md`](layout-measurement-contract.md).
+
 ## North Star
 
 Dynasty Prestige should feel:
@@ -124,6 +127,10 @@ Audit checks:
 ## Spacing And Geometry Matrix
 
 This is where homogeneity becomes measurable.
+
+The detailed measurement method lives in
+[`layout-measurement-contract.md`](layout-measurement-contract.md). The table
+below is the short version.
 
 | Geometry Rule | Target | Failure Example |
 | --- | --- | --- |
