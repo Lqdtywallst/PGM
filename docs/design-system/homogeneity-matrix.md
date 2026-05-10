@@ -160,6 +160,7 @@ The auditors should produce findings that map to this matrix.
 Recommended new audit modes:
 
 - `npm run audit:homogeneity:layouts`: page pattern and slot geometry.
+- `npm run audit:homogeneity:templates`: mother page templates, reference routes and rollout phase.
 - `npm run audit:homogeneity:components`: component family and variant contracts.
 - `npm run audit:visual:first-viewport`: viewport-first visual pass for mobile, tablet, laptop and desktop.
 
@@ -169,6 +170,30 @@ Layout checks must explicitly separate mobile, laptop and monitor:
   `mobile-wide-short`, `mobile-large`
 - laptop: `laptop-compact`, `laptop`, `laptop-large`
 - monitor: `desktop-standard`, `desktop-wide`, `desktop-large`
+
+## Mother Template Gate
+
+The executable mother-template source is:
+
+- `server/design-system/mother-page-templates.json`
+- `server/design-system/mother-template-audit-core.js`
+- `scripts/design-system/run-mother-template-audit.js`
+
+This gate answers a different question than the visual auditor. It does not
+decide whether a page is beautiful. It decides whether every page family has a
+declared mother template, reference route, migration order, shared component
+families and validation coverage for mobile, laptop and monitor.
+
+Current rollout state:
+
+- active: `foundation`
+- next: `marketing-home`, `listing-fleet`
+
+Run:
+
+```bash
+npm run audit:homogeneity:templates
+```
 
 ## Severity Model
 

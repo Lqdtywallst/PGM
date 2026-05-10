@@ -1,0 +1,263 @@
+{
+  "version": "2026-05-10",
+  "description": "Mother page template contract for Dynasty Prestige visual homogeneity migrations.",
+  "foundation": {
+    "tokenSource": "site/css/brand-tokens.css",
+    "primitiveSource": "site/css/dp-components.css",
+    "headerSource": "server/data/global-header.json",
+    "componentContractSource": "server/design-system/design-system-components.json",
+    "layoutPatternSource": "server/design-system/page-patterns.json"
+  },
+  "requiredValidationGroups": [
+    "mobile",
+    "laptop",
+    "monitor"
+  ],
+  "templates": {
+    "MarketingLandingPage": {
+      "referenceRoutes": [
+        "/"
+      ],
+      "migrationStatus": "reference-in-progress",
+      "intent": "Cinematic commercial landing with one premium message, one dominant CTA and visible booking intent.",
+      "componentFamilies": [
+        "header",
+        "hero",
+        "button",
+        "card"
+      ],
+      "canonicalSlots": [
+        "header",
+        "hero",
+        "primaryCta",
+        "datePlanner",
+        "trustStrip",
+        "curatedCards",
+        "finalCta",
+        "footer"
+      ],
+      "firstViewportRules": [
+        "one main headline",
+        "one dominant commercial CTA",
+        "booking/date intent visible or clearly implied",
+        "no horizontal overflow on mobile, laptop or monitor"
+      ],
+      "migrationOrder": [
+        "/",
+        "/luxury-car-rental-dubai.html",
+        "/supercar-rental-dubai.html",
+        "/about.html"
+      ]
+    },
+    "ListingPage": {
+      "referenceRoutes": [
+        "/fleet.html"
+      ],
+      "migrationStatus": "needs-layout-pass",
+      "intent": "Browse, filter and compare vehicles quickly without a decorative hero hiding the task.",
+      "componentFamilies": [
+        "header",
+        "hero",
+        "button",
+        "card"
+      ],
+      "canonicalSlots": [
+        "header",
+        "listingIntro",
+        "datePlanner",
+        "filterPanel",
+        "resultsContext",
+        "cardGrid",
+        "supportCta",
+        "footer"
+      ],
+      "firstViewportRules": [
+        "fleet task begins early on mobile and laptop",
+        "filters align with result grid",
+        "vehicle card rows align top and bottom edges on computer",
+        "mobile card actions stack cleanly"
+      ],
+      "migrationOrder": [
+        "/fleet.html"
+      ]
+    },
+    "HubPage": {
+      "referenceRoutes": [
+        "/services.html",
+        "/locations.html"
+      ],
+      "migrationStatus": "split-reference",
+      "intent": "Help the customer choose a service, location or route family from priority options.",
+      "componentFamilies": [
+        "header",
+        "hero",
+        "button",
+        "card"
+      ],
+      "canonicalSlots": [
+        "header",
+        "hubIntro",
+        "priorityChoices",
+        "guideOrCardGrid",
+        "process",
+        "finalCta",
+        "footer"
+      ],
+      "firstViewportRules": [
+        "priority choices visible before the fold on mobile when this is the main task",
+        "headline wraps naturally without staircase layout",
+        "cards in the same semantic row align unless documented as feature/editorial exception"
+      ],
+      "migrationOrder": [
+        "/services.html",
+        "/locations.html",
+        "/abu-dhabi-luxury-car-rental.html",
+        "/dubai-airport-luxury-car-rental.html",
+        "/palm-jumeirah-luxury-car-rental.html",
+        "/dubai-marina-luxury-car-rental.html"
+      ]
+    },
+    "DetailPage": {
+      "referenceRoutes": [
+        "/lamborghini-rental-dubai.html",
+        "/lamborghini-huracan-evo-spyder-rental-dubai.html"
+      ],
+      "migrationStatus": "needs-family-split",
+      "intent": "Explain one brand, vehicle or service and keep the reserve path visible.",
+      "componentFamilies": [
+        "header",
+        "hero",
+        "button",
+        "card",
+        "formPanel"
+      ],
+      "canonicalSlots": [
+        "header",
+        "detailHero",
+        "factsOrBookingPanel",
+        "primaryCta",
+        "trust",
+        "detailsOrGallery",
+        "relatedContent",
+        "finalCta",
+        "footer"
+      ],
+      "firstViewportRules": [
+        "identity and booking intent visible immediately",
+        "booking CTA not buried on mobile or short laptop",
+        "media and support panel align on computer"
+      ],
+      "migrationOrder": [
+        "/lamborghini-rental-dubai.html",
+        "/ferrari-rental-dubai.html",
+        "/mercedes-rental-dubai.html",
+        "/porsche-rental-dubai.html",
+        "/rolls-royce-rental-dubai.html",
+        "/chauffeur-service-dubai.html",
+        "/airport-concierge-dubai.html",
+        "/hotel-villa-airport-delivery-dubai.html",
+        "/wedding-event-car-rental-dubai.html",
+        "/business-car-rental-dubai.html",
+        "/monthly-luxury-car-rental-dubai.html",
+        "/lamborghini-huracan-evo-spyder-rental-dubai.html",
+        "/lamborghini-urus-rental-dubai.html",
+        "/ferrari-296-gts-rental-dubai.html",
+        "/mercedes-g63-amg-rental-dubai.html",
+        "/porsche-992-gt3-rental-dubai.html",
+        "/rolls-royce-cullinan-black-badge-rental-dubai.html"
+      ]
+    },
+    "AppFlowPage": {
+      "referenceRoutes": [
+        "/app/reserve/page.html",
+        "/reservation-lookup.html",
+        "/contact.html"
+      ],
+      "migrationStatus": "task-first",
+      "intent": "Let the customer complete a secure task with trust, clarity and minimal visual friction.",
+      "componentFamilies": [
+        "header",
+        "button",
+        "formPanel",
+        "card"
+      ],
+      "canonicalSlots": [
+        "header",
+        "secureIntro",
+        "formPanel",
+        "resultOrSummary",
+        "supportFallback",
+        "footer"
+      ],
+      "firstViewportRules": [
+        "form or next required customer action starts within the first viewport",
+        "safe public data only",
+        "support fallback visible without overpowering the primary task"
+      ],
+      "migrationOrder": [
+        "/app/reserve/page.html",
+        "/reservation-lookup.html",
+        "/contact.html"
+      ]
+    },
+    "AdminPage": {
+      "referenceRoutes": [
+        "/admin/reservations.html"
+      ],
+      "migrationStatus": "private-tooling",
+      "intent": "Private operational management with dense but readable reservation data.",
+      "componentFamilies": [
+        "button",
+        "card",
+        "formPanel"
+      ],
+      "canonicalSlots": [
+        "header",
+        "filterPanel",
+        "cardGrid",
+        "detailPanel",
+        "actionBar"
+      ],
+      "firstViewportRules": [
+        "operational controls visible without giant hero typography",
+        "private data remains behind admin auth"
+      ],
+      "migrationOrder": [
+        "/admin/reservations.html",
+        "/admin/content.html"
+      ]
+    }
+  },
+  "rolloutPhases": [
+    {
+      "phase": 0,
+      "name": "measure",
+      "status": "done",
+      "goal": "Create layout, component and homogeneity auditors before redesign work."
+    },
+    {
+      "phase": 1,
+      "name": "foundation",
+      "status": "active",
+      "goal": "Freeze tokens, primitives, page families and reference routes."
+    },
+    {
+      "phase": 2,
+      "name": "marketing-home",
+      "status": "next",
+      "goal": "Use Home as the first premium MarketingLandingPage reference."
+    },
+    {
+      "phase": 3,
+      "name": "listing-fleet",
+      "status": "next",
+      "goal": "Bring Fleet first viewport, filters and card geometry into ListingPage shape."
+    },
+    {
+      "phase": 4,
+      "name": "hub-pages",
+      "status": "queued",
+      "goal": "Normalize Services and Locations without losing their different customer tasks."
+    }
+  ]
+}

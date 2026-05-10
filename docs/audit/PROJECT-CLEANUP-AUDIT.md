@@ -1,13 +1,13 @@
 # Project Cleanup Audit
 
-Generated: 2026-05-10T14:13:09.451Z
+Generated: 2026-05-10T17:56:18.036Z
 
 ## Summary
 
-- Files scanned: 572
-- Tracked files: 567
+- Files scanned: 576
+- Tracked files: 571
 - Untracked files visible to git: 4
-- Total scanned size: 272.76 MB
+- Total scanned size: 272.79 MB
 - Delete-local candidates: 0
 - Review-delete candidates: 0
 - Asset review candidates: 28
@@ -19,10 +19,10 @@ Generated: 2026-05-10T14:13:09.451Z
 | local-env |1 |
 | root-config |12 |
 | unknown |1 |
-| backend |40 |
+| backend |42 |
 | audit-engine |3 |
 | docs |47 |
-| scripts |32 |
+| scripts |33 |
 | data |8 |
 | site-support |11 |
 | site-html |33 |
@@ -30,14 +30,14 @@ Generated: 2026-05-10T14:13:09.451Z
 | site-assets |87 |
 | site-js |7 |
 | site-docs |2 |
-| tests |272 |
+| tests |273 |
 
 ## Counts By Action
 
 | Action |Count |
 | --- |--- |
 | keep-local-never-commit |1 |
-| keep |498 |
+| keep |502 |
 | review |9 |
 | review-boundary |3 |
 | review-consolidate |14 |
@@ -131,10 +131,10 @@ _None._
 
 | Path |Action |Reason |
 | --- |--- |--- |
-| scripts/design-system/run-layout-audit.js |keep |Script referenced by package.json or an operating workflow. |
-| server/design-system/layout-audit-core.js |keep |Backend, API, renderers or audit core; deleting here can break reservations or tooling. |
-| server/design-system/page-patterns.json |keep |Backend, API, renderers or audit core; deleting here can break reservations or tooling. |
-| tests/unit/layout-audit-core.test.js |keep |Test coverage; do not clean without checking the scripts that run it. |
+| scripts/design-system/run-mother-template-audit.js |keep |Script referenced by package.json or an operating workflow. |
+| server/design-system/mother-page-templates.json |keep |Backend, API, renderers or audit core; deleting here can break reservations or tooling. |
+| server/design-system/mother-template-audit-core.js |keep |Backend, API, renderers or audit core; deleting here can break reservations or tooling. |
+| tests/unit/mother-template-audit-core.test.js |keep |Test coverage; do not clean without checking the scripts that run it. |
 
 ## Recommended Next Steps
 

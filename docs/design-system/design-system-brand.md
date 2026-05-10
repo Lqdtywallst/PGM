@@ -37,3 +37,5 @@ This document defines the global visual rules for PGM. The implementation source
 - New CSS should use `--dp-*` tokens.
 - Existing `--lab-*` variables are compatibility aliases and should not be expanded further.
 - If the visual editor generates overrides, its defaults must stay aligned with these tokens.
+- Page families and migration order are governed by `server/design-system/mother-page-templates.json`.
+- Use `npm run audit:homogeneity:templates` before starting a new visual phase to confirm every mother template still has mobile, laptop and monitor validation coverage.

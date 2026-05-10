@@ -53,6 +53,23 @@
     }
   },
   "components": {
+    "header": {
+      "canonicalClass": "lab-header",
+      "variants": [
+        "mega-utility",
+        "mobile-drawer"
+      ],
+      "knownLegacyFamilies": [
+        "site-header",
+        "reserve-shell-header",
+        "admin-header"
+      ],
+      "rules": {
+        "sameBrandBlockAcrossPublicPages": true,
+        "sameDropdownSurfaceAcrossPublicPages": true,
+        "noHeaderJumpBetweenRoutes": true
+      }
+    },
     "button": {
       "canonicalClass": "dp-button",
       "variants": [
@@ -215,6 +232,7 @@
     },
     "AppFlowPage": {
       "routes": [
+        "/contact.html",
         "/app/reserve/page.html",
         "/reservation-lookup.html"
       ],
@@ -229,6 +247,23 @@
       "rules": {
         "taskDrivenBeforeEditorial": true,
         "safePublicDataOnly": true
+      }
+    },
+    "AdminPage": {
+      "routes": [
+        "/admin/reservations.html",
+        "/admin/content.html"
+      ],
+      "slots": [
+        "header",
+        "filterPanel",
+        "cardGrid",
+        "detailPanel",
+        "actionBar"
+      ],
+      "rules": {
+        "privateRoutesRequireAdminSession": true,
+        "denseDataMustStayReadable": true
       }
     }
   }
