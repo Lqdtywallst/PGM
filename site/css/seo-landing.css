@@ -3425,7 +3425,8 @@ body.vehicle-page--premium-pilot {
 }
 
 .vehicle-landing-reserve {
-    width: min(100% - 3rem, 1200px);
+    width: var(--dp-frame-width);
+    max-width: var(--dp-frame-max);
     min-height: calc(100svh - 5.6rem);
     margin: 0 auto;
     padding: clamp(1.45rem, 3.2svh, 2.8rem) 0 2.15rem;
@@ -3638,6 +3639,154 @@ body.vehicle-page--premium-pilot {
     line-height: 1.22;
 }
 
+.vehicle-landing-depth {
+    width: var(--dp-frame-width);
+    max-width: var(--dp-frame-max);
+    margin: 0 auto;
+    padding: clamp(1.5rem, 3vw, 2.6rem) 0 4rem;
+}
+
+.vehicle-landing-depth .vehicle-section {
+    margin-top: clamp(2rem, 4vw, 3.5rem);
+}
+
+.vehicle-landing-depth .vehicle-section:first-child {
+    margin-top: 0;
+}
+
+.vehicle-landing-depth .vehicle-section__heading {
+    max-width: 48rem;
+}
+
+.vehicle-landing-depth .vehicle-section__heading h2 {
+    color: var(--dp-color-text);
+    font-family: var(--dp-font-display);
+    font-size: clamp(2.15rem, 4.2vw, 4.2rem);
+    line-height: 0.96;
+    letter-spacing: -0.055em;
+}
+
+.vehicle-landing-film__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.42fr) minmax(320px, 0.78fr);
+    gap: clamp(1rem, 1.5vw, 1.4rem);
+    align-items: stretch;
+}
+
+.vehicle-landing-film-card,
+.vehicle-landing-brief__grid article {
+    overflow: hidden;
+    border: 1px solid var(--dp-border-light);
+    border-radius: var(--dp-card-radius);
+    background:
+        radial-gradient(circle at top right, rgba(var(--dp-color-gold-rgb), 0.08), transparent 36%),
+        var(--dp-surface-light);
+    box-shadow: var(--dp-shadow-soft);
+}
+
+.vehicle-landing-film-card {
+    display: flex;
+    min-height: 100%;
+    flex-direction: column;
+}
+
+.vehicle-landing-film-card--feature {
+    min-height: clamp(25rem, 43vw, 36rem);
+}
+
+.vehicle-landing-film-card__media {
+    min-height: 18rem;
+    background: var(--dp-color-ink);
+}
+
+.vehicle-landing-film-card--feature .vehicle-landing-film-card__media {
+    flex: 1 1 auto;
+}
+
+.vehicle-landing-film-card__media--compact {
+    min-height: 16rem;
+}
+
+.vehicle-landing-film-card__media video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+    object-fit: cover;
+    filter: saturate(0.92) contrast(1.02);
+}
+
+.vehicle-landing-film-card__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: clamp(1rem, 1.5vw, 1.25rem);
+}
+
+.vehicle-landing-film-card__copy span,
+.vehicle-landing-brief__grid span {
+    color: var(--dp-color-gold-deep);
+    font-family: var(--dp-font-sans);
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.vehicle-landing-film-card__copy h3,
+.vehicle-landing-brief__grid h3 {
+    margin: 0;
+    color: var(--dp-color-text);
+    font-family: var(--dp-font-sans);
+    font-size: clamp(1.05rem, 1.25vw, 1.26rem);
+    line-height: 1.18;
+    letter-spacing: -0.025em;
+}
+
+.vehicle-landing-film-card__copy p,
+.vehicle-landing-brief__grid p {
+    margin: 0;
+    color: var(--dp-color-text-soft);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.vehicle-landing-brief__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(0.85rem, 1.35vw, 1.2rem);
+}
+
+.vehicle-landing-brief__grid article {
+    display: flex;
+    min-height: 100%;
+    flex-direction: column;
+    gap: 0.58rem;
+    padding: clamp(1rem, 1.55vw, 1.35rem);
+}
+
+.vehicle-landing-faq .faq-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(0.85rem, 1.35vw, 1.2rem);
+}
+
+.vehicle-landing-faq .faq-list details {
+    min-height: 100%;
+    border: 1px solid var(--dp-border-light);
+    border-radius: var(--dp-card-radius);
+    background: var(--dp-surface-light);
+    box-shadow: var(--dp-shadow-soft);
+}
+
+.vehicle-landing-faq .faq-list summary {
+    color: var(--dp-color-text);
+}
+
+.vehicle-landing-faq .faq-list .faq-a {
+    color: var(--dp-color-text-soft);
+}
+
 @media (min-width: 981px) {
     .vehicle-landing-specs {
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -3726,6 +3875,11 @@ body.vehicle-page--premium-pilot {
     .vehicle-page--landing-pilot .lab-floating-contact {
         right: max(1rem, env(safe-area-inset-right));
     }
+
+    .vehicle-landing-depth {
+        width: var(--dp-frame-width);
+        max-width: var(--dp-frame-max);
+    }
 }
 
 @media (max-width: 980px) {
@@ -3740,10 +3894,6 @@ body.vehicle-page--premium-pilot {
     }
 
     .vehicle-landing-reserve {
-        width: min(100% - 2rem, 760px);
-    }
-
-    .vehicle-landing-reserve {
         min-height: auto;
         padding-top: 1.5rem;
         grid-template-columns: 1fr;
@@ -3753,6 +3903,16 @@ body.vehicle-page--premium-pilot {
         grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
         align-items: stretch;
     }
+
+    .vehicle-landing-film__grid,
+    .vehicle-landing-brief__grid,
+    .vehicle-landing-faq .faq-list {
+        grid-template-columns: 1fr;
+    }
+
+    .vehicle-landing-film-card--feature {
+        min-height: auto;
+    }
 }
 
 @media (max-width: 640px) {
@@ -3761,11 +3921,20 @@ body.vehicle-page--premium-pilot {
     }
 
     .vehicle-landing-reserve {
-        width: min(100% - 1.5rem, 390px);
+        padding-top: 1rem;
     }
 
-    .vehicle-landing-reserve {
-        padding-top: 1rem;
+    .vehicle-landing-depth {
+        padding-bottom: 3rem;
+    }
+
+    .vehicle-landing-depth .vehicle-section__heading h2 {
+        font-size: clamp(2rem, 10vw, 3.1rem);
+    }
+
+    .vehicle-landing-film-card__media,
+    .vehicle-landing-film-card__media--compact {
+        min-height: 14rem;
     }
 
     .vehicle-landing-reserve__stage {
