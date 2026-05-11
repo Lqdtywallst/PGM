@@ -1066,10 +1066,19 @@
     background: linear-gradient(180deg, #3d3024 0%, #241b14 100%);
     color: #fff6e8;
     font-family: var(--lab-font-sans);
-    font-size: 0.68rem;
+    font-size: 0.64rem;
     font-weight: 800;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
+}
+
+.fleet-sidebar__topbar .fleet-sidebar__select {
+    padding-left: 0.78rem;
+    padding-right: 1.75rem;
+}
+
+.fleet-sidebar__topbar .fleet-filter-reset {
+    padding-inline: 0.68rem;
 }
 
 .fleet-sidebar__select {
@@ -1307,7 +1316,7 @@
 
 .fleet-price-range__slider {
     position: relative;
-    height: 1.42rem;
+    min-height: 44px;
 }
 
 .fleet-price-range__slider::before,

@@ -69,6 +69,7 @@
     "audit:visual:memory:responsive": "node scripts/audits/run-change-guard-audit.js --responsive",
     "audit:visual:memory:full": "node scripts/audits/run-change-guard-audit.js --full",
     "audit:visual:memory:approve": "node scripts/audits/run-change-guard-audit.js --approve-memory",
+    "audit:fleet:filter": "playwright test tests/e2e/fleet-filter-visual-functional.spec.js --project=desktop-chromium",
     "agent:visual:update-baselines": "node scripts/audits/run-visual-agent.js --update-baselines",
     "agent:visual:approve-latest": "node scripts/audits/run-visual-agent.js --approve-latest-clean",
     "audit:functional:missions": "playwright test tests/e2e/audit-customer-complete-flows.spec.js tests/e2e/services-to-reserve-funnels.spec.js tests/e2e/switch-car-mid-flow.spec.js --project=desktop-chromium --project=mobile-chromium",
