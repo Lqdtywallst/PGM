@@ -561,7 +561,7 @@
 
 @media (max-width: 640px) {
     .service-detail-hero {
-        padding-top: calc(var(--lab-header-offset) + 1.8rem);
+        padding-top: calc(var(--lab-header-offset) + 1.15rem);
     }
 
     .service-detail-hero__copy,
@@ -592,6 +592,10 @@
     .service-detail-actions {
         display: grid;
         margin-top: 0.9rem;
+    }
+
+    .service-detail-hero__copy .service-detail-actions {
+        padding-right: 1.55rem;
     }
 
     .service-detail-button {
