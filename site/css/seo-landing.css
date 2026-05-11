@@ -4007,6 +4007,10 @@ body.vehicle-page :is(h1, h2, h3, h4, h5, h6) {
     font-family: var(--lab-font-display);
 }
 
+.vehicle-page--lamborghini-brand {
+    --brand-landing-css-version: "20260511-brand-mother-audit2";
+}
+
 /* Brand mother landing pilot: models lead the page before any long explanation. */
 .vehicle-page--lamborghini-brand .brand-landing-hero {
     display: grid;
@@ -4133,6 +4137,20 @@ body.vehicle-page :is(h1, h2, h3, h4, h5, h6) {
     gap: clamp(0.9rem, 1.2vw, 1.15rem);
 }
 
+.vehicle-page--lamborghini-brand .brand-landing-models__heading {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    color: rgba(241, 226, 189, 0.92);
+    font-family: var(--lab-font-sans);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.17em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
 .vehicle-page--lamborghini-brand .brand-model-card {
     display: flex;
     flex-direction: column;
@@ -4180,7 +4198,7 @@ body.vehicle-page :is(h1, h2, h3, h4, h5, h6) {
     text-transform: uppercase;
 }
 
-.vehicle-page--lamborghini-brand .brand-model-card h2 {
+.vehicle-page--lamborghini-brand .brand-model-card h3 {
     margin: 0;
     padding: 0;
     border: 0;
@@ -4348,6 +4366,120 @@ body.vehicle-page :is(h1, h2, h3, h4, h5, h6) {
 
     .vehicle-page--lamborghini-brand .brand-model-card__media img {
         min-height: clamp(13rem, 42vw, 20rem);
+    }
+}
+
+@media (min-width: 741px) and (max-width: 900px) {
+    .vehicle-page--lamborghini-brand .brand-landing-hero {
+        gap: 0.85rem;
+        margin-top: 0.2rem;
+    }
+
+    .vehicle-page--lamborghini-brand .brand-landing-hero__copy {
+        padding: 1.05rem 1.15rem;
+    }
+
+    .vehicle-page--lamborghini-brand .brand-landing-hero__kicker {
+        gap: 0.55rem;
+        margin-bottom: 0.55rem;
+        font-size: 0.66rem;
+    }
+
+    .vehicle-page--lamborghini-brand .brand-landing-hero__kicker img {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .vehicle-page--lamborghini-brand .brand-landing-hero h1 {
+        max-width: 16ch;
+        font-size: clamp(2.15rem, 5vw, 2.7rem);
+        line-height: 0.98;
+    }
+
+    .vehicle-page--lamborghini-brand .brand-landing-hero__lead {
+        max-width: 40rem;
+        margin-top: 0.6rem;
+        font-size: 0.91rem;
+        line-height: 1.45;
+    }
+
+    .vehicle-page--lamborghini-brand .brand-landing-hero__trust {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.55rem;
+        margin: 0.85rem 0 0;
+    }
+
+    .vehicle-page--lamborghini-brand .brand-landing-hero__trust span {
+        align-items: flex-start;
+        font-size: 0.76rem;
+        line-height: 1.28;
+    }
+
+    .vehicle-page--lamborghini-brand .brand-landing-hero__trust span::before {
+        margin-top: 0.3rem;
+    }
+
+    .vehicle-page--lamborghini-brand .brand-landing-hero__secondary {
+        display: none;
+    }
+
+    .vehicle-page--lamborghini-brand .brand-landing-models {
+        min-height: 0;
+        gap: 0.85rem;
+    }
+
+    .vehicle-page--lamborghini-brand .brand-model-card__media img {
+        aspect-ratio: 16 / 7.35;
+        min-height: 0;
+    }
+
+    .vehicle-page--lamborghini-brand .brand-model-card__body {
+        padding: 0.95rem;
+    }
+
+    .vehicle-page--lamborghini-brand .brand-model-card__tag {
+        margin-bottom: 0.45rem;
+        font-size: 0.62rem;
+    }
+
+    .vehicle-page--lamborghini-brand .brand-landing-models__heading {
+        font-size: 0.66rem;
+    }
+
+    .vehicle-page--lamborghini-brand .brand-model-card h3 {
+        font-size: 1.42rem;
+    }
+
+    .vehicle-page--lamborghini-brand .brand-model-card p {
+        margin: 0.55rem 0 0.7rem;
+        font-size: 0.82rem;
+        line-height: 1.38;
+    }
+
+    .vehicle-page--lamborghini-brand .brand-model-card__meta {
+        gap: 0.4rem;
+        margin-bottom: 0.78rem;
+    }
+
+    .vehicle-page--lamborghini-brand .brand-model-card__meta div {
+        padding-top: 0.45rem;
+    }
+
+    .vehicle-page--lamborghini-brand .brand-model-card__meta div:nth-child(3) {
+        display: none;
+    }
+
+    .vehicle-page--lamborghini-brand .brand-model-card__meta dt {
+        font-size: 0.62rem;
+    }
+
+    .vehicle-page--lamborghini-brand .brand-model-card__meta dd {
+        font-size: 0.78rem;
+    }
+
+    .vehicle-page--lamborghini-brand .brand-model-card__cta {
+        min-height: 2.85rem;
+        font-size: 0.74rem;
     }
 }
 
