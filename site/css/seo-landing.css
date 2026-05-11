@@ -1407,6 +1407,13 @@ body.vehicle-page--mother-base {
     padding-top: 1rem;
 }
 
+.vehicle-page--mother-base .vehicle-main--brand-landing {
+    width: var(--dp-frame-width);
+    max-width: var(--dp-frame-max);
+    padding-left: 0;
+    padding-right: 0;
+}
+
 .vehicle-page--mother-base header.site-header {
     background: rgba(255, 255, 255, 0.97);
     border-bottom: 1px solid rgba(20, 20, 20, 0.08);
