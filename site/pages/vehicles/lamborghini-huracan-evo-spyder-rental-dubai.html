@@ -169,7 +169,7 @@
 }
     </script>
 </head>
-<body class="vehicle-page vehicle-page--mother-base vehicle-page--huracan">
+<body class="vehicle-page vehicle-page--mother-base vehicle-page--huracan vehicle-page--landing-pilot">
     <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="lab-header">
         <div class="lab-shell lab-header__inner">
@@ -341,8 +341,8 @@
         </div>
     </header>
 
-    <main id="main-content" class="vehicle-main vehicle-main--mother-base">
-        <nav class="breadcrumb" aria-label="Breadcrumb">
+    <main id="main-content" class="vehicle-main vehicle-main--mother-base vehicle-main--landing-pilot">
+        <nav class="breadcrumb vehicle-landing-breadcrumb" aria-label="Breadcrumb">
             <a href="index.html">Home</a>
             <span aria-hidden="true"> / </span>
             <a href="fleet.html">Fleet</a>
@@ -350,67 +350,33 @@
             <span aria-current="page">Lamborghini Huracan EVO Spyder</span>
         </nav>
 
-        <a class="vehicle-return-link" href="fleet.html" aria-label="Back to all fleet cars">
-            <span>Back to fleet</span>
-            <strong>View all cars</strong>
-        </a>
-
-        <section class="vehicle-pdp-hero-shell" aria-labelledby="vehicle-base-title">
-            <figure class="vehicle-pdp-gallery-top__stage" aria-label="Lamborghini Huracan EVO Spyder gallery">
-                <img src="./images/fleet/lamborghini-huracan/01-exterior-front.png" alt="Lamborghini Huracan EVO Spyder prepared for a Dubai handover" loading="eager">
-            </figure>
-
-            <div class="vehicle-pdp-gallery-top__rail">
-                <article class="vehicle-pdp-gallery-top__thumb vehicle-pdp-gallery-top__thumb--media">
-                    <img src="./images/fleet/lamborghini-huracan/03-exterior-rear.png" alt="Lamborghini Huracan EVO Spyder rear stance in Dubai" loading="lazy">
-                    <div class="vehicle-pdp-gallery-top__thumb-copy">
-                        <span class="vehicle-pdp-gallery-top__eyebrow">Support still</span>
-                        <strong>Rear stance</strong>
-                    </div>
-                </article>
-
-                <article class="vehicle-pdp-gallery-top__thumb vehicle-pdp-gallery-top__thumb--media">
-                    <img src="./images/fleet/lamborghini-huracan/04-interior-cockpit.png" alt="Lamborghini Huracan EVO Spyder cockpit and driver view" loading="lazy">
-                    <div class="vehicle-pdp-gallery-top__thumb-copy">
-                        <span class="vehicle-pdp-gallery-top__eyebrow">Support still</span>
-                        <strong>Cockpit view</strong>
-                    </div>
-                </article>
-
-                <article class="vehicle-pdp-gallery-top__thumb vehicle-pdp-gallery-top__thumb--media">
-                    <img src="./images/fleet/lamborghini-huracan/05-seat-detail.png" alt="Lamborghini Huracan EVO Spyder seat detail" loading="lazy">
-                    <div class="vehicle-pdp-gallery-top__thumb-copy">
-                        <span class="vehicle-pdp-gallery-top__eyebrow">Support still</span>
-                        <strong>Seat detail</strong>
-                    </div>
-                </article>
-
-                <article class="vehicle-pdp-gallery-top__thumb vehicle-pdp-gallery-top__thumb--media vehicle-pdp-gallery-top__thumb--more">
-                    <img src="./images/fleet/lamborghini-huracan/06-steering-wheel-detail.png" alt="Lamborghini Huracan EVO Spyder steering wheel detail" loading="lazy">
-                    <div class="vehicle-pdp-gallery-top__thumb-copy">
-                        <span class="vehicle-pdp-gallery-top__thumb-count">+3</span>
-                        <strong>More media</strong>
-                    </div>
-                </article>
+        <section class="vehicle-landing-reserve" id="vehicle-booking" aria-labelledby="vehicle-base-title">
+            <div class="vehicle-landing-reserve__gallery">
+                <a class="vehicle-landing-reserve__back" href="fleet.html">Back to fleet</a>
+                <figure class="vehicle-landing-reserve__stage">
+                    <img src="./images/fleet/lamborghini-huracan/01-exterior-front.png" alt="Lamborghini Huracan EVO Spyder exterior front view" loading="lazy">
+                </figure>
+                <div class="vehicle-landing-reserve__thumbs" aria-label="Huracan image highlights">
+                    <figure>
+                        <img src="./images/fleet/lamborghini-huracan/03-exterior-rear.png" alt="Lamborghini Huracan EVO Spyder rear stance" loading="lazy">
+                        <figcaption>Rear stance</figcaption>
+                    </figure>
+                    <figure>
+                        <img src="./images/fleet/lamborghini-huracan/04-interior-cockpit.png" alt="Lamborghini Huracan EVO Spyder cockpit" loading="lazy">
+                        <figcaption>Cockpit</figcaption>
+                    </figure>
+                    <figure>
+                        <img src="./images/fleet/lamborghini-huracan/05-seat-detail.png" alt="Lamborghini Huracan EVO Spyder seat detail" loading="lazy">
+                        <figcaption>Seat detail</figcaption>
+                    </figure>
+                </div>
             </div>
 
-            <div class="vehicle-pdp-hero-support">
-                <section class="vehicle-pdp-intro vehicle-pdp-intro--after-gallery" aria-labelledby="vehicle-base-title">
-                    <div class="vehicle-pdp-intro__brand">
-                        <span>Lamborghini / Dubai</span>
-                    </div>
-                    <h1 id="vehicle-base-title">Lamborghini Huracan EVO Spyder</h1>
-                    <p class="vehicle-pdp-intro__subline">Lamborghini Huracan EVO Spyder rental in Dubai &middot; Indicative daily rate &middot; Palm, Marina and hotel delivery</p>
-                    <p class="vehicle-pdp-intro__lead">A roof-down V10 booking for guests who want the car to shape the memory in the first ten seconds, not just carry the route from one stop to the next.</p>
-                    <div class="vehicle-pdp-intro__meta" aria-label="Lamborghini Huracan EVO Spyder quick tags">
-                        <span>Open-top V10</span>
-                        <span>2 seats</span>
-                        <span>Palm / Marina / hotels</span>
-                        <span>Celebration-led stays</span>
-                    </div>
-                </section>
-
-                <aside class="vehicle-booking" id="vehicle-booking">
+            <div class="vehicle-landing-reserve__content">
+                <aside class="vehicle-booking">
+                    <span class="section-kicker">Lamborghini in Dubai</span>
+                    <h1 id="vehicle-base-title">Huracan EVO Spyder in Dubai.</h1>
+                    <p class="vehicle-booking__intro">Roof-down V10 theatre for Palm, Marina and after-dark arrivals, coordinated with hotel, villa or airport handover.</p>
                     <p class="vehicle-booking__kicker">From per day</p>
                     <p class="vehicle-booking__price">3,200 AED</p>
                     <p class="vehicle-booking__price-note">Indicative day rate</p>
@@ -447,208 +413,35 @@
                         <p class="vehicle-booking__note">Pickup and return details move directly into the reservation flow.</p>
 
                         <button class="btn btn-primary vehicle-booking__submit" type="submit">Check availability</button>
-                        <a class="btn btn-outline vehicle-booking__secondary" href="https://wa.me/971586122568?text=Hi%2C%20I%20am%20interested%20in%20the%20Lamborghini%20Huracan%20EVO%20Spyder%20in%20Dubai." target="_blank" rel="noopener">WhatsApp the team</a>
                     </form>
                 </aside>
-            </div>
-        </section>
 
-        <section class="vehicle-pdp-summary-grid vehicle-pdp-summary-grid--layered">
-            <div class="vehicle-pdp-summary-primary">
-                <div class="vehicle-pdp-summary-side">
-                    <section class="vehicle-metrics" aria-label="Lamborghini Huracan EVO Spyder quick facts">
-                        <article class="vehicle-metric">
-                            <span class="vehicle-metric__label">Seats</span>
-                            <strong class="vehicle-metric__value">2</strong>
-                        </article>
-                        <article class="vehicle-metric">
-                            <span class="vehicle-metric__label">Powertrain</span>
-                            <strong class="vehicle-metric__value">V10</strong>
-                        </article>
-                        <article class="vehicle-metric">
-                            <span class="vehicle-metric__label">Service tone</span>
-                            <strong class="vehicle-metric__value">Self-drive theatre</strong>
-                        </article>
-                        <article class="vehicle-metric">
-                            <span class="vehicle-metric__label">Best fit</span>
-                            <strong class="vehicle-metric__value">Visible couple stays</strong>
-                        </article>
-                    </section>
-
-                    <article class="vehicle-pdp-summary-support">
-                        <span class="section-kicker">Service layer</span>
-                        <h3>Keep the close practical, because the car already carries the emotion by itself.</h3>
-                        <p>The job here is to answer delivery, terms and route logic fast enough that the booking does not lose momentum.</p>
-                        <div class="vehicle-pdp-summary-support__grid" aria-label="Huracan support content">
-                            <div class="vehicle-pdp-summary-support__item">
-                                <span class="vehicle-pdp-summary-support__eyebrow">Handover</span>
-                                <strong>Hotel, resort, residence or valet-led delivery.</strong>
-                                <p>Best when the arrival itself is part of the booking story.</p>
-                            </div>
-                            <div class="vehicle-pdp-summary-support__item">
-                                <span class="vehicle-pdp-summary-support__eyebrow">Terms</span>
-                                <strong>Mileage, deposit and low-clearance notes shared early.</strong>
-                                <p>Enough clarity to avoid a second round of basic questions.</p>
-                            </div>
-                            <div class="vehicle-pdp-summary-support__item">
-                                <span class="vehicle-pdp-summary-support__eyebrow">Support</span>
-                                <strong>Route timing guidance when Palm, Marina or dinner stops matter.</strong>
-                                <p>Useful when the guest wants the handover to feel seamless.</p>
-                            </div>
-                        </div>
+                <section class="vehicle-landing-specs" aria-label="Lamborghini Huracan EVO Spyder key characteristics">
+                    <article>
+                        <span>Powertrain</span>
+                        <strong>Open-top V10</strong>
                     </article>
-
-                    <section class="vehicle-pdp-car-note" aria-label="Huracan interior details">
-                        <div class="vehicle-pdp-car-note__media">
-                            <img src="./images/fleet/lamborghini-huracan/02-center-console.png" alt="Lamborghini Huracan EVO Spyder center console and cabin controls">
-                        </div>
-                        <div class="vehicle-pdp-car-note__content">
-                            <span class="section-kicker">Inside the car</span>
-                            <h3>The right stills make the Huracan feel intentional instead of just loud.</h3>
-                            <div class="vehicle-pdp-car-note__grid">
-                                <div class="vehicle-pdp-car-note__item">
-                                    <span class="vehicle-pdp-car-note__eyebrow">Cockpit focus</span>
-                                    <strong>The driving view feels compact, low and event-led from the first minute.</strong>
-                                </div>
-                                <div class="vehicle-pdp-car-note__item">
-                                    <span class="vehicle-pdp-car-note__eyebrow">Open-air effect</span>
-                                    <strong>Roof-down movement changes the whole tone of the arrival, especially after dark.</strong>
-                                </div>
-                                <div class="vehicle-pdp-car-note__item">
-                                    <span class="vehicle-pdp-car-note__eyebrow">Stay profile</span>
-                                    <strong>It fits lighter luggage and shorter stays better than practical multi-guest schedules.</strong>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-            </div>
-        </section>
-
-        <section class="vehicle-section vehicle-pdp-gallery">
-            <div class="vehicle-section__heading">
-                <span class="section-kicker">Narrative video</span>
-                <h2>Motion belongs after the booking logic, once the stills have already sold the tone.</h2>
-                <p>For the Huracan, video should underline arrival energy and road feel without turning the page into noise.</p>
-            </div>
-
-            <div class="vehicle-pdp-gallery__grid vehicle-pdp-gallery__grid--story">
-                <article class="vehicle-pdp-gallery-card vehicle-pdp-gallery-card--story-main">
-                    <div class="vehicle-pdp-gallery-card__media">
-                        <video autoplay muted loop playsinline preload="metadata" poster="./images/fleet/lamborghini-huracan/01-exterior-front.png">
-                            <source src="./media/hero-dubai-sunset.mp4" type="video/mp4">
-                        </video>
-                    </div>
-                    <div class="vehicle-pdp-gallery-card__copy">
-                        <span class="vehicle-pdp-gallery-card__eyebrow">Arrival film</span>
-                        <h3>Lead with the arrival clip, because the Huracan sells before the guest reaches the valet.</h3>
-                        <p>One clean exterior sequence is enough to frame the whole booking as a visible, roof-down event.</p>
-                    </div>
-                </article>
-
-                <article class="vehicle-pdp-gallery-card vehicle-pdp-gallery-card--story-video">
-                    <div class="vehicle-pdp-gallery-card__media vehicle-pdp-gallery-card__media--compact">
-                        <video autoplay muted loop playsinline preload="metadata" poster="./images/fleet/lamborghini-huracan/04-interior-cockpit.png">
-                            <source src="./media/hero-sports-road.mp4" type="video/mp4">
-                        </video>
-                    </div>
-                    <div class="vehicle-pdp-gallery-card__copy">
-                        <span class="vehicle-pdp-gallery-card__eyebrow">Cabin motion</span>
-                        <h3>Use the second clip to show driving position, cabin tightness and low-slung movement.</h3>
-                        <p>Shorter, sharper and more focused than the main arrival film.</p>
-                    </div>
-                </article>
-
-                <article class="vehicle-pdp-gallery-card vehicle-pdp-gallery-card--utility">
-                    <div class="vehicle-pdp-gallery-card__copy">
-                        <span class="vehicle-pdp-gallery-card__eyebrow">What guests check</span>
-                        <h3>Three stills are enough to answer the practical doubts without flattening the excitement.</h3>
-                        <p>The right close-ups explain fit, driving feel and stay profile faster than extra copy.</p>
-                    </div>
-                    <div class="vehicle-pdp-gallery-panel" aria-label="Huracan support stills">
-                        <figure class="vehicle-pdp-gallery-panel__item">
-                            <img src="./images/fleet/lamborghini-huracan/04-interior-cockpit.png" alt="Lamborghini Huracan EVO Spyder cockpit view">
-                            <figcaption>Cockpit feel</figcaption>
-                        </figure>
-                        <figure class="vehicle-pdp-gallery-panel__item">
-                            <img src="./images/fleet/lamborghini-huracan/05-seat-detail.png" alt="Lamborghini Huracan EVO Spyder seat detail and cabin trim">
-                            <figcaption>Seat detail</figcaption>
-                        </figure>
-                        <figure class="vehicle-pdp-gallery-panel__item">
-                            <img src="./images/fleet/lamborghini-huracan/03-exterior-rear.png" alt="Lamborghini Huracan EVO Spyder rear stance and road presence">
-                            <figcaption>Arrival stance</figcaption>
-                        </figure>
-                    </div>
-                </article>
-            </div>
-        </section>
-
-        <section class="vehicle-section vehicle-pdp-use">
-            <div class="vehicle-section__heading">
-                <span class="section-kicker">Why this car works</span>
-                <h2>The Huracan wins when the booking should feel visible, short-form and emotionally immediate.</h2>
-                <p>It is less about practicality and more about making the route itself part of the stay.</p>
-            </div>
-
-            <div class="vehicle-pdp-use__grid">
-                <article class="vehicle-pdp-use__card">
-                    <span class="vehicle-pdp-use__eyebrow">Palm and Marina</span>
-                    <h3>Open-air Dubai movement feels stronger here than almost anywhere else in the fleet.</h3>
-                    <p>The car suits visible waterfront routes and after-dark city movement naturally.</p>
-                </article>
-                <article class="vehicle-pdp-use__card">
-                    <span class="vehicle-pdp-use__eyebrow">Celebration stays</span>
-                    <h3>It fits birthdays, anniversaries and short premium visits where the car is part of the point.</h3>
-                    <p>The booking makes sense when the guest wants memory and theatre first.</p>
-                </article>
-                <article class="vehicle-pdp-use__card">
-                    <span class="vehicle-pdp-use__eyebrow">Visible arrival</span>
-                    <h3>More useful than a subtler car when the entrance needs energy rather than understatement.</h3>
-                    <p>That is exactly where the V10 Spyder earns its slot in the fleet.</p>
-                </article>
-            </div>
-        </section>
-
-        <section class="vehicle-section">
-            <div class="vehicle-section__heading">
-                <span class="section-kicker">FAQ</span>
-                <h2>Short answers before the reservation starts.</h2>
-                <p>The page should remove the predictable first-message friction without draining the excitement out of the booking.</p>
-            </div>
-            <div class="faq-list">
-                <details open>
-                    <summary>What kind of Dubai stay suits the Lamborghini Huracan EVO Spyder best?</summary>
-                    <div class="faq-a">It is strongest for Palm, Marina, beach-club, dinner and hotel-arrival bookings where the car should feel like part of the event.</div>
-                </details>
-                <details>
-                    <summary>Is the 3,200 AED figure the final rate?</summary>
-                    <div class="faq-a">No. It is the indicative starting rate. Final quoting depends on the dates, mileage logic, delivery timing and the exact rental window.</div>
-                </details>
-                <details>
-                    <summary>Can the Huracan EVO Spyder be delivered to a hotel or resort?</summary>
-                    <div class="faq-a">Yes. Hotel, resort, residence and selected valet handovers can be arranged across Dubai for confirmed bookings.</div>
-                </details>
-                <details>
-                    <summary>Do the dates selected here stay with the booking?</summary>
-                    <div class="faq-a">Yes. Pickup and return details selected in the booking card move directly into the reservation flow.</div>
-                </details>
-                <details>
-                    <summary>Is this the right choice for luggage-heavy or multi-guest stays?</summary>
-                    <div class="faq-a">Usually no. The Huracan is better for lighter luggage and shorter couple-led stays. For more flexibility, the Urus is the stronger Lamborghini fit.</div>
-                </details>
-            </div>
-        </section>
-
-        <section class="vehicle-section">
-            <div class="vehicle-section__heading">
-                <span class="section-kicker">Related cars</span>
-                <h2>Keep browsing around the role the car needs to play.</h2>
-            </div>
-            <div class="related-grid">
-                <a href="lamborghini-urus-rental-dubai.html"><strong>Need more flexibility?</strong>Move into the Urus when luggage, guests and daily rhythm matter more.</a>
-                <a href="ferrari-296-gts-rental-dubai.html"><strong>Want a more polished convertible?</strong>Open the Ferrari 296 GTS for a calmer two-seat reading.</a>
-                <a href="rolls-royce-cullinan-black-badge-rental-dubai.html"><strong>Need quieter authority?</strong>Open the Cullinan for hotel, airport and VIP arrival stays.</a>
-                <a href="fleet.html"><strong>Back to fleet</strong>Compare the Huracan against the rest of the curated line-up.</a>
+                    <article>
+                        <span>Guests</span>
+                        <strong>2 seats</strong>
+                    </article>
+                    <article>
+                        <span>Best for</span>
+                        <strong>Palm / Marina</strong>
+                    </article>
+                    <article>
+                        <span>Confirm</span>
+                        <strong>50% upfront</strong>
+                    </article>
+                    <article>
+                        <span>Handover</span>
+                        <strong>Hotel / villa / airport</strong>
+                    </article>
+                    <article>
+                        <span>Style</span>
+                        <strong>High-visibility arrival</strong>
+                    </article>
+                </section>
             </div>
         </section>
     </main>
