@@ -3654,13 +3654,13 @@ body.vehicle-page--premium-pilot {
         max-width: var(--dp-frame-max);
         min-height: auto;
         padding-top: clamp(0.85rem, 1.8svh, 1.8rem);
-        grid-template-columns: minmax(0, 690px) minmax(390px, 480px);
+        grid-template-columns: minmax(0, 1fr) minmax(440px, clamp(480px, 38vw, 600px));
         grid-template-areas:
             "stage booking"
             "thumbs specs";
         grid-template-rows: auto minmax(7.75rem, 8rem);
         gap: clamp(1rem, 1.2vw, 1.4rem);
-        justify-content: start;
+        justify-content: stretch;
         align-items: stretch;
     }
 
@@ -3714,6 +3714,10 @@ body.vehicle-page--premium-pilot {
 
     .vehicle-landing-specs article {
         min-height: 0;
+    }
+
+    .vehicle-page--landing-pilot .lab-floating-contact {
+        right: max(1rem, env(safe-area-inset-right));
     }
 }
 
