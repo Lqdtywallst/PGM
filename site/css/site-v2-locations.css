@@ -72,14 +72,15 @@
     background-size: cover;
     inset: 0;
     background-position: 72% 42%;
-    opacity: 1;
-    filter: none;
+    opacity: 0.78;
+    filter: saturate(0.72) brightness(0.62) contrast(1.06);
 }
 
 .locations-hero::after {
     background:
-        linear-gradient(180deg, rgba(7, 8, 10, 0.54) 0%, rgba(7, 8, 10, 0.36) 32%, rgba(7, 8, 10, 0.6) 100%),
-        radial-gradient(circle at center, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0) 52%);
+        linear-gradient(180deg, rgba(7, 8, 10, 0.72) 0%, rgba(7, 8, 10, 0.58) 34%, rgba(7, 8, 10, 0.82) 100%),
+        radial-gradient(circle at center, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0) 54%),
+        linear-gradient(90deg, rgba(4, 5, 7, 0.28), rgba(4, 5, 7, 0.08) 46%, rgba(4, 5, 7, 0.34));
 }
 
 .locations-hero__shell,
@@ -1264,8 +1265,9 @@
 
     .locations-hero::after {
         background:
-            linear-gradient(180deg, rgba(7, 8, 10, 0.54) 0%, rgba(7, 8, 10, 0.36) 32%, rgba(7, 8, 10, 0.6) 100%),
-            radial-gradient(circle at center, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0) 52%);
+            linear-gradient(180deg, rgba(7, 8, 10, 0.72) 0%, rgba(7, 8, 10, 0.58) 34%, rgba(7, 8, 10, 0.82) 100%),
+            radial-gradient(circle at center, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0) 54%),
+            linear-gradient(90deg, rgba(4, 5, 7, 0.28), rgba(4, 5, 7, 0.08) 46%, rgba(4, 5, 7, 0.34));
     }
 
     .locations-hero__zone-list,
@@ -1326,8 +1328,9 @@
 
     .locations-hero::after {
         background:
-            linear-gradient(180deg, rgba(7, 8, 10, 0.54) 0%, rgba(7, 8, 10, 0.36) 32%, rgba(7, 8, 10, 0.6) 100%),
-            radial-gradient(circle at center, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0) 52%);
+            linear-gradient(180deg, rgba(7, 8, 10, 0.72) 0%, rgba(7, 8, 10, 0.58) 34%, rgba(7, 8, 10, 0.82) 100%),
+            radial-gradient(circle at center, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0) 54%),
+            linear-gradient(90deg, rgba(4, 5, 7, 0.28), rgba(4, 5, 7, 0.08) 46%, rgba(4, 5, 7, 0.34));
     }
 
     .locations-hero__copy {

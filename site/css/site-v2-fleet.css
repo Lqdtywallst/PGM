@@ -1080,6 +1080,8 @@
     font-weight: 650;
     line-height: 1;
     font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     color-scheme: light;
     -webkit-appearance: none;
     appearance: none;
@@ -1090,7 +1092,8 @@
     background-color: #fff;
     color: #171412;
     font-family: var(--lab-font-sans);
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
 }
 
 .fleet-sidebar__select option:disabled {
