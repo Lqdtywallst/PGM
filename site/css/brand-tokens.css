@@ -56,8 +56,8 @@
 
     /* Typography */
     --dp-font-sans: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --dp-font-display: 'El Messiri', 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
-    --dp-font-serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+    --dp-font-display: 'El Messiri', Georgia, 'Times New Roman', serif;
+    --dp-font-serif: var(--dp-font-display);
 
     /* Type scale */
     --dp-type-kicker: clamp(0.68rem, 0.64rem + 0.14vw, 0.78rem);

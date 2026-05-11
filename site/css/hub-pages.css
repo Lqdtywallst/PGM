@@ -1,4 +1,4 @@
-@import url("./brand-tokens.css");
+﻿@import url("./brand-tokens.css");
 
 :root {
     --bg: var(--dp-color-obsidian);
@@ -70,7 +70,7 @@ nav ul {
 }
 
 nav a {
-    font-family: 'Montserrat', system-ui, sans-serif;
+    font-family: var(--lab-font-sans);
     text-decoration: none;
     color: var(--muted);
     text-transform: uppercase;
@@ -130,7 +130,7 @@ section {
     border: 1px solid rgba(214, 240, 60, 0.22);
     background: rgba(255, 255, 255, 0.03);
     color: var(--gold-soft);
-    font: 0.76rem 'Montserrat', system-ui, sans-serif;
+    font: 0.76rem var(--lab-font-sans);
     letter-spacing: 0.18em;
     text-transform: uppercase;
 }
@@ -146,7 +146,7 @@ section {
 
 h1,
 h2 {
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--lab-font-sans);
     color: var(--gold);
     text-transform: uppercase;
     letter-spacing: 0.12em;
@@ -205,7 +205,7 @@ h2 {
     display: block;
     margin-bottom: 0.3rem;
     color: var(--gold);
-    font: 0.76rem 'Montserrat', system-ui, sans-serif;
+    font: 0.76rem var(--lab-font-sans);
     text-transform: uppercase;
     letter-spacing: 0.16em;
 }
@@ -380,3 +380,4 @@ footer {
         width: 100%;
     }
 }
+

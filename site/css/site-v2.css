@@ -1,4 +1,4 @@
-@import url("./brand-tokens.css");
+﻿@import url("./brand-tokens.css");
 @import url("./dp-components.css");
 
 :root {
@@ -199,7 +199,7 @@
 .home-page .hero-lab__body-copy h1 {
     max-width: 5.9ch;
     margin: 0;
-    font-family: 'El Messiri', 'Cormorant Garamond', serif;
+    font-family: var(--lab-font-display);
     font-size: clamp(4.7rem, 6vw, 6.25rem);
     font-weight: 700;
     line-height: 0.92;
@@ -229,7 +229,7 @@
 
 .home-page .hero-lab__launcher h2 {
     margin: 0;
-    font-family: 'El Messiri', 'Cormorant Garamond', serif;
+    font-family: var(--lab-font-display);
     font-size: 2.05rem;
     line-height: 1.02;
     letter-spacing: 0;
@@ -524,16 +524,16 @@
 
 .home-page .hero-lab .home-booking__field select option,
 .hero-lab-overlay__input option {
-    background-color: #fffaf1;
-    color: #171412;
+    background-color: #3a3a3a;
+    color: #fffaf1;
     font-family: var(--lab-font-sans);
     font-weight: 650;
 }
 
 .home-page .hero-lab .home-booking__field select option:checked,
 .hero-lab-overlay__input option:checked {
-    background-color: #dcc171;
-    color: #171412;
+    background-color: #5a5a5a;
+    color: #fffaf1;
 }
 
 .home-page .hero-lab .home-booking__field input[type="date"]::-webkit-calendar-picker-indicator {
@@ -785,7 +785,7 @@
     }
 
     .home-page .hero-lab__body-copy h1 {
-        font-family: 'El Messiri', 'Cormorant Garamond', serif;
+        font-family: var(--lab-font-display);
         font-size: clamp(3rem, 10vw, 3.55rem);
         max-width: 6.1ch;
         line-height: 0.93;
@@ -807,7 +807,7 @@
     }
 
     .home-page .hero-lab__launcher h2 {
-        font-family: 'El Messiri', 'Cormorant Garamond', serif;
+        font-family: var(--lab-font-display);
         font-size: 1.34rem;
         line-height: 1.06;
     }
@@ -7016,7 +7016,7 @@ body.vehicle-media-lightbox-open {
 .vehicle-media-lightbox__caption,
 .vehicle-media-lightbox__counter {
     color: rgba(248, 238, 214, 0.9);
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.78rem;
     font-weight: 800;
     letter-spacing: 0.13em;
@@ -7429,4 +7429,5 @@ body.lab-mobile-nav-open {
         filter: saturate(1.08) brightness(0.72) contrast(1.04);
     }
 }
+
 

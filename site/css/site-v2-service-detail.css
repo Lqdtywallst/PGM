@@ -1,4 +1,4 @@
-.service-detail-page-main {
+﻿.service-detail-page-main {
     --service-detail-bg: #f6f1ea;
     --service-detail-bg-soft: #fcfaf6;
     --service-detail-bg-accent: #efe6d8;
@@ -117,7 +117,7 @@
     align-items: center;
     margin-bottom: 1rem;
     color: var(--service-detail-text-muted);
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.68rem;
     font-weight: 600;
     letter-spacing: 0.16em;
@@ -143,7 +143,7 @@
     align-items: center;
     gap: 0.9rem;
     color: var(--service-detail-kicker);
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.74rem;
     font-weight: 600;
     letter-spacing: 0.18em;
@@ -161,7 +161,7 @@
 .service-detail-section__heading h2,
 .service-detail-cta h3 {
     margin: 0.9rem 0 1rem;
-    font-family: 'Cormorant Garamond', serif;
+    font-family: var(--lab-font-display);
     font-weight: 600;
     line-height: 0.94;
     letter-spacing: -0.04em;
@@ -215,7 +215,7 @@
     padding: 0 1.3rem;
     border: 1px solid transparent;
     border-radius: 8px;
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.73rem;
     font-weight: 700;
     letter-spacing: 0.16em;
@@ -261,7 +261,7 @@
     border-radius: 8px;
     background: var(--service-detail-chip-bg);
     color: var(--service-detail-kicker);
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.68rem;
     font-weight: 600;
     letter-spacing: 0.14em;
@@ -323,7 +323,7 @@
 
 .service-detail-panel-metric strong {
     color: var(--service-detail-kicker);
-    font-family: 'Cormorant Garamond', serif;
+    font-family: var(--lab-font-display);
     font-size: 1.9rem;
     font-weight: 600;
     line-height: 1;
@@ -355,7 +355,7 @@
 .service-detail-related__card h3,
 .service-detail-faq__item summary {
     margin: 0;
-    font-family: 'Cormorant Garamond', serif;
+    font-family: var(--lab-font-display);
     font-weight: 600;
     line-height: 1.04;
     letter-spacing: -0.03em;
@@ -410,7 +410,7 @@
     content: "+";
     float: right;
     color: var(--service-detail-kicker);
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.9rem;
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -437,7 +437,7 @@
 
 .service-detail-related__card a {
     color: var(--service-detail-kicker);
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.16em;
@@ -599,3 +599,4 @@
         min-height: 46px;
     }
 }
+

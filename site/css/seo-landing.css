@@ -1,4 +1,4 @@
-/* Dynasty Prestige â€” shared SEO landing layout (alineado con index.html) */
+﻿/* Dynasty Prestige Ã¢â‚¬â€ shared SEO landing layout (alineado con index.html) */
 :root {
     --bg-primary: #050506;
     --bg-secondary: #0a0a0c;
@@ -11,8 +11,8 @@
     --silver-soft: #b5b5b5;
     --border: rgba(255, 255, 255, 0.08);
     --cta-shadow: 0 14px 40px rgba(214, 240, 60, 0.22);
-    --lab-font-sans: 'Manrope', system-ui, sans-serif;
-    --lab-font-display: 'El Messiri', 'Cormorant Garamond', serif;
+    --lab-font-sans: var(--dp-font-sans, 'Manrope', system-ui, sans-serif);
+    --lab-font-display: var(--dp-font-display, 'El Messiri', Georgia, serif);
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 [hidden] {
@@ -394,7 +394,7 @@ header.site-header {
     border-bottom: 1px solid var(--border);
 }
 .header-brand {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.72rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -459,7 +459,7 @@ main {
 .breadcrumb span[aria-current="page"] { color: #fff; font-weight: 500; }
 
 h1 {
-    font-family: 'Orbitron', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: clamp(1.75rem, 4vw, 2.35rem);
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -489,7 +489,7 @@ h1 {
 }
 
 h2 {
-    font-family: 'Orbitron', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: clamp(1.15rem, 2.5vw, 1.45rem);
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -499,7 +499,7 @@ h2 {
     border-bottom: 1px solid rgba(214, 240, 60, 0.12);
 }
 h3 {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 1.05rem;
     color: #fff;
     margin: 1.25rem 0 0.65rem;
@@ -544,7 +544,7 @@ p { color: var(--silver); margin-bottom: 1rem; }
     padding: 1.35rem 1.4rem 1.5rem;
 }
 .model-card h3 {
-    font-family: 'Orbitron', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 1.05rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -665,7 +665,7 @@ table.price-table {
 .price-table th {
     background: rgba(214, 240, 60, 0.08);
     color: var(--gold-soft);
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.78rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -698,7 +698,7 @@ table.price-table {
     font-size: 1.25rem;
     font-weight: 400;
 }
-.faq-list details[open] summary::after { content: "âˆ’"; }
+.faq-list details[open] summary::after { content: "Ã¢Ë†â€™"; }
 .faq-list .faq-a {
     padding: 0 1.15rem 1.1rem;
     color: var(--silver);
@@ -911,7 +911,7 @@ body.vehicle-page {
     margin: 0;
     max-width: 12ch;
     color: #fff9f0;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: clamp(3rem, 6vw, 5.35rem);
     font-weight: 700;
     line-height: 0.96;
@@ -970,7 +970,7 @@ body.vehicle-page {
 .vehicle-booking__price {
     margin: 0;
     color: #fff;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: clamp(2rem, 4vw, 2.75rem);
     font-weight: 700;
     line-height: 1;
@@ -1093,7 +1093,7 @@ body.vehicle-page {
     padding: 0;
     border: none;
     color: #fff8ed;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: clamp(1.9rem, 3.2vw, 3rem);
     font-weight: 700;
     line-height: 1.02;
@@ -1135,7 +1135,7 @@ body.vehicle-page {
 .vehicle-spec-panel h3 {
     margin: 0.85rem 0 0.55rem;
     color: #fff;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 1.12rem;
     line-height: 1.2;
     letter-spacing: -0.02em;
@@ -1515,7 +1515,7 @@ body.vehicle-page--mother-base {
 .vehicle-page--mother-base h1 {
     margin: 0;
     color: #121212;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: clamp(2.8rem, 6vw, 5rem);
     font-weight: 700;
     letter-spacing: -0.05em;
@@ -1867,7 +1867,7 @@ body.vehicle-page--premium-pilot {
 .vehicle-page--premium-pilot h1 {
     margin: 0;
     color: #121212;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: clamp(2.8rem, 6vw, 5rem);
     font-weight: 700;
     letter-spacing: -0.05em;
@@ -2213,7 +2213,7 @@ body.vehicle-page--premium-pilot {
 
 .vehicle-pdp-gallery-top__thumb strong {
     color: #181818;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 1rem;
     line-height: 1.22;
 }
@@ -2390,7 +2390,7 @@ body.vehicle-page--premium-pilot {
 
 .vehicle-pdp-film__copy strong {
     color: #181818;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 1.25rem;
     line-height: 1.15;
 }
@@ -2472,7 +2472,7 @@ body.vehicle-page--premium-pilot {
 .vehicle-pdp-summary-support h3 {
     margin: 0;
     color: #171717;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 1.12rem;
     line-height: 1.16;
     letter-spacing: -0.02em;
@@ -2563,7 +2563,7 @@ body.vehicle-page--premium-pilot {
 .vehicle-pdp-car-note__content h3 {
     margin: 0;
     color: #171717;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 1.08rem;
     line-height: 1.22;
     letter-spacing: -0.02em;
@@ -2664,7 +2664,7 @@ body.vehicle-page--premium-pilot {
 .vehicle-pdp-gallery-card__copy h3 {
     margin: 0;
     color: #171717;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 1.15rem;
     line-height: 1.18;
     letter-spacing: -0.02em;
@@ -2786,7 +2786,7 @@ body.vehicle-page--premium-pilot {
 .vehicle-pdp-panel h3 {
     margin: 0.7rem 0 0.55rem;
     color: #171717;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 1.08rem;
     line-height: 1.2;
     letter-spacing: -0.02em;
@@ -2810,7 +2810,7 @@ body.vehicle-page--premium-pilot {
 .vehicle-pdp-review__quote {
     margin: 0;
     color: #171717;
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 1.02rem;
     font-weight: 600;
     line-height: 1.45;
@@ -3403,3 +3403,4 @@ body.vehicle-page :is(p, li, a, button, label, span, strong, small, input, selec
 body.vehicle-page :is(h1, h2, h3, h4, h5, h6) {
     font-family: var(--lab-font-display);
 }
+

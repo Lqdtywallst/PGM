@@ -13,9 +13,16 @@ const FONT_STACKS = new Set([
 ]);
 
 const PROPERTY_DEFINITIONS = Object.freeze({
+    display: { css: 'display', type: 'enum', values: ['block', 'inline-block', 'flex', 'inline-flex', 'grid', 'none'] },
+    flexDirection: { css: 'flex-direction', type: 'enum', values: ['row', 'row-reverse', 'column', 'column-reverse'] },
+    justifyContent: { css: 'justify-content', type: 'enum', values: ['flex-start', 'center', 'flex-end', 'space-between', 'space-around', 'space-evenly'] },
+    alignItems: { css: 'align-items', type: 'enum', values: ['stretch', 'flex-start', 'center', 'flex-end', 'baseline'] },
+    textAlign: { css: 'text-align', type: 'enum', values: ['left', 'center', 'right', 'start', 'end'] },
     fontFamily: { css: 'font-family', type: 'font' },
     fontSize: { css: 'font-size', type: 'length', min: 8, max: 120 },
     fontWeight: { css: 'font-weight', type: 'fontWeight' },
+    lineHeight: { css: 'line-height', type: 'numberOrLength', min: 0.7, max: 3.2 },
+    letterSpacing: { css: 'letter-spacing', type: 'length', min: -10, max: 30 },
     color: { css: 'color', type: 'color' },
     backgroundColor: { css: 'background-color', type: 'color' },
     width: { css: 'width', type: 'length', min: 0, max: 1600 },
@@ -32,7 +39,11 @@ const PROPERTY_DEFINITIONS = Object.freeze({
     marginRight: { css: 'margin-right', type: 'length', min: -260, max: 260 },
     marginBottom: { css: 'margin-bottom', type: 'length', min: -260, max: 260 },
     marginLeft: { css: 'margin-left', type: 'length', min: -260, max: 260 },
+    gap: { css: 'gap', type: 'length', min: 0, max: 260 },
+    rowGap: { css: 'row-gap', type: 'length', min: 0, max: 260 },
+    columnGap: { css: 'column-gap', type: 'length', min: 0, max: 260 },
     borderRadius: { css: 'border-radius', type: 'length', min: 0, max: 260 },
+    opacity: { css: 'opacity', type: 'number', min: 0, max: 1 },
     order: { css: 'order', type: 'integer', min: -50, max: 50 },
     translateX: { css: null, type: 'translate', min: -900, max: 900 },
     translateY: { css: null, type: 'translate', min: -900, max: 900 }
@@ -132,6 +143,35 @@ function normalizeLength(value, definition) {
     return '';
 }
 
+function normalizeNumber(value, definition) {
+    const raw = trimString(value);
+    const parsed = Number.parseFloat(raw);
+
+    if (!raw || !Number.isFinite(parsed) || parsed < definition.min || parsed > definition.max) {
+        return '';
+    }
+
+    return Number(parsed.toFixed(3)).toString();
+}
+
+function normalizeNumberOrLength(value, definition) {
+    const raw = trimString(value);
+
+    if (!raw) {
+        return '';
+    }
+
+    if (/^\d+(\.\d+)?$/.test(raw)) {
+        return normalizeNumber(raw, definition);
+    }
+
+    return normalizeLength(value, {
+        ...definition,
+        min: 0,
+        max: 260
+    });
+}
+
 function normalizeFontWeight(value) {
     const normalized = trimString(value).toLowerCase();
 
@@ -153,6 +193,11 @@ function normalizePropertyValue(name, value) {
         return '';
     }
 
+    if (definition.type === 'enum') {
+        const normalized = trimString(value).toLowerCase();
+        return definition.values.includes(normalized) ? normalized : '';
+    }
+
     if (definition.type === 'font') {
         const normalized = trimString(value);
         return FONT_STACKS.has(normalized) ? normalized : '';
@@ -168,6 +213,14 @@ function normalizePropertyValue(name, value) {
 
     if (definition.type === 'length') {
         return normalizeLength(value, definition);
+    }
+
+    if (definition.type === 'number') {
+        return normalizeNumber(value, definition);
+    }
+
+    if (definition.type === 'numberOrLength') {
+        return normalizeNumberOrLength(value, definition);
     }
 
     if (definition.type === 'integer') {

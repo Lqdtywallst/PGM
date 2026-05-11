@@ -1,4 +1,4 @@
-.local-guide-page {
+﻿.local-guide-page {
     --guide-glow: rgba(var(--dp-color-gold-rgb), 0.1);
     --guide-glow-soft: rgba(151, 178, 209, 0.12);
     --guide-border: rgba(135, 109, 77, 0.16);
@@ -171,7 +171,7 @@
     align-items: center;
     margin-bottom: 1rem;
     color: var(--guide-text-muted);
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.68rem;
     font-weight: 600;
     letter-spacing: 0.16em;
@@ -238,7 +238,7 @@
 .local-guide-section__intro h2,
 .local-guide-cta__copy h2 {
     margin: 0.7rem 0 0;
-    font-family: 'Cormorant Garamond', serif;
+    font-family: var(--lab-font-display);
     font-weight: 600;
     letter-spacing: -0.04em;
 }
@@ -290,7 +290,7 @@
     min-height: 48px;
     padding: 0 1.2rem;
     border-radius: 8px;
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.72rem;
     font-weight: 600;
     letter-spacing: 0.16em;
@@ -338,7 +338,7 @@
 .local-guide-card__tag,
 .local-guide-process-card strong,
 .local-guide-spotlight-card__label {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.68rem;
     font-weight: 600;
     letter-spacing: 0.16em;
@@ -390,7 +390,7 @@
 .local-guide-spotlight-card h3,
 .local-guide-related-card h3 {
     margin: 0;
-    font-family: 'Cormorant Garamond', serif;
+    font-family: var(--lab-font-display);
     font-weight: 600;
     line-height: 0.98;
     letter-spacing: -0.03em;
@@ -415,7 +415,7 @@
 
 .local-guide-hero__facts dt {
     color: var(--guide-text-muted);
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.65rem;
     font-weight: 600;
     letter-spacing: 0.18em;
@@ -519,7 +519,7 @@
 
 .local-guide-car-card__meta span {
     color: var(--guide-text-muted);
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.64rem;
     font-weight: 600;
     letter-spacing: 0.16em;
@@ -564,7 +564,7 @@
     justify-content: space-between;
     gap: 1rem;
     padding: 1.2rem 1.35rem;
-    font-family: 'Cormorant Garamond', serif;
+    font-family: var(--lab-font-display);
     font-size: 1.55rem;
     font-weight: 600;
     line-height: 1.05;
@@ -577,7 +577,7 @@
 .local-guide-faq-item summary::after {
     content: "+";
     color: var(--guide-kicker);
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.9rem;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -789,3 +789,4 @@
         font-size: 1.35rem;
     }
 }
+

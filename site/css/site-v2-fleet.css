@@ -1,4 +1,4 @@
-.fleet-page-main {
+﻿.fleet-page-main {
     position: relative;
     min-height: 100vh;
     background:
@@ -94,7 +94,7 @@
 .fleet-page-hero__body h1 {
     max-width: 13ch;
     margin: 0.75rem 0 0.95rem;
-    font-family: 'Cormorant Garamond', serif;
+    font-family: var(--lab-font-display);
     font-size: clamp(3rem, 6vw, 4.8rem);
     font-weight: 600;
     line-height: 0.92;
@@ -123,7 +123,7 @@
     min-height: 48px;
     padding: 0 1.15rem;
     border-radius: 999px;
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 0.16em;
@@ -169,7 +169,7 @@
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.035);
     color: rgba(245, 241, 232, 0.92);
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.68rem;
     font-weight: 600;
     letter-spacing: 0.14em;
@@ -195,7 +195,7 @@
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.03);
     color: rgba(245, 241, 232, 0.84);
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.61rem;
     font-weight: 700;
     letter-spacing: 0.16em;
@@ -280,7 +280,7 @@
     align-items: center;
     gap: 0.8rem;
     color: rgba(241, 226, 189, 0.92);
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.6rem;
     font-weight: 700;
     letter-spacing: 0.2em;
@@ -298,7 +298,7 @@
 .fleet-browser__hero-copy h1 {
     margin: 0;
     max-width: 12.8ch;
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--lab-font-display);
     font-size: clamp(3rem, 4.7vw, 5.05rem);
     font-weight: 700;
     line-height: 0.92;
@@ -330,7 +330,7 @@
     border-radius: 1rem;
     background: rgba(255, 255, 255, 0.055);
     color: rgba(255, 250, 240, 0.76);
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.63rem;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -343,7 +343,7 @@
 .fleet-browser__hero-proof strong {
     display: block;
     color: #f3d781;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 1rem;
     font-weight: 800;
     letter-spacing: 0.02em;
@@ -364,7 +364,7 @@
     min-height: 50px;
     padding: 0 1.25rem;
     border-radius: 999px;
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.68rem;
     font-weight: 800;
     letter-spacing: 0.16em;
@@ -427,7 +427,7 @@
 .fleet-results__eyebrow {
     grid-column: 1 / -1;
     color: #6f5433;
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.6rem;
     font-weight: 700;
     letter-spacing: 0.18em;
@@ -460,7 +460,7 @@
     border-radius: 999px;
     background: rgba(255, 251, 245, 0.72);
     color: #6f5433;
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.55rem;
     font-weight: 700;
     letter-spacing: 0.13em;
@@ -477,7 +477,7 @@
     align-self: end;
     white-space: nowrap;
     color: #2f261f;
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.14em;
@@ -561,7 +561,7 @@
     border-radius: 999px;
     background: rgba(241, 226, 189, 0.42);
     color: #74512d;
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.56rem;
     font-weight: 700;
     letter-spacing: 0.16em;
@@ -575,7 +575,7 @@
     gap: 0.4rem;
     min-width: 0;
     color: #6a523a;
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.52rem;
     font-weight: 600;
     letter-spacing: 0.14em;
@@ -610,7 +610,7 @@
     padding: 0;
     border: 0;
     color: #74512d;
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.56rem;
     font-weight: 700;
     letter-spacing: 0.16em;
@@ -622,7 +622,7 @@
     justify-self: end;
     min-width: 0;
     color: #5c4732;
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.52rem;
     font-weight: 600;
     letter-spacing: 0.15em;
@@ -661,7 +661,7 @@
 }
 
 .fleet-card__title a {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--lab-font-sans);
     font-weight: 700;
     letter-spacing: -0.03em;
     color: #171412;
@@ -683,7 +683,7 @@
     margin: 0.54rem 0 0;
     height: calc(0.52rem * 1.42 * 2);
     color: #74512d;
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.52rem;
     font-weight: 700;
     line-height: 1.42;
@@ -713,7 +713,7 @@
     border-radius: 0.8rem;
     background: #f4eee5;
     color: #43362b;
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.5rem;
     font-weight: 600;
     letter-spacing: 0.1em;
@@ -746,7 +746,7 @@
     border-radius: 999px;
     background: rgba(255, 250, 244, 0.76);
     color: #5f4930;
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.58rem;
     font-weight: 800;
     letter-spacing: 0.12em;
@@ -806,7 +806,7 @@
 .fleet-card__price-kicker {
     display: block;
     color: #5f4930;
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.58rem;
     font-weight: 700;
     letter-spacing: 0.16em;
@@ -816,7 +816,7 @@
 .fleet-card__price-value {
     display: block;
     margin-top: 0.2rem;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 1.28rem;
     font-weight: 700;
     letter-spacing: -0.02em;
@@ -835,7 +835,7 @@
     border-radius: 999px;
     background: rgba(241, 226, 189, 0.4);
     color: #74512d;
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.56rem;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -851,7 +851,7 @@
     justify-content: center;
     min-height: 44px;
     border-radius: 999px;
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.18em;
@@ -1036,7 +1036,7 @@
 .fleet-sidebar__label,
 .fleet-sidebar__field span {
     color: #5f4930;
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.56rem;
     font-weight: 700;
     letter-spacing: 0.16em;
@@ -1065,12 +1065,17 @@
     border-color: rgba(76, 57, 37, 0.22);
     background: linear-gradient(180deg, #3d3024 0%, #241b14 100%);
     color: #fff6e8;
+    font-family: var(--lab-font-sans);
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
 }
 
 .fleet-sidebar__select {
     padding-left: 0.96rem;
     padding-right: 2.3rem;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.86rem;
     font-weight: 650;
     line-height: 1;
@@ -1084,6 +1089,8 @@
 .fleet-sidebar__select option {
     background-color: #fff;
     color: #171412;
+    font-family: var(--lab-font-sans);
+    text-transform: uppercase;
 }
 
 .fleet-sidebar__select option:disabled {
@@ -1116,7 +1123,7 @@
 
 .fleet-sidebar__input[type="date"],
 .fleet-sidebar__input[type="time"] {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.92rem;
     font-weight: 560;
     letter-spacing: 0.004em;
@@ -1185,7 +1192,7 @@
     margin: 0;
     padding: 0;
     color: rgba(61, 44, 26, 0.95);
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.62rem;
     font-weight: 700;
     letter-spacing: 0.18em;
@@ -1244,13 +1251,14 @@
     min-height: 54px;
     padding: 0 1rem;
     color: #171412;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.92rem;
     font-weight: 560;
     letter-spacing: 0.004em;
     line-height: 1;
     font-variant-numeric: tabular-nums;
     text-align: center;
+    pointer-events: none;
 }
 
 .fleet-sidebar__field-shell--date .fleet-sidebar__field-display {
@@ -1286,7 +1294,7 @@
     border: 0;
     border-radius: 0;
     background: none;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 1.02rem;
     font-weight: 700;
     letter-spacing: -0.01em;
@@ -1395,7 +1403,7 @@
     justify-content: space-between;
     gap: 1rem;
     color: #4f351f;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.74rem;
     font-weight: 650;
     letter-spacing: 0;
@@ -1414,7 +1422,7 @@
     border: 1px solid rgba(131, 101, 68, 0.18);
     background: rgba(255, 251, 245, 0.98);
     color: rgba(61, 44, 26, 0.92);
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 0.59rem;
     font-weight: 700;
     letter-spacing: 0.14em;
@@ -1496,7 +1504,7 @@
 .fleet-browser__empty h3 {
     margin: 0;
     color: #171412;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--lab-font-sans);
     font-size: 1.6rem;
     font-weight: 700;
     line-height: 1.05;
@@ -1836,7 +1844,7 @@
         border-radius: 8px;
         background: rgba(255, 255, 255, 0.84);
         color: #171412;
-        font-family: "Montserrat", sans-serif;
+        font-family: var(--lab-font-sans);
         font-size: 0.64rem;
         font-weight: 700;
         letter-spacing: 0.08em;
@@ -1943,7 +1951,7 @@
 
     .fleet-filter-sheet-head__copy span {
         color: #5f4930;
-        font-family: "Montserrat", sans-serif;
+        font-family: var(--lab-font-sans);
         font-size: 0.64rem;
         font-weight: 800;
         letter-spacing: 0.16em;
@@ -1952,7 +1960,7 @@
 
     .fleet-filter-sheet-head__copy strong {
         color: #211a14;
-        font-family: "Cormorant Garamond", Georgia, serif;
+        font-family: var(--lab-font-display);
         font-size: 1.55rem;
         line-height: 0.98;
         font-weight: 700;
@@ -2434,3 +2442,4 @@ body.fleet-page :is(p, li, a, button, label, span, strong, small, input, select,
 body.fleet-page :is(h1, h2, h3, h4, h5, h6) {
     font-family: var(--lab-font-display);
 }
+

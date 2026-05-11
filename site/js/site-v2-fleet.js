@@ -353,6 +353,47 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    const fallbackPickerClicks = new WeakSet();
+
+    function openNativeSchedulePicker(input) {
+        if (!(input instanceof HTMLInputElement) || input.disabled || input.readOnly) {
+            return;
+        }
+
+        if (fallbackPickerClicks.has(input)) {
+            return;
+        }
+
+        input.focus({ preventScroll: true });
+
+        if (typeof input.showPicker === "function") {
+            try {
+                input.showPicker();
+                return;
+            } catch (error) {
+                // Some browsers only expose showPicker for specific input types or user gestures.
+            }
+        }
+
+        fallbackPickerClicks.add(input);
+        input.click();
+        window.setTimeout(() => fallbackPickerClicks.delete(input), 0);
+    }
+
+    function bindSchedulePickerHitAreas() {
+        fieldInputs.forEach((input) => {
+            const shell = input.closest(".fleet-sidebar__field-shell");
+
+            if (!shell) {
+                return;
+            }
+
+            shell.addEventListener("click", () => {
+                openNativeSchedulePicker(input);
+            });
+        });
+    }
+
     let scheduleCaptured = hasSchedule(getIncomingBookingIntent());
 
     function normalizeScheduleInputs(changedInput = null) {
@@ -1211,6 +1252,7 @@ document.addEventListener("DOMContentLoaded", () => {
     applyIncomingFleetFilters();
     syncDateDefaults();
     syncFieldDisplays();
+    bindSchedulePickerHitAreas();
     syncCardActions();
     initMobileFilters();
     initDatePrompts();

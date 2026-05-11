@@ -288,6 +288,77 @@ function renderAdminVisualEditorPage() {
             font-size: 0.78rem;
         }
 
+        .family-card {
+            display: grid;
+            gap: 12px;
+            margin-top: 14px;
+            padding: 14px;
+            border: 1px solid rgba(220, 180, 88, 0.32);
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(255, 248, 231, 0.82), rgba(255, 255, 255, 0.66));
+        }
+
+        .family-card__top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .family-badge {
+            display: inline-flex;
+            align-items: center;
+            min-height: 28px;
+            padding: 0 10px;
+            border-radius: 999px;
+            background: rgba(13, 13, 15, 0.92);
+            color: #fff8e7;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .family-risk {
+            color: var(--muted);
+            font-size: 0.76rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .family-card p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.5;
+            font-size: 0.86rem;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .quick-action {
+            min-height: 38px;
+            padding: 0 10px;
+            border: 1px solid rgba(23, 18, 13, 0.14);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.82);
+            color: var(--ink);
+            cursor: pointer;
+            font-size: 0.76rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .quick-action:hover {
+            border-color: rgba(220, 180, 88, 0.58);
+            background: rgba(255, 248, 231, 0.92);
+        }
+
         .property-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -379,6 +450,10 @@ function renderAdminVisualEditorPage() {
                 grid-template-columns: 1fr;
             }
 
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
             .frame-shell {
                 padding: 10px;
             }
@@ -439,6 +514,14 @@ function renderAdminVisualEditorPage() {
                     <code id="selectedSelector">Click inside the preview to inspect an element.</code>
                     <p id="selectedComputed">Computed styles will appear here.</p>
                 </div>
+                <div class="family-card" id="elementFamilyCard">
+                    <div class="family-card__top">
+                        <span class="family-badge" id="elementFamilyBadge">Waiting</span>
+                        <span class="family-risk" id="elementFamilyRisk">Select an element</span>
+                    </div>
+                    <p id="elementFamilyAdvice">The inspector will adapt once you pick a button, text, card, form, media block or layout container.</p>
+                    <div class="quick-actions" id="quickActions"></div>
+                </div>
             </section>
 
             <section class="inspector-section">
@@ -476,27 +559,113 @@ function renderAdminVisualEditorPage() {
             </section>
 
             <section class="inspector-section">
+                <h2>Layout and alignment</h2>
+                <div class="property-grid">
+                    <label>
+                        <span>Display</span>
+                        <select data-prop="display">
+                            <option value="">Keep current</option>
+                            <option value="block">Block</option>
+                            <option value="inline-block">Inline block</option>
+                            <option value="flex">Flex</option>
+                            <option value="inline-flex">Inline flex</option>
+                            <option value="grid">Grid</option>
+                            <option value="none">Hide</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Direction</span>
+                        <select data-prop="flexDirection">
+                            <option value="">Keep current</option>
+                            <option value="row">Row</option>
+                            <option value="column">Column</option>
+                            <option value="row-reverse">Row reverse</option>
+                            <option value="column-reverse">Column reverse</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Justify</span>
+                        <select data-prop="justifyContent">
+                            <option value="">Keep current</option>
+                            <option value="flex-start">Start</option>
+                            <option value="center">Center</option>
+                            <option value="flex-end">End</option>
+                            <option value="space-between">Space between</option>
+                            <option value="space-around">Space around</option>
+                            <option value="space-evenly">Space evenly</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Align</span>
+                        <select data-prop="alignItems">
+                            <option value="">Keep current</option>
+                            <option value="stretch">Stretch</option>
+                            <option value="flex-start">Start</option>
+                            <option value="center">Center</option>
+                            <option value="flex-end">End</option>
+                            <option value="baseline">Baseline</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Text align</span>
+                        <select data-prop="textAlign">
+                            <option value="">Keep current</option>
+                            <option value="left">Left</option>
+                            <option value="center">Center</option>
+                            <option value="right">Right</option>
+                            <option value="start">Start</option>
+                            <option value="end">End</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Gap px</span>
+                        <input data-prop="gap" data-unit="px" type="number" min="0" max="260" step="1">
+                    </label>
+                    <label>
+                        <span>Row gap px</span>
+                        <input data-prop="rowGap" data-unit="px" type="number" min="0" max="260" step="1">
+                    </label>
+                    <label>
+                        <span>Column gap px</span>
+                        <input data-prop="columnGap" data-unit="px" type="number" min="0" max="260" step="1">
+                    </label>
+                    <label>
+                        <span>Line height</span>
+                        <input data-prop="lineHeight" type="number" min="0.7" max="3.2" step="0.05">
+                    </label>
+                    <label>
+                        <span>Letter spacing px</span>
+                        <input data-prop="letterSpacing" data-unit="px" type="number" min="-10" max="30" step="0.5">
+                    </label>
+                    <label>
+                        <span>Opacity</span>
+                        <input data-prop="opacity" type="number" min="0" max="1" step="0.05">
+                    </label>
+                </div>
+            </section>
+
+            <section class="inspector-section">
                 <h2>Size and box</h2>
                 <div class="property-grid">
                     <label>
                         <span>Width px</span>
-                        <input data-prop="width" data-unit="px" type="number" min="0" max="1600" step="1">
+                        <input data-prop="width" type="text" placeholder="320px or 100%">
                     </label>
                     <label>
                         <span>Max width px</span>
-                        <input data-prop="maxWidth" data-unit="px" type="number" min="0" max="1600" step="1">
+                        <input data-prop="maxWidth" type="text" placeholder="620px or 90%">
                     </label>
                     <label>
                         <span>Min width px</span>
-                        <input data-prop="minWidth" data-unit="px" type="number" min="0" max="1600" step="1">
+                        <input data-prop="minWidth" type="text" placeholder="180px">
                     </label>
                     <label>
                         <span>Height px</span>
-                        <input data-prop="height" data-unit="px" type="number" min="0" max="1600" step="1">
+                        <input data-prop="height" type="text" placeholder="320px or 60%">
                     </label>
                     <label>
                         <span>Min height px</span>
-                        <input data-prop="minHeight" data-unit="px" type="number" min="0" max="1600" step="1">
+                        <input data-prop="minHeight" type="text" placeholder="280px">
                     </label>
                     <label>
                         <span>Radius px</span>
@@ -590,6 +759,10 @@ function renderAdminVisualEditorPage() {
             const selectedLabel = document.getElementById('selectedLabel');
             const selectedSelector = document.getElementById('selectedSelector');
             const selectedComputed = document.getElementById('selectedComputed');
+            const elementFamilyBadge = document.getElementById('elementFamilyBadge');
+            const elementFamilyRisk = document.getElementById('elementFamilyRisk');
+            const elementFamilyAdvice = document.getElementById('elementFamilyAdvice');
+            const quickActions = document.getElementById('quickActions');
             const statusMessage = document.getElementById('statusMessage');
             const ruleList = document.getElementById('ruleList');
             const fields = Array.from(document.querySelectorAll('[data-prop]'));
@@ -597,9 +770,16 @@ function renderAdminVisualEditorPage() {
                 return [field.dataset.prop, field];
             }));
             const CSS_PROPERTIES = {
+                display: 'display',
+                flexDirection: 'flex-direction',
+                justifyContent: 'justify-content',
+                alignItems: 'align-items',
+                textAlign: 'text-align',
                 fontFamily: 'font-family',
                 fontSize: 'font-size',
                 fontWeight: 'font-weight',
+                lineHeight: 'line-height',
+                letterSpacing: 'letter-spacing',
                 color: 'color',
                 backgroundColor: 'background-color',
                 width: 'width',
@@ -616,7 +796,11 @@ function renderAdminVisualEditorPage() {
                 marginRight: 'margin-right',
                 marginBottom: 'margin-bottom',
                 marginLeft: 'margin-left',
+                gap: 'gap',
+                rowGap: 'row-gap',
+                columnGap: 'column-gap',
                 borderRadius: 'border-radius',
+                opacity: 'opacity',
                 order: 'order'
             };
 
@@ -630,6 +814,211 @@ function renderAdminVisualEditorPage() {
             function setStatus(message, kind) {
                 statusMessage.textContent = message || '';
                 statusMessage.className = 'status' + (kind ? ' is-' + kind : '');
+            }
+
+            function elementSignature(element) {
+                const tag = element && element.tagName ? element.tagName.toLowerCase() : '';
+                const classes = Array.from(element && element.classList || []).join(' ').toLowerCase();
+                const role = String(element && element.getAttribute && element.getAttribute('role') || '').toLowerCase();
+                const type = String(element && element.getAttribute && element.getAttribute('type') || '').toLowerCase();
+
+                return { tag, classes, role, type };
+            }
+
+            function signatureIncludes(signature, words) {
+                return words.some(function (word) {
+                    return signature.classes.includes(word) ||
+                        signature.role.includes(word) ||
+                        signature.type.includes(word) ||
+                        signature.tag === word;
+                });
+            }
+
+            function classifyElement(element) {
+                const signature = elementSignature(element);
+
+                if (
+                    signature.tag === 'button' ||
+                    signature.tag === 'a' ||
+                    signature.role === 'button' ||
+                    signatureIncludes(signature, ['button', 'btn', 'cta', 'submit', 'primary', 'secondary', 'whatsapp', 'call'])
+                ) {
+                    return {
+                        key: 'button',
+                        label: 'Button / CTA',
+                        risk: 'High impact',
+                        advice: 'Edit size, spacing, hierarchy and movement carefully. Main CTAs should stay clear, tappable and visually dominant only when needed.'
+                    };
+                }
+
+                if (signatureIncludes(signature, ['card', 'panel', 'surface', 'tile', 'result', 'fleet-card', 'vehicle-card'])) {
+                    return {
+                        key: 'card',
+                        label: 'Card / Panel',
+                        risk: 'Medium impact',
+                        advice: 'Good candidates for width, padding, radius, gap and height changes. Keep cards in the same row visually aligned.'
+                    };
+                }
+
+                if (
+                    signature.tag === 'form' ||
+                    signatureIncludes(signature, ['form', 'field', 'input', 'select', 'booking', 'lookup', 'reserve', 'contact'])
+                ) {
+                    return {
+                        key: 'form',
+                        label: 'Form / Booking',
+                        risk: 'High impact',
+                        advice: 'Prioritize readability and tap targets. Avoid moving forms below the first viewport on mobile or laptop.'
+                    };
+                }
+
+                if (
+                    signature.tag === 'img' ||
+                    signature.tag === 'picture' ||
+                    signature.tag === 'video' ||
+                    signatureIncludes(signature, ['image', 'media', 'gallery', 'visual', 'photo', 'thumb'])
+                ) {
+                    return {
+                        key: 'media',
+                        label: 'Media / Image',
+                        risk: 'Medium impact',
+                        advice: 'Use width, height, radius and movement for visual balance. Cropping controls will be a later phase.'
+                    };
+                }
+
+                if (
+                    /^h[1-6]$/.test(signature.tag) ||
+                    signature.tag === 'p' ||
+                    signature.tag === 'span' ||
+                    signatureIncludes(signature, ['headline', 'title', 'lead', 'eyebrow', 'copy', 'text', 'kicker'])
+                ) {
+                    return {
+                        key: 'text',
+                        label: 'Text / Hero copy',
+                        risk: 'Medium impact',
+                        advice: 'Use typography, max width, line height and alignment. Keep one clear headline and avoid oversized text on small screens.'
+                    };
+                }
+
+                if (
+                    signature.tag === 'section' ||
+                    signature.tag === 'main' ||
+                    signature.tag === 'header' ||
+                    signature.tag === 'footer' ||
+                    signatureIncludes(signature, ['grid', 'row', 'stack', 'layout', 'section', 'shell', 'inner', 'container', 'actions'])
+                ) {
+                    return {
+                        key: 'layout',
+                        label: 'Layout / Section',
+                        risk: 'High impact',
+                        advice: 'Layout changes affect many children. Prefer gap, alignment and order before absolute movement.'
+                    };
+                }
+
+                return {
+                    key: 'generic',
+                    label: 'Generic element',
+                    risk: 'Low impact',
+                    advice: 'Use small spacing, size and movement changes first. If it controls layout, test all viewport buttons before saving.'
+                };
+            }
+
+            function setFieldValue(prop, value) {
+                const field = fieldByProp.get(prop);
+
+                if (!field) {
+                    return;
+                }
+
+                field.value = field.dataset.unit === 'px' ? stripPx(value) : String(value);
+            }
+
+            function applyPreset(properties, message) {
+                if (!selected) {
+                    setStatus('Select an element in the preview first.', 'error');
+                    return;
+                }
+
+                Object.entries(properties).forEach(function (entry) {
+                    setFieldValue(entry[0], entry[1]);
+                });
+
+                applyLivePreview();
+                setStatus(message || 'Preset applied in preview. Save it if it looks right.', 'ok');
+            }
+
+            function quickActionPresets(familyKey) {
+                const presets = {
+                    button: [
+                        ['Make bigger', { minHeight: '54px', paddingTop: '14px', paddingBottom: '14px', paddingLeft: '24px', paddingRight: '24px', borderRadius: '999px', fontWeight: '800', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }],
+                        ['Make smaller', { minHeight: '44px', paddingTop: '10px', paddingBottom: '10px', paddingLeft: '16px', paddingRight: '16px', fontSize: '14px' }],
+                        ['Move up', { translateY: '-12px' }],
+                        ['Center button', { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }]
+                    ],
+                    text: [
+                        ['Hero title feel', { fontFamily: "'El Messiri', 'Cormorant Garamond', serif", fontWeight: '700', lineHeight: '1.05', letterSpacing: '-1px' }],
+                        ['Body copy feel', { fontFamily: "'Manrope', system-ui, sans-serif", fontWeight: '400', lineHeight: '1.55', letterSpacing: '0px' }],
+                        ['Center text', { textAlign: 'center' }],
+                        ['Narrow width', { maxWidth: '620px' }]
+                    ],
+                    card: [
+                        ['Roomier card', { paddingTop: '24px', paddingRight: '24px', paddingBottom: '24px', paddingLeft: '24px', borderRadius: '24px', gap: '16px' }],
+                        ['Compact card', { paddingTop: '16px', paddingRight: '16px', paddingBottom: '16px', paddingLeft: '16px', borderRadius: '16px', gap: '10px' }],
+                        ['Taller card', { minHeight: '320px' }],
+                        ['Move up', { translateY: '-12px' }]
+                    ],
+                    form: [
+                        ['Roomier form', { paddingTop: '24px', paddingRight: '24px', paddingBottom: '24px', paddingLeft: '24px', gap: '14px', borderRadius: '22px' }],
+                        ['Compact form', { paddingTop: '16px', paddingRight: '16px', paddingBottom: '16px', paddingLeft: '16px', gap: '10px' }],
+                        ['Make wider', { maxWidth: '520px' }],
+                        ['Move up', { translateY: '-14px' }]
+                    ],
+                    media: [
+                        ['Soft radius', { borderRadius: '24px' }],
+                        ['Square radius', { borderRadius: '8px' }],
+                        ['Wider media', { width: '100%' }],
+                        ['Move up', { translateY: '-12px' }]
+                    ],
+                    layout: [
+                        ['Flex row', { display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '16px' }],
+                        ['Stack column', { display: 'flex', flexDirection: 'column', gap: '14px' }],
+                        ['Center children', { display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }],
+                        ['Spread children', { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }]
+                    ],
+                    generic: [
+                        ['Move up', { translateY: '-12px' }],
+                        ['Move down', { translateY: '12px' }],
+                        ['More spacing', { marginTop: '16px', marginBottom: '16px' }],
+                        ['Hide element', { display: 'none' }]
+                    ]
+                };
+
+                return presets[familyKey] || presets.generic;
+            }
+
+            function renderFamilyPanel(family) {
+                elementFamilyBadge.textContent = family.label;
+                elementFamilyRisk.textContent = family.risk;
+                elementFamilyAdvice.textContent = family.advice;
+                quickActions.innerHTML = '';
+
+                quickActionPresets(family.key).forEach(function (preset) {
+                    const button = document.createElement('button');
+                    button.className = 'quick-action';
+                    button.type = 'button';
+                    button.textContent = preset[0];
+                    button.addEventListener('click', function () {
+                        applyPreset(preset[1], preset[0] + ' applied in preview. Save it if it looks right.');
+                    });
+                    quickActions.appendChild(button);
+                });
+            }
+
+            function resetFamilyPanel() {
+                elementFamilyBadge.textContent = 'Waiting';
+                elementFamilyRisk.textContent = 'Select an element';
+                elementFamilyAdvice.textContent = 'The inspector will adapt once you pick a button, text, card, form, media block or layout container.';
+                quickActions.innerHTML = '';
             }
 
             function cssEscape(value) {
@@ -682,6 +1071,7 @@ function renderAdminVisualEditorPage() {
                 selectedLabel.textContent = 'No element selected yet';
                 selectedSelector.textContent = 'Click inside the preview to inspect an element.';
                 selectedComputed.textContent = 'Computed styles will appear here.';
+                resetFamilyPanel();
             }
 
             function installFrameStyle(doc) {
@@ -870,14 +1260,24 @@ function renderAdminVisualEditorPage() {
                 const rect = element.getBoundingClientRect();
                 const backgroundHex = rgbToHex(computed.backgroundColor);
 
+                setPlaceholder('display', computed.display);
+                setPlaceholder('flexDirection', computed.flexDirection);
+                setPlaceholder('justifyContent', computed.justifyContent);
+                setPlaceholder('alignItems', computed.alignItems);
+                setPlaceholder('textAlign', computed.textAlign);
                 setPlaceholder('fontSize', computed.fontSize);
                 setPlaceholder('fontWeight', computed.fontWeight);
+                setPlaceholder('lineHeight', computed.lineHeight);
+                setPlaceholder('letterSpacing', computed.letterSpacing);
                 setPlaceholder('color', rgbToHex(computed.color));
                 setPlaceholder('backgroundColor', backgroundHex || 'transparent');
                 setPlaceholder('width', rect.width ? String(Math.round(rect.width)) : computed.width);
                 setPlaceholder('height', rect.height ? String(Math.round(rect.height)) : computed.height);
                 setPlaceholder('minHeight', computed.minHeight);
                 setPlaceholder('maxWidth', computed.maxWidth);
+                setPlaceholder('gap', computed.gap);
+                setPlaceholder('rowGap', computed.rowGap);
+                setPlaceholder('columnGap', computed.columnGap);
                 setPlaceholder('paddingTop', computed.paddingTop);
                 setPlaceholder('paddingRight', computed.paddingRight);
                 setPlaceholder('paddingBottom', computed.paddingBottom);
@@ -887,7 +1287,8 @@ function renderAdminVisualEditorPage() {
                 setPlaceholder('marginBottom', computed.marginBottom);
                 setPlaceholder('marginLeft', computed.marginLeft);
                 setPlaceholder('borderRadius', computed.borderRadius);
-                selectedComputed.textContent = 'font ' + computed.fontSize + ' / weight ' + computed.fontWeight + ' | box ' + Math.round(rect.width) + 'x' + Math.round(rect.height) + 'px';
+                setPlaceholder('opacity', computed.opacity);
+                selectedComputed.textContent = 'display ' + computed.display + ' | font ' + computed.fontSize + ' / weight ' + computed.fontWeight + ' | box ' + Math.round(rect.width) + 'x' + Math.round(rect.height) + 'px';
             }
 
             function clearFields() {
@@ -945,6 +1346,7 @@ function renderAdminVisualEditorPage() {
                 const scopeSelector = forcedRule ? (forcedRule.scopeSelector || '') : bodyScope();
                 const label = forcedRule ? forcedRule.label : elementLabel(element);
                 const rule = forcedRule || matchingRuleForSelection(publicPath, selector, scopeSelector);
+                const family = classifyElement(element);
 
                 clearHover();
                 clearSelectedMarker(doc);
@@ -956,11 +1358,13 @@ function renderAdminVisualEditorPage() {
                     publicPath: publicPath,
                     selector: selector,
                     scopeSelector: scopeSelector,
-                    label: label
+                    label: label,
+                    family: family.key
                 };
 
                 selectedLabel.textContent = label;
                 selectedSelector.textContent = (scopeSelector && selector !== 'body' ? scopeSelector + ' ' : '') + selector;
+                renderFamilyPanel(family);
                 fillComputedPlaceholders(element);
                 fillFieldsFromRule(rule);
                 setStatus(rule ? 'Loaded saved rule for this element.' : 'Element selected. Change any field and preview it live.', rule ? 'ok' : '');

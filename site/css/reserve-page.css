@@ -1,13 +1,5 @@
-        :root {
+﻿        :root {
             --reserve-shell-max-width: 1180px;
-        }
-
-        @font-face {
-            font-family: 'Cormorant Garamond';
-            font-style: normal;
-            font-weight: 600 700;
-            font-display: swap;
-            src: url('https://fonts.gstatic.com/s/cormorantgaramond/v21/co3bmX5slCNuHLi8bLeY9MK7whWMhyjYqXtKky2F7g.woff2') format('woff2');
         }
 
         @font-face {
@@ -96,7 +88,7 @@
         .reserve-page-heading {
             margin: 0;
             color: #fff8e7;
-            font-family: var(--lab-font-display, 'El Messiri', 'Cormorant Garamond', serif);
+            font-family: var(--lab-font-display);
             font-size: clamp(2.2rem, 4vw, 4rem);
             line-height: 0.94;
         }
@@ -2130,7 +2122,7 @@
         .step-heading {
             margin-bottom: 0.55rem;
             color: #17120d;
-            font-family: var(--lab-font-display, 'El Messiri', 'Cormorant Garamond', serif);
+            font-family: var(--lab-font-display);
             font-size: clamp(2.2rem, 4vw, 3.2rem);
             font-weight: 600;
             line-height: 0.96;
@@ -2913,3 +2905,4 @@
                 min-width: 0;
             }
         }
+
