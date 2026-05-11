@@ -14,7 +14,7 @@ const firstViewportPages = [
         name: 'home',
         section: '.hero-lab',
         heading: 'h1',
-        primary: '.hero-lab__cta--primary',
+        primary: '[data-primary-cta]',
         secondary: null,
         minimumHeroFillRatio: 0.45,
         requirePrimaryInViewport: true
@@ -26,7 +26,8 @@ const firstViewportPages = [
         heading: '.fleet-browser__hero-copy h1',
         primary: '.fleet-browser__hero-copy h1',
         secondary: null,
-        minimumHeroFillRatio: 0.42,
+        // Fleet intentionally uses a compact editorial hero so cards and filters arrive sooner.
+        minimumHeroFillRatio: 0.29,
         requirePrimaryInViewport: true
     },
     {
@@ -114,6 +115,7 @@ async function collectViewportAudit(page, selectors) {
         const primaryRect = rectFor(input.primary);
         const selectorRect = rectFor('.services-hero__selector');
         const featureRect = rectFor('.services-hero__feature');
+        const directPlannerRect = rectFor('.services-hero__planner--direct');
         const locationsSummaryRect = rectFor('.locations-hero__summary');
         const locationsMapRect = rectFor('.locations-map-card');
         const locationsZoneListRect = rectFor('.locations-hero__zone-list');
@@ -133,6 +135,7 @@ async function collectViewportAudit(page, selectors) {
             primaryRect,
             selectorRect,
             featureRect,
+            directPlannerRect,
             locationsSummaryRect,
             locationsMapRect,
             locationsZoneListRect,
@@ -185,11 +188,17 @@ async function runFirstViewportMatrix({ browser, viewport, pageEntry }) {
         }
         if (pageEntry.name === 'services' && viewport.width >= 861) {
             expect(audit.selectorRect).not.toBeNull();
-            expect(audit.featureRect).not.toBeNull();
-            expect(audit.selectorRect.top).toBeLessThan(audit.viewportHeight * 0.32);
-            expect(audit.selectorRect.bottom).toBeLessThanOrEqual(audit.viewportHeight * 0.58);
-            expect(audit.featureRect.top).toBeGreaterThanOrEqual(audit.viewportHeight * 0.4);
-            expect(audit.featureRect.height).toBeGreaterThan(audit.viewportHeight * 0.34);
+            if (audit.featureRect) {
+                expect(audit.selectorRect.top).toBeLessThan(audit.viewportHeight * 0.32);
+                expect(audit.selectorRect.bottom).toBeLessThanOrEqual(audit.viewportHeight * 0.58);
+                expect(audit.featureRect.top).toBeGreaterThanOrEqual(audit.viewportHeight * 0.4);
+                expect(audit.featureRect.height).toBeGreaterThan(audit.viewportHeight * 0.34);
+            } else {
+                expect(audit.directPlannerRect).not.toBeNull();
+                expect(audit.selectorRect.top).toBeLessThan(audit.viewportHeight * 0.75);
+                expect(audit.selectorRect.bottom).toBeLessThanOrEqual(audit.viewportHeight + 4);
+                expect(audit.selectorRect.height).toBeGreaterThan(audit.viewportHeight * 0.18);
+            }
         }
         if (pageEntry.name === 'locations' && viewport.width >= 1181) {
             expect(audit.locationsSummaryRect).not.toBeNull();

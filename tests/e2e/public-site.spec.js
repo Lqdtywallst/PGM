@@ -149,9 +149,7 @@ test.describe('Public site quality gate', () => {
         await page.getByRole('button', { name: 'Cars Brands' }).click();
         await expect(page.getByRole('link', { name: /Lamborghini/i }).first()).toBeVisible();
 
-        await page.getByRole('button', { name: 'Start with dates' }).click();
-        await expect(page.locator('#hero-lab-overlay')).toHaveAttribute('aria-hidden', 'false');
-        await expect(page.locator('#hero-lab-pickup-date')).toBeVisible();
+        await expect(page.getByRole('button', { name: /See available cars/i })).toBeVisible();
 
         await expectNoConsoleErrors(consoleErrors, 'home desktop interactions');
     });

@@ -12,7 +12,7 @@ async function collectFirstViewportAudit(page) {
         const viewportHeight = window.innerHeight;
         const hero = document.querySelector('.hero-lab');
         const h1 = document.querySelector('h1');
-        const primaryCta = document.querySelector('.hero-lab__cta--primary');
+        const primaryCta = document.querySelector('[data-primary-cta], .home-booking__submit, .hero-lab__cta--primary');
         const heroActions = hero ? Array.from(hero.querySelectorAll('a[href], button')) : [];
         const root = document.documentElement;
         const body = document.body;
@@ -124,7 +124,7 @@ test('homepage first viewport stays clear and stable', async ({ page }) => {
     expect(audit.horizontalOverflowPx).toBeLessThanOrEqual(4);
 
     await expect(page.locator('h1')).toBeVisible();
-    await expect(page.locator('.hero-lab__cta--primary')).toBeVisible();
+    await expect(page.locator('[data-primary-cta]')).toBeVisible();
     await expectNoConsoleErrors(consoleErrors, 'first viewport');
 });
 

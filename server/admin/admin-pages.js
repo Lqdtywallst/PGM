@@ -170,7 +170,8 @@ function renderAdminLoginPage() {
                 var url = new URL(nextPath, window.location.origin);
                 var isSameOrigin = url.origin === window.location.origin;
                 var isAllowedAdminPage = url.pathname === '/admin/reservations.html' ||
-                    url.pathname === '/admin/content.html';
+                    url.pathname === '/admin/content.html' ||
+                    url.pathname === '/admin/visual.html';
 
                 if (isSameOrigin && isAllowedAdminPage) {
                     return url.pathname + url.search + url.hash;
@@ -630,6 +631,7 @@ function renderAdminReservationsPage() {
         </div>
         <div class="topbar-actions">
             <a class="topbar-link" href="/admin/content.html">Content editor</a>
+            <a class="topbar-link" href="/admin/visual.html">Visual editor</a>
             <button class="logout" id="logoutButton" type="button">Logout</button>
         </div>
     </header>

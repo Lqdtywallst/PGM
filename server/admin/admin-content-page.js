@@ -1094,7 +1094,8 @@ function renderAdminContentEditorPage() {
         </div>
         <div class="topbar-actions">
             <a class="topbar-link" href="/admin/reservations.html">Reservations</a>
-            <a class="topbar-link topbar-link--primary" href="http://localhost:8080/index.html" target="_blank" rel="noopener">Open local preview</a>
+            <a class="topbar-link topbar-link--primary" href="/admin/visual.html">Visual editor</a>
+            <a class="topbar-link" href="http://localhost:8080/index.html" target="_blank" rel="noopener">Open local preview</a>
             <button class="logout" id="logoutButton" type="button">Logout</button>
         </div>
     </header>

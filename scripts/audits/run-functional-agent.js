@@ -2193,27 +2193,26 @@ function createHomeCarsTypesFilterAction() {
 
 function createHomeOverlaySearchAction() {
     return {
-        id: 'home-overlay-search',
-        label: 'Home booking overlay submits into fleet',
+        id: 'home-booking-search',
+        label: 'Home booking panel submits into fleet',
         kind: 'form',
         async run(page) {
             const recorder = createStepRecorder();
-            await page.getByRole('button', { name: /start with dates/i }).click();
-            await expect(page.locator('#hero-lab-overlay')).toHaveAttribute('aria-hidden', 'false');
-            recorder.record('open-booking-overlay', 'Open booking overlay', {
-                expected: 'overlay aria-hidden=false',
-                observed: await page.locator('#hero-lab-overlay').getAttribute('aria-hidden') || ''
+            await expect(page.locator('#home-booking')).toBeVisible();
+            recorder.record('find-home-booking-panel', 'Find home booking panel', {
+                expected: 'home booking form visible above the fold',
+                observed: await page.locator('#home-booking').isVisible() ? 'visible' : 'hidden'
             });
 
-            await page.locator('#hero-lab-pickup-date').fill('2026-08-03');
-            await page.locator('#hero-lab-return-date').fill('2026-08-05');
-            await page.locator('#hero-lab-pickup-time').selectOption('12:00');
-            await page.locator('#hero-lab-return-time').selectOption('13:00');
+            await page.locator('#home-pickup-date').fill('2026-08-03');
+            await page.locator('#home-return-date').fill('2026-08-05');
+            await page.locator('#home-pickup-time').selectOption('12:00');
+            await page.locator('#home-return-time').selectOption('13:00');
             recorder.record('fill-home-schedule', 'Fill home schedule', {
                 expected: '2026-08-03 to 2026-08-05',
                 observed: '2026-08-03 to 2026-08-05'
             });
-            await page.locator('.hero-lab-overlay__submit').click();
+            await page.getByRole('button', { name: /see available cars/i }).click();
 
             await expect(page).toHaveURL(/\/fleet\.html\?/i);
             await page.waitForLoadState('domcontentloaded').catch(() => null);
@@ -2226,7 +2225,7 @@ function createHomeOverlaySearchAction() {
             });
 
             return {
-                message: 'Overlay search carried schedule into fleet.',
+                message: 'Home booking panel carried schedule into fleet.',
                 observedUrl: page.url(),
                 observedPath: currentPathFromPageUrl(page.url()),
                 steps: recorder.steps

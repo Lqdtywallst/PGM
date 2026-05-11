@@ -50,14 +50,11 @@ test.describe('Mobile customer journeys', () => {
         await page.goto('/', { waitUntil: 'domcontentloaded' });
         await settlePage(page);
 
-        await page.getByRole('button', { name: /Start with dates/i }).click();
-        await expect(page.locator('#hero-lab-overlay')).toHaveAttribute('aria-hidden', 'false');
-
-        await page.locator('#hero-lab-pickup-date').fill('2026-09-03');
-        await page.locator('#hero-lab-return-date').fill('2026-09-05');
-        await page.locator('#hero-lab-pickup-time').selectOption('12:00');
-        await page.locator('#hero-lab-return-time').selectOption('13:00');
-        await page.getByRole('button', { name: /Search vehicles/i }).click();
+        await page.locator('#home-pickup-date').fill('2026-09-03');
+        await page.locator('#home-return-date').fill('2026-09-05');
+        await page.locator('#home-pickup-time').selectOption('12:00');
+        await page.locator('#home-return-time').selectOption('13:00');
+        await page.getByRole('button', { name: /See available cars/i }).click();
 
         await expect(page).toHaveURL(/\/fleet\.html\?/i);
         await expect(page.locator('#fleet-pickup-date')).toHaveValue('2026-09-03');

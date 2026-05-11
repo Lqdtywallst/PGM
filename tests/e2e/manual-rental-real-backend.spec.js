@@ -190,9 +190,9 @@ test.describe('Manual rental QA environment with real backend storage', () => {
         await fillFleetSchedule(page, schedules.clear);
         await expect(blockedCard).toBeVisible({ timeout: 15000 });
         await expect(blockedCard.locator('.fleet-card__reserve')).toHaveAttribute('href', new RegExp(`startDate=${schedules.clear.startDate}`));
-        await expect(blockedCard.locator('.fleet-card__secondary').first()).toHaveAttribute('href', contactPhoneHref);
-        await expect(blockedCard.locator('.fleet-card__secondary--wa')).toHaveAttribute('href', whatsappPattern);
-        expect(decodeURIComponent(await blockedCard.locator('.fleet-card__secondary--wa').getAttribute('href'))).toContain('Mercedes G63 AMG');
+        await expect(blockedCard.locator('.fleet-card__secondary')).toHaveCount(0);
+        await expect(page.locator('.lab-floating-contact__button--call')).toHaveAttribute('href', contactPhoneHref);
+        await expect(page.locator('.lab-floating-contact__button--wa')).toHaveAttribute('href', whatsappPattern);
 
         await page.goto('/reservation-lookup.html', { waitUntil: 'domcontentloaded' });
         await settlePage(page);

@@ -14,7 +14,7 @@ const responsivePages = [
         path: '/',
         name: 'home',
         expectsVisibleH1: true,
-        primary: (page) => page.getByRole('button', { name: /Start with dates/i })
+        primary: (page) => page.getByRole('button', { name: /See available cars/i })
     },
     {
         path: '/fleet.html',
@@ -344,7 +344,7 @@ test.describe('Responsive audit matrix', () => {
     }
 
     for (const viewport of overlayAuditViewports) {
-        test(`home booking overlay stays usable on ${viewport.name} (${viewport.width}x${viewport.height})`, async ({ browser }, testInfo) => {
+        test(`home booking panel stays usable on ${viewport.name} (${viewport.width}x${viewport.height})`, async ({ browser }, testInfo) => {
             const context = await browser.newContext(buildContextOptions(viewport));
             const page = await context.newPage();
 
@@ -353,17 +353,15 @@ test.describe('Responsive audit matrix', () => {
             });
 
             const consoleErrors = createConsoleTracker(page);
-            const auditLabel = `home-overlay-${viewport.name}`;
+            const auditLabel = `home-booking-${viewport.name}`;
 
             try {
                 await page.goto('/', { waitUntil: 'domcontentloaded' });
                 await settlePage(page);
 
-                await page.getByRole('button', { name: /Start with dates/i }).click();
-                await expect(page.locator('#hero-lab-overlay')).toHaveAttribute('aria-hidden', 'false');
-                await expect(page.locator('#hero-lab-pickup-date')).toBeVisible();
-                await expect(page.locator('#hero-lab-return-date')).toBeVisible();
-                await expect(page.getByRole('button', { name: /Search vehicles/i })).toBeVisible();
+                await expect(page.locator('#home-pickup-date')).toBeVisible();
+                await expect(page.locator('#home-return-date')).toBeVisible();
+                await expect(page.getByRole('button', { name: /See available cars/i })).toBeVisible();
 
                 const audit = await collectResponsiveAudit(page);
                 await attachAuditData(testInfo, auditLabel, audit);

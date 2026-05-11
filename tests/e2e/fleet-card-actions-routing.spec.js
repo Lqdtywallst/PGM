@@ -106,10 +106,11 @@ test.describe('Fleet card action routing', () => {
             expect(clickedReserveUrl.searchParams.get('price')).toBe(fleetCard.price);
 
             await openFleet(page);
-            await expect(card.locator('.fleet-card__secondary').first()).toHaveAttribute('href', 'tel:+971586122568');
-            await expect(card.locator('.fleet-card__secondary--wa')).toHaveAttribute('href', /https:\/\/wa\.me\/971586122568/);
-            const whatsappHref = await card.locator('.fleet-card__secondary--wa').getAttribute('href');
-            expect(decodeURIComponent(whatsappHref)).toContain(fleetCard.fullCar);
+            await expect(card.locator('.fleet-card__secondary')).toHaveCount(0);
+            await expect(page.locator('.lab-floating-contact__button--call')).toBeVisible();
+            await expect(page.locator('.lab-floating-contact__button--call')).toHaveAttribute('href', 'tel:+971586122568');
+            await expect(page.locator('.lab-floating-contact__button--wa')).toBeVisible();
+            await expect(page.locator('.lab-floating-contact__button--wa')).toHaveAttribute('href', /https:\/\/wa\.me\/971586122568/);
 
             await expectNoConsoleErrors(consoleErrors, `${fleetCard.fullCar} Fleet card actions`);
         });

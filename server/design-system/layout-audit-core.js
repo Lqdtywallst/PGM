@@ -66,6 +66,7 @@ const DEFAULT_SLOT_SELECTORS = Object.freeze({
     '.service-detail-actions__secondary'
   ],
   datePlanner: [
+    '.home-booking',
     '.date-planner',
     '.booking-widget',
     '.hero-lab__booking',

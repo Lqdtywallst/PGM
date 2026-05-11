@@ -355,7 +355,7 @@ test.describe('Mobile friction points', () => {
         await expectNoConsoleErrors(consoleErrors, 'short mobile fleet filter sheet');
     });
 
-    test('fleet mobile card contact bar spans the full card width as a 50/50 split', async ({ page }) => {
+    test('fleet mobile cards avoid embedded contact buttons and keep the global dock visible', async ({ page }) => {
         const consoleErrors = createConsoleTracker(page);
 
         await page.setViewportSize({ width: 390, height: 844 });
@@ -373,49 +373,42 @@ test.describe('Mobile friction points', () => {
             const row = element.querySelector('.fleet-card__contact-row');
             const rowRect = row?.getBoundingClientRect();
             const floating = document.querySelector('.lab-floating-contact');
+            const floatingRect = floating?.getBoundingClientRect();
             const floatingStyle = floating ? window.getComputedStyle(floating) : null;
-            const buttons = Array.from(row?.querySelectorAll('.fleet-card__secondary') || [])
-                .map((button) => {
+            const visibleEmbeddedContactActions = Array.from(element.querySelectorAll('.fleet-card__secondary'))
+                .filter((button) => {
                     const rect = button.getBoundingClientRect();
-
-                    return {
-                        text: String(button.textContent || '').trim(),
-                        left: rect.left,
-                        right: rect.right,
-                        top: rect.top,
-                        width: rect.width,
-                        height: rect.height
-                    };
+                    const style = window.getComputedStyle(button);
+                    return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
                 });
 
             return {
                 cardWidth: cardRect.width,
+                primaryWidth: primaryRect?.width || 0,
+                primaryBottomGapPx: primaryRect ? cardRect.bottom - primaryRect.bottom : 0,
                 rowWidth: rowRect?.width || 0,
-                rowLeftGapPx: rowRect ? rowRect.left - cardRect.left : 999,
-                rowRightGapPx: rowRect ? cardRect.right - rowRect.right : 999,
-                gapFromPrimaryPx: rowRect && primaryRect ? rowRect.top - primaryRect.bottom : 0,
-                floatingOpacity: floatingStyle ? Number.parseFloat(floatingStyle.opacity) : null,
+                contactRowVisible: rowRect ? rowRect.width > 0 && rowRect.height > 0 && window.getComputedStyle(row).display !== 'none' : false,
+                visibleEmbeddedContactActionCount: visibleEmbeddedContactActions.length,
+                floatingOpacity: floatingStyle ? Number.parseFloat(floatingStyle.opacity) : 0,
                 floatingOverCardActions: floating ? floating.classList.contains('is-over-card-actions') : false,
-                buttons
+                floatingRightGapPx: floatingRect ? window.innerWidth - floatingRect.right : null,
+                floatingBottomGapPx: floatingRect ? window.innerHeight - floatingRect.bottom : null
             };
         });
 
-        expect(contactBarMetrics.buttons.map((button) => button.text)).toEqual(['Call', 'WhatsApp']);
-        expect(contactBarMetrics.gapFromPrimaryPx).toBeGreaterThanOrEqual(8);
-        expect(Math.abs(contactBarMetrics.rowLeftGapPx)).toBeLessThanOrEqual(2);
-        expect(Math.abs(contactBarMetrics.rowRightGapPx)).toBeLessThanOrEqual(2);
-        expect(contactBarMetrics.rowWidth / contactBarMetrics.cardWidth).toBeGreaterThanOrEqual(0.985);
-        expect(Math.abs(contactBarMetrics.buttons[0].top - contactBarMetrics.buttons[1].top)).toBeLessThanOrEqual(1);
+        expect(contactBarMetrics.contactRowVisible).toBe(false);
+        expect(contactBarMetrics.visibleEmbeddedContactActionCount).toBe(0);
+        expect(contactBarMetrics.primaryWidth / contactBarMetrics.cardWidth).toBeGreaterThanOrEqual(0.78);
+        expect(contactBarMetrics.primaryBottomGapPx).toBeGreaterThanOrEqual(12);
+        expect(contactBarMetrics.primaryBottomGapPx).toBeLessThanOrEqual(42);
+        expect(contactBarMetrics.floatingOverCardActions).toBe(false);
+        expect(contactBarMetrics.floatingOpacity).toBeGreaterThanOrEqual(0.75);
+        expect(contactBarMetrics.floatingRightGapPx).toBeGreaterThanOrEqual(4);
+        expect(contactBarMetrics.floatingRightGapPx).toBeLessThanOrEqual(24);
+        expect(contactBarMetrics.floatingBottomGapPx).toBeGreaterThanOrEqual(4);
+        expect(contactBarMetrics.floatingBottomGapPx).toBeLessThanOrEqual(24);
 
-        for (const button of contactBarMetrics.buttons) {
-            expect(button.width / contactBarMetrics.rowWidth).toBeGreaterThanOrEqual(0.49);
-            expect(button.width / contactBarMetrics.rowWidth).toBeLessThanOrEqual(0.51);
-            expect(button.height).toBeGreaterThanOrEqual(44);
-        }
-        expect(contactBarMetrics.floatingOverCardActions).toBe(true);
-        expect(contactBarMetrics.floatingOpacity).toBeLessThanOrEqual(0.05);
-
-        await expectNoConsoleErrors(consoleErrors, 'fleet mobile card contact bar');
+        await expectNoConsoleErrors(consoleErrors, 'fleet mobile card contact dock');
     });
 
     test('mobile reserve clears private details after reload while preserving schedule', async ({ page }) => {

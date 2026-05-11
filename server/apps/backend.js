@@ -38,6 +38,9 @@ const {
     renderAdminContentEditorPage
 } = require('../admin/admin-content-page');
 const {
+    renderAdminVisualEditorPage
+} = require('../admin/admin-visual-editor-page');
+const {
     createAdminReservationsRouter
 } = require('../admin/admin-reservations');
 const {
@@ -51,11 +54,18 @@ const {
     readAppearanceEditorState,
     saveAppearanceEditorState,
     saveStyleEditorState,
+    readVisualEditorState,
+    saveVisualOverrideRule,
+    deleteVisualOverrideRule,
     saveServicesContent,
     saveLocationsContent,
+    listEditablePages,
     readEditablePage,
     saveEditablePage
 } = require('../admin/content-editor');
+const {
+    VISUAL_OVERRIDES_HREF
+} = require('../renderers/render-visual-overrides');
 const {
     fetchGoogleReviews,
     getGoogleReviewsConfig,
@@ -97,6 +107,14 @@ app.get('/favicon.ico', serveSiteAsset('favicon.ico'));
 app.get('/logo-dp-transparent.png', serveSiteAsset('logo-dp-transparent.png'));
 app.use('/icons', express.static(path.join(siteRoot, 'icons'), { fallthrough: true }));
 app.use('/images', express.static(path.join(siteRoot, 'images'), { fallthrough: true }));
+app.use('/css', express.static(path.join(siteRoot, 'css'), { fallthrough: true }));
+app.use('/js', express.static(path.join(siteRoot, 'js'), { fallthrough: true }));
+app.use('/media', express.static(path.join(siteRoot, 'media'), { fallthrough: true }));
+app.use('/vendor', express.static(path.join(siteRoot, 'vendor'), { fallthrough: true }));
+app.get('/config.js', serveSiteAsset('config.js'));
+app.get('/runtime-config.js', serveSiteAsset('runtime-config.js'));
+app.get('/manifest.json', serveSiteAsset('manifest.json'));
+app.get('/sw.js', serveSiteAsset('sw.js'));
 
 // Import reservation routes
 let reserveRoutes;
@@ -260,10 +278,31 @@ function setAdminNoIndexHeaders(res) {
     res.setHeader('X-Robots-Tag', 'noindex, nofollow');
 }
 
+function injectAdminPreviewAssets(html) {
+    let nextHtml = String(html || '');
+    const newline = nextHtml.includes('\r\n') ? '\r\n' : '\n';
+
+    if (!/<base\b/i.test(nextHtml) && /<head[^>]*>/i.test(nextHtml)) {
+        nextHtml = nextHtml.replace(/(<head[^>]*>)/i, `$1${newline}    <base href="/">`);
+    }
+
+    if (!/admin-visual-overrides\.css/i.test(nextHtml)) {
+        const link = `    <link rel="stylesheet" href="${VISUAL_OVERRIDES_HREF}">`;
+
+        if (/<\/head>/i.test(nextHtml)) {
+            nextHtml = nextHtml.replace(/<\/head>/i, `${link}${newline}</head>`);
+        } else {
+            nextHtml += `${newline}${link}`;
+        }
+    }
+
+    return nextHtml;
+}
+
 function safeAdminRedirectPath(value) {
     const candidate = String(value || '').trim();
 
-    if (/^\/admin\/(?:reservations|content)\.html(?:[?#].*)?$/i.test(candidate)) {
+    if (/^\/admin\/(?:reservations|content|visual)\.html(?:[?#].*)?$/i.test(candidate)) {
         return candidate;
     }
 
@@ -435,6 +474,23 @@ app.get('/admin/content.html', requireAdminSession({ redirectToLogin: true }), (
     res.type('html').send(renderAdminContentEditorPage());
 });
 
+app.get('/admin/visual.html', requireAdminSession({ redirectToLogin: true }), (req, res) => {
+    setAdminNoIndexHeaders(res);
+    res.type('html').send(renderAdminVisualEditorPage());
+});
+
+app.get('/admin/preview/page', requireAdminSession({ redirectToLogin: true }), (req, res) => {
+    setAdminNoIndexHeaders(res);
+
+    try {
+        const page = readEditablePage(req.query.path || '/');
+        res.type('html').send(injectAdminPreviewAssets(page.source));
+    } catch (error) {
+        console.error('[ADMIN VISUAL] Error loading preview page:', error.message);
+        res.status(400).type('html').send('<!doctype html><title>Preview unavailable</title><p>Could not load this page preview.</p>');
+    }
+});
+
 app.get('/api/admin/content', requireAdminSession(), (req, res) => {
     setAdminNoIndexHeaders(res);
 
@@ -443,6 +499,52 @@ app.get('/api/admin/content', requireAdminSession(), (req, res) => {
     } catch (error) {
         console.error('[ADMIN CONTENT] Error loading editor state:', error.message);
         res.status(500).json({ error: 'Could not load the current editable content.' });
+    }
+});
+
+app.get('/api/admin/visual-editor', requireAdminSession(), (req, res) => {
+    setAdminNoIndexHeaders(res);
+
+    try {
+        res.json({
+            ok: true,
+            pages: listEditablePages(),
+            visual: readVisualEditorState()
+        });
+    } catch (error) {
+        console.error('[ADMIN VISUAL] Error loading visual editor state:', error.message);
+        res.status(500).json({ error: 'Could not load the visual editor.' });
+    }
+});
+
+app.put('/api/admin/visual-editor/rule', requireAdminSession(), (req, res) => {
+    setAdminNoIndexHeaders(res);
+
+    try {
+        const visual = saveVisualOverrideRule(req.body || {});
+        const rule = visual.rules.find((candidate) => candidate.id === req.body?.id) ||
+            visual.rules.find((candidate) => (
+                candidate.publicPath === req.body?.publicPath &&
+                candidate.selector === req.body?.selector &&
+                (candidate.scopeSelector || '') === (req.body?.scopeSelector || '')
+            ));
+
+        res.json({ ok: true, visual, rule });
+    } catch (error) {
+        console.error('[ADMIN VISUAL] Error saving visual rule:', error.message);
+        res.status(400).json({ error: error.message || 'Could not save the visual rule.' });
+    }
+});
+
+app.delete('/api/admin/visual-editor/rule/:id', requireAdminSession(), (req, res) => {
+    setAdminNoIndexHeaders(res);
+
+    try {
+        const visual = deleteVisualOverrideRule(req.params.id);
+        res.json({ ok: true, visual });
+    } catch (error) {
+        console.error('[ADMIN VISUAL] Error deleting visual rule:', error.message);
+        res.status(400).json({ error: error.message || 'Could not delete the visual rule.' });
     }
 });
 

@@ -11,6 +11,12 @@ const {
     normalizeStyleEditorState,
     renderStyleOverridesCss
 } = require('../renderers/render-style-overrides');
+const {
+    VISUAL_OVERRIDES_RELATIVE_PATH,
+    applyVisualOverridesLink,
+    normalizeVisualEditorState,
+    renderVisualOverridesCss
+} = require('../renderers/render-visual-overrides');
 const { PUBLIC_PAGE_FILE_MAP, siteFileForPublicPath } = require('../shared/public-page-map');
 
 const projectRoot = path.resolve(__dirname, '..', '..');
@@ -21,6 +27,8 @@ const globalHeaderPath = path.join(__dirname, '..', 'data', 'global-header.json'
 const siteAppearancePath = path.join(__dirname, '..', 'data', 'site-appearance.json');
 const styleEditorPath = path.join(__dirname, '..', 'data', 'style-editor.json');
 const styleOverridesPath = path.join(siteRoot, STYLE_OVERRIDES_RELATIVE_PATH);
+const visualEditorPath = path.join(__dirname, '..', 'data', 'visual-overrides.json');
+const visualOverridesPath = path.join(siteRoot, VISUAL_OVERRIDES_RELATIVE_PATH);
 const servicesContentPath = path.join(__dirname, '..', 'data', 'services-editor.json');
 const locationsContentPath = path.join(__dirname, '..', 'data', 'locations-editor.json');
 
@@ -58,6 +66,10 @@ function replaceOnce(source, pattern, replacer, label) {
 
     const nextSource = source.replace(pattern, replacer);
     return nextSource;
+}
+
+function replaceOptionalOnce(source, pattern, replacer) {
+    return pattern.test(source) ? source.replace(pattern, replacer) : source;
 }
 
 function normalizeText(value) {
@@ -305,6 +317,23 @@ function syncStyleOverridesAcrossSite() {
     return touchedFiles;
 }
 
+function syncVisualOverridesAcrossSite() {
+    const htmlFiles = listHtmlFiles(siteRoot);
+    const touchedFiles = [];
+
+    htmlFiles.forEach((filePath) => {
+        const html = readUtf8(filePath);
+        const nextHtml = applyVisualOverridesLink(html);
+
+        if (nextHtml !== html) {
+            writeUtf8(filePath, nextHtml);
+            touchedFiles.push(filePath);
+        }
+    });
+
+    return touchedFiles;
+}
+
 function readStyleEditorState() {
     return normalizeStyleEditorState(JSON.parse(readUtf8(styleEditorPath)));
 }
@@ -315,6 +344,62 @@ function saveStyleEditorState(payload = {}) {
     writeUtf8(styleOverridesPath, renderStyleOverridesCss(nextState));
     syncStyleOverridesAcrossSite();
     return readStyleEditorState();
+}
+
+function readVisualEditorState() {
+    if (!fs.existsSync(visualEditorPath)) {
+        return normalizeVisualEditorState();
+    }
+
+    return normalizeVisualEditorState(JSON.parse(readUtf8(visualEditorPath)));
+}
+
+function writeVisualEditorState(payload = {}) {
+    const nextState = normalizeVisualEditorState(payload);
+    writeUtf8(visualEditorPath, `${JSON.stringify(nextState, null, 2)}\n`);
+    writeUtf8(visualOverridesPath, renderVisualOverridesCss(nextState));
+    syncVisualOverridesAcrossSite();
+    return readVisualEditorState();
+}
+
+function createVisualRuleId() {
+    return `visual-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function saveVisualOverrideRule(payload = {}) {
+    const currentState = readVisualEditorState();
+    const page = assertEditablePublicPath(payload.publicPath || '/');
+    const id = normalizeText(payload.id) || createVisualRuleId();
+    const candidate = {
+        ...payload,
+        id,
+        publicPath: page.publicPath,
+        updatedAt: new Date().toISOString()
+    };
+    const normalizedRule = normalizeVisualEditorState({ rules: [candidate] }).rules[0];
+
+    if (!normalizedRule) {
+        throw new Error('Select an element and set at least one visual property before saving.');
+    }
+
+    const existingIndex = currentState.rules.findIndex((rule) => rule.id === normalizedRule.id);
+    const rules = existingIndex >= 0
+        ? currentState.rules.map((rule, index) => (index === existingIndex ? normalizedRule : rule))
+        : [...currentState.rules, normalizedRule];
+
+    return writeVisualEditorState({ rules });
+}
+
+function deleteVisualOverrideRule(ruleId) {
+    const id = normalizeText(ruleId);
+
+    if (!id) {
+        throw new Error('A visual rule id is required.');
+    }
+
+    const currentState = readVisualEditorState();
+    const rules = currentState.rules.filter((rule) => rule.id !== id);
+    return writeVisualEditorState({ rules });
 }
 
 function saveSiteAppearanceSettings(payload = {}) {
@@ -385,8 +470,24 @@ function heroCtaPattern(modifier) {
     return new RegExp(`<([a-z0-9-]+)\\b([^>]*class="[^"]*\\bhero-lab__cta--${escapeRegExp(modifier)}\\b[^"]*"[^>]*)>([\\s\\S]*?)<\\/\\1>`, 'i');
 }
 
-function readHeroCta(html, modifier, fallbackHref = './fleet.html') {
-    const match = requireMatch(html, heroCtaPattern(modifier), `${modifier} CTA`);
+function homePrimaryCtaPattern() {
+    return /<([a-z0-9-]+)\b([^>]*(?:class="[^"]*\bhero-lab__cta--primary\b[^"]*"|data-primary-cta\b)[^>]*)>([\s\S]*?)<\/\1>/i;
+}
+
+function homeCtaPattern(modifier) {
+    return modifier === 'primary' ? homePrimaryCtaPattern() : heroCtaPattern(modifier);
+}
+
+function readHeroCta(html, modifier, fallbackHref = './fleet.html', fallbackLabel = '') {
+    const match = html.match(homeCtaPattern(modifier));
+
+    if (!match) {
+        return {
+            href: fallbackHref,
+            label: fallbackLabel
+        };
+    }
+
     const tagName = match[1].toLowerCase();
     const attrs = match[2];
 
@@ -408,9 +509,18 @@ function replaceHtmlAttribute(attrs, name, value) {
 }
 
 function replaceHeroCta(html, modifier, href, label) {
-    return replaceOnce(
-        html,
-        heroCtaPattern(modifier),
+    const pattern = homeCtaPattern(modifier);
+
+    if (!pattern.test(html)) {
+        if (modifier === 'secondary') {
+            return html;
+        }
+
+        throw new Error(`Could not update ${modifier} CTA in homepage source.`);
+    }
+
+    return html.replace(
+        pattern,
         (fullMatch, tagName, attrs) => {
             const normalizedTag = tagName.toLowerCase();
             const nextAttrs = normalizedTag === 'a'
@@ -418,22 +528,25 @@ function replaceHeroCta(html, modifier, href, label) {
                 : attrs;
 
             return `<${tagName}${nextAttrs}>${label}</${tagName}>`;
-        },
-        `${modifier} CTA`
+        }
     );
 }
 
 function readHomeEditorState() {
     const html = readUtf8(homeHtmlPath);
-    const primaryCta = readHeroCta(html, 'primary', '#home-booking');
-    const secondaryCta = readHeroCta(html, 'secondary', './fleet.html');
+    const primaryCta = readHeroCta(html, 'primary', '#home-booking', 'See available cars');
+    const secondaryCta = readHeroCta(html, 'secondary', './fleet.html', 'Explore fleet');
+    const launcherHeading = html.match(/<div class="hero-lab__launcher">\s*<h2>([\s\S]*?)<\/h2>/i) ||
+        html.match(/<h2\b[^>]*id="home-booking-title"[^>]*>([\s\S]*?)<\/h2>/i);
+    const launcherText = html.match(/<div class="hero-lab__launcher">[\s\S]*?<h2>[\s\S]*?<\/h2>\s*<p>([\s\S]*?)<\/p>/i) ||
+        html.match(/<div class="home-booking__intro">[\s\S]*?<h2\b[\s\S]*?<\/h2>\s*<p>([\s\S]*?)<\/p>/i);
 
     return {
         eyebrow: decodeHtml(requireMatch(html, /<span class="hero-lab__eyebrow">([\s\S]*?)<\/span>/, 'hero eyebrow')[1]),
         headline: decodeHtml(requireMatch(html, /<h1>([\s\S]*?)<\/h1>/, 'hero headline')[1]),
         lead: decodeHtml(requireMatch(html, /<p class="hero-lab__lead">([\s\S]*?)<\/p>/, 'hero lead')[1]),
-        launcherHeading: decodeHtml(requireMatch(html, /<div class="hero-lab__launcher">\s*<h2>([\s\S]*?)<\/h2>/, 'hero launcher heading')[1]),
-        launcherText: decodeHtml(requireMatch(html, /<div class="hero-lab__launcher">[\s\S]*?<h2>[\s\S]*?<\/h2>\s*<p>([\s\S]*?)<\/p>/, 'hero launcher text')[1]),
+        launcherHeading: decodeHtml(launcherHeading?.[1] || ''),
+        launcherText: decodeHtml(launcherText?.[1] || ''),
         primaryCtaHref: primaryCta.href,
         primaryCtaLabel: primaryCta.label,
         secondaryCtaHref: secondaryCta.href,
@@ -458,12 +571,17 @@ function saveHomeEditorState(payload = {}) {
     html = replaceOnce(html, /(<span class="hero-lab__eyebrow">)([\s\S]*?)(<\/span>)/, `$1${nextState.eyebrow}$3`, 'hero eyebrow');
     html = replaceOnce(html, /(<h1>)([\s\S]*?)(<\/h1>)/, `$1${nextState.headline}$3`, 'hero headline');
     html = replaceOnce(html, /(<p class="hero-lab__lead">)([\s\S]*?)(<\/p>)/, `$1${nextState.lead}$3`, 'hero lead');
-    html = replaceOnce(html, /(<div class="hero-lab__launcher">\s*<h2>)([\s\S]*?)(<\/h2>)/, `$1${nextState.launcherHeading}$3`, 'hero launcher heading');
-    html = replaceOnce(
+    html = replaceOptionalOnce(html, /(<div class="hero-lab__launcher">\s*<h2>)([\s\S]*?)(<\/h2>)/, `$1${nextState.launcherHeading}$3`);
+    html = replaceOptionalOnce(html, /(<h2\b[^>]*id="home-booking-title"[^>]*>)([\s\S]*?)(<\/h2>)/, `$1${nextState.launcherHeading}$3`);
+    html = replaceOptionalOnce(
         html,
         /(<div class="hero-lab__launcher">[\s\S]*?<h2>[\s\S]*?<\/h2>\s*<p>)([\s\S]*?)(<\/p>)/,
-        `$1${nextState.launcherText}$3`,
-        'hero launcher text'
+        `$1${nextState.launcherText}$3`
+    );
+    html = replaceOptionalOnce(
+        html,
+        /(<div class="home-booking__intro">[\s\S]*?<h2\b[\s\S]*?<\/h2>\s*<p>)([\s\S]*?)(<\/p>)/,
+        `$1${nextState.launcherText}$3`
     );
     html = replaceHeroCta(html, 'primary', nextState.primaryCtaHref, nextState.primaryCtaLabel);
     html = replaceHeroCta(html, 'secondary', nextState.secondaryCtaHref, nextState.secondaryCtaLabel);
@@ -596,6 +714,7 @@ function readEditorState() {
         header: readGlobalHeaderContent(),
         appearance: readAppearanceEditorState('/'),
         style: readStyleEditorState(),
+        visual: readVisualEditorState(),
         services: readServicesContent(),
         locations: readLocationsContent(),
         pages: listEditablePages()
@@ -616,6 +735,9 @@ module.exports = {
     savePageAppearance,
     readStyleEditorState,
     saveStyleEditorState,
+    readVisualEditorState,
+    saveVisualOverrideRule,
+    deleteVisualOverrideRule,
     readServicesContent,
     saveServicesContent,
     readLocationsContent,

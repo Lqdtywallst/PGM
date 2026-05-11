@@ -13,7 +13,7 @@ test.describe('Desktop card action rhythm', () => {
         );
     });
 
-    test('fleet desktop card contact actions form a full-width 50/50 split below the primary CTA', async ({ page }) => {
+    test('fleet desktop cards avoid embedded contact actions and keep the global contact dock available', async ({ page }) => {
         const consoleErrors = createConsoleTracker(page);
 
         await page.setViewportSize({ width: 1440, height: 900 });
@@ -30,46 +30,43 @@ test.describe('Desktop card action rhythm', () => {
             const primaryRect = primary?.getBoundingClientRect();
             const row = element.querySelector('.fleet-card__contact-row');
             const rowRect = row?.getBoundingClientRect();
-            const buttons = Array.from(row?.querySelectorAll('.fleet-card__secondary') || [])
-                .map((button) => {
+            const visibleEmbeddedContactActions = Array.from(element.querySelectorAll('.fleet-card__secondary'))
+                .filter((button) => {
                     const rect = button.getBoundingClientRect();
-
-                    return {
-                        text: String(button.textContent || '').trim(),
-                        top: rect.top,
-                        width: rect.width,
-                        height: rect.height
-                    };
+                    const style = window.getComputedStyle(button);
+                    return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
                 });
+            const floating = document.querySelector('.lab-floating-contact');
+            const floatingRect = floating?.getBoundingClientRect();
+            const floatingStyle = floating ? window.getComputedStyle(floating) : null;
 
             return {
                 cardWidth: cardRect.width,
-                rowWidth: rowRect?.width || 0,
-                rowLeftGapPx: rowRect ? rowRect.left - cardRect.left : 0,
-                rowRightGapPx: rowRect ? cardRect.right - rowRect.right : 0,
-                gapFromPrimaryPx: rowRect && primaryRect ? rowRect.top - primaryRect.bottom : 0,
-                buttons
+                primaryWidth: primaryRect?.width || 0,
+                primaryBottomGapPx: primaryRect ? cardRect.bottom - primaryRect.bottom : 0,
+                contactRowVisible: rowRect ? rowRect.width > 0 && rowRect.height > 0 && window.getComputedStyle(row).display !== 'none' : false,
+                visibleEmbeddedContactActionCount: visibleEmbeddedContactActions.length,
+                floatingVisible: floatingStyle ? floatingStyle.display !== 'none' && floatingStyle.visibility !== 'hidden' && Number.parseFloat(floatingStyle.opacity) > 0.75 : false,
+                floatingRightGapPx: floatingRect ? window.innerWidth - floatingRect.right : null,
+                floatingBottomGapPx: floatingRect ? window.innerHeight - floatingRect.bottom : null
             };
         });
 
-        expect(contactMetrics.buttons.map((button) => button.text)).toEqual(['Call', 'WhatsApp']);
-        expect(contactMetrics.gapFromPrimaryPx).toBeGreaterThanOrEqual(10);
-        expect(Math.abs(contactMetrics.rowLeftGapPx)).toBeLessThanOrEqual(2);
-        expect(Math.abs(contactMetrics.rowRightGapPx)).toBeLessThanOrEqual(2);
-        expect(contactMetrics.rowWidth / contactMetrics.cardWidth).toBeGreaterThanOrEqual(0.985);
-        expect(Math.abs(contactMetrics.buttons[0].top - contactMetrics.buttons[1].top)).toBeLessThanOrEqual(1);
+        expect(contactMetrics.contactRowVisible).toBe(false);
+        expect(contactMetrics.visibleEmbeddedContactActionCount).toBe(0);
+        expect(contactMetrics.primaryWidth / contactMetrics.cardWidth).toBeGreaterThanOrEqual(0.78);
+        expect(contactMetrics.primaryBottomGapPx).toBeGreaterThanOrEqual(12);
+        expect(contactMetrics.primaryBottomGapPx).toBeLessThanOrEqual(42);
+        expect(contactMetrics.floatingVisible).toBe(true);
+        expect(contactMetrics.floatingRightGapPx).toBeGreaterThanOrEqual(8);
+        expect(contactMetrics.floatingRightGapPx).toBeLessThanOrEqual(28);
+        expect(contactMetrics.floatingBottomGapPx).toBeGreaterThanOrEqual(8);
+        expect(contactMetrics.floatingBottomGapPx).toBeLessThanOrEqual(28);
 
-        for (const button of contactMetrics.buttons) {
-            expect(button.width / contactMetrics.rowWidth).toBeGreaterThanOrEqual(0.49);
-            expect(button.width / contactMetrics.rowWidth).toBeLessThanOrEqual(0.51);
-            expect(button.height).toBeGreaterThanOrEqual(44);
-            expect(button.height).toBeLessThanOrEqual(72);
-        }
-
-        await expectNoConsoleErrors(consoleErrors, 'fleet desktop card contact actions');
+        await expectNoConsoleErrors(consoleErrors, 'fleet desktop card action rhythm');
     });
 
-    test('home featured fleet cards use the same full-width 50/50 desktop contact split', async ({ page }) => {
+    test('home featured fleet cards stay clean without embedded contact actions', async ({ page }) => {
         const consoleErrors = createConsoleTracker(page);
 
         await page.setViewportSize({ width: 1440, height: 900 });
@@ -86,42 +83,39 @@ test.describe('Desktop card action rhythm', () => {
             const primaryRect = primary?.getBoundingClientRect();
             const row = element.querySelector('.fleet-visual-card__contact-row');
             const rowRect = row?.getBoundingClientRect();
-            const buttons = Array.from(row?.querySelectorAll('.fleet-visual-card__contact-link') || [])
-                .map((button) => {
+            const visibleEmbeddedContactActions = Array.from(element.querySelectorAll('.fleet-visual-card__contact-link'))
+                .filter((button) => {
                     const rect = button.getBoundingClientRect();
-
-                    return {
-                        text: String(button.textContent || '').trim(),
-                        top: rect.top,
-                        width: rect.width,
-                        height: rect.height
-                    };
+                    const style = window.getComputedStyle(button);
+                    return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
                 });
+            const floating = document.querySelector('.lab-floating-contact');
+            const floatingRect = floating?.getBoundingClientRect();
+            const floatingStyle = floating ? window.getComputedStyle(floating) : null;
 
             return {
                 cardWidth: cardRect.width,
-                rowWidth: rowRect?.width || 0,
-                rowLeftGapPx: rowRect ? rowRect.left - cardRect.left : 0,
-                rowRightGapPx: rowRect ? cardRect.right - rowRect.right : 0,
-                gapFromPrimaryPx: rowRect && primaryRect ? rowRect.top - primaryRect.bottom : 0,
-                buttons
+                primaryWidth: primaryRect?.width || 0,
+                primaryBottomGapPx: primaryRect ? cardRect.bottom - primaryRect.bottom : 0,
+                contactRowVisible: rowRect ? rowRect.width > 0 && rowRect.height > 0 && window.getComputedStyle(row).display !== 'none' : false,
+                visibleEmbeddedContactActionCount: visibleEmbeddedContactActions.length,
+                floatingVisible: floatingStyle ? floatingStyle.display !== 'none' && floatingStyle.visibility !== 'hidden' && Number.parseFloat(floatingStyle.opacity) > 0.75 : false,
+                floatingRightGapPx: floatingRect ? window.innerWidth - floatingRect.right : null,
+                floatingBottomGapPx: floatingRect ? window.innerHeight - floatingRect.bottom : null
             };
         });
 
-        expect(contactMetrics.buttons.map((button) => button.text)).toEqual(['Call', 'WhatsApp']);
-        expect(contactMetrics.gapFromPrimaryPx).toBeGreaterThanOrEqual(10);
-        expect(Math.abs(contactMetrics.rowLeftGapPx)).toBeLessThanOrEqual(2);
-        expect(Math.abs(contactMetrics.rowRightGapPx)).toBeLessThanOrEqual(2);
-        expect(contactMetrics.rowWidth / contactMetrics.cardWidth).toBeGreaterThanOrEqual(0.985);
-        expect(Math.abs(contactMetrics.buttons[0].top - contactMetrics.buttons[1].top)).toBeLessThanOrEqual(1);
+        expect(contactMetrics.contactRowVisible).toBe(false);
+        expect(contactMetrics.visibleEmbeddedContactActionCount).toBe(0);
+        expect(contactMetrics.primaryWidth / contactMetrics.cardWidth).toBeGreaterThanOrEqual(0.78);
+        expect(contactMetrics.primaryBottomGapPx).toBeGreaterThanOrEqual(12);
+        expect(contactMetrics.primaryBottomGapPx).toBeLessThanOrEqual(42);
+        expect(contactMetrics.floatingVisible).toBe(true);
+        expect(contactMetrics.floatingRightGapPx).toBeGreaterThanOrEqual(8);
+        expect(contactMetrics.floatingRightGapPx).toBeLessThanOrEqual(28);
+        expect(contactMetrics.floatingBottomGapPx).toBeGreaterThanOrEqual(8);
+        expect(contactMetrics.floatingBottomGapPx).toBeLessThanOrEqual(28);
 
-        for (const button of contactMetrics.buttons) {
-            expect(button.width / contactMetrics.rowWidth).toBeGreaterThanOrEqual(0.49);
-            expect(button.width / contactMetrics.rowWidth).toBeLessThanOrEqual(0.51);
-            expect(button.height).toBeGreaterThanOrEqual(44);
-            expect(button.height).toBeLessThanOrEqual(72);
-        }
-
-        await expectNoConsoleErrors(consoleErrors, 'home desktop featured fleet card contact actions');
+        await expectNoConsoleErrors(consoleErrors, 'home desktop featured fleet card action rhythm');
     });
 });

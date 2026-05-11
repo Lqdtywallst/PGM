@@ -118,13 +118,13 @@ const PROFILE_SELECTORS = Object.freeze({
     home: {
         heroSelectors: ['.hero-lab'],
         cropSelectors: ['.hero-lab'],
-        primaryCtaSelectors: ['.hero-lab__cta--primary'],
-        firstUsefulSelectors: ['.hero-lab h1', '.hero-lab__cta--primary'],
+        primaryCtaSelectors: ['[data-primary-cta]', '.home-booking__submit', '.hero-lab__cta--primary'],
+        firstUsefulSelectors: ['.hero-lab h1', '[data-primary-cta]', '.home-booking__submit', '.hero-lab__cta--primary'],
         headerSelectors: ['.lab-header', 'header'],
         navSelectors: ['nav[aria-label="Main navigation"]', 'header nav', 'nav'],
         mediaSelectors: ['.hero-lab img', '.hero-lab video', '.hero-lab picture img'],
-        keySelectors: ['h1', '.hero-lab__cta--primary', '.hero-lab__lead', '.hero-lab__signal-row li'],
-        formSelectors: ['#hero-lab-overlay', '.hero-lab-overlay__form'],
+        keySelectors: ['h1', '[data-primary-cta]', '.home-booking__submit', '.hero-lab__cta--primary', '.hero-lab__lead', '.hero-lab__signal-row li'],
+        formSelectors: ['.home-booking', '#hero-lab-overlay', '.hero-lab-overlay__form'],
         statusSelectors: ['[role="status"]'],
         priceSelectors: []
     },

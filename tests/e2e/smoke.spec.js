@@ -16,7 +16,7 @@ test('homepage opens cleanly with a visible hero', async ({ page }) => {
     await expect(page.locator('h1')).toHaveCount(1);
     await expect(page.locator('h1')).toBeVisible();
     await expect(page.locator('.hero-lab')).toBeVisible();
-    await expect(page.locator('.hero-lab__cta--primary')).toBeVisible();
+    await expect(page.locator('[data-primary-cta]')).toBeVisible();
 
     await expectNoConsoleErrors(consoleErrors, 'homepage smoke');
 });
