@@ -2227,6 +2227,21 @@
     .services-page .services-hero__planner--direct .services-hero__selector {
         width: 100%;
         gap: 0.56rem;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(10.2rem, 11rem);
+        grid-template-columns: none;
+        justify-content: start;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        padding: 0 3.25rem 0.35rem 0;
+        scroll-padding-inline: 0;
+        scroll-snap-type: x proximity;
+        scrollbar-width: none;
+    }
+
+    .services-page .services-hero__planner--direct .services-hero__selector::-webkit-scrollbar {
+        display: none;
     }
 
     .services-page .services-lane-orb {
@@ -2236,6 +2251,7 @@
         min-height: 0;
         padding: 0.54rem;
         border-radius: 12px;
+        scroll-snap-align: start;
     }
 
     .services-page .services-lane-orb__media {
