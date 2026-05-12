@@ -135,6 +135,28 @@ These are the measurements every visual/homogeneity audit should compute.
 | H1 line count | DOM range/client rect lines | mobile `2-5`, desktop `1-3` unless intentional |
 | Body line length | rendered text width or characters per line | target `45-75ch` desktop, shorter mobile |
 
+## Typography Scale Guardrail
+
+The layout auditor should flag oversized typography, especially in the first
+viewport. Premium display type should create hierarchy without making the page
+feel like it is zoomed for elderly users.
+
+Suggested H1 warning thresholds:
+
+| Viewport Group | Warning |
+| --- | --- |
+| mobile | H1 above `56px` or more than 5 rendered lines |
+| tablet | H1 above `72px` without a documented exception |
+| laptop | H1 above `80px` when primary task/cards/forms move below the fold |
+| desktop | H1 above `92px` unless the page is intentionally cinematic and approved |
+
+The auditor should prefer a copy/layout fix over simply shrinking everything:
+
+1. shorten the headline
+2. reduce first-viewport clutter
+3. adjust grid distribution
+4. then tune font size
+
 ## Pattern-Specific Geometry
 
 ### MarketingLandingPage

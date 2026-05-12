@@ -21,6 +21,9 @@ This document defines:
 For the exact geometry rules, viewport list, slot measurements and layout
 thresholds, use [`layout-measurement-contract.md`](layout-measurement-contract.md).
 
+For the practical page review checklist used by agents and humans before each
+visual/SEO phase, use [`page-audit-rules.md`](page-audit-rules.md).
+
 ## North Star
 
 Dynasty Prestige should feel:
