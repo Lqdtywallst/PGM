@@ -1728,7 +1728,7 @@
 
 .services-hero__hub-intro h1 {
     max-width: 13ch;
-    font-size: clamp(3rem, 6vw, 5.8rem);
+    font-size: clamp(3rem, 5.2vw, 4.85rem);
     line-height: 0.88;
     text-align: center;
     text-wrap: balance;
@@ -1893,7 +1893,7 @@
 
 .services-page .services-hero__hub-intro h1 {
     max-width: 12.5ch;
-    font-size: clamp(3.1rem, 6.8vw, 6.15rem);
+    font-size: clamp(2.95rem, 5.1vw, 4.85rem);
     line-height: 0.86;
 }
 
