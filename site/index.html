@@ -282,25 +282,29 @@
                                 <form class="home-booking__form js-home-booking-form">
                                     <div class="home-booking__leg home-booking__leg--pickup" role="group" aria-labelledby="home-booking-pickup-label">
                                         <span class="home-booking__leg-label" id="home-booking-pickup-label">Pickup</span>
-                                        <label class="home-booking__field home-booking__field--date">
-                                            <span>Date</span>
-                                            <input id="home-pickup-date" name="pickupDate" type="date" required>
-                                        </label>
-                                        <label class="home-booking__field home-booking__field--time">
-                                            <span>Time</span>
-                                            <select id="home-pickup-time" name="pickupTime" required></select>
-                                        </label>
+                                        <div class="home-booking__leg-control">
+                                            <label class="home-booking__field home-booking__field--date">
+                                                <span>Date</span>
+                                                <input id="home-pickup-date" name="pickupDate" type="date" required>
+                                            </label>
+                                            <label class="home-booking__field home-booking__field--time">
+                                                <span>Time</span>
+                                                <select id="home-pickup-time" name="pickupTime" required></select>
+                                            </label>
+                                        </div>
                                     </div>
                                     <div class="home-booking__leg home-booking__leg--return" role="group" aria-labelledby="home-booking-return-label">
                                         <span class="home-booking__leg-label" id="home-booking-return-label">Return</span>
-                                        <label class="home-booking__field home-booking__field--date">
-                                            <span>Date</span>
-                                            <input id="home-return-date" name="returnDate" type="date" required>
-                                        </label>
-                                        <label class="home-booking__field home-booking__field--time">
-                                            <span>Time</span>
-                                            <select id="home-return-time" name="returnTime" required></select>
-                                        </label>
+                                        <div class="home-booking__leg-control">
+                                            <label class="home-booking__field home-booking__field--date">
+                                                <span>Date</span>
+                                                <input id="home-return-date" name="returnDate" type="date" required>
+                                            </label>
+                                            <label class="home-booking__field home-booking__field--time">
+                                                <span>Time</span>
+                                                <select id="home-return-time" name="returnTime" required></select>
+                                            </label>
+                                        </div>
                                     </div>
                                     <div class="home-booking__action">
                                         <button type="submit" class="home-booking__submit" data-primary-cta>See available cars</button>
