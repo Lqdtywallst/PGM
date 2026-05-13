@@ -544,11 +544,12 @@
 }
 
 .home-page .hero-lab .home-booking__intro h2 {
-    font-family: var(--lab-font-sans);
-    grid-column: 1 / -1;
-    font-size: clamp(1.08rem, 1.35vw, 1.28rem);
-    font-weight: 760;
-    letter-spacing: -0.025em;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
 }
 
 .home-page .hero-lab .home-booking__form {
@@ -1105,8 +1106,8 @@
     }
 
     .home-page .hero-lab .home-booking__shell {
-        gap: 0.72rem;
-        padding: 0.82rem;
+        gap: 0.58rem;
+        padding: 0.74rem;
         border-radius: 18px;
         text-align: left;
     }
@@ -1117,18 +1118,13 @@
         text-align: left;
     }
 
-    .home-page .hero-lab .home-booking__intro h2 {
-        font-size: 1.06rem;
-        line-height: 1.1;
-    }
-
     .home-page .hero-lab .home-booking__intro p {
         display: none;
     }
 
     .home-page .hero-lab .home-booking__form {
         grid-template-columns: 1fr;
-        gap: 0.66rem;
+        gap: 0.48rem;
         padding: 0;
         border: 0;
         border-radius: 0;
@@ -1138,23 +1134,23 @@
 
     .home-page .hero-lab .home-booking__leg {
         grid-template-columns: minmax(0, 1fr) minmax(5.2rem, 0.58fr);
-        gap: 0.34rem 0.68rem;
-        padding: 0.62rem 0.74rem 0.66rem;
+        gap: 0.18rem 0.62rem;
+        padding: 0.48rem 0.68rem 0.5rem;
         border-color: rgba(255, 255, 255, 0.13);
-        border-radius: 16px;
+        border-radius: 14px;
     }
 
     .home-page .hero-lab .home-booking__leg-label {
-        font-size: 0.56rem;
+        font-size: 0.52rem;
     }
 
     .home-page .hero-lab .home-booking__field {
-        gap: 0.32rem;
+        gap: 0.18rem;
         padding: 0;
     }
 
     .home-page .hero-lab .home-booking__field span {
-        font-size: 0.55rem;
+        font-size: 0.5rem;
         letter-spacing: 0.11em;
         padding-left: 0;
     }
@@ -1169,7 +1165,7 @@
     }
 
     .home-page .hero-lab .home-booking__submit {
-        min-height: 50px;
+        min-height: 48px;
         font-size: 0.7rem;
     }
 
@@ -1182,17 +1178,13 @@
 
 @media (min-width: 340px) and (max-width: 430px) {
     .home-page .hero-lab .home-booking__shell {
-        gap: 0.72rem;
-        padding: 0.78rem;
-    }
-
-    .home-page .hero-lab .home-booking__intro h2 {
-        font-size: 1.02rem;
+        gap: 0.56rem;
+        padding: 0.7rem;
     }
 
     .home-page .hero-lab .home-booking__form {
         grid-template-columns: 1fr;
-        gap: 0.64rem;
+        gap: 0.46rem;
     }
 
     .home-page .hero-lab .home-booking__field span {
