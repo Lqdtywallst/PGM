@@ -98,6 +98,39 @@ Failure examples:
 - labels are tiny, tracked out and grey
 - different pages use visibly different font families
 
+## Copy Usefulness Rules
+
+Every visible text block must earn its place.
+
+A section, paragraph, card label or SEO block is allowed only if it helps at
+least one of these jobs:
+
+- reserve: moves the guest toward checking availability, reserving or contacting support
+- trust: explains safety, confirmation, payment, handover, support or privacy
+- compare: helps choose a vehicle, brand, service, location or route
+- understand: explains what happens next in plain customer language
+- navigate: points clearly to the next useful page or action
+- rank: supports real Dubai/search intent with specific, believable information
+
+If text does not pass one of those jobs, cut it, shorten it or rewrite it.
+
+Required:
+
+- first-viewport copy must be short enough to scan in under five seconds
+- every H1/H2 must say something specific, not just sound luxurious
+- paragraphs above the fold must stay compact and useful
+- SEO sections must add real vehicle, brand, service, route, booking or handover value
+- repeated pages may share structure, but not lazy duplicated filler
+- customer-facing copy must never mention technical internals unless it is an admin-only surface
+
+Failure examples:
+
+- generic luxury claims that could belong to any rental company
+- paragraphs that repeat the heading without adding new information
+- SEO blocks added only to make the page longer
+- overexplaining a simple step until it pushes the useful task below the fold
+- vague promises about insurance, availability or delivery that are not guaranteed
+
 ## Header Rules
 
 The public header is a brand asset, not page decoration.

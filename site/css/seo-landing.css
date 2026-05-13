@@ -3904,6 +3904,19 @@ body.vehicle-page--premium-pilot {
         align-items: stretch;
     }
 
+    .vehicle-landing-reserve__thumbs {
+        display: none;
+    }
+
+    .vehicle-page--landing-pilot .lab-floating-contact {
+        right: -0.2rem;
+    }
+
+    .vehicle-page--landing-pilot .lab-floating-contact__button {
+        width: 44px;
+        height: 44px;
+    }
+
     .vehicle-landing-film__grid,
     .vehicle-landing-brief__grid,
     .vehicle-landing-faq .faq-list {
@@ -3921,7 +3934,8 @@ body.vehicle-page--premium-pilot {
     }
 
     .vehicle-landing-reserve {
-        padding-top: 1rem;
+        gap: 0.58rem;
+        padding-top: 0.62rem;
     }
 
     .vehicle-landing-depth {
@@ -3938,13 +3952,12 @@ body.vehicle-page--premium-pilot {
     }
 
     .vehicle-landing-reserve__stage {
-        aspect-ratio: 1.18;
+        aspect-ratio: 1.9;
         border-radius: 1rem;
     }
 
     .vehicle-landing-reserve__thumbs {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 0.5rem;
+        display: none;
     }
 
     .vehicle-landing-reserve__thumbs figure {
@@ -3965,27 +3978,87 @@ body.vehicle-page--premium-pilot {
 
     .vehicle-landing-reserve .vehicle-booking {
         border-radius: 1rem;
+        gap: 0.28rem;
+        padding: 0.78rem;
     }
 
     .vehicle-landing-reserve .vehicle-booking h1 {
-        max-width: 12ch;
-        font-size: clamp(2.25rem, 11vw, 3.15rem);
+        max-width: 10.8ch;
+        font-size: clamp(1.84rem, 8.6vw, 2.34rem);
+        line-height: 0.96;
     }
 
     .vehicle-landing-reserve .vehicle-booking h1,
     .vehicle-landing-reserve .vehicle-booking__intro {
-        padding-right: 2.8rem;
+        padding-right: 3.6rem;
+    }
+
+    .vehicle-landing-reserve .vehicle-booking__intro {
+        display: none;
+    }
+
+    .vehicle-landing-reserve .vehicle-booking__kicker {
+        margin-top: 0.25rem;
+        font-size: 0.62rem;
+        letter-spacing: 0.18em;
+    }
+
+    .vehicle-landing-reserve .vehicle-booking__kicker::before {
+        width: 1.55rem;
+    }
+
+    .vehicle-landing-reserve .vehicle-booking__price {
+        font-size: clamp(1.85rem, 8vw, 2.28rem);
+    }
+
+    .vehicle-landing-reserve .vehicle-booking__price-note {
+        display: none;
+    }
+
+    .vehicle-landing-reserve .vehicle-booking__form {
+        gap: 0.44rem;
     }
 
     .vehicle-landing-reserve .vehicle-booking__grid {
         grid-template-columns: 1fr 1fr;
-        gap: 0.58rem;
+        gap: 0.45rem;
+    }
+
+    .vehicle-landing-reserve .vehicle-booking__field {
+        gap: 0.3rem;
+    }
+
+    .vehicle-landing-reserve .vehicle-booking__field span {
+        font-size: 0.58rem;
+        letter-spacing: 0.12em;
     }
 
     .vehicle-landing-reserve .vehicle-booking__input {
-        min-height: 44px;
-        padding: 0 0.72rem;
-        font-size: 0.86rem;
+        min-height: 38px;
+        padding: 0 0.68rem;
+        border-radius: 0.75rem;
+        font-size: 0.82rem;
+    }
+
+    .vehicle-landing-reserve .vehicle-booking__submit {
+        min-height: 40px;
+        font-size: 0.72rem;
+        letter-spacing: 0.09em;
+    }
+
+    .vehicle-page--landing-pilot .lab-floating-contact {
+        right: -0.65rem;
+        gap: 0.42rem;
+    }
+
+    .vehicle-page--landing-pilot .lab-floating-contact__button {
+        width: 44px;
+        height: 44px;
+    }
+
+    .vehicle-page--landing-pilot .lab-floating-contact__button svg {
+        width: 20px;
+        height: 20px;
     }
 
     .vehicle-landing-specs {
