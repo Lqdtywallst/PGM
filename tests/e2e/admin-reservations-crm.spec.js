@@ -129,12 +129,16 @@ test.describe('Private admin reservations CRM', () => {
     });
 
     test('admin can log in, see a stored reservation and update private workflow notes', async ({ page }) => {
-        await page.goto(`${adminBaseUrl}/admin/login.html`, { waitUntil: 'domcontentloaded' });
+        await page.goto(`${adminBaseUrl}/crm`, { waitUntil: 'domcontentloaded' });
+        await expect(page).toHaveURL(/\/admin\/login\.html/);
         await page.fill('#username', adminUser);
         await page.fill('#password', adminPassword);
         await page.click('button[type="submit"]');
 
         await expect(page).toHaveURL(/\/admin\/reservations\.html$/);
+        await expect(page.locator('#operationsPanel')).toContainText('CRM readiness');
+        await expect(page.locator('#operationsPanel')).toContainText('Test CRM');
+        await expect(page.locator('#operationsPanel')).toContainText('Local fallback');
         await expect(page.locator('#storageMode')).toContainText('local-json');
         await expect(page.locator('#resultCount')).toContainText('reservation');
 

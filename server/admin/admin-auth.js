@@ -53,9 +53,11 @@ function getAdminConfig(env = process.env) {
     const passwordHash = String(env.ADMIN_PASSWORD_HASH || '').trim();
     const sessionSecret = String(env.ADMIN_SESSION_SECRET || '').trim();
     const explicitSecure = String(env.ADMIN_COOKIE_SECURE || '').trim().toLowerCase();
+    const appEnvironment = String(env.APP_ENV || env.PGM_APP_ENV || '').trim().toLowerCase();
+    const onlineEnvironment = ['production', 'prod', 'staging', 'stage', 'preprod', 'preproduction'].includes(appEnvironment);
     const cookieSecure = explicitSecure
         ? explicitSecure !== 'false'
-        : String(env.NODE_ENV || '').toLowerCase() === 'production';
+        : onlineEnvironment || String(env.NODE_ENV || '').toLowerCase() === 'production';
 
     return {
         user,

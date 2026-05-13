@@ -18,6 +18,8 @@ Website and reservation stack for Dynasty Prestige, focused on luxury car rental
 - `npm run qa:manual:db`: run the manual QA environment with required `DATABASE_URL`.
 - `npm run qa:test:manual`: test the running manual QA environment.
 - `npm run build:site`: render fleet cards and public runtime config.
+- `npm run admin:crm:validate:staging`: verify staging CRM env vars before deployment.
+- `npm run admin:crm:validate:production`: verify production CRM env vars before release.
 - `npm run test:smoke`: run the repo smoke baseline.
 - `npm test`: run the full configured audit/test suite.
 
@@ -58,6 +60,7 @@ Copy `.env.example` to `.env` and set the variables needed for the task:
 - `DATABASE_SSL`: set `false` for local Postgres.
 - `ALLOWED_ORIGINS`: frontend origins allowed to call the backend.
 - `ADMIN_USER`, `ADMIN_PASSWORD_HASH`, `ADMIN_SESSION_SECRET`: CRM/admin login.
+- `RESERVATION_TELEGRAM_BOT_TOKEN`, `RESERVATION_TELEGRAM_CHAT_ID`: mobile reservation alerts.
 - `CONTACT_FORM_LOG_ONLY=true`: local contact-form testing without email delivery.
 
 ## Active Documentation

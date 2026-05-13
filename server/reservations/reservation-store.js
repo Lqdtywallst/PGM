@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const runtimeReservationDir = path.resolve(__dirname, '..', '..', 'output', 'runtime-reservations');
+const RESERVATION_STORAGE_SCHEMA_VERSION = 1;
 
 const CREATE_RESERVATIONS_TABLE_SQL = `
 CREATE TABLE IF NOT EXISTS reservations (
@@ -29,6 +30,7 @@ CREATE TABLE IF NOT EXISTS reservations (
     payment_data JSONB NOT NULL DEFAULT '{}'::jsonb,
     email_data JSONB NOT NULL DEFAULT '{}'::jsonb,
     raw_request JSONB,
+    schema_version INTEGER NOT NULL DEFAULT 1,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -36,6 +38,11 @@ CREATE TABLE IF NOT EXISTS reservations (
 CREATE INDEX IF NOT EXISTS reservations_created_at_idx ON reservations (created_at DESC);
 CREATE INDEX IF NOT EXISTS reservations_customer_email_idx ON reservations (customer_email);
 CREATE INDEX IF NOT EXISTS reservations_status_idx ON reservations (status);
+CREATE INDEX IF NOT EXISTS reservations_car_idx ON reservations (car);
+CREATE INDEX IF NOT EXISTS reservations_schedule_idx ON reservations (start_date, end_date);
+
+ALTER TABLE reservations
+    ADD COLUMN IF NOT EXISTS schema_version INTEGER NOT NULL DEFAULT 1;
 `;
 
 let pgPool = null;
@@ -295,10 +302,17 @@ function saveLocalReservationRecord(record) {
     }
 
     ensureReservationDir();
-    fs.writeFileSync(getReservationRecordPath(recordKey), JSON.stringify(record, null, 2));
+    const filePath = getReservationRecordPath(recordKey);
+    const tempPath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
+    fs.writeFileSync(tempPath, JSON.stringify({
+        ...record,
+        schemaVersion: record.schemaVersion || RESERVATION_STORAGE_SCHEMA_VERSION
+    }, null, 2));
+    fs.renameSync(tempPath, filePath);
 
     return {
         ...record,
+        schemaVersion: record.schemaVersion || RESERVATION_STORAGE_SCHEMA_VERSION,
         storage: getReservationStoreMode()
     };
 }
@@ -324,6 +338,7 @@ function rowToReservationRecord(row) {
         payment: row.payment_data || {},
         email: row.email_data || {},
         rawRequest: row.raw_request || null,
+        schemaVersion: row.schema_version || RESERVATION_STORAGE_SCHEMA_VERSION,
         createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : row.created_at,
         updatedAt: row.updated_at instanceof Date ? row.updated_at.toISOString() : row.updated_at,
         storage: 'postgres'
@@ -408,6 +423,7 @@ async function savePostgresReservationRecord(record) {
         JSON.stringify(paymentData),
         JSON.stringify(emailData),
         record.rawRequest ? JSON.stringify(record.rawRequest) : null,
+        record.schemaVersion || RESERVATION_STORAGE_SCHEMA_VERSION,
         record.createdAt || new Date().toISOString(),
         record.updatedAt || new Date().toISOString()
     ];
@@ -437,6 +453,7 @@ async function savePostgresReservationRecord(record) {
             payment_data,
             email_data,
             raw_request,
+            schema_version,
             created_at,
             updated_at
         )
@@ -444,7 +461,7 @@ async function savePostgresReservationRecord(record) {
             $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
             $11, $12, $13, $14, $15, $16, $17, $18,
             $19::jsonb, $20::jsonb, $21::jsonb, $22::jsonb,
-            $23::jsonb, $24, $25
+            $23::jsonb, $24, $25, $26
         )
         ON CONFLICT (reservation_id) DO UPDATE SET
             payment_intent_id = COALESCE(EXCLUDED.payment_intent_id, reservations.payment_intent_id),
@@ -468,6 +485,7 @@ async function savePostgresReservationRecord(record) {
             payment_data = reservations.payment_data || EXCLUDED.payment_data,
             email_data = reservations.email_data || EXCLUDED.email_data,
             raw_request = COALESCE(EXCLUDED.raw_request, reservations.raw_request),
+            schema_version = GREATEST(reservations.schema_version, EXCLUDED.schema_version),
             updated_at = EXCLUDED.updated_at
         RETURNING *`,
         values
@@ -519,8 +537,30 @@ async function listReservationRecords(options = {}) {
 
 async function saveReservationRecord(record) {
     const recordKey = getPrimaryRecordKey(record) || buildReservationId();
-    const existingRecord = await readReservationRecord(recordKey);
-    const nextRecord = normalizeReservationRecord(record, existingRecord);
+    let existingRecord = await readReservationRecord(recordKey);
+    const paymentIntentId = record.paymentIntentId || record.payment?.paymentIntentId || record.payment?.id || null;
+    if (!existingRecord && paymentIntentId && paymentIntentId !== recordKey) {
+        existingRecord = await readReservationRecord(paymentIntentId);
+    }
+    const existingPaymentIntentId = existingRecord?.paymentIntentId || existingRecord?.payment?.paymentIntentId || existingRecord?.payment?.id || null;
+    const hasConflictingReservationId = Boolean(
+        existingRecord?.reservationId &&
+        record.reservationId &&
+        record.reservationId !== existingRecord.reservationId &&
+        paymentIntentId &&
+        paymentIntentId === existingPaymentIntentId
+    );
+    const incomingRecord = hasConflictingReservationId
+        ? {
+            ...record,
+            reservationId: existingRecord.reservationId,
+            reservationData: {
+                ...(record.reservationData || {}),
+                reservationId: existingRecord.reservationId
+            }
+        }
+        : record;
+    const nextRecord = normalizeReservationRecord(incomingRecord, existingRecord);
 
     if (isDatabaseConfigured()) {
         return savePostgresReservationRecord(nextRecord);
@@ -543,6 +583,61 @@ async function deleteReservationRecord(recordKey) {
     deleteLocalReservationRecord(recordKey);
 }
 
+async function getReservationStoreDiagnostics() {
+    const mode = getReservationStoreMode();
+    const diagnostics = {
+        mode,
+        databaseConfigured: isDatabaseConfigured(),
+        schemaVersion: RESERVATION_STORAGE_SCHEMA_VERSION,
+        ok: true
+    };
+
+    if (!isDatabaseConfigured()) {
+        try {
+            ensureReservationDir();
+            const records = listLocalReservationRecords({ limit: 5000 });
+            return {
+                ...diagnostics,
+                storagePath: runtimeReservationDir,
+                reservationCount: records.length,
+                latestUpdatedAt: records[0]?.updatedAt || records[0]?.createdAt || null
+            };
+        } catch (error) {
+            return {
+                ...diagnostics,
+                ok: false,
+                error: error.message
+            };
+        }
+    }
+
+    try {
+        await ensureDatabaseSchema();
+        const pool = getDatabasePool();
+        const result = await pool.query(
+            `SELECT COUNT(*)::int AS reservation_count, MAX(updated_at) AS latest_updated_at
+             FROM reservations`
+        );
+        const row = result.rows[0] || {};
+
+        return {
+            ...diagnostics,
+            schemaReady: true,
+            reservationCount: row.reservation_count || 0,
+            latestUpdatedAt: row.latest_updated_at instanceof Date
+                ? row.latest_updated_at.toISOString()
+                : row.latest_updated_at || null
+        };
+    } catch (error) {
+        return {
+            ...diagnostics,
+            ok: false,
+            schemaReady: false,
+            error: error.message
+        };
+    }
+}
+
 async function closeReservationStore() {
     if (pgPool) {
         await pgPool.end();
@@ -553,13 +648,16 @@ async function closeReservationStore() {
 }
 
 module.exports = {
+    RESERVATION_STORAGE_SCHEMA_VERSION,
     buildReservationId,
     closeReservationStore,
     deleteReservationRecord,
     findReservationForLookup,
+    getReservationStoreDiagnostics,
     getReservationRecordPath,
     getReservationStoreMode,
     isDatabaseConfigured,
+    listLocalReservationRecords,
     listReservationRecords,
     readReservationRecord,
     runtimeReservationDir,

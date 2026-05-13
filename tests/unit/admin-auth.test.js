@@ -4,6 +4,7 @@ const test = require('node:test');
 const {
     ADMIN_COOKIE_NAME,
     createAdminSessionToken,
+    getAdminConfig,
     hashAdminPassword,
     parseCookies,
     verifyAdminCredentials,
@@ -108,4 +109,11 @@ test('admin cookie parsing reads signed session cookie safely', () => {
 
     assert.equal(cookies[ADMIN_COOKIE_NAME], 'abc.def');
     assert.equal(cookies.theme, 'dark');
+});
+
+test('admin cookies default to secure in hosted staging and production', () => {
+    assert.equal(getAdminConfig({ APP_ENV: 'staging' }).cookieSecure, true);
+    assert.equal(getAdminConfig({ APP_ENV: 'production' }).cookieSecure, true);
+    assert.equal(getAdminConfig({ APP_ENV: 'development' }).cookieSecure, false);
+    assert.equal(getAdminConfig({ APP_ENV: 'staging', ADMIN_COOKIE_SECURE: 'false' }).cookieSecure, false);
 });

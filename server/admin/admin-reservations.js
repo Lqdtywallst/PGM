@@ -1,4 +1,7 @@
 const express = require('express');
+const {
+    getMobileNotificationDiagnostics
+} = require('../integrations/mobile-notifications');
 
 const QUICK_FILTERS = Object.freeze({
     pending_payment: 'Pending payment',
@@ -42,8 +45,150 @@ const CONFIRMED_STATUSES = new Set([
 const FAILED_PAYMENT_STATUSES = new Set([
     'customer_processing_failed',
     'payment_canceled',
+    'payment_intent_failed',
     'payment_failed'
 ]);
+
+function normalizeAppEnvironment(env = process.env) {
+    const raw = asCleanString(env.APP_ENV || env.PGM_APP_ENV || env.NODE_ENV).toLowerCase();
+
+    if (['production', 'prod'].includes(raw)) return 'production';
+    if (['staging', 'stage', 'preview', 'preprod', 'preproduction'].includes(raw)) return 'staging';
+    if (['test'].includes(raw)) return 'test';
+    if (['development', 'dev', 'local'].includes(raw)) return 'development';
+
+    return raw || 'development';
+}
+
+function labelFromEnvironment(environment) {
+    if (environment === 'production') return 'Production CRM';
+    if (environment === 'staging') return 'Staging CRM';
+    if (environment === 'test') return 'Test CRM';
+    return 'Local CRM';
+}
+
+function getStripeSecretMode(env = process.env) {
+    const secretKey = asCleanString(env.STRIPE_SECRET_KEY);
+    if (!secretKey) return 'missing';
+    if (secretKey.startsWith('sk_live_')) return 'live';
+    if (secretKey.startsWith('sk_test_')) return 'test';
+    return 'unknown';
+}
+
+function buildStatusCheck(id, label, status, detail) {
+    return {
+        id,
+        label,
+        status,
+        detail: asCleanString(detail)
+    };
+}
+
+function buildAdminOperationsStatus(options = {}) {
+    const env = options.env || process.env;
+    const diagnostics = options.diagnostics || {};
+    const appEnv = normalizeAppEnvironment(env);
+    const isRealEnvironment = appEnv === 'production' || appEnv === 'staging';
+    const expectedStripeMode = appEnv === 'production'
+        ? 'live'
+        : appEnv === 'staging'
+            ? 'test'
+            : null;
+    const stripeMode = getStripeSecretMode(env);
+    const databaseConfigured = diagnostics.mode === 'postgres' || Boolean(asCleanString(env.DATABASE_URL));
+    const adminConfigured = Boolean(
+        asCleanString(env.ADMIN_USER) &&
+        asCleanString(env.ADMIN_PASSWORD_HASH) &&
+        asCleanString(env.ADMIN_SESSION_SECRET)
+    );
+    const webhookConfigured = Boolean(asCleanString(env.STRIPE_WEBHOOK_SECRET));
+    const mobileNotifications = getMobileNotificationDiagnostics(env);
+    const checks = [];
+
+    checks.push(buildStatusCheck(
+        'reservation_storage',
+        'Reservation storage',
+        databaseConfigured ? 'pass' : (isRealEnvironment ? 'fail' : 'warn'),
+        databaseConfigured
+            ? 'Reservations are stored in PostgreSQL.'
+            : 'Using local JSON fallback. This is not acceptable for staging/production.'
+    ));
+
+    checks.push(buildStatusCheck(
+        'stripe_mode',
+        'Stripe mode',
+        expectedStripeMode
+            ? (stripeMode === expectedStripeMode ? 'pass' : 'fail')
+            : (stripeMode === 'missing' ? 'warn' : 'pass'),
+        expectedStripeMode
+            ? `Expected ${expectedStripeMode}, detected ${stripeMode}.`
+            : `Detected ${stripeMode}.`
+    ));
+
+    checks.push(buildStatusCheck(
+        'stripe_webhook',
+        'Stripe webhook',
+        webhookConfigured ? 'pass' : (isRealEnvironment ? 'fail' : 'warn'),
+        webhookConfigured
+            ? 'Webhook secret is configured.'
+            : 'STRIPE_WEBHOOK_SECRET is missing.'
+    ));
+
+    checks.push(buildStatusCheck(
+        'admin_access',
+        'Admin access',
+        adminConfigured ? 'pass' : 'fail',
+        adminConfigured
+            ? 'Admin username, password hash and session secret are configured.'
+            : 'Missing one of ADMIN_USER, ADMIN_PASSWORD_HASH or ADMIN_SESSION_SECRET.'
+    ));
+
+    checks.push(buildStatusCheck(
+        'mobile_notifications',
+        'Mobile notifications',
+        mobileNotifications.configured ? 'pass' : (isRealEnvironment ? 'fail' : 'warn'),
+        mobileNotifications.configured
+            ? `Configured channels: ${mobileNotifications.channels.join(', ')}.`
+            : 'Configure Telegram or a reservation notification webhook for phone alerts.'
+    ));
+
+    checks.push(buildStatusCheck(
+        'storage_health',
+        'Storage health',
+        diagnostics.ok === false ? 'fail' : 'pass',
+        diagnostics.ok === false
+            ? diagnostics.error || 'Storage diagnostics failed.'
+            : 'Storage diagnostics are healthy.'
+    ));
+
+    const failCount = checks.filter((check) => check.status === 'fail').length;
+    const warnCount = checks.filter((check) => check.status === 'warn').length;
+
+    return {
+        generatedAt: new Date().toISOString(),
+        appEnv,
+        nodeEnv: env.NODE_ENV || null,
+        label: labelFromEnvironment(appEnv),
+        overallStatus: failCount ? 'bad' : (warnCount ? 'review' : 'ok'),
+        checks,
+        services: {
+            adminConfigured,
+            stripeConfigured: stripeMode !== 'missing',
+            stripeMode,
+            stripeWebhookConfigured: webhookConfigured,
+            mobileNotifications
+        },
+        storage: {
+            mode: diagnostics.mode || (databaseConfigured ? 'postgres' : 'local-json'),
+            ok: diagnostics.ok !== false,
+            databaseConfigured,
+            schemaVersion: diagnostics.schemaVersion || null,
+            schemaReady: diagnostics.schemaReady ?? null,
+            reservationCount: diagnostics.reservationCount ?? null,
+            latestUpdatedAt: diagnostics.latestUpdatedAt || null
+        }
+    };
+}
 
 function asCleanString(value) {
     return String(value ?? '').trim();
@@ -564,6 +709,34 @@ function createAdminReservationsRouter(dependencies = {}) {
         });
     }));
 
+    router.get('/reservations/storage', asyncRoute(async (req, res) => {
+        if (!store.getReservationStoreDiagnostics) {
+            return res.json({
+                ok: true,
+                mode: store.getReservationStoreMode ? store.getReservationStoreMode() : null,
+                diagnosticsAvailable: false
+            });
+        }
+
+        const diagnostics = await store.getReservationStoreDiagnostics();
+        return res.status(diagnostics.ok ? 200 : 503).json({
+            ...diagnostics,
+            diagnosticsAvailable: true
+        });
+    }));
+
+    router.get('/reservations/operations', asyncRoute(async (req, res) => {
+        const diagnostics = store.getReservationStoreDiagnostics
+            ? await store.getReservationStoreDiagnostics()
+            : {
+                ok: true,
+                mode: store.getReservationStoreMode ? store.getReservationStoreMode() : null
+            };
+        const status = buildAdminOperationsStatus({ diagnostics });
+
+        return res.status(status.overallStatus === 'bad' ? 503 : 200).json(status);
+    }));
+
     router.get('/reservations.csv', asyncRoute(async (req, res) => {
         const filters = collectReservationFilters({ ...req.query, limit: 5000 });
         const records = await store.listReservationRecords({ limit: 5000 });
@@ -617,6 +790,7 @@ module.exports = {
     applyAdminReservationAction,
     buildAdminReservationDetail,
     buildAdminReservationSummary,
+    buildAdminOperationsStatus,
     classifyReservation,
     collectReservationFilters,
     createAdminReservationsRouter,

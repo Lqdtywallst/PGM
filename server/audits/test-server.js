@@ -512,11 +512,18 @@ async function run() {
 
     const indexPage = readFile('site/index.html');
     const homeSiteCss = readFile('site/css/site-v2.css');
-    assert(
-        indexPage.includes('id="hero-lab-overlay"') &&
+    const hasLegacyHeroOverlayControls = indexPage.includes('id="hero-lab-overlay"') &&
         indexPage.includes('id="hero-lab-pickup-date"') &&
         indexPage.includes('id="hero-lab-return-date"') &&
-        indexPage.includes('js-booking-open'),
+        indexPage.includes('js-booking-open');
+    const hasInlineHeroBookingControls = indexPage.includes('id="home-booking"') &&
+        indexPage.includes('class="home-booking__form js-home-booking-form"') &&
+        indexPage.includes('id="home-pickup-date"') &&
+        indexPage.includes('id="home-return-date"') &&
+        indexPage.includes('id="home-pickup-time"') &&
+        indexPage.includes('id="home-return-time"');
+    assert(
+        hasLegacyHeroOverlayControls || hasInlineHeroBookingControls,
         'home page exposes the date-first hero controls'
     );
     const homeMobileHeroVideoRule = /\.home-page\s+\.hero-lab__video\s*\{(?=[^}]*display:\s*block;)(?=[^}]*opacity:\s*0\.72;)[^}]*\}/m;
