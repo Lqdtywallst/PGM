@@ -273,9 +273,12 @@
                         <section class="home-booking home-booking--hero" id="home-booking" aria-labelledby="home-booking-title">
                             <div class="home-booking__shell">
                                 <div class="home-booking__intro">
-                                    <span class="home-booking__eyebrow">Choose your dates</span>
-                                    <h2 id="home-booking-title">Set the rental window first.</h2>
-                                    <p>Your dates carry through Fleet and Reserve, so every car stays tied to the trip.</p>
+                                    <div class="home-booking__topline">
+                                        <span class="home-booking__eyebrow">Choose your dates</span>
+                                        <span class="home-booking__badge">Live fleet check</span>
+                                    </div>
+                                    <h2 id="home-booking-title">Plan your rental window.</h2>
+                                    <p>Set the rental window once; Fleet and Reserve keep the same trip details.</p>
                                 </div>
                                 <form class="home-booking__form js-home-booking-form">
                                     <label class="home-booking__field">
@@ -294,7 +297,10 @@
                                         <span>Return time</span>
                                         <select id="home-return-time" name="returnTime" required></select>
                                     </label>
-                                    <button type="submit" class="home-booking__submit" data-primary-cta>See available cars</button>
+                                    <div class="home-booking__action">
+                                        <button type="submit" class="home-booking__submit" data-primary-cta>See available cars</button>
+                                        <span class="home-booking__action-note">No payment yet</span>
+                                    </div>
                                 </form>
                             </div>
                         </section>

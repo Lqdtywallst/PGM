@@ -7,22 +7,30 @@ const {
     settlePage
 } = require('./support/site-helpers');
 
+function addDaysIso(days) {
+    const date = new Date();
+    date.setDate(date.getDate() + days);
+    return date.toISOString().slice(0, 10);
+}
+
 test('home booking form passes schedule into fleet', async ({ page }) => {
     await primeHomeAnimations(page);
     const consoleErrors = createConsoleTracker(page);
+    const pickupDate = addDaysIso(28);
+    const returnDate = addDaysIso(30);
 
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await settlePage(page);
 
-    await page.locator('#home-pickup-date').fill('2026-05-10');
-    await page.locator('#home-return-date').fill('2026-05-12');
+    await page.locator('#home-pickup-date').fill(pickupDate);
+    await page.locator('#home-return-date').fill(returnDate);
     await page.locator('#home-pickup-time').selectOption('10:00');
     await page.locator('#home-return-time').selectOption('18:00');
     await page.getByRole('button', { name: /See available cars/i }).click();
 
     await expect(page).toHaveURL(/\/fleet\.html\?/i);
-    await expect(page.locator('#fleet-pickup-date')).toHaveValue('2026-05-10');
-    await expect(page.locator('#fleet-return-date')).toHaveValue('2026-05-12');
+    await expect(page.locator('#fleet-pickup-date')).toHaveValue(pickupDate);
+    await expect(page.locator('#fleet-return-date')).toHaveValue(returnDate);
     await expect(page.locator('#fleet-pickup-time')).toHaveValue('10:00');
     await expect(page.locator('#fleet-return-time')).toHaveValue('18:00');
 
