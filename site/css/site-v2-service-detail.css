@@ -1,4 +1,5 @@
 ﻿.service-detail-page-main {
+    --service-detail-floating-safe-space: clamp(3.4rem, 7vw, 5.2rem);
     --service-detail-bg: #f6f1ea;
     --service-detail-bg-soft: #fcfaf6;
     --service-detail-bg-accent: #efe6d8;
@@ -51,6 +52,12 @@
     grid-template-columns: minmax(0, 1.04fr) minmax(21rem, 0.96fr);
     gap: 1.2rem;
     align-items: stretch;
+}
+
+@media (min-width: 641px) {
+    .service-detail-hero__shell {
+        padding-right: var(--service-detail-floating-safe-space);
+    }
 }
 
 .service-detail-hero__copy,
@@ -163,13 +170,13 @@
     margin: 0.9rem 0 1rem;
     font-family: var(--lab-font-display);
     font-weight: 600;
-    line-height: 0.94;
+    line-height: 0.98;
     letter-spacing: -0.04em;
 }
 
 .service-detail-hero__copy h1 {
     max-width: 15ch;
-    font-size: clamp(2.65rem, 4.45vw, 3.9rem);
+    font-size: clamp(2.25rem, 3.75vw, 3.35rem);
 }
 
 .service-detail-section__heading h2,
@@ -503,7 +510,7 @@
 
     .service-detail-hero__copy h1 {
         max-width: 14ch;
-        font-size: clamp(2.45rem, 4vw, 3.55rem);
+        font-size: clamp(2.18rem, 3.35vw, 3rem);
         margin: 0.7rem 0 0.8rem;
     }
 
@@ -577,7 +584,7 @@
 
     .service-detail-hero__copy h1 {
         max-width: 14ch;
-        font-size: clamp(2.05rem, 10vw, 2.8rem);
+        font-size: clamp(1.9rem, 8.6vw, 2.42rem);
     }
 
     .service-detail-section__heading h2,
