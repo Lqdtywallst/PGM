@@ -3,6 +3,7 @@ const test = require('node:test');
 
 const {
     applyAdminReservationAction,
+    buildAdminOperationsStatus,
     buildAdminReservationDetail,
     buildAdminReservationSummary,
     collectReservationFilters,
@@ -68,7 +69,7 @@ test('admin reservation filters support quick views and search', () => {
         }),
         reservation({
             reservationId: 'res_failed',
-            status: 'payment_failed',
+            status: 'payment_intent_failed',
             car: 'Range Rover Vogue',
             startDate: '2026-05-10'
         })
@@ -130,4 +131,50 @@ test('admin CSV export escapes customer data safely', () => {
 
     assert.match(csv, /"Client, VIP"/);
     assert.match(csv, /"Ferrari ""296"" GTS"/);
+});
+
+test('admin operations status separates staging and production safety checks', () => {
+    const stagingStatus = buildAdminOperationsStatus({
+        env: {
+            APP_ENV: 'staging',
+            NODE_ENV: 'production',
+            STRIPE_SECRET_KEY: 'sk_test_123',
+            STRIPE_WEBHOOK_SECRET: 'whsec_123',
+            ADMIN_USER: 'owner',
+            ADMIN_PASSWORD_HASH: 'pbkdf2_sha256$310000$salt$digest',
+            ADMIN_SESSION_SECRET: 'session-secret',
+            RESERVATION_TELEGRAM_BOT_TOKEN: '123456:test-token',
+            RESERVATION_TELEGRAM_CHAT_ID: '987654'
+        },
+        diagnostics: {
+            ok: true,
+            mode: 'postgres',
+            reservationCount: 12,
+            latestUpdatedAt: now
+        }
+    });
+
+    assert.equal(stagingStatus.label, 'Staging CRM');
+    assert.equal(stagingStatus.overallStatus, 'ok');
+    assert.equal(stagingStatus.services.stripeMode, 'test');
+    assert.equal(stagingStatus.storage.databaseConfigured, true);
+
+    const brokenProduction = buildAdminOperationsStatus({
+        env: {
+            APP_ENV: 'production',
+            STRIPE_SECRET_KEY: 'sk_test_123',
+            ADMIN_USER: 'owner',
+            ADMIN_PASSWORD_HASH: 'pbkdf2_sha256$310000$salt$digest',
+            ADMIN_SESSION_SECRET: 'session-secret'
+        },
+        diagnostics: {
+            ok: true,
+            mode: 'local-json'
+        }
+    });
+
+    assert.equal(brokenProduction.label, 'Production CRM');
+    assert.equal(brokenProduction.overallStatus, 'bad');
+    assert.equal(brokenProduction.checks.some((check) => check.id === 'reservation_storage' && check.status === 'fail'), true);
+    assert.equal(brokenProduction.checks.some((check) => check.id === 'stripe_mode' && check.status === 'fail'), true);
 });

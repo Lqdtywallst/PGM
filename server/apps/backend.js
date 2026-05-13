@@ -13,9 +13,16 @@ const {
 } = require('../integrations/email-config');
 const {
     buildReservationId,
+    getReservationStoreMode,
     listReservationRecords,
     saveReservationRecord
 } = require('../reservations/reservation-store');
+const {
+    queueReservationMobileNotification
+} = require('../reservations/reservation-mobile-notifier');
+const {
+    getMobileNotificationDiagnostics
+} = require('../integrations/mobile-notifications');
 const {
     buildAvailability,
     buildPublicAvailabilityPayload,
@@ -302,6 +309,10 @@ function injectAdminPreviewAssets(html) {
 function safeAdminRedirectPath(value) {
     const candidate = String(value || '').trim();
 
+    if (/^\/(?:admin|crm)\/?(?:[?#].*)?$/i.test(candidate)) {
+        return '/admin/reservations.html';
+    }
+
     if (/^\/admin\/(?:reservations|content|visual)\.html(?:[?#].*)?$/i.test(candidate)) {
         return candidate;
     }
@@ -337,10 +348,11 @@ async function handleStripeWebhook(req, res) {
             console.log('   Cliente:', maskEmail(paymentIntent.metadata.customerEmail));
             console.log('   Vehicle:', paymentIntent.metadata.car);
             console.log('   Monto:', paymentIntent.amount / 100, paymentIntent.currency.toUpperCase());
-            await persistBackendReservation(
+            const savedReservation = await persistBackendReservation(
                 buildReservationRecordFromPaymentIntent(paymentIntent, 'confirmed', 'stripe_webhook'),
                 'stripe webhook payment succeeded'
             );
+            queueReservationMobileNotification(savedReservation, 'payment_confirmed');
             break;
         }
         case 'payment_intent.payment_failed': {
@@ -462,6 +474,16 @@ app.get('/api/admin/session', (req, res) => {
         user: session?.user || null,
         expiresAt: session?.expiresAt || null
     });
+});
+
+app.get(['/admin', '/admin/', '/crm', '/crm/'], requireAdminSession({ redirectToLogin: true }), (req, res) => {
+    setAdminNoIndexHeaders(res);
+    res.redirect('/admin/reservations.html');
+});
+
+app.get('/admin/reservations', requireAdminSession({ redirectToLogin: true }), (req, res) => {
+    setAdminNoIndexHeaders(res);
+    res.redirect('/admin/reservations.html');
 });
 
 app.get('/admin/reservations.html', requireAdminSession({ redirectToLogin: true }), (req, res) => {
@@ -756,7 +778,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
             return res.status(400).json({ error: 'The provided email is not valid' });
         }
 
-        await persistBackendReservation({
+        const checkoutReservation = await persistBackendReservation({
             reservationId,
             status: 'checkout_started',
             source: 'legacy_payment_intent_endpoint',
@@ -767,6 +789,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
                 currency: (currency || 'aed').toLowerCase()
             }
         }, 'legacy checkout started', { critical: true });
+        queueReservationMobileNotification(checkoutReservation, 'reservation_received');
 
         // Create or retrieve customer
         let customer;
@@ -1087,7 +1110,10 @@ app.get('/api/test', (req, res) => {
         services: {
             stripeConfigured,
             emailConfigured: isEmailConfigured(),
-            contactMode: EMAIL_CONFIG.logOnlyInDevelopment && !isEmailConfigured() ? 'development-log-only' : 'email'
+            contactMode: EMAIL_CONFIG.logOnlyInDevelopment && !isEmailConfigured() ? 'development-log-only' : 'email',
+            reservationStorage: getReservationStoreMode(),
+            databaseConfigured: getReservationStoreMode() === 'postgres',
+            mobileNotifications: getMobileNotificationDiagnostics()
         }
     });
 });

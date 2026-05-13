@@ -9,6 +9,7 @@ being carried forever.
 - [Manual functional QA](qa/MANUAL_FUNCTIONAL_QA.md): local customer-style testing environment for reserve, CRM, availability, WhatsApp and call checks.
 - [Preproduction setup](deployment/PREPRODUCTION.md): Vercel-ready staging/release setup with Railway backend and public runtime config.
 - [Admin reservations desk](admin/admin-reservations.md): CRM/admin setup, login and reservation storage notes.
+- [Partner CRM access](admin/partner-crm-access.md): production/staging CRM URLs, credential rules and operating flow.
 - [Manual editing guide](admin/MANUAL-EDITING-GUIDE.md): safe editing map for content changes.
 - [Test plan](qa/test-plan.md): baseline test strategy.
 

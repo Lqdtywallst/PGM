@@ -1,4 +1,23 @@
+function normalizeAdminEnvironment(env = process.env) {
+    const raw = String(env.APP_ENV || env.PGM_APP_ENV || env.NODE_ENV || '').trim().toLowerCase();
+
+    if (['production', 'prod'].includes(raw)) return 'production';
+    if (['staging', 'stage', 'preview', 'preprod', 'preproduction'].includes(raw)) return 'staging';
+    if (raw === 'test') return 'test';
+    return 'development';
+}
+
+function getAdminEnvironmentLabel(env = process.env) {
+    const appEnv = normalizeAdminEnvironment(env);
+    if (appEnv === 'production') return 'Production CRM';
+    if (appEnv === 'staging') return 'Staging CRM';
+    if (appEnv === 'test') return 'Test CRM';
+    return 'Local CRM';
+}
+
 function renderAdminLoginPage() {
+    const environmentLabel = getAdminEnvironmentLabel();
+
     return `<!doctype html>
 <html lang="en">
 <head>
@@ -137,6 +156,18 @@ function renderAdminLoginPage() {
             color: var(--gold-soft);
             font-family: Consolas, monospace;
         }
+        .environment-pill {
+            display: inline-flex;
+            margin-bottom: 18px;
+            padding: 7px 11px;
+            border: 1px solid rgba(228, 189, 96, 0.42);
+            border-radius: 999px;
+            color: var(--gold-soft);
+            background: rgba(228, 189, 96, 0.08);
+            font: 800 0.68rem Arial, sans-serif;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
@@ -148,6 +179,7 @@ function renderAdminLoginPage() {
                 <span>Private Admin</span>
             </div>
         </div>
+        <div class="environment-pill">${environmentLabel}</div>
         <h1 id="admin-title">Reservations desk.</h1>
         <p>Private access for managing client reservations, payment state and handover follow-up.</p>
         <form id="loginForm" autocomplete="off">
@@ -215,6 +247,8 @@ function renderAdminLoginPage() {
 }
 
 function renderAdminReservationsPage() {
+    const environmentLabel = getAdminEnvironmentLabel();
+
     return `<!doctype html>
 <html lang="en">
 <head>
@@ -297,6 +331,20 @@ function renderAdminReservationsPage() {
             gap: 10px;
             flex-wrap: wrap;
         }
+        .environment-chip {
+            min-height: 34px;
+            padding: 0 13px;
+            border: 1px solid rgba(247, 223, 149, 0.36);
+            border-radius: 999px;
+            background: rgba(247, 223, 149, 0.1);
+            color: var(--gold-soft);
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.66rem;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
         .topbar-link {
             min-height: 38px;
             padding: 0 16px;
@@ -367,6 +415,65 @@ function renderAdminReservationsPage() {
             gap: 10px;
             flex-wrap: wrap;
         }
+        .ops-panel {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: minmax(220px, 0.7fr) minmax(0, 1.3fr);
+            gap: 14px;
+            padding: 16px;
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            background: rgba(13, 13, 15, 0.92);
+            color: #fff8e7;
+            box-shadow: var(--shadow);
+        }
+        .ops-panel.is-ok { border-color: rgba(31, 143, 84, 0.34); }
+        .ops-panel.is-review { border-color: rgba(180, 120, 37, 0.48); }
+        .ops-panel.is-bad { border-color: rgba(182, 64, 53, 0.62); }
+        .ops-title {
+            margin: 0;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 1.35rem;
+            line-height: 1;
+        }
+        .ops-copy {
+            margin: 7px 0 0;
+            color: rgba(255, 248, 231, 0.68);
+            line-height: 1.42;
+            font-size: 0.86rem;
+        }
+        .ops-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+        }
+        .ops-metric,
+        .ops-check {
+            min-width: 0;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.11);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .ops-metric span,
+        .ops-check span {
+            display: block;
+            color: rgba(255, 248, 231, 0.56);
+            font-size: 0.58rem;
+            font-weight: 900;
+            letter-spacing: 0.11em;
+            text-transform: uppercase;
+        }
+        .ops-metric strong,
+        .ops-check strong {
+            display: block;
+            margin-top: 4px;
+            overflow-wrap: anywhere;
+            font-size: 0.88rem;
+        }
+        .ops-check.is-pass strong { color: #8ee0ad; }
+        .ops-check.is-warn strong { color: #f1c174; }
+        .ops-check.is-fail strong { color: #ff9a92; }
         .toolbar,
         .list-panel,
         .detail-panel {
@@ -590,6 +697,10 @@ function renderAdminReservationsPage() {
             .hero {
                 display: block;
             }
+            .ops-panel,
+            .ops-grid {
+                grid-template-columns: 1fr;
+            }
             .detail-panel {
                 position: static;
                 max-height: none;
@@ -630,6 +741,8 @@ function renderAdminReservationsPage() {
             </div>
         </div>
         <div class="topbar-actions">
+            <span class="environment-chip">${environmentLabel}</span>
+            <a class="topbar-link" href="/admin/reservations.html">Reservations</a>
             <a class="topbar-link" href="/admin/content.html">Content editor</a>
             <a class="topbar-link" href="/admin/visual.html">Visual editor</a>
             <button class="logout" id="logoutButton" type="button">Logout</button>
@@ -644,6 +757,16 @@ function renderAdminReservationsPage() {
             <div class="hero-actions">
                 <a class="button" href="/admin/content.html">Open content editor</a>
                 <button class="button primary" id="exportCsvButton" type="button">Export CSV</button>
+            </div>
+        </section>
+
+        <section class="ops-panel is-review" id="operationsPanel" aria-live="polite">
+            <div>
+                <h2 class="ops-title">CRM readiness</h2>
+                <p class="ops-copy" id="operationsSummary">Checking reservation storage, Stripe mode and admin setup...</p>
+            </div>
+            <div class="ops-grid" id="operationsGrid">
+                <div class="ops-metric"><span>Status</span><strong>Checking...</strong></div>
             </div>
         </section>
 
@@ -707,6 +830,58 @@ function renderAdminReservationsPage() {
             if (item.flags && item.flags.pendingPayment) return 'pending';
             if (item.flags && item.flags.confirmed) return 'confirmed';
             return '';
+        }
+
+        function statusWord(value) {
+            if (value === 'ok') return 'Ready';
+            if (value === 'bad') return 'Needs setup';
+            return 'Review';
+        }
+
+        function checkWord(value) {
+            if (value === 'pass') return 'OK';
+            if (value === 'fail') return 'Fix';
+            return 'Review';
+        }
+
+        function renderOperationsStatus(data) {
+            var panel = document.getElementById('operationsPanel');
+            var summary = document.getElementById('operationsSummary');
+            var grid = document.getElementById('operationsGrid');
+            var overall = data.overallStatus || 'review';
+            panel.classList.remove('is-ok', 'is-review', 'is-bad');
+            panel.classList.add('is-' + overall);
+            summary.textContent = data.label + ' - ' + statusWord(overall) + '. Storage: ' +
+                (data.storage && data.storage.mode ? data.storage.mode : 'unknown') +
+                '. Stripe: ' + (data.services && data.services.stripeMode ? data.services.stripeMode : 'unknown') + '.';
+
+            var checks = Array.isArray(data.checks) ? data.checks : [];
+            var metricCards = [
+                '<div class="ops-metric"><span>Environment</span><strong>' + escapeHtml(data.label || 'CRM') + '</strong></div>',
+                '<div class="ops-metric"><span>Reservations</span><strong>' + escapeHtml(data.storage && data.storage.reservationCount != null ? data.storage.reservationCount : 'Unknown') + '</strong></div>',
+                '<div class="ops-metric"><span>Database</span><strong>' + escapeHtml(data.storage && data.storage.databaseConfigured ? 'Postgres' : 'Local fallback') + '</strong></div>',
+                '<div class="ops-metric"><span>Updated</span><strong>' + escapeHtml(data.storage && data.storage.latestUpdatedAt ? formatDate(data.storage.latestUpdatedAt) : 'No records yet') + '</strong></div>'
+            ];
+            var checkCards = checks.map(function (check) {
+                return '<div class="ops-check is-' + escapeHtml(check.status || 'warn') + '">' +
+                    '<span>' + escapeHtml(check.label || 'Check') + '</span>' +
+                    '<strong>' + escapeHtml(checkWord(check.status)) + '</strong>' +
+                '</div>';
+            });
+
+            grid.innerHTML = metricCards.concat(checkCards).join('');
+        }
+
+        async function loadOperationsStatus() {
+            try {
+                var response = await api('/api/admin/reservations/operations');
+                var data = await response.json();
+                renderOperationsStatus(data);
+            } catch (error) {
+                document.getElementById('operationsSummary').textContent = 'CRM readiness could not be checked.';
+                document.getElementById('operationsGrid').innerHTML =
+                    '<div class="ops-check is-fail"><span>Status</span><strong>Unavailable</strong></div>';
+            }
         }
 
         async function api(path, options) {
@@ -895,7 +1070,10 @@ function renderAdminReservationsPage() {
             }
         }
 
-        document.getElementById('refreshButton').addEventListener('click', loadReservations);
+        document.getElementById('refreshButton').addEventListener('click', function () {
+            loadOperationsStatus();
+            loadReservations();
+        });
         document.getElementById('exportCsvButton').addEventListener('click', function () {
             window.location.href = '/api/admin/reservations.csv?' + currentQueryString();
         });
@@ -919,6 +1097,7 @@ function renderAdminReservationsPage() {
             });
         });
 
+        loadOperationsStatus();
         loadReservations();
     </script>
 </body>

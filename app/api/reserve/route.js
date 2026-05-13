@@ -13,6 +13,9 @@ const {
     readReservationRecord,
     saveReservationRecord
 } = require('../../../server/reservations/reservation-store');
+const {
+    queueReservationMobileNotification
+} = require('../../../server/reservations/reservation-mobile-notifier');
 
 // Verify that STRIPE_SECRET_KEY is configured
 if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('tu_clave')) {
@@ -645,6 +648,8 @@ router.post('/', async (req, res) => {
             rawRequest: sanitizeReservationRequestForStorage(data)
         }, 'reservation received', { critical: true });
 
+        queueReservationMobileNotification(persistedReservation, 'reservation_received');
+
         // Send notification email BEFORE payment (async, non-blocking)
         console.log('[API] Sending notification email (async)...');
         sendReservationNotificationEmail(reservationData, customerData)
@@ -1043,7 +1048,7 @@ router.post('/confirm', async (req, res) => {
                 ? paymentIntent.customer
                 : paymentIntent.customer?.id || null;
 
-            await persistReservationUpdate({
+            const confirmedReservation = await persistReservationUpdate({
                 reservationId,
                 paymentIntentId,
                 stripeCustomerId,
@@ -1052,6 +1057,7 @@ router.post('/confirm', async (req, res) => {
                 reservationData: finalReservationData,
                 payment: buildPaymentPersistence(paymentIntent, paymentIntent.currency || finalReservationData.currency)
             }, 'payment confirmed', { critical: true });
+            queueReservationMobileNotification(confirmedReservation, 'payment_confirmed');
 
             // Send confirmation emails
             console.log('[API CONFIRM] Sending confirmation emails...');

@@ -78,6 +78,9 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 ADMIN_USER=<staging admin user>
 ADMIN_PASSWORD_HASH=<hash generated with npm run admin:hash-password>
 ADMIN_SESSION_SECRET=<different strong secret from production>
+ADMIN_COOKIE_SECURE=true
+RESERVATION_TELEGRAM_BOT_TOKEN=<staging Telegram bot token>
+RESERVATION_TELEGRAM_CHAT_ID=<staging/private partner chat id>
 GOOGLE_PLACES_API_KEY=<Google Places API key restricted to Places Details>
 GOOGLE_PLACE_ID=<Dynasty Prestige Google Business place id>
 GOOGLE_REVIEWS_URL=<official Google Maps review/profile URL>
@@ -87,6 +90,47 @@ ALLOWED_ORIGINS=https://your-vercel-preview.vercel.app,https://your-netlify-prep
 
 Never reuse the production `DATABASE_URL`, live Stripe secret key, or admin
 session secret in staging.
+
+Before deploying the backend, validate the staging variables locally or in the
+hosting shell:
+
+```powershell
+$env:APP_ENV="staging"
+$env:NODE_ENV="production"
+$env:DATABASE_URL="<staging PostgreSQL URL>"
+$env:STRIPE_SECRET_KEY="sk_test_..."
+$env:PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_..."
+$env:STRIPE_WEBHOOK_SECRET="whsec_..."
+$env:ADMIN_USER="<staging admin user>"
+$env:ADMIN_PASSWORD_HASH="<generated hash>"
+$env:ADMIN_SESSION_SECRET="<strong random value>"
+$env:ADMIN_COOKIE_SECURE="true"
+$env:RESERVATION_TELEGRAM_BOT_TOKEN="<bot token>"
+$env:RESERVATION_TELEGRAM_CHAT_ID="<chat id>"
+$env:RESERVATION_CRM_URL="https://your-railway-staging.up.railway.app/crm"
+$env:ALLOWED_ORIGINS="https://your-vercel-preview.vercel.app,https://staging.prestigegoalmotion.com"
+npm run admin:crm:validate:staging
+```
+
+For production, run:
+
+```powershell
+$env:APP_ENV="production"
+$env:NODE_ENV="production"
+$env:DATABASE_URL="<production PostgreSQL URL>"
+$env:STRIPE_SECRET_KEY="sk_live_..."
+$env:PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_live_..."
+$env:STRIPE_WEBHOOK_SECRET="whsec_..."
+$env:ADMIN_USER="<production admin user>"
+$env:ADMIN_PASSWORD_HASH="<generated hash>"
+$env:ADMIN_SESSION_SECRET="<different strong random value>"
+$env:ADMIN_COOKIE_SECURE="true"
+$env:RESERVATION_TELEGRAM_BOT_TOKEN="<production bot token>"
+$env:RESERVATION_TELEGRAM_CHAT_ID="<production/private partner chat id>"
+$env:RESERVATION_CRM_URL="https://your-production-backend/crm"
+$env:ALLOWED_ORIGINS="https://prestigegoalmotion.com,https://www.prestigegoalmotion.com"
+npm run admin:crm:validate:production
+```
 
 ## Vercel Production Migration
 
@@ -105,7 +149,34 @@ still be set explicitly so the environment is never ambiguous.
 
 ## Functional Gate
 
-Run this against the public preproduction frontend and the staging backend:
+First run the readiness check against the public preproduction frontend and the
+staging backend:
+
+```powershell
+$env:PREPROD_FRONTEND_URL="https://your-preprod-frontend.example"
+$env:PREPROD_BACKEND_URL="https://your-railway-staging.up.railway.app"
+npm run audit:staging:readiness
+```
+
+Mac/Linux:
+
+```bash
+PREPROD_FRONTEND_URL="https://your-preprod-frontend.example" \
+PREPROD_BACKEND_URL="https://your-railway-staging.up.railway.app" \
+npm run audit:staging:readiness
+```
+
+The readiness check verifies that:
+
+- The backend health endpoint is reachable.
+- The backend reports Stripe configured.
+- Reservation storage is PostgreSQL, not local JSON fallback.
+- Mobile reservation notifications are configured.
+- The frontend resolves to `APP_ENV=staging`.
+- The frontend points to the same staging backend URL.
+- The browser-visible Stripe key is `pk_test_...`, not a live key.
+
+After readiness passes, run the full functional gate:
 
 ```powershell
 $env:PREPROD_FRONTEND_URL="https://your-preprod-frontend.example"
