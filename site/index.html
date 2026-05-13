@@ -274,32 +274,36 @@
                             <div class="home-booking__shell">
                                 <div class="home-booking__intro">
                                     <div class="home-booking__topline">
-                                        <span class="home-booking__eyebrow">Choose your dates</span>
-                                        <span class="home-booking__badge">Live fleet check</span>
+                                        <span class="home-booking__eyebrow">Rental dates</span>
+                                        <span class="home-booking__badge">Live availability</span>
                                     </div>
-                                    <h2 id="home-booking-title">Plan your rental window.</h2>
-                                    <p>Set the rental window once; Fleet and Reserve keep the same trip details.</p>
+                                    <h2 id="home-booking-title">Set your Dubai delivery window.</h2>
                                 </div>
                                 <form class="home-booking__form js-home-booking-form">
-                                    <label class="home-booking__field">
-                                        <span>Pickup date</span>
-                                        <input id="home-pickup-date" name="pickupDate" type="date" required>
-                                    </label>
-                                    <label class="home-booking__field">
-                                        <span>Return date</span>
-                                        <input id="home-return-date" name="returnDate" type="date" required>
-                                    </label>
-                                    <label class="home-booking__field">
-                                        <span>Pickup time</span>
-                                        <select id="home-pickup-time" name="pickupTime" required></select>
-                                    </label>
-                                    <label class="home-booking__field">
-                                        <span>Return time</span>
-                                        <select id="home-return-time" name="returnTime" required></select>
-                                    </label>
+                                    <div class="home-booking__leg home-booking__leg--pickup" role="group" aria-labelledby="home-booking-pickup-label">
+                                        <span class="home-booking__leg-label" id="home-booking-pickup-label">Pickup</span>
+                                        <label class="home-booking__field home-booking__field--date">
+                                            <span>Date</span>
+                                            <input id="home-pickup-date" name="pickupDate" type="date" required>
+                                        </label>
+                                        <label class="home-booking__field home-booking__field--time">
+                                            <span>Time</span>
+                                            <select id="home-pickup-time" name="pickupTime" required></select>
+                                        </label>
+                                    </div>
+                                    <div class="home-booking__leg home-booking__leg--return" role="group" aria-labelledby="home-booking-return-label">
+                                        <span class="home-booking__leg-label" id="home-booking-return-label">Return</span>
+                                        <label class="home-booking__field home-booking__field--date">
+                                            <span>Date</span>
+                                            <input id="home-return-date" name="returnDate" type="date" required>
+                                        </label>
+                                        <label class="home-booking__field home-booking__field--time">
+                                            <span>Time</span>
+                                            <select id="home-return-time" name="returnTime" required></select>
+                                        </label>
+                                    </div>
                                     <div class="home-booking__action">
                                         <button type="submit" class="home-booking__submit" data-primary-cta>See available cars</button>
-                                        <span class="home-booking__action-note">No payment yet</span>
                                     </div>
                                 </form>
                             </div>
