@@ -52,6 +52,7 @@
     "audit:homogeneity:components": "node scripts/design-system/run-component-contract-audit.js",
     "audit:homogeneity:layouts": "node scripts/design-system/run-layout-audit.js",
     "audit:homogeneity:headers": "node scripts/audits/run-header-homogeneity-guard.js",
+    "audit:homogeneity:typography": "node scripts/design-system/run-typography-contract-audit.js",
     "agent:pricing": "node scripts/pricing/run-pricing-agent.js",
     "agent:pricing:apply": "node scripts/pricing/run-pricing-agent.js --apply",
     "audit:pricing": "node scripts/pricing/run-pricing-agent.js --strict",
