@@ -18,6 +18,32 @@ When working on landing pages, homepage, or hero sections, always optimize the f
 - Keep the design elegant across mobile, tablet, laptop, and desktop
 - When two parallel blocks share a row on desktop, align their top and bottom edges unless the layout has an intentional documented exception
 
+## Brand homogeneity rules
+
+Every public page must feel like the same Dynasty Prestige product, even when
+the page type changes.
+
+- Use the same header family, logo treatment, navigation rhythm and dropdown style
+- Use the same brand frame width logic for header, hero, cards, forms and main sections
+- Use the same typography contract: display titles use the brand display font, body/UI/buttons use the brand sans font
+- Use the same premium color language: obsidian, warm ivory, champagne gold and controlled neutral surfaces
+- Use the same CTA grammar: one dominant action, uppercase button labels, secondary actions visually quieter
+- Use the same card grammar: consistent radius, borders, padding, shadow and internal hierarchy
+- Use the same floating contact rhythm on public pages and never let it cover key content
+- Do not introduce page-specific fonts, random colors, unrelated button systems or different header moods
+- If a page intentionally breaks a shared rule, document the exception before implementing it
+
+## Copy usefulness rules
+
+Every visible text block must earn its place.
+
+- Keep first-viewport copy short, specific and easy to scan
+- Every heading, paragraph, card label and SEO block must help the guest reserve, trust, compare, understand, navigate or rank
+- Cut or rewrite generic luxury filler, repeated paragraphs and SEO padding that does not add real value
+- Do not let copy length push the useful task, form, cards or CTA below the fold
+- Customer-facing text must be premium English, clear and operationally believable
+- Do not expose technical internals such as server logs, backend URLs or payment object names to customers
+
 ## Responsive rules
 
 Any layout change must be validated across:

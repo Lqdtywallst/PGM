@@ -50,8 +50,50 @@ These rules apply everywhere.
 | Spacing | Shared section, grid and card spacing scale | Arbitrary gaps, cramped controls, isolated centered islands | frame delta, gap delta |
 | Buttons | One `dp-button` family with approved variants | Multiple unrelated button systems competing | unknown button family |
 | Cards | One `dp-card` base with approved variants | Different radius, padding, CTA order per page | card family drift |
+| Copy | Every visible text block has a clear job: reserve, trust, compare, understand, navigate or rank | Generic filler, duplicated SEO padding, overlong above-fold paragraphs | content usefulness failure |
 | Floating Actions | Same bottom-right rhythm and overlap rules | Buttons covering forms/cards/text | overlap ratio failure |
 | First Viewport | One main message, one main action, clear next step | CTA clutter, hidden task, horizontal scroll | first-viewport contract failure |
+
+## Brand Homogeneity Contract
+
+This is the page-level rule that sits above individual components:
+
+Every public page may have different content, imagery and intent, but it must
+still look like the same Dynasty Prestige brand system within the first three
+seconds.
+
+Shared brand DNA:
+
+- Header: same dark premium family, logo treatment, navigation spacing, active state and dropdown surface.
+- Frame: header, hero content, forms, cards and primary sections align to the same brand frame unless an exception is documented.
+- Typography: `--dp-font-display` for expressive headings; `--dp-font-sans` for body, navigation, forms, buttons and operational copy.
+- Color: obsidian, warm ivory, champagne gold and controlled neutral surfaces; no random accent colors outside approved role tokens.
+- Buttons: one CTA grammar across the app; labels are uppercase, primary actions are dominant, secondary actions are quieter.
+- Cards: one visual grammar for radius, border, shadow, padding and title/body/action order.
+- Copy: every heading, paragraph, label and SEO block must help the customer reserve, trust, compare, understand, navigate or rank.
+- Imagery: luxury, Dubai context and vehicle/service purpose should match the page family; avoid random glamour shots that do not support the task.
+- Motion and loading: no font swap flash, header jump, menu color drift or first-viewport layout shift between pages.
+
+Allowed variation:
+
+- Page family layout can change: home, listing, vehicle detail, brand hub, service detail, location guide, app flow and admin.
+- Content, image subject and SEO depth can change.
+- Mobile can reorder the same story if it keeps hierarchy, spacing and task access clear.
+
+Not allowed:
+
+- A route feeling like a separate website because it uses a different header, font stack, CTA style, card style or color mood.
+- One page using oversized editorial typography while another uses compact UI typography for the same role.
+- Dropdowns, floating actions, filters or date controls changing visual family between pages.
+
+Auditor failure signals:
+
+- `font-family` drift from the typography contract.
+- Text blocks that do not add a customer, conversion or SEO job.
+- Header height, logo size, nav order, active state or dropdown background mismatch.
+- Main content frame more than 10px away from the approved frame on desktop/laptop without an exception.
+- Different button/card radius, padding, uppercase treatment or shadow on equivalent components.
+- First viewport appears cluttered, pale, oversized, cramped or visually unrelated to Home/Fleet.
 
 ## Page Pattern Matrix
 

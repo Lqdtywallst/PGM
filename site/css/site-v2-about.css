@@ -6,7 +6,8 @@
 
 .about-page-main .lab-shell,
 .about-page .site-v2-footer .lab-shell {
-    width: min(100% - clamp(1rem, 1.8vw, 2rem), 100rem);
+    width: var(--lab-frame-width);
+    max-width: var(--lab-frame-max);
 }
 
 .about-page .lab-header {
@@ -58,7 +59,7 @@
 .about-hero__shell {
     display: grid;
     gap: 1.35rem;
-    max-width: 59rem;
+    align-content: center;
 }
 
 .about-breadcrumb {
@@ -109,9 +110,9 @@
 }
 
 .about-hero h1 {
-    max-width: 13.5ch;
-    font-size: clamp(4rem, 4.55vw, 5.15rem);
-    line-height: 0.88;
+    max-width: 12.5ch;
+    font-size: clamp(3.05rem, 3.45vw, 4.05rem);
+    line-height: 0.94;
     text-wrap: pretty;
 }
 
@@ -516,8 +517,8 @@
     }
 
     .about-hero h1 {
-        max-width: 11.5ch;
-        font-size: 3.55rem;
+        max-width: 12ch;
+        font-size: 3rem;
     }
 
     .about-proof-strip__grid,
@@ -548,11 +549,6 @@
 }
 
 @media (max-width: 760px) {
-    .about-page-main .lab-shell,
-    .about-page .site-v2-footer .lab-shell {
-        width: min(100% - 2rem, 98rem);
-    }
-
     .about-hero {
         min-height: auto;
         padding: calc(var(--lab-header-offset) + 0.9rem) 0 5.1rem;
@@ -574,9 +570,9 @@
     }
 
     .about-hero h1 {
-        max-width: 11.2ch;
-        font-size: clamp(2.3rem, 11vw, 2.72rem);
-        line-height: 0.92;
+        max-width: 12ch;
+        font-size: clamp(2rem, 9.4vw, 2.32rem);
+        line-height: 0.98;
     }
 
     .about-hero__lead {
@@ -603,8 +599,8 @@
     .about-section-head h2,
     .about-cta__copy h2 {
         max-width: 100%;
-        font-size: clamp(2rem, 8.2vw, 2.28rem);
-        line-height: 1;
+        font-size: clamp(1.48rem, 5.8vw, 1.68rem);
+        line-height: 1.04;
     }
 
     .about-proof-strip__grid,
@@ -649,11 +645,6 @@
 }
 
 @media (max-width: 380px) {
-    .about-page-main .lab-shell,
-    .about-page .site-v2-footer .lab-shell {
-        width: min(100% - 1.5rem, 98rem);
-    }
-
     .about-hero {
         padding: calc(var(--lab-header-offset) + 0.65rem) 0 4.8rem;
     }
@@ -672,8 +663,8 @@
     }
 
     .about-hero h1 {
-        max-width: 10.8ch;
-        font-size: clamp(2.05rem, 10.6vw, 2.34rem);
+        max-width: 12ch;
+        font-size: clamp(1.82rem, 9vw, 2.04rem);
     }
 
     .about-hero__lead {
@@ -693,7 +684,7 @@
     .about-proof-strip__head h2,
     .about-section-head h2,
     .about-cta__copy h2 {
-        font-size: clamp(1.92rem, 8.6vw, 2.12rem);
+        font-size: clamp(1.38rem, 5.6vw, 1.55rem);
     }
 }
 
