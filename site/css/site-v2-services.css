@@ -2236,12 +2236,12 @@
         gap: 0.56rem;
         display: grid;
         grid-auto-flow: column;
-        grid-auto-columns: minmax(10.2rem, 11rem);
+        grid-auto-columns: clamp(13.75rem, 64vw, 16rem);
         grid-template-columns: none;
         justify-content: start;
         overflow-x: auto;
         overscroll-behavior-x: contain;
-        padding: 0 3.25rem 0.35rem 0;
+        padding: 0 3.75rem 0.35rem 0;
         scroll-padding-inline: 0;
         scroll-snap-type: x proximity;
         scrollbar-width: none;
@@ -2253,7 +2253,7 @@
 
     .services-page .services-lane-orb {
         grid-template-columns: 1fr;
-        grid-template-rows: minmax(4rem, 1fr) auto;
+        grid-template-rows: minmax(5.25rem, 1fr) auto;
         gap: 0.44rem;
         min-height: 0;
         padding: 0.54rem;
@@ -2282,7 +2282,9 @@
     }
 
     .services-page .services-lane-orb__copy {
-        display: none;
+        display: block;
+        font-size: 0.68rem;
+        line-height: 1.32;
     }
 
     .services-page .services-lane-orb__action {
@@ -2309,6 +2311,10 @@
     }
 
     .services-page .services-lane-orb__action {
+        display: none;
+    }
+
+    .services-page .services-lane-orb__copy {
         display: none;
     }
 }
