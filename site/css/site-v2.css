@@ -91,6 +91,19 @@
     height: 16px;
 }
 
+.lab-header__utility-link[href*="wa.me"],
+.lab-header__utility-link[href*="api.whatsapp.com"] {
+    box-shadow: none;
+}
+
+.lab-header__utility-link[href*="wa.me"] svg,
+.lab-header__utility-link[href*="api.whatsapp.com"] svg,
+.lab-header__utility-link[href*="wa.me"] path,
+.lab-header__utility-link[href*="api.whatsapp.com"] path {
+    filter: none;
+    text-shadow: none;
+}
+
 .lab-header__utility-link span {
     display: none;
 }
@@ -6885,7 +6898,12 @@ a.brand-marquee__item:focus-visible img {
 .lab-floating-contact__button--wa {
     background: #19a83f;
     color: #fff;
-    box-shadow: 0 18px 38px rgba(0, 0, 0, 0.3);
+    box-shadow: none;
+}
+
+.lab-floating-contact__button--wa:hover,
+.lab-floating-contact__button--wa:focus-visible {
+    box-shadow: none;
 }
 
 .lab-floating-contact__button svg {

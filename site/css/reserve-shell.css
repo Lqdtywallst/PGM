@@ -531,6 +531,19 @@ textarea {
     height: 16px;
 }
 
+.lab-header__utility-link[href*="wa.me"],
+.lab-header__utility-link[href*="api.whatsapp.com"] {
+    box-shadow: none;
+}
+
+.lab-header__utility-link[href*="wa.me"] svg,
+.lab-header__utility-link[href*="api.whatsapp.com"] svg,
+.lab-header__utility-link[href*="wa.me"] path,
+.lab-header__utility-link[href*="api.whatsapp.com"] path {
+    filter: none;
+    text-shadow: none;
+}
+
 .lab-header__utility-link span {
     display: none;
 }
@@ -983,11 +996,19 @@ textarea {
 .lab-floating-contact__button--wa {
     background: linear-gradient(135deg, #35c551, #108e34);
     color: #fff;
+    box-shadow: none;
+}
+
+.lab-floating-contact__button--wa:hover,
+.lab-floating-contact__button--wa:focus-visible {
+    box-shadow: none;
 }
 
 .lab-floating-contact__button svg {
     width: 25px;
     height: 25px;
+    filter: none;
+    text-shadow: none;
 }
 
 .lab-floating-contact__button span {
