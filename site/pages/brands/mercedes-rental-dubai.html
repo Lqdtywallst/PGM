@@ -116,7 +116,7 @@
 }
     </script>
 </head>
-<body class="vehicle-page vehicle-page--mother-base">
+<body class="vehicle-page vehicle-page--mother-base vehicle-page--brand-mother vehicle-page--mercedes-brand">
     <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="lab-header">
         <div class="lab-shell lab-header__inner">
@@ -289,79 +289,104 @@
     </header>
     <main id="main-content" class="vehicle-main vehicle-main--mother-base vehicle-main--brand-landing">
         <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><span aria-hidden="true"> / </span><span aria-current="page">Mercedes rental Dubai</span></nav>
-        <section class="vehicle-hero">
-            <div class="vehicle-hero__media">
-                <img src="./images/fleet/mercedes-g63-amg/01-exterior-front.jpg" alt="Mercedes G63 AMG prepared for a Dubai handover" loading="eager">
-                <div class="vehicle-hero__shade"></div>
-                <div class="vehicle-hero__copy">
-                    <div class="vehicle-hero__brand-line">
-                        <img src="./images/brands/mercedes-mark.png" alt="" aria-hidden="true">
-                        <span>Mercedes in Dubai</span>
-                    </div>
-                    <h1>Mercedes G63 AMG rental Dubai</h1>
-                    <p class="vehicle-hero__lead">The hotel-ready SUV booking when the car should feel authoritative, useful and unmistakably premium across airport arrivals, villas and guest-led schedules.</p>
-                    <div class="vehicle-hero__actions">
-                        <a class="btn btn-primary" href="#vehicle-booking">Check availability</a>
-                    </div>
+        <section class="brand-landing-hero" aria-labelledby="brand-hero-title">
+            <div class="brand-landing-hero__copy">
+                <div class="brand-landing-hero__kicker">
+                    <img src="./images/brands/mercedes-mark.png" alt="" aria-hidden="true">
+                    <span>Mercedes in Dubai</span>
+                </div>
+                <h1 id="brand-hero-title">Rent Mercedes in Dubai</h1>
+                <p class="brand-landing-hero__lead">A premium SUV rental page for guests who need presence, comfort, luggage room and reliable Dubai movement in one car.</p>
+                <div class="brand-landing-hero__trust" aria-label="Dynasty Prestige Mercedes rental highlights">
+                    <span>Airport, hotel and villa delivery</span>
+                    <span>Useful for luggage and daily movement</span>
+                    <span>Dates confirmed before payment</span>
                 </div>
             </div>
 
-            <aside class="vehicle-booking" id="vehicle-booking">
-                <p class="vehicle-booking__kicker">From per day</p>
-                <p class="vehicle-booking__price">1,650 AED</p>
-                <p class="vehicle-booking__price-note">Indicative day rate</p>
-                <p class="vehicle-booking__copy">Best for airport pickups, business stays and guest movement where luggage room and arrival presence both matter.</p>
-                <div class="vehicle-booking__trust" aria-label="Mercedes G63 AMG booking highlights">
-                    <span>Dubai delivery</span>
-                    <span>WhatsApp confirmation</span>
-                    <span>Dates carry forward</span>
-                </div>
-
-                <form class="vehicle-booking__form js-vehicle-booking-form" action="app/reserve/page.html" method="get">
-                    <input type="hidden" name="car" value="Mercedes G63 AMG">
-                    <input type="hidden" name="price" value="1650">
-
-                    <div class="vehicle-booking__grid">
-                        <label class="vehicle-booking__field">
-                            <span>Pickup date</span>
-                            <input class="vehicle-booking__input js-vehicle-date" type="date" name="startDate" required>
-                        </label>
-                        <label class="vehicle-booking__field">
-                            <span>Pickup time</span>
-                            <input class="vehicle-booking__input js-vehicle-time" type="time" name="pickupTime" value="12:00" step="1800" required>
-                        </label>
-                        <label class="vehicle-booking__field">
-                            <span>Return date</span>
-                            <input class="vehicle-booking__input js-vehicle-date" type="date" name="endDate" required>
-                        </label>
-                        <label class="vehicle-booking__field">
-                            <span>Return time</span>
-                            <input class="vehicle-booking__input js-vehicle-time" type="time" name="dropoffTime" value="12:00" step="1800" required>
-                        </label>
+            <div class="brand-landing-models brand-landing-models--single" aria-label="Available Mercedes models">
+                <h2 class="brand-landing-models__heading">Available Mercedes models</h2>
+                <article class="brand-model-card" itemscope itemtype="https://schema.org/Product">
+                    <link itemprop="image" href="https://prestigegoalmotion.com/images/fleet/mercedes-g63-amg/01-exterior-front.jpg">
+                    <a class="brand-model-card__media" href="mercedes-g63-amg-rental-dubai.html" aria-label="View Mercedes G63 AMG">
+                        <img src="/images/fleet/mercedes-g63-amg/01-exterior-front.jpg" alt="Mercedes G63 AMG available to rent in Dubai" width="640" height="410" loading="eager" decoding="async">
+                    </a>
+                    <div class="brand-model-card__body">
+                        <div itemprop="brand" itemscope itemtype="https://schema.org/Brand"><meta itemprop="name" content="Mercedes-Benz"></div>
+                        <span class="brand-model-card__tag">Luxury performance SUV</span>
+                        <h3 itemprop="name">Mercedes G63 AMG</h3>
+                        <p itemprop="description">Best for airport arrivals, business schedules, luggage-heavy stays and guests who want authority with everyday comfort.</p>
+                        <dl class="brand-model-card__meta">
+                            <div><dt>From</dt><dd>1,650 AED/day</dd></div>
+                            <div><dt>Seats</dt><dd>5</dd></div>
+                            <div><dt>Character</dt><dd>V8, executive SUV</dd></div>
+                        </dl>
+                        <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                            <meta itemprop="priceCurrency" content="AED">
+                            <meta itemprop="price" content="1650">
+                            <link itemprop="availability" href="https://schema.org/InStock">
+                        </div>
+                        <a class="brand-model-card__cta" href="mercedes-g63-amg-rental-dubai.html">View / reserve G63 AMG</a>
                     </div>
-
-                    <p class="vehicle-booking__note">Pickup and return details move directly into the reservation flow.</p>
-
-                    <button class="btn btn-primary vehicle-booking__submit" type="submit">Check availability</button>
-                    <a class="btn btn-outline vehicle-booking__secondary" href="https://wa.me/971586122568?text=Hi%2C%20I%20am%20interested%20in%20the%20Mercedes%20G63%20AMG%20in%20Dubai." target="_blank" rel="noopener">WhatsApp the team</a>
-                </form>
-            </aside>
+                </article>
+            </div>
         </section>
-        <h2>Mercedes G63 AMG rental Dubai</h2>
-        <p class="lead">Iconic <strong>G-Class</strong> presence - from <strong>1,650 AED/day</strong> - ideal for Dubai roads, hotels and desert-adjacent style.</p>
-        <div class="cta-row"><a class="btn btn-primary" href="app/reserve/page.html">Reserve</a><a class="btn btn-outline" href="index.html#fleet">Fleet</a></div>
-        <section><h2>Mercedes G 63 AMG</h2><div class="model-grid"><article class="model-card">
-        <img src="./images/fleet/mercedes-g63-amg/01-exterior-front.jpg" alt="Mercedes G63 AMG rental Dubai" width="400" height="200" loading="lazy">
-        <div class="model-card-body"><h3>Mercedes G 63 AMG</h3><p class="tagline">Luxury SUV with unmistakable design and strong V8 performance.</p>
-        <dl class="spec-grid"><dt>Engine</dt><dd>V8 biturbo</dd><dt>0-100</dt><dd>about 4.5 s</dd><dt>Doors</dt><dd>5</dd><dt>Seats</dt><dd>5</dd></dl>
-        <div class="price-tag"><small>From per day</small>1,650 AED</div>
-        <div class="model-actions"><a class="btn btn-primary" href="app/reserve/page.html?car=Mercedes%20G%2063%20AMG&price=1650">Book</a><a class="btn btn-outline" href="tel:+971586122568">Call</a><a class="btn btn-ghost" href="https://wa.me/971586122568?text=Mercedes%20G63%20Dubai" target="_blank" rel="noopener">WhatsApp</a></div>
-        <a class="text-link" href="mercedes-g63-amg-rental-dubai.html">Open G63 detail page</a></div></article></div></section>
-        <section><h2>Pricing</h2><div class="price-table-wrap"><table class="price-table"><caption>G-Class reference</caption>
-        <thead><tr><th scope="col">Model</th><th scope="col">AED / day</th><th scope="col">Longer hire</th></tr></thead>
-        <tbody><tr><th scope="row">G 63 AMG</th><td>1,650</td><td>Quote weekly+</td></tr></tbody></table></div></section>
-        <section><h2>Related</h2><div class="related-grid">
-        <a href="mercedes-g63-amg-rental-dubai.html"><strong>G63 AMG</strong></a><a href="lamborghini-rental-dubai.html"><strong>Lamborghini</strong></a><a href="luxury-car-rental-dubai.html"><strong>Luxury hub</strong></a></div></section>
+
+        <section class="brand-landing-guide" aria-labelledby="brand-guide-heading">
+            <div class="brand-landing-guide__intro">
+                <span class="brand-landing-guide__kicker">Dynasty Prestige guidance</span>
+                <h2 id="brand-guide-heading">Choose Mercedes when the booking needs comfort and control first.</h2>
+                <p>Mercedes suits Dubai stays where the car must work hard: airport transfers, hotel-to-meeting movement, family plans and villa access. We confirm the date window, handover and final rate before payment.</p>
+            </div>
+            <div class="brand-landing-guide__grid">
+                <article>
+                    <h3>Best fit</h3>
+                    <p>Business guests, families, luggage-heavy arrivals and anyone who wants premium presence without supercar compromise.</p>
+                </article>
+                <article>
+                    <h3>Delivery rhythm</h3>
+                    <p>Strong for DXB, DWC, hotels, villas and multi-stop daily use where access and comfort matter.</p>
+                </article>
+                <article>
+                    <h3>Compare before booking</h3>
+                    <p>Choose Rolls-Royce for quieter VIP ceremony, Lamborghini Urus for louder SUV theatre, or G63 for all-round confidence.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="vehicle-section">
+            <div class="vehicle-section__heading">
+                <span class="section-kicker">Related pages</span>
+                <h2>Keep the Mercedes booking easy to compare.</h2>
+            </div>
+            <div class="related-grid">
+                <a href="mercedes-g63-amg-rental-dubai.html"><strong>Mercedes G63 AMG</strong>Open the model detail and reserve with dates attached.</a>
+                <a href="rolls-royce-rental-dubai.html"><strong>Rolls-Royce</strong>Compare the quieter VIP SUV option.</a>
+                <a href="lamborghini-rental-dubai.html"><strong>Lamborghini</strong>Compare the louder Urus alternative.</a>
+                <a href="fleet.html"><strong>Back to fleet</strong>Compare Mercedes against every curated model.</a>
+            </div>
+        </section>
+
+        <section class="vehicle-section">
+            <div class="vehicle-section__heading">
+                <span class="section-kicker">FAQ</span>
+                <h2>Short answers before you reserve Mercedes in Dubai.</h2>
+            </div>
+            <div class="faq-list">
+                <details open>
+                    <summary>What kind of Dubai stay suits the Mercedes G63 AMG best?</summary>
+                    <div class="faq-a">It is strongest for airport pickups, business stays, hotel movement and guests who need luggage room with strong visual presence.</div>
+                </details>
+                <details>
+                    <summary>Is the 1,650 AED figure the final rate?</summary>
+                    <div class="faq-a">It is the indicative starting rate. The final quote depends on dates, delivery timing, route pattern and any additional service layer.</div>
+                </details>
+                <details>
+                    <summary>Can I reserve from the model card?</summary>
+                    <div class="faq-a">Yes. The card opens the model detail, where the date and reservation flow are tied to the Mercedes G63 AMG.</div>
+                </details>
+            </div>
+        </section>
         <footer class="page-foot">
             <p><strong style="color:#ccc;">Dynasty Prestige</strong> - WhatsApp <a href="https://wa.me/971586122568">+971 58 612 2568</a> - <a href="mailto:prestigegoalmotion@gmail.com">prestigegoalmotion@gmail.com</a></p>
             <p style="margin-top:0.75rem;"><a href="index.html">Home</a> - <a href="app/reserve/page.html">Reserve</a> - <a href="terms-and-conditions-uae.html">Terms (UAE)</a></p>
