@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -20,13 +20,13 @@
     <meta name="twitter:title" content="Rolls-Royce Cullinan Black Badge Rental Dubai | Dynasty Prestige">
     <meta name="twitter:description" content="A quieter, higher-touch arrival SUV for VIP hotels, villas and airport handovers in Dubai.">
     <meta name="twitter:image" content="https://prestigegoalmotion.com/images/fleet/rolls-royce-cullinan-black-badge/02-exterior-front.png">
-<meta property="og:locale" content="en_AE">
+    <meta property="og:locale" content="en_AE">
     <meta property="og:site_name" content="Dynasty Prestige">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preload" href="/fonts/manrope-latin-400-800.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/el-messiri-latin-600-700.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="css/dp-fonts.css?v=20260513-local-fonts1">
     <link rel="stylesheet" href="css/site-v2.css?v=20260510-brand-tokens1">
-    <link rel="stylesheet" href="css/seo-landing.css?v=20260510-brand-tokens1">
+    <link rel="stylesheet" href="css/seo-landing.css?v=20260513-vehicle-mother2">
     <link rel="stylesheet" href="/css/admin-style-overrides.css?v=20260510-brand-tokens1">
     <script src="js/site-v2.js?v=20260424-backnav1" defer></script>
     <script type="application/ld+json">
@@ -169,7 +169,7 @@
 }
     </script>
 </head>
-<body class="vehicle-page vehicle-page--mother-base vehicle-page--cullinan">
+<body class="vehicle-page vehicle-page--mother-base vehicle-page--cullinan vehicle-page--landing-pilot">
     <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="lab-header">
         <div class="lab-shell lab-header__inner">
@@ -341,8 +341,8 @@
         </div>
     </header>
 
-    <main id="main-content" class="vehicle-main vehicle-main--mother-base">
-        <nav class="breadcrumb" aria-label="Breadcrumb">
+    <main id="main-content" class="vehicle-main vehicle-main--mother-base vehicle-main--landing-pilot">
+        <nav class="breadcrumb vehicle-landing-breadcrumb" aria-label="Breadcrumb">
             <a href="index.html">Home</a>
             <span aria-hidden="true"> / </span>
             <a href="fleet.html">Fleet</a>
@@ -350,67 +350,32 @@
             <span aria-current="page">Rolls-Royce Cullinan Black Badge</span>
         </nav>
 
-        <a class="vehicle-return-link" href="fleet.html" aria-label="Back to all fleet cars">
-            <span>Back to fleet</span>
-            <strong>View all cars</strong>
-        </a>
-
-        <section class="vehicle-pdp-hero-shell" aria-labelledby="vehicle-base-title">
-            <figure class="vehicle-pdp-gallery-top__stage" aria-label="Rolls-Royce Cullinan Black Badge gallery">
-                <img src="./images/fleet/rolls-royce-cullinan-black-badge/02-exterior-front.png" alt="Rolls-Royce Cullinan Black Badge prepared for a Dubai arrival" loading="eager">
-            </figure>
-
-            <div class="vehicle-pdp-gallery-top__rail">
-                <article class="vehicle-pdp-gallery-top__thumb vehicle-pdp-gallery-top__thumb--media">
-                    <img src="./images/fleet/rolls-royce-cullinan-black-badge/01-exterior-rear.png" alt="Rolls-Royce Cullinan Black Badge rear stance in Dubai" loading="lazy">
-                    <div class="vehicle-pdp-gallery-top__thumb-copy">
-                        <span class="vehicle-pdp-gallery-top__eyebrow">Support still</span>
-                        <strong>Rear stance</strong>
-                    </div>
-                </article>
-
-                <article class="vehicle-pdp-gallery-top__thumb vehicle-pdp-gallery-top__thumb--media">
-                    <img src="./images/fleet/rolls-royce-cullinan-black-badge/06-exterior-front-open-doors.png" alt="Rolls-Royce Cullinan Black Badge with doors open for handover" loading="lazy">
-                    <div class="vehicle-pdp-gallery-top__thumb-copy">
-                        <span class="vehicle-pdp-gallery-top__eyebrow">Support still</span>
-                        <strong>Arrival access</strong>
-                    </div>
-                </article>
-
-                <article class="vehicle-pdp-gallery-top__thumb vehicle-pdp-gallery-top__thumb--media">
-                    <img src="./images/fleet/rolls-royce-cullinan-black-badge/05-interior-rear-seats.png" alt="Rolls-Royce Cullinan Black Badge rear cabin view" loading="lazy">
-                    <div class="vehicle-pdp-gallery-top__thumb-copy">
-                        <span class="vehicle-pdp-gallery-top__eyebrow">Support still</span>
-                        <strong>Rear cabin</strong>
-                    </div>
-                </article>
-
-                <article class="vehicle-pdp-gallery-top__thumb vehicle-pdp-gallery-top__thumb--media vehicle-pdp-gallery-top__thumb--more">
-                    <img src="./images/fleet/rolls-royce-cullinan-black-badge/03-interior-front-seats.png" alt="Rolls-Royce Cullinan Black Badge front cabin detail" loading="lazy">
-                    <div class="vehicle-pdp-gallery-top__thumb-copy">
-                        <span class="vehicle-pdp-gallery-top__thumb-count">+3</span>
-                        <strong>More media</strong>
-                    </div>
-                </article>
+        <section class="vehicle-landing-reserve" id="vehicle-booking" aria-labelledby="vehicle-base-title">
+            <div class="vehicle-landing-reserve__gallery">
+                <figure class="vehicle-landing-reserve__stage">
+                    <img src="./images/fleet/rolls-royce-cullinan-black-badge/02-exterior-front.png" alt="Rolls-Royce Cullinan Black Badge prepared for a Dubai arrival" loading="eager">
+                </figure>
+                <div class="vehicle-landing-reserve__thumbs" aria-label="Rolls-Royce Cullinan Black Badge image highlights">
+                    <figure>
+                        <img src="./images/fleet/rolls-royce-cullinan-black-badge/01-exterior-rear.png" alt="Rolls-Royce Cullinan Black Badge rear stance in Dubai" loading="lazy">
+                        <figcaption>Rear stance</figcaption>
+                    </figure>
+                    <figure>
+                        <img src="./images/fleet/rolls-royce-cullinan-black-badge/06-exterior-front-open-doors.png" alt="Rolls-Royce Cullinan Black Badge with doors open for handover" loading="lazy">
+                        <figcaption>Arrival access</figcaption>
+                    </figure>
+                    <figure>
+                        <img src="./images/fleet/rolls-royce-cullinan-black-badge/05-interior-rear-seats.png" alt="Rolls-Royce Cullinan Black Badge rear cabin view" loading="lazy">
+                        <figcaption>Rear cabin</figcaption>
+                    </figure>
+                </div>
             </div>
 
-            <div class="vehicle-pdp-hero-support">
-                <section class="vehicle-pdp-intro vehicle-pdp-intro--after-gallery" aria-labelledby="vehicle-base-title">
-                    <div class="vehicle-pdp-intro__brand">
-                        <span>Rolls-Royce / Dubai</span>
-                    </div>
-                    <h1 id="vehicle-base-title">Cullinan Black Badge</h1>
-                    <p class="vehicle-pdp-intro__subline">Rolls-Royce Cullinan Black Badge rental in Dubai &middot; Indicative daily rate &middot; Airport, hotel and villa delivery</p>
-                    <p class="vehicle-pdp-intro__lead">A quiet-authority SUV for airport arrivals, villa stays and executive guest movement, with rear-cabin comfort and a softer service tone.</p>
-                    <div class="vehicle-pdp-intro__meta" aria-label="Rolls-Royce Cullinan Black Badge quick tags">
-                        <span>Luxury SUV</span>
-                        <span>5 seats</span>
-                        <span>Airport / hotel / villa</span>
-                        <span>VIP arrival tone</span>
-                    </div>
-                </section>
-
-                <aside class="vehicle-booking" id="vehicle-booking">
+            <div class="vehicle-landing-reserve__content">
+                <aside class="vehicle-booking">
+                    <span class="section-kicker">Rolls-Royce in Dubai</span>
+                    <h1 id="vehicle-base-title">Cullinan Black Badge in Dubai.</h1>
+                    <p class="vehicle-booking__intro">Quiet-authority SUV for airport arrivals, villas and executive guest movement, coordinated with hotel, villa or airport handover.</p>
                     <p class="vehicle-booking__kicker">From per day</p>
                     <p class="vehicle-booking__price">3,750 AED</p>
                     <p class="vehicle-booking__price-note">Indicative day rate</p>
@@ -447,9 +412,35 @@
                         <p class="vehicle-booking__note">Pickup and return details move directly into the reservation flow.</p>
 
                         <button class="btn btn-primary vehicle-booking__submit" type="submit">Check availability</button>
-                        <a class="btn btn-outline vehicle-booking__secondary" href="https://wa.me/971586122568?text=Hi%2C%20I%20am%20interested%20in%20the%20Rolls-Royce%20Cullinan%20Black%20Badge%20in%20Dubai." target="_blank" rel="noopener">WhatsApp the team</a>
                     </form>
                 </aside>
+
+                <section class="vehicle-landing-specs" aria-label="Rolls-Royce Cullinan Black Badge key characteristics">
+                    <article>
+                        <span>Powertrain</span>
+                        <strong>V12</strong>
+                    </article>
+                    <article>
+                        <span>Guests</span>
+                        <strong>5 seats</strong>
+                    </article>
+                    <article>
+                        <span>Best for</span>
+                        <strong>VIP arrivals</strong>
+                    </article>
+                    <article>
+                        <span>Confirm</span>
+                        <strong>50% upfront</strong>
+                    </article>
+                    <article>
+                        <span>Handover</span>
+                        <strong>Hotel / villa / airport</strong>
+                    </article>
+                    <article>
+                        <span>Style</span>
+                        <strong>Quiet authority</strong>
+                    </article>
+                </section>
             </div>
         </section>
 

@@ -3402,7 +3402,7 @@ body.vehicle-page--premium-pilot {
     }
 }
 
-/* Vehicle landing mother pilot: isolated to the Huracan test page before rolling out. */
+/* Vehicle landing mother template shared by the individual car pages. */
 .vehicle-page--landing-pilot {
     background:
         radial-gradient(circle at 50% 0%, rgba(var(--dp-color-gold-rgb), 0.16), transparent 32rem),
@@ -3416,6 +3416,10 @@ body.vehicle-page--premium-pilot {
 }
 
 .vehicle-page--landing-pilot .vehicle-landing-breadcrumb {
+    display: none;
+}
+
+.vehicle-page--landing-pilot .lab-floating-back {
     display: none;
 }
 
@@ -3444,28 +3448,6 @@ body.vehicle-page--premium-pilot {
 
 .vehicle-landing-reserve__gallery {
     position: relative;
-}
-
-.vehicle-landing-reserve__back {
-    position: absolute;
-    z-index: 2;
-    top: 1rem;
-    left: 1rem;
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.35rem;
-    padding: 0.2rem 0.92rem;
-    border: 1px solid color-mix(in srgb, var(--dp-color-ivory) 24%, transparent);
-    border-radius: var(--dp-button-radius);
-    color: color-mix(in srgb, var(--dp-color-ivory) 86%, transparent);
-    background: color-mix(in srgb, var(--dp-color-ink) 42%, transparent);
-    backdrop-filter: blur(16px);
-    font-family: var(--dp-font-sans);
-    font-size: 0.68rem;
-    font-weight: 900;
-    letter-spacing: 0.14em;
-    text-decoration: none;
-    text-transform: uppercase;
 }
 
 .vehicle-landing-reserve__stage {
@@ -3823,15 +3805,6 @@ body.vehicle-page--premium-pilot {
     .vehicle-landing-reserve__gallery,
     .vehicle-landing-reserve__content {
         display: contents;
-    }
-
-    .vehicle-landing-reserve__back {
-        grid-area: stage;
-        position: relative;
-        inset: auto;
-        align-self: start;
-        justify-self: start;
-        margin: 1rem;
     }
 
     .vehicle-landing-reserve__stage {

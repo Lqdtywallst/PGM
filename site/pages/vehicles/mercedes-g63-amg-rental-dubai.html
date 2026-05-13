@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -20,13 +20,13 @@
     <meta name="twitter:title" content="Mercedes G63 AMG Rental Dubai | Dynasty Prestige">
     <meta name="twitter:description" content="The upright premium SUV for airport, hotel and villa stays where access, luggage and all-day presence matter together.">
     <meta name="twitter:image" content="https://prestigegoalmotion.com/images/fleet/mercedes-g63-amg/01-exterior-front.jpg">
-<meta property="og:locale" content="en_AE">
+    <meta property="og:locale" content="en_AE">
     <meta property="og:site_name" content="Dynasty Prestige">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preload" href="/fonts/manrope-latin-400-800.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/el-messiri-latin-600-700.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="css/dp-fonts.css?v=20260513-local-fonts1">
     <link rel="stylesheet" href="css/site-v2.css?v=20260510-brand-tokens1">
-    <link rel="stylesheet" href="css/seo-landing.css?v=20260510-brand-tokens1">
+    <link rel="stylesheet" href="css/seo-landing.css?v=20260513-vehicle-mother2">
     <link rel="stylesheet" href="/css/admin-style-overrides.css?v=20260510-brand-tokens1">
     <script src="js/site-v2.js?v=20260424-backnav1" defer></script>
     <script type="application/ld+json">
@@ -187,7 +187,7 @@
 }
     </script>
 </head>
-<body class="vehicle-page vehicle-page--mother-base vehicle-page--g63">
+<body class="vehicle-page vehicle-page--mother-base vehicle-page--g63 vehicle-page--landing-pilot">
     <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="lab-header">
         <div class="lab-shell lab-header__inner">
@@ -359,8 +359,8 @@
         </div>
     </header>
 
-    <main id="main-content" class="vehicle-main vehicle-main--mother-base">
-        <nav class="breadcrumb" aria-label="Breadcrumb">
+    <main id="main-content" class="vehicle-main vehicle-main--mother-base vehicle-main--landing-pilot">
+        <nav class="breadcrumb vehicle-landing-breadcrumb" aria-label="Breadcrumb">
             <a href="index.html">Home</a>
             <span aria-hidden="true"> / </span>
             <a href="fleet.html">Fleet</a>
@@ -368,71 +368,36 @@
             <span aria-current="page">Mercedes G63 AMG</span>
         </nav>
 
-        <a class="vehicle-return-link" href="fleet.html" aria-label="Back to all fleet cars">
-            <span>Back to fleet</span>
-            <strong>View all cars</strong>
-        </a>
-
-        <section class="vehicle-pdp-hero-shell" aria-labelledby="vehicle-base-title">
-            <figure class="vehicle-pdp-gallery-top__stage" aria-label="Mercedes G63 AMG gallery">
-                <img src="./images/fleet/mercedes-g63-amg/01-exterior-front.jpg" alt="Mercedes G63 AMG prepared for a premium Dubai handover" loading="eager">
-            </figure>
-
-            <div class="vehicle-pdp-gallery-top__rail">
-                <article class="vehicle-pdp-gallery-top__thumb vehicle-pdp-gallery-top__thumb--media">
-                    <img src="./images/fleet/mercedes-g63-amg/02-exterior-angle.jpg" alt="Mercedes G63 AMG front authority at handover" loading="lazy">
-                    <div class="vehicle-pdp-gallery-top__thumb-copy">
-                        <span class="vehicle-pdp-gallery-top__eyebrow">Support still</span>
-                        <strong>Front authority</strong>
-                    </div>
-                </article>
-
-                <article class="vehicle-pdp-gallery-top__thumb vehicle-pdp-gallery-top__thumb--media">
-                    <img src="./images/fleet/mercedes-g63-amg/05-interior-rear.jpg" alt="Mercedes G63 AMG door-open side access" loading="lazy">
-                    <div class="vehicle-pdp-gallery-top__thumb-copy">
-                        <span class="vehicle-pdp-gallery-top__eyebrow">Support still</span>
-                        <strong>Door-open access</strong>
-                    </div>
-                </article>
-
-                <article class="vehicle-pdp-gallery-top__thumb vehicle-pdp-gallery-top__thumb--media">
-                    <img src="./images/fleet/mercedes-g63-amg/04-interior-front.jpg" alt="Mercedes G63 AMG rear stance and luggage access" loading="lazy">
-                    <div class="vehicle-pdp-gallery-top__thumb-copy">
-                        <span class="vehicle-pdp-gallery-top__eyebrow">Support still</span>
-                        <strong>Rear load stance</strong>
-                    </div>
-                </article>
-
-                <article class="vehicle-pdp-gallery-top__thumb vehicle-pdp-gallery-top__thumb--media vehicle-pdp-gallery-top__thumb--more">
-                    <img src="./images/fleet/mercedes-g63-amg/03-exterior-side.jpg" alt="Mercedes G63 AMG side profile and city stance" loading="lazy">
-                    <div class="vehicle-pdp-gallery-top__thumb-copy">
-                        <span class="vehicle-pdp-gallery-top__thumb-count">+3</span>
-                        <strong>More media</strong>
-                    </div>
-                </article>
+        <section class="vehicle-landing-reserve" id="vehicle-booking" aria-labelledby="vehicle-base-title">
+            <div class="vehicle-landing-reserve__gallery">
+                <figure class="vehicle-landing-reserve__stage">
+                    <img src="./images/fleet/mercedes-g63-amg/01-exterior-front.jpg" alt="Mercedes G63 AMG prepared for a premium Dubai handover" loading="eager">
+                </figure>
+                <div class="vehicle-landing-reserve__thumbs" aria-label="Mercedes G63 AMG image highlights">
+                    <figure>
+                        <img src="./images/fleet/mercedes-g63-amg/02-exterior-angle.jpg" alt="Mercedes G63 AMG front authority at handover" loading="lazy">
+                        <figcaption>Front authority</figcaption>
+                    </figure>
+                    <figure>
+                        <img src="./images/fleet/mercedes-g63-amg/05-interior-rear.jpg" alt="Mercedes G63 AMG door-open side access" loading="lazy">
+                        <figcaption>Door access</figcaption>
+                    </figure>
+                    <figure>
+                        <img src="./images/fleet/mercedes-g63-amg/04-interior-front.jpg" alt="Mercedes G63 AMG rear stance and luggage access" loading="lazy">
+                        <figcaption>Cabin detail</figcaption>
+                    </figure>
+                </div>
             </div>
 
-            <div class="vehicle-pdp-hero-support">
-                <section class="vehicle-pdp-intro vehicle-pdp-intro--after-gallery" aria-labelledby="vehicle-base-title">
-                    <div class="vehicle-pdp-intro__brand">
-                        <span>Mercedes / Dubai</span>
-                    </div>
-                    <h1 id="vehicle-base-title">Mercedes G63 AMG</h1>
-                    <p class="vehicle-pdp-intro__subline">Mercedes G63 AMG rental in Dubai &middot; Indicative daily rate &middot; Airport, hotel and villa delivery</p>
-                    <p class="vehicle-pdp-intro__lead">The upright Dubai booking for airport runs, hotel arrivals and guest-led days that need luggage, higher access and stronger city authority than a low sports car.</p>
-                    <div class="vehicle-pdp-intro__meta" aria-label="Mercedes G63 AMG quick tags">
-                        <span>Executive SUV</span>
-                        <span>5 seats</span>
-                        <span>Airport / villa / hotel</span>
-                        <span>Chauffeur optional</span>
-                    </div>
-                </section>
-
-                <aside class="vehicle-booking" id="vehicle-booking">
+            <div class="vehicle-landing-reserve__content">
+                <aside class="vehicle-booking">
+                    <span class="section-kicker">Mercedes in Dubai</span>
+                    <h1 id="vehicle-base-title">Mercedes G63 AMG in Dubai.</h1>
+                    <p class="vehicle-booking__intro">Upright G-Class authority for airport runs, hotel arrivals and guest-led days that need luggage, access and presence.</p>
                     <p class="vehicle-booking__kicker">From per day</p>
                     <p class="vehicle-booking__price">1,650 AED</p>
                     <p class="vehicle-booking__price-note">Indicative day rate</p>
-                    <p class="vehicle-booking__copy">Best for airport arrivals, villa stays and guest-led days where the SUV should feel useful, visible and unmistakably premium at the same time.</p>
+                    <p class="vehicle-booking__copy">Best for airport arrivals, villa stays and all-day movement where the SUV should feel useful, visible and unmistakably premium.</p>
                     <div class="vehicle-booking__trust" aria-label="G63 booking highlights">
                         <span>Dubai delivery</span>
                         <span>WhatsApp confirmation</span>
@@ -465,9 +430,35 @@
                         <p class="vehicle-booking__note">Pickup and return details move directly into the reservation flow.</p>
 
                         <button class="btn btn-primary vehicle-booking__submit" type="submit">Check availability</button>
-                        <a class="btn btn-outline vehicle-booking__secondary" href="https://wa.me/971586122568?text=Hi%2C%20I%20am%20interested%20in%20the%20Mercedes%20G63%20AMG%20in%20Dubai." target="_blank" rel="noopener">WhatsApp the team</a>
                     </form>
                 </aside>
+
+                <section class="vehicle-landing-specs" aria-label="Mercedes G63 AMG key characteristics">
+                    <article>
+                        <span>Powertrain</span>
+                        <strong>V8 biturbo</strong>
+                    </article>
+                    <article>
+                        <span>Guests</span>
+                        <strong>5 seats</strong>
+                    </article>
+                    <article>
+                        <span>Best for</span>
+                        <strong>Airport / villa</strong>
+                    </article>
+                    <article>
+                        <span>Confirm</span>
+                        <strong>50% upfront</strong>
+                    </article>
+                    <article>
+                        <span>Handover</span>
+                        <strong>Hotel / villa / airport</strong>
+                    </article>
+                    <article>
+                        <span>Style</span>
+                        <strong>Executive SUV</strong>
+                    </article>
+                </section>
             </div>
         </section>
 
