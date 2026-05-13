@@ -22,9 +22,9 @@
     <meta name="twitter:image" content="https://prestigegoalmotion.com/images/fleet/ferrari-296-gts/07-hero-dubai.jpeg">
     <script>document.documentElement.classList.add("js");</script>
     <link rel="manifest" href="/manifest.json">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preload" href="/fonts/manrope-latin-400-800.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/el-messiri-latin-600-700.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="./css/dp-fonts.css?v=20260513-local-fonts1">
     <link rel="stylesheet" href="./css/site-v2.css?v=20260510-brand-tokens1">
     <link rel="stylesheet" href="./css/site-v2-contact.css?v=20260510-visual-brand1">
     <link rel="stylesheet" href="/css/admin-style-overrides.css?v=20260510-brand-tokens1">
@@ -232,8 +232,8 @@
                     </nav>
 
                     <span class="contact-kicker">Reservations desk</span>
-                    <h1>Talk to our booking team.</h1>
-                    <p class="contact-hero__lead">Use WhatsApp for the fastest answer, reserve online when the vehicle is already clear, or send the form when the trip needs more context.</p>
+                    <h1>Talk to the booking team.</h1>
+                    <p class="contact-hero__lead">WhatsApp is the fastest route. Share the car, dates and handover point; we confirm availability and the clean next step.</p>
 
                     <div class="contact-hero__actions">
                         <a href="https://wa.me/971586122568?text=Hi%2C%20I%20would%20like%20to%20talk%20to%20the%20Dynasty%20Prestige%20booking%20team%20about%20a%20Dubai%20luxury%20car%20rental." class="contact-button contact-button--primary contact-button--whatsapp" target="_blank" rel="noopener" aria-label="WhatsApp the Dynasty Prestige booking team">
@@ -246,16 +246,16 @@
                     </div>
 
                     <ul class="contact-trust-list" aria-label="Key contact details">
+                        <li><strong>WhatsApp</strong><span>Fastest availability check.</span></li>
                         <li><strong>Phone</strong><span>+971 58 612 2568</span></li>
                         <li><strong>Email</strong><span>prestigegoalmotion@gmail.com</span></li>
-                        <li><strong>Coverage</strong><span>Hotels, villas, airports and city handovers.</span></li>
                     </ul>
                 </div>
 
                 <aside class="form-card contact-form-card" aria-labelledby="contact-form-title">
-                    <span class="contact-card-kicker">Send a message</span>
-                    <h2 id="contact-form-title">Send the booking details.</h2>
-                    <p class="contact-form-card__intro">Best for multi-day stays, event support, brand requests or handovers with several moving parts.</p>
+                    <span class="contact-card-kicker">Booking request</span>
+                    <h2 id="contact-form-title">Send the details.</h2>
+                    <p class="contact-form-card__intro">Best when the stay needs dates, car preference and handover notes in one place.</p>
 
                     <form id="contactForm" class="form-layout" onsubmit="handleContactSubmit(event)" novalidate>
                         <div class="contact-form-grid">
@@ -275,117 +275,31 @@
                                 <input type="tel" id="contactPhone" name="phone" autocomplete="tel">
                             </div>
                             <div class="contact-form-field">
-                                <label for="contactSubject">Subject *</label>
+                                <label for="contactSubject">Request *</label>
                                 <select id="contactSubject" name="subject" required>
-                                    <option value="">Select a subject</option>
-                                    <option value="reservation">Reservation inquiry</option>
-                                    <option value="fleet">Fleet information</option>
-                                    <option value="price">Price inquiry</option>
-                                    <option value="event">Corporate events</option>
+                                    <option value="">Select request</option>
+                                    <option value="reservation">Reservation</option>
+                                    <option value="fleet">Fleet guidance</option>
+                                    <option value="price">Price check</option>
+                                    <option value="event">Event or VIP support</option>
                                     <option value="other">Other</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="contact-form-field">
-                            <label for="contactMessage">Message *</label>
-                            <textarea id="contactMessage" name="message" required placeholder="Dates, preferred cars, hotel or airport, and anything else that matters."></textarea>
+                            <label for="contactMessage">Trip details *</label>
+                            <textarea id="contactMessage" name="message" required placeholder="Dates, preferred car, hotel / airport / villa, and anything the team should know."></textarea>
                         </div>
 
                         <div class="contact-form-actions">
-                            <button type="submit" class="contact-button contact-button--primary" id="contactSubmitButton">Send message</button>
+                            <button type="submit" class="contact-button contact-button--primary" id="contactSubmitButton">Send request</button>
                             <a href="tel:+971586122568" class="contact-button contact-button--ghost" aria-label="Call Dynasty Prestige at +971 58 612 2568">Call instead</a>
                         </div>
 
                         <div id="contactFormStatus" class="status" role="status" aria-live="polite"></div>
                     </form>
                 </aside>
-            </div>
-        </section>
-
-        <section class="contact-band contact-band--soft" aria-labelledby="contact-channels-title">
-            <div class="lab-shell">
-                <div class="contact-section-head">
-                    <span class="contact-kicker contact-kicker--dark">Direct channels</span>
-                    <h2 id="contact-channels-title">Choose the route that keeps the booking moving.</h2>
-                    <p>Each channel has a clear job, so the next step feels obvious instead of noisy.</p>
-                </div>
-
-                <div class="contact-methods-grid">
-                    <article class="info-card">
-                        <span class="info-card__eyebrow">WhatsApp</span>
-                        <h3>Fast availability checks</h3>
-                        <p>Best for same-day answers, shortlist help and quick availability checks.</p>
-                        <a href="https://wa.me/971586122568?text=Hi%2C%20I%20would%20like%20help%20checking%20availability%20for%20a%20Dynasty%20Prestige%20luxury%20car%20in%20Dubai." target="_blank" rel="noopener">Open WhatsApp</a>
-                    </article>
-
-                    <article class="info-card">
-                        <span class="info-card__eyebrow">Reservation flow</span>
-                        <h3>Direct booking path</h3>
-                        <p>Best when the car is already chosen and the booking can move into confirmation.</p>
-                        <a href="./app/reserve/page.html">Open reservation</a>
-                    </article>
-
-                    <article class="info-card">
-                        <span class="info-card__eyebrow">Phone</span>
-                        <h3>Immediate coordination</h3>
-                        <p>Best when arrivals, drivers or timing changes need a fast verbal handoff.</p>
-                        <a href="tel:+971586122568" aria-label="Call Dynasty Prestige at +971 58 612 2568">Call now</a>
-                    </article>
-
-                    <article class="info-card">
-                        <span class="info-card__eyebrow">Email</span>
-                        <h3>Longer or multi-part stays</h3>
-                        <p>Best for events, brand-specific requests and planning that spans several steps.</p>
-                        <a href="mailto:prestigegoalmotion@gmail.com?subject=Dynasty%20Prestige%20booking%20request&body=Hi%20Dynasty%20Prestige%2C%0A%0AI%20would%20like%20help%20with%20a%20Dubai%20luxury%20car%20booking.%0A%0ADates%3A%0APreferred%20car%3A%0APickup%20location%3A">Send email</a>
-                    </article>
-                </div>
-            </div>
-        </section>
-
-        <section class="contact-band" aria-labelledby="contact-coverage-title">
-            <div class="lab-shell contact-coverage">
-                <div class="contact-coverage__copy">
-                    <span class="contact-kicker contact-kicker--dark">Dubai coverage</span>
-                    <h2 id="contact-coverage-title">Palm Jumeirah base with citywide handover planning.</h2>
-                    <p>Most guests start with a hotel, villa or airport handover. The team confirms the practical point first, then aligns timing around the stay.</p>
-
-                    <div class="contact-coverage__facts">
-                        <div>
-                            <strong>24/7</strong>
-                            <span>Reservation support and follow-up.</span>
-                        </div>
-                        <div>
-                            <strong>Across Dubai</strong>
-                            <span>Hotel, villa, airport and landmark delivery planning.</span>
-                        </div>
-                        <div>
-                            <strong>Fleet guidance</strong>
-                            <span>Help choosing the right car for guests, luggage and trip format.</span>
-                        </div>
-                    </div>
-
-                    <div class="contact-coverage__links">
-                        <a href="./locations.html">Review locations</a>
-                        <a href="https://www.google.com/maps/search/?api=1&query=Palm+Jumeirah+Dubai" target="_blank" rel="noopener">Open map</a>
-                    </div>
-                </div>
-
-                <div class="contact-coverage__visuals">
-                    <figure class="contact-media-card">
-                        <img src="./images/fleet/ferrari-296-gts/07-hero-dubai.jpeg" alt="Dynasty Prestige handover in Dubai">
-                        <figcaption>Cleaner arrivals, tighter timing and less back and forth.</figcaption>
-                    </figure>
-
-                    <div class="contact-map-card">
-                        <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=55.08%2C25.06%2C55.20%2C25.16&layer=mapnik&marker=25.1124%2C55.1390" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Dynasty Prestige Palm Jumeirah location"></iframe>
-                        <div class="contact-map-card__note" aria-label="Handover point view">
-                            <span>Point view</span>
-                            <strong>Palm Jumeirah coordination base</strong>
-                            <p>Share the hotel, villa, airport or district first; the team confirms the cleanest delivery point before handover.</p>
-                        </div>
-                    </div>
-                </div>
             </div>
         </section>
 
