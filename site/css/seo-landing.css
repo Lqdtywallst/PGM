@@ -209,6 +209,23 @@ body {
     color: #fff1c9;
 }
 
+.vehicle-page .lab-header__utility-link[href*="wa.me"],
+.vehicle-page .lab-header__utility-link[href*="api.whatsapp.com"],
+.vehicle-page .lab-header__utility-link[href*="wa.me"]:hover,
+.vehicle-page .lab-header__utility-link[href*="wa.me"]:focus-visible,
+.vehicle-page .lab-header__utility-link[href*="api.whatsapp.com"]:hover,
+.vehicle-page .lab-header__utility-link[href*="api.whatsapp.com"]:focus-visible {
+    box-shadow: none;
+}
+
+.vehicle-page .lab-header__utility-link[href*="wa.me"] svg,
+.vehicle-page .lab-header__utility-link[href*="api.whatsapp.com"] svg,
+.vehicle-page .lab-header__utility-link[href*="wa.me"] path,
+.vehicle-page .lab-header__utility-link[href*="api.whatsapp.com"] path {
+    filter: none;
+    text-shadow: none;
+}
+
 .vehicle-page .lab-header__nav {
     flex: 0 1 auto;
     justify-content: flex-start;
