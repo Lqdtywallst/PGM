@@ -383,6 +383,7 @@ async function collectHeaderDropdownStates(page, pageDir) {
             const panelRect = rect(panel);
             const triggerRect = rect(trigger);
             const headerRect = rect(header);
+            const firstCard = panel.querySelector('.lab-nav__card, a[href], button');
 
             return {
                 exists: true,
@@ -405,6 +406,7 @@ async function collectHeaderDropdownStates(page, pageDir) {
                 boxShadow: style.boxShadow && style.boxShadow !== 'none',
                 minTextContrastRatio: contrastValues.length > 0 ? Number(Math.min(...contrastValues).toFixed(2)) : null,
                 panelRect,
+                firstCardRect: firstCard ? rect(firstCard) : null,
                 triggerRect,
                 topOffsetFromHeaderPx: panelRect && headerRect ? Number((panelRect.top - headerRect.bottom).toFixed(2)) : null,
                 triggerToPanelGapPx: panelRect && triggerRect ? Number((panelRect.top - triggerRect.bottom).toFixed(2)) : null

@@ -28,6 +28,8 @@ const DEFAULT_HEADER_POLICY = Object.freeze({
     maxDropdownSurfaceLuminanceDelta: 0.28,
     maxDropdownTopOffsetDeltaPx: 22,
     maxDropdownWidthDeltaRatio: 0.24,
+    maxDropdownHeightDeltaRatio: 0.24,
+    maxDropdownCardHeightDeltaRatio: 0.24,
     maxDropdownBorderRadiusDeltaPx: 8,
     minDropdownTextContrastRatio: 4.5
 });
@@ -825,6 +827,38 @@ function compareHeaderDropdownSystems(referencePage = {}, actualPage = {}, optio
                 message: 'Dropdown width differs from the approved header component.',
                 reference: referenceWidth,
                 actual: actualWidth
+            });
+        }
+
+        const referenceHeight = numberOrNull(reference.panelRect?.height);
+        const actualHeight = numberOrNull(actual.panelRect?.height);
+        if (
+            referenceHeight !== null &&
+            actualHeight !== null &&
+            relativeDelta(referenceHeight, actualHeight) > policy.maxDropdownHeightDeltaRatio
+        ) {
+            pushMismatch(mismatches, {
+                field: `${key}.panelHeightPx`,
+                severity: 'high',
+                message: 'Dropdown height differs from the approved header component, usually because item padding or row rhythm drifted.',
+                reference: referenceHeight,
+                actual: actualHeight
+            });
+        }
+
+        const referenceCardHeight = numberOrNull(reference.firstCardRect?.height);
+        const actualCardHeight = numberOrNull(actual.firstCardRect?.height);
+        if (
+            referenceCardHeight !== null &&
+            actualCardHeight !== null &&
+            relativeDelta(referenceCardHeight, actualCardHeight) > policy.maxDropdownCardHeightDeltaRatio
+        ) {
+            pushMismatch(mismatches, {
+                field: `${key}.cardHeightPx`,
+                severity: 'high',
+                message: 'Dropdown item height differs from the approved header component.',
+                reference: referenceCardHeight,
+                actual: actualCardHeight
             });
         }
 
