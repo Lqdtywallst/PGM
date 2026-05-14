@@ -1459,7 +1459,7 @@ test('buildDeterministicFindings flags services mobile when direct circles are b
             headingRect: { top: 360, bottom: 460 },
             viewportWidth: 390,
             viewportHeight: 844,
-            servicesSelectorRect: { top: 610, bottom: 760, width: 342, height: 150 },
+            servicesSelectorRect: { top: 610, bottom: 860, width: 342, height: 250 },
             servicesOrbMetrics: { count: 4, minWidthPx: 64, averageWidthPx: 65, maxWidthPx: 66 },
             heroActionCount: 0,
             headerFamily: 'lab-header',
@@ -1678,6 +1678,74 @@ test('buildDeterministicFindings flags services desktop when the top selector sh
     });
 
     assert.ok(findings.some((finding) => finding.category === 'first_viewport_layout'));
+});
+
+test('buildDeterministicFindings flags services when headings become too multiline or drift from the card frame', () => {
+    const findings = buildDeterministicFindings({
+        route: '/services.html',
+        viewport: { name: 'laptop' },
+        profile: 'hub_marketing',
+        metrics: {
+            horizontalOverflowPx: 0,
+            visibleH1Count: 1,
+            headingRect: { top: 180, bottom: 345 },
+            headingLineMetrics: { lineCount: 3 },
+            servicesHeroHeadingLineMetrics: { lineCount: 3 },
+            viewportWidth: 1366,
+            viewportHeight: 768,
+            servicesSelectorRect: { top: 420, bottom: 728, left: 90, right: 1276, width: 1186, height: 308 },
+            servicesHeroIntroRect: { top: 132, bottom: 390, left: 446, right: 920, width: 474, height: 258 },
+            servicesDirectoryHeadRect: { top: 900, bottom: 1110, left: 420, right: 946, width: 526, height: 210 },
+            servicesDirectoryLayoutRect: { top: 1160, bottom: 1640, left: 84, right: 1282, width: 1198, height: 480 },
+            servicesFlowShellRect: { top: 1700, bottom: 2200, left: 48, right: 1318, width: 1270, height: 500 },
+            servicesDirectoryHeadingLineMetrics: { lineCount: 4 },
+            servicesDirectoryGroupRects: [
+                { top: 1180, bottom: 1520, width: 560 },
+                { top: 1212, bottom: 1640, width: 560 }
+            ],
+            servicesOrbRects: [
+                { left: 90, right: 330, width: 240 },
+                { left: 410, right: 650, width: 240 },
+                { left: 730, right: 970, width: 240 },
+                { left: 1050, right: 1180, width: 130 }
+            ],
+            servicesOrbMetrics: { count: 4, minWidthPx: 180, averageWidthPx: 184, maxWidthPx: 188 },
+            heroActionCount: 0,
+            headerFamily: 'lab-header',
+            visualIntent: 'modern_dark_system',
+            hasVisualMedia: true,
+            hasNav: true,
+            headerOcclusionPx: 0,
+            clippedElements: [],
+            overlaps: [],
+            brokenMedia: [],
+            headingInsideHeroMedia: true,
+            heroBackgroundLuminance: 0.01,
+            headingColorLuminance: 0.96,
+            headingColor: 'rgb(255, 250, 242)'
+        },
+        consoleErrors: [],
+        networkErrors: {
+            requestFailures: [],
+            criticalResponses: [],
+            pageErrors: []
+        },
+        artifacts: {
+            viewportScreenshot: '/tmp/services-text-distribution.png'
+        }
+    });
+
+    const finding = findings.find((entry) => (
+        entry.category === 'section_rhythm' &&
+        /text distribution/.test(entry.message)
+    ));
+
+    assert.ok(finding);
+    assert.match(finding.evidence, /heroHeadingLineCount=3>2/);
+    assert.match(finding.evidence, /directoryHeadingLineCount=4>2/);
+    assert.match(finding.evidence, /heroIntroToSelectorWidthRatio/);
+    assert.match(finding.evidence, /directoryToFlowWidthRatio/);
+    assert.match(finding.evidence, /heroSelectorCardEdgeDeltaPx/);
 });
 
 test('buildServiceInteractionFindings accepts service circles when each state updates cleanly and stays aligned', () => {
@@ -1899,6 +1967,61 @@ test('buildDeterministicFindings flags locations desktop when both columns sink 
     });
 
     assert.ok(findings.some((finding) => finding.category === 'first_viewport_layout'));
+});
+
+test('buildDeterministicFindings flags locations cards when hero zone text is clipped or collides with the map', () => {
+    const findings = buildDeterministicFindings({
+        route: '/locations.html',
+        viewport: { name: 'tablet-landscape-short' },
+        profile: 'hub_marketing',
+        metrics: {
+            horizontalOverflowPx: 0,
+            visibleH1Count: 1,
+            headingRect: { top: 190 },
+            viewportWidth: 879,
+            viewportHeight: 414,
+            locationsSummaryRect: { top: 112, bottom: 395, width: 782, height: 283 },
+            locationsMapRect: { top: 424, bottom: 706, left: 48, right: 831, width: 782, height: 282 },
+            locationsHeroShellRect: { top: 0, width: 782, bottom: 724, height: 724 },
+            locationsHeroZoneListRect: { top: 395, bottom: 520, left: 48, right: 831, width: 782, height: 125 },
+            locationsHeroZoneTextMetrics: [
+                {
+                    clientHeight: 14,
+                    scrollHeight: 28,
+                    clipped: true,
+                    text: 'Hotels, residences, Palm, Marina, Downtown, Business Bay and JBR.'
+                }
+            ],
+            heroActionCount: 1,
+            primaryCtaRect: { top: 260, bottom: 308 },
+            headerFamily: 'lab-header',
+            visualIntent: 'modern_dark_system',
+            hasVisualMedia: true,
+            hasNav: true,
+            headerOcclusionPx: 0,
+            clippedElements: [],
+            overlaps: [],
+            brokenMedia: [],
+            headingInsideHeroMedia: true,
+            heroBackgroundLuminance: 0.01,
+            headingColorLuminance: 0.96,
+            headingColor: 'rgb(255, 250, 242)'
+        },
+        consoleErrors: [],
+        networkErrors: {
+            requestFailures: [],
+            criticalResponses: [],
+            pageErrors: []
+        },
+        artifacts: {
+            viewportScreenshot: '/tmp/locations-zone-clipped.png'
+        }
+    });
+
+    assert.ok(findings.some((finding) => (
+        finding.category === 'clipping' &&
+        /Location guide cards/.test(finding.message)
+    )));
 });
 
 test('buildDeterministicFindings accepts balanced hero-support splits for brand landings', () => {

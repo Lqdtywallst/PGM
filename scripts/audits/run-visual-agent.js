@@ -37,6 +37,7 @@ const {
     getFirstViewportContract,
     getMobileInteractionContract,
     getSectionRhythmContract,
+    getTextDistributionContract,
     getViewportCoverageMatrix
 } = require(path.join(__dirname, '..', '..', 'server', 'design-system', 'design-system-contract.js'));
 const {
@@ -918,6 +919,44 @@ async function captureRegionScreenshot(page, selectors, outputPath) {
     }
 
     return null;
+}
+
+async function stabilizeVisualOnlySurfaces(page, route) {
+    if (route !== '/locations.html') {
+        return;
+    }
+
+    await page.addStyleTag({
+        content: `
+            .locations-map-card__iframe {
+                opacity: 0 !important;
+            }
+
+            .locations-map-card__frame {
+                background:
+                    radial-gradient(circle at 63% 31%, rgba(210, 176, 96, 0.34), rgba(210, 176, 96, 0) 8rem),
+                    radial-gradient(circle at 24% 75%, rgba(76, 82, 88, 0.28), rgba(76, 82, 88, 0) 8rem),
+                    linear-gradient(135deg, #d9e8e8 0%, #e8e1d6 44%, #cfdcd1 100%) !important;
+            }
+
+            .locations-map-card__frame::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                z-index: 2;
+                pointer-events: none;
+                background:
+                    linear-gradient(38deg, transparent 0 44%, rgba(86, 67, 47, 0.34) 44.4% 45.2%, transparent 45.6%),
+                    linear-gradient(145deg, transparent 0 51%, rgba(86, 67, 47, 0.2) 51.2% 52%, transparent 52.4%),
+                    radial-gradient(circle at 58% 37%, rgba(12, 15, 19, 0.16) 0 0.28rem, transparent 0.32rem);
+                opacity: 0.72;
+            }
+
+            .locations-map-card__marker-layer {
+                z-index: 4 !important;
+            }
+        `
+    });
 }
 
 function serviceStateScreenshotPath(pageDir, tabId = '') {
@@ -5988,7 +6027,14 @@ async function collectVisualMetrics(page, profile) {
             const verticalOutsidePx = intersectsViewportVertically
                 ? Math.max(0, -rect.top) + Math.max(0, rect.bottom - viewportHeight)
                 : 0;
-            const outsideViewportPx = horizontalOutsidePx + verticalOutsidePx;
+            const horizontalScroller = element.closest('.services-hero__selector');
+            const horizontalScrollerStyle = horizontalScroller ? window.getComputedStyle(horizontalScroller) : null;
+            const intentionalHorizontalScroll = Boolean(
+                horizontalScroller &&
+                horizontalScroller.scrollWidth > horizontalScroller.clientWidth + 4 &&
+                /(auto|scroll)/.test(String(horizontalScrollerStyle?.overflowX || '').toLowerCase())
+            );
+            const outsideViewportPx = (intentionalHorizontalScroll ? 0 : horizontalOutsidePx) + verticalOutsidePx;
             const overflowStyle = `${style.overflow} ${style.overflowX} ${style.overflowY}`.toLowerCase();
             const allowsClipping = /(hidden|clip)/.test(overflowStyle) || style.textOverflow === 'ellipsis';
             const singleLine = String(style.whiteSpace || '').includes('nowrap');
@@ -6565,15 +6611,42 @@ async function collectVisualMetrics(page, profile) {
         const servicesFeatureCopy = firstVisible(['.services-hero__feature-copy']);
         const servicesFeatureList = firstVisible(['.services-hero__feature-list']);
         const servicesFeatureSide = firstVisible(['.services-hero__feature-side']);
+        const servicesHeroIntro = firstVisible(['.services-hero__hub-intro']);
+        const servicesDirectoryHead = firstVisible(['.services-directory .services-section__head--center']);
+        const servicesDirectoryHeading = firstVisible(['#service-directory-title']);
+        const servicesDirectoryLead = firstVisible(['.services-directory .services-section__head p']);
+        const servicesDirectoryLayout = firstVisible(['.services-directory__layout']);
         const servicesDirectoryShell = firstVisible(['.services-directory__shell']);
         const servicesFlowShell = firstVisible(['.services-flow__shell']);
         const servicesFaqShell = firstVisible(['.services-faq__shell']);
+        const servicesDirectoryGroupRects = selectorElements(['.services-directory__group'], 4)
+            .map((element) => rectData(element))
+            .filter(Boolean);
+        const servicesOrbRects = selectorElements(['.services-lane-orb'], 8)
+            .map((element) => rectData(element))
+            .filter(Boolean);
         const servicesOrbMediaRects = selectorElements(['.services-lane-orb__media'], 8)
             .map((element) => rectData(element))
             .filter(Boolean);
         const locationsSummary = firstVisible(['.locations-hero__summary']);
         const locationsMapCard = firstVisible(['.locations-map-card']);
         const locationsHeroShell = firstVisible(['.locations-hero__shell']);
+        const locationsHeroZoneList = firstVisible(['.locations-hero__zone-list']);
+        const locationsHeroZoneTextMetrics = selectorElements(['.locations-hero__zone p'], 8)
+            .map((element) => {
+                const rect = element.getBoundingClientRect();
+
+                return {
+                    top: Number(rect.top.toFixed(2)),
+                    bottom: Number(rect.bottom.toFixed(2)),
+                    width: Number(rect.width.toFixed(2)),
+                    height: Number(rect.height.toFixed(2)),
+                    scrollHeight: Number(element.scrollHeight || 0),
+                    clientHeight: Number(element.clientHeight || 0),
+                    clipped: Number(element.scrollHeight || 0) > Number(element.clientHeight || 0) + 1,
+                    text: String(element.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 80)
+                };
+            });
         const homeContentBox = firstVisible(['.hero-lab__content-box']);
         const homeHeroShell = firstVisible(['.hero-lab__shell']);
         const contactIntro = firstVisible(['.contact-hero__intro']);
@@ -6849,12 +6922,22 @@ async function collectVisualMetrics(page, profile) {
             servicesFeatureCopyRect: rectData(servicesFeatureCopy),
             servicesFeatureListRect: rectData(servicesFeatureList),
             servicesFeatureSideRect: rectData(servicesFeatureSide),
+            servicesHeroIntroRect: rectData(servicesHeroIntro),
+            servicesHeroHeadingLineMetrics: collectHeadingLineMetrics(servicesHeroIntro?.querySelector('h1') || null),
+            servicesDirectoryHeadRect: rectData(servicesDirectoryHead),
+            servicesDirectoryLayoutRect: rectData(servicesDirectoryLayout),
+            servicesDirectoryHeadingLineMetrics: collectHeadingLineMetrics(servicesDirectoryHeading),
+            servicesDirectoryLeadLineMetrics: collectHeadingLineMetrics(servicesDirectoryLead),
+            servicesDirectoryGroupRects,
+            servicesOrbRects,
             servicesDirectoryShellRect: rectData(servicesDirectoryShell),
             servicesFlowShellRect: rectData(servicesFlowShell),
             servicesFaqShellRect: rectData(servicesFaqShell),
             locationsSummaryRect: rectData(locationsSummary),
             locationsMapRect: rectData(locationsMapCard),
             locationsHeroShellRect: rectData(locationsHeroShell),
+            locationsHeroZoneListRect: rectData(locationsHeroZoneList),
+            locationsHeroZoneTextMetrics,
             homeContentBoxRect: rectData(homeContentBox),
             homeHeroShellRect: rectData(homeHeroShell),
             contactIntroRect: rectData(contactIntro),
@@ -7220,6 +7303,114 @@ function evaluateSectionRhythm({ leadRect, peerRects = [], rules = {} }) {
     return failures;
 }
 
+function rectCenterX(rect) {
+    if (!rect) {
+        return 0;
+    }
+
+    if (Number.isFinite(Number(rect.center))) {
+        return Number(rect.center);
+    }
+
+    if (Number.isFinite(Number(rect.left)) && Number.isFinite(Number(rect.right))) {
+        return (Number(rect.left) + Number(rect.right)) / 2;
+    }
+
+    return Number(rect.left || 0) + (Number(rect.width || 0) / 2);
+}
+
+function evaluateServicesTextDistribution({ metrics = {}, rules = {} }) {
+    if (!rules) {
+        return [];
+    }
+
+    const failures = [];
+    const heroLineCount = Number(metrics.servicesHeroHeadingLineMetrics?.lineCount || metrics.headingLineMetrics?.lineCount || 0);
+    const directoryLineCount = Number(metrics.servicesDirectoryHeadingLineMetrics?.lineCount || 0);
+    const heroCenterDeltaPx = metrics.servicesHeroIntroRect && metrics.servicesSelectorRect
+        ? Math.abs(rectCenterX(metrics.servicesHeroIntroRect) - rectCenterX(metrics.servicesSelectorRect))
+        : 0;
+    const directoryCenterDeltaPx = metrics.servicesDirectoryHeadRect && metrics.servicesDirectoryLayoutRect
+        ? Math.abs(rectCenterX(metrics.servicesDirectoryHeadRect) - rectCenterX(metrics.servicesDirectoryLayoutRect))
+        : 0;
+    const heroIntroToSelectorWidthRatio = metrics.servicesHeroIntroRect?.width && metrics.servicesSelectorRect?.width
+        ? metrics.servicesHeroIntroRect.width / metrics.servicesSelectorRect.width
+        : 0;
+    const directoryToFlowWidthRatio = metrics.servicesDirectoryLayoutRect?.width && metrics.servicesFlowShellRect?.width
+        ? metrics.servicesDirectoryLayoutRect.width / metrics.servicesFlowShellRect.width
+        : 0;
+    const directoryFlowCenterDeltaPx = metrics.servicesDirectoryLayoutRect && metrics.servicesFlowShellRect
+        ? Math.abs(rectCenterX(metrics.servicesDirectoryLayoutRect) - rectCenterX(metrics.servicesFlowShellRect))
+        : 0;
+    const servicesOrbRects = Array.isArray(metrics.servicesOrbRects) ? metrics.servicesOrbRects : [];
+    const heroSelectorCardEdgeDeltaPx = metrics.servicesSelectorRect && servicesOrbRects.length >= 2
+        ? Math.max(
+            Math.abs(Number(servicesOrbRects[0].left || 0) - Number(metrics.servicesSelectorRect.left || 0)),
+            Math.abs(Number(servicesOrbRects[servicesOrbRects.length - 1].right || 0) - Number(metrics.servicesSelectorRect.right || 0))
+        )
+        : 0;
+
+    if (
+        Number.isFinite(rules.maxHeroHeadingLineCount) &&
+        heroLineCount > rules.maxHeroHeadingLineCount
+    ) {
+        failures.push(`heroHeadingLineCount=${heroLineCount}>${rules.maxHeroHeadingLineCount}`);
+    }
+
+    if (
+        Number.isFinite(rules.maxDirectoryHeadingLineCount) &&
+        directoryLineCount > rules.maxDirectoryHeadingLineCount
+    ) {
+        failures.push(`directoryHeadingLineCount=${directoryLineCount}>${rules.maxDirectoryHeadingLineCount}`);
+    }
+
+    if (
+        Number.isFinite(rules.maxHeroIntroSelectorCenterDeltaPx) &&
+        heroCenterDeltaPx > rules.maxHeroIntroSelectorCenterDeltaPx
+    ) {
+        failures.push(`heroIntroSelectorCenterDeltaPx=${heroCenterDeltaPx.toFixed(2)}`);
+    }
+
+    if (
+        Number.isFinite(rules.maxDirectoryHeadLayoutCenterDeltaPx) &&
+        directoryCenterDeltaPx > rules.maxDirectoryHeadLayoutCenterDeltaPx
+    ) {
+        failures.push(`directoryHeadLayoutCenterDeltaPx=${directoryCenterDeltaPx.toFixed(2)}`);
+    }
+
+    if (
+        Number.isFinite(rules.minHeroIntroToSelectorWidthRatio) &&
+        heroIntroToSelectorWidthRatio > 0 &&
+        heroIntroToSelectorWidthRatio < rules.minHeroIntroToSelectorWidthRatio
+    ) {
+        failures.push(`heroIntroToSelectorWidthRatio=${heroIntroToSelectorWidthRatio.toFixed(3)}`);
+    }
+
+    if (
+        Number.isFinite(rules.minDirectoryToFlowWidthRatio) &&
+        directoryToFlowWidthRatio > 0 &&
+        directoryToFlowWidthRatio < rules.minDirectoryToFlowWidthRatio
+    ) {
+        failures.push(`directoryToFlowWidthRatio=${directoryToFlowWidthRatio.toFixed(3)}`);
+    }
+
+    if (
+        Number.isFinite(rules.maxDirectoryFlowCenterDeltaPx) &&
+        directoryFlowCenterDeltaPx > rules.maxDirectoryFlowCenterDeltaPx
+    ) {
+        failures.push(`directoryFlowCenterDeltaPx=${directoryFlowCenterDeltaPx.toFixed(2)}`);
+    }
+
+    if (
+        Number.isFinite(rules.maxHeroSelectorCardEdgeDeltaPx) &&
+        heroSelectorCardEdgeDeltaPx > rules.maxHeroSelectorCardEdgeDeltaPx
+    ) {
+        failures.push(`heroSelectorCardEdgeDeltaPx=${heroSelectorCardEdgeDeltaPx.toFixed(2)}`);
+    }
+
+    return failures;
+}
+
 function buildDeterministicFindings({ route, viewport, profile, metrics, consoleErrors, networkErrors, artifacts }) {
     const findings = [];
     const profileConfig = getProfileConfig(profile);
@@ -7234,6 +7425,11 @@ function buildDeterministicFindings({ route, viewport, profile, metrics, console
         viewportWidth: metrics.viewportWidth
     });
     const sectionRhythmContract = getSectionRhythmContract({
+        route: normalizedRoute,
+        viewportName,
+        viewportWidth: metrics.viewportWidth
+    });
+    const textDistributionContract = getTextDistributionContract({
         route: normalizedRoute,
         viewportName,
         viewportWidth: metrics.viewportWidth
@@ -7898,6 +8094,26 @@ function buildDeterministicFindings({ route, viewport, profile, metrics, console
         }
     }
 
+    if (textDistributionContract) {
+        const textDistributionFailures = evaluateServicesTextDistribution({
+            metrics,
+            rules: textDistributionContract
+        });
+
+        if (textDistributionFailures.length > 0) {
+            findings.push(createVisualFinding({
+                route,
+                viewport: viewportName,
+                severity: 'medium',
+                category: 'section_rhythm',
+                message: 'The services page text distribution no longer matches the premium layout contract.',
+                evidence: textDistributionFailures.join('; '),
+                likelyCause: 'A heading, lead block, or directory section became too narrow, too multiline, or misaligned with the card frame.',
+                screenshotPath
+            }));
+        }
+    }
+
     if (
         profileConfig.heroLed &&
         metrics.headingRect &&
@@ -8155,6 +8371,37 @@ function buildDeterministicFindings({ route, viewport, profile, metrics, console
             hardFail: true,
             screenshotPath
         }));
+    }
+
+    if (normalizedRoute === '/locations.html') {
+        const clippedZoneTexts = (metrics.locationsHeroZoneTextMetrics || [])
+            .filter((entry) => entry?.clipped)
+            .slice(0, 5);
+        const zoneListRect = metrics.locationsHeroZoneListRect || null;
+        const mapRect = metrics.locationsMapRect || null;
+        const zoneMapOverlapArea = zoneListRect && mapRect
+            ? Math.max(0, Math.min(zoneListRect.right, mapRect.right) - Math.max(zoneListRect.left, mapRect.left)) *
+                Math.max(0, Math.min(zoneListRect.bottom, mapRect.bottom) - Math.max(zoneListRect.top, mapRect.top))
+            : 0;
+
+        if (clippedZoneTexts.length > 0 || zoneMapOverlapArea > 64) {
+            findings.push(createVisualFinding({
+                route,
+                viewport: viewportName,
+                severity: 'high',
+                category: 'clipping',
+                selector: '.locations-hero__zone',
+                message: 'Location guide cards are clipping text or colliding with the map in the hero.',
+                evidence: [
+                    clippedZoneTexts.length ? `clippedZoneTexts=${clippedZoneTexts.length}` : '',
+                    clippedZoneTexts.map((entry) => `text="${entry.text || ''}" ${entry.clientHeight}/${entry.scrollHeight}`).join(' | '),
+                    zoneMapOverlapArea > 64 ? `zoneMapOverlapArea=${zoneMapOverlapArea.toFixed(2)}` : ''
+                ].filter(Boolean).join('; '),
+                likelyCause: 'A short viewport or compact desktop rule is forcing the locations card grid into too little vertical space.',
+                hardFail: true,
+                screenshotPath
+            }));
+        }
     }
 
     for (const clipped of metrics.clippedElements || []) {
@@ -10335,6 +10582,7 @@ async function runPageAudit({ browser, baseUrl, route, viewport, runDir, updateB
         }
 
         await resetInteractiveChrome(page);
+        await stabilizeVisualOnlySurfaces(page, route);
         await page.screenshot({
             path: artifacts.viewportScreenshot,
             fullPage: false,

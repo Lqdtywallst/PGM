@@ -763,7 +763,7 @@
 .services-section__head {
     display: grid;
     gap: 0.8rem;
-    max-width: 42rem;
+    max-width: 52rem;
 }
 
 .services-section__head--center {
@@ -773,21 +773,38 @@
 }
 
 .services-section__head h2 {
-    max-width: 12ch;
+    max-width: 16ch;
     font-size: clamp(2.3rem, 4vw, 3.35rem);
     line-height: 0.95;
     color: #171412;
 }
 
 .services-section__head p {
+    max-width: 42rem;
     color: #3f3328;
+}
+
+.services-directory .services-section__head {
+    max-width: min(100%, 56rem);
+    justify-self: center;
+}
+
+.services-directory .services-section__head h2 {
+    max-width: 17ch;
+}
+
+.services-directory .services-section__head p {
+    justify-self: center;
+    max-width: 44rem;
 }
 
 .services-directory__layout {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 2rem 3rem;
+    grid-template-columns: 1fr;
+    gap: clamp(1.6rem, 3vw, 2.35rem);
     align-items: start;
+    width: 100%;
+    justify-self: center;
 }
 
 .services-directory__group {
@@ -807,16 +824,30 @@
 
 .services-directory__list {
     display: grid;
+    gap: 1rem;
+}
+
+.services-directory__group:first-child .services-directory__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.services-directory__group:last-child .services-directory__list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .services-directory__item {
     display: grid;
     gap: 0.35rem;
-    padding: 1rem 0;
-    border-bottom: 1px solid rgba(68, 59, 52, 0.12);
+    align-content: start;
+    min-height: 100%;
+    padding: 1rem;
+    border: 1px solid rgba(68, 59, 52, 0.12);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.48);
     color: #171412;
     text-decoration: none;
-    transition: transform 180ms ease, color 180ms ease;
+    box-shadow: 0 12px 26px rgba(29, 22, 16, 0.05);
+    transition: transform 180ms ease, border-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
 }
 
 .services-directory__eyebrow {
@@ -846,7 +877,9 @@
 .services-directory__item:hover,
 .services-directory__item:focus-visible {
     transform: translateX(3px);
+    border-color: rgba(128, 97, 58, 0.22);
     color: #070606;
+    box-shadow: 0 16px 32px rgba(29, 22, 16, 0.08);
 }
 
 .services-lane-grid,
@@ -1321,11 +1354,14 @@
         justify-self: start;
     }
 
-    .services-directory__layout,
     .services-lane-grid,
     .services-local__grid,
     .services-private__grid,
     .services-flow__list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .services-directory__group:last-child .services-directory__list {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
@@ -1346,7 +1382,6 @@
     }
 
     .services-directory__layout {
-        grid-template-columns: 1fr;
         gap: 1.4rem;
     }
 
@@ -1460,6 +1495,11 @@
 
     .services-directory__title {
         font-size: 1.65rem;
+    }
+
+    .services-directory__group:first-child .services-directory__list,
+    .services-directory__group:last-child .services-directory__list {
+        grid-template-columns: 1fr;
     }
 
     .services-button,
@@ -1856,7 +1896,7 @@
 
 /* Mother Services hero: two clear viewport halves, direct service actions. */
 .services-page .services-hero {
-    min-height: 100svh;
+    min-height: calc(100svh - var(--lab-header-offset));
     isolation: isolate;
 }
 
@@ -1873,8 +1913,8 @@
 }
 
 .services-page .services-hero__shell {
-    min-height: 100svh;
-    --services-hero-pad-top: calc(var(--lab-header-offset) + clamp(0.85rem, 2vh, 1.35rem));
+    min-height: calc(100svh - var(--lab-header-offset));
+    --services-hero-pad-top: clamp(0.85rem, 2vh, 1.35rem);
     --services-hero-pad-bottom: clamp(1rem, 2.4vh, 1.65rem);
     padding-top: var(--services-hero-pad-top);
     padding-bottom: var(--services-hero-pad-bottom);
@@ -1887,25 +1927,25 @@
     align-items: stretch;
     align-content: stretch;
     justify-items: center;
-    width: min(100%, 78rem);
-    min-height: calc(100svh - var(--services-hero-pad-top) - var(--services-hero-pad-bottom));
-    max-width: 78rem;
+    width: min(100%, 90rem);
+    min-height: calc(100svh - var(--lab-header-offset) - var(--services-hero-pad-top) - var(--services-hero-pad-bottom));
+    max-width: 90rem;
 }
 
 .services-page .services-hero__hub-intro {
     align-self: center;
     gap: clamp(0.62rem, 1.35vh, 0.95rem);
-    width: min(100%, 54rem);
+    width: min(100%, 66rem);
 }
 
 .services-page .services-hero__hub-intro h1 {
-    max-width: 12.5ch;
-    font-size: clamp(2.95rem, 5.1vw, 4.85rem);
-    line-height: 0.86;
+    max-width: 16ch;
+    font-size: clamp(3.05rem, 5vw, 4.8rem);
+    line-height: 0.9;
 }
 
 .services-page .services-hero__planner--direct .services-hero__lead {
-    max-width: 40rem;
+    max-width: 44rem;
     color: rgba(255, 250, 242, 0.88);
     font-size: clamp(0.94rem, 1.25vw, 1.08rem);
 }
@@ -1942,6 +1982,7 @@
     gap: clamp(0.8rem, 1.55vw, 1.2rem);
     width: 100%;
     min-height: 0;
+    padding-right: 0;
 }
 
 .services-page .services-lane-orb {
@@ -1952,7 +1993,7 @@
     min-height: 100%;
     padding: clamp(0.72rem, 1vw, 0.95rem);
     border: 1px solid rgba(255, 250, 242, 0.17);
-    border-radius: 14px;
+    border-radius: 12px;
     background:
         linear-gradient(180deg, rgba(255, 250, 242, 0.12) 0%, rgba(255, 250, 242, 0.055) 100%),
         rgba(8, 9, 11, 0.48);
@@ -2093,19 +2134,19 @@
 
     .services-page .services-hero__hub-intro {
         gap: 0.46rem;
-        width: min(100%, 46rem);
+        width: min(100%, 60rem);
     }
 
     .services-page .services-hero__hub-intro h1 {
-        max-width: 13.5ch;
-        font-size: clamp(2.42rem, 4.45vw, 3.55rem);
-        line-height: 0.86;
+        max-width: 16ch;
+        font-size: clamp(2.62rem, 4.2vw, 3.7rem);
+        line-height: 0.9;
     }
 
     .services-page .services-hero__planner--direct .services-hero__lead {
         max-width: 34rem;
         font-size: 0.86rem;
-        line-height: 1.38;
+        line-height: 1.4;
     }
 
     .services-page .services-hero__trust {
@@ -2202,7 +2243,7 @@
 
 @media (max-width: 640px) {
     .services-page .services-hero__shell {
-        --services-hero-pad-top: calc(var(--lab-header-offset) + 0.7rem);
+        --services-hero-pad-top: 0.7rem;
         --services-hero-pad-bottom: 0.9rem;
     }
 
@@ -2216,9 +2257,9 @@
     }
 
     .services-page .services-hero__hub-intro h1 {
-        max-width: 10.5ch;
-        font-size: clamp(2.2rem, 11vw, 3.05rem);
-        line-height: 0.9;
+        max-width: 9.8ch;
+        font-size: clamp(2.35rem, 11vw, 3.15rem);
+        line-height: 0.92;
     }
 
     .services-page .services-hero__planner--direct .services-hero__lead {

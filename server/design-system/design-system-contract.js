@@ -906,7 +906,7 @@ const DESIGN_SYSTEM_CONTRACT = Object.freeze({
           mobile: Object.freeze({
             policy: 'locked',
             check: 'services_direct_lanes',
-            selectorBottomRatio: Object.freeze({ max: 0.72 }),
+            selectorBottomRatio: Object.freeze({ max: 0.99 }),
             minOrbSlotFillRatio: 0.48,
             minOrbMediaWidthPx: 48,
             maxHeadingTopRatio: 0.34,
@@ -939,6 +939,40 @@ const DESIGN_SYSTEM_CONTRACT = Object.freeze({
             usefulRectKey: 'locationsSummaryRect',
             usefulLabel: 'locations summary',
             maxUsefulTopRatio: 0.38,
+          }),
+        }),
+      }),
+      textDistribution: Object.freeze({
+        tiers: Object.freeze({
+          laptop: Object.freeze({
+            policy: 'locked',
+            maxHeroHeadingLineCount: 2,
+            maxDirectoryHeadingLineCount: 2,
+            maxHeroIntroSelectorCenterDeltaPx: 24,
+            maxDirectoryHeadLayoutCenterDeltaPx: 24,
+            minHeroIntroToSelectorWidthRatio: 0.72,
+            minDirectoryToFlowWidthRatio: 0.96,
+            maxDirectoryFlowCenterDeltaPx: 24,
+            maxHeroSelectorCardEdgeDeltaPx: 10,
+          }),
+          desktop: Object.freeze({
+            policy: 'locked',
+            maxHeroHeadingLineCount: 2,
+            maxDirectoryHeadingLineCount: 2,
+            maxHeroIntroSelectorCenterDeltaPx: 28,
+            maxDirectoryHeadLayoutCenterDeltaPx: 28,
+            minHeroIntroToSelectorWidthRatio: 0.72,
+            minDirectoryToFlowWidthRatio: 0.96,
+            maxDirectoryFlowCenterDeltaPx: 28,
+            maxHeroSelectorCardEdgeDeltaPx: 12,
+          }),
+          mobile: Object.freeze({
+            policy: 'locked',
+            maxHeroHeadingLineCount: 3,
+            maxDirectoryHeadingLineCount: 3,
+            maxHeroIntroSelectorCenterDeltaPx: 18,
+            maxDirectoryHeadLayoutCenterDeltaPx: 18,
+            minHeroIntroToSelectorWidthRatio: 0.82,
           }),
         }),
       }),
@@ -992,7 +1026,7 @@ const DESIGN_SYSTEM_CONTRACT = Object.freeze({
       maxButtonFamilyCount: 5,
     }),
     hub_marketing: Object.freeze({
-      headingFontFamilies: Object.freeze(['cormorant garamond']),
+      headingFontFamilies: Object.freeze(['el messiri', 'cormorant garamond']),
       bodyFontFamilies: Object.freeze(['manrope']),
       visualIntents: Object.freeze(['modern_dark_system']),
       headerVariants: Object.freeze(['lab_mega_utility']),
@@ -1138,6 +1172,13 @@ function getSectionRhythmContract({ route = '', viewportName = '', viewportWidth
   return pageContract?.tiers?.[viewportTier] || null;
 }
 
+function getTextDistributionContract({ route = '', viewportName = '', viewportWidth = 0 } = {}) {
+  const normalizedRoute = normalizeRouteToken(route);
+  const viewportTier = resolveViewportTier(viewportName, viewportWidth);
+  const pageContract = DESIGN_SYSTEM_CONTRACT.pages?.[normalizedRoute]?.textDistribution || null;
+  return pageContract?.tiers?.[viewportTier] || null;
+}
+
 function getMobileInteractionContract({ interaction = '', viewportName = '', viewportWidth = 0 } = {}) {
   const viewportTier = resolveViewportTier(viewportName, viewportWidth);
   const interactionContract = DESIGN_SYSTEM_CONTRACT.mobileInteractionPolicies?.[interaction] || null;
@@ -1150,6 +1191,7 @@ module.exports = {
   getFirstViewportContract,
   getMobileInteractionContract,
   getSectionRhythmContract,
+  getTextDistributionContract,
   getViewportCoverageMatrix,
   resolveViewportTier,
 };

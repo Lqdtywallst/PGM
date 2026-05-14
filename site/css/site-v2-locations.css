@@ -794,8 +794,8 @@
     z-index: 4;
     padding: 0.22rem 0.46rem;
     border-radius: 999px;
-    background: rgba(255, 250, 242, 0.82);
-    color: rgba(17, 22, 30, 0.66);
+    background: rgba(255, 250, 242, 0.94);
+    color: #11161e;
     font-size: 0.62rem;
     font-weight: 800;
     pointer-events: none;
@@ -1118,12 +1118,10 @@
     }
 
     .locations-hero__zone p {
-        font-size: 0.68rem;
-        line-height: 1.22;
-        display: -webkit-box;
-        overflow: hidden;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
+        font-size: 0.7rem;
+        line-height: 1.36;
+        display: block;
+        overflow: visible;
     }
 
     .locations-map-card {
@@ -1196,11 +1194,21 @@
 }
 
 @media (max-width: 1180px) {
+    .locations-hero {
+        min-height: auto;
+        overflow: visible;
+    }
+
     .locations-hero__shell,
     .locations-section__head,
     .locations-faq__shell,
     .locations-map-card__foot {
         grid-template-columns: 1fr;
+    }
+
+    .locations-hero__shell {
+        min-height: auto;
+        align-content: start;
     }
 
     .locations-map-card {
@@ -1209,13 +1217,23 @@
         align-self: start;
     }
 
+    .locations-hero__summary,
+    .locations-map-card {
+        max-height: none;
+    }
+
     .locations-map-card__action {
         min-height: 2.45rem;
     }
 
     .locations-hero__summary {
         gap: 1rem;
+        grid-template-rows: auto auto;
         min-height: auto;
+    }
+
+    .locations-hero__zone-list {
+        align-content: start;
     }
 
     .locations-section__head p {
@@ -1466,5 +1484,33 @@
 
     .locations-map-card__frame {
         flex: 1 1 auto;
+    }
+}
+
+@media (min-width: 861px) and (max-width: 1180px) {
+    .locations-hero {
+        min-height: auto;
+        overflow: visible;
+    }
+
+    .locations-hero__shell {
+        min-height: auto;
+        grid-template-columns: 1fr;
+        grid-auto-rows: auto;
+        align-content: start;
+    }
+
+    .locations-hero__summary,
+    .locations-map-card {
+        max-height: none;
+    }
+
+    .locations-hero__summary {
+        grid-template-rows: auto auto;
+        align-content: start;
+    }
+
+    .locations-hero__zone-list {
+        align-content: start;
     }
 }
