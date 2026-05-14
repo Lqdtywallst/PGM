@@ -1,5 +1,9 @@
+.about-page {
+    background: #f5efe5;
+}
+
 .about-page-main {
-    background: #090a0d;
+    background: linear-gradient(180deg, #f5efe5 0%, #fbf8f1 34%, #f3eadf 100%);
     color: #171615;
     font-family: var(--lab-font-sans);
 }
@@ -30,7 +34,9 @@
     min-height: 100svh;
     padding: calc(var(--lab-header-offset) + clamp(1rem, 2.4vw, 2.1rem)) 0 clamp(1.4rem, 3vw, 2.7rem);
     color: #fff8eb;
-    background: #090a0d;
+    background:
+        radial-gradient(circle at 50% 0%, rgba(213, 180, 102, 0.16), rgba(213, 180, 102, 0) 28rem),
+        linear-gradient(180deg, #f5efe5 0%, #fbf8f1 48%, #f3eadf 100%);
     overflow: hidden;
 }
 
@@ -39,9 +45,9 @@
     inset: 0;
     pointer-events: none;
     background:
-        radial-gradient(circle at 72% 30%, rgba(241, 226, 189, 0.12), rgba(241, 226, 189, 0) 20rem),
-        radial-gradient(circle at 15% 24%, rgba(209, 184, 122, 0.14), rgba(209, 184, 122, 0) 18rem),
-        linear-gradient(135deg, #08090c 0%, #111217 58%, #19150f 100%);
+        radial-gradient(circle at 72% 30%, rgba(213, 180, 102, 0.14), rgba(213, 180, 102, 0) 20rem),
+        radial-gradient(circle at 15% 24%, rgba(17, 18, 22, 0.08), rgba(17, 18, 22, 0) 18rem),
+        linear-gradient(135deg, rgba(245, 239, 229, 0.98) 0%, rgba(251, 248, 241, 0.92) 58%, rgba(243, 234, 223, 0.96) 100%);
 }
 
 .about-hero__backdrop::after {
@@ -303,7 +309,7 @@
 .about-proof-strip,
 .about-band,
 .about-cta {
-    background: #f7f3ea;
+    background: #f5efe5;
 }
 
 .about-proof-strip {
@@ -361,7 +367,7 @@
 }
 
 .about-band--soft {
-    background: #eee7dd;
+    background: #f3eadf;
 }
 
 .about-story__shell,
@@ -543,7 +549,8 @@
 }
 
 .about-page .site-v2-footer {
-    background: #0f1218;
+    background:
+        linear-gradient(180deg, #f3eadf 0%, #fbf8f1 42%, #f5efe5 100%);
 }
 
 @media (min-width: 1181px) {
@@ -594,13 +601,15 @@
         box-sizing: border-box;
         min-height: 100svh;
         padding: calc(var(--lab-header-offset) + 0.95rem) 0 1.25rem;
-        background: #090a0d;
+        background:
+            radial-gradient(circle at 50% 0%, rgba(213, 180, 102, 0.16), rgba(213, 180, 102, 0) 24rem),
+            linear-gradient(180deg, #f5efe5 0%, #fbf8f1 48%, #f3eadf 100%);
     }
 
     .about-hero__backdrop {
         background:
-            radial-gradient(circle at 14% 8%, rgba(209, 184, 122, 0.2), rgba(209, 184, 122, 0) 16rem),
-            linear-gradient(180deg, #090a0d 0%, #111217 100%);
+            radial-gradient(circle at 14% 8%, rgba(213, 180, 102, 0.16), rgba(213, 180, 102, 0) 16rem),
+            linear-gradient(180deg, rgba(245, 239, 229, 0.98) 0%, rgba(243, 234, 223, 0.96) 100%);
     }
 
     .about-hero__backdrop::after {
