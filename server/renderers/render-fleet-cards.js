@@ -96,7 +96,7 @@ function renderCard(card) {
         `                                                </div>`,
         `                                                <span class="fleet-card__price-note">${escapeHtml(card.booking.priceNote)}</span>`,
         `                                            </div>`,
-        `                                            <a class="fleet-card__primary" href="${escapeHtml(card.href)}">${escapeHtml(card.booking.primaryLabel || "More information")}</a>`,
+        `                                            <a class="fleet-card__primary" href="${escapeHtml(card.href)}">${escapeHtml(card.booking.primaryLabel || "View details")}</a>`,
         `                                        </div>`,
         `                                    </div>`,
         `                                </div>`,

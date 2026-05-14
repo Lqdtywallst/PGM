@@ -41,7 +41,7 @@ const rules = [
     {
         id: 'generic-cta',
         severity: 'low',
-        pattern: /\b(?:click here|submit|learn more|read more)\b/i,
+        pattern: /\b(?:click here|submit|learn more|read more|more information)\b/i,
         message: 'Generic CTA copy should be made more specific where visible.'
     },
     {
