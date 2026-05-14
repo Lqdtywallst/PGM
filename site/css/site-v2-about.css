@@ -26,8 +26,9 @@
     position: relative;
     display: grid;
     align-items: center;
-    min-height: min(760px, 100svh);
-    padding: calc(var(--lab-header-offset) + clamp(1.3rem, 3vw, 2.8rem)) 0 clamp(2.2rem, 4.4vw, 4rem);
+    box-sizing: border-box;
+    min-height: 100svh;
+    padding: calc(var(--lab-header-offset) + clamp(1rem, 2.4vw, 2.1rem)) 0 clamp(1.4rem, 3vw, 2.7rem);
     color: #fff8eb;
     background: #090a0d;
     overflow: hidden;
@@ -61,12 +62,13 @@
     display: grid;
     grid-template-columns: minmax(22rem, 0.88fr) minmax(28rem, 1.12fr);
     gap: clamp(1rem, 2vw, 1.7rem);
-    align-items: stretch;
+    align-items: center;
 }
 
 .about-hero__copy,
 .about-visual-card {
-    min-height: clamp(27rem, 42vw, 32.5rem);
+    height: clamp(27rem, 68svh, 38rem);
+    min-height: clamp(24rem, 34vw, 31rem);
     border: 1px solid rgba(241, 226, 189, 0.16);
     border-radius: 24px;
     box-shadow:
@@ -113,7 +115,7 @@
     display: block;
     width: 100%;
     height: 100%;
-    min-height: clamp(18rem, 26vw, 24rem);
+    min-height: clamp(14rem, 22vw, 22rem);
     object-fit: cover;
     filter: saturate(0.9) contrast(1.05) brightness(0.72);
 }
@@ -576,6 +578,7 @@
 
     .about-hero__copy,
     .about-visual-card {
+        height: auto;
         min-height: auto;
     }
 
@@ -588,6 +591,8 @@
 
 @media (max-width: 760px) {
     .about-hero {
+        box-sizing: border-box;
+        min-height: 100svh;
         padding: calc(var(--lab-header-offset) + 0.95rem) 0 1.25rem;
         background: #090a0d;
     }
@@ -648,21 +653,19 @@
     }
 
     .about-visual-card__media img {
-        min-height: 13rem;
+        min-height: clamp(11rem, 48vw, 13rem);
     }
 
     .about-visual-card__caption {
-        padding: 1rem;
+        padding: 1rem 4.75rem 1rem 1rem;
+    }
+
+    .about-visual-card__caption strong {
+        font-size: 1.35rem;
     }
 
     .about-hero-stats {
-        grid-template-columns: 1fr;
-        gap: 0.55rem;
-        padding: 0 1rem 1rem;
-    }
-
-    .about-hero-stats div {
-        padding: 0.7rem 0.8rem;
+        display: none;
     }
 
     .about-hero__actions,
@@ -711,6 +714,21 @@
 
     .about-cta__media {
         display: none;
+    }
+}
+
+@media (max-width: 760px) and (max-height: 700px) {
+    .about-visual-card {
+        display: none;
+    }
+
+    .about-page .lab-floating-contact {
+        display: none;
+    }
+
+    .about-hero__shell {
+        align-content: center;
+        min-height: calc(100svh - var(--lab-header-offset) - 2.2rem);
     }
 }
 
