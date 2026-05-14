@@ -84,6 +84,13 @@ async function mockFleetAvailability(page, overrides = {}) {
     });
 }
 
+async function fillVehicleAvailabilityWindow(page, bookingWindow) {
+    await page.locator('input[name="startDate"]').fill(bookingWindow.startDate);
+    await page.locator('input[name="endDate"]').fill(bookingWindow.endDate);
+    await page.locator('input[name="pickupTime"]').fill(bookingWindow.pickupTime);
+    await page.locator('input[name="dropoffTime"]').fill(bookingWindow.dropoffTime);
+}
+
 async function captureAuditScreenshot(page, testInfo, name) {
     const screenshotPath = testInfo.outputPath(`${name}.png`);
 
@@ -330,6 +337,50 @@ test.describe('Public site quality gate', () => {
         await expect(page.locator('#vehicle-booking input[name="car"]')).toHaveValue('Ferrari 296 GTS');
 
         await expectNoConsoleErrors(consoleErrors, 'home featured vehicle landing handoff');
+    });
+
+    test('vehicle availability blocks unavailable cars before reserve', async ({ page }) => {
+        const consoleErrors = createConsoleTracker(page);
+        await mockFleetAvailability(page, {
+            'ferrari-296-gts': { available: false }
+        });
+
+        await page.goto('/ferrari-296-gts-rental-dubai.html', { waitUntil: 'domcontentloaded' });
+        await fillVehicleAvailabilityWindow(page, {
+            startDate: '2026-11-20',
+            endDate: '2026-11-22',
+            pickupTime: '10:00',
+            dropoffTime: '18:00'
+        });
+
+        await page.locator('#vehicle-booking').getByRole('button', { name: /Check availability/i }).click();
+
+        await expect(page.locator('.vehicle-availability-toast')).toContainText('Not available for those dates');
+        await expect(page).toHaveURL(/\/ferrari-296-gts-rental-dubai\.html$/i);
+        await expectNoConsoleErrors(consoleErrors, 'vehicle unavailable availability guard');
+    });
+
+    test('vehicle availability confirms available cars before reserve handoff', async ({ page }) => {
+        const consoleErrors = createConsoleTracker(page);
+        await mockFleetAvailability(page, {
+            'ferrari-296-gts': { available: true }
+        });
+
+        await page.goto('/ferrari-296-gts-rental-dubai.html', { waitUntil: 'domcontentloaded' });
+        await fillVehicleAvailabilityWindow(page, {
+            startDate: '2026-11-20',
+            endDate: '2026-11-22',
+            pickupTime: '10:00',
+            dropoffTime: '18:00'
+        });
+
+        await page.locator('#vehicle-booking').getByRole('button', { name: /Check availability/i }).click();
+
+        await expect(page.locator('.vehicle-availability-toast')).toContainText('Available for your selected window');
+        await expect(page).toHaveURL(/\/app\/reserve\/page\.html\?/i);
+        await expect(page.locator('#selectedCar')).toHaveText('Ferrari 296 GTS');
+        await expect(page.locator('#startDate')).toHaveValue('2026-11-20');
+        await expectNoConsoleErrors(consoleErrors, 'vehicle available availability handoff');
     });
 
     test('critical pages pass a focused accessibility scan', async ({ page }, testInfo) => {

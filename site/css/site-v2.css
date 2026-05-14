@@ -339,7 +339,8 @@ html.js .home-page .hero-lab:not(.is-video-ready) .hero-lab__video {
 
 .hero-floating-actions__link--wa {
     background: #19a83f;
-    box-shadow: 0 18px 38px rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(241, 226, 189, 0.58);
+    box-shadow: none;
 }
 
 .home-page .hero-floating-actions {
@@ -2315,6 +2316,10 @@ select {
     letter-spacing: -0.01em;
 }
 
+.mobile-scroll-hint {
+    display: none;
+}
+
 .fleet-showcase {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 17.2rem), 1fr));
@@ -3941,7 +3946,8 @@ a.brand-marquee__item:focus-visible img {
     position: relative;
     isolation: isolate;
     overflow: clip;
-    background: #efe7da;
+    background:
+        linear-gradient(180deg, #f2eadc 0%, #fbf8f1 52%, #efe7da 100%);
 }
 
 .guest-reviews {
@@ -3958,9 +3964,12 @@ a.brand-marquee__item:focus-visible img {
     z-index: 0;
     pointer-events: none;
     overflow: hidden;
+    background:
+        radial-gradient(circle at 18% 16%, rgba(var(--dp-color-gold-rgb), 0.16), transparent 28rem),
+        radial-gradient(circle at 82% 12%, rgba(42, 31, 20, 0.08), transparent 26rem),
+        repeating-linear-gradient(90deg, rgba(72, 54, 36, 0.045) 0 1px, transparent 1px 88px);
 }
 
-.guest-reviews__bg-video,
 .guest-reviews__bg-shade {
     position: absolute;
     inset: 0;
@@ -3968,19 +3977,10 @@ a.brand-marquee__item:focus-visible img {
     height: 100%;
 }
 
-.guest-reviews__bg-video {
-    object-fit: cover;
-    object-position: center 42%;
-    opacity: 0.94;
-    filter: saturate(1.08) brightness(0.88) contrast(1.12);
-    transform: scale(1.04);
-}
-
 .guest-reviews__bg-shade {
     background:
-        radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 24%),
-        radial-gradient(circle at 82% 22%, rgba(214, 188, 134, 0.14), rgba(214, 188, 134, 0) 24%),
-        linear-gradient(180deg, rgba(239, 231, 218, 0.24) 0%, rgba(239, 231, 218, 0.08) 16%, rgba(239, 231, 218, 0.02) 40%, rgba(17, 19, 23, 0.2) 74%, rgba(9, 12, 15, 0.52) 100%);
+        radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0) 28%),
+        linear-gradient(180deg, rgba(248, 244, 236, 0.92) 0%, rgba(248, 244, 236, 0.68) 42%, rgba(239, 231, 218, 0.92) 100%);
 }
 
 .guest-reviews__shell {
@@ -5560,18 +5560,31 @@ a.brand-marquee__item:focus-visible img {
         justify-content: flex-start;
         justify-items: initial;
         gap: 0.85rem;
-        padding: 0.1rem 0.05rem 0.6rem;
+        padding: 0.1rem 2.1rem 0.7rem 0.05rem;
         border-radius: 0;
         overflow-x: auto;
         overscroll-behavior-x: contain;
         scroll-padding-inline: 0.05rem;
         scroll-snap-type: x mandatory;
         -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
+        scrollbar-color: rgba(214, 181, 94, 0.5) rgba(70, 52, 34, 0.08);
+        scrollbar-width: thin;
+        mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 2.55rem), transparent 100%);
     }
 
     .fleet-categories__shell::-webkit-scrollbar {
-        display: none;
+        display: block;
+        height: 4px;
+    }
+
+    .fleet-categories__shell::-webkit-scrollbar-track {
+        background: rgba(70, 52, 34, 0.08);
+        border-radius: 999px;
+    }
+
+    .fleet-categories__shell::-webkit-scrollbar-thumb {
+        background: rgba(214, 181, 94, 0.54);
+        border-radius: 999px;
     }
 
     .fleet-category {
@@ -5663,10 +5676,6 @@ a.brand-marquee__item:focus-visible img {
 
     .guest-reviews__bg {
         inset: 0;
-    }
-
-    .guest-reviews__bg-video {
-        opacity: 0.18;
     }
 
     .catalog-card__media {
@@ -5905,7 +5914,7 @@ a.brand-marquee__item:focus-visible img {
 
 @media (max-width: 560px) {
     .guest-reviews__bg {
-        display: none;
+        opacity: 0.7;
     }
 
     .fleet-categories {
@@ -5979,27 +5988,75 @@ a.brand-marquee__item:focus-visible img {
 }
 
 @media (max-width: 860px) {
+    .mobile-scroll-hint {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.52rem;
+        width: fit-content;
+        margin: -0.25rem auto 0.1rem;
+        padding: 0.45rem 0.74rem;
+        border: 1px solid rgba(214, 181, 94, 0.24);
+        border-radius: 999px;
+        background: rgba(255, 252, 247, 0.76);
+        color: #604b35;
+        font-family: var(--lab-font-sans);
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        line-height: 1;
+        text-transform: uppercase;
+        box-shadow: 0 10px 24px rgba(45, 31, 18, 0.08);
+    }
+
+    .mobile-scroll-hint::after {
+        content: "";
+        width: 1.6rem;
+        height: 0.56rem;
+        border-radius: 999px;
+        background:
+            radial-gradient(circle at 0.28rem 50%, rgba(96, 75, 53, 0.52) 0 0.12rem, transparent 0.13rem),
+            radial-gradient(circle at 0.8rem 50%, rgba(96, 75, 53, 0.34) 0 0.12rem, transparent 0.13rem),
+            radial-gradient(circle at 1.32rem 50%, rgba(96, 75, 53, 0.2) 0 0.12rem, transparent 0.13rem);
+    }
+
+    .featured-fleet__mobile-hint {
+        justify-self: center;
+    }
+
     .fleet-showcase {
         display: flex;
         grid-template-columns: none;
         gap: 1rem;
         width: 100%;
         margin-inline: 0;
-        padding: 0.1rem 0.05rem 0.65rem;
+        padding: 0.1rem 2.35rem 0.75rem 0.05rem;
         overflow-x: auto;
         overscroll-behavior-x: contain;
         scroll-padding-inline: 0.05rem;
         scroll-snap-type: x mandatory;
         -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
+        scrollbar-color: rgba(214, 181, 94, 0.55) rgba(70, 52, 34, 0.08);
+        scrollbar-width: thin;
+        mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 2.9rem), transparent 100%);
     }
 
     .fleet-showcase::-webkit-scrollbar {
-        display: none;
+        display: block;
+        height: 4px;
+    }
+
+    .fleet-showcase::-webkit-scrollbar-track {
+        background: rgba(70, 52, 34, 0.08);
+        border-radius: 999px;
+    }
+
+    .fleet-showcase::-webkit-scrollbar-thumb {
+        background: rgba(214, 181, 94, 0.58);
+        border-radius: 999px;
     }
 
     .fleet-showcase .fleet-visual-card {
-        flex: 0 0 clamp(18rem, 82vw, 22rem);
+        flex: 0 0 clamp(16.5rem, 76vw, 21rem);
         scroll-snap-align: start;
         scroll-snap-stop: always;
     }
@@ -6911,12 +6968,14 @@ a.brand-marquee__item:focus-visible img {
 
 .lab-floating-contact__button--wa {
     background: #19a83f;
+    border-color: rgba(241, 226, 189, 0.58);
     color: #fff;
     box-shadow: none;
 }
 
 .lab-floating-contact__button--wa:hover,
 .lab-floating-contact__button--wa:focus-visible {
+    border-color: rgba(241, 226, 189, 0.78);
     box-shadow: none;
 }
 

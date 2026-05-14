@@ -994,13 +994,15 @@ textarea {
 }
 
 .lab-floating-contact__button--wa {
-    background: linear-gradient(135deg, #35c551, #108e34);
+    border-color: rgba(241, 226, 189, 0.58);
+    background: #19a83f;
     color: #fff;
     box-shadow: none;
 }
 
 .lab-floating-contact__button--wa:hover,
 .lab-floating-contact__button--wa:focus-visible {
+    border-color: rgba(241, 226, 189, 0.78);
     box-shadow: none;
 }
 

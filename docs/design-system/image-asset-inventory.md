@@ -17,7 +17,7 @@ PGM has enough imagery to keep the current site running, but not enough coherent
 
 Main risks:
 
-- P0: `site/images/fleet/porsche-992-gt3/01-exterior-front.jpg` is used as a primary Porsche exterior/card/hero asset, but visually reads as an interior/cockpit. This breaks semantics and comparison quality.
+- P0 guardrail: `site/images/fleet/porsche-992-gt3/01-exterior-front.jpg` visually reads as an interior/cockpit and must not return as a primary Porsche exterior/card/hero asset.
 - P0: `site/images/locations-hero-temp.jpg` contains non-Dubai limousine/Las Vegas visual context and should not represent PGM locations.
 - P1: Rolls-Royce assets, especially `06-exterior-front-open-doors.png`, are overused across Fleet, About, Services, Locations, brand and PDP contexts.
 - P1: Fleet cards mix different image systems: garden daylight, industrial exterior, cockpit, grey studio, villa daylight and Dubai handover.
@@ -27,9 +27,16 @@ Priority summary:
 
 | Priority | Action |
 | --- | --- |
-| P0 | Replace Porsche primary asset with true exterior; remove Las Vegas/location temp image from public storytelling use. |
+| P0 | Keep Porsche primary assets on true exterior media; remove Las Vegas/location temp image from public storytelling use. |
 | P1 | Normalize Fleet card image rules; reduce Rolls reuse; approve final Home video identity; create service-specific assets. |
 | P2 | Upgrade category assets, add metadata conventions, automate image drift checks. |
+
+## Applied Audit Notes - 2026-05-14
+
+- Home reviews no longer reuse `hero-sports-road.mp4`; Home remains video-led only in the hero.
+- Locations process and guide media no longer use `service-detail.png` as a location visual. A map/routing visual is preferred until proper Dubai/UAE location photography exists.
+- Porsche Fleet and Porsche brand primary media now use `porsche-992-gt3/02-exterior-side.jpg` as the temporary exterior fix.
+- Contact, Locations and Find Booking social previews now use neutral DP branding instead of unrelated model-specific car photos.
 
 ## Classification Legend
 
@@ -174,7 +181,7 @@ Recommendation: keep `06` as the temporary flagship/fleet Rolls asset, but stop 
 | Asset | Dimensions | Recommended use | Current use found | Status | Problems / notes |
 | --- | ---: | --- | --- | --- | --- |
 | `site/images/service-handover.png` | 1024x683 | `service-card`, temporary `service-hero` for airport/handover | Services hub, airport concierge page, `server/data/services-editor.json` | Temporary | Duplicate visual of Rolls open-doors; good handover cue but contributes to Rolls overuse. |
-| `site/images/service-detail.png` | 1024x682 | `service-card`, `vehicle-gallery` support only | Services hub, Locations feature/card backgrounds, hotel/villa delivery page, About, admin defaults | Temporary | Lamborghini cockpit/detail is too driving-focused and orange for broad delivery/location service use. |
+| `site/images/service-detail.png` | 1024x682 | `vehicle-gallery` / narrow brand-detail support only | About support image and admin defaults | Temporary | Lamborghini cockpit/detail is too driving-focused and orange for broad delivery/location service use. It has been removed from Locations and tailored-delivery primary usage. |
 | `site/images/service-cockpit.png` | 1024x682 | `service-card` for business/driver focus only | Business service page | Temporary | Same Urus cockpit family; saturated orange. Use narrowly. |
 | `site/images/locations-hero-temp.jpg` | 2400x3593 | `deprecated/no-usar` | Historical cleanup docs / legacy references only | Replace urgently | Removed from visible core page storytelling. Non-Dubai/Las Vegas limousine context, visible external brand text, portrait ratio, high saturation. |
 
@@ -185,8 +192,8 @@ Recommendation: service and location imagery is the largest missing set. Do not 
 | Asset | Type / dimensions | Recommended use | Current use found | Status | Problems / notes |
 | --- | ---: | --- | --- | --- | --- |
 | `site/media/home-hero-city-streets.mp4` | video, 9.0 MB | `home-hero` desktop | Home | Temporary | Best current Home direction if it communicates Dubai movement. Home now uses a neutral brand gradient until video readiness instead of a photo poster/fallback. |
-| `site/media/hero-sports-road.mp4` | video, 2.8 MB | `home-hero` mobile temporary, `vehicle-gallery` video support | Home, all vehicle PDP video sections, tests/docs | Temporary | Repeated across many PDPs; generic sports-road tone can dilute vehicle specificity. |
-| `site/media/hero-dubai-sunset.mp4` | video, 11.9 MB | `vehicle-gallery` / atmospheric support | Brand/PDP video sections, previews/docs | Temporary | Large and repeated. Avoid using as every vehicle's unique story. |
+| `site/media/hero-sports-road.mp4` | video, 2.8 MB | `home-hero` mobile temporary only if needed | Home tests/docs and hidden legacy PDP markup | Temporary | Removed from visible vehicle PDP storytelling until model-specific footage exists. |
+| `site/media/hero-dubai-sunset.mp4` | video, 11.9 MB | Atmospheric support only after explicit approval | Hidden legacy PDP markup, previews/docs | Temporary | Large and repeated. Do not use as every vehicle's unique story. |
 | `site/images/home-hero-video-poster.jpg` | 2560x1440 | `home-hero` poster candidate if a poster is reintroduced | Docs only | Reusable now | Good Dubai skyline poster candidate, but public Home intentionally avoids a photo fallback so the video entrance feels fluid. |
 
 Recommendation: align Home to one family: `home-hero-city-streets.mp4` plus a matching owned/licensed Dubai poster. Avoid fallbacking to Ferrari PDP imagery as the Home identity.

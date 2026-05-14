@@ -1066,6 +1066,87 @@ body.vehicle-page {
     width: 100%;
 }
 
+.vehicle-booking__submit[aria-busy="true"] {
+    cursor: progress;
+    opacity: 0.78;
+}
+
+.vehicle-availability-toast {
+    position: fixed;
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: calc(max(1rem, env(safe-area-inset-bottom)) + 6.2rem);
+    z-index: 420;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.78rem;
+    width: min(24rem, calc(100vw - 2rem));
+    padding: 0.92rem 1rem;
+    border: 1px solid rgba(241, 226, 189, 0.22);
+    border-radius: 1.1rem;
+    background:
+        radial-gradient(circle at top right, rgba(224, 185, 92, 0.14), transparent 42%),
+        linear-gradient(145deg, rgba(13, 13, 15, 0.96), rgba(29, 25, 20, 0.94));
+    box-shadow:
+        0 22px 54px rgba(0, 0, 0, 0.34),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    color: #fff;
+    pointer-events: none;
+    transform: translate3d(0, 18px, 0);
+    opacity: 0;
+    transition:
+        opacity 180ms ease,
+        transform 180ms ease;
+}
+
+.vehicle-availability-toast.is-visible {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+}
+
+.vehicle-availability-toast__mark {
+    width: 0.78rem;
+    height: 0.78rem;
+    margin-top: 0.36rem;
+    border-radius: 999px;
+    background: #e3c15f;
+    box-shadow: 0 0 0 0.36rem rgba(227, 193, 95, 0.14);
+}
+
+.vehicle-availability-toast--success .vehicle-availability-toast__mark {
+    background: #48c774;
+    box-shadow: 0 0 0 0.36rem rgba(72, 199, 116, 0.16);
+}
+
+.vehicle-availability-toast--warning .vehicle-availability-toast__mark {
+    background: #e3c15f;
+}
+
+.vehicle-availability-toast--error .vehicle-availability-toast__mark {
+    background: #e06455;
+    box-shadow: 0 0 0 0.36rem rgba(224, 100, 85, 0.16);
+}
+
+.vehicle-availability-toast__copy {
+    display: grid;
+    gap: 0.2rem;
+}
+
+.vehicle-availability-toast__copy strong {
+    color: #fffaf0;
+    font-family: var(--lab-font-sans);
+    font-size: 0.84rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    line-height: 1.25;
+    text-transform: uppercase;
+}
+
+.vehicle-availability-toast__copy span {
+    color: rgba(255, 250, 240, 0.76);
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
 .vehicle-metrics {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2626,6 +2707,13 @@ body.vehicle-page--premium-pilot {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1rem;
     align-items: stretch;
+}
+
+/* Generic shared videos are not premium enough for model-specific PDPs.
+   Keep these sections hidden until each vehicle has its own real footage. */
+.vehicle-page .vehicle-pdp-gallery--generic-video,
+.vehicle-page .vehicle-landing-film {
+    display: none;
 }
 
 .vehicle-pdp-gallery__grid--story {

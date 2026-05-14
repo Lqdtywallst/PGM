@@ -435,10 +435,12 @@
     inset: 0;
     pointer-events: none;
     background:
-        linear-gradient(180deg, rgba(247, 243, 237, 0.5) 0%, rgba(247, 243, 237, 0.34) 24%, rgba(247, 243, 237, 0.46) 100%),
-        linear-gradient(90deg, rgba(247, 243, 237, 0.86) 0%, rgba(247, 243, 237, 0.72) 24%, rgba(247, 243, 237, 0.2) 56%, rgba(10, 10, 10, 0.16) 100%),
-        url("../images/service-detail.png") no-repeat center center / cover;
-    filter: saturate(0.92) brightness(0.82) contrast(1.04);
+        linear-gradient(180deg, rgba(247, 243, 237, 0.92) 0%, rgba(247, 243, 237, 0.76) 34%, rgba(247, 243, 237, 0.92) 100%),
+        radial-gradient(circle at 78% 28%, rgba(var(--dp-color-gold-rgb), 0.14), transparent 18rem),
+        radial-gradient(circle at 22% 70%, rgba(52, 64, 70, 0.08), transparent 20rem),
+        repeating-linear-gradient(35deg, rgba(81, 66, 45, 0.055) 0 1px, transparent 1px 72px),
+        repeating-linear-gradient(125deg, rgba(81, 66, 45, 0.04) 0 1px, transparent 1px 88px);
+    filter: none;
 }
 
 .locations-process .locations-section__head {
@@ -471,11 +473,92 @@
     overflow: hidden;
 }
 
-.locations-guide-feature__media img {
+.locations-guide-feature__media {
+    position: relative;
+    min-height: 100%;
+    overflow: hidden;
+    background:
+        linear-gradient(145deg, rgba(12, 14, 16, 0.96) 0%, rgba(35, 28, 21, 0.88) 58%, rgba(10, 12, 14, 0.96) 100%),
+        repeating-linear-gradient(32deg, rgba(255, 250, 242, 0.06) 0 1px, transparent 1px 64px),
+        repeating-linear-gradient(122deg, rgba(255, 250, 242, 0.045) 0 1px, transparent 1px 76px);
+}
+
+.locations-guide-feature__media::before {
+    content: "";
+    position: absolute;
+    inset: -20%;
+    background:
+        radial-gradient(circle at 70% 22%, rgba(var(--dp-color-gold-rgb), 0.22), transparent 16rem),
+        radial-gradient(circle at 28% 78%, rgba(255, 250, 242, 0.1), transparent 13rem);
+    opacity: 0.95;
+}
+
+.locations-guide-feature__map-art {
+    position: relative;
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    min-height: 22rem;
+}
+
+.locations-guide-feature__route {
+    position: absolute;
+    left: 14%;
+    right: 12%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(var(--dp-color-gold-rgb), 0.72), transparent);
+    border-radius: 999px;
+    transform-origin: left center;
+}
+
+.locations-guide-feature__route--one {
+    top: 42%;
+    transform: rotate(-18deg);
+}
+
+.locations-guide-feature__route--two {
+    top: 58%;
+    transform: rotate(12deg);
+    opacity: 0.68;
+}
+
+.locations-guide-feature__pin {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 4.7rem;
+    min-height: 2.15rem;
+    padding: 0 0.75rem;
+    border: 1px solid rgba(var(--dp-color-gold-rgb), 0.38);
+    border-radius: 999px;
+    background: rgba(10, 12, 14, 0.78);
+    color: #fffaf2;
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.22);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.locations-guide-feature__pin--palm {
+    left: 16%;
+    top: 34%;
+}
+
+.locations-guide-feature__pin--marina {
+    left: 36%;
+    top: 56%;
+}
+
+.locations-guide-feature__pin--dxb {
+    right: 14%;
+    top: 30%;
+}
+
+.locations-guide-feature__pin--abu {
+    left: 18%;
+    bottom: 18%;
 }
 
 .locations-guide-feature__copy,
@@ -1303,9 +1386,11 @@
 
     .locations-process::before {
         background:
-            linear-gradient(180deg, rgba(247, 243, 237, 0.58) 0%, rgba(247, 243, 237, 0.42) 30%, rgba(247, 243, 237, 0.54) 100%),
-            linear-gradient(90deg, rgba(247, 243, 237, 0.88) 0%, rgba(247, 243, 237, 0.78) 36%, rgba(247, 243, 237, 0.28) 68%, rgba(10, 10, 10, 0.1) 100%),
-            url("../images/service-detail.png") no-repeat center center / cover;
+            linear-gradient(180deg, rgba(247, 243, 237, 0.94) 0%, rgba(247, 243, 237, 0.82) 36%, rgba(247, 243, 237, 0.94) 100%),
+            radial-gradient(circle at 74% 22%, rgba(var(--dp-color-gold-rgb), 0.13), transparent 18rem),
+            radial-gradient(circle at 18% 76%, rgba(52, 64, 70, 0.08), transparent 18rem),
+            repeating-linear-gradient(35deg, rgba(81, 66, 45, 0.052) 0 1px, transparent 1px 64px),
+            repeating-linear-gradient(125deg, rgba(81, 66, 45, 0.038) 0 1px, transparent 1px 78px);
     }
 
     .locations-process .locations-section__head p {
@@ -1338,6 +1423,11 @@
     .locations-hero {
         min-height: auto;
         padding-top: calc(var(--lab-header-offset) + 0.15rem);
+        padding-bottom: 2rem;
+    }
+
+    .locations-guides {
+        padding-top: 2.1rem;
     }
 
     .locations-hero__shell {
@@ -1382,6 +1472,10 @@
         margin-top: 0.55rem;
     }
 
+    .locations-guides .locations-section__head {
+        gap: 0.7rem;
+    }
+
     .locations-section__head h2,
     .locations-guide-feature__copy h3,
     .locations-guide-card h3,
@@ -1390,7 +1484,34 @@
     .locations-process__item h3,
     .locations-faq__cta h3 {
         max-width: none;
-        font-size: 2.25rem;
+        font-size: clamp(1.85rem, 7.2vw, 2.08rem);
+        line-height: 1.02;
+    }
+
+    .locations-section__head p {
+        max-width: 31rem;
+        font-size: 0.98rem;
+        line-height: 1.52;
+    }
+
+    .locations-guides .locations-section__head,
+    .locations-zones .locations-section__head {
+        max-width: 34rem;
+    }
+
+    .locations-guide-feature__media {
+        min-height: auto;
+    }
+
+    .locations-guide-feature__map-art {
+        min-height: 18rem;
+    }
+
+    .locations-guide-feature__pin {
+        min-width: 4.1rem;
+        min-height: 1.95rem;
+        padding: 0 0.62rem;
+        font-size: 0.64rem;
     }
 
     .locations-button,
@@ -1403,9 +1524,11 @@
 
     .locations-process::before {
         background:
-            linear-gradient(180deg, rgba(247, 243, 237, 0.62) 0%, rgba(247, 243, 237, 0.52) 30%, rgba(247, 243, 237, 0.58) 100%),
-            linear-gradient(90deg, rgba(247, 243, 237, 0.9) 0%, rgba(247, 243, 237, 0.84) 42%, rgba(247, 243, 237, 0.34) 72%, rgba(10, 10, 10, 0.08) 100%),
-            url("../images/service-detail.png") no-repeat 62% center / cover;
+            linear-gradient(180deg, rgba(247, 243, 237, 0.96) 0%, rgba(247, 243, 237, 0.88) 38%, rgba(247, 243, 237, 0.96) 100%),
+            radial-gradient(circle at 76% 20%, rgba(var(--dp-color-gold-rgb), 0.12), transparent 16rem),
+            radial-gradient(circle at 14% 78%, rgba(52, 64, 70, 0.08), transparent 15rem),
+            repeating-linear-gradient(35deg, rgba(81, 66, 45, 0.045) 0 1px, transparent 1px 58px),
+            repeating-linear-gradient(125deg, rgba(81, 66, 45, 0.034) 0 1px, transparent 1px 70px);
     }
 
     .locations-map-card__frame {
