@@ -67,20 +67,21 @@
 }
 
 .locations-hero::before {
-    background-image: url("../images/locations-hero-temp.jpg");
-    background-repeat: no-repeat;
-    background-size: cover;
-    inset: 0;
-    background-position: 72% 42%;
-    opacity: 0.78;
-    filter: saturate(0.72) brightness(0.62) contrast(1.06);
+    background:
+        radial-gradient(circle at 69% 31%, rgba(var(--dp-color-gold-rgb), 0.18), rgba(var(--dp-color-gold-rgb), 0) 17rem),
+        radial-gradient(circle at 32% 68%, rgba(255, 250, 242, 0.07), rgba(255, 250, 242, 0) 18rem),
+        linear-gradient(115deg, rgba(17, 24, 27, 0.96) 0%, rgba(8, 10, 13, 0.98) 56%, rgba(20, 15, 10, 0.94) 100%),
+        repeating-linear-gradient(32deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 64px),
+        repeating-linear-gradient(122deg, rgba(255, 255, 255, 0.026) 0 1px, transparent 1px 78px);
+    opacity: 1;
+    filter: none;
 }
 
 .locations-hero::after {
     background:
-        linear-gradient(180deg, rgba(7, 8, 10, 0.72) 0%, rgba(7, 8, 10, 0.58) 34%, rgba(7, 8, 10, 0.82) 100%),
-        radial-gradient(circle at center, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0) 54%),
-        linear-gradient(90deg, rgba(4, 5, 7, 0.28), rgba(4, 5, 7, 0.08) 46%, rgba(4, 5, 7, 0.34));
+        linear-gradient(180deg, rgba(7, 8, 10, 0.58) 0%, rgba(7, 8, 10, 0.42) 34%, rgba(7, 8, 10, 0.78) 100%),
+        radial-gradient(circle at center, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0) 54%),
+        linear-gradient(90deg, rgba(4, 5, 7, 0.42), rgba(4, 5, 7, 0.08) 46%, rgba(4, 5, 7, 0.34));
 }
 
 .locations-hero__shell,
@@ -1318,7 +1319,12 @@
 
     .locations-hero {
         min-height: auto;
-        padding-top: calc(var(--lab-header-offset) + 0.45rem);
+        padding-top: calc(var(--lab-header-offset) + 0.15rem);
+    }
+
+    .locations-hero__shell {
+        padding-top: 0;
+        padding-bottom: 0;
     }
 
     .locations-hero::before {

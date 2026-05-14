@@ -125,7 +125,7 @@
 }
     </script>
 </head>
-<body class="vehicle-page vehicle-page--mother-base">
+<body class="vehicle-page vehicle-page--mother-base vehicle-page--brand-mother vehicle-page--porsche-brand">
     <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="lab-header">
         <div class="lab-shell lab-header__inner">
@@ -306,205 +306,101 @@
             <span aria-current="page">Porsche rental Dubai</span>
         </nav>
 
-        <section class="vehicle-hero">
-            <div class="vehicle-hero__media">
-                <img src="./images/fleet/porsche-992-gt3/01-exterior-front.jpg" alt="Porsche 992 GT3 prepared for a Dubai handover" loading="eager">
-                <div class="vehicle-hero__shade"></div>
-                <div class="vehicle-hero__copy">
-                    <div class="vehicle-hero__brand-line">
-                        <img src="./images/brands/porsche-mark.png" alt="" aria-hidden="true">
-                        <span>Porsche in Dubai</span>
-                    </div>
-                    <h1>Porsche 992 GT3</h1>
-                    <p class="vehicle-hero__lead">The purist booking in the fleet: lower on theatre, higher on steering feel, road feedback and the kind of engineering-led prestige that enthusiasts notice immediately.</p>
-                    <div class="vehicle-hero__actions">
-                        <a class="btn btn-primary" href="#vehicle-booking">Check availability</a>
-                    </div>
+        <section class="brand-landing-hero" aria-labelledby="brand-hero-title">
+            <div class="brand-landing-hero__copy">
+                <div class="brand-landing-hero__kicker">
+                    <img src="./images/brands/porsche-mark.png" alt="" aria-hidden="true">
+                    <span>Porsche in Dubai</span>
+                </div>
+                <h1 id="brand-hero-title">Rent Porsche in Dubai</h1>
+                <p class="brand-landing-hero__lead">A driver-first Porsche rental page for guests who care about precision, road feel and a cleaner performance signal.</p>
+                <div class="brand-landing-hero__trust" aria-label="Dynasty Prestige Porsche rental highlights">
+                    <span>Driver-focused model selection</span>
+                    <span>Dates confirmed before payment</span>
+                    <span>Dubai delivery coordinated by WhatsApp</span>
                 </div>
             </div>
 
-            <aside class="vehicle-booking" id="vehicle-booking">
-                <p class="vehicle-booking__kicker">From per day</p>
-                <p class="vehicle-booking__price">2,100 AED</p>
-                <p class="vehicle-booking__price-note">Indicative day rate</p>
-                <p class="vehicle-booking__copy">Best suited to enthusiasts, tighter schedules and bookings where the drive itself matters more than the loudest possible arrival.</p>
-
-                <form class="vehicle-booking__form js-vehicle-booking-form" action="app/reserve/page.html" method="get">
-                    <input type="hidden" name="car" value="Porsche 992 GT3">
-                    <input type="hidden" name="price" value="2100">
-
-                    <div class="vehicle-booking__grid">
-                        <label class="vehicle-booking__field">
-                            <span>Pickup date</span>
-                            <input class="vehicle-booking__input js-vehicle-date" type="date" name="startDate" required>
-                        </label>
-                        <label class="vehicle-booking__field">
-                            <span>Pickup time</span>
-                            <input class="vehicle-booking__input js-vehicle-time" type="time" name="pickupTime" value="12:00" step="1800" required>
-                        </label>
-                        <label class="vehicle-booking__field">
-                            <span>Return date</span>
-                            <input class="vehicle-booking__input js-vehicle-date" type="date" name="endDate" required>
-                        </label>
-                        <label class="vehicle-booking__field">
-                            <span>Return time</span>
-                            <input class="vehicle-booking__input js-vehicle-time" type="time" name="dropoffTime" value="12:00" step="1800" required>
-                        </label>
+            <div class="brand-landing-models brand-landing-models--single" aria-label="Available Porsche models">
+                <h2 class="brand-landing-models__heading">Available Porsche models</h2>
+                <article class="brand-model-card" itemscope itemtype="https://schema.org/Product">
+                    <link itemprop="image" href="https://prestigegoalmotion.com/images/fleet/porsche-992-gt3/01-exterior-front.jpg">
+                    <a class="brand-model-card__media" href="porsche-992-gt3-rental-dubai.html" aria-label="View Porsche 992 GT3">
+                        <img src="/images/fleet/porsche-992-gt3/01-exterior-front.jpg" alt="Porsche 992 GT3 available to rent in Dubai" width="640" height="410" loading="eager" decoding="async">
+                    </a>
+                    <div class="brand-model-card__body">
+                        <div itemprop="brand" itemscope itemtype="https://schema.org/Brand"><meta itemprop="name" content="Porsche"></div>
+                        <span class="brand-model-card__tag">Driver-focused sports car</span>
+                        <h3 itemprop="name">Porsche 992 GT3</h3>
+                        <p itemprop="description">Best for enthusiasts, precise routes and guests who want substance before spectacle.</p>
+                        <dl class="brand-model-card__meta">
+                            <div><dt>From</dt><dd>2,100 AED/day</dd></div>
+                            <div><dt>Seats</dt><dd>2</dd></div>
+                            <div><dt>Character</dt><dd>GT3, purist feel</dd></div>
+                        </dl>
+                        <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                            <meta itemprop="priceCurrency" content="AED">
+                            <meta itemprop="price" content="2100">
+                            <link itemprop="availability" href="https://schema.org/InStock">
+                        </div>
+                        <a class="brand-model-card__cta" href="porsche-992-gt3-rental-dubai.html">View / reserve 992 GT3</a>
                     </div>
-
-                    <p class="vehicle-booking__note">Dates carry directly into the reservation flow.</p>
-
-                    <button class="btn btn-primary vehicle-booking__submit" type="submit">Check availability</button>
-                    <a class="btn btn-outline vehicle-booking__secondary" href="https://wa.me/971586122568?text=Hi%2C%20I%20am%20interested%20in%20the%20Porsche%20992%20GT3%20in%20Dubai." target="_blank" rel="noopener">WhatsApp the team</a>
-                </form>
-            </aside>
-        </section>
-
-        <section class="vehicle-metrics" aria-label="Porsche 992 GT3 summary">
-            <article class="vehicle-metric">
-                <span class="vehicle-metric__label">Seats</span>
-                <strong class="vehicle-metric__value">2</strong>
-            </article>
-            <article class="vehicle-metric">
-                <span class="vehicle-metric__label">Powertrain</span>
-                <strong class="vehicle-metric__value">Flat-six</strong>
-            </article>
-            <article class="vehicle-metric">
-                <span class="vehicle-metric__label">0-100 km/h</span>
-                <strong class="vehicle-metric__value">3.4 s</strong>
-            </article>
-            <article class="vehicle-metric">
-                <span class="vehicle-metric__label">Best fit</span>
-                <strong class="vehicle-metric__value">Purist sports car</strong>
-            </article>
-        </section>
-
-        <section class="vehicle-section vehicle-section--intro">
-            <div class="vehicle-section__heading">
-                <span class="section-kicker">Dubai fit</span>
-                <h2>The strongest option when the booking is about the drive, not only the entrance.</h2>
-                <p>The GT3 is not the obvious choice for every guest, which is exactly why it feels more considered. It suits drivers who want connection, balance and a more disciplined kind of performance prestige inside Dubai.</p>
-            </div>
-            <div class="vehicle-story-grid">
-                <article class="vehicle-story-card">
-                    <span class="vehicle-story-card__eyebrow">Enthusiast stays</span>
-                    <h3>Chosen by people who notice the steering before the badge.</h3>
-                    <p>The 992 GT3 earns its place through feel, not excess. That makes it the fleet's clearest enthusiast-led booking.</p>
-                </article>
-                <article class="vehicle-story-card">
-                    <span class="vehicle-story-card__eyebrow">Cleaner routes</span>
-                    <h3>Lower-key visually, sharper mechanically.</h3>
-                    <p>It carries prestige in a more disciplined way, making it ideal for guests who want less spectacle and more substance.</p>
-                </article>
-                <article class="vehicle-story-card">
-                    <span class="vehicle-story-card__eyebrow">Weekend drives</span>
-                    <h3>Best when the road itself is part of the reason for booking.</h3>
-                    <p>Late-night city movement or longer open-road runs feel more intentional in the GT3 than in a softer luxury car.</p>
                 </article>
             </div>
         </section>
 
-        <section class="vehicle-section vehicle-section--split">
-            <div class="vehicle-section__copy">
-                <span class="section-kicker">Why guests choose it</span>
-                <h2>Precision first. Status second. That is the appeal.</h2>
-                <p>Most Dubai bookings lean toward visibility. The GT3 attracts a different guest: someone who still wants something rare and serious, but would rather feel the car properly than perform the loudest valet arrival in the city.</p>
-                <ul class="vehicle-checklist">
-                    <li>Driver-led character with stronger mechanical credibility.</li>
-                    <li>Lower-key luxury than Ferrari or Lamborghini, but no less premium.</li>
-                    <li>Excellent fit for enthusiast weekends and cleaner highway movement.</li>
-                    <li>Ideal when the booking needs focus more than ceremony or guest luggage.</li>
-                </ul>
+        <section class="brand-landing-guide" aria-labelledby="brand-guide-heading">
+            <div class="brand-landing-guide__intro">
+                <span class="brand-landing-guide__kicker">Dynasty Prestige guidance</span>
+                <h2 id="brand-guide-heading">Choose Porsche when the drive matters more than the loudest entrance.</h2>
+                <p>Porsche is the considered performance choice: lower-key visually, sharper mechanically and especially strong for guests who notice handling. We keep the booking direct and confirm delivery, date window and final rate before payment.</p>
             </div>
-
-            <aside class="vehicle-spec-panel">
-                <span class="section-kicker">Rental snapshot</span>
-                <h3>Quick guide before you reserve.</h3>
-                <dl class="vehicle-spec-panel__grid">
-                    <div>
-                        <dt>Body style</dt>
-                        <dd>Sports coupe</dd>
-                    </div>
-                    <div>
-                        <dt>Seats</dt>
-                        <dd>2</dd>
-                    </div>
-                    <div>
-                        <dt>Delivery</dt>
-                        <dd>Hotel and residence</dd>
-                    </div>
-                    <div>
-                        <dt>Use case</dt>
-                        <dd>Driver-led booking</dd>
-                    </div>
-                </dl>
-                <div class="vehicle-spec-panel__chips" aria-label="Porsche 992 GT3 tags">
-                    <span>Enthusiast stay</span>
-                    <span>Road feel</span>
-                    <span>Weekend run</span>
-                    <span>Focused arrival</span>
-                </div>
-            </aside>
-        </section>
-
-        <section class="vehicle-section vehicle-section--rates">
-            <div class="vehicle-section__heading">
-                <span class="section-kicker">Rate guide</span>
-                <h2>Clear starting price for a more specialist booking.</h2>
-                <p>The GT3 sits lower than the louder flagship arrivals in daily price, but it is still a specialist car. Final detail depends on dates, delivery point and the exact stay pattern around the handover.</p>
-            </div>
-
-            <div class="price-table-wrap">
-                <table class="price-table">
-                    <caption>Porsche 992 GT3 booking guide</caption>
-                    <thead>
-                        <tr>
-                            <th scope="col">Model</th>
-                            <th scope="col">From / day</th>
-                            <th scope="col">Notes</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th scope="row">Porsche 992 GT3</th>
-                            <td>2,100 AED</td>
-                            <td>Indicative starting rate with final quote aligned to dates, delivery and exact schedule.</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="brand-landing-guide__grid">
+                <article>
+                    <h3>Best fit</h3>
+                    <p>Enthusiasts, weekend routes, precise city movement and guests who prefer engineering-led prestige.</p>
+                </article>
+                <article>
+                    <h3>Delivery rhythm</h3>
+                    <p>Useful for hotel handovers, Marina routes and any plan where the car should feel sharp without being visually excessive.</p>
+                </article>
+                <article>
+                    <h3>Compare before booking</h3>
+                    <p>Choose Ferrari for social open-top polish, Lamborghini for theatre, or Porsche for the cleanest driver-first read.</p>
+                </article>
             </div>
         </section>
 
         <section class="vehicle-section">
             <div class="vehicle-section__heading">
                 <span class="section-kicker">Related pages</span>
-                <h2>Keep browsing around the same booking logic.</h2>
+                <h2>Keep the Porsche booking easy to compare.</h2>
             </div>
             <div class="related-grid">
-                <a href="ferrari-296-gts-rental-dubai.html"><strong>Ferrari 296 GTS</strong>See the more social and visible convertible alternative.</a>
-                <a href="lamborghini-rental-dubai.html"><strong>Lamborghini page</strong>Compare the louder open-top and SUV readings.</a>
-                <a href="supercar-rental-dubai.html"><strong>Supercar guide</strong>Keep browsing the sharper side of the fleet.</a>
-                <a href="fleet.html"><strong>Back to fleet</strong>Compare the GT3 against the rest of the curated line-up.</a>
+                <a href="porsche-992-gt3-rental-dubai.html"><strong>Porsche 992 GT3</strong>Open the model detail and reserve with dates attached.</a>
+                <a href="ferrari-rental-dubai.html"><strong>Ferrari</strong>Compare the more social open-top supercar.</a>
+                <a href="lamborghini-rental-dubai.html"><strong>Lamborghini</strong>Compare the louder theatre-first options.</a>
+                <a href="fleet.html"><strong>Back to fleet</strong>Compare Porsche against every curated model.</a>
             </div>
         </section>
 
         <section class="vehicle-section">
             <div class="vehicle-section__heading">
                 <span class="section-kicker">FAQ</span>
-                <h2>Short answers before the reservation starts.</h2>
+                <h2>Short answers before you reserve Porsche in Dubai.</h2>
             </div>
             <div class="faq-list">
                 <details open>
                     <summary>Who usually books the Porsche 992 GT3 in Dubai?</summary>
-                    <div class="faq-a">Usually enthusiasts and guests who care about road feel, engineering and a more disciplined type of prestige than a full theatre-first supercar.</div>
+                    <div class="faq-a">Usually enthusiasts and guests who care about road feel, engineering and a more disciplined type of prestige than a theatre-first supercar.</div>
                 </details>
                 <details>
                     <summary>Is the 2,100 AED figure the final rate?</summary>
-                    <div class="faq-a">It is the indicative starting rate. Final quoting depends on the exact rental window, delivery timing and any additional service layer around the handover.</div>
+                    <div class="faq-a">It is the indicative starting rate. Final quoting depends on the exact rental window, delivery timing and any additional service layer.</div>
                 </details>
                 <details>
-                    <summary>Do the dates I pick here stay with the booking?</summary>
-                    <div class="faq-a">Yes. Pickup and return details selected in the booking panel are sent into the reservation page to keep the booking intent intact.</div>
+                    <summary>Can I reserve from the model card?</summary>
+                    <div class="faq-a">Yes. The card opens the model detail, where the date and reservation flow are tied to the Porsche 992 GT3.</div>
                 </details>
             </div>
         </section>

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -20,13 +20,13 @@
     <meta name="twitter:title" content="Ferrari 296 GTS Rental Dubai | Dynasty Prestige">
     <meta name="twitter:description" content="Open-top Ferrari handovers for resort, hotel and elegant city-led stays in Dubai.">
     <meta name="twitter:image" content="https://prestigegoalmotion.com/images/fleet/ferrari-296-gts/07-hero-dubai.jpeg">
-<meta property="og:locale" content="en_AE">
+    <meta property="og:locale" content="en_AE">
     <meta property="og:site_name" content="Dynasty Prestige">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preload" href="/fonts/manrope-latin-400-800.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/el-messiri-latin-600-700.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="css/dp-fonts.css?v=20260513-local-fonts1">
     <link rel="stylesheet" href="css/site-v2.css?v=20260510-brand-tokens1">
-    <link rel="stylesheet" href="css/seo-landing.css?v=20260510-brand-tokens1">
+    <link rel="stylesheet" href="css/seo-landing.css?v=20260513-vehicle-mother2">
     <link rel="stylesheet" href="/css/admin-style-overrides.css?v=20260510-brand-tokens1">
     <script src="js/site-v2.js?v=20260424-backnav1" defer></script>
     <script type="application/ld+json">
@@ -187,7 +187,7 @@
 }
     </script>
 </head>
-<body class="vehicle-page vehicle-page--mother-base vehicle-page--ferrari">
+<body class="vehicle-page vehicle-page--mother-base vehicle-page--ferrari vehicle-page--landing-pilot">
     <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="lab-header">
         <div class="lab-shell lab-header__inner">
@@ -359,8 +359,8 @@
         </div>
     </header>
 
-    <main id="main-content" class="vehicle-main vehicle-main--mother-base">
-        <nav class="breadcrumb" aria-label="Breadcrumb">
+    <main id="main-content" class="vehicle-main vehicle-main--mother-base vehicle-main--landing-pilot">
+        <nav class="breadcrumb vehicle-landing-breadcrumb" aria-label="Breadcrumb">
             <a href="index.html">Home</a>
             <span aria-hidden="true"> / </span>
             <a href="fleet.html">Fleet</a>
@@ -368,67 +368,32 @@
             <span aria-current="page">Ferrari 296 GTS</span>
         </nav>
 
-        <a class="vehicle-return-link" href="fleet.html" aria-label="Back to all fleet cars">
-            <span>Back to fleet</span>
-            <strong>View all cars</strong>
-        </a>
-
-        <section class="vehicle-pdp-hero-shell" aria-labelledby="vehicle-base-title">
-            <figure class="vehicle-pdp-gallery-top__stage" aria-label="Ferrari 296 GTS gallery">
-                <img src="./images/fleet/ferrari-296-gts/07-hero-dubai.jpeg" alt="Ferrari 296 GTS prepared for a refined Dubai handover" loading="eager">
-            </figure>
-
-            <div class="vehicle-pdp-gallery-top__rail">
-                <article class="vehicle-pdp-gallery-top__thumb vehicle-pdp-gallery-top__thumb--media">
-                    <img src="./images/fleet/ferrari-296-gts/01-exterior-front.jpg" alt="Ferrari 296 GTS front profile in Dubai" loading="lazy">
-                    <div class="vehicle-pdp-gallery-top__thumb-copy">
-                        <span class="vehicle-pdp-gallery-top__eyebrow">Support still</span>
-                        <strong>Front profile</strong>
-                    </div>
-                </article>
-
-                <article class="vehicle-pdp-gallery-top__thumb vehicle-pdp-gallery-top__thumb--media">
-                    <img src="./images/fleet/ferrari-296-gts/03-exterior-rear.jpg" alt="Ferrari 296 GTS rear stance on a Dubai rooftop" loading="lazy">
-                    <div class="vehicle-pdp-gallery-top__thumb-copy">
-                        <span class="vehicle-pdp-gallery-top__eyebrow">Support still</span>
-                        <strong>Dubai rooftop</strong>
-                    </div>
-                </article>
-
-                <article class="vehicle-pdp-gallery-top__thumb vehicle-pdp-gallery-top__thumb--media">
-                    <img src="./images/fleet/ferrari-296-gts/06-exterior-motion.jpg" alt="Ferrari 296 GTS night-ready exterior tone" loading="lazy">
-                    <div class="vehicle-pdp-gallery-top__thumb-copy">
-                        <span class="vehicle-pdp-gallery-top__eyebrow">Support still</span>
-                        <strong>Rear deck</strong>
-                    </div>
-                </article>
-
-                <article class="vehicle-pdp-gallery-top__thumb vehicle-pdp-gallery-top__thumb--media vehicle-pdp-gallery-top__thumb--more">
-                    <img src="./images/fleet/ferrari-296-gts/08-front-profile.jpg" alt="Ferrari 296 GTS rear deck and rooftop profile" loading="lazy">
-                    <div class="vehicle-pdp-gallery-top__thumb-copy">
-                        <span class="vehicle-pdp-gallery-top__thumb-count">+3</span>
-                        <strong>More media</strong>
-                    </div>
-                </article>
+        <section class="vehicle-landing-reserve" id="vehicle-booking" aria-labelledby="vehicle-base-title">
+            <div class="vehicle-landing-reserve__gallery">
+                <figure class="vehicle-landing-reserve__stage">
+                    <img src="./images/fleet/ferrari-296-gts/07-hero-dubai.jpeg" alt="Ferrari 296 GTS prepared for a refined Dubai handover" loading="eager">
+                </figure>
+                <div class="vehicle-landing-reserve__thumbs" aria-label="Ferrari 296 GTS image highlights">
+                    <figure>
+                        <img src="./images/fleet/ferrari-296-gts/01-exterior-front.jpg" alt="Ferrari 296 GTS front profile in Dubai" loading="lazy">
+                        <figcaption>Front profile</figcaption>
+                    </figure>
+                    <figure>
+                        <img src="./images/fleet/ferrari-296-gts/03-exterior-rear.jpg" alt="Ferrari 296 GTS rear stance on a Dubai rooftop" loading="lazy">
+                        <figcaption>Dubai rooftop</figcaption>
+                    </figure>
+                    <figure>
+                        <img src="./images/fleet/ferrari-296-gts/06-exterior-motion.jpg" alt="Ferrari 296 GTS night-ready exterior tone" loading="lazy">
+                        <figcaption>Rear deck</figcaption>
+                    </figure>
+                </div>
             </div>
 
-            <div class="vehicle-pdp-hero-support">
-                <section class="vehicle-pdp-intro vehicle-pdp-intro--after-gallery" aria-labelledby="vehicle-base-title">
-                    <div class="vehicle-pdp-intro__brand">
-                        <span>Ferrari / Dubai</span>
-                    </div>
-                    <h1 id="vehicle-base-title">Ferrari 296 GTS</h1>
-                    <p class="vehicle-pdp-intro__subline">Ferrari 296 GTS rental in Dubai &middot; Indicative daily rate &middot; Hotel, resort and dinner delivery</p>
-                    <p class="vehicle-pdp-intro__lead">A more polished open-top Ferrari for couples, resort arrivals and visible city routes that want elegance before theatre.</p>
-                    <div class="vehicle-pdp-intro__meta" aria-label="Ferrari 296 GTS quick tags">
-                        <span>Open-top hybrid</span>
-                        <span>2 seats</span>
-                        <span>Palm / Marina / resorts</span>
-                        <span>Couple-led stays</span>
-                    </div>
-                </section>
-
-                <aside class="vehicle-booking" id="vehicle-booking">
+            <div class="vehicle-landing-reserve__content">
+                <aside class="vehicle-booking">
+                    <span class="section-kicker">Ferrari in Dubai</span>
+                    <h1 id="vehicle-base-title">Ferrari 296 GTS in Dubai.</h1>
+                    <p class="vehicle-booking__intro">A polished open-top Ferrari for resort arrivals, dinner routes and city-led stays, coordinated with hotel, residence or valet handover.</p>
                     <p class="vehicle-booking__kicker">From per day</p>
                     <p class="vehicle-booking__price">3,400 AED</p>
                     <p class="vehicle-booking__price-note">Indicative day rate</p>
@@ -465,9 +430,35 @@
                         <p class="vehicle-booking__note">Pickup and return details move directly into the reservation flow.</p>
 
                         <button class="btn btn-primary vehicle-booking__submit" type="submit">Check availability</button>
-                        <a class="btn btn-outline vehicle-booking__secondary" href="https://wa.me/971586122568?text=Hi%2C%20I%20am%20interested%20in%20the%20Ferrari%20296%20GTS%20in%20Dubai." target="_blank" rel="noopener">WhatsApp the team</a>
                     </form>
                 </aside>
+
+                <section class="vehicle-landing-specs" aria-label="Ferrari 296 GTS key characteristics">
+                    <article>
+                        <span>Powertrain</span>
+                        <strong>V6 hybrid</strong>
+                    </article>
+                    <article>
+                        <span>Guests</span>
+                        <strong>2 seats</strong>
+                    </article>
+                    <article>
+                        <span>Best for</span>
+                        <strong>Resort / dinner</strong>
+                    </article>
+                    <article>
+                        <span>Confirm</span>
+                        <strong>50% upfront</strong>
+                    </article>
+                    <article>
+                        <span>Handover</span>
+                        <strong>Hotel / resort / valet</strong>
+                    </article>
+                    <article>
+                        <span>Style</span>
+                        <strong>Refined arrival</strong>
+                    </article>
+                </section>
             </div>
         </section>
 

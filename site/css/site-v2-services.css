@@ -30,15 +30,15 @@
     height: 100%;
     object-fit: cover;
     object-position: center 42%;
-    opacity: 0.78;
-    filter: saturate(0.72) brightness(0.62) contrast(1.06);
+    opacity: 0.58;
+    filter: saturate(0.66) brightness(0.5) contrast(1.04);
 }
 
 .services-hero__shade {
     background:
-        linear-gradient(180deg, rgba(7, 8, 10, 0.72) 0%, rgba(7, 8, 10, 0.58) 34%, rgba(7, 8, 10, 0.82) 100%),
-        radial-gradient(circle at center, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0) 54%),
-        linear-gradient(90deg, rgba(4, 5, 7, 0.28), rgba(4, 5, 7, 0.08) 46%, rgba(4, 5, 7, 0.34));
+        linear-gradient(180deg, rgba(7, 8, 10, 0.76) 0%, rgba(7, 8, 10, 0.6) 34%, rgba(7, 8, 10, 0.88) 100%),
+        radial-gradient(circle at 50% 18%, rgba(var(--dp-color-gold-rgb), 0.11), rgba(var(--dp-color-gold-rgb), 0) 38%),
+        linear-gradient(90deg, rgba(4, 5, 7, 0.54), rgba(4, 5, 7, 0.2) 46%, rgba(4, 5, 7, 0.54));
 }
 
 .services-hero__shell,
@@ -2236,12 +2236,12 @@
         gap: 0.56rem;
         display: grid;
         grid-auto-flow: column;
-        grid-auto-columns: minmax(10.2rem, 11rem);
+        grid-auto-columns: clamp(13.75rem, 64vw, 16rem);
         grid-template-columns: none;
         justify-content: start;
         overflow-x: auto;
         overscroll-behavior-x: contain;
-        padding: 0 3.25rem 0.35rem 0;
+        padding: 0 3.75rem 0.35rem 0;
         scroll-padding-inline: 0;
         scroll-snap-type: x proximity;
         scrollbar-width: none;
@@ -2253,7 +2253,7 @@
 
     .services-page .services-lane-orb {
         grid-template-columns: 1fr;
-        grid-template-rows: minmax(4rem, 1fr) auto;
+        grid-template-rows: minmax(5.25rem, 1fr) auto;
         gap: 0.44rem;
         min-height: 0;
         padding: 0.54rem;
@@ -2282,7 +2282,9 @@
     }
 
     .services-page .services-lane-orb__copy {
-        display: none;
+        display: block;
+        font-size: 0.68rem;
+        line-height: 1.32;
     }
 
     .services-page .services-lane-orb__action {
@@ -2309,6 +2311,10 @@
     }
 
     .services-page .services-lane-orb__action {
+        display: none;
+    }
+
+    .services-page .services-lane-orb__copy {
         display: none;
     }
 }

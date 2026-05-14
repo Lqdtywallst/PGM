@@ -125,7 +125,7 @@
 }
     </script>
 </head>
-<body class="vehicle-page vehicle-page--premium-pilot">
+<body class="vehicle-page vehicle-page--mother-base vehicle-page--brand-mother vehicle-page--ferrari-brand">
     <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="lab-header">
         <div class="lab-shell lab-header__inner">
@@ -297,7 +297,7 @@
         </div>
     </header>
 
-    <main id="main-content" class="vehicle-main vehicle-main--premium-pilot vehicle-main--brand-landing">
+    <main id="main-content" class="vehicle-main vehicle-main--mother-base vehicle-main--brand-landing">
         <nav class="breadcrumb" aria-label="Breadcrumb">
             <a href="index.html">Home</a>
             <span aria-hidden="true"> / </span>
@@ -306,241 +306,101 @@
             <span aria-current="page">Ferrari rental Dubai</span>
         </nav>
 
-        <section class="vehicle-hero">
-            <div class="vehicle-hero__media">
-                <img src="./images/fleet/ferrari-296-gts/01-exterior-front.jpg" alt="Ferrari 296 GTS prepared for a Dubai handover" loading="eager">
-                <div class="vehicle-hero__shade"></div>
-                <div class="vehicle-hero__copy">
-                    <div class="vehicle-hero__brand-line">
-                        <img src="./images/brands/ferrari-mark.png" alt="" aria-hidden="true">
-                        <span>Ferrari in Dubai</span>
-                    </div>
-                    <h1 id="ferrari-296-title">Ferrari 296 GTS</h1>
-                    <p class="vehicle-hero__lead">Open-top Ferrari for hotel arrivals, dinner routes and couple-led stays that want visible elegance, immediate clarity and a fast handoff into reservation.</p>
-                    <div class="vehicle-hero__actions">
-                        <a class="btn btn-primary" href="#vehicle-booking">Check availability</a>
-                    </div>
+        <section class="brand-landing-hero" aria-labelledby="brand-hero-title">
+            <div class="brand-landing-hero__copy">
+                <div class="brand-landing-hero__kicker">
+                    <img src="./images/brands/ferrari-mark.png" alt="" aria-hidden="true">
+                    <span>Ferrari in Dubai</span>
+                </div>
+                <h1 id="brand-hero-title">Rent Ferrari in Dubai</h1>
+                <p class="brand-landing-hero__lead">A focused Ferrari rental page for guests who want a polished open-top supercar, clear dates and a direct handover plan.</p>
+                <div class="brand-landing-hero__trust" aria-label="Dynasty Prestige Ferrari rental highlights">
+                    <span>Hotel, resort and villa delivery</span>
+                    <span>Dates confirmed before payment</span>
+                    <span>WhatsApp support before handover</span>
                 </div>
             </div>
 
-            <aside class="vehicle-booking" id="vehicle-booking">
-                <p class="vehicle-booking__kicker">From per day</p>
-                <p class="vehicle-booking__price">3,400 AED</p>
-                <p class="vehicle-booking__price-note">Indicative day rate</p>
-                <p class="vehicle-booking__copy">Best for couples, hotel arrivals, resort stays and dinner-led routes where Ferrari should feel polished, not overplayed.</p>
-                <div class="vehicle-booking__trust" aria-label="Ferrari 296 GTS booking highlights">
-                    <span>Dubai delivery</span>
-                    <span>WhatsApp confirmation</span>
-                    <span>Dates carry forward</span>
-                </div>
-
-                <form class="vehicle-booking__form js-vehicle-booking-form" action="app/reserve/page.html" method="get">
-                    <input type="hidden" name="car" value="Ferrari 296 GTS">
-                    <input type="hidden" name="price" value="3400">
-
-                    <div class="vehicle-booking__grid">
-                        <label class="vehicle-booking__field">
-                            <span>Pickup date</span>
-                            <input class="vehicle-booking__input js-vehicle-date" type="date" name="startDate" required>
-                        </label>
-                        <label class="vehicle-booking__field">
-                            <span>Pickup time</span>
-                            <input class="vehicle-booking__input js-vehicle-time" type="time" name="pickupTime" value="12:00" step="1800" required>
-                        </label>
-                        <label class="vehicle-booking__field">
-                            <span>Return date</span>
-                            <input class="vehicle-booking__input js-vehicle-date" type="date" name="endDate" required>
-                        </label>
-                        <label class="vehicle-booking__field">
-                            <span>Return time</span>
-                            <input class="vehicle-booking__input js-vehicle-time" type="time" name="dropoffTime" value="12:00" step="1800" required>
-                        </label>
+            <div class="brand-landing-models brand-landing-models--single" aria-label="Available Ferrari models">
+                <h2 class="brand-landing-models__heading">Available Ferrari models</h2>
+                <article class="brand-model-card" itemscope itemtype="https://schema.org/Product">
+                    <link itemprop="image" href="https://prestigegoalmotion.com/images/fleet/ferrari-296-gts/01-exterior-front.jpg">
+                    <a class="brand-model-card__media" href="ferrari-296-gts-rental-dubai.html" aria-label="View Ferrari 296 GTS">
+                        <img src="/images/fleet/ferrari-296-gts/01-exterior-front.jpg" alt="Ferrari 296 GTS available to rent in Dubai" width="640" height="410" loading="eager" decoding="async">
+                    </a>
+                    <div class="brand-model-card__body">
+                        <div itemprop="brand" itemscope itemtype="https://schema.org/Brand"><meta itemprop="name" content="Ferrari"></div>
+                        <span class="brand-model-card__tag">Open-top hybrid supercar</span>
+                        <h3 itemprop="name">Ferrari 296 GTS</h3>
+                        <p itemprop="description">Best for couples, resort arrivals and evening routes where the car should feel exciting, sharp and still refined.</p>
+                        <dl class="brand-model-card__meta">
+                            <div><dt>From</dt><dd>3,400 AED/day</dd></div>
+                            <div><dt>Seats</dt><dd>2</dd></div>
+                            <div><dt>Character</dt><dd>Hybrid V6, roof-down</dd></div>
+                        </dl>
+                        <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                            <meta itemprop="priceCurrency" content="AED">
+                            <meta itemprop="price" content="3400">
+                            <link itemprop="availability" href="https://schema.org/InStock">
+                        </div>
+                        <a class="brand-model-card__cta" href="ferrari-296-gts-rental-dubai.html">View / reserve 296 GTS</a>
                     </div>
-
-                    <p class="vehicle-booking__note">Pickup and return details move directly into the reservation flow.</p>
-
-                    <button class="btn btn-primary vehicle-booking__submit" type="submit">Check availability</button>
-                    <a class="btn btn-outline vehicle-booking__secondary" href="https://wa.me/971586122568?text=Hi%2C%20I%20am%20interested%20in%20the%20Ferrari%20296%20GTS%20in%20Dubai." target="_blank" rel="noopener">WhatsApp the team</a>
-                </form>
-            </aside>
+                </article>
+            </div>
         </section>
 
-        <section class="vehicle-metrics" aria-label="Ferrari 296 GTS summary">
-            <article class="vehicle-metric">
-                <span class="vehicle-metric__label">Seats</span>
-                <strong class="vehicle-metric__value">2</strong>
-            </article>
-            <article class="vehicle-metric">
-                <span class="vehicle-metric__label">Powertrain</span>
-                <strong class="vehicle-metric__value">V6 hybrid</strong>
-            </article>
-            <article class="vehicle-metric">
-                <span class="vehicle-metric__label">Delivery</span>
-                <strong class="vehicle-metric__value">Hotel and resort</strong>
-            </article>
-            <article class="vehicle-metric">
-                <span class="vehicle-metric__label">Best fit</span>
-                <strong class="vehicle-metric__value">Refined open-top stay</strong>
-            </article>
+        <section class="brand-landing-guide" aria-labelledby="brand-guide-heading">
+            <div class="brand-landing-guide__intro">
+                <span class="brand-landing-guide__kicker">Dynasty Prestige guidance</span>
+                <h2 id="brand-guide-heading">Choose Ferrari when the stay needs emotion without losing polish.</h2>
+                <p>Ferrari works best when the arrival is social, route-led and memorable. We keep the booking practical: confirm the rental window, delivery point and final quote before payment, then carry those details into the reservation flow.</p>
+            </div>
+            <div class="brand-landing-guide__grid">
+                <article>
+                    <h3>Best fit</h3>
+                    <p>Couples, resort stays, Marina evenings and guests who want a supercar that feels elegant rather than excessive.</p>
+                </article>
+                <article>
+                    <h3>Delivery rhythm</h3>
+                    <p>Ideal for hotel, villa and dinner-led handovers where timing and presentation are part of the experience.</p>
+                </article>
+                <article>
+                    <h3>Compare before booking</h3>
+                    <p>Choose Lamborghini for louder theatre, Porsche for purist drive feel, or Ferrari for the balanced social supercar.</p>
+                </article>
+            </div>
         </section>
 
-        <section class="vehicle-section vehicle-pdp-gallery">
+        <section class="vehicle-section">
             <div class="vehicle-section__heading">
-                <span class="section-kicker">Gallery and motion</span>
-                <h2>One image is never enough for a car like this.</h2>
-                <p>The stronger version of this page mixes stills, short clips and operational detail in one uninterrupted product flow. This pilot opens that structure first.</p>
-            </div>
-
-            <div class="vehicle-pdp-gallery__grid">
-                <article class="vehicle-pdp-gallery-card vehicle-pdp-gallery-card--feature">
-                    <div class="vehicle-pdp-gallery-card__media">
-                        <video autoplay muted loop playsinline preload="metadata" poster="./images/fleet/ferrari-296-gts/01-exterior-front.jpg">
-                            <source src="./media/hero-dubai-sunset.mp4" type="video/mp4">
-                        </video>
-                    </div>
-                    <div class="vehicle-pdp-gallery-card__copy">
-                        <span class="vehicle-pdp-gallery-card__eyebrow">Arrival film</span>
-                        <h3>Short motion where the booking starts to feel real.</h3>
-                        <p>Premium car pages win when they show the arrival tone, not only the sheet of numbers. This block is where the model-specific video layer belongs.</p>
-                    </div>
-                </article>
-
-                <article class="vehicle-pdp-gallery-card vehicle-pdp-gallery-card--image">
-                    <div class="vehicle-pdp-gallery-card__media">
-                        <img src="./images/fleet/ferrari-296-gts/01-exterior-front.jpg" alt="Ferrari 296 GTS exterior detail for Dubai rental" loading="lazy">
-                    </div>
-                    <div class="vehicle-pdp-gallery-card__copy">
-                        <span class="vehicle-pdp-gallery-card__eyebrow">Exterior still</span>
-                        <h3>Low-slung, clean and recognisably Ferrari before it moves.</h3>
-                    </div>
-                </article>
-
-                <article class="vehicle-pdp-gallery-card vehicle-pdp-gallery-card--text">
-                    <div class="vehicle-pdp-gallery-card__copy">
-                        <span class="vehicle-pdp-gallery-card__eyebrow">Cockpit mood</span>
-                        <h3>Driver display, roof-down feel and the calm premium read of the cabin.</h3>
-                        <p>Interior footage should sit beside the hero instead of disappearing further down the page.</p>
-                    </div>
-                </article>
-
-                <article class="vehicle-pdp-gallery-card vehicle-pdp-gallery-card--text">
-                    <div class="vehicle-pdp-gallery-card__copy">
-                        <span class="vehicle-pdp-gallery-card__eyebrow">Night arrival</span>
-                        <h3>Resort, valet and curbside tone after dark.</h3>
-                        <p>This is where the second film or vertical clip should prove why the 296 works so well for evening-led stays.</p>
-                    </div>
-                </article>
-            </div>
-        </section>
-
-        <section class="vehicle-section vehicle-pdp-use">
-            <div class="vehicle-section__heading">
-                <span class="section-kicker">Why this Ferrari works</span>
-                <h2>More social than technical. More elegant than aggressive.</h2>
-                <p>The 296 GTS belongs to the guest who wants Ferrari presence, open-air excitement and a cleaner fit with hotels, dinners and premium city movement.</p>
-            </div>
-
-            <div class="vehicle-pdp-use__grid">
-                <article class="vehicle-pdp-use__card">
-                    <span class="vehicle-pdp-use__eyebrow">Couple-led stays</span>
-                    <h3>A sharper choice than a GT, without the heavier theatre of a harder supercar.</h3>
-                    <p>The two-seat layout and roof-down character make it strongest for guests building the stay around shared moments, not luggage logic.</p>
-                </article>
-                <article class="vehicle-pdp-use__card">
-                    <span class="vehicle-pdp-use__eyebrow">Hotel and resort arrivals</span>
-                    <h3>Ferrari status that still looks composed at the curb.</h3>
-                    <p>The 296 GTS is instantly legible as a Ferrari, but it carries itself with a smoother hospitality tone than the loudest cars in the fleet.</p>
-                </article>
-                <article class="vehicle-pdp-use__card">
-                    <span class="vehicle-pdp-use__eyebrow">Dinner routes</span>
-                    <h3>Short, visible drives where the car should become part of the night.</h3>
-                    <p>Palm, Marina and resort movement suit this model especially well because the experience starts before the destination does.</p>
-                </article>
-            </div>
-        </section>
-
-        <section class="vehicle-section vehicle-pdp-ops">
-            <div class="vehicle-section__heading">
-                <span class="section-kicker">Operational clarity</span>
-                <h2>The premium feel has to stay intact when the practical questions start.</h2>
-                <p>The structure below pulls price logic, booking conditions and service confidence closer to the top so the page works like a product page, not just a landing.</p>
-            </div>
-
-            <div class="vehicle-pdp-ops__grid">
-                <article class="vehicle-pdp-panel">
-                    <span class="section-kicker">Rental terms</span>
-                    <h3>Clear first numbers before the enquiry starts.</h3>
-                    <dl class="vehicle-pdp-term-list">
-                        <div>
-                            <dt>Indicative day rate</dt>
-                            <dd>3,400 AED</dd>
-                        </div>
-                        <div>
-                            <dt>Weekly / monthly</dt>
-                            <dd>Quoted on request</dd>
-                        </div>
-                        <div>
-                            <dt>Delivery</dt>
-                            <dd>Hotel, resort and residence</dd>
-                        </div>
-                        <div>
-                            <dt>Mileage</dt>
-                            <dd>Shared with the final quote</dd>
-                        </div>
-                        <div>
-                            <dt>Insurance</dt>
-                            <dd>Explained before payment</dd>
-                        </div>
-                        <div>
-                            <dt>Deposit</dt>
-                            <dd>Confirmed per booking</dd>
-                        </div>
-                    </dl>
-                </article>
-
-                <article class="vehicle-pdp-panel">
-                    <span class="section-kicker">Included flow</span>
-                    <h3>One point of contact from first message to handover.</h3>
-                    <ul class="vehicle-checklist">
-                        <li>WhatsApp response and availability confirmation.</li>
-                        <li>Dates carried directly into the reservation journey.</li>
-                        <li>Dubai-wide coordination for hotel and residence delivery.</li>
-                        <li>Cleaner guidance on whether this Ferrari is the right fit for the stay.</li>
-                    </ul>
-                </article>
-            </div>
-        </section>
-
-        <section class="vehicle-section vehicle-pdp-compare">
-            <div class="vehicle-section__heading">
-                <span class="section-kicker">Compare by intention</span>
-                <h2>Keep browsing around the role the car needs to play.</h2>
+                <span class="section-kicker">Related pages</span>
+                <h2>Keep the Ferrari booking easy to compare.</h2>
             </div>
             <div class="related-grid">
-                <a href="lamborghini-rental-dubai.html"><strong>Want more theatre?</strong>Open the Huracan and Urus page for the louder Lamborghini reading.</a>
-                <a href="porsche-992-gt3-rental-dubai.html"><strong>Want more driver focus?</strong>Move into the Porsche GT3 for a purer engineering-led booking.</a>
-                <a href="mercedes-g63-amg-rental-dubai.html"><strong>Need more flexibility?</strong>Open the G63 for luggage, comfort and all-day premium movement.</a>
-                <a href="fleet.html"><strong>Back to fleet</strong>Compare the Ferrari against the rest of the curated line-up.</a>
+                <a href="ferrari-296-gts-rental-dubai.html"><strong>Ferrari 296 GTS</strong>Open the model detail and reserve with dates attached.</a>
+                <a href="lamborghini-rental-dubai.html"><strong>Lamborghini</strong>Compare the louder open-top and SUV alternatives.</a>
+                <a href="porsche-rental-dubai.html"><strong>Porsche</strong>Move toward a sharper driver-first choice.</a>
+                <a href="fleet.html"><strong>Back to fleet</strong>Compare Ferrari against every curated model.</a>
             </div>
         </section>
 
         <section class="vehicle-section">
             <div class="vehicle-section__heading">
                 <span class="section-kicker">FAQ</span>
-                <h2>Short answers before the reservation starts.</h2>
+                <h2>Short answers before you reserve Ferrari in Dubai.</h2>
             </div>
             <div class="faq-list">
                 <details open>
                     <summary>What kind of Dubai stay suits the Ferrari 296 GTS best?</summary>
-                    <div class="faq-a">It is strongest for couples, resort arrivals, visible dinner routes and shorter premium stays where the car should feel exciting but still polished.</div>
+                    <div class="faq-a">It is strongest for couples, resort arrivals, dinner routes and shorter premium stays where the car should feel exciting but still polished.</div>
                 </details>
                 <details>
                     <summary>Is the 3,400 AED figure the final rate?</summary>
-                    <div class="faq-a">It is the indicative starting rate. Final quoting depends on the exact rental window, delivery timing, mileage logic and any added service layer around the handover.</div>
+                    <div class="faq-a">It is the indicative starting rate. Final quoting depends on dates, delivery timing, mileage logic and any added service layer around the handover.</div>
                 </details>
                 <details>
-                    <summary>Do the dates I pick here stay with the booking?</summary>
-                    <div class="faq-a">Yes. Pickup and return details selected in the booking panel are sent into the reservation page to keep the booking intent intact.</div>
+                    <summary>Can I continue straight into reservation?</summary>
+                    <div class="faq-a">Yes. Open the model card and the reservation flow keeps the vehicle context clear so the team can confirm quickly.</div>
                 </details>
             </div>
         </section>

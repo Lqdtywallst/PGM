@@ -1,8 +1,8 @@
 .contact-page {
     --lab-font-display: var(--dp-font-display);
-    --lab-font-sans: 'Manrope', system-ui, sans-serif;
-    background: #f4f6f8;
-    color: #151821;
+    --lab-font-sans: var(--dp-font-sans);
+    background: var(--dp-color-warm-white);
+    color: var(--dp-color-text);
 }
 
 .contact-page .lab-header {
@@ -59,24 +59,25 @@
 }
 
 .contact-hero {
-    padding: 2.5rem 0 2rem;
+    padding: clamp(1.15rem, 2.5svh, 2.1rem) 0 clamp(1.35rem, 3svh, 2.4rem);
     background:
-        radial-gradient(circle at top left, rgba(209, 184, 122, 0.14), rgba(209, 184, 122, 0) 26%),
-        linear-gradient(180deg, #f8f9fb 0%, #ffffff 100%);
+        radial-gradient(circle at top left, rgba(209, 184, 122, 0.15), rgba(209, 184, 122, 0) 28%),
+        radial-gradient(circle at 82% 18%, rgba(15, 18, 24, 0.08), rgba(15, 18, 24, 0) 31%),
+        linear-gradient(180deg, #fbfaf6 0%, #f5f0e8 100%);
 }
 
 .contact-hero__shell.hero-grid {
     display: grid;
-    grid-template-columns: minmax(0, 0.96fr) minmax(20rem, 1.04fr);
-    gap: 1.5rem;
-    align-items: start;
+    grid-template-columns: minmax(0, 0.88fr) minmax(24rem, 1.12fr);
+    gap: clamp(1rem, 2.3vw, 2rem);
+    align-items: center;
 }
 
 .contact-hero__intro {
     display: grid;
     align-content: start;
-    gap: 1rem;
-    padding-top: 0.4rem;
+    gap: 0.86rem;
+    padding-top: 0;
 }
 
 .contact-breadcrumb {
@@ -101,15 +102,15 @@
     display: inline-flex;
     align-items: center;
     width: fit-content;
-    min-height: 2rem;
-    padding: 0 0.8rem;
+    min-height: 1.88rem;
+    padding: 0 0.76rem;
     border: 1px solid rgba(208, 176, 106, 0.32);
     border-radius: 999px;
     background: rgba(208, 176, 106, 0.08);
     color: #6c5730;
     font-family: var(--lab-font-sans);
-    font-size: 0.7rem;
-    font-weight: 700;
+    font-size: 0.66rem;
+    font-weight: 800;
     letter-spacing: 0.12em;
     text-transform: uppercase;
 }
@@ -132,12 +133,12 @@
 }
 
 .contact-hero h1 {
-    max-width: 10ch;
-    font-size: 4.15rem;
+    max-width: 11ch;
+    font-size: clamp(3rem, 4.6vw, 3.72rem);
 }
 
 .contact-form-card h2 {
-    font-size: 2.2rem;
+    font-size: clamp(1.76rem, 2.6vw, 2.08rem);
 }
 
 .contact-section-head h2,
@@ -153,8 +154,8 @@
     margin: 0;
     max-width: 38rem;
     color: #303a47;
-    font-size: 1rem;
-    line-height: 1.62;
+    font-size: 0.98rem;
+    line-height: 1.52;
 }
 
 .contact-hero__actions,
@@ -171,8 +172,8 @@
     align-items: center;
     justify-content: center;
     gap: 0.56rem;
-    min-height: 3.25rem;
-    padding: 0 1.22rem;
+    min-height: 3rem;
+    padding: 0 1.16rem;
     border: 1px solid transparent;
     border-radius: 14px;
     font-family: var(--lab-font-sans);
@@ -242,8 +243,8 @@
 .contact-trust-list {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.9rem;
-    margin: 0.2rem 0 0;
+    gap: 0.75rem;
+    margin: 0.15rem 0 0;
     padding: 0;
     list-style: none;
 }
@@ -252,7 +253,7 @@
     display: grid;
     gap: 0.3rem;
     min-width: 0;
-    padding: 1rem;
+    padding: 0.82rem 0.88rem;
     border: 1px solid rgba(18, 24, 33, 0.08);
     border-radius: 14px;
     background: rgba(255, 255, 255, 0.86);
@@ -269,13 +270,13 @@
 
 .contact-trust-list span {
     color: #344050;
-    font-size: 0.95rem;
-    line-height: 1.5;
+    font-size: 0.88rem;
+    line-height: 1.42;
     overflow-wrap: anywhere;
 }
 
 .form-card {
-    padding: 1.4rem;
+    padding: clamp(1rem, 1.7vw, 1.28rem);
     border: 1px solid rgba(18, 24, 33, 0.08);
     border-radius: 18px;
     background: #ffffff;
@@ -284,29 +285,31 @@
 
 .contact-form-card {
     display: grid;
-    gap: 0.9rem;
+    gap: 0.68rem;
 }
 
 .form-layout {
     display: grid;
-    gap: 0.9rem;
+    gap: 0.66rem;
 }
 
 .contact-form-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.8rem;
+    gap: 0.66rem;
 }
 
 .contact-form-field {
     display: grid;
-    gap: 0.45rem;
+    gap: 0.32rem;
 }
 
 .contact-page label {
     color: #171921;
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
 }
 
 .contact-page input,
@@ -324,7 +327,7 @@
 }
 
 .contact-page textarea {
-    min-height: 7.25rem;
+    min-height: 5.45rem;
     resize: vertical;
 }
 
@@ -636,9 +639,12 @@
 
     .contact-hero__shell.hero-grid,
     .contact-coverage,
-    .contact-form-grid,
     .contact-methods-grid {
         grid-template-columns: 1fr;
+    }
+
+    .contact-form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .contact-hero__intro {
@@ -702,12 +708,12 @@
     .contact-page input,
     .contact-page select,
     .contact-page textarea {
-        min-height: 2.9rem;
+        min-height: 2.72rem;
         padding: 0.78rem 0.9rem;
     }
 
     .contact-page textarea {
-        min-height: 6.8rem;
+        min-height: 5.8rem;
     }
 
     .contact-band {
@@ -858,6 +864,27 @@
         font-size: 1.38rem;
         line-height: 0.96;
     }
+
+    .contact-page input,
+    .contact-page select {
+        min-height: 2.42rem;
+        padding-block: 0.54rem;
+        font-size: 0.88rem;
+    }
+
+    .contact-page select {
+        padding-inline: 0.72rem 1.75rem;
+    }
+
+    .contact-page textarea {
+        min-height: 4.8rem;
+        padding-block: 0.62rem;
+        font-size: 0.88rem;
+    }
+
+    .contact-form-actions .contact-button {
+        min-height: 2.68rem;
+    }
 }
 
 @media (min-width: 861px) {
@@ -869,7 +896,7 @@
 
     .contact-hero__shell.hero-grid {
         min-height: calc(100svh - var(--lab-header-offset));
-        align-items: stretch;
-        align-content: start;
+        align-items: center;
+        align-content: center;
     }
 }
