@@ -2908,7 +2908,7 @@
 
     .services-page .services-hero__hub-intro {
         display: grid;
-        grid-template-rows: auto auto auto auto auto auto;
+        grid-template-rows: auto auto auto auto auto minmax(0, 1fr);
         align-self: stretch;
         align-content: start;
         justify-items: start;
@@ -2943,6 +2943,25 @@
 
     .services-page .services-hero__trust {
         align-self: end;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.48rem;
+    }
+
+    .services-page .services-hero__trust span {
+        min-height: 0;
+        padding: 0.58rem 0.62rem;
+        gap: 0.2rem;
+    }
+
+    .services-page .services-hero__trust strong {
+        font-size: 0.54rem;
+        letter-spacing: 0.1em;
+        line-height: 1.12;
+    }
+
+    .services-page .services-hero__trust small {
+        font-size: 0.64rem;
+        line-height: 1.22;
     }
 
     .services-page .services-hero__planner--direct .services-hero__selector {
@@ -2979,22 +2998,66 @@
 }
 
 @media (min-width: 1025px) and (max-height: 820px) {
+    .services-page .services-hero__shell {
+        --services-support-top-gap: 0.65rem;
+        --services-support-bottom-gap: 1.35rem;
+    }
+
     .services-page .services-hero__hub-intro {
-        gap: 0.52rem;
-        padding: 0.92rem;
+        grid-template-rows: auto auto auto auto auto minmax(0, 1fr);
+        gap: 0.48rem;
+        padding: 0.84rem;
     }
 
     .services-page .services-hero__hub-intro h1 {
-        font-size: clamp(2.45rem, 3.45vw, 3.15rem);
+        font-size: clamp(2.42rem, 3.35vw, 3rem);
+    }
+
+    .services-page .services-hero__planner--direct .services-hero__lead {
+        font-size: 0.82rem;
+        line-height: 1.32;
     }
 
     .services-page .services-hero__cue,
     .services-page .services-hero__decision {
-        padding: 0.54rem;
+        padding: 0.48rem;
+    }
+
+    .services-page .services-hero__cue p {
+        font-size: 0.78rem;
+        line-height: 1.32;
+    }
+
+    .services-page .services-hero__decision {
+        gap: 0.34rem;
+    }
+
+    .services-page .services-hero__decision ul {
+        gap: 0.3rem;
+    }
+
+    .services-page .services-hero__decision li {
+        min-height: 2.55rem;
+        padding: 0.36rem 0.42rem;
+    }
+
+    .services-page .services-hero__decision small {
+        font-size: 0.6rem;
+        line-height: 1.18;
+    }
+
+    .services-page .services-hero__trust {
+        gap: 0.38rem;
     }
 
     .services-page .services-hero__trust span {
-        min-height: 3.2rem;
+        min-height: 0;
+        padding: 0.42rem 0.46rem;
+    }
+
+    .services-page .services-hero__trust small {
+        font-size: 0.58rem;
+        line-height: 1.15;
     }
 }
 
