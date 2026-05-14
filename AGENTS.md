@@ -18,6 +18,24 @@ When working on landing pages, homepage, or hero sections, always optimize the f
 - Keep the design elegant across mobile, tablet, laptop, and desktop
 - When two parallel blocks share a row on desktop, align their top and bottom edges unless the layout has an intentional documented exception
 
+### Public support first viewport rule
+
+Services, Locations, Contact, About Us and Find Booking belong to the same
+public support page family.
+
+On laptop and monitor viewports, these pages must start at the same visual
+height below the shared header and use the same first-viewport structure:
+
+- two filled columns inside the shared brand frame
+- left column: page headline, short useful context and the main navigation or trust cue
+- right column: the page task, proof panel, map, form, contact block or support action
+- both columns align at the top and should end in the same visual band unless a documented exception exists
+- content length must be trimmed or redistributed instead of changing the first-viewport height from page to page
+
+On tablet and mobile, the same content may stack, but the order and hierarchy
+must remain consistent: headline/context first, useful task/action immediately
+after, no decorative filler before the page purpose.
+
 ## Brand homogeneity rules
 
 Every public page must feel like the same Dynasty Prestige product, even when

@@ -134,6 +134,8 @@ These are the measurements every visual/homogeneity audit should compute.
 | Text contrast | WCAG contrast ratio | normal `>= 4.5`, large `>= 3` |
 | H1 line count | DOM range/client rect lines | mobile `2-5`, desktop `1-3` unless intentional |
 | Body line length | rendered text width or characters per line | target `45-75ch` desktop, shorter mobile |
+| Support family start delta | max first-content top difference across Services, Locations, Contact, About and Find Booking | `<= 12px` on laptop/monitor after header |
+| Support split bottom band | max bottom difference between left/right first-viewport columns | `<= 24px` unless documented |
 
 ## Typography Scale Guardrail
 
@@ -272,6 +274,45 @@ Failure examples:
 - service circles are centered on mobile but float oddly on desktop.
 - intro text is not aligned with cards below.
 - user must click a circle and then another CTA to navigate.
+
+### PublicSupportFirstViewport
+
+This is a cross-pattern shell that applies before the page-specific pattern
+takes over. It covers:
+
+- Services
+- Locations
+- Contact
+- About
+- Find Booking / reservation lookup
+
+Measure on laptop and monitor:
+
+- distance from header bottom to first content top
+- shared frame left and right edges
+- left column top/bottom
+- right column top/bottom
+- primary action/task depth
+- headline line count and copy height
+
+Targets:
+
+- all routes start in the same first-viewport band below the header
+- two filled columns inside the same brand frame
+- left column carries headline, useful context and a trust/navigation cue
+- right column carries the page-specific task or proof surface
+- left and right columns align at the top
+- left and right columns finish in the same visual band
+- copy is shortened or redistributed before changing the page family height
+
+Failure examples:
+
+- Contact starts lower than Services because its editorial title is too large.
+- About becomes a single centered block while Locations keeps a two-column
+  map layout.
+- Find Booking pushes its form below the first viewport while the others show
+  useful action immediately.
+- One route uses a different header-to-content gap or frame width.
 
 ### AppFlowPage
 

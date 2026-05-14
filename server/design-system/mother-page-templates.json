@@ -13,6 +13,35 @@
     "laptop",
     "monitor"
   ],
+  "crossPatternContracts": {
+    "PublicSupportFirstViewport": {
+      "routes": [
+        "/services.html",
+        "/locations.html",
+        "/contact.html",
+        "/about.html",
+        "/reservation-lookup.html"
+      ],
+      "validationGroups": [
+        "laptop",
+        "monitor"
+      ],
+      "intent": "Services, Locations, Contact, About Us and Find Booking start with the same premium two-column support shell before their route-specific content takes over.",
+      "structure": [
+        "shared header",
+        "shared brand frame",
+        "left column: headline, short useful context and trust/navigation cue",
+        "right column: task, proof panel, map, form, lookup panel, contact action or support block"
+      ],
+      "rules": [
+        "same visual start height below the header on laptop and monitor",
+        "two filled columns with aligned top edges",
+        "left and right columns finish in the same visual band unless an exception is documented",
+        "content length is trimmed or redistributed instead of changing the first-viewport family height",
+        "tablet and mobile may stack, but hierarchy stays headline/context then task/proof/action"
+      ]
+    }
+  },
   "templates": {
     "MarketingLandingPage": {
       "referenceRoutes": [

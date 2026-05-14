@@ -57,6 +57,47 @@ Pattern examples:
 - Service landing: service choices or booking path visible early.
 - Find Booking/Reserve: form task starts inside the first viewport.
 
+### Public Support First Viewport Family
+
+Services, Locations, Contact, About Us and Find Booking must feel like the
+same family when a customer moves between them.
+
+Desktop/laptop contract:
+
+- all five pages start at the same visual height below the shared header
+- all five use the same shared brand frame width
+- the first viewport uses a two-column split
+- the left column carries the main headline, short useful context and the
+  page's primary trust/navigation cue
+- the right column carries the page task or proof surface: service choices,
+  map, contact form, booking lookup, support panel or similar
+- both columns must feel filled; no empty side, tiny orphan card or random
+  centered island
+- top edges must align; bottom edges should land in the same visual band
+  even when the content differs
+- if copy makes one page taller than the others, cut or redistribute the copy
+  instead of letting the first viewport drift
+
+Tablet/mobile contract:
+
+- columns may stack, but the order stays consistent: headline/context, then
+  task/proof/action
+- the first useful action must remain visible or clearly implied without a
+  long decorative scroll
+- the stacked blocks must keep the same typography, card, CTA and spacing
+  grammar as the desktop family
+
+Failure examples:
+
+- Services begins under the header, but Contact starts much lower because of a
+  giant title.
+- Locations has a map panel on the right, but About becomes a single centered
+  editorial block with no equivalent right-side task/proof surface.
+- Find Booking keeps the form below the fold while the other pages show useful
+  action immediately.
+- The same page family changes heading size, card radius or background mood
+  between routes.
+
 ## Typography Scale Rules
 
 Premium does not mean huge text.

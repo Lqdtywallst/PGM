@@ -53,6 +53,7 @@ These rules apply everywhere.
 | Copy | Every visible text block has a clear job: reserve, trust, compare, understand, navigate or rank | Generic filler, duplicated SEO padding, overlong above-fold paragraphs | content usefulness failure |
 | Floating Actions | Same bottom-right rhythm and overlap rules | Buttons covering forms/cards/text | overlap ratio failure |
 | First Viewport | One main message, one main action, clear next step | CTA clutter, hidden task, horizontal scroll | first-viewport contract failure |
+| Support First Viewport | Services, Locations, Contact, About and Find Booking share one laptop/monitor two-column shell | Each page starts at a different height or changes to an unrelated hero structure | support-family geometry drift |
 
 ## Brand Homogeneity Contract
 
@@ -108,6 +109,39 @@ the slot order, rhythm and first-viewport contract do not.
 | `HubPage` | Services, locations, brand/type hubs | header, hub intro, priority choices, guide grid, process, final CTA | choices are visible and directly clickable without extra panel friction | circles/cards misaligned, intro not centered, dead preview panels |
 | `AppFlowPage` | Reserve, Find Booking, future customer utilities | header, secure intro, form panel, result/summary, support fallback | the task form starts within the first viewport | oversized editorial heading, form cropped below fold |
 | `AdminPage` | Private CRM/content admin | private header, filters, list/detail split, action bar, notes/status | dense but readable management view | oversized elements, weak table/list hierarchy |
+
+### Cross-Pattern First Viewport Family
+
+Some public pages have different page patterns below the fold but must share
+the same first-viewport shell because the customer experiences them as the
+same support/navigation layer.
+
+Applies to:
+
+- `/services.html`
+- `/locations.html`
+- `/contact.html`
+- `/about.html`
+- `/reservation-lookup.html` / Find Booking
+
+Laptop/monitor rule:
+
+- same starting height below the global header
+- same brand frame width
+- two filled columns
+- left column: headline, short useful copy and primary trust/navigation cue
+- right column: task/proof surface such as service choices, map, form, lookup
+  panel, support block or contact action
+- top edges align; bottom edges land in the same visual band unless an
+  exception is documented
+- content length is adjusted to fit the family rhythm, not the other way round
+
+Mobile/tablet rule:
+
+- columns can stack
+- hierarchy stays consistent: headline/context first, task/proof/action second
+- no decorative block may push the useful action out of the first useful
+  viewport
 
 ## Page Route Assignment
 
@@ -189,6 +223,8 @@ below is the short version.
 | Text contrast | WCAG 4.5:1 normal, 3:1 large | pale grey text on white |
 | Card internal padding | tokenized per variant | buttons touch card edge |
 | Section spacing | tokenized scale | random giant gaps or cramped content |
+| Support page start height | Services, Locations, Contact, About and Find Booking start within the same approved first-viewport band on laptop/monitor | one route begins much lower or higher after the header |
+| Support page split balance | two-column support shell top delta max 8px, bottom band delta max 24px | left/right panels feel unrelated or one side ends far earlier |
 
 ## Audit Matrix
 

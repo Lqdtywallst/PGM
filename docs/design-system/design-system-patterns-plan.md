@@ -230,6 +230,24 @@ Rules:
 - avoid oversized hero blocks that push the actual page task too far below the
   fold on laptop screens
 
+### Public support first viewport shell
+
+Services, Locations, Contact, About Us and Find Booking must share the same
+laptop/monitor first-viewport shell even when their page pattern differs below
+the fold.
+
+Rules:
+
+- same start height below the global header
+- same brand frame width
+- two filled columns
+- left column: headline, short useful copy and trust/navigation cue
+- right column: task/proof surface such as service choices, map, form, lookup,
+  contact action or support panel
+- top edges align; bottom edges should finish in the same visual band
+- content must be edited to fit the shell instead of letting each route invent
+  its own first-viewport height
+
 ### Mobile distribution
 
 Mobile pages should prioritize clarity and continuation.
