@@ -962,11 +962,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function getScheduleChipCopy() {
         const schedule = getCurrentSchedule();
+        const pickupTime = normalizeValue(schedule.pickupTime || "12:00");
+        const dropoffTime = normalizeValue(schedule.dropoffTime || "12:00");
+        const timeLabel = pickupTime && dropoffTime
+            ? `${pickupTime} / ${dropoffTime}`
+            : pickupTime || dropoffTime;
 
         if (!hasSchedule(schedule)) {
             return {
                 eyebrow: "Rental dates",
-                value: "Choose pickup & return"
+                value: timeLabel ? `Choose dates | ${timeLabel}` : "Choose pickup & return"
             };
         }
 
@@ -976,7 +981,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (startShort && endShort) {
             return {
                 eyebrow: "Rental dates",
-                value: `${startShort} - ${endShort}`
+                value: `${startShort} ${pickupTime} - ${endShort} ${dropoffTime}`
             };
         }
 

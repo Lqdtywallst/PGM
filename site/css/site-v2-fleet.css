@@ -645,7 +645,7 @@
 
 .fleet-card__copy {
     display: grid;
-    grid-template-rows: 1.45rem 4.15rem 1.35rem auto;
+    grid-template-rows: minmax(2.8rem, auto) 4.15rem 1.35rem auto;
     align-content: start;
     min-height: 100%;
 }
@@ -655,9 +655,9 @@
     color: #171412;
     font-size: 1.08rem;
     line-height: 1.14;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
 }
 
 .fleet-card__title a {

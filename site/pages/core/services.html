@@ -24,9 +24,9 @@
     <link rel="preload" href="/fonts/el-messiri-latin-600-700.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="./css/dp-fonts.css?v=20260513-local-fonts1">
     <link rel="stylesheet" href="./css/site-v2.css?v=20260426-header1">
-    <link rel="stylesheet" href="./css/site-v2-services.css?v=20260511-services-mother1">
+    <link rel="stylesheet" href="./css/site-v2-services.css?v=20260514-hero-footer1">
     <link rel="stylesheet" href="/css/admin-style-overrides.css?v=20260508-style-editor">
-    <script src="./js/site-v2.js?v=20260424-backnav1" defer></script>
+    <script src="./js/site-v2.js?v=20260514-floating-contact2" defer></script>
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -127,7 +127,7 @@
                             aria-expanded="false"
                             aria-controls="lab-nav-dynamic-panel-3"
                         >
-                            <span>Cars Brands</span>
+                            <span>Car Brands</span>
                             <span class="lab-nav__chevron" aria-hidden="true"></span>
                         </button>
 
@@ -193,7 +193,7 @@
                             aria-expanded="false"
                             aria-controls="lab-nav-dynamic-panel-4"
                         >
-                            <span>Cars Types</span>
+                            <span>Car Types</span>
                             <span class="lab-nav__chevron" aria-hidden="true"></span>
                         </button>
 
@@ -269,11 +269,45 @@
                     <div class="services-hero__hub-intro">
                         <span class="services-kicker">Dubai luxury car services</span>
                         <h1>Choose your service.</h1>
-                        <p class="services-hero__lead">Airport handover, chauffeur movement, delivery and monthly support, routed by one booking team.</p>
+                        <p class="services-hero__lead">Airport handover, chauffeur movement, delivery and monthly support with one booking team.</p>
+                        <div class="services-hero__cue">
+                            <span>Choose the right service</span>
+                            <p>Airport for arrivals, chauffeur for driver-led days, delivery for hotels or villas, monthly for longer stays.</p>
+                        </div>
+                        <div class="services-hero__decision" aria-label="Quick service routing guide">
+                            <span>Fast guide</span>
+                            <ul>
+                                <li>
+                                    <strong>Arrival day</strong>
+                                    <small>Flight, meet and route handled together.</small>
+                                </li>
+                                <li>
+                                    <strong>Driver needed</strong>
+                                    <small>Meetings, dinners or full-day plans.</small>
+                                </li>
+                                <li>
+                                    <strong>Hotel or villa</strong>
+                                    <small>Handover timed to property access.</small>
+                                </li>
+                                <li>
+                                    <strong>Longer stay</strong>
+                                    <small>One vehicle plan across weeks.</small>
+                                </li>
+                            </ul>
+                        </div>
                         <div class="services-hero__trust" aria-label="Service confidence signals">
-                            <span>24/7 concierge</span>
-                            <span>DXB, DWC, hotel and villa</span>
-                            <span>One premium booking team</span>
+                            <span>
+                                <strong>24/7 concierge</strong>
+                                <small>WhatsApp triage before timing is locked.</small>
+                            </span>
+                            <span>
+                                <strong>DXB, DWC, hotel and villa</strong>
+                                <small>Airport and property handovers planned early.</small>
+                            </span>
+                            <span>
+                                <strong>One premium booking team</strong>
+                                <small>Service, vehicle and route stay connected.</small>
+                            </span>
                         </div>
                     </div>
 
@@ -389,7 +423,7 @@
             </div>
         </section>
 
-        <section class="services-directory" id="service-directory" aria-labelledby="service-directory-title">
+        <section class="services-directory" id="service-directory" aria-labelledby="service-directory-title" hidden aria-hidden="true">
             <div class="lab-shell services-directory__shell">
                 <div class="services-section__head services-section__head--center">
                     <span class="services-kicker services-kicker--dark">Other routes</span>
@@ -455,12 +489,12 @@
             </div>
         </section>
 
-        <section class="services-flow" id="service-flow" aria-labelledby="service-flow-title">
+        <section class="services-flow" id="service-flow" aria-labelledby="service-flow-title" hidden aria-hidden="true">
             <div class="lab-shell services-flow__shell">
                 <div class="services-section__head">
                     <span class="services-kicker services-kicker--dark">How it works</span>
                     <h2 id="service-flow-title">A premium booking path should stay short.</h2>
-                    <p>The guest should explain the stay once. After that, the route, the vehicle and the handover should already feel aligned.</p>
+                    <p>Tell us the dates, pickup point and service type. We match the vehicle, route and handover.</p>
                 </div>
 
                 <ol class="services-flow__list">
@@ -471,19 +505,19 @@
                     </li>
                     <li class="services-flow__item">
                         <strong>02</strong>
-                        <h3>Match the lane</h3>
-                        <p>Airport concierge, chauffeur, delivery timing, monthly support or a narrower secondary route.</p>
+                        <h3>Choose the service</h3>
+                        <p>Airport concierge, chauffeur, delivery timing, monthly support or a focused route.</p>
                     </li>
                     <li class="services-flow__item">
                         <strong>03</strong>
                         <h3>Confirm the handover</h3>
-                        <p>Lock the vehicle, property or airport point and the timing rhythm so one team can run the booking cleanly.</p>
+                        <p>Lock the vehicle, property or airport point and the timing plan so the booking can run cleanly.</p>
                     </li>
                 </ol>
             </div>
         </section>
 
-        <section class="services-faq" aria-labelledby="services-faq-title">
+        <section class="services-faq" aria-labelledby="services-faq-title" hidden aria-hidden="true">
             <div class="lab-shell services-faq__shell">
                 <div class="services-faq__main">
                     <div class="services-section__head">
@@ -510,8 +544,8 @@
 
                 <aside class="services-faq__cta">
                     <span class="services-kicker">Next step</span>
-                    <h3>Choose the lane, then move the booking forward.</h3>
-                    <p>Open the reservation flow when the basics are clear, or move straight into WhatsApp when the stay needs a quieter hand.</p>
+                    <h3>Choose a service, then confirm the booking.</h3>
+                    <p>Open the reservation flow when the basics are clear, or use WhatsApp when the stay needs more context.</p>
                     <div class="services-faq__cta-actions">
                         <a class="services-button services-button--primary" href="./app/reserve/page.html" data-analytics-event="service_reservation_click" data-analytics-service="services_hub" data-analytics-placement="final_cta" data-analytics-channel="reservation">Open reservation flow</a>
                         <a class="services-button services-button--ghost" href="./fleet.html">View fleet</a>
@@ -528,7 +562,7 @@
                         <span class="site-v2-footer__crest" aria-hidden="true">
                             <img src="./images/dp-crest-cropped.png" alt="">
                         </span>
-                        <p>Dynasty Prestige turns premium mobility into a wider concierge layer: curated cars, chauffeur-led transfers, tailored delivery and Dubai experiences handled by one team.</p>
+                        <p>Luxury cars, chauffeur options and hotel, villa or airport handovers across Dubai.</p>
                     </div>
 
                     <div class="site-v2-footer__column">
@@ -573,5 +607,3 @@
     </main>
 </body>
 </html>
-
-

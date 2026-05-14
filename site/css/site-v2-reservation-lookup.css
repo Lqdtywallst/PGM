@@ -232,7 +232,7 @@
     display: grid;
     grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
     gap: clamp(1.25rem, 4vw, 3rem);
-    align-items: start;
+    align-items: stretch;
 }
 
 .lookup-help > div:first-child {
@@ -243,6 +243,7 @@
 .lookup-help__cards {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: minmax(0, 1fr);
     gap: 0.9rem;
 }
 
@@ -275,12 +276,19 @@
         gap: 0.5rem;
     }
 
+    .lookup-hero__intro.contact-hero__intro {
+        color: #fff8eb;
+    }
+
     .lookup-hero h1 {
         max-width: 10ch;
+        color: #fff8eb;
         font-size: clamp(2.25rem, 10.6vw, 2.9rem);
+        text-shadow: 0 16px 44px rgba(0, 0, 0, 0.24);
     }
 
     .lookup-hero__lead {
+        color: rgba(248, 243, 232, 0.78);
         font-size: 0.88rem;
         line-height: 1.42;
     }
@@ -328,5 +336,116 @@
     .lookup-result-card__actions {
         display: grid;
         grid-template-columns: 1fr;
+    }
+}
+
+/* Support family desktop shell alignment. */
+@media (min-width: 861px) {
+    .lookup-hero {
+        --lookup-support-top-gap: 1.1rem;
+        --lookup-support-bottom-gap: clamp(0.85rem, 1.7vh, 1.35rem);
+        min-height: calc(100svh - var(--lab-header-offset));
+        padding-top: var(--lookup-support-top-gap);
+        padding-bottom: var(--lookup-support-bottom-gap);
+    }
+
+    .lookup-hero__shell.contact-hero__shell.hero-grid {
+        grid-template-columns: minmax(19rem, 0.88fr) minmax(0, 1.12fr);
+        grid-template-rows: minmax(0, 1fr);
+        gap: clamp(0.9rem, 1.5vw, 1.3rem);
+        height: calc(100svh - var(--lab-header-offset) - var(--lookup-support-top-gap) - var(--lookup-support-bottom-gap));
+        min-height: 0;
+        align-items: stretch;
+        align-content: start;
+    }
+
+    .lookup-hero__intro,
+    .lookup-card {
+        height: 100%;
+        min-height: 0;
+    }
+
+    .lookup-hero__intro {
+        grid-template-rows: auto auto auto auto minmax(0, 1fr);
+    }
+
+    .lookup-hero__intro .contact-breadcrumb {
+        color: rgba(248, 243, 232, 0.58);
+    }
+
+    .lookup-hero__intro .contact-breadcrumb span {
+        color: rgba(248, 243, 232, 0.78);
+    }
+
+    .lookup-hero h1 {
+        color: #fff8eb;
+        text-shadow: 0 16px 44px rgba(0, 0, 0, 0.24);
+    }
+
+    .lookup-hero__lead {
+        color: rgba(248, 243, 232, 0.78);
+    }
+
+    .lookup-proof-grid {
+        align-self: end;
+        margin-top: auto;
+    }
+
+    .lookup-card {
+        align-content: start;
+    }
+}
+
+@media (max-width: 860px) {
+    .reservation-lookup-page .lab-floating-back {
+        display: none;
+    }
+
+    .reservation-lookup-page input,
+    .reservation-lookup-page select {
+        min-height: 2.75rem;
+    }
+
+    .lookup-form__actions .contact-button {
+        min-height: 2.75rem;
+    }
+}
+
+@media (max-width: 380px) and (max-height: 700px) {
+    .lookup-hero {
+        padding-top: 0.72rem;
+        padding-bottom: 0.9rem;
+    }
+
+    .lookup-hero__shell {
+        gap: 0.72rem;
+    }
+
+    .lookup-hero__intro.contact-hero__intro {
+        gap: 0.38rem;
+        padding: 0.78rem 0.92rem;
+    }
+
+    .lookup-hero h1 {
+        font-size: clamp(1.95rem, 10.4vw, 2.35rem);
+        line-height: 0.95;
+    }
+
+    .lookup-hero__lead {
+        font-size: 0.8rem;
+        line-height: 1.32;
+    }
+
+    .lookup-card {
+        gap: 0.48rem;
+        padding: 0.84rem;
+    }
+
+    .lookup-card h2 {
+        font-size: 1.34rem;
+    }
+
+    .lookup-form {
+        gap: 0.44rem;
     }
 }

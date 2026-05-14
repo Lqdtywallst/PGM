@@ -1637,3 +1637,557 @@
         align-content: start;
     }
 }
+
+@media (max-width: 860px) {
+    .locations-page .lab-floating-back {
+        display: none;
+    }
+
+    .locations-page .lab-floating-contact.is-visible.is-over-card-actions {
+        opacity: 0;
+        pointer-events: none;
+        transform: translate3d(8px, 10px, 0) scale(0.96);
+    }
+
+    .locations-map-card__action {
+        min-height: 2.75rem;
+    }
+}
+
+@media (max-width: 760px) and (max-height: 780px) {
+    .locations-hero__lead {
+        display: block;
+        font-size: 0.86rem;
+        line-height: 1.36;
+    }
+}
+
+/* Support family desktop shell: same brand frame, filled columns, readable cards. */
+@media (min-width: 1181px) {
+    .locations-hero {
+        padding-bottom: 0;
+    }
+
+    .locations-page .locations-hero__shell {
+        width: var(--lab-frame-width);
+        height: 100svh;
+        min-height: 100svh;
+        grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+        grid-template-rows: minmax(0, 1fr);
+        gap: clamp(0.9rem, 1.5vw, 1.3rem);
+        padding-top: calc(var(--lab-header-offset) + 0.78rem);
+        padding-bottom: clamp(0.85rem, 1.7vh, 1.35rem);
+        align-content: start;
+    }
+
+    .locations-hero__summary,
+    .locations-map-card {
+        align-self: stretch;
+        min-height: 0;
+        max-height: calc(100svh - var(--lab-header-offset) - 2.1rem);
+    }
+
+    .locations-hero__summary {
+        grid-template-rows: auto minmax(0, 1fr);
+        gap: clamp(0.68rem, 1.2vh, 0.88rem);
+    }
+
+    .locations-hero__copy {
+        justify-items: start;
+        max-width: none;
+        gap: 0.5rem;
+        text-align: left;
+    }
+
+    .locations-hero__copy h1 {
+        max-width: 13.8ch;
+        margin-top: 0.16rem;
+        font-size: clamp(2.45rem, 3vw, 3.15rem);
+        line-height: 0.9;
+    }
+
+    .locations-hero__lead {
+        max-width: 31rem;
+        margin-top: 0.16rem;
+        font-size: 0.9rem;
+        line-height: 1.42;
+    }
+
+    .locations-hero__actions {
+        justify-content: flex-start;
+        margin-top: 0.45rem;
+    }
+
+    .locations-hero__zone-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-auto-rows: minmax(0, 1fr);
+        align-self: stretch;
+        align-content: stretch;
+        gap: clamp(0.52rem, 0.85vw, 0.68rem);
+        min-height: 0;
+    }
+
+    .locations-hero__zone,
+    .locations-hero__zone:last-child {
+        align-content: start;
+        justify-items: start;
+        min-height: 0;
+        padding: clamp(0.56rem, 0.85vw, 0.72rem);
+        text-align: left;
+        overflow: visible;
+    }
+
+    .locations-hero__zone:last-child {
+        grid-column: 1 / -1;
+    }
+
+    .locations-hero__zone span {
+        font-size: 0.58rem;
+        line-height: 1.18;
+    }
+
+    .locations-hero__zone strong {
+        font-size: clamp(0.78rem, 0.88vw, 0.9rem);
+        line-height: 1.14;
+    }
+
+    .locations-hero__zone p {
+        margin: 0;
+        font-size: clamp(0.68rem, 0.76vw, 0.76rem);
+        line-height: 1.34;
+        overflow: visible;
+    }
+
+    .locations-map-card {
+        gap: clamp(0.6rem, 1vh, 0.82rem);
+        padding: clamp(0.78rem, 1vw, 0.95rem);
+    }
+
+    .locations-map-card__head {
+        gap: 0.42rem;
+    }
+
+    .locations-map-card__head p {
+        max-width: 37rem;
+        font-size: 0.88rem;
+        line-height: 1.38;
+    }
+
+    .locations-map-card__frame {
+        min-height: clamp(18rem, 42vh, 25rem);
+    }
+
+    .locations-map-card__foot {
+        gap: 0.55rem;
+    }
+
+    .locations-map-card__foot div {
+        align-content: center;
+        min-height: 0;
+        padding: 0.64rem 0.62rem;
+    }
+
+    .locations-map-card__foot span {
+        font-size: 0.62rem;
+        line-height: 1.18;
+    }
+
+    .locations-map-card__foot strong {
+        font-size: clamp(0.74rem, 0.9vw, 0.86rem);
+        line-height: 1.24;
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 380px) and (max-height: 700px) {
+    .locations-hero {
+        padding-top: calc(var(--lab-header-offset) + 0.05rem);
+    }
+
+    .locations-hero__copy {
+        gap: 0.32rem;
+    }
+
+    .locations-hero__copy h1 {
+        max-width: 13.2ch;
+        font-size: clamp(1.56rem, 7.7vw, 2rem);
+        line-height: 0.92;
+    }
+
+    .locations-hero__lead {
+        font-size: 0.8rem;
+        line-height: 1.28;
+    }
+
+    .locations-hero__actions {
+        margin-top: 0.26rem;
+    }
+
+    .locations-map-card {
+        gap: 0.5rem;
+        padding: 0.72rem 0.78rem;
+    }
+
+    .locations-map-card__head {
+        gap: 0.34rem;
+    }
+
+    .locations-map-card__head p {
+        font-size: 0.84rem;
+        line-height: 1.3;
+    }
+}
+
+/* Single-viewport Locations: white page, dark cards, aligned columns. */
+.locations-page,
+.locations-page-main {
+    background: #ffffff;
+}
+
+.locations-page-main > [hidden] {
+    display: none !important;
+}
+
+.locations-page .lab-floating-contact {
+    display: none !important;
+}
+
+.locations-page .locations-hero {
+    background: #ffffff;
+    color: #fffaf2;
+    padding: 0;
+}
+
+.locations-page .locations-hero::before,
+.locations-page .locations-hero::after {
+    display: none;
+}
+
+.locations-page .locations-hero__summary,
+.locations-page .locations-map-card {
+    border: 1px solid rgba(213, 180, 102, 0.42);
+    border-radius: 12px;
+    background:
+        radial-gradient(circle at 14% 8%, rgba(var(--dp-color-gold-rgb), 0.15), rgba(var(--dp-color-gold-rgb), 0) 34%),
+        linear-gradient(155deg, #202124 0%, #111316 48%, #07080a 100%);
+    box-shadow:
+        0 20px 46px rgba(15, 16, 20, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.locations-page .locations-hero__copy h1,
+.locations-page .locations-hero__zone strong,
+.locations-page .locations-map-card__foot strong {
+    color: #fffaf2;
+}
+
+.locations-page .locations-hero__lead,
+.locations-page .locations-hero__zone p,
+.locations-page .locations-map-card__head p {
+    color: rgba(255, 250, 242, 0.78);
+}
+
+.locations-page .locations-kicker,
+.locations-page .locations-hero .locations-kicker,
+.locations-page .locations-hero .locations-kicker--dark,
+.locations-page .locations-map-card .locations-kicker,
+.locations-page .locations-map-card .locations-kicker--dark {
+    color: #e6c66d;
+}
+
+.locations-page .locations-hero__zone,
+.locations-page .locations-map-card__foot div {
+    border-color: rgba(213, 180, 102, 0.24);
+    background: rgba(255, 255, 255, 0.055);
+    box-shadow: none;
+}
+
+.locations-page .locations-hero__zone span,
+.locations-page .locations-map-card__foot span {
+    color: rgba(230, 198, 109, 0.76);
+}
+
+.locations-page .locations-map-card__action {
+    border-color: rgba(230, 198, 109, 0.46);
+    color: #fffaf2;
+}
+
+.locations-page .locations-map-card__frame {
+    border-color: rgba(213, 180, 102, 0.42);
+}
+
+@media (min-width: 1025px) {
+    .locations-page .locations-hero {
+        height: 100svh;
+        min-height: 100svh;
+        padding: 0;
+        overflow: clip;
+    }
+
+    .locations-page .locations-hero__shell {
+        width: var(--lab-frame-width);
+        height: 100%;
+        min-height: 0;
+        grid-template-columns: minmax(20rem, 0.86fr) minmax(0, 1.14fr);
+        grid-template-rows: minmax(0, 1fr);
+        gap: clamp(0.9rem, 1.35vw, 1.25rem);
+        padding-top: calc(var(--lab-header-offset) + clamp(0.75rem, 1.25vh, 1rem));
+        padding-bottom: clamp(0.75rem, 1.45vh, 1.05rem);
+        align-content: stretch;
+        align-items: stretch;
+    }
+
+    .locations-page .locations-hero__summary,
+    .locations-page .locations-map-card {
+        align-self: stretch;
+        min-height: 0;
+        height: 100%;
+        max-height: none;
+    }
+
+    .locations-page .locations-hero__summary {
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
+        gap: clamp(0.68rem, 1.1vh, 0.9rem);
+        padding: clamp(1rem, 1.65vw, 1.35rem);
+    }
+
+    .locations-page .locations-hero__copy {
+        justify-items: start;
+        max-width: none;
+        gap: 0.52rem;
+        text-align: left;
+    }
+
+    .locations-page .locations-hero__copy h1 {
+        max-width: 12.6ch;
+        margin-top: 0.16rem;
+        font-size: clamp(2.7rem, 3.65vw, 4rem);
+        line-height: 0.9;
+    }
+
+    .locations-page .locations-hero__lead {
+        max-width: 31rem;
+        margin-top: 0.1rem;
+        font-size: clamp(0.86rem, 0.95vw, 1rem);
+        line-height: 1.42;
+    }
+
+    .locations-page .locations-hero__actions {
+        justify-content: flex-start;
+        margin-top: 0.36rem;
+    }
+
+    .locations-page .locations-hero__zone-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-auto-rows: minmax(0, 1fr);
+        align-self: stretch;
+        align-content: stretch;
+        gap: clamp(0.52rem, 0.85vw, 0.7rem);
+        min-height: 0;
+    }
+
+    .locations-page .locations-hero__zone,
+    .locations-page .locations-hero__zone:last-child {
+        align-content: start;
+        justify-items: start;
+        min-height: 0;
+        padding: clamp(0.58rem, 0.86vw, 0.76rem);
+        text-align: left;
+        overflow: visible;
+    }
+
+    .locations-page .locations-hero__zone:last-child {
+        grid-column: 1 / -1;
+    }
+
+    .locations-page .locations-hero__zone span {
+        font-size: 0.58rem;
+        line-height: 1.18;
+    }
+
+    .locations-page .locations-hero__zone strong {
+        font-size: clamp(0.78rem, 0.9vw, 0.92rem);
+        line-height: 1.14;
+    }
+
+    .locations-page .locations-hero__zone p {
+        margin: 0;
+        font-size: clamp(0.68rem, 0.76vw, 0.76rem);
+        line-height: 1.34;
+        overflow: visible;
+    }
+
+    .locations-page .locations-map-card {
+        gap: clamp(0.6rem, 1vh, 0.82rem);
+        padding: clamp(0.78rem, 1vw, 0.95rem);
+    }
+
+    .locations-page .locations-map-card__head {
+        gap: 0.42rem;
+    }
+
+    .locations-page .locations-map-card__head p {
+        max-width: 37rem;
+        font-size: 0.88rem;
+        line-height: 1.38;
+    }
+
+    .locations-page .locations-map-card__frame {
+        flex: 1 1 auto;
+        min-height: clamp(18rem, 42vh, 25rem);
+    }
+
+    .locations-page .locations-map-card__foot {
+        gap: 0.55rem;
+    }
+
+    .locations-page .locations-map-card__foot div {
+        align-content: center;
+        min-height: 0;
+        padding: 0.64rem 0.62rem;
+    }
+
+    .locations-page .locations-map-card__foot span {
+        font-size: 0.62rem;
+        line-height: 1.18;
+    }
+
+    .locations-page .locations-map-card__foot strong {
+        font-size: clamp(0.74rem, 0.9vw, 0.86rem);
+        line-height: 1.24;
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (min-width: 1025px) and (max-height: 820px) {
+    .locations-page .locations-hero__summary {
+        gap: 0.56rem;
+        padding: 0.92rem;
+    }
+
+    .locations-page .locations-hero__copy h1 {
+        max-width: 13ch;
+        font-size: clamp(2.35rem, 3.25vw, 3.05rem);
+    }
+
+    .locations-page .locations-hero__zone {
+        padding: 0.52rem 0.58rem;
+    }
+
+    .locations-page .locations-map-card {
+        padding: 0.82rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .locations-page .locations-hero {
+        min-height: auto;
+        overflow: visible;
+    }
+
+    .locations-page .locations-hero__shell {
+        width: min(100% - 2rem, 62rem);
+        min-height: auto;
+        grid-template-columns: 1fr;
+        padding-top: calc(var(--lab-header-offset) + 1rem);
+        padding-bottom: 1.2rem;
+    }
+
+    .locations-page .locations-hero__summary {
+        display: grid;
+        grid-template-rows: auto auto;
+        gap: 1rem;
+        min-height: auto;
+        padding: clamp(1rem, 4vw, 1.25rem);
+    }
+
+    .locations-page .locations-hero__copy {
+        justify-items: center;
+        text-align: center;
+    }
+
+    .locations-page .locations-hero__copy h1 {
+        max-width: 15ch;
+        color: #fffaf2;
+    }
+
+    .locations-page .locations-hero__zone-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-content: start;
+    }
+
+    .locations-page .locations-map-card {
+        min-height: auto;
+        max-height: none;
+        padding: clamp(1rem, 4vw, 1.25rem);
+    }
+}
+
+@media (max-width: 640px) {
+    .locations-page .locations-hero__shell {
+        width: min(100% - 1.4rem, 36rem);
+        padding-top: calc(var(--lab-header-offset) + 0.8rem);
+    }
+
+    .locations-page .locations-hero__copy h1 {
+        font-size: clamp(2.05rem, 10vw, 2.8rem);
+    }
+
+    .locations-page .locations-hero__lead {
+        font-size: 0.9rem;
+        line-height: 1.45;
+    }
+
+    .locations-page .locations-hero__zone-list,
+    .locations-page .locations-map-card__foot {
+        grid-template-columns: 1fr;
+    }
+
+    .locations-page .locations-map-card__frame {
+        min-height: 22rem;
+    }
+}
+
+.locations-page .site-v2-footer {
+    position: relative;
+    isolation: isolate;
+    margin-top: -1px;
+    padding: clamp(2.6rem, 6vw, 5.25rem) 0 clamp(1.8rem, 4vw, 3rem);
+    background:
+        linear-gradient(180deg, #ffffff 0%, #fbfaf7 42%, #f4efe8 100%);
+    overflow: hidden;
+}
+
+.locations-page .site-v2-footer::before,
+.locations-page .site-v2-footer::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.locations-page .site-v2-footer::before {
+    inset: 0 0 auto;
+    height: clamp(7rem, 16vw, 15rem);
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(213, 180, 102, 0.18), rgba(213, 180, 102, 0) 58%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 239, 232, 0));
+}
+
+.locations-page .site-v2-footer::after {
+    left: 50%;
+    top: clamp(1rem, 3vw, 2.5rem);
+    width: min(72rem, 78vw);
+    height: 1px;
+    background: linear-gradient(90deg, rgba(213, 180, 102, 0), rgba(213, 180, 102, 0.34), rgba(213, 180, 102, 0));
+    transform: translateX(-50%);
+}
+
+.locations-page .site-v2-footer__shell {
+    position: relative;
+    border-color: rgba(213, 180, 102, 0.16);
+    box-shadow:
+        0 26px 64px rgba(15, 16, 20, 0.2),
+        0 -18px 48px rgba(213, 180, 102, 0.06);
+}

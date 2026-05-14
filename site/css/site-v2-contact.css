@@ -930,3 +930,50 @@
         align-content: center;
     }
 }
+
+/* Support family desktop shell alignment. */
+@media (min-width: 861px) {
+    .contact-hero {
+        --contact-support-top-gap: 1.1rem;
+        --contact-support-bottom-gap: clamp(0.85rem, 1.7vh, 1.35rem);
+        display: block;
+        min-height: calc(100svh - var(--lab-header-offset));
+        padding-top: var(--contact-support-top-gap);
+        padding-bottom: var(--contact-support-bottom-gap);
+    }
+
+    .contact-hero .contact-hero__shell.hero-grid {
+        grid-template-columns: minmax(19rem, 0.88fr) minmax(0, 1.12fr);
+        grid-template-rows: minmax(0, 1fr);
+        gap: clamp(0.9rem, 1.5vw, 1.3rem);
+        height: calc(100svh - var(--lab-header-offset) - var(--contact-support-top-gap) - var(--contact-support-bottom-gap));
+        min-height: 0;
+        align-items: stretch;
+        align-content: start;
+    }
+
+    .contact-hero .contact-hero__intro,
+    .contact-hero .contact-form-card {
+        min-height: 0;
+        height: 100%;
+    }
+}
+
+@media (max-width: 860px) {
+    .contact-page .lab-floating-back {
+        display: none;
+    }
+
+    .contact-page input,
+    .contact-page select {
+        min-height: 2.75rem;
+    }
+}
+
+@media (max-width: 860px) and (max-height: 780px) {
+    .contact-hero__lead {
+        display: block;
+        font-size: 0.86rem;
+        line-height: 1.36;
+    }
+}

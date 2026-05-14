@@ -746,3 +746,34 @@
         display: none;
     }
 }
+
+@media (max-width: 860px) {
+    .about-page .lab-floating-back {
+        display: none;
+    }
+}
+
+/* Support family desktop shell alignment. */
+@media (min-width: 1181px) {
+    .about-hero {
+        --about-support-top-gap: 0.78rem;
+        --about-support-bottom-gap: clamp(0.85rem, 1.7vh, 1.35rem);
+        display: block;
+        min-height: 100svh;
+        padding-top: calc(var(--lab-header-offset) + var(--about-support-top-gap));
+        padding-bottom: var(--about-support-bottom-gap);
+    }
+
+    .about-hero__shell {
+        height: calc(100svh - var(--lab-header-offset) - var(--about-support-top-gap) - var(--about-support-bottom-gap));
+        min-height: 0;
+        align-items: stretch;
+        gap: clamp(0.9rem, 1.5vw, 1.3rem);
+    }
+
+    .about-hero__copy,
+    .about-visual-card {
+        height: auto;
+        min-height: 0;
+    }
+}
