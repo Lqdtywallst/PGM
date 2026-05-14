@@ -475,11 +475,11 @@
 }
 
 .home-page .hero-lab .home-booking__intro {
-    justify-items: center;
+    justify-items: start;
     gap: 0.34rem;
     max-width: none;
     padding-right: 0;
-    text-align: center;
+    text-align: left;
 }
 
 .home-page .hero-lab .home-booking__intro h2 {
@@ -502,13 +502,14 @@
 
 .home-page .hero-lab .home-booking__field {
     gap: 0.38rem;
+    text-align: left;
 }
 
 .home-page .hero-lab .home-booking__field span {
     color: rgba(245, 241, 232, 0.7);
     font-size: 0.62rem;
-    padding-left: 0;
-    text-align: center;
+    padding-left: 0.95rem;
+    text-align: left;
 }
 
 .home-page .hero-lab .home-booking__field input,
@@ -523,6 +524,8 @@
     letter-spacing: -0.015em;
     font-variant-numeric: tabular-nums;
     color-scheme: dark;
+    text-align: left;
+    text-align-last: left;
 }
 
 .home-page .hero-lab .home-booking__field select option,
@@ -957,7 +960,7 @@
 
     .home-page .hero-lab .home-booking__intro {
         align-items: stretch;
-        text-align: center;
+        text-align: left;
     }
 
     .home-page .hero-lab .home-booking__intro h2 {
@@ -981,7 +984,7 @@
     .home-page .hero-lab .home-booking__field span {
         font-size: 0.55rem;
         letter-spacing: 0.11em;
-        padding-left: 0;
+        padding-left: 0.72rem;
     }
 
     .home-page .hero-lab .home-booking__field input,
@@ -1018,7 +1021,7 @@
     }
 
     .home-page .hero-lab .home-booking__field span {
-        padding-left: 0;
+        padding-left: 0.66rem;
         font-size: 0.52rem;
     }
 
@@ -1123,7 +1126,7 @@
     }
 
     .home-page .hero-lab .home-booking__field span {
-        padding-left: 0;
+        padding-left: 0.58rem;
         font-size: 0.48rem;
         letter-spacing: 0.1em;
     }
@@ -1137,7 +1140,7 @@
     }
 
     .home-page .hero-lab .home-booking__field input[type="date"] {
-        padding: 0 0.42rem;
+        padding: 0 0.58rem;
         font-size: 0.72rem;
     }
 
