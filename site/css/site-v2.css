@@ -111,8 +111,8 @@
 .home-page .hero-lab {
     min-height: 100svh;
     background:
-        linear-gradient(180deg, rgba(7, 8, 10, 0.44), rgba(7, 8, 10, 0.8)),
-        url("../images/fleet/ferrari-296-gts/07-hero-dubai.jpeg") 58% 34% / cover no-repeat;
+        radial-gradient(circle at 68% 22%, rgba(var(--dp-color-gold-rgb), 0.12), rgba(var(--dp-color-gold-rgb), 0) 30%),
+        linear-gradient(180deg, #060708 0%, #10100d 42%, #050607 100%);
 }
 
 .home-page .hero-lab__video {
@@ -126,10 +126,19 @@
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(180deg, rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.06)),
-        url("../images/fleet/ferrari-296-gts/07-hero-dubai.jpeg") 58% 34% / cover no-repeat;
+        radial-gradient(circle at 70% 24%, rgba(var(--dp-color-gold-rgb), 0.1), rgba(var(--dp-color-gold-rgb), 0) 30%),
+        linear-gradient(180deg, rgba(6, 7, 8, 0.98) 0%, rgba(14, 14, 12, 0.96) 48%, rgba(5, 6, 7, 0.98) 100%);
+    opacity: 1;
+    transform: none;
+    transition: opacity 900ms ease;
+}
+
+.home-page .hero-lab.is-video-ready .hero-lab__still {
     opacity: 0;
-    transform: scale(1.01);
+}
+
+html.js .home-page .hero-lab:not(.is-video-ready) .hero-lab__video {
+    opacity: 0;
 }
 
 .home-page .hero-lab__overlay {
@@ -747,10 +756,9 @@
     }
 
     .home-page .hero-lab__still {
-        opacity: 0;
         background:
-            linear-gradient(180deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.04)),
-            url("../images/fleet/ferrari-296-gts/07-hero-dubai.jpeg") 58% 34% / cover no-repeat;
+            radial-gradient(circle at 64% 22%, rgba(var(--dp-color-gold-rgb), 0.1), rgba(var(--dp-color-gold-rgb), 0) 34%),
+            linear-gradient(180deg, rgba(6, 7, 8, 0.98) 0%, rgba(14, 14, 12, 0.96) 48%, rgba(5, 6, 7, 0.98) 100%);
     }
 
     .home-page .hero-lab__overlay {
@@ -4351,7 +4359,7 @@ a.brand-marquee__item:focus-visible img {
 
 .site-v2-footer__top {
     display: grid;
-    grid-template-columns: minmax(0, 1.25fr) repeat(2, minmax(0, 0.72fr));
+    grid-template-columns: minmax(0, 1.15fr) repeat(3, minmax(0, 0.64fr));
     gap: 1.4rem;
 }
 
@@ -7321,7 +7329,9 @@ body.lab-mobile-nav-open {
 
     .hero-lab {
         min-height: 100svh;
-        background: linear-gradient(180deg, rgba(7, 8, 10, 0.44), rgba(7, 8, 10, 0.8)), url("../images/fleet/ferrari-296-gts/07-hero-dubai.jpeg") 58% 34% / cover no-repeat;
+        background:
+            radial-gradient(circle at 62% 20%, rgba(var(--dp-color-gold-rgb), 0.12), rgba(var(--dp-color-gold-rgb), 0) 32%),
+            linear-gradient(180deg, #060708 0%, #10100d 42%, #050607 100%);
     }
 
     .hero-lab__video {

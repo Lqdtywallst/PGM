@@ -37,14 +37,30 @@
 }
 
 .about-hero__image {
-    background: url("../images/fleet/rolls-royce-cullinan-black-badge/06-exterior-front-open-doors.png") center 58% / cover no-repeat;
-    filter: saturate(0.92) brightness(0.72);
+    background:
+        radial-gradient(circle at 68% 24%, rgba(var(--dp-color-gold-rgb), 0.16), rgba(var(--dp-color-gold-rgb), 0) 19rem),
+        radial-gradient(circle at 18% 72%, rgba(255, 250, 242, 0.055), rgba(255, 250, 242, 0) 17rem),
+        linear-gradient(125deg, rgba(7, 8, 10, 0.98) 0%, rgba(18, 16, 13, 0.96) 50%, rgba(6, 7, 9, 0.98) 100%),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 82px);
+    filter: none;
+}
+
+.about-hero__image::after {
+    content: "";
+    position: absolute;
+    top: 18%;
+    right: clamp(3rem, 9vw, 11rem);
+    width: clamp(16rem, 28vw, 27rem);
+    aspect-ratio: 1;
+    background: url("../images/dp-crest-cropped.png") center / contain no-repeat;
+    opacity: 0.055;
+    filter: grayscale(1) brightness(1.35);
 }
 
 .about-hero__shade {
     background:
-        linear-gradient(180deg, rgba(8, 10, 14, 0.62) 0%, rgba(8, 10, 14, 0.28) 24%, rgba(8, 10, 14, 0.74) 100%),
-        linear-gradient(90deg, rgba(8, 10, 14, 0.82) 0%, rgba(8, 10, 14, 0.38) 52%, rgba(8, 10, 14, 0.12) 100%);
+        linear-gradient(180deg, rgba(8, 10, 14, 0.52) 0%, rgba(8, 10, 14, 0.24) 24%, rgba(8, 10, 14, 0.72) 100%),
+        linear-gradient(90deg, rgba(8, 10, 14, 0.78) 0%, rgba(8, 10, 14, 0.34) 52%, rgba(8, 10, 14, 0.16) 100%);
 }
 
 .about-hero__shell,
@@ -556,6 +572,13 @@
 
     .about-hero__image {
         background-position: 62% center;
+    }
+
+    .about-hero__image::after {
+        top: 8%;
+        right: -8rem;
+        width: 18rem;
+        opacity: 0.035;
     }
 
     .about-hero__shade {

@@ -48,6 +48,7 @@ function initSiteV2() {
     let introTimers = [];
     let introStarted = false;
     let introComplete = false;
+    let heroVideoReadinessBound = false;
     let lastFocusedElement = null;
 
     if (overlay) {
@@ -718,6 +719,33 @@ function initSiteV2() {
         return desktopSource || mobileSource;
     }
 
+    function markHeroVideoReady() {
+        if (!hero) {
+            return;
+        }
+
+        hero.classList.add("is-video-ready");
+    }
+
+    function bindHeroVideoReadiness() {
+        if (!(heroVideo instanceof HTMLVideoElement)) {
+            return;
+        }
+
+        if (heroVideo.readyState >= 2) {
+            markHeroVideoReady();
+            return;
+        }
+
+        if (heroVideoReadinessBound) {
+            return;
+        }
+
+        heroVideoReadinessBound = true;
+        heroVideo.addEventListener("loadeddata", markHeroVideoReady, { once: true });
+        heroVideo.addEventListener("canplay", markHeroVideoReady, { once: true });
+    }
+
     function hydrateHeroVideo() {
         if (!(heroVideo instanceof HTMLVideoElement) || shouldSkipHeroVideo) {
             return;
@@ -735,6 +763,7 @@ function initSiteV2() {
             heroVideo.load();
         }
 
+        bindHeroVideoReadiness();
         tryPlayVideo(heroVideo);
     }
 

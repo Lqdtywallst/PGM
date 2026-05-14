@@ -30,15 +30,15 @@
     height: 100%;
     object-fit: cover;
     object-position: center 42%;
-    opacity: 0.78;
-    filter: saturate(0.72) brightness(0.62) contrast(1.06);
+    opacity: 0.58;
+    filter: saturate(0.66) brightness(0.5) contrast(1.04);
 }
 
 .services-hero__shade {
     background:
-        linear-gradient(180deg, rgba(7, 8, 10, 0.72) 0%, rgba(7, 8, 10, 0.58) 34%, rgba(7, 8, 10, 0.82) 100%),
-        radial-gradient(circle at center, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0) 54%),
-        linear-gradient(90deg, rgba(4, 5, 7, 0.28), rgba(4, 5, 7, 0.08) 46%, rgba(4, 5, 7, 0.34));
+        linear-gradient(180deg, rgba(7, 8, 10, 0.76) 0%, rgba(7, 8, 10, 0.6) 34%, rgba(7, 8, 10, 0.88) 100%),
+        radial-gradient(circle at 50% 18%, rgba(var(--dp-color-gold-rgb), 0.11), rgba(var(--dp-color-gold-rgb), 0) 38%),
+        linear-gradient(90deg, rgba(4, 5, 7, 0.54), rgba(4, 5, 7, 0.2) 46%, rgba(4, 5, 7, 0.54));
 }
 
 .services-hero__shell,

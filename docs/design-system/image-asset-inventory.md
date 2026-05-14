@@ -21,14 +21,14 @@ Main risks:
 - P0: `site/images/locations-hero-temp.jpg` contains non-Dubai limousine/Las Vegas visual context and should not represent PGM locations.
 - P1: Rolls-Royce assets, especially `06-exterior-front-open-doors.png`, are overused across Fleet, About, Services, Locations, brand and PDP contexts.
 - P1: Fleet cards mix different image systems: garden daylight, industrial exterior, cockpit, grey studio, villa daylight and Dubai handover.
-- P1: Home does not yet have a single stable image identity; it mixes city video, sports-road mobile video and Ferrari fallback/poster intent.
+- P1: Home is now video-first with a neutral brand fallback, but still needs one final owned/licensed video family approved for desktop and mobile.
 
 Priority summary:
 
 | Priority | Action |
 | --- | --- |
 | P0 | Replace Porsche primary asset with true exterior; remove Las Vegas/location temp image from public storytelling use. |
-| P1 | Normalize Fleet card image rules; reduce Rolls reuse; define stable Home hero identity; create service-specific assets. |
+| P1 | Normalize Fleet card image rules; reduce Rolls reuse; approve final Home video identity; create service-specific assets. |
 | P2 | Upgrade category assets, add metadata conventions, automate image drift checks. |
 
 ## Classification Legend
@@ -99,7 +99,7 @@ Status labels:
 | `site/images/fleet/ferrari-296-gts/04-interior-cabin.jpg` | 2560x1429 | `vehicle-gallery` | Cleanup docs only | Reusable now | Useful missing gallery candidate; not currently public. |
 | `site/images/fleet/ferrari-296-gts/05-detail-wheel.jpg` | 2560x1428 | `vehicle-gallery` | No active public references found | Reusable now | Useful detail candidate. |
 | `site/images/fleet/ferrari-296-gts/06-exterior-motion.jpg` | 1024x599 | `vehicle-gallery` | Ferrari PDP | Temporary | High saturation/sports energy; OK as support, not as global hero/card. |
-| `site/images/fleet/ferrari-296-gts/07-hero-dubai.jpeg` | 1024x683 | `vehicle-pdp-hero`, temporary `home-hero` fallback | Home CSS/poster, About/Contact/reservation lookup references, Ferrari PDP | Temporary | Overused. Good Ferrari/Dubai mood but too model-specific for Home and utility pages. |
+| `site/images/fleet/ferrari-296-gts/07-hero-dubai.jpeg` | 1024x683 | `vehicle-pdp-hero` | Ferrari PDP and remaining Ferrari-specific references | Temporary | No longer used as Home fallback. Good Ferrari/Dubai mood but too model-specific for utility or brand-wide pages. |
 | `site/images/fleet/ferrari-296-gts/08-front-profile.jpg` | 1572x1882 | `vehicle-gallery` | Ferrari PDP | Temporary | Portrait crop; not card/hero safe. |
 
 Recommendation: use `07-hero-dubai.jpeg` for Ferrari PDP hero only until a stronger Ferrari-specific exterior exists. Use `01-exterior-front.jpg` for Ferrari fleet/brand temporarily, but it should be replaced with a Dubai-context exterior.
@@ -176,7 +176,7 @@ Recommendation: keep `06` as the temporary flagship/fleet Rolls asset, but stop 
 | `site/images/service-handover.png` | 1024x683 | `service-card`, temporary `service-hero` for airport/handover | Services hub, airport concierge page, `server/data/services-editor.json` | Temporary | Duplicate visual of Rolls open-doors; good handover cue but contributes to Rolls overuse. |
 | `site/images/service-detail.png` | 1024x682 | `service-card`, `vehicle-gallery` support only | Services hub, Locations feature/card backgrounds, hotel/villa delivery page, About, admin defaults | Temporary | Lamborghini cockpit/detail is too driving-focused and orange for broad delivery/location service use. |
 | `site/images/service-cockpit.png` | 1024x682 | `service-card` for business/driver focus only | Business service page | Temporary | Same Urus cockpit family; saturated orange. Use narrowly. |
-| `site/images/locations-hero-temp.jpg` | 2400x3593 | `deprecated/no-usar` | Locations CSS, About page, cleanup docs | Replace urgently | Non-Dubai/Las Vegas limousine context, visible external brand text, portrait ratio, high saturation. |
+| `site/images/locations-hero-temp.jpg` | 2400x3593 | `deprecated/no-usar` | Historical cleanup docs / legacy references only | Replace urgently | Removed from visible core page storytelling. Non-Dubai/Las Vegas limousine context, visible external brand text, portrait ratio, high saturation. |
 
 Recommendation: service and location imagery is the largest missing set. Do not keep solving services with product images. Produce/source service-specific scenes and Dubai place imagery.
 
@@ -184,10 +184,10 @@ Recommendation: service and location imagery is the largest missing set. Do not 
 
 | Asset | Type / dimensions | Recommended use | Current use found | Status | Problems / notes |
 | --- | ---: | --- | --- | --- | --- |
-| `site/media/home-hero-city-streets.mp4` | video, 9.0 MB | `home-hero` desktop | Home | Temporary | Best current Home direction if it communicates Dubai movement; needs stable poster match. |
+| `site/media/home-hero-city-streets.mp4` | video, 9.0 MB | `home-hero` desktop | Home | Temporary | Best current Home direction if it communicates Dubai movement. Home now uses a neutral brand gradient until video readiness instead of a photo poster/fallback. |
 | `site/media/hero-sports-road.mp4` | video, 2.8 MB | `home-hero` mobile temporary, `vehicle-gallery` video support | Home, all vehicle PDP video sections, tests/docs | Temporary | Repeated across many PDPs; generic sports-road tone can dilute vehicle specificity. |
 | `site/media/hero-dubai-sunset.mp4` | video, 11.9 MB | `vehicle-gallery` / atmospheric support | Brand/PDP video sections, previews/docs | Temporary | Large and repeated. Avoid using as every vehicle's unique story. |
-| `site/images/home-hero-video-poster.jpg` | 2560x1440 | `home-hero` poster candidate | Docs only | Reusable now | Good Dubai skyline poster candidate; not currently active in public Home. |
+| `site/images/home-hero-video-poster.jpg` | 2560x1440 | `home-hero` poster candidate if a poster is reintroduced | Docs only | Reusable now | Good Dubai skyline poster candidate, but public Home intentionally avoids a photo fallback so the video entrance feels fluid. |
 
 Recommendation: align Home to one family: `home-hero-city-streets.mp4` plus a matching owned/licensed Dubai poster. Avoid fallbacking to Ferrari PDP imagery as the Home identity.
 
@@ -195,14 +195,14 @@ Recommendation: align Home to one family: `home-hero-city-streets.mp4` plus a ma
 
 | Page / family | Current best asset to use now | Future target asset | Notes |
 | --- | --- | --- | --- |
-| Home | `site/media/home-hero-city-streets.mp4` plus `site/images/home-hero-video-poster.jpg` if approved | Owned/licensed Dubai concierge mobility video/poster with car/handover atmosphere | Stop using Ferrari PDP fallback as brand identity once a stable poster exists. |
+| Home | `site/media/home-hero-city-streets.mp4` with neutral brand-gradient fallback | Owned/licensed Dubai concierge mobility video with optional matching poster only if it does not create a visible photo-to-video jump | Ferrari PDP fallback has been removed from Home identity. |
 | Fleet | `site/images/fleet/rolls-royce-cullinan-black-badge/06-exterior-front-open-doors.png` for temporary hero | Wide fleet/arrival image with Dubai context and safe text area | Keep hero distinct from card repetition if possible. |
 | Services | `site/images/service-handover.png` only as temporary airport/handover cue | Service shoot: airport, chauffeur, hotel/villa, monthly, business, event | Product-only images do not communicate service lanes clearly enough. |
 | Locations | No current approved image | Dubai/Palm/Marina/airport/Abu Dhabi place imagery | `locations-hero-temp.jpg` should be retired from public use. |
-| About | `site/images/fleet/rolls-royce-cullinan-black-badge/06-exterior-front-open-doors.png` temporary | Team/process/handover/concierge scene | Current Rolls reuse is acceptable only short-term. |
+| About | Dark brand-gradient hero with subtle DP watermark; `service-handover.png` only as support imagery | Team/process/handover/concierge scene | Avoid using a vehicle hero as the primary About identity. |
 | Contact | Prefer no major photo; subtle brand/desk texture if needed | Concierge desk/contact detail | Keep forms/actions dominant. |
 | Reserve | Prefer no major photo; controlled dark background | Booking-safe abstract/vehicle detail if needed | Avoid high-energy vehicle imagery. |
-| Find Booking / reservation lookup | Avoid Ferrari hero as long-term identity | Secure/quiet task background or subtle texture | Current Ferrari background is too sales/model-led for lookup. |
+| Find Booking / reservation lookup | Secure/quiet brand texture | Secure/quiet task background or subtle texture | Ferrari background has been removed so the page feels more private and task-led. |
 
 ## Recommended Image Per Brand Landing
 
