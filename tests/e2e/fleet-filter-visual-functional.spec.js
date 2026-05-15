@@ -13,6 +13,21 @@ const FILTER_VIEWPORTS = [
     { name: 'desktop-1600', width: 1600, height: 900 }
 ];
 
+function getDubaiDateString(offsetDays = 0) {
+    const dubaiNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Dubai' }));
+    dubaiNow.setDate(dubaiNow.getDate() + offsetDays);
+    const year = dubaiNow.getFullYear();
+    const month = String(dubaiNow.getMonth() + 1).padStart(2, '0');
+    const day = String(dubaiNow.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+}
+
+function formatDateDisplay(value) {
+    const [year, month, day] = String(value).split('-');
+    return `${day}/${month}/${year}`;
+}
+
 async function openFilterIfCollapsed(page) {
     const toggle = page.locator('.fleet-mobile-filter-toggle:visible').first();
 
@@ -130,9 +145,17 @@ test.describe('Fleet filter visual and functional audit', () => {
     for (const viewport of FILTER_VIEWPORTS) {
         test(`filter works and stays readable on ${viewport.name}`, async ({ page }) => {
             const consoleErrors = createConsoleTracker(page);
+            const startDate = getDubaiDateString(0);
+            const endDate = getDubaiDateString(1);
+            const params = new URLSearchParams({
+                startDate,
+                endDate,
+                pickupTime: '12:00',
+                dropoffTime: '12:00'
+            });
 
             await page.setViewportSize({ width: viewport.width, height: viewport.height });
-            await page.goto('/fleet.html?startDate=2026-05-13&endDate=2026-05-16&pickupTime=12:00&dropoffTime=12:00', {
+            await page.goto(`/fleet.html?${params.toString()}`, {
                 waitUntil: 'domcontentloaded'
             });
             await settlePage(page);
@@ -152,9 +175,9 @@ test.describe('Fleet filter visual and functional audit', () => {
             expect(metrics.pageOverflowX).toBe(false);
             expect(metrics.sidebarOverflowX).toBe(false);
             expect(metrics.fieldDisplays.map((entry) => entry.text)).toEqual(expect.arrayContaining([
-                '13/05/2026',
+                formatDateDisplay(startDate),
                 '12:00',
-                '16/05/2026'
+                formatDateDisplay(endDate)
             ]));
 
             for (const field of metrics.fieldDisplays) {
