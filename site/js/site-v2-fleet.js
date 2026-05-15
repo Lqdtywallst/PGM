@@ -394,7 +394,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    let scheduleCaptured = hasSchedule(getIncomingBookingIntent());
+    let scheduleCaptured = false;
 
     function normalizeScheduleInputs(changedInput = null) {
         const pickupDate = pickupDateInput?.value || "";
@@ -416,19 +416,31 @@ document.addEventListener("DOMContentLoaded", () => {
     function syncDateDefaults() {
         const incomingIntent = getIncomingBookingIntent();
         const today = getDubaiDateString(0);
-        const tomorrow = getDubaiDateString(1);
-        const incomingStartDate = clampBookingDateValue(incomingIntent.startDate, today, today);
-        const incomingEndFallback = incomingIntent.endDate || addDaysToDateInputValue(incomingStartDate, 1);
-        const incomingEndDate = clampBookingDateValue(incomingEndFallback, tomorrow, incomingStartDate);
+        const hasIncomingStartDate = isValidDateInputValue(incomingIntent.startDate);
+        const hasIncomingEndDate = isValidDateInputValue(incomingIntent.endDate);
+        const hasIncomingScheduleDates = hasIncomingStartDate && hasIncomingEndDate;
+        const fallbackStartDate = hasIncomingEndDate && incomingIntent.endDate > today
+            ? addDaysToDateInputValue(incomingIntent.endDate, -1)
+            : today;
+        const incomingStartDate = clampBookingDateValue(
+            hasIncomingStartDate ? incomingIntent.startDate : fallbackStartDate,
+            today,
+            today
+        );
+        const defaultEndDate = addDaysToDateInputValue(incomingStartDate, 1);
+        const incomingEndFallback = hasIncomingScheduleDates || (hasIncomingEndDate && incomingIntent.endDate > incomingStartDate)
+            ? incomingIntent.endDate
+            : defaultEndDate;
+        const incomingEndDate = clampBookingDateValue(incomingEndFallback, incomingEndFallback, incomingStartDate);
 
         if (pickupDateInput) {
             pickupDateInput.min = today;
-            pickupDateInput.value = scheduleCaptured ? incomingStartDate : "";
+            pickupDateInput.value = incomingStartDate;
         }
 
         if (returnDateInput) {
             returnDateInput.min = pickupDateInput?.value || today;
-            returnDateInput.value = scheduleCaptured ? incomingEndDate : "";
+            returnDateInput.value = incomingEndDate;
         }
 
         if (pickupTimeInput) {
@@ -444,6 +456,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         normalizeScheduleInputs();
+        scheduleCaptured = hasSchedule(getCurrentSchedule());
         storeBookingIntent(getCurrentSchedule());
     }
 
