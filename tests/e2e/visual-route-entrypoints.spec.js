@@ -43,11 +43,11 @@ const firstViewportPages = [
     {
         path: '/services.html',
         name: 'services',
-        section: '.services-hero',
-        heading: 'h1[data-service-title], .services-hero h1',
-        primary: '.services-hero__selector .services-lane-orb',
+        section: '.services-flow--lead',
+        heading: '#service-flow-title',
+        primary: '.services-flow--lead .services-flow__item',
         secondary: null,
-        minimumHeroFillRatio: 0.45,
+        minimumHeroFillRatio: 0.72,
         requirePrimaryInViewport: true
     },
     {
@@ -114,6 +114,7 @@ async function collectViewportAudit(page, selectors) {
         const headingRect = rectFor(input.heading);
         const primaryRect = rectFor(input.primary);
         const selectorRect = rectFor('.services-hero__selector');
+        const flowRect = rectFor('.services-flow--lead');
         const featureRect = rectFor('.services-hero__feature');
         const directPlannerRect = rectFor('.services-hero__planner--direct');
         const locationsSummaryRect = rectFor('.locations-hero__summary');
@@ -134,6 +135,7 @@ async function collectViewportAudit(page, selectors) {
             headingRect,
             primaryRect,
             selectorRect,
+            flowRect,
             featureRect,
             directPlannerRect,
             locationsSummaryRect,
@@ -187,18 +189,12 @@ async function runFirstViewportMatrix({ browser, viewport, pageEntry }) {
             expect(audit.primaryRect.top).toBeLessThan(audit.viewportHeight * 1.5);
         }
         if (pageEntry.name === 'services' && viewport.width >= 861) {
+            expect(audit.flowRect).not.toBeNull();
             expect(audit.selectorRect).not.toBeNull();
-            if (audit.featureRect) {
-                expect(audit.selectorRect.top).toBeLessThan(audit.viewportHeight * 0.32);
-                expect(audit.selectorRect.bottom).toBeLessThanOrEqual(audit.viewportHeight * 0.58);
-                expect(audit.featureRect.top).toBeGreaterThanOrEqual(audit.viewportHeight * 0.4);
-                expect(audit.featureRect.height).toBeGreaterThan(audit.viewportHeight * 0.34);
-            } else {
-                expect(audit.directPlannerRect).not.toBeNull();
-                expect(audit.selectorRect.top).toBeLessThan(audit.viewportHeight * 0.75);
-                expect(audit.selectorRect.bottom).toBeLessThanOrEqual(audit.viewportHeight + 4);
-                expect(audit.selectorRect.height).toBeGreaterThan(audit.viewportHeight * 0.18);
-            }
+            expect(audit.flowRect.top).toBeLessThan(audit.viewportHeight * 0.12);
+            expect(audit.flowRect.height).toBeGreaterThan(audit.viewportHeight * 0.82);
+            expect(audit.selectorRect.top).toBeGreaterThanOrEqual(audit.viewportHeight * 0.88);
+            expect(audit.selectorRect.height).toBeGreaterThan(audit.viewportHeight * 0.18);
         }
         if (pageEntry.name === 'locations' && viewport.width >= 1181) {
             expect(audit.locationsSummaryRect).not.toBeNull();
