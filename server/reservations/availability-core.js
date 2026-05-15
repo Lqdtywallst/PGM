@@ -10,6 +10,14 @@ const NON_BLOCKING_STATUS_PATTERNS = [
     /refunded/i,
     /expired/i
 ];
+const TEMPORARY_HOLD_STATUS_PATTERNS = [
+    /^checkout_started$/i,
+    /^lead_received$/i,
+    /^payment_intent_created$/i,
+    /^payment_requires_action$/i,
+    /^received$/i
+];
+const TEMPORARY_HOLD_MS = 30 * 60 * 1000;
 
 function cleanText(value) {
     return String(value || '').trim();
@@ -151,12 +159,36 @@ function schedulesOverlap(left, right) {
     return Boolean(left && right && left.startMs < right.endMs && right.startMs < left.endMs);
 }
 
-function isBlockingReservation(record = {}) {
-    const status = cleanText(record.status || record.reservationData?.status || 'received');
-    return !NON_BLOCKING_STATUS_PATTERNS.some((pattern) => pattern.test(status));
+function timestampToMs(value) {
+    const parsed = new Date(cleanText(value)).getTime();
+    return Number.isFinite(parsed) ? parsed : null;
 }
 
-function buildAvailability({ fleetCards, reservations = [], schedule = {} } = {}) {
+function temporaryHoldAgeMs(record = {}, now = Date.now()) {
+    const createdMs = timestampToMs(record.createdAt || record.rawRequest?.submittedAt || record.updatedAt);
+    return Number.isFinite(createdMs) ? now - createdMs : null;
+}
+
+function isTemporaryHoldStatus(status) {
+    return TEMPORARY_HOLD_STATUS_PATTERNS.some((pattern) => pattern.test(status));
+}
+
+function isBlockingReservation(record = {}, options = {}) {
+    const status = cleanText(record.status || record.reservationData?.status || 'received');
+
+    if (NON_BLOCKING_STATUS_PATTERNS.some((pattern) => pattern.test(status))) {
+        return false;
+    }
+
+    if (isTemporaryHoldStatus(status)) {
+        const ageMs = temporaryHoldAgeMs(record, options.now);
+        return ageMs === null || ageMs <= TEMPORARY_HOLD_MS;
+    }
+
+    return true;
+}
+
+function buildAvailability({ fleetCards, reservations = [], schedule = {}, now = Date.now() } = {}) {
     const catalog = buildVehicleCatalog(fleetCards);
     const requestedWindow = buildScheduleWindow(schedule);
 
@@ -176,7 +208,7 @@ function buildAvailability({ fleetCards, reservations = [], schedule = {} } = {}
     }
 
     const activeReservations = reservations
-        .filter(isBlockingReservation)
+        .filter((record) => isBlockingReservation(record, { now }))
         .map((record) => ({
             record,
             vehicleName: reservationVehicleName(record),

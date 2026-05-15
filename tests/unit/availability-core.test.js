@@ -30,6 +30,8 @@ function reservation(overrides = {}) {
     return {
         reservationId: overrides.reservationId || 'res_default',
         status: overrides.status || 'confirmed',
+        createdAt: overrides.createdAt,
+        updatedAt: overrides.updatedAt,
         reservationData: {
             car: overrides.car || 'Mercedes-Benz G63 AMG',
             startDate: overrides.startDate || '2026-11-10',
@@ -69,7 +71,9 @@ test('cancelled or failed reservations do not block availability', () => {
         fleetCards,
         reservations: [
             reservation({ reservationId: 'res_cancelled', status: 'admin_canceled' }),
-            reservation({ reservationId: 'res_failed', status: 'payment_failed' })
+            reservation({ reservationId: 'res_failed', status: 'payment_failed' }),
+            reservation({ reservationId: 'res_intent_failed', status: 'payment_intent_failed' }),
+            reservation({ reservationId: 'res_canceled', status: 'payment_canceled' })
         ],
         schedule: requestedSchedule
     });
@@ -77,6 +81,79 @@ test('cancelled or failed reservations do not block availability', () => {
     const mercedes = availability.vehicles.find((vehicle) => vehicle.id === 'mercedes-g63-amg');
     assert.equal(mercedes.available, true);
     assert.equal(mercedes.conflicts.length, 0);
+});
+
+test('fresh pending requests hold availability only briefly', () => {
+    const now = Date.parse('2026-11-09T10:00:00.000Z');
+    const availability = buildAvailability({
+        fleetCards,
+        reservations: [
+            reservation({
+                reservationId: 'res_fresh_hold',
+                status: 'checkout_started',
+                createdAt: '2026-11-09T09:55:00.000Z'
+            }),
+            reservation({
+                reservationId: 'res_fresh_lead',
+                status: 'lead_received',
+                createdAt: '2026-11-09T09:56:00.000Z'
+            }),
+            reservation({
+                reservationId: 'res_payment_intent_created',
+                status: 'payment_intent_created',
+                createdAt: '2026-11-09T09:58:00.000Z'
+            })
+        ],
+        schedule: requestedSchedule,
+        now
+    });
+
+    const mercedes = availability.vehicles.find((vehicle) => vehicle.id === 'mercedes-g63-amg');
+    assert.equal(mercedes.available, false);
+    assert.deepEqual(mercedes.conflicts.map((conflict) => conflict.reservationId), [
+        'res_fresh_hold',
+        'res_fresh_lead',
+        'res_payment_intent_created'
+    ]);
+});
+
+test('stale pending requests do not hide available cars', () => {
+    const now = Date.parse('2026-11-09T10:00:00.000Z');
+    const availability = buildAvailability({
+        fleetCards,
+        reservations: [
+            reservation({
+                reservationId: 'res_abandoned_checkout',
+                status: 'checkout_started',
+                createdAt: '2026-11-09T09:00:00.000Z'
+            }),
+            reservation({
+                reservationId: 'res_abandoned_lead',
+                status: 'lead_received',
+                createdAt: '2026-11-09T09:00:00.000Z'
+            })
+        ],
+        schedule: requestedSchedule,
+        now
+    });
+
+    const mercedes = availability.vehicles.find((vehicle) => vehicle.id === 'mercedes-g63-amg');
+    assert.equal(mercedes.available, true);
+    assert.equal(mercedes.conflicts.length, 0);
+});
+
+test('confirmed payment-like statuses keep blocking availability', () => {
+    for (const status of ['payment_succeeded', 'confirmed_email_failed', 'confirmed', 'reservation_confirmed']) {
+        const availability = buildAvailability({
+            fleetCards,
+            reservations: [reservation({ reservationId: `res_${status}`, status })],
+            schedule: requestedSchedule
+        });
+
+        const mercedes = availability.vehicles.find((vehicle) => vehicle.id === 'mercedes-g63-amg');
+        assert.equal(mercedes.available, false, `${status} should block availability`);
+        assert.equal(mercedes.conflicts.length, 1);
+    }
 });
 
 test('non-overlapping reservations do not block availability', () => {
@@ -94,6 +171,53 @@ test('non-overlapping reservations do not block availability', () => {
 
     const mercedes = availability.vehicles.find((vehicle) => vehicle.id === 'mercedes-g63-amg');
     assert.equal(mercedes.available, true);
+});
+
+test('touching schedule boundaries do not count as overlap', () => {
+    const availability = buildAvailability({
+        fleetCards,
+        reservations: [
+            reservation({
+                reservationId: 'res_ends_at_pickup',
+                startDate: '2026-11-09',
+                endDate: '2026-11-11',
+                pickupTime: '10:00',
+                dropoffTime: '12:00'
+            }),
+            reservation({
+                reservationId: 'res_starts_at_return',
+                startDate: '2026-11-13',
+                endDate: '2026-11-14',
+                pickupTime: '12:00',
+                dropoffTime: '12:00'
+            })
+        ],
+        schedule: requestedSchedule
+    });
+
+    const mercedes = availability.vehicles.find((vehicle) => vehicle.id === 'mercedes-g63-amg');
+    assert.equal(mercedes.available, true);
+    assert.equal(mercedes.conflicts.length, 0);
+});
+
+test('one-minute schedule overlap blocks availability', () => {
+    const availability = buildAvailability({
+        fleetCards,
+        reservations: [
+            reservation({
+                reservationId: 'res_one_minute_overlap',
+                startDate: '2026-11-09',
+                endDate: '2026-11-11',
+                pickupTime: '10:00',
+                dropoffTime: '12:01'
+            })
+        ],
+        schedule: requestedSchedule
+    });
+
+    const mercedes = availability.vehicles.find((vehicle) => vehicle.id === 'mercedes-g63-amg');
+    assert.equal(mercedes.available, false);
+    assert.equal(mercedes.conflicts.length, 1);
 });
 
 test('vehicle matching tolerates CRM aliases and brand variations', () => {
