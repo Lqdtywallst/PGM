@@ -2,14 +2,6 @@
             --reserve-shell-max-width: 1180px;
         }
 
-        @font-face {
-            font-family: 'Manrope';
-            font-style: normal;
-            font-weight: 400 800;
-            font-display: swap;
-            src: url('https://fonts.gstatic.com/s/manrope/v20/xn7gYHE41ni1AdIRggexSvfedN4.woff2') format('woff2');
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -24,7 +16,7 @@
             min-height: 100vh;
             background: #050506;
             color: white;
-            font-family: 'Manrope', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: var(--lab-font-sans);
             display: block;
             padding: 0;
         }
