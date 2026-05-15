@@ -1,5 +1,5 @@
 .locations-page-main {
-    background: linear-gradient(180deg, #f7f3ee 0%, #fbfaf7 28%, #f6f2ec 100%);
+    background: linear-gradient(180deg, #f5efe5 0%, #fbf8f1 34%, #f3eadf 100%);
     color: #171615;
 }
 
@@ -1841,7 +1841,7 @@
 /* Single-viewport Locations: white page, dark cards, aligned columns. */
 .locations-page,
 .locations-page-main {
-    background: #ffffff;
+    background: #f5efe5;
 }
 
 .locations-page-main > [hidden] {
@@ -1853,7 +1853,9 @@
 }
 
 .locations-page .locations-hero {
-    background: #ffffff;
+    background:
+        radial-gradient(circle at 50% 0%, rgba(213, 180, 102, 0.16), rgba(213, 180, 102, 0) 28rem),
+        linear-gradient(180deg, #f5efe5 0%, #fbf8f1 48%, #f3eadf 100%);
     color: #fffaf2;
     padding: 0;
 }
@@ -2155,7 +2157,7 @@
     margin-top: -1px;
     padding: clamp(2.6rem, 6vw, 5.25rem) 0 clamp(1.8rem, 4vw, 3rem);
     background:
-        linear-gradient(180deg, #ffffff 0%, #fbfaf7 42%, #f4efe8 100%);
+        linear-gradient(180deg, #f3eadf 0%, #fbf8f1 42%, #f5efe5 100%);
     overflow: hidden;
 }
 
@@ -2172,7 +2174,7 @@
     height: clamp(7rem, 16vw, 15rem);
     background:
         radial-gradient(ellipse at 50% 0%, rgba(213, 180, 102, 0.18), rgba(213, 180, 102, 0) 58%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 239, 232, 0));
+        linear-gradient(180deg, rgba(245, 239, 229, 0.96), rgba(243, 234, 223, 0));
 }
 
 .locations-page .site-v2-footer::after {
