@@ -117,7 +117,8 @@
     pointer-events: none;
 }
 
-.about-visual-card__media img {
+.about-visual-card__media img,
+.about-visual-card__media video {
     display: block;
     width: 100%;
     height: 100%;
@@ -221,7 +222,7 @@
 }
 
 .about-hero h1 {
-    max-width: 11.8ch;
+    max-width: 13ch;
     color: #fff8eb;
     font-size: clamp(3rem, 4.2vw, 4.35rem);
     line-height: 0.94;
@@ -229,6 +230,7 @@
 }
 
 .about-hero__lead,
+.about-proof-strip__head p,
 .about-section-head p,
 .about-story__content p,
 .about-checklist li,
@@ -316,6 +318,10 @@
     padding: clamp(2.2rem, 4.2vw, 4rem) 0;
 }
 
+.about-proof-strip--entry {
+    padding-top: calc(var(--lab-header-offset) + clamp(0.85rem, 1.8vw, 1.35rem));
+}
+
 .about-proof-strip__head,
 .about-section-head {
     display: grid;
@@ -325,7 +331,7 @@
 
 .about-proof-strip__head h2,
 .about-section-head h2 {
-    max-width: 16ch;
+    max-width: 17ch;
     color: #171615;
     font-size: clamp(2.25rem, 3.2vw, 3.4rem);
     line-height: 0.96;
@@ -342,6 +348,7 @@
 .about-step,
 .about-standard {
     display: grid;
+    align-content: start;
     gap: 0.55rem;
     min-height: 100%;
     padding: 1.05rem;
@@ -537,6 +544,7 @@
 }
 
 .about-cta__copy p,
+.about-proof-strip__head p,
 .about-section-head p {
     max-width: 42rem;
     color: #4c453d;
@@ -567,6 +575,10 @@
 
     .about-section-head p {
         padding-bottom: 0.2rem;
+    }
+
+    .about-proof-strip__head p {
+        padding-bottom: 0.25rem;
     }
 }
 
@@ -637,7 +649,7 @@
     }
 
     .about-hero h1 {
-        max-width: 12ch;
+        max-width: 13ch;
         font-size: clamp(2rem, 9vw, 2.6rem);
         line-height: 0.96;
     }
@@ -651,6 +663,7 @@
     }
 
     .about-hero__lead,
+    .about-proof-strip__head p,
     .about-section-head p,
     .about-story__content p,
     .about-checklist li,
@@ -661,7 +674,8 @@
         line-height: 1.5;
     }
 
-    .about-visual-card__media img {
+    .about-visual-card__media img,
+    .about-visual-card__media video {
         min-height: clamp(11rem, 48vw, 13rem);
     }
 
@@ -692,6 +706,10 @@
     .about-proof-strip,
     .about-band {
         padding: 2.4rem 0;
+    }
+
+    .about-proof-strip--entry {
+        padding-top: calc(var(--lab-header-offset) + 1rem);
     }
 
     .about-proof-strip__grid,
