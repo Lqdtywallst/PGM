@@ -24,8 +24,8 @@
     },
     "copy": {
       "title": "Huracan EVO Spyder",
-      "description": "The loudest emotional booking in the fleet: short, visible, roof-down and built for guests who want the car to shape the memory, not just the route.",
-      "salesLine": "Best for Palm, Marina and after-dark arrivals where theatre matters more than luggage.",
+      "description": "Roof-down Lamborghini drama for Palm, Marina and after-dark arrivals.",
+      "salesLine": "Best when visibility matters more than luggage.",
       "specs": [
         "Convertible",
         "2 seats",
@@ -33,7 +33,7 @@
       ]
     },
     "booking": {
-      "priceNote": "Celebration-led stays",
+      "priceNote": "Evening arrival pick",
       "primaryLabel": "View Huracan EVO Spyder"
     },
     "contact": {
@@ -65,8 +65,8 @@
     },
     "copy": {
       "title": "296 GTS",
-      "description": "A more polished Ferrari reading for couples, dinner routes and guests who want Maranello presence without the rawer Lamborghini tone.",
-      "salesLine": "Best for Marina dinners, resort arrivals and two-person stays with visible elegance.",
+      "description": "Polished Ferrari presence for dinners, resorts and two-person city plans.",
+      "salesLine": "Best for elegant routes with open-top presence.",
       "specs": [
         "Convertible",
         "2 seats",
@@ -74,7 +74,7 @@
       ]
     },
     "booking": {
-      "priceNote": "Elegant city runs",
+      "priceNote": "Couple-led city plans",
       "primaryLabel": "View Ferrari 296 GTS"
     },
     "contact": {
@@ -105,8 +105,8 @@
     },
     "copy": {
       "title": "992 GT3",
-      "description": "The least theatrical model in the line-up and the most driver-led: built for guests who care about feel, balance and road connection before valet impact.",
-      "salesLine": "Best for enthusiasts, cleaner highway movement and bookings led by the drive itself.",
+      "description": "Focused Porsche energy for guests who book the drive before the valet moment.",
+      "salesLine": "Best for enthusiasts and sharper highway movement.",
       "specs": [
         "Sports",
         "2 seats",
@@ -114,7 +114,7 @@
       ]
     },
     "booking": {
-      "priceNote": "Pure driver focus",
+      "priceNote": "Driver-first choice",
       "primaryLabel": "View Porsche 992 GT3"
     },
     "contact": {
@@ -146,8 +146,8 @@
     },
     "copy": {
       "title": "Urus Sport",
-      "description": "The Lamborghini answer for stays that still need presence but cannot sacrifice cabin room, luggage ease or a more flexible daily rhythm.",
-      "salesLine": "Best for airport arrivals, villa stays and guest-led schedules that still need drama.",
+      "description": "Lamborghini presence with SUV room for luggage, guests and full-day plans.",
+      "salesLine": "Best for airport arrivals, villas and flexible schedules.",
       "specs": [
         "Luxury SUV",
         "Up to 5",
@@ -155,7 +155,7 @@
       ]
     },
     "booking": {
-      "priceNote": "High-presence daily use",
+      "priceNote": "Airport-to-villa fit",
       "primaryLabel": "View Lamborghini Urus"
     },
     "contact": {
@@ -187,8 +187,8 @@
     },
     "copy": {
       "title": "G63 AMG",
-      "description": "A stronger daily booking than most supercars: easier access, upright comfort and enough status to carry hotels, meetings and dinners without changing tone.",
-      "salesLine": "Best for business stays, longer hotel runs and guests who want visible comfort.",
+      "description": "Upright AMG comfort with enough status for hotels, meetings and dinners.",
+      "salesLine": "Best for business stays and longer hotel runs.",
       "specs": [
         "Luxury SUV",
         "Up to 5",
@@ -196,7 +196,7 @@
       ]
     },
     "booking": {
-      "priceNote": "Hotel-to-meeting rhythm",
+      "priceNote": "Business-ready SUV",
       "primaryLabel": "View Mercedes G63 AMG"
     },
     "contact": {
@@ -228,8 +228,8 @@
     },
     "copy": {
       "title": "Cullinan Black Badge",
-      "description": "The most ceremonial car in the fleet: softer, quieter and more elevated, built for guests who want the arrival to feel composed, rare and unmistakably premium.",
-      "salesLine": "Best for villas, VIP hotels, airport reception and executive guest care.",
+      "description": "Quiet flagship SUV for villas, VIP hotels and composed airport reception.",
+      "salesLine": "Best for executive guest care and ceremonial arrivals.",
       "specs": [
         "Luxury SUV",
         "Up to 5",
@@ -237,7 +237,7 @@
       ]
     },
     "booking": {
-      "priceNote": "Flagship arrival tone",
+      "priceNote": "Chauffeur optional",
       "primaryLabel": "View Cullinan Black Badge"
     },
     "contact": {
