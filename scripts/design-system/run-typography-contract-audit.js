@@ -63,20 +63,6 @@ function auditHtmlFontLoading(htmlFiles, findings) {
     const text = readText(filePath);
     const lower = text.toLowerCase();
 
-    if (lower.includes('fonts.googleapis.com') || lower.includes('fonts.gstatic.com')) {
-      const index = Math.max(
-        lower.indexOf('fonts.googleapis.com'),
-        lower.indexOf('fonts.gstatic.com')
-      );
-      addFinding(findings, {
-        category: 'font_loading_contract',
-        file: filePath,
-        line: lineNumberForIndex(text, index),
-        message: 'Public pages must not load Google Fonts directly; use the local /css/dp-fonts.css contract to avoid font swap drift.',
-        evidence: text.split(/\r?\n/)[lineNumberForIndex(text, index) - 1]?.trim()
-      });
-    }
-
     if (!lower.includes('dp-fonts.css')) {
       addFinding(findings, {
         category: 'font_loading_contract',
@@ -88,20 +74,40 @@ function auditHtmlFontLoading(htmlFiles, findings) {
   }
 }
 
-function auditForbiddenFamilies(files, findings) {
-  const forbiddenRegex = /\b(?:Cormorant(?:\s+Garamond)?|Inter|Montserrat|Roboto)\b/gi;
+function auditRemoteFontUrls(files, findings) {
+  const remoteFontRegex = /https:\/\/fonts\.(?:googleapis|gstatic)\.com[^\s"'`)<>]*/gi;
 
   for (const filePath of files) {
     const text = readText(filePath);
-    const matches = text.matchAll(forbiddenRegex);
-    for (const match of matches) {
+    for (const match of text.matchAll(remoteFontRegex)) {
       addFinding(findings, {
-        category: 'font_family_contract',
+        category: 'font_loading_contract',
         file: filePath,
         line: lineNumberForIndex(text, match.index || 0),
-        message: 'Public UI typography must use the approved brand roles: display = El Messiri, body/nav/forms/CTA = Manrope.',
+        message: 'Public pages and styles must not load Google Fonts directly; use the local /css/dp-fonts.css contract to avoid font swap drift.',
         evidence: match[0]
       });
+    }
+  }
+}
+
+function auditForbiddenFamilies(files, findings) {
+  const forbiddenRegex = /\b(?:Cormorant(?:\s+Garamond)?|Inter|Montserrat|Roboto)\b/gi;
+  const typographyContextRegex = /(?:font-family\s*:\s*[^;]+;|(?:^|[{\s;])font\s*:\s*[^;]+;|<link\b[^>]*(?:fonts\.googleapis\.com|fonts\.gstatic\.com)[^>]*>|@import[^;]*(?:fonts\.googleapis\.com|fonts\.gstatic\.com)[^;]*;)/gi;
+
+  for (const filePath of files) {
+    const text = readText(filePath);
+    for (const context of text.matchAll(typographyContextRegex)) {
+      const declaration = context[0] || '';
+      for (const match of declaration.matchAll(forbiddenRegex)) {
+        addFinding(findings, {
+          category: 'font_family_contract',
+          file: filePath,
+          line: lineNumberForIndex(text, context.index || 0),
+          message: 'Public UI typography must use the approved brand roles: display = El Messiri, body/nav/forms/CTA = Manrope.',
+          evidence: declaration.trim()
+        });
+      }
     }
   }
 }
@@ -172,6 +178,7 @@ function main() {
   const findings = [];
   auditTokenFiles(findings);
   auditHtmlFontLoading(htmlFiles, findings);
+  auditRemoteFontUrls(styleAndHtmlFiles, findings);
   auditForbiddenFamilies(styleAndHtmlFiles, findings);
 
   const report = {
