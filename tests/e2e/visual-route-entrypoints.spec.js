@@ -53,9 +53,9 @@ const firstViewportPages = [
     {
         path: '/about.html',
         name: 'about',
-        section: '.about-hero',
-        heading: '.about-hero h1',
-        primary: '.about-button--primary',
+        section: '.about-proof-strip--entry',
+        heading: '#about-proof-title',
+        primary: '.about-proof-strip--entry .about-proof',
         secondary: null,
         minimumHeroFillRatio: 0.45,
         requirePrimaryInViewport: true

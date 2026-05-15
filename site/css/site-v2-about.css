@@ -211,6 +211,7 @@
 }
 
 .about-hero h1,
+.about-proof-strip__head h1,
 .about-proof-strip__head h2,
 .about-section-head h2,
 .about-cta__copy h2 {
@@ -330,6 +331,7 @@
 }
 
 .about-proof-strip__head h2,
+.about-proof-strip__head h1,
 .about-section-head h2 {
     max-width: 17ch;
     color: #171615;
@@ -654,6 +656,7 @@
         line-height: 0.96;
     }
 
+    .about-proof-strip__head h1,
     .about-proof-strip__head h2,
     .about-section-head h2,
     .about-cta__copy h2 {

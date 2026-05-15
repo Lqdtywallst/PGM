@@ -6,7 +6,7 @@ const { chromium } = require('playwright');
     {path:'/services.html',name:'services',section:'.services-hero',heading:'h1[data-service-title], .services-hero h1',primary:'.services-button--primary',support:'.services-hero__selector,.services-hero__feature'},
     {path:'/locations.html',name:'locations',section:'.locations-hero',heading:'.locations-hero__copy h1',primary:'.locations-button--primary',support:'.locations-hero__summary,.locations-hero__zone-list'},
     {path:'/fleet.html',name:'fleet',section:'.fleet-browser__hero',heading:'.fleet-browser__hero-copy h1',primary:'.fleet-browser__hero-copy',support:'.fleet-browser__hero-media'},
-    {path:'/about.html',name:'about',section:'.about-hero',heading:'.about-hero h1',primary:'.about-button--primary',support:'.about-hero__actions'},
+    {path:'/about.html',name:'about',section:'.about-proof-strip--entry',heading:'#about-proof-title',primary:'.about-proof-strip--entry .about-proof',support:'.about-proof-strip__grid'},
     {path:'/contact.html',name:'contact',section:'.contact-hero',heading:'.contact-hero h1',primary:'.contact-button--primary',support:'.contact-hero__intro'}
   ];
   const viewports = [
