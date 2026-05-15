@@ -1,5 +1,6 @@
 {
   "buildCommand": "npm run build:site",
+  "outputDirectory": "site",
   "redirects": [
     {
       "source": "/reservations",
@@ -65,135 +66,139 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/site/index.html"
+      "destination": "/index.html"
     },
     {
       "source": "/about.html",
-      "destination": "/site/pages/core/about.html"
+      "destination": "/pages/core/about.html"
     },
     {
       "source": "/contact.html",
-      "destination": "/site/pages/core/contact.html"
+      "destination": "/pages/core/contact.html"
     },
     {
       "source": "/fleet.html",
-      "destination": "/site/pages/core/fleet.html"
+      "destination": "/pages/core/fleet.html"
     },
     {
       "source": "/locations.html",
-      "destination": "/site/pages/core/locations.html"
+      "destination": "/pages/core/locations.html"
     },
     {
       "source": "/reservation-lookup.html",
-      "destination": "/site/pages/core/reservation-lookup.html"
+      "destination": "/pages/core/reservation-lookup.html"
     },
     {
       "source": "/services.html",
-      "destination": "/site/pages/core/services.html"
+      "destination": "/pages/core/services.html"
     },
     {
       "source": "/luxury-car-rental-dubai.html",
-      "destination": "/site/pages/guides/luxury-car-rental-dubai.html"
+      "destination": "/pages/guides/luxury-car-rental-dubai.html"
     },
     {
       "source": "/abu-dhabi-luxury-car-rental.html",
-      "destination": "/site/pages/guides/abu-dhabi-luxury-car-rental.html"
+      "destination": "/pages/guides/abu-dhabi-luxury-car-rental.html"
     },
     {
       "source": "/dubai-airport-luxury-car-rental.html",
-      "destination": "/site/pages/guides/dubai-airport-luxury-car-rental.html"
+      "destination": "/pages/guides/dubai-airport-luxury-car-rental.html"
     },
     {
       "source": "/palm-jumeirah-luxury-car-rental.html",
-      "destination": "/site/pages/guides/palm-jumeirah-luxury-car-rental.html"
+      "destination": "/pages/guides/palm-jumeirah-luxury-car-rental.html"
     },
     {
       "source": "/dubai-marina-luxury-car-rental.html",
-      "destination": "/site/pages/guides/dubai-marina-luxury-car-rental.html"
+      "destination": "/pages/guides/dubai-marina-luxury-car-rental.html"
     },
     {
       "source": "/supercar-rental-dubai.html",
-      "destination": "/site/pages/guides/supercar-rental-dubai.html"
+      "destination": "/pages/guides/supercar-rental-dubai.html"
     },
     {
       "source": "/airport-concierge-dubai.html",
-      "destination": "/site/pages/services/airport-concierge-dubai.html"
+      "destination": "/pages/services/airport-concierge-dubai.html"
     },
     {
       "source": "/chauffeur-service-dubai.html",
-      "destination": "/site/pages/services/chauffeur-service-dubai.html"
+      "destination": "/pages/services/chauffeur-service-dubai.html"
     },
     {
       "source": "/hotel-villa-airport-delivery-dubai.html",
-      "destination": "/site/pages/services/hotel-villa-airport-delivery-dubai.html"
+      "destination": "/pages/services/hotel-villa-airport-delivery-dubai.html"
     },
     {
       "source": "/wedding-event-car-rental-dubai.html",
-      "destination": "/site/pages/services/wedding-event-car-rental-dubai.html"
+      "destination": "/pages/services/wedding-event-car-rental-dubai.html"
     },
     {
       "source": "/business-car-rental-dubai.html",
-      "destination": "/site/pages/services/business-car-rental-dubai.html"
+      "destination": "/pages/services/business-car-rental-dubai.html"
     },
     {
       "source": "/monthly-luxury-car-rental-dubai.html",
-      "destination": "/site/pages/services/monthly-luxury-car-rental-dubai.html"
+      "destination": "/pages/services/monthly-luxury-car-rental-dubai.html"
     },
     {
       "source": "/lamborghini-rental-dubai.html",
-      "destination": "/site/pages/brands/lamborghini-rental-dubai.html"
+      "destination": "/pages/brands/lamborghini-rental-dubai.html"
     },
     {
       "source": "/ferrari-rental-dubai.html",
-      "destination": "/site/pages/brands/ferrari-rental-dubai.html"
+      "destination": "/pages/brands/ferrari-rental-dubai.html"
     },
     {
       "source": "/mercedes-rental-dubai.html",
-      "destination": "/site/pages/brands/mercedes-rental-dubai.html"
+      "destination": "/pages/brands/mercedes-rental-dubai.html"
     },
     {
       "source": "/porsche-rental-dubai.html",
-      "destination": "/site/pages/brands/porsche-rental-dubai.html"
+      "destination": "/pages/brands/porsche-rental-dubai.html"
     },
     {
       "source": "/rolls-royce-rental-dubai.html",
-      "destination": "/site/pages/brands/rolls-royce-rental-dubai.html"
+      "destination": "/pages/brands/rolls-royce-rental-dubai.html"
     },
     {
       "source": "/lamborghini-huracan-evo-spyder-rental-dubai.html",
-      "destination": "/site/pages/vehicles/lamborghini-huracan-evo-spyder-rental-dubai.html"
+      "destination": "/pages/vehicles/lamborghini-huracan-evo-spyder-rental-dubai.html"
     },
     {
       "source": "/lamborghini-urus-rental-dubai.html",
-      "destination": "/site/pages/vehicles/lamborghini-urus-rental-dubai.html"
+      "destination": "/pages/vehicles/lamborghini-urus-rental-dubai.html"
     },
     {
       "source": "/ferrari-296-gts-rental-dubai.html",
-      "destination": "/site/pages/vehicles/ferrari-296-gts-rental-dubai.html"
+      "destination": "/pages/vehicles/ferrari-296-gts-rental-dubai.html"
     },
     {
       "source": "/mercedes-g63-amg-rental-dubai.html",
-      "destination": "/site/pages/vehicles/mercedes-g63-amg-rental-dubai.html"
+      "destination": "/pages/vehicles/mercedes-g63-amg-rental-dubai.html"
     },
     {
       "source": "/porsche-992-gt3-rental-dubai.html",
-      "destination": "/site/pages/vehicles/porsche-992-gt3-rental-dubai.html"
+      "destination": "/pages/vehicles/porsche-992-gt3-rental-dubai.html"
     },
     {
       "source": "/rolls-royce-cullinan-black-badge-rental-dubai.html",
-      "destination": "/site/pages/vehicles/rolls-royce-cullinan-black-badge-rental-dubai.html"
+      "destination": "/pages/vehicles/rolls-royce-cullinan-black-badge-rental-dubai.html"
     },
     {
       "source": "/terms-and-conditions.html",
-      "destination": "/site/pages/legal/terms-and-conditions.html"
+      "destination": "/pages/legal/terms-and-conditions.html"
     },
     {
       "source": "/terms-and-conditions-uae.html",
-      "destination": "/site/pages/legal/terms-and-conditions-uae.html"
+      "destination": "/pages/legal/terms-and-conditions-uae.html"
+    },
+    {
+      "source": "/site/(.*)",
+      "destination": "/$1"
     },
     {
       "source": "/((?!api/|site/).*)",
-      "destination": "/site/$1"
+      "destination": "/$1"
     }
   ],
   "headers": [
