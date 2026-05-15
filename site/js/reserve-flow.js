@@ -1187,9 +1187,10 @@
                     style: {
                         base: {
                             fontSize: '16px',
-                            color: '#ffffff',
+                            color: '#17120d',
+                            iconColor: '#6f6257',
                             '::placeholder': {
-                                color: '#71717a',
+                                color: '#81756a',
                             },
                             fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
                         },
