@@ -14,8 +14,6 @@ const serviceDetails = [
     '/airport-concierge-dubai.html',
     '/chauffeur-service-dubai.html',
     '/hotel-villa-airport-delivery-dubai.html',
-    '/wedding-event-car-rental-dubai.html',
-    '/business-car-rental-dubai.html',
     '/monthly-luxury-car-rental-dubai.html'
 ];
 
@@ -40,7 +38,7 @@ test.describe('Services hub deep links', () => {
         );
     });
 
-    test('primary service circles navigate directly without a preview panel', async ({ browser }) => {
+    test('process-first services hub keeps cards as direct links', async ({ browser }) => {
         const context = await browser.newContext(buildContextOptions(serviceViewports[2]));
         const page = await context.newPage();
 
@@ -49,7 +47,10 @@ test.describe('Services hub deep links', () => {
             await settlePage(page);
 
             await expect(page.locator('[data-service-panel]')).toHaveCount(0);
-            await expect(page.locator('h1')).toContainText('Choose the service around the stay');
+            await expect(page.locator('h1')).toContainText('A short path for premium mobility.');
+            await expect(page.getByRole('heading', { name: 'Share the stay' })).toBeVisible();
+            await expect(page.getByRole('heading', { name: 'Choose your Dubai mobility service.' })).toHaveCount(1);
+            await expect(page.getByText('24/7 WhatsApp concierge')).toHaveCount(0);
 
             const chauffeurCircle = page.locator('#services-lane-tab-chauffeur');
             await expect(chauffeurCircle).toHaveAttribute('href', './chauffeur-service-dubai.html');

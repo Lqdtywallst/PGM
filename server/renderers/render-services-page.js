@@ -33,6 +33,7 @@ function normalizeLane(lane = {}, index = 0) {
     requireText(lane.navMeta, `Service lane ${index + 1} needs a nav meta line.`);
     requireText(lane.href, `Service lane ${index + 1} needs a page link.`);
     requireText(lane.imageSrc, `Service lane ${index + 1} needs an image path.`);
+    requireText(lane.navCopy || lane.cardCopy, `Service lane ${index + 1} needs a short selector description.`);
     requireText(lane.cardKicker, `Service lane ${index + 1} needs a panel kicker.`);
     requireText(lane.cardTitle, `Service lane ${index + 1} needs a panel title.`);
     requireText(lane.cardCopy, `Service lane ${index + 1} needs a panel description.`);
@@ -52,14 +53,16 @@ function normalizeLane(lane = {}, index = 0) {
         cardKicker: String(lane.cardKicker).trim(),
         cardTitle: String(lane.cardTitle).trim(),
         cardCopy: String(lane.cardCopy).trim(),
+        navCopy: String(lane.navCopy || lane.cardCopy).trim(),
         pointOne: String(lane.pointOne).trim(),
         pointTwo: String(lane.pointTwo).trim(),
         pointThree: String(lane.pointThree).trim(),
         buttonLabel: String(lane.buttonLabel).trim(),
+        actionLabel: String(lane.actionLabel || 'Open service').trim(),
         analyticsService: String(lane.analyticsService || slug.replace(/-/g, '_')).trim(),
         isActive: Boolean(lane.isActive),
-        id: `services-lane-tab-${slug}`,
-        ariaLabel: `Open ${String(lane.cardTitle).trim().toLowerCase()} service`
+        id: String(lane.id || `services-lane-tab-${slug}`).trim(),
+        ariaLabel: String(lane.ariaLabel || `Open ${String(lane.cardTitle).trim().toLowerCase()} service`).trim()
     };
 }
 
@@ -131,10 +134,14 @@ function renderLane(lane) {
         `                            data-service-primary-href="${escapeHtml(lane.href)}"`,
         `                            data-service-analytics-service="${escapeHtml(lane.analyticsService)}">`,
         '                            <span class="services-lane-orb__media" aria-hidden="true">',
-        `                                <img src="${escapeHtml(lane.imageSrc)}" alt="${escapeHtml(lane.imageAlt)}">`,
+        `                                <img src="${escapeHtml(lane.imageSrc)}" alt="${escapeHtml(lane.imageAlt)}" decoding="async" loading="lazy">`,
         '                            </span>',
-        `                            <span class="services-lane-orb__label">${escapeHtml(lane.navLabel)}</span>`,
-        `                            <span class="services-lane-orb__meta">${escapeHtml(lane.navMeta)}</span>`,
+        '                            <span class="services-lane-orb__content">',
+        `                                <span class="services-lane-orb__label">${escapeHtml(lane.navLabel)}</span>`,
+        `                                <span class="services-lane-orb__meta">${escapeHtml(lane.navMeta)}</span>`,
+        `                                <span class="services-lane-orb__copy">${escapeHtml(lane.navCopy)}</span>`,
+        `                                <span class="services-lane-orb__action">${escapeHtml(lane.actionLabel)}</span>`,
+        '                            </span>',
         '                        </a>'
     ].join('\n');
 }
@@ -153,8 +160,13 @@ function replaceMarkerBlock(html, config, markup, newline) {
     const block = [config.indent + config.start, markup, config.indent + config.end].join(newline);
 
     if (html.includes(config.start) && html.includes(config.end)) {
+        const markerPattern = new RegExp(
+            `^[\\t ]*${escapeRegExp(config.start)}[\\s\\S]*?^[\\t ]*${escapeRegExp(config.end)}`,
+            'm'
+        );
+
         return html.replace(
-            new RegExp(`${escapeRegExp(config.start)}[\\s\\S]*?${escapeRegExp(config.end)}`, 'm'),
+            markerPattern,
             block
         );
     }
