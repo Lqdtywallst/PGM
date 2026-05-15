@@ -2968,6 +2968,166 @@
     }
 }
 
+/* Brand-dark filter surface: carbon shell with ivory controls and champagne/gold accents. */
+.fleet-sidebar {
+    border-color: rgba(var(--dp-color-gold-rgb), 0.26);
+    background:
+        radial-gradient(circle at 18% 0%, rgba(var(--dp-color-gold-soft-rgb), 0.16), transparent 38%),
+        linear-gradient(180deg, rgba(35, 27, 20, 0.98) 0%, rgba(15, 14, 13, 0.98) 100%);
+    color: var(--dp-color-ivory);
+    box-shadow:
+        0 24px 58px rgba(0, 0, 0, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.fleet-sidebar__topbar {
+    border-bottom-color: rgba(var(--dp-color-gold-soft-rgb), 0.18);
+}
+
+.fleet-sidebar__module + .fleet-sidebar__module {
+    border-top-color: rgba(var(--dp-color-gold-soft-rgb), 0.16);
+}
+
+.fleet-sidebar__summary,
+.fleet-sidebar__label,
+.fleet-sidebar__field span {
+    color: rgba(245, 241, 232, 0.82);
+}
+
+.fleet-sidebar__summary {
+    color: var(--dp-color-champagne);
+}
+
+.fleet-sidebar__note {
+    color: rgba(245, 241, 232, 0.66);
+}
+
+.fleet-sidebar__select,
+.fleet-sidebar__input,
+.fleet-sidebar__field-shell,
+.fleet-price-range__selection {
+    border-color: rgba(var(--dp-color-gold-rgb), 0.24);
+    background:
+        linear-gradient(180deg, rgba(255, 253, 249, 0.98), rgba(246, 239, 228, 0.98));
+    color: var(--dp-color-text);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        0 10px 22px rgba(0, 0, 0, 0.12);
+}
+
+.fleet-sidebar__field-display,
+.fleet-price-range__selection,
+.fleet-price-range__limits {
+    color: var(--dp-color-text);
+}
+
+.fleet-sidebar__field .fleet-sidebar__field-display {
+    color: var(--dp-color-text);
+}
+
+.fleet-sidebar__select-shell::after {
+    border-right-color: rgba(38, 29, 21, 0.7);
+    border-bottom-color: rgba(38, 29, 21, 0.7);
+}
+
+.fleet-sidebar__topbar .fleet-sidebar__select,
+.fleet-sidebar__topbar .fleet-filter-reset {
+    border-color: rgba(var(--dp-color-gold-rgb), 0.32);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.22),
+        0 12px 28px rgba(0, 0, 0, 0.16);
+}
+
+.fleet-sidebar__topbar .fleet-sidebar__select {
+    background: linear-gradient(180deg, rgba(255, 253, 249, 0.98), rgba(244, 235, 221, 0.98));
+    color: var(--dp-color-text);
+}
+
+.fleet-sidebar__topbar .fleet-filter-reset,
+.fleet-filter-apply,
+.fleet-filter-close--top {
+    background: linear-gradient(135deg, var(--dp-color-gold-soft), var(--dp-color-gold));
+    color: #17120d;
+}
+
+.fleet-sidebar__topbar .fleet-sidebar__select-shell::after {
+    border-right-color: rgba(38, 29, 21, 0.7);
+    border-bottom-color: rgba(38, 29, 21, 0.7);
+}
+
+.fleet-sidebar__field-shell:focus-within,
+.fleet-sidebar__select:focus-visible,
+.fleet-sidebar__input:focus-visible {
+    border-color: rgba(var(--dp-color-gold-soft-rgb), 0.58);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        0 0 0 4px rgba(var(--dp-color-gold-rgb), 0.18);
+}
+
+.fleet-price-range__slider::before {
+    background: rgba(245, 241, 232, 0.2);
+}
+
+.fleet-price-range__slider::after {
+    background: linear-gradient(90deg, var(--dp-color-gold-soft), var(--dp-color-gold));
+}
+
+.fleet-price-range__limits {
+    color: rgba(245, 241, 232, 0.84);
+}
+
+.fleet-sidebar__scroll {
+    scrollbar-color: rgba(var(--dp-color-gold-rgb), 0.5) rgba(255, 255, 255, 0.08);
+}
+
+.fleet-sidebar__scroll::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.fleet-sidebar__scroll::-webkit-scrollbar-thumb {
+    background: rgba(var(--dp-color-gold-rgb), 0.5);
+}
+
+@media (max-width: 960px) {
+    .fleet-sidebar {
+        background:
+            radial-gradient(circle at 18% 0%, rgba(var(--dp-color-gold-soft-rgb), 0.2), transparent 36%),
+            linear-gradient(180deg, rgba(38, 29, 21, 0.99) 0%, rgba(16, 14, 12, 0.99) 100%);
+    }
+
+    .fleet-filter-sheet-head {
+        border-bottom-color: rgba(var(--dp-color-gold-soft-rgb), 0.18);
+    }
+
+    .fleet-filter-sheet-head__copy span {
+        color: var(--dp-color-champagne);
+    }
+
+    .fleet-filter-sheet-head__copy strong {
+        color: var(--dp-color-ivory);
+    }
+
+    .fleet-sidebar__topbar {
+        border-bottom-color: rgba(var(--dp-color-gold-soft-rgb), 0.18);
+    }
+
+    .fleet-filter-sheet-footer {
+        border-top-color: rgba(var(--dp-color-gold-soft-rgb), 0.18);
+    }
+
+    .fleet-filter-apply,
+    .fleet-filter-close--top {
+        border-color: rgba(var(--dp-color-gold-soft-rgb), 0.4);
+        color: #17120d;
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
+    }
+
+    .fleet-price-range__selection {
+        background:
+            linear-gradient(180deg, rgba(255, 253, 249, 0.98), rgba(246, 239, 228, 0.98));
+    }
+}
+
 /* Homogeneity guardrail: Fleet inherits the same premium type system as Home. */
 body.fleet-page :is(p, li, a, button, label, span, strong, small, input, select, textarea, [class]) {
     font-family: var(--lab-font-sans);
