@@ -316,18 +316,19 @@
 }
 
 .about-proof-strip {
-    padding: clamp(2.2rem, 4.2vw, 4rem) 0;
+    padding: clamp(2rem, 3.6vw, 3.2rem) 0;
 }
 
 .about-proof-strip--entry {
     padding-top: calc(var(--lab-header-offset) + clamp(0.85rem, 1.8vw, 1.35rem));
+    padding-bottom: clamp(1.35rem, 2.6vw, 2.2rem);
 }
 
 .about-proof-strip__head,
 .about-section-head {
     display: grid;
     gap: 0.75rem;
-    margin-bottom: clamp(1rem, 2vw, 1.35rem);
+    margin-bottom: clamp(0.9rem, 1.6vw, 1.2rem);
 }
 
 .about-proof-strip__head h2,
@@ -373,6 +374,10 @@
 
 .about-band {
     padding: clamp(2.4rem, 5vw, 4.8rem) 0;
+}
+
+.about-band--story {
+    padding-top: clamp(1.35rem, 2.8vw, 2.35rem);
 }
 
 .about-band--soft {
@@ -566,8 +571,9 @@
 @media (min-width: 1181px) {
     .about-proof-strip__head,
     .about-section-head {
-        grid-template-columns: minmax(18rem, 31rem) minmax(0, 42rem);
-        align-items: end;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: clamp(1.4rem, 3vw, 2.2rem);
+        align-items: start;
     }
 
     .about-proof-strip__head .about-kicker,
@@ -576,11 +582,28 @@
     }
 
     .about-section-head p {
-        padding-bottom: 0.2rem;
+        align-self: start;
+        padding-top: 0.35rem;
+        padding-bottom: 0;
     }
 
     .about-proof-strip__head p {
-        padding-bottom: 0.25rem;
+        align-self: start;
+        padding-top: 0.35rem;
+        padding-bottom: 0;
+    }
+
+    .about-proof-strip__grid {
+        gap: clamp(0.9rem, 1.45vw, 1.25rem);
+    }
+
+    .about-proof {
+        min-height: 7.7rem;
+        padding: 1.08rem 1.16rem;
+    }
+
+    .about-proof strong {
+        max-width: 21rem;
     }
 }
 
