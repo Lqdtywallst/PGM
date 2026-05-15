@@ -37,6 +37,7 @@ Priority summary:
 - Locations process and guide media no longer use `service-detail.png` as a location visual. A map/routing visual is preferred until proper Dubai/UAE location photography exists.
 - Porsche Fleet and Porsche brand primary media now use `porsche-992-gt3/02-exterior-side.jpg` as the temporary exterior fix.
 - Contact, Locations and Find Booking social previews now use neutral DP branding instead of unrelated model-specific car photos.
+- Fleet hero now uses `site/images/fleet/hero/dubai-luxury-fleet-victoria-ouarets-pexels.jpg`, sourced from Pexels photo `5288746` by Victoria Ouarets, replacing the category cutout with a Dubai-context fleet lineup.
 
 ## Classification Legend
 
@@ -95,6 +96,12 @@ Status labels:
 | `site/images/categories/electric-local-card.jpg` | 1400x959 | `deprecated/no-usar` | Cleanup docs only | Replace urgently if public | No current business/category role. |
 
 ## Fleet And Vehicle Assets
+
+### Fleet Hero
+
+| Asset | Dimensions | Recommended use | Current use found | Status | Problems / notes |
+| --- | ---: | --- | --- | --- | --- |
+| `site/images/fleet/hero/dubai-luxury-fleet-victoria-ouarets-pexels.jpg` | 1920x1280 | `fleet-hero` | Fleet hero | Reusable now | Pexels photo `5288746` by Victoria Ouarets. Strong Dubai skyline and multi-vehicle fleet cue; crop with a darker overlay for headline legibility. |
 
 ### Ferrari 296 GTS
 
@@ -203,7 +210,7 @@ Recommendation: align Home to one family: `home-hero-city-streets.mp4` plus a ma
 | Page / family | Current best asset to use now | Future target asset | Notes |
 | --- | --- | --- | --- |
 | Home | `site/media/home-hero-city-streets.mp4` with neutral brand-gradient fallback | Owned/licensed Dubai concierge mobility video with optional matching poster only if it does not create a visible photo-to-video jump | Ferrari PDP fallback has been removed from Home identity. |
-| Fleet | `site/images/fleet/rolls-royce-cullinan-black-badge/06-exterior-front-open-doors.png` for temporary hero | Wide fleet/arrival image with Dubai context and safe text area | Keep hero distinct from card repetition if possible. |
+| Fleet | `site/images/fleet/hero/dubai-luxury-fleet-victoria-ouarets-pexels.jpg` | Owned/licensed wide fleet/arrival image with Dubai context and safe text area | Current Pexels image improves fleet credibility and avoids repeating card imagery. |
 | Services | `site/images/service-handover.png` only as temporary airport/handover cue | Service shoot: airport, chauffeur, hotel/villa, monthly, business, event | Product-only images do not communicate service lanes clearly enough. |
 | Locations | No current approved image | Dubai/Palm/Marina/airport/Abu Dhabi place imagery | `locations-hero-temp.jpg` should be retired from public use. |
 | About | Dark brand-gradient hero with subtle DP watermark; `service-handover.png` only as support imagery | Team/process/handover/concierge scene | Avoid using a vehicle hero as the primary About identity. |

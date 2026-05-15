@@ -253,7 +253,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 62% 43%;
+    object-position: 50% 68%;
 }
 
 .fleet-browser__hero-shell {
@@ -3125,6 +3125,17 @@
     .fleet-price-range__selection {
         background:
             linear-gradient(180deg, rgba(255, 253, 249, 0.98), rgba(246, 239, 228, 0.98));
+    }
+}
+
+@media (max-width: 720px) {
+    .fleet-browser__hero,
+    .fleet-browser__hero-shell {
+        min-height: 17.75rem;
+    }
+
+    .fleet-browser__hero-media img {
+        object-position: 52% 72%;
     }
 }
 
