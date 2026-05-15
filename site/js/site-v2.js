@@ -166,6 +166,7 @@ function initSiteV2() {
 
     function initFloatingBackButton() {
         const navigationMemoryKey = "dynastyPreviousPage";
+        const pendingNavigationMaxAgeMs = 30000;
 
         function normalizeInternalPath(href) {
             if (!href) {
@@ -215,6 +216,68 @@ function initSiteV2() {
             } catch (error) {
                 // Ignore storage failures in restricted browsing modes.
             }
+        }
+
+        function getPendingInternalPreviousPath(memory, currentPath) {
+            const pending = memory?.pending;
+            const pendingFrom = normalizeInternalPath(pending?.from);
+            const pendingTo = normalizeInternalPath(pending?.to);
+            const pendingAge = Date.now() - Number(pending?.updatedAt || 0);
+
+            if (
+                pendingFrom &&
+                pendingTo &&
+                pathsEqual(pendingTo, currentPath) &&
+                !pathsEqual(pendingFrom, currentPath) &&
+                pendingAge >= 0 &&
+                pendingAge <= pendingNavigationMaxAgeMs
+            ) {
+                return pendingFrom;
+            }
+
+            return "";
+        }
+
+        function bindInternalNavigationCapture(currentPath) {
+            document.addEventListener("click", (event) => {
+                if (
+                    event.defaultPrevented ||
+                    event.button !== 0 ||
+                    event.metaKey ||
+                    event.ctrlKey ||
+                    event.shiftKey ||
+                    event.altKey
+                ) {
+                    return;
+                }
+
+                const link = event.target instanceof Element ? event.target.closest("a[href]") : null;
+
+                if (
+                    !(link instanceof HTMLAnchorElement) ||
+                    link.closest(".lab-floating-back") ||
+                    (link.target && link.target.toLowerCase() !== "_self") ||
+                    link.hasAttribute("download")
+                ) {
+                    return;
+                }
+
+                const nextPath = normalizeInternalPath(link.href);
+
+                if (!nextPath || pathsEqual(nextPath, currentPath)) {
+                    return;
+                }
+
+                writeNavigationMemory({
+                    ...readNavigationMemory(),
+                    current: currentPath,
+                    pending: {
+                        from: currentPath,
+                        to: nextPath,
+                        updatedAt: Date.now()
+                    }
+                });
+            }, { capture: true });
         }
 
         function bindAdaptiveBackOpacity(button) {
@@ -306,17 +369,22 @@ function initSiteV2() {
         const currentPath = normalizeInternalPath(window.location.href);
         const referrerPath = normalizeInternalPath(document.referrer);
         const storedMemory = readNavigationMemory();
-        const storedCurrentPath = normalizeInternalPath(storedMemory.current);
-        const storedPreviousPath = normalizeInternalPath(storedMemory.previous);
+        const pendingPreviousPath = getPendingInternalPreviousPath(storedMemory, currentPath);
+        const hasInternalHistoryTarget = Boolean(
+            (referrerPath && !pathsEqual(referrerPath, currentPath)) ||
+            pendingPreviousPath
+        );
         const previousPath = [
             referrerPath,
-            storedCurrentPath && !pathsEqual(storedCurrentPath, currentPath) ? storedCurrentPath : "",
-            storedPreviousPath
+            pendingPreviousPath
         ].find((candidate) => candidate && !pathsEqual(candidate, currentPath));
+
+        bindInternalNavigationCapture(currentPath);
 
         writeNavigationMemory({
             current: currentPath,
             previous: previousPath || "",
+            pending: null,
             updatedAt: Date.now()
         });
 
@@ -324,7 +392,7 @@ function initSiteV2() {
             return;
         }
 
-        if (!previousPath || document.querySelector(".lab-floating-back")) {
+        if (!previousPath || !hasInternalHistoryTarget || document.querySelector(".lab-floating-back")) {
             return;
         }
 
@@ -342,12 +410,19 @@ function initSiteV2() {
 
         backButton.addEventListener("click", (event) => {
             const liveReferrerPath = normalizeInternalPath(document.referrer);
+            const canUseHistoryBack = window.history.length > 1 && (
+                Boolean(pendingPreviousPath && pathsEqual(pendingPreviousPath, previousPath)) ||
+                Boolean(liveReferrerPath && pathsEqual(liveReferrerPath, previousPath))
+            );
 
-            if (!liveReferrerPath || !pathsEqual(liveReferrerPath, previousPath) || window.history.length <= 1) {
+            event.preventDefault();
+
+            if (!canUseHistoryBack) {
+                backButton.classList.remove("is-visible");
+                backButton.setAttribute("aria-hidden", "true");
                 return;
             }
 
-            event.preventDefault();
             window.history.back();
             window.setTimeout(() => {
                 if (!document.hidden) {
