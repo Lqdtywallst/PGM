@@ -4187,7 +4187,7 @@ body.vehicle-page--premium-pilot {
 
 .vehicle-trim-detail__grid {
     display: grid;
-    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    grid-template-columns: minmax(0, 1fr);
     gap: clamp(0.9rem, 1.4vw, 1.25rem);
     align-items: stretch;
 }
