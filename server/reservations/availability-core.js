@@ -5,7 +5,8 @@ const fleetCardsPath = path.join(__dirname, '..', 'data', 'fleet-cards.json');
 
 const NON_BLOCKING_STATUS_PATTERNS = [
     /cancel/i,
-    /failed/i,
+    /^payment(?:_intent)?_failed$/i,
+    /^customer_processing_failed$/i,
     /refunded/i,
     /expired/i
 ];
@@ -16,6 +17,8 @@ function cleanText(value) {
 
 function normalizeVehicleName(value) {
     return cleanText(value)
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
         .toLowerCase()
         .replace(/&/g, ' and ')
         .replace(/rolls[\s-]?royce/g, 'rolls royce')

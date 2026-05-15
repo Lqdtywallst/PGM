@@ -18,6 +18,11 @@ const fleetCards = [
         id: 'ferrari-296-gts',
         brand: 'Ferrari',
         copy: { title: '296 GTS' }
+    },
+    {
+        id: 'lamborghini-huracan-evo-spyder',
+        brand: 'Lamborghini',
+        copy: { title: 'Huracán EVO Spyder' }
     }
 ];
 
@@ -106,6 +111,25 @@ test('vehicle matching tolerates CRM aliases and brand variations', () => {
     assert.equal(vehicleMatchesReservation(mercedesVehicle, 'Mercedes-Benz G63 AMG'), true);
     assert.equal(vehicleMatchesReservation(mercedesVehicle, 'G63 AMG'), true);
     assert.equal(vehicleMatchesReservation(mercedesVehicle, 'Ferrari 296 GTS'), false);
+});
+
+test('vehicle matching ignores accents between catalog titles and CRM reservations', () => {
+    const availability = buildAvailability({
+        fleetCards,
+        reservations: [
+            reservation({
+                reservationId: 'res_huracan_paid',
+                car: 'Huracan EVO Spyder',
+                status: 'confirmed_email_failed'
+            })
+        ],
+        schedule: requestedSchedule
+    });
+
+    const huracan = availability.vehicles.find((vehicle) => vehicle.id === 'lamborghini-huracan-evo-spyder');
+    assert.equal(huracan.available, false);
+    assert.equal(huracan.conflicts.length, 1);
+    assert.equal(huracan.conflicts[0].reservationId, 'res_huracan_paid');
 });
 
 test('invalid schedules return a missing schedule state', () => {
