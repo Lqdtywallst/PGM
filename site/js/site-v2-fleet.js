@@ -197,6 +197,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return Boolean(normalizeValue(intent?.startDate) && normalizeValue(intent?.endDate));
     }
 
+    function normalizeScheduleTime(value, fallbackValue = "12:00") {
+        const normalized = normalizeValue(value || fallbackValue);
+        return /^\d{2}:\d{2}$/.test(normalized) ? normalized : fallbackValue;
+    }
+
     function isScheduleRangeValid(schedule) {
         if (!hasSchedule(schedule)) {
             return false;
@@ -211,9 +216,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (schedule.startDate === schedule.endDate) {
-            const pickupTime = normalizeValue(schedule.pickupTime || "12:00");
-            const dropoffTime = normalizeValue(schedule.dropoffTime || "12:00");
-            return !pickupTime || !dropoffTime || dropoffTime > pickupTime;
+            const pickupTime = normalizeScheduleTime(schedule.pickupTime);
+            const dropoffTime = normalizeScheduleTime(schedule.dropoffTime);
+            return dropoffTime > pickupTime;
         }
 
         return true;
@@ -410,6 +415,15 @@ document.addEventListener("DOMContentLoaded", () => {
             returnDateInput.value = changedInput === pickupDateInput
                 ? addDaysToDateInputValue(pickupDate, 1)
                 : pickupDate;
+        }
+
+        if (pickupDate && returnDateInput.value === pickupDate) {
+            const pickupTime = normalizeScheduleTime(pickupTimeInput?.value);
+            const dropoffTime = normalizeScheduleTime(returnTimeInput?.value);
+
+            if (dropoffTime <= pickupTime) {
+                returnDateInput.value = addDaysToDateInputValue(pickupDate, 1);
+            }
         }
     }
 

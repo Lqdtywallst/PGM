@@ -23,6 +23,18 @@ function getDubaiDateString(offsetDays = 0) {
     return `${year}-${month}-${day}`;
 }
 
+function addDaysToDateInputValue(value, offsetDays = 0) {
+    const [year, month, day] = String(value).split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    date.setDate(date.getDate() + offsetDays);
+
+    return [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, '0'),
+        String(date.getDate()).padStart(2, '0')
+    ].join('-');
+}
+
 function formatDateDisplay(value) {
     const [year, month, day] = String(value).split('-');
     return `${day}/${month}/${year}`;
@@ -210,4 +222,20 @@ test.describe('Fleet filter visual and functional audit', () => {
             await expectNoConsoleErrors(consoleErrors, `fleet filter ${viewport.name}`);
         });
     }
+
+    test('same pickup and return moment is normalized to a valid rental window', async ({ page }) => {
+        const startDate = getDubaiDateString(0);
+        const nextDate = addDaysToDateInputValue(startDate, 1);
+
+        await page.goto(`/fleet.html?startDate=${startDate}&endDate=${nextDate}&pickupTime=12:00&dropoffTime=12:00`, {
+            waitUntil: 'domcontentloaded'
+        });
+        await settlePage(page);
+
+        await page.locator('#fleet-return-date').fill(startDate);
+
+        await expect(page.locator('#fleet-return-date')).toHaveValue(nextDate);
+        await expect(page.locator('#fleet-return-date + .js-fleet-field-display'))
+            .toHaveText(formatDateDisplay(nextDate));
+    });
 });
