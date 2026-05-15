@@ -3148,3 +3148,19 @@ body.fleet-page :is(h1, h2, h3, h4, h5, h6) {
     font-family: var(--lab-font-display);
 }
 
+/* Fleet filter contract: labels stay left, option values sit centered. */
+body.fleet-page .fleet-sidebar__summary,
+body.fleet-page .fleet-sidebar__label,
+body.fleet-page .fleet-sidebar__field > span:first-child {
+    justify-self: start;
+    width: 100%;
+    text-align: left;
+}
+
+body.fleet-page .fleet-sidebar__module[aria-labelledby="fleet-sidebar-brands"] .fleet-sidebar__select,
+body.fleet-page .fleet-sidebar__module[aria-labelledby="fleet-sidebar-types"] .fleet-sidebar__select {
+    padding-left: 2.25rem;
+    padding-right: 2.25rem;
+    text-align: center;
+    text-align-last: center;
+}
