@@ -876,7 +876,11 @@
     background: linear-gradient(135deg, rgba(220, 183, 104, 0.96), rgba(198, 151, 66, 0.92));
     color: #171412;
     box-shadow: 0 12px 26px rgba(198, 151, 66, 0.16);
+    font-size: clamp(0.88rem, 0.82rem + 0.18vw, 1rem);
+    font-weight: 820;
+    line-height: 1.12;
     letter-spacing: 0;
+    text-align: center;
     text-transform: none;
 }
 

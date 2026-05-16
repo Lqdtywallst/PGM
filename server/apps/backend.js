@@ -25,11 +25,15 @@ const {
 } = require('../integrations/mobile-notifications');
 const {
     buildAvailability,
-    buildVehicleCatalog,
     buildPublicAvailabilityPayload,
-    loadFleetCards,
-    vehicleMatchesReservation
+    loadFleetCards
 } = require('../reservations/availability-core');
+const {
+    assertCheckoutVehicleAvailable,
+    buildCheckoutIdempotencyKey,
+    verifyCheckoutAmount,
+    withCheckoutVehicleLock
+} = require('../reservations/checkout-guard');
 const {
     clearAdminSessionCookie,
     createAdminSessionToken,
@@ -751,62 +755,6 @@ app.get('/api/reviews/google', async (req, res) => {
     }
 });
 
-function recordMatchesReservationId(record = {}, reservationId) {
-    const normalizedId = String(reservationId || '').trim();
-    if (!normalizedId) {
-        return false;
-    }
-
-    return [
-        record.reservationId,
-        record.reservationData?.reservationId,
-        record.rawRequest?.reservationId
-    ].some((value) => String(value || '').trim() === normalizedId);
-}
-
-async function assertVehicleAvailableForCheckout(reservationData = {}, reservationId) {
-    const fleetCards = loadFleetCards();
-    const catalog = buildVehicleCatalog(fleetCards);
-    const requestedVehicleName = reservationData.car || reservationData.vehicle;
-    const matchingVehicleIds = catalog
-        .filter((vehicle) => vehicleMatchesReservation(vehicle, requestedVehicleName))
-        .map((vehicle) => vehicle.id);
-
-    if (matchingVehicleIds.length === 0) {
-        return;
-    }
-
-    const reservations = (await listReservationRecords({ limit: 5000 }))
-        .filter((record) => !recordMatchesReservationId(record, reservationId));
-
-    const availability = buildAvailability({
-        fleetCards,
-        reservations,
-        schedule: {
-            startDate: reservationData.startDate,
-            endDate: reservationData.endDate,
-            pickupTime: reservationData.pickupTime,
-            dropoffTime: reservationData.dropoffTime
-        }
-    });
-
-    if (availability.status !== 'ok') {
-        const error = new Error('Choose a valid pickup and return window before payment.');
-        error.statusCode = 400;
-        throw error;
-    }
-
-    const blockedVehicle = availability.vehicles.find((vehicle) => (
-        matchingVehicleIds.includes(vehicle.id) && vehicle.available === false
-    ));
-
-    if (blockedVehicle) {
-        const error = new Error(`${blockedVehicle.title || 'This vehicle'} is not available for those dates. Choose another car or WhatsApp the team.`);
-        error.statusCode = 409;
-        throw error;
-    }
-}
-
 // Compatibility endpoint for creating a Stripe payment intent.
 app.post('/api/create-payment-intent', async (req, res) => {
     try {
@@ -830,31 +778,52 @@ app.post('/api/create-payment-intent', async (req, res) => {
 
         const reservationId = reservationData.reservationId || buildReservationId();
         reservationData.reservationId = reservationId;
+        let verifiedCheckout;
+        try {
+            verifiedCheckout = verifyCheckoutAmount({
+                reservationData,
+                amount,
+                currency
+            });
+            Object.assign(reservationData, verifiedCheckout.reservationData, { reservationId });
+        } catch (checkoutError) {
+            return res.status(checkoutError.statusCode || 409).json({
+                error: checkoutError.message
+            });
+        }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(customerData.email)) {
             return res.status(400).json({ error: 'The provided email is not valid' });
         }
 
+        let checkoutReservation;
         try {
-            await assertVehicleAvailableForCheckout(reservationData, reservationId);
-        } catch (availabilityError) {
-            return res.status(availabilityError.statusCode || 409).json({
-                error: availabilityError.message
+            checkoutReservation = await withCheckoutVehicleLock(reservationData, async () => {
+                const reservations = await listReservationRecords({ limit: 5000 });
+                assertCheckoutVehicleAvailable({
+                    reservations,
+                    reservationData,
+                    reservationId
+                });
+
+                return persistBackendReservation({
+                    reservationId,
+                    status: 'checkout_started',
+                    source: 'legacy_payment_intent_endpoint',
+                    customerData,
+                    reservationData,
+                    payment: {
+                        amount: verifiedCheckout.amountMinor,
+                        currency: verifiedCheckout.currency
+                    }
+                }, 'legacy checkout started', { critical: true });
+            });
+        } catch (checkoutError) {
+            return res.status(checkoutError.statusCode || 500).json({
+                error: checkoutError.message
             });
         }
-
-        const checkoutReservation = await persistBackendReservation({
-            reservationId,
-            status: 'checkout_started',
-            source: 'legacy_payment_intent_endpoint',
-            customerData,
-            reservationData,
-            payment: {
-                amount: Math.round(amount),
-                currency: (currency || 'aed').toLowerCase()
-            }
-        }, 'legacy checkout started', { critical: true });
         queueReservationMobileNotification(checkoutReservation, 'reservation_received');
 
         // Create or retrieve customer
@@ -908,8 +877,8 @@ app.post('/api/create-payment-intent', async (req, res) => {
 
         // Create the Stripe payment intent.
         const paymentIntentParams = {
-            amount: Math.round(amount),
-            currency: (currency || 'aed').toLowerCase(),
+            amount: verifiedCheckout.amountMinor,
+            currency: verifiedCheckout.currency,
             customer: customer.id,
             confirmation_method: 'manual',
             confirm: false,
@@ -934,7 +903,9 @@ app.post('/api/create-payment-intent', async (req, res) => {
             paymentIntentParams.payment_method = paymentMethodId;
         }
 
-        const paymentIntent = await stripe.paymentIntents.create(paymentIntentParams);
+        const paymentIntent = await stripe.paymentIntents.create(paymentIntentParams, {
+            idempotencyKey: buildCheckoutIdempotencyKey(reservationId)
+        });
 
         await persistBackendReservation({
             reservationId,

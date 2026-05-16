@@ -18,11 +18,11 @@ const {
     queueReservationMobileNotification
 } = require('../../../server/reservations/reservation-mobile-notifier');
 const {
-    buildAvailability,
-    buildVehicleCatalog,
-    loadFleetCards,
-    vehicleMatchesReservation
-} = require('../../../server/reservations/availability-core');
+    assertCheckoutVehicleAvailable,
+    buildCheckoutIdempotencyKey,
+    verifyCheckoutAmount,
+    withCheckoutVehicleLock
+} = require('../../../server/reservations/checkout-guard');
 
 // Verify that STRIPE_SECRET_KEY is configured
 if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('tu_clave')) {
@@ -33,6 +33,7 @@ if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('tu
 const stripe = process.env.STRIPE_SECRET_KEY ? require('stripe')(process.env.STRIPE_SECRET_KEY) : null;
 
 const router = express.Router();
+const reservationRateBuckets = new Map();
 
 // Map country names to 2-character ISO codes
 const countryNameToCode = {
@@ -261,60 +262,50 @@ function buildPaymentPersistence(paymentIntent = null, currency = 'aed') {
     };
 }
 
-function recordMatchesReservationId(record = {}, reservationId) {
-    const normalizedId = String(reservationId || '').trim();
-    if (!normalizedId) {
-        return false;
-    }
-
-    return [
-        record.reservationId,
-        record.reservationData?.reservationId,
-        record.rawRequest?.reservationId
-    ].some((value) => String(value || '').trim() === normalizedId);
+function getRequestIp(req = {}) {
+    const forwardedFor = String(req.headers?.['x-forwarded-for'] || '').split(',')[0].trim();
+    return forwardedFor ||
+        req.headers?.['cf-connecting-ip'] ||
+        req.ip ||
+        req.socket?.remoteAddress ||
+        'unknown';
 }
 
-async function assertVehicleAvailableForCheckout(reservationData = {}, reservationId) {
-    const fleetCards = loadFleetCards();
-    const catalog = buildVehicleCatalog(fleetCards);
-    const requestedVehicleName = reservationData.car || reservationData.vehicle;
-    const matchingVehicleIds = catalog
-        .filter((vehicle) => vehicleMatchesReservation(vehicle, requestedVehicleName))
-        .map((vehicle) => vehicle.id);
+function getRateLimitEmail(req = {}) {
+    const body = req.body || {};
+    return String(body.email || body.customerData?.email || '').trim().toLowerCase();
+}
 
-    if (matchingVehicleIds.length === 0) {
-        return;
-    }
+function createReservationRateLimit({ group, windowMs, max }) {
+    return (req, res, next) => {
+        const now = Date.now();
+        const ip = getRequestIp(req);
+        const email = getRateLimitEmail(req);
+        const key = `${group}:${ip}:${email || 'anonymous'}`;
 
-    const reservations = (await listReservationRecords({ limit: 5000 }))
-        .filter((record) => !recordMatchesReservationId(record, reservationId));
-
-    const availability = buildAvailability({
-        fleetCards,
-        reservations,
-        schedule: {
-            startDate: reservationData.startDate,
-            endDate: reservationData.endDate,
-            pickupTime: reservationData.pickupTime,
-            dropoffTime: reservationData.dropoffTime
+        for (const [bucketKey, bucket] of reservationRateBuckets.entries()) {
+            if (bucket.resetAt <= now) {
+                reservationRateBuckets.delete(bucketKey);
+            }
         }
-    });
 
-    if (availability.status !== 'ok') {
-        const error = new Error('Choose a valid pickup and return window before payment.');
-        error.statusCode = 400;
-        throw error;
-    }
+        const bucket = reservationRateBuckets.get(key) || {
+            count: 0,
+            resetAt: now + windowMs
+        };
 
-    const blockedVehicle = availability.vehicles.find((vehicle) => (
-        matchingVehicleIds.includes(vehicle.id) && vehicle.available === false
-    ));
+        bucket.count += 1;
+        reservationRateBuckets.set(key, bucket);
 
-    if (blockedVehicle) {
-        const error = new Error(`${blockedVehicle.title || 'This vehicle'} is not available for those dates. Choose another car or WhatsApp the team.`);
-        error.statusCode = 409;
-        throw error;
-    }
+        if (bucket.count > max) {
+            res.set('Retry-After', String(Math.ceil((bucket.resetAt - now) / 1000)));
+            return res.status(429).json({
+                error: 'Too many reservation attempts. Please wait a moment or WhatsApp the team.'
+            });
+        }
+
+        return next();
+    };
 }
 
 async function persistReservationUpdate(record, contextLabel, options = {}) {
@@ -619,7 +610,11 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
 }
 
 // POST /api/reserve - Create reservation
-router.post('/', async (req, res) => {
+router.post('/', createReservationRateLimit({
+    group: 'reserve',
+    windowMs: 10 * 60 * 1000,
+    max: 20
+}), async (req, res) => {
     console.log('[API] ========== NEW RESERVATION REQUEST ==========');
     console.log('[API] Timestamp:', new Date().toISOString());
     console.log('[API] Request summary:', summarizeHeaders(req.headers));
@@ -680,7 +675,24 @@ router.post('/', async (req, res) => {
         };
         const reservationId = data.reservationId || reservationData.reservationId || buildReservationId();
         reservationData.reservationId = reservationId;
-        enrichReservationPricing(reservationData, reservationCurrency);
+        let verifiedCheckout = null;
+        if (data.amount) {
+            try {
+                verifiedCheckout = verifyCheckoutAmount({
+                    reservationData,
+                    amount: data.amount,
+                    currency: reservationCurrency
+                });
+                Object.assign(reservationData, verifiedCheckout.reservationData, { reservationId });
+            } catch (checkoutError) {
+                console.warn('[API] Checkout pricing blocked:', checkoutError.message);
+                return res.status(checkoutError.statusCode || 409).json({
+                    error: checkoutError.message
+                });
+            }
+        } else {
+            enrichReservationPricing(reservationData, reservationCurrency);
+        }
 
         console.log('[API] Normalized reservation summary:', {
             customer: summarizeCustomerData(customerData),
@@ -696,31 +708,65 @@ router.post('/', async (req, res) => {
         });
 
         if (data.amount) {
-            try {
-                await assertVehicleAvailableForCheckout(reservationData, reservationId);
-            } catch (availabilityError) {
-                console.warn('[API] Checkout availability blocked:', availabilityError.message);
-                return res.status(availabilityError.statusCode || 409).json({
-                    error: availabilityError.message
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(customerData.email)) {
+                console.error('[API]  Invalid email:', customerData.email);
+                return res.status(400).json({
+                    error: 'Invalid email format'
+                });
+            }
+
+            if (!stripe) {
+                console.error('[API]  Stripe is not initialized');
+                return res.status(503).json({
+                    error: 'Secure payment is temporarily unavailable'
                 });
             }
         }
 
-        const persistedReservation = await persistReservationUpdate({
-            reservationId,
-            status: data.amount ? 'checkout_started' : 'lead_received',
-            source: 'website',
-            customerData,
-            reservationData,
-            payment: buildPaymentPersistence(null, reservationCurrency),
-            email: {
-                pendingNotification: {
-                    status: 'queued',
-                    queuedAt: new Date().toISOString()
+        let persistedReservation;
+        try {
+            const persistCheckoutReservation = async () => {
+                if (data.amount) {
+                    const reservations = await listReservationRecords({ limit: 5000 });
+                    assertCheckoutVehicleAvailable({
+                        reservations,
+                        reservationData,
+                        reservationId
+                    });
                 }
-            },
-            rawRequest: sanitizeReservationRequestForStorage(data)
-        }, 'reservation received', { critical: true });
+
+                return persistReservationUpdate({
+                    reservationId,
+                    status: data.amount ? 'checkout_started' : 'lead_received',
+                    source: 'website',
+                    customerData,
+                    reservationData,
+                    payment: data.amount
+                        ? {
+                            amount: verifiedCheckout.amountMinor,
+                            currency: verifiedCheckout.currency
+                        }
+                        : buildPaymentPersistence(null, reservationCurrency),
+                    email: {
+                        pendingNotification: {
+                            status: 'queued',
+                            queuedAt: new Date().toISOString()
+                        }
+                    },
+                    rawRequest: sanitizeReservationRequestForStorage(data)
+                }, 'reservation received', { critical: true });
+            };
+
+            persistedReservation = data.amount
+                ? await withCheckoutVehicleLock(reservationData, persistCheckoutReservation)
+                : await persistCheckoutReservation();
+        } catch (checkoutError) {
+            console.warn('[API] Checkout reservation blocked:', checkoutError.message);
+            return res.status(checkoutError.statusCode || 500).json({
+                error: checkoutError.message
+            });
+        }
 
         queueReservationMobileNotification(persistedReservation, 'reservation_received');
 
@@ -762,23 +808,6 @@ router.post('/', async (req, res) => {
         if (data.amount) {
             console.log('[API] Amount received:', data.amount);
             console.log('[API] Creating payment intent with Stripe...');
-            
-            // Validate email format
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(customerData.email)) {
-                console.error('[API]  Invalid email:', customerData.email);
-                return res.status(400).json({ 
-                    error: 'Invalid email format' 
-                });
-            }
-
-            // Verify Stripe is configured
-            if (!stripe) {
-                console.error('[API]  Stripe is not initialized');
-                return res.status(500).json({ 
-                    error: 'Secure payment is temporarily unavailable' 
-                });
-            }
 
             // Create or retrieve customer in Stripe
             console.log('[API] Looking up/creating Stripe customer...');
@@ -857,8 +886,8 @@ router.post('/', async (req, res) => {
             const paymentIntentStartTime = Date.now();
             try {
                 const paymentIntentData = {
-                    amount: Math.round(data.amount),
-                    currency: data.currency || 'aed',
+                    amount: verifiedCheckout.amountMinor,
+                    currency: verifiedCheckout.currency,
                     customer: customer.id,
                     confirmation_method: 'automatic',
                     confirm: false,
@@ -895,7 +924,9 @@ router.post('/', async (req, res) => {
                     description: paymentIntentData.description
                 });
                 
-                paymentIntent = await stripe.paymentIntents.create(paymentIntentData);
+                paymentIntent = await stripe.paymentIntents.create(paymentIntentData, {
+                    idempotencyKey: buildCheckoutIdempotencyKey(reservationId)
+                });
                 const paymentIntentDuration = Date.now() - paymentIntentStartTime;
                 console.log('[API]  Payment intent created:', {
                     id: paymentIntent.id,
@@ -990,7 +1021,11 @@ router.post('/', async (req, res) => {
 });
 
 // POST /api/reserve/lookup - Secure customer-facing reservation lookup
-router.post('/lookup', async (req, res) => {
+router.post('/lookup', createReservationRateLimit({
+    group: 'lookup',
+    windowMs: 5 * 60 * 1000,
+    max: 30
+}), async (req, res) => {
     try {
         const reservationId = normalizeLookupValue(req.body?.reservationId);
         const email = normalizeLookupEmail(req.body?.email);
@@ -1032,7 +1067,11 @@ router.post('/lookup', async (req, res) => {
 });
 
 // POST /api/reserve/confirm - Confirm payment and send emails
-router.post('/confirm', async (req, res) => {
+router.post('/confirm', createReservationRateLimit({
+    group: 'confirm',
+    windowMs: 10 * 60 * 1000,
+    max: 40
+}), async (req, res) => {
     console.log('[API CONFIRM] ========== RESERVATION CONFIRMATION ==========');
     console.log('[API CONFIRM] Timestamp:', new Date().toISOString());
     
@@ -1071,8 +1110,9 @@ router.post('/confirm', async (req, res) => {
         if (paymentIntent.status === 'succeeded') {
             console.log('[API CONFIRM]  Payment successful, sending emails...');
             
-            // Prepare reservation data (use provided data or payment metadata)
-            let finalReservationData = reservationData || {
+            // Use server-side data as the source of truth. Client payloads are only
+            // a last resort for non-authoritative contact fields after payment.
+            const metadataReservationData = {
                 car: paymentIntent.metadata.car,
                 days: parseMoneyValue(paymentIntent.metadata.days) || 1,
                 startDate: paymentIntent.metadata.startDate,
@@ -1091,31 +1131,78 @@ router.post('/confirm', async (req, res) => {
                 pickupLocation: paymentIntent.metadata.pickupLocation,
                 currency: paymentIntent.currency || 'aed',
             };
-            const reservationId = finalReservationData.reservationId || paymentIntent.metadata.reservationId || existingReservation?.reservationId || buildReservationId();
+
+            let finalReservationData = {
+                ...metadataReservationData,
+                ...(existingReservation?.reservationData || {})
+            };
+
+            if (!finalReservationData.pickupLocation && !existingReservation?.reservationData && reservationData?.pickupLocation) {
+                finalReservationData.pickupLocation = reservationData.pickupLocation;
+            }
+
+            const reservationId = existingReservation?.reservationId || finalReservationData.reservationId || paymentIntent.metadata.reservationId || buildReservationId();
             finalReservationData.reservationId = reservationId;
-            enrichReservationPricing(finalReservationData, finalReservationData.currency || paymentIntent.currency || 'aed');
-            
-            // Prepare customer data (use provided data or payment metadata)
-            let finalCustomerData = customerData;
-            if (!finalCustomerData) {
-                finalCustomerData = {
-                    name: paymentIntent.metadata.customerName,
-                    email: paymentIntent.metadata.customerEmail,
-                };
-                
-                // Try to fetch full customer data from Stripe
-                try {
-                    if (paymentIntent.customer) {
-                        const customer = await stripe.customers.retrieve(paymentIntent.customer);
-                        finalCustomerData.phone = customer.phone || '';
-                        finalCustomerData.address = customer.address?.line1 || '';
-                        finalCustomerData.city = customer.address?.city || '';
-                        finalCustomerData.country = customer.address?.country || '';
-                        finalCustomerData.dni = customer.metadata?.dni || '';
+
+            try {
+                const verifiedCheckout = verifyCheckoutAmount({
+                    reservationData: finalReservationData,
+                    amount: paymentIntent.amount,
+                    currency: paymentIntent.currency || finalReservationData.currency || 'aed'
+                });
+                Object.assign(finalReservationData, verifiedCheckout.reservationData, { reservationId });
+            } catch (checkoutError) {
+                console.error('[API CONFIRM] Payment amount/catalog mismatch:', checkoutError.message);
+                await persistReservationUpdate({
+                    reservationId,
+                    paymentIntentId,
+                    status: 'payment_amount_mismatch',
+                    reservationData: finalReservationData,
+                    payment: buildPaymentPersistence(paymentIntent, paymentIntent.currency || finalReservationData.currency),
+                    admin: {
+                        securityReview: {
+                            reason: checkoutError.message,
+                            detectedAt: new Date().toISOString()
+                        }
                     }
-                } catch (customerError) {
-                    console.warn('[API CONFIRM]  Error fetching customer data:', customerError);
+                }, 'payment amount mismatch', { critical: true });
+                return res.status(checkoutError.statusCode || 409).json({
+                    error: 'Payment received but reservation needs manual review. WhatsApp the team with your payment reference.'
+                });
+            }
+            
+            // Prepare customer data from the stored checkout and Stripe customer.
+            let finalCustomerData = {
+                name: paymentIntent.metadata.customerName,
+                email: paymentIntent.metadata.customerEmail,
+            };
+
+            try {
+                if (paymentIntent.customer) {
+                    const customer = await stripe.customers.retrieve(paymentIntent.customer);
+                    finalCustomerData = {
+                        ...finalCustomerData,
+                        phone: customer.phone || '',
+                        address: customer.address?.line1 || '',
+                        city: customer.address?.city || '',
+                        country: customer.address?.country || '',
+                        dni: customer.metadata?.dni || '',
+                    };
                 }
+            } catch (customerError) {
+                console.warn('[API CONFIRM]  Error fetching customer data:', customerError);
+            }
+
+            finalCustomerData = {
+                ...finalCustomerData,
+                ...(existingReservation?.customerData || {})
+            };
+
+            if (!existingReservation?.customerData && customerData) {
+                finalCustomerData = {
+                    ...customerData,
+                    ...finalCustomerData
+                };
             }
             
             const stripeCustomerId = typeof paymentIntent.customer === 'string'
