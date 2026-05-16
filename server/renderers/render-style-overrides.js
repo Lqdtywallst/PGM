@@ -1,6 +1,6 @@
 const path = require('path');
 
-const STYLE_OVERRIDES_HREF = '/css/admin-style-overrides.css?v=20260510-brand-tokens1';
+const STYLE_OVERRIDES_HREF = '/css/admin-style-overrides.css?v=20260516-nav-dropdown-solid1';
 const STYLE_OVERRIDES_RELATIVE_PATH = path.join('css', 'admin-style-overrides.css');
 
 const FONT_STACKS = new Set([
@@ -382,6 +382,48 @@ body {
 .vehicle-booking,
 .vehicle-hero__media {
     border-radius: var(--editor-card-radius);
+}
+
+/* Navigation readability guardrail: brand/type card dropdowns must stay opaque on every page background. */
+.lab-nav__panel--brands,
+.lab-nav__panel--types,
+.vehicle-page .lab-nav__panel--brands,
+.vehicle-page .lab-nav__panel--types,
+.reserve-page .lab-nav__panel--brands,
+.reserve-page .lab-nav__panel--types,
+.contact-page .lab-nav__panel--brands,
+.contact-page .lab-nav__panel--types,
+.reservation-lookup-page .lab-nav__panel--brands,
+.reservation-lookup-page .lab-nav__panel--types {
+    border-color: rgba(241, 226, 189, 0.22) !important;
+    background:
+        linear-gradient(180deg, #171717 0%, #0d0e10 100%) !important;
+    box-shadow:
+        0 26px 64px rgba(0, 0, 0, 0.34),
+        0 12px 26px rgba(23, 18, 12, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.lab-nav__panel--brands .lab-nav__card,
+.lab-nav__panel--types .lab-nav__card,
+.vehicle-page .lab-nav__panel--brands .lab-nav__card,
+.vehicle-page .lab-nav__panel--types .lab-nav__card,
+.reserve-page .lab-nav__panel--brands .lab-nav__card,
+.reserve-page .lab-nav__panel--types .lab-nav__card,
+.contact-page .lab-nav__panel--brands .lab-nav__card,
+.contact-page .lab-nav__panel--types .lab-nav__card,
+.reservation-lookup-page .lab-nav__panel--brands .lab-nav__card,
+.reservation-lookup-page .lab-nav__panel--types .lab-nav__card {
+    border: 1px solid rgba(241, 226, 189, 0.12) !important;
+    background: linear-gradient(180deg, rgba(34, 33, 31, 0.98), rgba(18, 18, 18, 0.98)) !important;
+    color: #f8f1e4 !important;
+}
+
+.lab-nav__panel--brands .lab-nav__card-copy span,
+.lab-nav__panel--types .lab-nav__card-copy span {
+    color: rgba(248, 241, 228, 0.7) !important;
 }
 
 body.vehicle-page--mother-base .vehicle-main--brand-landing .vehicle-hero {

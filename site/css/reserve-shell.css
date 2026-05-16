@@ -786,6 +786,25 @@ textarea {
     transform: translateY(-1px);
 }
 
+.lab-nav__panel--brands,
+.lab-nav__panel--types {
+    border-color: rgba(241, 226, 189, 0.2);
+    background:
+        linear-gradient(180deg, #171717 0%, #0d0e10 100%);
+}
+
+.lab-nav__panel--brands .lab-nav__card,
+.lab-nav__panel--types .lab-nav__card {
+    border: 1px solid rgba(241, 226, 189, 0.1);
+    background: linear-gradient(180deg, rgba(34, 33, 31, 0.98), rgba(18, 18, 18, 0.98));
+    color: #f8f1e4;
+}
+
+.lab-nav__panel--brands .lab-nav__card-copy span,
+.lab-nav__panel--types .lab-nav__card-copy span {
+    color: rgba(248, 241, 228, 0.7);
+}
+
 .lab-nav__card-media {
     display: inline-flex;
     align-items: center;
