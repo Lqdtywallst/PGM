@@ -511,15 +511,19 @@
 }
 
 .about-story__media img {
-    object-position: 42% center;
+    object-position: 50% 54%;
 }
 
 .about-operations__media img {
-    object-position: 48% center;
+    object-position: 50% 42%;
+}
+
+.about-standards__media img {
+    object-position: 50% 58%;
 }
 
 .about-cta__media img {
-    object-position: center center;
+    object-position: 54% 42%;
 }
 
 .about-steps {

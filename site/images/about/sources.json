@@ -1,0 +1,31 @@
+{
+  "license": "Pexels License",
+  "licenseUrl": "https://www.pexels.com/license/",
+  "images": [
+    {
+      "file": "handover-ready.jpg",
+      "source": "https://www.pexels.com/photo/professional-chauffeur-standing-by-black-suv-36377051/",
+      "usedFor": "Top proof block: prepared vehicle and handover readiness"
+    },
+    {
+      "file": "access-luggage-plan.jpg",
+      "source": "https://www.pexels.com/photo/person-with-luggage-beside-open-car-door-33232900/",
+      "usedFor": "Before handover: luggage, access and arrival planning"
+    },
+    {
+      "file": "key-handover-check.jpg",
+      "source": "https://www.pexels.com/photo/a-person-holding-a-car-key-8033684/",
+      "usedFor": "How we work: key handover and return path coordination"
+    },
+    {
+      "file": "cabin-readiness.jpg",
+      "source": "https://www.pexels.com/photo/luxury-car-interior-13555525/",
+      "usedFor": "Standards: cabin and presentation readiness"
+    },
+    {
+      "file": "concierge-ready.jpg",
+      "source": "https://www.pexels.com/photo/businessman-in-black-suit-posed-by-luxury-car-31906962/",
+      "usedFor": "CTA: concierge-led rental coordination"
+    }
+  ]
+}
