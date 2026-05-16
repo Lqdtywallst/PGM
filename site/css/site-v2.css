@@ -1,4 +1,4 @@
-﻿@import url("./brand-tokens.css");
+@import url("./brand-tokens.css");
 @import url("./dp-components.css");
 
 :root {
@@ -1657,8 +1657,9 @@ select {
 
 .lab-nav__panel--brands .lab-nav__card,
 .lab-nav__panel--types .lab-nav__card {
-    border-color: rgba(198, 220, 243, 0.1);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.028));
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
 }
 
 .lab-nav__item:focus-within .lab-nav__panel,

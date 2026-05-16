@@ -1,6 +1,6 @@
 const path = require('path');
 
-const STYLE_OVERRIDES_HREF = '/css/admin-style-overrides.css?v=20260516-nav-opacity-fix1';
+const STYLE_OVERRIDES_HREF = '/css/admin-style-overrides.css?v=20260516-nav-opacity-fix2';
 const STYLE_OVERRIDES_RELATIVE_PATH = path.join('css', 'admin-style-overrides.css');
 
 const FONT_STACKS = new Set([
@@ -407,8 +407,9 @@ body {
 .contact-page .lab-nav__panel--types .lab-nav__card,
 .reservation-lookup-page .lab-nav__panel--brands .lab-nav__card,
 .reservation-lookup-page .lab-nav__panel--types .lab-nav__card {
-    border-color: rgba(198, 220, 243, 0.1) !important;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.028)) !important;
+    border-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
 }
 
 body.vehicle-page--mother-base .vehicle-main--brand-landing .vehicle-hero {
