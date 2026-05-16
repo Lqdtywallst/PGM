@@ -32,6 +32,7 @@ function reservation(overrides = {}) {
         status: overrides.status || 'confirmed',
         createdAt: overrides.createdAt,
         updatedAt: overrides.updatedAt,
+        payment: overrides.payment,
         reservationData: {
             car: overrides.car || 'Mercedes-Benz G63 AMG',
             startDate: overrides.startDate || '2026-11-10',
@@ -102,6 +103,14 @@ test('fresh pending requests hold availability only briefly', () => {
                 reservationId: 'res_payment_intent_created',
                 status: 'payment_intent_created',
                 createdAt: '2026-11-09T09:58:00.000Z'
+            }),
+            reservation({
+                reservationId: 'res_detached_card',
+                status: 'payment_intent_created',
+                createdAt: '2026-11-09T09:58:00.000Z',
+                payment: {
+                    stripeStatus: 'requires_payment_method'
+                }
             })
         ],
         schedule: requestedSchedule,

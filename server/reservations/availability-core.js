@@ -173,10 +173,21 @@ function isTemporaryHoldStatus(status) {
     return TEMPORARY_HOLD_STATUS_PATTERNS.some((pattern) => pattern.test(status));
 }
 
+function hasDetachedPaymentMethod(record = {}) {
+    const status = cleanText(record.status || record.reservationData?.status);
+    const stripeStatus = cleanText(record.payment?.stripeStatus || record.rawRequest?.stripeStatus);
+
+    return /^payment_intent_created$/i.test(status) && /^requires_payment_method$/i.test(stripeStatus);
+}
+
 function isBlockingReservation(record = {}, options = {}) {
     const status = cleanText(record.status || record.reservationData?.status || 'received');
 
     if (NON_BLOCKING_STATUS_PATTERNS.some((pattern) => pattern.test(status))) {
+        return false;
+    }
+
+    if (hasDetachedPaymentMethod(record)) {
         return false;
     }
 

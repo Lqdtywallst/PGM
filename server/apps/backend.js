@@ -1066,6 +1066,54 @@ async function sendContactEmail(contactData) {
     }
 }
 
+async function saveContactLead(contactData, emailStatus = {}) {
+    const reservationId = buildReservationId();
+    const now = new Date().toISOString();
+    const subjectLabels = {
+        reservation: 'Reservation Inquiry',
+        fleet: 'Fleet Information',
+        price: 'Pricing Inquiry',
+        event: 'Corporate Events',
+        other: 'Other'
+    };
+    const subjectLabel = subjectLabels[contactData.subject] || contactData.subject || 'Contact request';
+
+    return persistBackendReservation({
+        reservationId,
+        status: 'lead_received',
+        source: 'contact_form',
+        customerData: {
+            name: contactData.name,
+            email: contactData.email,
+            phone: contactData.phone || ''
+        },
+        reservationData: {
+            reservationId,
+            car: `Contact request: ${subjectLabel}`,
+            service: contactData.subject,
+            pickupLocation: 'Contact form',
+            notes: contactData.message,
+            currency: 'AED'
+        },
+        payment: {
+            currency: 'aed'
+        },
+        email: {
+            contact: {
+                status: emailStatus.status || 'not_configured',
+                attemptedAt: now,
+                error: emailStatus.error || null
+            }
+        },
+        rawRequest: {
+            type: 'contact_form',
+            subject: contactData.subject,
+            message: contactData.message,
+            submittedAt: now
+        }
+    }, 'contact lead captured', { critical: true });
+}
+
 // Contact form endpoint
 app.post('/api/contact', async (req, res) => {
     try {
@@ -1099,6 +1147,24 @@ app.post('/api/contact', async (req, res) => {
             });
         } catch (emailError) {
             console.error('Error sending email:', emailError);
+            if (!isEmailConfigured()) {
+                try {
+                    const savedLead = await saveContactLead(contactData, {
+                        status: 'not_configured',
+                        error: emailError.message
+                    });
+
+                    return res.json({
+                        success: true,
+                        mode: 'crm-lead',
+                        reservationId: savedLead.reservationId,
+                        message: 'Request received. The team will follow up directly.'
+                    });
+                } catch (leadError) {
+                    console.error('Error saving contact lead:', leadError);
+                }
+            }
+
             const statusCode = isEmailConfigured() ? 502 : 503;
             res.status(statusCode).json({ 
                 error: isEmailConfigured()

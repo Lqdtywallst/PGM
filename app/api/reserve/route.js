@@ -1170,6 +1170,33 @@ router.post('/confirm', createReservationRateLimit({
                     error: 'Payment received but reservation needs manual review. WhatsApp the team with your payment reference.'
                 });
             }
+
+            try {
+                const reservations = await listReservationRecords({ limit: 5000 });
+                assertCheckoutVehicleAvailable({
+                    reservations,
+                    reservationData: finalReservationData,
+                    reservationId
+                });
+            } catch (availabilityError) {
+                console.error('[API CONFIRM] Payment availability conflict:', availabilityError.message);
+                await persistReservationUpdate({
+                    reservationId,
+                    paymentIntentId,
+                    status: 'payment_availability_conflict',
+                    reservationData: finalReservationData,
+                    payment: buildPaymentPersistence(paymentIntent, paymentIntent.currency || finalReservationData.currency),
+                    admin: {
+                        securityReview: {
+                            reason: availabilityError.message,
+                            detectedAt: new Date().toISOString()
+                        }
+                    }
+                }, 'payment availability conflict', { critical: true });
+                return res.status(availabilityError.statusCode || 409).json({
+                    error: 'Payment received but this vehicle now needs manual review. WhatsApp the team with your payment reference.'
+                });
+            }
             
             // Prepare customer data from the stored checkout and Stripe customer.
             let finalCustomerData = {

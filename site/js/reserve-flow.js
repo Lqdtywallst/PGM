@@ -1184,6 +1184,7 @@
                 // Create the card element
                 console.log('[STRIPE ELEMENTS] Creating card element...');
                 cardElement = elements.create('card', {
+                    hidePostalCode: true,
                     style: {
                         base: {
                             fontSize: '16px',

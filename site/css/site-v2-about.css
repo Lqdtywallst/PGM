@@ -324,6 +324,14 @@
     padding-bottom: clamp(1.35rem, 2.6vw, 2.2rem);
 }
 
+.about-proof-strip__intro {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(22rem, 1.1fr);
+    gap: clamp(1rem, 2vw, 1.6rem);
+    align-items: stretch;
+    margin-bottom: clamp(1rem, 1.8vw, 1.35rem);
+}
+
 .about-proof-strip__head,
 .about-section-head {
     display: grid;
@@ -487,9 +495,30 @@
     object-fit: cover;
 }
 
+.about-proof-strip__media {
+    min-height: clamp(19rem, 31vw, 27rem);
+}
+
+.about-proof-strip__media img {
+    min-height: 100%;
+    object-position: center center;
+}
+
 .about-story__media img,
 .about-operations__media img,
 .about-standards__media img {
+    object-position: center center;
+}
+
+.about-story__media img {
+    object-position: 42% center;
+}
+
+.about-operations__media img {
+    object-position: 48% center;
+}
+
+.about-cta__media img {
     object-position: center center;
 }
 
@@ -593,6 +622,20 @@
         padding-bottom: 0;
     }
 
+    .about-proof-strip__intro .about-proof-strip__head {
+        grid-template-columns: 1fr;
+        align-content: center;
+        margin-bottom: 0;
+    }
+
+    .about-proof-strip__intro .about-proof-strip__head .about-kicker {
+        grid-column: auto;
+    }
+
+    .about-proof-strip__intro .about-proof-strip__head p {
+        padding-top: 0;
+    }
+
     .about-proof-strip__grid {
         gap: clamp(0.9rem, 1.45vw, 1.25rem);
     }
@@ -613,6 +656,7 @@
     }
 
     .about-hero__shell,
+    .about-proof-strip__intro,
     .about-story__layout,
     .about-operations__layout,
     .about-standards__layout,
@@ -736,6 +780,10 @@
 
     .about-proof-strip--entry {
         padding-top: calc(var(--lab-header-offset) + 1rem);
+    }
+
+    .about-proof-strip__intro {
+        margin-bottom: 1rem;
     }
 
     .about-proof-strip__grid,
