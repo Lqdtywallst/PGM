@@ -251,8 +251,7 @@
     },
     "AdminPage": {
       "routes": [
-        "/admin/reservations.html",
-        "/admin/content.html"
+        "/admin/reservations.html"
       ],
       "slots": [
         "header",

@@ -136,6 +136,20 @@ test.describe('Private admin reservations CRM', () => {
         await page.click('button[type="submit"]');
 
         await expect(page).toHaveURL(/\/admin\/reservations\.html$/);
+        await expect(page.locator('a[href="/admin/content.html"]')).toHaveCount(0);
+        await expect(page.locator('a[href="/admin/visual.html"]')).toHaveCount(0);
+
+        for (const removedEditorPath of [
+            '/admin/content.html',
+            '/admin/visual.html',
+            '/admin/preview/page?path=%2F',
+            '/api/admin/content',
+            '/api/admin/visual-editor'
+        ]) {
+            const removedEditorResponse = await page.request.get(`${adminBaseUrl}${removedEditorPath}`);
+            expect(removedEditorResponse.status(), removedEditorPath).toBe(404);
+        }
+
         await expect(page.locator('#operationsPanel')).toContainText('CRM readiness');
         await expect(page.locator('#operationsPanel')).toContainText('Test CRM');
         await expect(page.locator('#operationsPanel')).toContainText('Local fallback');

@@ -252,8 +252,7 @@
         "private data remains behind admin auth"
       ],
       "migrationOrder": [
-        "/admin/reservations.html",
-        "/admin/content.html"
+        "/admin/reservations.html"
       ]
     }
   },

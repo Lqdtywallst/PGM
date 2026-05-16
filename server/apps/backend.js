@@ -48,37 +48,8 @@ const {
     renderAdminReservationsPage
 } = require('../admin/admin-pages');
 const {
-    renderAdminContentEditorPage
-} = require('../admin/admin-content-page');
-const {
-    renderAdminVisualEditorPage
-} = require('../admin/admin-visual-editor-page');
-const {
     createAdminReservationsRouter
 } = require('../admin/admin-reservations');
-const {
-    runContentConsistencyAudit
-} = require('../admin/content-consistency-audit');
-const {
-    readEditorState,
-    saveHomeEditorState,
-    saveFleetCards,
-    saveGlobalHeaderContent,
-    readAppearanceEditorState,
-    saveAppearanceEditorState,
-    saveStyleEditorState,
-    readVisualEditorState,
-    saveVisualOverrideRule,
-    deleteVisualOverrideRule,
-    saveServicesContent,
-    saveLocationsContent,
-    listEditablePages,
-    readEditablePage,
-    saveEditablePage
-} = require('../admin/content-editor');
-const {
-    VISUAL_OVERRIDES_HREF
-} = require('../renderers/render-visual-overrides');
 const {
     fetchGoogleReviews,
     getGoogleReviewsConfig,
@@ -291,27 +262,6 @@ function setAdminNoIndexHeaders(res) {
     res.setHeader('X-Robots-Tag', 'noindex, nofollow');
 }
 
-function injectAdminPreviewAssets(html) {
-    let nextHtml = String(html || '');
-    const newline = nextHtml.includes('\r\n') ? '\r\n' : '\n';
-
-    if (!/<base\b/i.test(nextHtml) && /<head[^>]*>/i.test(nextHtml)) {
-        nextHtml = nextHtml.replace(/(<head[^>]*>)/i, `$1${newline}    <base href="/">`);
-    }
-
-    if (!/admin-visual-overrides\.css/i.test(nextHtml)) {
-        const link = `    <link rel="stylesheet" href="${VISUAL_OVERRIDES_HREF}">`;
-
-        if (/<\/head>/i.test(nextHtml)) {
-            nextHtml = nextHtml.replace(/<\/head>/i, `${link}${newline}</head>`);
-        } else {
-            nextHtml += `${newline}${link}`;
-        }
-    }
-
-    return nextHtml;
-}
-
 function safeAdminRedirectPath(value) {
     const candidate = String(value || '').trim();
 
@@ -319,7 +269,7 @@ function safeAdminRedirectPath(value) {
         return '/admin/reservations.html';
     }
 
-    if (/^\/admin\/(?:reservations|content|visual)\.html(?:[?#].*)?$/i.test(candidate)) {
+    if (/^\/admin\/reservations\.html(?:[?#].*)?$/i.test(candidate)) {
         return candidate;
     }
 
@@ -495,217 +445,6 @@ app.get('/admin/reservations', requireAdminSession({ redirectToLogin: true }), (
 app.get('/admin/reservations.html', requireAdminSession({ redirectToLogin: true }), (req, res) => {
     setAdminNoIndexHeaders(res);
     res.type('html').send(renderAdminReservationsPage());
-});
-
-app.get('/admin/content.html', requireAdminSession({ redirectToLogin: true }), (req, res) => {
-    setAdminNoIndexHeaders(res);
-    res.type('html').send(renderAdminContentEditorPage());
-});
-
-app.get('/admin/visual.html', requireAdminSession({ redirectToLogin: true }), (req, res) => {
-    setAdminNoIndexHeaders(res);
-    res.type('html').send(renderAdminVisualEditorPage());
-});
-
-app.get('/admin/preview/page', requireAdminSession({ redirectToLogin: true }), (req, res) => {
-    setAdminNoIndexHeaders(res);
-
-    try {
-        const page = readEditablePage(req.query.path || '/');
-        res.type('html').send(injectAdminPreviewAssets(page.source));
-    } catch (error) {
-        console.error('[ADMIN VISUAL] Error loading preview page:', error.message);
-        res.status(400).type('html').send('<!doctype html><title>Preview unavailable</title><p>Could not load this page preview.</p>');
-    }
-});
-
-app.get('/api/admin/content', requireAdminSession(), (req, res) => {
-    setAdminNoIndexHeaders(res);
-
-    try {
-        res.json(readEditorState());
-    } catch (error) {
-        console.error('[ADMIN CONTENT] Error loading editor state:', error.message);
-        res.status(500).json({ error: 'Could not load the current editable content.' });
-    }
-});
-
-app.get('/api/admin/visual-editor', requireAdminSession(), (req, res) => {
-    setAdminNoIndexHeaders(res);
-
-    try {
-        res.json({
-            ok: true,
-            pages: listEditablePages(),
-            visual: readVisualEditorState()
-        });
-    } catch (error) {
-        console.error('[ADMIN VISUAL] Error loading visual editor state:', error.message);
-        res.status(500).json({ error: 'Could not load the visual editor.' });
-    }
-});
-
-app.put('/api/admin/visual-editor/rule', requireAdminSession(), (req, res) => {
-    setAdminNoIndexHeaders(res);
-
-    try {
-        const visual = saveVisualOverrideRule(req.body || {});
-        const rule = visual.rules.find((candidate) => candidate.id === req.body?.id) ||
-            visual.rules.find((candidate) => (
-                candidate.publicPath === req.body?.publicPath &&
-                candidate.selector === req.body?.selector &&
-                (candidate.scopeSelector || '') === (req.body?.scopeSelector || '')
-            ));
-
-        res.json({ ok: true, visual, rule });
-    } catch (error) {
-        console.error('[ADMIN VISUAL] Error saving visual rule:', error.message);
-        res.status(400).json({ error: error.message || 'Could not save the visual rule.' });
-    }
-});
-
-app.delete('/api/admin/visual-editor/rule/:id', requireAdminSession(), (req, res) => {
-    setAdminNoIndexHeaders(res);
-
-    try {
-        const visual = deleteVisualOverrideRule(req.params.id);
-        res.json({ ok: true, visual });
-    } catch (error) {
-        console.error('[ADMIN VISUAL] Error deleting visual rule:', error.message);
-        res.status(400).json({ error: error.message || 'Could not delete the visual rule.' });
-    }
-});
-
-app.put('/api/admin/content/home', requireAdminSession(), (req, res) => {
-    setAdminNoIndexHeaders(res);
-
-    try {
-        const home = saveHomeEditorState(req.body || {});
-        res.json({ ok: true, home });
-    } catch (error) {
-        console.error('[ADMIN CONTENT] Error saving home hero:', error.message);
-        res.status(400).json({ error: error.message || 'Could not save the home hero.' });
-    }
-});
-
-app.put('/api/admin/content/fleet', requireAdminSession(), (req, res) => {
-    setAdminNoIndexHeaders(res);
-
-    try {
-        const fleet = saveFleetCards(req.body?.cards || []);
-        res.json({ ok: true, fleet });
-    } catch (error) {
-        console.error('[ADMIN CONTENT] Error saving fleet cards:', error.message);
-        res.status(400).json({ error: error.message || 'Could not save the fleet cards.' });
-    }
-});
-
-app.put('/api/admin/content/header', requireAdminSession(), (req, res) => {
-    setAdminNoIndexHeaders(res);
-
-    try {
-        const header = saveGlobalHeaderContent(req.body || {});
-        res.json({ ok: true, header });
-    } catch (error) {
-        console.error('[ADMIN CONTENT] Error saving global header:', error.message);
-        res.status(400).json({ error: error.message || 'Could not save the global header.' });
-    }
-});
-
-app.get('/api/admin/content/appearance/page', requireAdminSession(), (req, res) => {
-    setAdminNoIndexHeaders(res);
-
-    try {
-        const appearance = readAppearanceEditorState(req.query.path || '/');
-        res.json({ ok: true, appearance });
-    } catch (error) {
-        console.error('[ADMIN CONTENT] Error loading browser tab appearance:', error.message);
-        res.status(400).json({ error: error.message || 'Could not load the browser tab appearance.' });
-    }
-});
-
-app.put('/api/admin/content/appearance', requireAdminSession(), (req, res) => {
-    setAdminNoIndexHeaders(res);
-
-    try {
-        const appearance = saveAppearanceEditorState(req.body || {});
-        res.json({ ok: true, appearance });
-    } catch (error) {
-        console.error('[ADMIN CONTENT] Error saving browser tab appearance:', error.message);
-        res.status(400).json({ error: error.message || 'Could not save the browser tab appearance.' });
-    }
-});
-
-app.put('/api/admin/content/style', requireAdminSession(), (req, res) => {
-    setAdminNoIndexHeaders(res);
-
-    try {
-        const style = saveStyleEditorState(req.body || {});
-        res.json({ ok: true, style });
-    } catch (error) {
-        console.error('[ADMIN CONTENT] Error saving style editor settings:', error.message);
-        res.status(400).json({ error: error.message || 'Could not save the style editor settings.' });
-    }
-});
-
-app.put('/api/admin/content/services', requireAdminSession(), (req, res) => {
-    setAdminNoIndexHeaders(res);
-
-    try {
-        const services = saveServicesContent(req.body || {});
-        res.json({ ok: true, services });
-    } catch (error) {
-        console.error('[ADMIN CONTENT] Error saving services content:', error.message);
-        res.status(400).json({ error: error.message || 'Could not save the services content.' });
-    }
-});
-
-app.put('/api/admin/content/locations', requireAdminSession(), (req, res) => {
-    setAdminNoIndexHeaders(res);
-
-    try {
-        const locations = saveLocationsContent(req.body || {});
-        res.json({ ok: true, locations });
-    } catch (error) {
-        console.error('[ADMIN CONTENT] Error saving locations content:', error.message);
-        res.status(400).json({ error: error.message || 'Could not save the locations content.' });
-    }
-});
-
-app.get('/api/admin/content/audit', requireAdminSession(), (req, res) => {
-    setAdminNoIndexHeaders(res);
-
-    try {
-        const audit = runContentConsistencyAudit();
-        res.json({ ok: true, audit });
-    } catch (error) {
-        console.error('[ADMIN CONTENT] Error running content consistency audit:', error.message);
-        res.status(500).json({ error: error.message || 'Could not run the content consistency audit.' });
-    }
-});
-
-app.get('/api/admin/content/page', requireAdminSession(), (req, res) => {
-    setAdminNoIndexHeaders(res);
-
-    try {
-        const page = readEditablePage(req.query.path || '/');
-        res.json({ ok: true, page });
-    } catch (error) {
-        console.error('[ADMIN CONTENT] Error loading full page source:', error.message);
-        res.status(400).json({ error: error.message || 'Could not load that page source.' });
-    }
-});
-
-app.put('/api/admin/content/page', requireAdminSession(), (req, res) => {
-    setAdminNoIndexHeaders(res);
-
-    try {
-        const page = saveEditablePage(req.body?.path, req.body?.source);
-        res.json({ ok: true, page });
-    } catch (error) {
-        console.error('[ADMIN CONTENT] Error saving full page source:', error.message);
-        res.status(400).json({ error: error.message || 'Could not save that page source.' });
-    }
 });
 
 app.use('/api/admin', requireAdminSession(), createAdminReservationsRouter());

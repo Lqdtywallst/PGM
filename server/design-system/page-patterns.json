@@ -169,7 +169,6 @@
     "/wedding-event-car-rental-dubai.html": "DetailPage",
     "/business-car-rental-dubai.html": "DetailPage",
     "/monthly-luxury-car-rental-dubai.html": "DetailPage",
-    "/admin/reservations.html": "AdminPage",
-    "/admin/content.html": "AdminPage"
+    "/admin/reservations.html": "AdminPage"
   }
 }

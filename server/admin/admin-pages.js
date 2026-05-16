@@ -201,9 +201,7 @@ function renderAdminLoginPage() {
             try {
                 var url = new URL(nextPath, window.location.origin);
                 var isSameOrigin = url.origin === window.location.origin;
-                var isAllowedAdminPage = url.pathname === '/admin/reservations.html' ||
-                    url.pathname === '/admin/content.html' ||
-                    url.pathname === '/admin/visual.html';
+                var isAllowedAdminPage = url.pathname === '/admin/reservations.html';
 
                 if (isSameOrigin && isAllowedAdminPage) {
                     return url.pathname + url.search + url.hash;
@@ -743,8 +741,6 @@ function renderAdminReservationsPage() {
         <div class="topbar-actions">
             <span class="environment-chip">${environmentLabel}</span>
             <a class="topbar-link" href="/admin/reservations.html">Reservations</a>
-            <a class="topbar-link" href="/admin/content.html">Content editor</a>
-            <a class="topbar-link" href="/admin/visual.html">Visual editor</a>
             <button class="logout" id="logoutButton" type="button">Logout</button>
         </div>
     </header>
@@ -755,7 +751,6 @@ function renderAdminReservationsPage() {
                 <p>Track every booking from checkout to confirmed handover, with quick contact actions and private admin notes.</p>
             </div>
             <div class="hero-actions">
-                <a class="button" href="/admin/content.html">Open content editor</a>
                 <button class="button primary" id="exportCsvButton" type="button">Export CSV</button>
             </div>
         </section>
