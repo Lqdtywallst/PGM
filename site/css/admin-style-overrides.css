@@ -226,9 +226,6 @@ body {
     border-radius: var(--editor-card-radius);
 }
 
-/* Navigation readability guardrail: brand/type card dropdowns must stay opaque on every page background. */
-.lab-nav__panel--brands,
-.lab-nav__panel--types,
 .vehicle-page .lab-nav__panel--brands,
 .vehicle-page .lab-nav__panel--types,
 .reserve-page .lab-nav__panel--brands,
@@ -237,19 +234,13 @@ body {
 .contact-page .lab-nav__panel--types,
 .reservation-lookup-page .lab-nav__panel--brands,
 .reservation-lookup-page .lab-nav__panel--types {
-    border-color: rgba(241, 226, 189, 0.22) !important;
     background:
-        linear-gradient(180deg, #171717 0%, #0d0e10 100%) !important;
-    box-shadow:
-        0 26px 64px rgba(0, 0, 0, 0.34),
-        0 12px 26px rgba(23, 18, 12, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+        linear-gradient(180deg, rgba(18, 29, 44, 0.92) 0%, rgba(8, 15, 25, 0.96) 100%),
+        radial-gradient(circle at 18% -10%, var(--lab-cool-glass-top, rgba(245, 250, 255, 0.24)), rgba(255, 255, 255, 0) 34%),
+        radial-gradient(circle at 100% 12%, var(--lab-cool-glass-mid, rgba(165, 190, 220, 0.14)), rgba(255, 255, 255, 0) 30%),
+        radial-gradient(circle at 15% 112%, var(--lab-cool-glass-bottom, rgba(56, 87, 123, 0.14)), rgba(255, 255, 255, 0) 42%) !important;
 }
 
-.lab-nav__panel--brands .lab-nav__card,
-.lab-nav__panel--types .lab-nav__card,
 .vehicle-page .lab-nav__panel--brands .lab-nav__card,
 .vehicle-page .lab-nav__panel--types .lab-nav__card,
 .reserve-page .lab-nav__panel--brands .lab-nav__card,
@@ -258,14 +249,8 @@ body {
 .contact-page .lab-nav__panel--types .lab-nav__card,
 .reservation-lookup-page .lab-nav__panel--brands .lab-nav__card,
 .reservation-lookup-page .lab-nav__panel--types .lab-nav__card {
-    border: 1px solid rgba(241, 226, 189, 0.12) !important;
-    background: linear-gradient(180deg, rgba(34, 33, 31, 0.98), rgba(18, 18, 18, 0.98)) !important;
-    color: #f8f1e4 !important;
-}
-
-.lab-nav__panel--brands .lab-nav__card-copy span,
-.lab-nav__panel--types .lab-nav__card-copy span {
-    color: rgba(248, 241, 228, 0.7) !important;
+    border-color: rgba(198, 220, 243, 0.1) !important;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.028)) !important;
 }
 
 body.vehicle-page--mother-base .vehicle-main--brand-landing .vehicle-hero {
