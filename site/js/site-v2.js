@@ -1819,7 +1819,9 @@ function initSiteV2() {
             ".vehicle-pdp-gallery-top__stage img",
             ".vehicle-pdp-gallery-top__thumb--media img",
             ".vehicle-pdp-gallery-panel__item img",
-            ".vehicle-pdp-gallery-card__media img"
+            ".vehicle-pdp-gallery-card__media img",
+            ".vehicle-landing-reserve__stage img",
+            ".vehicle-landing-reserve__thumbs img"
         ].join(",")));
 
         if (galleryImages.length < 2) {
@@ -1857,7 +1859,7 @@ function initSiteV2() {
                 alt: normalizeBookingValue(image.getAttribute("alt")) || "Vehicle media",
                 caption: getCaptionForImage(image)
             };
-            const trigger = image.closest(".vehicle-pdp-gallery-top__stage, .vehicle-pdp-gallery-top__thumb--media, .vehicle-pdp-gallery-panel__item, .vehicle-pdp-gallery-card__media");
+            const trigger = image.closest(".vehicle-pdp-gallery-top__stage, .vehicle-pdp-gallery-top__thumb--media, .vehicle-pdp-gallery-panel__item, .vehicle-pdp-gallery-card__media, .vehicle-landing-reserve__stage, .vehicle-landing-reserve__thumbs figure");
 
             seenSources.add(absoluteSource);
             items.push(item);
@@ -1984,6 +1986,7 @@ function initSiteV2() {
         const reviewsLink = reviewsSection.querySelector("[data-google-reviews-link]");
         const writeReviewLink = reviewsSection.querySelector("[data-google-write-review-link]");
         const fallbackReviewsUrl = reviewsSection.getAttribute("data-google-reviews-url") || "https://www.google.com/maps/search/?api=1&query=Dynasty%20Prestige%20Luxury%20Car%20Rental%20Dubai";
+        const fallbackWriteReviewUrl = reviewsSection.getAttribute("data-google-write-review-url") || writeReviewLink?.href || fallbackReviewsUrl;
 
         function setLink(element, href) {
             if (element instanceof HTMLAnchorElement && href) {
@@ -2079,7 +2082,7 @@ function initSiteV2() {
         }
 
         setLink(reviewsLink, fallbackReviewsUrl);
-        setLink(writeReviewLink, fallbackReviewsUrl);
+        setLink(writeReviewLink, fallbackWriteReviewUrl);
 
         const runtimeConfig = window.PGM_RUNTIME_CONFIG && typeof window.PGM_RUNTIME_CONFIG === "object"
             ? window.PGM_RUNTIME_CONFIG
@@ -2104,7 +2107,7 @@ function initSiteV2() {
                 const place = payload?.place || {};
                 const reviews = Array.isArray(payload?.reviews) ? payload.reviews : [];
                 const reviewsUrl = normalizeBookingValue(place.reviewsUrl) || fallbackReviewsUrl;
-                const writeReviewUrl = normalizeBookingValue(place.writeReviewUrl) || reviewsUrl;
+                const writeReviewUrl = normalizeBookingValue(place.writeReviewUrl) || fallbackWriteReviewUrl;
                 const rating = Number(place.rating);
                 const totalReviews = Number(place.totalReviews);
 

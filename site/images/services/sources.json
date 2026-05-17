@@ -1,30 +1,30 @@
 {
-  "license": "Pexels License",
-  "licenseUrl": "https://www.pexels.com/license/",
+  "license": "Original generated asset set for Dynasty Prestige",
+  "licenseUrl": "",
   "images": [
     {
       "file": "airport-concierge.jpg",
-      "source": "https://www.pexels.com/photo/professional-chauffeur-loading-luggage-into-sedan-36377043/"
+      "source": "Generated in-house with Codex image generation, 2026-05-17"
     },
     {
       "file": "chauffeur-private-movement.jpg",
-      "source": "https://www.pexels.com/photo/man-in-suit-jacket-sitting-inside-a-car-8052209/"
+      "source": "Generated in-house with Codex image generation, 2026-05-17"
     },
     {
       "file": "hotel-villa-delivery.jpg",
-      "source": "https://www.pexels.com/photo/black-bentley-continental-gt-parked-under-hotel-entrance-16861684/"
+      "source": "Generated in-house with Codex image generation, 2026-05-17"
     },
     {
       "file": "monthly-luxury-rental.jpg",
-      "source": "https://www.pexels.com/photo/luxury-cars-at-an-open-space-5288746/"
+      "source": "Generated in-house with Codex image generation, 2026-05-17"
     },
     {
       "file": "wedding-event-rental.jpg",
-      "source": "https://www.pexels.com/photo/man-and-woman-kissing-inside-car-9334775/"
+      "source": "Generated in-house with Codex image generation, 2026-05-17"
     },
     {
       "file": "business-vip-movement.jpg",
-      "source": "https://www.pexels.com/photo/confident-businessman-in-luxury-car-interior-30462808/"
+      "source": "Generated in-house with Codex image generation, 2026-05-17"
     }
   ]
 }

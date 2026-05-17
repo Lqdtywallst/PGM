@@ -955,7 +955,19 @@
                         <p class="delivery-card-note">Start with the area, hotel or airport.</p>
                         <div class="form-group" style="margin-top: 0;">
                             <label for="pickupLocation" class="field-label"><i class="fa-solid fa-map-pin"></i>Delivery address *</label>
-                            <input type="text" id="pickupLocation" name="pickupLocation" placeholder="Palm Jumeirah, Marina, Downtown, hotel or airport" class="input" autocomplete="street-address" required>
+                            <input type="text" id="pickupLocation" name="pickupLocation" list="deliveryLocationOptions" placeholder="Choose a delivery zone or type exact hotel / villa" class="input" autocomplete="street-address" required>
+                            <datalist id="deliveryLocationOptions">
+                                <option value="Palm Jumeirah"></option>
+                                <option value="Dubai Marina"></option>
+                                <option value="Downtown Dubai"></option>
+                                <option value="JBR"></option>
+                                <option value="Business Bay"></option>
+                                <option value="Dubai Airport DXB"></option>
+                                <option value="Al Maktoum Airport DWC"></option>
+                                <option value="DIFC"></option>
+                                <option value="Jumeirah Beach"></option>
+                                <option value="Private hotel, villa or residence"></option>
+                            </datalist>
                             <p class="field-error" id="pickupLocation-error"></p>
                             <div class="delivery-map-wrapper">
                                 <iframe

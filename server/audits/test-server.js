@@ -526,13 +526,12 @@ async function run() {
         hasLegacyHeroOverlayControls || hasInlineHeroBookingControls,
         'home page exposes the date-first hero controls'
     );
-    const homeMobileHeroVideoRule = /\.home-page\s+\.hero-lab__video\s*\{(?=[^}]*display:\s*block;)(?=[^}]*opacity:\s*0\.72;)[^}]*\}/m;
-    const homeMobileHeroStillRule = /\.home-page\s+\.hero-lab__still\s*\{(?=[^}]*opacity:\s*0;)[^}]*\}/m;
+    const homeOriginalHeroStillRule = /\.home-page\s+\.hero-lab__still\s*\{(?=[^}]*home-hero-original\.jpg)[^}]*\}/m;
     assert(
-        indexPage.includes('data-src-mobile="./media/hero-sports-road.mp4"') &&
-        homeMobileHeroVideoRule.test(homeSiteCss) &&
-        homeMobileHeroStillRule.test(homeSiteCss),
-        'home mobile hero keeps the lightweight video visible above the fold'
+        !indexPage.includes('data-src-mobile="./media/hero-sports-road.mp4"') &&
+        !indexPage.includes('data-src-desktop="./media/home-hero-city-streets.mp4"') &&
+        homeOriginalHeroStillRule.test(homeSiteCss),
+        'home hero uses the original generated still instead of unverified video media'
     );
     assert(
         indexPage.includes('./fleet.html') &&

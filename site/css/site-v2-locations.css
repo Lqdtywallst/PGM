@@ -2007,7 +2007,7 @@
 
     .locations-page .locations-hero__zone,
     .locations-page .locations-hero__zone:last-child {
-        align-content: start;
+        align-content: center;
         justify-items: center;
         gap: clamp(0.48rem, 1.05vh, 0.72rem);
         min-height: clamp(9.8rem, 16vh, 11.4rem);
