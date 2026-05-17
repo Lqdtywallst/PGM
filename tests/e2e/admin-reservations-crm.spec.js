@@ -164,11 +164,21 @@ test.describe('Private admin reservations CRM', () => {
         const card = page.locator('.reservation-card', { hasText: 'CRM Test Client' });
         await expect(card).toContainText('Lamborghini Huracan EVO Spyder');
         await expect(card).toContainText('Pending review');
+        await expect(page.locator('#reservationDetail')).toContainText('Operations overview');
+        await expect(page.locator('#reservationDetail')).toContainText('Today at a glance');
+        await expect(page.locator('#closeReservationDetail')).toHaveCount(0);
         await card.click();
 
         await expect(page.locator('.detail-title')).toContainText('Lamborghini Huracan EVO Spyder');
+        await expect(page.locator('#closeReservationDetail')).toBeVisible();
         await expect(page.locator('#reservationDetail')).toContainText('crm-test-client@example.com');
         await expect(page.locator('#reservationDetail')).toContainText('6,400 AED');
+        await page.click('#closeReservationDetail');
+        await expect(page.locator('#reservationDetail')).toContainText('Operations overview');
+        await expect(page.locator('#reservationDetail')).toContainText('Today at a glance');
+        await expect(page.locator('#closeReservationDetail')).toHaveCount(0);
+        await card.click();
+        await expect(page.locator('.detail-title')).toContainText('Lamborghini Huracan EVO Spyder');
 
         await page.fill('#adminNotes', 'Client contacted from the CRM E2E test.');
         await page.click('[data-action="update_notes"]');

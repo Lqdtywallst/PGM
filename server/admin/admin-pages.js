@@ -788,6 +788,103 @@ function renderAdminReservationsPage() {
             overflow: auto;
             padding: 18px;
         }
+        .workspace-overview {
+            display: grid;
+            gap: 16px;
+        }
+        .workspace-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+        }
+        .workspace-kicker {
+            margin: 0 0 6px;
+            color: var(--gold);
+            font-size: 0.64rem;
+            font-weight: 900;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+        .workspace-title {
+            margin: 0;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(1.45rem, 2vw, 1.9rem);
+            line-height: 1;
+            letter-spacing: -0.035em;
+        }
+        .workspace-copy {
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.45;
+        }
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .workspace-card {
+            min-width: 0;
+            padding: 13px;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: rgba(255, 250, 242, 0.72);
+        }
+        .workspace-card span {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--muted);
+            font-size: 0.62rem;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .workspace-card strong {
+            display: block;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 1.45rem;
+            line-height: 1;
+        }
+        .workspace-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .workspace-list {
+            display: grid;
+            gap: 8px;
+        }
+        .workspace-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: center;
+            padding: 10px 11px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.7);
+        }
+        .workspace-row strong {
+            display: block;
+            overflow-wrap: anywhere;
+            font-size: 0.88rem;
+        }
+        .workspace-row span {
+            display: block;
+            margin-top: 2px;
+            color: var(--muted);
+            font-size: 0.76rem;
+        }
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 14px;
+        }
+        .detail-close {
+            flex: 0 0 auto;
+        }
         .detail-empty {
             padding: 42px 12px;
             text-align: center;
@@ -899,6 +996,7 @@ function renderAdminReservationsPage() {
             .reservation-card,
             .detail-actions,
             .field-grid,
+            .workspace-grid,
             .form-grid {
                 grid-template-columns: 1fr;
             }
@@ -1089,12 +1187,12 @@ function renderAdminReservationsPage() {
         </section>
 
         <aside class="detail-panel" id="reservationDetail" aria-live="polite">
-            <div class="detail-empty">Select a reservation to see client details, payment state and admin actions.</div>
+            <div class="detail-empty">Loading operations overview...</div>
         </aside>
     </main>
 
     <script>
-        var state = { quick: '', q: '', selectedId: '', manualMode: 'create', currentReservation: null };
+        var state = { quick: '', q: '', selectedId: '', manualMode: 'create', currentReservation: null, lastListData: null };
         var searchTimer = null;
 
         function escapeHtml(value) {
@@ -1109,6 +1207,16 @@ function renderAdminReservationsPage() {
         function display(value, fallback) {
             var clean = value == null ? '' : String(value).trim();
             return clean || (fallback || 'Not set');
+        }
+
+        function numberFromMoney(value) {
+            var numeric = Number.parseFloat(String(value || '').replace(/[^0-9.-]/g, ''));
+            return Number.isFinite(numeric) ? numeric : 0;
+        }
+
+        function formatDashboardMoney(value) {
+            if (!Number.isFinite(value) || value <= 0) return 'AED 0';
+            return 'AED ' + Math.round(value).toLocaleString('en-US');
         }
 
         function formatDate(value) {
@@ -1150,8 +1258,8 @@ function renderAdminReservationsPage() {
             panel.classList.add('is-' + overall);
             var storageMode = data.storage && data.storage.mode ? data.storage.mode : 'unknown';
             var stripeMode = data.services && data.services.stripeMode ? data.services.stripeMode : 'unknown';
-            summary.textContent = data.label + ' - ' + statusWord(overall) + ' · ' +
-                storageMode + ' · Stripe ' + stripeMode;
+            summary.textContent = data.label + ' - ' + statusWord(overall) + ' - ' +
+                storageMode + ' - Stripe ' + stripeMode;
 
             var checks = Array.isArray(data.checks) ? data.checks : [];
             var crmData = data.storage && data.storage.crmData ? data.storage.crmData : {};
@@ -1237,16 +1345,22 @@ function renderAdminReservationsPage() {
 
         function renderList(data) {
             var list = document.getElementById('reservationList');
+            state.lastListData = data;
             document.getElementById('resultCount').textContent = data.total + ' reservation' + (data.total === 1 ? '' : 's') + ' found';
             document.getElementById('storageMode').textContent = data.storage ? 'Storage: ' + data.storage : '';
 
             if (!data.items.length) {
                 list.innerHTML = '<div class="empty">No reservations match this view yet.</div>';
+                if (!state.selectedId) renderWorkspaceOverview(data);
                 return;
             }
 
             list.innerHTML = data.items.map(renderCard).join('');
             bindReservationCards();
+
+            if (!state.selectedId) {
+                renderWorkspaceOverview(data);
+            }
         }
 
         async function loadReservations() {
@@ -1263,6 +1377,113 @@ function renderAdminReservationsPage() {
 
         function field(label, value) {
             return '<div class="field"><span>' + escapeHtml(label) + '</span><strong>' + escapeHtml(display(value)) + '</strong></div>';
+        }
+
+        function overviewCount(items, predicate) {
+            return items.filter(predicate).length;
+        }
+
+        function uniqueClientCount(items) {
+            var ids = new Set();
+            items.forEach(function (item) {
+                var key = display(
+                    item.customer && (item.customer.email || item.customer.phone || item.customer.name),
+                    item.reservationId || item.id
+                ).toLowerCase();
+                ids.add(key);
+            });
+            return ids.size;
+        }
+
+        function priorityLabel(item) {
+            if (item.flags && item.flags.paymentIssue) return 'Payment issue';
+            if (item.flags && item.flags.pickupToday) return 'Pickup today';
+            if (item.flags && item.flags.pendingReview) return 'Needs review';
+            if (item.flags && item.flags.confirmedToSchedule) return 'Plan handover';
+            if (item.flags && item.flags.pendingPayment) return 'Payment pending';
+            return item.statusLabel || 'Review';
+        }
+
+        function renderWorkspaceOverview(data) {
+            var detail = document.getElementById('reservationDetail');
+            var items = (data && Array.isArray(data.items)) ? data.items : [];
+            var activeItems = items.filter(function (item) { return !item.flags || item.flags.active !== false; });
+            var pendingReview = overviewCount(items, function (item) { return item.flags && item.flags.pendingReview; });
+            var paymentIssues = overviewCount(items, function (item) { return item.flags && item.flags.paymentIssue; });
+            var pickupToday = overviewCount(items, function (item) { return item.flags && item.flags.pickupToday; });
+            var nextSeven = overviewCount(items, function (item) { return item.flags && item.flags.next7Days; });
+            var totalValue = activeItems.reduce(function (sum, item) {
+                return sum + numberFromMoney(item.payment && item.payment.total);
+            }, 0);
+            var priorities = items
+                .filter(function (item) {
+                    return item.flags && (
+                        item.flags.paymentIssue ||
+                        item.flags.pickupToday ||
+                        item.flags.pendingReview ||
+                        item.flags.confirmedToSchedule ||
+                        item.flags.pendingPayment
+                    );
+                })
+                .slice(0, 5);
+
+            detail.classList.remove('has-detail');
+            state.currentReservation = null;
+            detail.innerHTML =
+                '<div class="workspace-overview">' +
+                    '<div class="workspace-head">' +
+                        '<div>' +
+                            '<p class="workspace-kicker">Operations overview</p>' +
+                            '<h2 class="workspace-title">Today at a glance.</h2>' +
+                            '<p class="workspace-copy">Use this space to see the current workload. Select a reservation to open the client workspace here.</p>' +
+                        '</div>' +
+                        '<button class="action primary" type="button" id="overviewNewBooking">New booking</button>' +
+                    '</div>' +
+                    '<div class="workspace-grid">' +
+                        '<div class="workspace-card"><span>Active reservations</span><strong>' + escapeHtml(activeItems.length) + '</strong></div>' +
+                        '<div class="workspace-card"><span>Known clients</span><strong>' + escapeHtml(uniqueClientCount(items)) + '</strong></div>' +
+                        '<div class="workspace-card"><span>Pending review</span><strong>' + escapeHtml(pendingReview) + '</strong></div>' +
+                        '<div class="workspace-card"><span>Payment issues</span><strong>' + escapeHtml(paymentIssues) + '</strong></div>' +
+                        '<div class="workspace-card"><span>Pickup today</span><strong>' + escapeHtml(pickupToday) + '</strong></div>' +
+                        '<div class="workspace-card"><span>Next 7 days</span><strong>' + escapeHtml(nextSeven) + '</strong></div>' +
+                    '</div>' +
+                    '<div class="section"><h2>Current value</h2><div class="field-grid">' +
+                        field('Visible active value', formatDashboardMoney(totalValue)) +
+                        field('Current queue', state.quick ? display(state.quick.replace(/_/g, ' ')) : 'All reservations') +
+                    '</div></div>' +
+                    '<div class="section"><h2>Priority work</h2>' +
+                        (
+                            priorities.length
+                                ? '<div class="workspace-list">' + priorities.map(function (item) {
+                                    return '<button class="workspace-row" type="button" data-overview-reservation-id="' + escapeHtml(item.id) + '">' +
+                                        '<span><strong>' + escapeHtml(display(item.customer && item.customer.name, 'Guest not set')) + '</strong>' +
+                                        '<span>' + escapeHtml(display(item.vehicle && item.vehicle.name, 'Vehicle not set')) + ' - ' + escapeHtml(display(item.schedule && item.schedule.startDate, 'Date not set')) + '</span></span>' +
+                                        '<span class="status ' + statusClass(item) + '">' + escapeHtml(priorityLabel(item)) + '</span>' +
+                                    '</button>';
+                                }).join('') + '</div>'
+                                : '<div class="detail-empty">No priority work in this view.</div>'
+                        ) +
+                    '</div>' +
+                    '<div class="section"><h2>Queue shortcuts</h2><div class="workspace-actions">' +
+                        '<button class="action" type="button" data-overview-filter="pending_review">Pending review</button>' +
+                        '<button class="action" type="button" data-overview-filter="payment_issues">Payment issues</button>' +
+                        '<button class="action" type="button" data-overview-filter="next_7_days">Next 7 days</button>' +
+                    '</div></div>' +
+                '</div>';
+
+            document.getElementById('overviewNewBooking').addEventListener('click', function () {
+                openManualPanel('create', null);
+            });
+            detail.querySelectorAll('[data-overview-reservation-id]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    openReservation(button.getAttribute('data-overview-reservation-id'));
+                });
+            });
+            detail.querySelectorAll('[data-overview-filter]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    applyQuickFilter(button.getAttribute('data-overview-filter') || '');
+                });
+            });
         }
 
         function externalAction(label, href, primary) {
@@ -1366,9 +1587,15 @@ function renderAdminReservationsPage() {
             var r = payload.reservation;
             var detail = document.getElementById('reservationDetail');
             state.currentReservation = r;
+            detail.classList.add('has-detail');
             detail.innerHTML =
-                '<h2 class="detail-title">' + escapeHtml(display(r.vehicle.name, 'Reservation detail')) + '</h2>' +
-                '<p class="detail-subtitle">' + escapeHtml(display(r.customer.name, 'Guest not set')) + ' · ' + escapeHtml(display(r.reservationId)) + '</p>' +
+                '<div class="detail-header">' +
+                    '<div>' +
+                        '<h2 class="detail-title">' + escapeHtml(display(r.vehicle.name, 'Reservation detail')) + '</h2>' +
+                        '<p class="detail-subtitle">' + escapeHtml(display(r.customer.name, 'Guest not set')) + ' - ' + escapeHtml(display(r.reservationId)) + '</p>' +
+                    '</div>' +
+                    '<button class="action detail-close" type="button" id="closeReservationDetail">Close</button>' +
+                '</div>' +
                 '<span class="status ' + statusClass(r) + '">' + escapeHtml(r.statusLabel) + '</span>' +
                 '<div class="detail-actions">' +
                     externalAction('WhatsApp client', r.customer.whatsappHref, true) +
@@ -1431,6 +1658,16 @@ function renderAdminReservationsPage() {
             document.getElementById('editReservationButton').addEventListener('click', function () {
                 openManualPanel('edit', state.currentReservation);
             });
+            document.getElementById('closeReservationDetail').addEventListener('click', closeReservationDetail);
+        }
+
+        function closeReservationDetail() {
+            state.selectedId = '';
+            state.currentReservation = null;
+            document.querySelectorAll('[data-reservation-id]').forEach(function (button) {
+                button.classList.remove('is-active');
+            });
+            renderWorkspaceOverview(state.lastListData || { items: [], total: 0 });
         }
 
         async function openReservation(id) {
@@ -1539,12 +1776,18 @@ function renderAdminReservationsPage() {
                 loadReservations();
             }, 220);
         });
+        function applyQuickFilter(value) {
+            state.quick = value || '';
+            state.selectedId = '';
+            document.querySelectorAll('[data-filter]').forEach(function (item) {
+                var isActive = (item.getAttribute('data-filter') || '') === state.quick;
+                item.classList.toggle('is-active', isActive);
+            });
+            loadReservations();
+        }
         document.querySelectorAll('[data-filter]').forEach(function (button) {
             button.addEventListener('click', function () {
-                document.querySelectorAll('[data-filter]').forEach(function (item) { item.classList.remove('is-active'); });
-                button.classList.add('is-active');
-                state.quick = button.getAttribute('data-filter') || '';
-                loadReservations();
+                applyQuickFilter(button.getAttribute('data-filter') || '');
             });
         });
 
