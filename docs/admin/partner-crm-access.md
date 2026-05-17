@@ -116,6 +116,6 @@ dates, pickup location, amount and the `/crm` link. A separate
 3. Use `Needs contact` for new reservations that need follow-up.
 4. Open a reservation and use WhatsApp, call or email actions.
 5. Save private notes after each client contact.
-6. Mark contacted when the client has been reached.
+6. Mark reviewed when the client or booking has been checked by the team.
 7. Confirm handover only when the car handover is actually confirmed.
 8. Export CSV when operations needs a backup or handoff sheet.

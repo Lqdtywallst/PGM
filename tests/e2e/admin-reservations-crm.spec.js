@@ -158,7 +158,7 @@ test.describe('Private admin reservations CRM', () => {
 
         const card = page.locator('.reservation-card', { hasText: 'CRM Test Client' });
         await expect(card).toContainText('Lamborghini Huracan EVO Spyder');
-        await expect(card).toContainText('To contact');
+        await expect(card).toContainText('Pending review');
         await card.click();
 
         await expect(page.locator('.detail-title')).toContainText('Lamborghini Huracan EVO Spyder');
@@ -170,6 +170,6 @@ test.describe('Private admin reservations CRM', () => {
         await expect(page.locator('#adminNotes')).toHaveValue('Client contacted from the CRM E2E test.');
 
         await page.click('[data-action="mark_contacted"]');
-        await expect(page.locator('#reservationDetail')).toContainText('Contacted at');
+        await expect(page.locator('#reservationDetail')).toContainText('Reviewed at');
     });
 });

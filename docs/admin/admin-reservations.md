@@ -23,14 +23,14 @@ The CRM separates reservations into three operational layers:
 | Commercial pipeline | `Payment issues` | `customer_processing_failed`, `payment_canceled`, `payment_intent_failed` or `payment_failed` | Recover the reservation or close the failed attempt. |
 | Confirmed booking | `Handover open` | Confirmed/paid records without `admin.handoverConfirmedAt` | Coordinate delivery, documents, deposit and timing. |
 | Confirmed booking | `Email issues` | `confirmed_email_failed` or failed/bounced/rejected email status | Confirm manually and fix delivery issue. |
-| Human follow-up | `To contact` | Active leads, pending payments, payment issues or confirmed bookings without `admin.contactedAt` | First human follow-up still needs to happen. |
+| Human review | `Pending review` | Active leads, pending payments, payment issues or confirmed bookings without `admin.contactedAt` | First team review/follow-up still needs to happen. |
 | Agenda | `New today` | Active records created today | Review new activity. |
 | Agenda | `Pickup today` | Active records with `startDate` today | Prepare same-day handover. |
 | Agenda | `Next 7 days` | Active records with `startDate` from today through the next 7 days | Prepare upcoming handovers. |
 | Completion | `Handover done` | Records with `admin.handoverConfirmedAt` | Already operationally completed. |
 | Closed | `Canceled` | `admin_canceled` or records with `admin.canceledAt` | Closed by the team; excluded from active agenda filters. |
 
-Legacy API aliases still work for old links: `confirmed`, `today`, `needs_contact` and `failed_payment`.
+Legacy API aliases still work for old links: `to_contact`, `confirmed`, `today`, `needs_contact` and `failed_payment`.
 
 ## Required Environment
 

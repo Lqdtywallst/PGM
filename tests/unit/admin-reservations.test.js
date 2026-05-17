@@ -156,13 +156,15 @@ test('admin reservation quick filters separate client work queues', () => {
 
     assert.deepEqual(idsFor('new_leads'), ['res_created_today', 'res_lead']);
     assert.deepEqual(idsFor('new_today'), ['res_created_today']);
-    assert.deepEqual(idsFor('to_contact'), [
+    const pendingReviewIds = [
         'res_checkout',
         'res_created_today',
         'res_email_issue',
         'res_lead',
         'res_payment_issue'
-    ]);
+    ];
+    assert.deepEqual(idsFor('pending_review'), pendingReviewIds);
+    assert.deepEqual(idsFor('to_contact'), pendingReviewIds);
     assert.deepEqual(idsFor('pending_payment'), ['res_checkout', 'res_created_today', 'res_lead']);
     assert.deepEqual(idsFor('payment_issues'), ['res_payment_issue']);
     assert.deepEqual(idsFor('confirmed_to_schedule'), ['res_confirmed_open', 'res_email_issue']);

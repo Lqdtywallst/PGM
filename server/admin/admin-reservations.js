@@ -6,7 +6,8 @@ const {
 const QUICK_FILTERS = Object.freeze({
     new_leads: 'New leads',
     new_today: 'New today',
-    to_contact: 'To contact',
+    pending_review: 'Pending review',
+    to_contact: 'Pending review',
     pending_payment: 'Payment pending',
     payment_issues: 'Payment issues',
     confirmed_to_schedule: 'Confirmed handover open',
@@ -17,7 +18,7 @@ const QUICK_FILTERS = Object.freeze({
     canceled: 'Canceled',
     confirmed: 'Confirmed',
     today: 'Today',
-    needs_contact: 'Needs follow-up',
+    needs_contact: 'Pending review',
     failed_payment: 'Failed payment'
 });
 
@@ -458,6 +459,7 @@ function classifyReservation(record = {}, options = {}) {
         today: pickupToday || newToday,
         next7Days,
         toContact,
+        pendingReview: toContact,
         needsContact: toContact,
         failedPayment,
         paymentCanceled,
@@ -586,6 +588,8 @@ function summaryMatchesQuickFilter(summary, quickFilter) {
             return summary.flags.newLead;
         case 'new_today':
             return summary.flags.newToday;
+        case 'pending_review':
+            return summary.flags.pendingReview;
         case 'to_contact':
             return summary.flags.toContact;
         case 'pending_payment':
@@ -719,7 +723,7 @@ function toReservationCsv(items = []) {
         ['total', 'Total'],
         ['upfront', 'Upfront'],
         ['remaining', 'Remaining'],
-        ['contactedAt', 'Contacted at'],
+        ['contactedAt', 'Reviewed at'],
         ['handoverConfirmedAt', 'Handover confirmed at'],
         ['updatedAt', 'Updated at']
     ];

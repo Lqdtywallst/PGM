@@ -750,7 +750,7 @@ function renderAdminReservationsPage() {
         <section class="hero" aria-labelledby="pageTitle">
             <div>
                 <h1 id="pageTitle">Reservations, clients and handovers.</h1>
-                <p>Track leads, payment issues, confirmed handovers and follow-up work with quick contact actions and private admin notes.</p>
+                <p>Track leads, payment issues, confirmed handovers and pending review work with quick contact actions and private admin notes.</p>
             </div>
             <div class="hero-actions">
                 <button class="button primary" id="exportCsvButton" type="button">Export CSV</button>
@@ -777,7 +777,7 @@ function renderAdminReservationsPage() {
                     <button class="filter is-active" type="button" data-filter="">All</button>
                     <button class="filter" type="button" data-filter="new_leads">New leads</button>
                     <button class="filter" type="button" data-filter="new_today">New today</button>
-                    <button class="filter" type="button" data-filter="to_contact">To contact</button>
+                    <button class="filter" type="button" data-filter="pending_review">Pending review</button>
                     <button class="filter" type="button" data-filter="pending_payment">Payment pending</button>
                     <button class="filter" type="button" data-filter="payment_issues">Payment issues</button>
                     <button class="filter" type="button" data-filter="confirmed_to_schedule">Handover open</button>
@@ -911,7 +911,7 @@ function renderAdminReservationsPage() {
             var contactFlag = item.flags.handoverDone
                 ? 'Handover done'
                 : item.flags.toContact
-                    ? 'To contact'
+                    ? 'Pending review'
                     : (item.admin.contacted ? 'Contacted' : 'No contact mark');
             return '<button class="reservation-card' + activeClass + '" type="button" data-reservation-id="' + escapeHtml(item.id) + '">' +
                 '<div>' +
@@ -984,7 +984,7 @@ function renderAdminReservationsPage() {
                     externalAction('WhatsApp client', r.customer.whatsappHref, true) +
                     externalAction('Call', r.customer.callHref, false) +
                     externalAction('Email', r.customer.emailHref, false) +
-                    '<button class="action" type="button" data-action="mark_contacted">Mark contacted</button>' +
+                    '<button class="action" type="button" data-action="mark_contacted">Mark reviewed</button>' +
                 '</div>' +
                 '<div class="section"><h2>Client</h2><div class="field-grid">' +
                     field('Name', r.customer.name) +
@@ -1017,7 +1017,7 @@ function renderAdminReservationsPage() {
                         '<button class="action danger" type="button" data-action="cancel">Cancel</button>' +
                     '</div>' +
                     '<div class="field-grid">' +
-                        field('Contacted at', r.admin.contactedAt ? formatDate(r.admin.contactedAt) : '') +
+                        field('Reviewed at', r.admin.contactedAt ? formatDate(r.admin.contactedAt) : '') +
                         field('Handover confirmed', r.admin.handoverConfirmedAt ? formatDate(r.admin.handoverConfirmedAt) : '') +
                     '</div>' +
                 '</div>' +
