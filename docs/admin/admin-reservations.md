@@ -36,7 +36,7 @@ Legacy API aliases still work for old links: `to_contact`, `confirmed`, `today`,
 ## Manual Reservations
 
 The CRM can create bookings received outside checkout, such as WhatsApp, phone
-or partner handoffs. Use `New manual booking` and fill at least:
+or partner handoffs. Use `New booking` and fill at least:
 
 - Client name.
 - WhatsApp/phone.

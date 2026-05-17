@@ -200,7 +200,7 @@ test.describe('Private admin reservations CRM', () => {
         await expect(page.locator('.detail-title')).toContainText('Bentley Bentayga Azure');
         await expect(page.locator('#reservationDetail')).toContainText('Manual CRM E2E Client');
         await expect(page.locator('#reservationDetail')).toContainText('9,800 AED');
-        await expect(page.locator('#reservationDetail')).toContainText('Manual booking created in CRM');
+        await expect(page.locator('#reservationDetail')).toContainText('Booking created in CRM');
 
         const manualListResponse = await page.request.get(`${adminBaseUrl}/api/admin/reservations?q=Manual%20CRM%20E2E%20Client`);
         const manualList = await manualListResponse.json();

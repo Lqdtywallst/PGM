@@ -118,7 +118,7 @@ dates, pickup location, amount and the `/crm` link. A separate
 5. Save private notes after each client contact.
 6. Mark reviewed when the client or booking has been checked by the team.
 7. Confirm handover only when the car handover is actually confirmed.
-8. Use `New manual booking` for WhatsApp, phone or partner reservations that did not pass through checkout.
+8. Use `New booking` for WhatsApp, phone or partner reservations that did not pass through checkout.
 9. Use `Edit booking` for safe client, schedule, vehicle and price corrections.
 10. Use `Cancel` or `Archive` to close records; do not hard-delete operational reservations.
 11. Export CSV when operations needs a backup or handoff sheet.

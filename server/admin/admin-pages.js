@@ -847,7 +847,7 @@ function renderAdminReservationsPage() {
                 <p>Track leads, payment issues, confirmed handovers and pending review work with quick contact actions and private admin notes.</p>
             </div>
             <div class="hero-actions">
-                <button class="button primary" id="manualNewButton" type="button">New manual booking</button>
+                <button class="button primary" id="manualNewButton" type="button">New booking</button>
                 <button class="button primary" id="exportCsvButton" type="button">Export CSV</button>
             </div>
         </section>
@@ -865,7 +865,7 @@ function renderAdminReservationsPage() {
         <section class="manual-panel" id="manualPanel" hidden>
             <div class="panel-heading">
                 <div>
-                    <h2 id="manualPanelTitle">New manual booking</h2>
+                    <h2 id="manualPanelTitle">New booking</h2>
                     <p id="manualPanelCopy">Create reservations received by WhatsApp, phone or partner handoff without using public checkout.</p>
                 </div>
                 <button class="action" id="manualCloseButton" type="button">Close</button>
@@ -1218,7 +1218,7 @@ function renderAdminReservationsPage() {
                 setFormValue('manualRemainingAmount', rawReservationValue(reservation, 'remainingAmount', ''));
                 setFormValue('manualNotes', reservation.admin.notes || '');
             } else {
-                title.textContent = 'New manual booking';
+                title.textContent = 'New booking';
                 copy.textContent = 'Create reservations received by WhatsApp, phone or partner handoff without using public checkout.';
             }
 

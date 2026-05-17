@@ -744,7 +744,7 @@ function createManualReservationRecord(payload = {}, actor = 'admin', options = 
         action: 'create_manual',
         at: timestamp,
         by: actor || 'admin',
-        summary: 'Manual booking created in CRM'
+            summary: 'Booking created in CRM'
     });
 
     return {
