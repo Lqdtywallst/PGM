@@ -385,11 +385,11 @@
 }
 
 .about-band {
-    padding: clamp(2.4rem, 5vw, 4.8rem) 0;
+    padding: clamp(2.1rem, 4.2vw, 4rem) 0;
 }
 
 .about-band--story {
-    padding-top: clamp(1.35rem, 2.8vw, 2.35rem);
+    padding-top: clamp(1rem, 2.2vw, 1.85rem);
 }
 
 .about-band--soft {
@@ -408,12 +408,12 @@
 .about-standards__layout,
 .about-cta__shell {
     display: grid;
-    gap: clamp(1rem, 2vw, 1.6rem);
+    gap: clamp(1.15rem, 2.8vw, 2.35rem);
     align-items: stretch;
 }
 
 .about-story__layout {
-    grid-template-columns: minmax(0, 0.94fr) minmax(24rem, 1.06fr);
+    grid-template-columns: minmax(0, 0.92fr) minmax(22rem, 1.08fr);
 }
 
 .about-operations__layout {
@@ -427,10 +427,11 @@
 
 .about-story__content {
     display: grid;
-    align-content: start;
+    align-content: center;
+    align-self: stretch;
     gap: 1rem;
-    min-height: 100%;
-    padding: clamp(1.1rem, 2vw, 1.5rem);
+    min-height: 0;
+    padding: clamp(1.05rem, 1.7vw, 1.35rem);
     border: 1px solid rgba(35, 28, 19, 0.1);
     border-radius: 18px;
     background: #ffffff;
@@ -485,7 +486,7 @@
     margin: 0;
     box-sizing: border-box;
     width: 100%;
-    min-height: 100%;
+    min-height: 0;
     overflow: hidden;
     border: 1px solid rgba(35, 28, 19, 0.1);
     border-radius: 18px;
@@ -497,8 +498,20 @@
     display: block;
     width: 100%;
     height: 100%;
-    min-height: 18rem;
+    min-height: 0;
     object-fit: cover;
+}
+
+.about-story__media,
+.about-operations__media,
+.about-standards__media {
+    align-self: center;
+    height: clamp(20rem, 30vw, 25.5rem);
+    min-height: 0;
+}
+
+.about-operations__media {
+    height: clamp(21rem, 32vw, 27rem);
 }
 
 .about-proof-strip__media {
@@ -692,6 +705,12 @@
     .about-proof-strip__media {
         height: clamp(16rem, 42vw, 22rem);
     }
+
+    .about-story__media,
+    .about-operations__media,
+    .about-standards__media {
+        height: clamp(16rem, 46vw, 24rem);
+    }
 }
 
 @media (max-width: 760px) {
@@ -825,12 +844,18 @@
     }
 
     .about-media img {
-        min-height: 15.5rem;
+        min-height: 0;
     }
 
     .about-proof-strip__media {
         height: clamp(13rem, 56vw, 15.5rem);
         min-height: 0;
+    }
+
+    .about-story__media,
+    .about-operations__media,
+    .about-standards__media {
+        height: clamp(14rem, 58vw, 17.5rem);
     }
 
     .about-cta__copy {
