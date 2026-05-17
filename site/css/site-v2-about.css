@@ -112,8 +112,8 @@
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(180deg, rgba(5, 6, 8, 0), rgba(5, 6, 8, 0.18)),
-        radial-gradient(circle at 20% 10%, rgba(241, 226, 189, 0.08), rgba(241, 226, 189, 0) 17rem);
+        linear-gradient(180deg, rgba(5, 6, 8, 0), rgba(5, 6, 8, 0.06)),
+        radial-gradient(circle at 20% 10%, rgba(241, 226, 189, 0.035), rgba(241, 226, 189, 0) 17rem);
     pointer-events: none;
 }
 
@@ -124,11 +124,11 @@
     height: 100%;
     min-height: clamp(14rem, 22vw, 22rem);
     object-fit: cover;
-    filter: saturate(1.12) contrast(1.04) brightness(1.02);
+    filter: saturate(1.18) contrast(1.07) brightness(1.06);
 }
 
 .about-media img {
-    filter: saturate(1.12) contrast(1.04) brightness(1.04);
+    filter: saturate(1.18) contrast(1.07) brightness(1.07);
 }
 
 .about-visual-card__caption {
