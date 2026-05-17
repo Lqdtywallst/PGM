@@ -4,11 +4,20 @@ const {
 } = require('../integrations/mobile-notifications');
 
 const QUICK_FILTERS = Object.freeze({
-    pending_payment: 'Pending payment',
+    new_leads: 'New leads',
+    new_today: 'New today',
+    to_contact: 'To contact',
+    pending_payment: 'Payment pending',
+    payment_issues: 'Payment issues',
+    confirmed_to_schedule: 'Confirmed handover open',
+    email_issue: 'Email issues',
+    pickup_today: 'Pickup today',
+    next_7_days: 'Next 7 days',
+    handover_done: 'Handover done',
+    canceled: 'Canceled',
     confirmed: 'Confirmed',
     today: 'Today',
-    next_7_days: 'Next 7 days',
-    needs_contact: 'Needs contact',
+    needs_contact: 'Needs follow-up',
     failed_payment: 'Failed payment'
 });
 
@@ -47,6 +56,24 @@ const FAILED_PAYMENT_STATUSES = new Set([
     'payment_canceled',
     'payment_intent_failed',
     'payment_failed'
+]);
+
+const LEAD_STATUSES = new Set([
+    'lead_received',
+    'received'
+]);
+
+const CHECKOUT_PENDING_STATUSES = new Set([
+    'checkout_started',
+    'payment_intent_created',
+    'payment_requires_action'
+]);
+
+const EMAIL_ISSUE_STATUSES = new Set([
+    'failed',
+    'error',
+    'bounced',
+    'rejected'
 ]);
 
 function normalizeAppEnvironment(env = process.env) {
@@ -391,26 +418,52 @@ function classifyReservation(record = {}, options = {}) {
     const today = toIsoDate(options.now || new Date());
     const nextWeek = addDaysIsoDate(today, 7);
     const status = facts.status;
-    const isCanceled = status.includes('cancel') || Boolean(admin.canceledAt);
+    const adminCanceled = status === 'admin_canceled' || Boolean(admin.canceledAt);
+    const paymentCanceled = status === 'payment_canceled';
+    const isCanceled = adminCanceled;
     const startsToday = facts.startDate === today;
     const createdToday = toIsoDate(facts.createdAt) === today;
-    const startsNextSevenDays = Boolean(
+    const lead = LEAD_STATUSES.has(status);
+    const checkoutPending = CHECKOUT_PENDING_STATUSES.has(status);
+    const paymentIssue = FAILED_PAYMENT_STATUSES.has(status);
+    const failedPayment = paymentIssue;
+    const pendingPayment = PENDING_PAYMENT_STATUSES.has(status);
+    const confirmed = CONFIRMED_STATUSES.has(status);
+    const emailStatus = normalizeStatus(facts.emailStatus);
+    const emailIssue = status === 'confirmed_email_failed' || EMAIL_ISSUE_STATUSES.has(emailStatus);
+    const handoverDone = Boolean(admin.handoverConfirmedAt);
+    const active = !isCanceled;
+    const newLead = active && lead && !admin.contactedAt;
+    const confirmedToSchedule = active && confirmed && !handoverDone;
+    const toContact = active && !admin.contactedAt && (lead || checkoutPending || paymentIssue || confirmed);
+    const newToday = active && createdToday;
+    const pickupToday = active && startsToday;
+    const next7Days = active && Boolean(
         facts.startDate &&
         facts.startDate >= today &&
         facts.startDate <= nextWeek
     );
-    const failedPayment = FAILED_PAYMENT_STATUSES.has(status);
-    const pendingPayment = PENDING_PAYMENT_STATUSES.has(status);
-    const confirmed = CONFIRMED_STATUSES.has(status);
-    const needsContact = !isCanceled && !admin.contactedAt && (pendingPayment || failedPayment || confirmed);
 
     return {
+        lead,
+        newLead,
+        checkoutPending,
         pendingPayment,
+        paymentIssue,
         confirmed,
-        today: startsToday || createdToday,
-        next7Days: startsNextSevenDays,
-        needsContact,
+        confirmedToSchedule,
+        emailIssue,
+        newToday,
+        pickupToday,
+        today: pickupToday || newToday,
+        next7Days,
+        toContact,
+        needsContact: toContact,
         failedPayment,
+        paymentCanceled,
+        handoverDone,
+        active,
+        adminCanceled,
         canceled: isCanceled
     };
 }
@@ -529,8 +582,22 @@ function summaryMatchesSearch(summary, query) {
 
 function summaryMatchesQuickFilter(summary, quickFilter) {
     switch (quickFilter) {
+        case 'new_leads':
+            return summary.flags.newLead;
+        case 'new_today':
+            return summary.flags.newToday;
+        case 'to_contact':
+            return summary.flags.toContact;
         case 'pending_payment':
             return summary.flags.pendingPayment;
+        case 'payment_issues':
+            return summary.flags.paymentIssue;
+        case 'confirmed_to_schedule':
+            return summary.flags.confirmedToSchedule;
+        case 'email_issue':
+            return summary.flags.emailIssue;
+        case 'pickup_today':
+            return summary.flags.pickupToday;
         case 'confirmed':
             return summary.flags.confirmed;
         case 'today':
@@ -539,6 +606,10 @@ function summaryMatchesQuickFilter(summary, quickFilter) {
             return summary.flags.next7Days;
         case 'needs_contact':
             return summary.flags.needsContact;
+        case 'handover_done':
+            return summary.flags.handoverDone;
+        case 'canceled':
+            return summary.flags.canceled;
         case 'failed_payment':
             return summary.flags.failedPayment;
         default:
@@ -783,8 +854,11 @@ function createAdminReservationsRouter(dependencies = {}) {
 }
 
 module.exports = {
+    CHECKOUT_PENDING_STATUSES,
     CONFIRMED_STATUSES,
+    EMAIL_ISSUE_STATUSES,
     FAILED_PAYMENT_STATUSES,
+    LEAD_STATUSES,
     PENDING_PAYMENT_STATUSES,
     QUICK_FILTERS,
     applyAdminReservationAction,

@@ -13,6 +13,10 @@ const {
 
 const now = '2026-04-25T12:00:00.000Z';
 
+function valueOrDefault(source, key, fallback) {
+    return Object.prototype.hasOwnProperty.call(source, key) ? source[key] : fallback;
+}
+
 function reservation(overrides = {}) {
     return {
         reservationId: overrides.reservationId || 'res_default',
@@ -26,8 +30,8 @@ function reservation(overrides = {}) {
         reservationData: {
             reservationId: overrides.reservationId || 'res_default',
             car: overrides.car || 'Mercedes G63 AMG',
-            startDate: overrides.startDate || '2026-04-25',
-            endDate: overrides.endDate || '2026-04-27',
+            startDate: valueOrDefault(overrides, 'startDate', '2026-04-25'),
+            endDate: valueOrDefault(overrides, 'endDate', '2026-04-27'),
             pickupTime: '10:00',
             dropoffTime: '18:00',
             pickupLocation: 'Dubai Marina',
@@ -41,6 +45,7 @@ function reservation(overrides = {}) {
             paymentIntentId: overrides.paymentIntentId || 'pi_default',
             stripeStatus: overrides.stripeStatus || 'requires_payment_method'
         },
+        email: overrides.emailData || {},
         createdAt: overrides.createdAt || '2026-04-24T09:00:00.000Z',
         updatedAt: overrides.updatedAt || '2026-04-24T09:00:00.000Z',
         storage: 'local-json'
@@ -89,6 +94,88 @@ test('admin reservation filters support quick views and search', () => {
     );
     assert.equal(ferrari.total, 1);
     assert.equal(ferrari.items[0].reservationId, 'res_contacted');
+});
+
+test('admin reservation quick filters separate client work queues', () => {
+    const records = [
+        reservation({
+            reservationId: 'res_lead',
+            status: 'lead_received',
+            car: 'Contact request',
+            startDate: '',
+            endDate: ''
+        }),
+        reservation({
+            reservationId: 'res_created_today',
+            status: 'received',
+            car: 'General inquiry',
+            startDate: '2026-05-20',
+            endDate: '2026-05-22',
+            createdAt: now
+        }),
+        reservation({
+            reservationId: 'res_checkout',
+            status: 'payment_intent_created',
+            startDate: '2026-04-29'
+        }),
+        reservation({
+            reservationId: 'res_payment_issue',
+            status: 'payment_canceled',
+            startDate: '2026-05-09'
+        }),
+        reservation({
+            reservationId: 'res_confirmed_open',
+            status: 'payment_succeeded',
+            startDate: '2026-04-26',
+            admin: { contactedAt: now }
+        }),
+        reservation({
+            reservationId: 'res_email_issue',
+            status: 'confirmed_email_failed',
+            startDate: '2026-04-27',
+            emailData: { status: 'failed' }
+        }),
+        reservation({
+            reservationId: 'res_handover_done',
+            status: 'confirmed',
+            startDate: '2026-04-25',
+            admin: { contactedAt: now, handoverConfirmedAt: now }
+        }),
+        reservation({
+            reservationId: 'res_canceled',
+            status: 'admin_canceled',
+            startDate: '2026-04-25',
+            admin: { canceledAt: now }
+        })
+    ];
+    const idsFor = (quick) => filterAdminReservationSummaries(
+        records,
+        collectReservationFilters({ quick }),
+        { now }
+    ).items.map((item) => item.reservationId).sort();
+
+    assert.deepEqual(idsFor('new_leads'), ['res_created_today', 'res_lead']);
+    assert.deepEqual(idsFor('new_today'), ['res_created_today']);
+    assert.deepEqual(idsFor('to_contact'), [
+        'res_checkout',
+        'res_created_today',
+        'res_email_issue',
+        'res_lead',
+        'res_payment_issue'
+    ]);
+    assert.deepEqual(idsFor('pending_payment'), ['res_checkout', 'res_created_today', 'res_lead']);
+    assert.deepEqual(idsFor('payment_issues'), ['res_payment_issue']);
+    assert.deepEqual(idsFor('confirmed_to_schedule'), ['res_confirmed_open', 'res_email_issue']);
+    assert.deepEqual(idsFor('email_issue'), ['res_email_issue']);
+    assert.deepEqual(idsFor('pickup_today'), ['res_handover_done']);
+    assert.deepEqual(idsFor('next_7_days'), [
+        'res_checkout',
+        'res_confirmed_open',
+        'res_email_issue',
+        'res_handover_done'
+    ]);
+    assert.deepEqual(idsFor('handover_done'), ['res_handover_done']);
+    assert.deepEqual(idsFor('canceled'), ['res_canceled']);
 });
 
 test('admin actions persist private workflow state without deleting reservation data', () => {

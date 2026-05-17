@@ -158,7 +158,7 @@ test.describe('Private admin reservations CRM', () => {
 
         const card = page.locator('.reservation-card', { hasText: 'CRM Test Client' });
         await expect(card).toContainText('Lamborghini Huracan EVO Spyder');
-        await expect(card).toContainText('Needs contact');
+        await expect(card).toContainText('To contact');
         await card.click();
 
         await expect(page.locator('.detail-title')).toContainText('Lamborghini Huracan EVO Spyder');

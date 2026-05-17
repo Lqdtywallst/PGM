@@ -616,6 +616,8 @@ function renderAdminReservationsPage() {
         .status.confirmed { background: rgba(31, 143, 84, 0.13); color: var(--green); }
         .status.pending { background: rgba(180, 120, 37, 0.14); color: var(--amber); }
         .status.failed { background: rgba(182, 64, 53, 0.12); color: var(--red); }
+        .status.email { background: rgba(180, 120, 37, 0.16); color: var(--amber); }
+        .status.canceled { background: rgba(117, 107, 97, 0.16); color: var(--muted); }
         .detail-panel {
             position: sticky;
             top: 72px;
@@ -748,7 +750,7 @@ function renderAdminReservationsPage() {
         <section class="hero" aria-labelledby="pageTitle">
             <div>
                 <h1 id="pageTitle">Reservations, clients and handovers.</h1>
-                <p>Track every booking from checkout to confirmed handover, with quick contact actions and private admin notes.</p>
+                <p>Track leads, payment issues, confirmed handovers and follow-up work with quick contact actions and private admin notes.</p>
             </div>
             <div class="hero-actions">
                 <button class="button primary" id="exportCsvButton" type="button">Export CSV</button>
@@ -773,12 +775,17 @@ function renderAdminReservationsPage() {
                 </div>
                 <div class="filters" id="filters">
                     <button class="filter is-active" type="button" data-filter="">All</button>
-                    <button class="filter" type="button" data-filter="pending_payment">Pending payment</button>
-                    <button class="filter" type="button" data-filter="confirmed">Confirmed</button>
-                    <button class="filter" type="button" data-filter="today">Today</button>
+                    <button class="filter" type="button" data-filter="new_leads">New leads</button>
+                    <button class="filter" type="button" data-filter="new_today">New today</button>
+                    <button class="filter" type="button" data-filter="to_contact">To contact</button>
+                    <button class="filter" type="button" data-filter="pending_payment">Payment pending</button>
+                    <button class="filter" type="button" data-filter="payment_issues">Payment issues</button>
+                    <button class="filter" type="button" data-filter="confirmed_to_schedule">Handover open</button>
+                    <button class="filter" type="button" data-filter="email_issue">Email issues</button>
+                    <button class="filter" type="button" data-filter="pickup_today">Pickup today</button>
                     <button class="filter" type="button" data-filter="next_7_days">Next 7 days</button>
-                    <button class="filter" type="button" data-filter="needs_contact">Needs contact</button>
-                    <button class="filter" type="button" data-filter="failed_payment">Failed payment</button>
+                    <button class="filter" type="button" data-filter="handover_done">Handover done</button>
+                    <button class="filter" type="button" data-filter="canceled">Canceled</button>
                 </div>
             </div>
             <div class="list-panel">
@@ -821,7 +828,9 @@ function renderAdminReservationsPage() {
         }
 
         function statusClass(item) {
-            if (item.flags && item.flags.failedPayment) return 'failed';
+            if (item.flags && item.flags.canceled) return 'canceled';
+            if (item.flags && item.flags.emailIssue) return 'email';
+            if (item.flags && item.flags.paymentIssue) return 'failed';
             if (item.flags && item.flags.pendingPayment) return 'pending';
             if (item.flags && item.flags.confirmed) return 'confirmed';
             return '';
@@ -899,12 +908,17 @@ function renderAdminReservationsPage() {
         function renderCard(item) {
             var activeClass = item.id === state.selectedId ? ' is-active' : '';
             var dateText = display(item.schedule.startDate) + ' to ' + display(item.schedule.endDate);
-            var contactFlag = item.flags.needsContact ? 'Needs contact' : (item.admin.contacted ? 'Contacted' : 'No contact mark');
+            var contactFlag = item.flags.handoverDone
+                ? 'Handover done'
+                : item.flags.toContact
+                    ? 'To contact'
+                    : (item.admin.contacted ? 'Contacted' : 'No contact mark');
             return '<button class="reservation-card' + activeClass + '" type="button" data-reservation-id="' + escapeHtml(item.id) + '">' +
                 '<div>' +
                     '<h2 class="reservation-title">' + escapeHtml(display(item.vehicle.name, 'Vehicle not set')) + '</h2>' +
                     '<div class="reservation-meta">' +
                         '<span>' + escapeHtml(display(item.customer.name, 'Guest not set')) + '</span>' +
+                        '<span>' + escapeHtml(display(item.reservationId)) + '</span>' +
                         '<span>' + escapeHtml(dateText) + '</span>' +
                         '<span>' + escapeHtml(display(item.payment.total, 'Total not set')) + '</span>' +
                         '<span>' + escapeHtml(contactFlag) + '</span>' +
@@ -979,6 +993,7 @@ function renderAdminReservationsPage() {
                     field('ID / Passport', r.customer.idDocument) +
                 '</div></div>' +
                 '<div class="section"><h2>Reservation</h2><div class="field-grid">' +
+                    field('Reservation ID', r.reservationId) +
                     field('Vehicle', r.vehicle.name) +
                     field('Date range', display(r.schedule.startDate) + ' to ' + display(r.schedule.endDate)) +
                     field('Pickup time', r.schedule.pickupTime) +

@@ -12,6 +12,26 @@ Private mini-CRM for Dynasty Prestige reservations. It is served by the Railway/
 - `/api/admin/reservations/:id`: reservation detail.
 - `/api/admin/reservations.csv`: filtered CSV export.
 
+## Client Classification Matrix
+
+The CRM separates reservations into three operational layers:
+
+| Layer | CRM filter | Included records | Team action |
+| --- | --- | --- | --- |
+| Commercial pipeline | `New leads` | `lead_received` or `received`, active and not contacted | Qualify the request and move it to booking/payment. |
+| Commercial pipeline | `Payment pending` | `checkout_started`, `lead_received`, `payment_intent_created`, `payment_requires_action` or `received` | Help the client finish payment or confirm intent. |
+| Commercial pipeline | `Payment issues` | `customer_processing_failed`, `payment_canceled`, `payment_intent_failed` or `payment_failed` | Recover the reservation or close the failed attempt. |
+| Confirmed booking | `Handover open` | Confirmed/paid records without `admin.handoverConfirmedAt` | Coordinate delivery, documents, deposit and timing. |
+| Confirmed booking | `Email issues` | `confirmed_email_failed` or failed/bounced/rejected email status | Confirm manually and fix delivery issue. |
+| Human follow-up | `To contact` | Active leads, pending payments, payment issues or confirmed bookings without `admin.contactedAt` | First human follow-up still needs to happen. |
+| Agenda | `New today` | Active records created today | Review new activity. |
+| Agenda | `Pickup today` | Active records with `startDate` today | Prepare same-day handover. |
+| Agenda | `Next 7 days` | Active records with `startDate` from today through the next 7 days | Prepare upcoming handovers. |
+| Completion | `Handover done` | Records with `admin.handoverConfirmedAt` | Already operationally completed. |
+| Closed | `Canceled` | `admin_canceled` or records with `admin.canceledAt` | Closed by the team; excluded from active agenda filters. |
+
+Legacy API aliases still work for old links: `confirmed`, `today`, `needs_contact` and `failed_payment`.
+
 ## Required Environment
 
 Set these variables in Railway before using the desk:
