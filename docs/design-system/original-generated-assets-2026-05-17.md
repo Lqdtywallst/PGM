@@ -27,8 +27,9 @@ Saved assets:
 
 Original prompt summary:
 Create an original premium 2x2 category sheet for Sports, Convertible, Luxury
-and SUV navigation. Use generic premium silhouettes and reflections only, no
-text, no logos, no real badges, no recognizable existing vehicle models.
+and SUV navigation. Use floating 3D generic premium car silhouettes, soft studio
+shadows and cream backgrounds only, no text, no logos, no real badges, no
+recognizable existing vehicle models.
 
 Saved active assets:
 - `site/images/categories/mock-fastpng/sports-stage.png`
