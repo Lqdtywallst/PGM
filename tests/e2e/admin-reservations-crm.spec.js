@@ -16,6 +16,9 @@ const repoRoot = path.resolve(__dirname, '../..');
 const adminUser = 'owner';
 const adminPassword = 'AdminCrmTest2026!';
 const reservationId = `e2e_admin_${crypto.randomBytes(5).toString('hex')}`;
+const reservationSuffix = reservationId.slice(-6);
+const adminClientName = `CRM Test Client ${reservationSuffix}`;
+const manualClientName = `Manual CRM E2E Client ${reservationSuffix}`;
 
 let backendProcess = null;
 let adminBaseUrl = '';
@@ -71,7 +74,7 @@ test.describe('Private admin reservations CRM', () => {
             status: 'checkout_started',
             source: 'admin_crm_e2e',
             customerData: {
-                name: 'CRM Test Client',
+                name: adminClientName,
                 email: 'crm-test-client@example.com',
                 phone: '+971 58 612 2568',
                 passport: 'CRM-TEST-ID'
@@ -128,10 +131,6 @@ test.describe('Private admin reservations CRM', () => {
         }
     });
 
-    test.beforeEach(({}, testInfo) => {
-        test.skip(/mobile/i.test(testInfo.project.name), 'Admin CRM layout is validated on desktop.');
-    });
-
     test('admin can log in, see a stored reservation and update private workflow notes', async ({ page }) => {
         await page.goto(`${adminBaseUrl}/crm`, { waitUntil: 'domcontentloaded' });
         await expect(page).toHaveURL(/\/admin\/login\.html/);
@@ -168,7 +167,7 @@ test.describe('Private admin reservations CRM', () => {
         await expect(page.locator('#storageMode')).toContainText('local-json');
         await expect(page.locator('#resultCount')).toContainText('reservation');
 
-        const card = page.locator('.reservation-card', { hasText: 'CRM Test Client' });
+        const card = page.locator('.reservation-card', { hasText: reservationId });
         await expect(card).toContainText('Lamborghini Huracan EVO Spyder');
         await expect(card).toContainText('Pending review');
         await expect(page.locator('#reservationDetail')).toContainText('Operations overview');
@@ -196,7 +195,7 @@ test.describe('Private admin reservations CRM', () => {
 
         await page.click('#manualNewButton');
         await expect(page.locator('#manualPanel')).toBeVisible();
-        await page.fill('#manualCustomerName', 'Manual CRM E2E Client');
+        await page.fill('#manualCustomerName', manualClientName);
         await page.fill('#manualCustomerPhone', '+971 55 777 3333');
         await page.fill('#manualCustomerEmail', 'manual-crm-e2e@example.com');
         await page.fill('#manualCustomerId', 'MANUAL-E2E-ID');
@@ -216,11 +215,11 @@ test.describe('Private admin reservations CRM', () => {
 
         await expect(page.locator('#manualPanel')).toBeHidden();
         await expect(page.locator('.detail-title')).toContainText('Bentley Bentayga Azure');
-        await expect(page.locator('#reservationDetail')).toContainText('Manual CRM E2E Client');
+        await expect(page.locator('#reservationDetail')).toContainText(manualClientName);
         await expect(page.locator('#reservationDetail')).toContainText('9,800 AED');
         await expect(page.locator('#reservationDetail')).toContainText('Booking created in CRM');
 
-        const manualListResponse = await page.request.get(`${adminBaseUrl}/api/admin/reservations?q=Manual%20CRM%20E2E%20Client`);
+        const manualListResponse = await page.request.get(`${adminBaseUrl}/api/admin/reservations?q=${encodeURIComponent(manualClientName)}`);
         const manualList = await manualListResponse.json();
         manualReservationId = manualList.items[0]?.reservationId || '';
         expect(manualReservationId).toMatch(/^manual_/);
@@ -245,6 +244,6 @@ test.describe('Private admin reservations CRM', () => {
         await expect(page.locator('#reservationDetail')).toContainText('Archive after E2E coverage.');
 
         await page.selectOption('#queueFilterSelect', 'archived');
-        await expect(page.locator('.reservation-card', { hasText: 'Manual CRM E2E Client' })).toContainText('Archived');
+        await expect(page.locator('.reservation-card', { hasText: manualClientName })).toContainText('Archived');
     });
 });

@@ -87,7 +87,7 @@
     "audit:preprod:functional": "node scripts/qa/run-preprod-functional-gate.js",
     "audit:functional:deep": "node scripts/audits/run-functional-agent.js --deep",
     "audit:functional:master": "npm run audit:functional:missions && npm run audit:functional:contracts && npm run audit:functional:recovery && npm run audit:functional:adversarial",
-    "test:admin:e2e": "playwright test tests/e2e/admin-reservations-crm.spec.js --project=desktop-chromium",
+    "test:admin:e2e": "playwright test tests/e2e/admin-reservations-crm.spec.js --project=desktop-chromium --project=mobile-chromium",
     "audit:regression": "npm run test:visual && npm run audit:visual:memory:responsive",
     "audit:final": "npm run test:core && npm run audit:seo && npm run test:e2e",
     "audit": "npm run audit:inventory && npm run test:visual && npm run audit:connectivity:views:strict && npm run audit:visual && npm run audit:visual:memory:responsive && npm run audit:final",

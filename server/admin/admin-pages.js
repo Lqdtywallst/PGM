@@ -1034,42 +1034,188 @@ function renderAdminReservationsPage() {
         }
         @media (max-width: 620px) {
             .topbar {
-                align-items: flex-start;
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto;
+                align-items: center;
+                padding: 8px 14px;
+            }
+            .brand {
+                gap: 8px;
+            }
+            .brand-mark {
+                width: 34px;
+                height: 34px;
+                border-radius: 10px;
+            }
+            .brand strong {
+                font-size: 0.72rem;
+                line-height: 1.1;
             }
             .brand span {
                 display: none;
             }
+            .topbar-actions {
+                display: grid;
+                grid-template-columns: auto;
+                justify-items: end;
+                gap: 6px;
+            }
+            .environment-chip {
+                min-height: 28px;
+                padding: 0 10px;
+                font-size: 0.58rem;
+            }
+            .topbar-link {
+                display: none;
+            }
+            .logout {
+                min-height: 32px;
+                padding: 0 12px;
+                border-radius: 999px;
+                font-size: 0.66rem;
+            }
             .layout {
-                padding: 14px;
+                gap: 12px;
+                padding: 12px;
             }
             .hero,
             .toolbar,
             .detail-panel {
-                border-radius: 20px;
-                padding: 18px;
+                border-radius: 18px;
+                padding: 14px;
+            }
+            h1 {
+                font-size: clamp(1.55rem, 10vw, 1.95rem);
+            }
+            .hero p {
+                font-size: 0.86rem;
+            }
+            .hero-actions {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 8px;
+                margin-top: 12px;
+            }
+            .hero-actions .button {
+                width: 100%;
+                min-height: 40px;
+                padding: 0 8px;
+                font-size: 0.62rem;
             }
             .manual-panel {
-                border-radius: 20px;
+                border-radius: 18px;
+                padding: 14px;
             }
-            .search-row,
             .ops-panel,
             .reservation-card,
-            .detail-actions,
             .field-grid,
-            .workspace-grid,
             .form-grid {
                 grid-template-columns: 1fr;
+            }
+            .search-row {
+                grid-template-columns: minmax(0, 1fr) minmax(100px, auto);
+                gap: 9px;
+            }
+            #searchInput {
+                grid-column: 1 / -1;
+            }
+            .queue-field {
+                grid-column: 1;
+            }
+            #refreshButton {
+                grid-column: 2;
+                align-self: end;
+                min-width: 104px;
+                padding: 0 10px;
             }
             .form-field.is-wide {
                 grid-column: span 1;
             }
-            .ops-status-main,
-            .ops-strip,
-            .ops-details-toggle {
-                grid-column: auto;
+            .ops-panel {
+                grid-template-columns: minmax(0, 1fr) auto;
+                gap: 9px;
+                padding: 12px;
+            }
+            .ops-status-main {
+                grid-column: 1 / -1;
+            }
+            .ops-strip {
+                grid-column: 1;
             }
             .ops-details-toggle {
+                grid-column: 2;
+                align-self: end;
+                min-height: 30px;
+                padding: 0 10px;
+                font-size: 0.62rem;
+            }
+            .ops-grid {
+                gap: 7px;
+            }
+            .reservation-card {
+                gap: 8px;
+                padding: 12px;
+            }
+            .reservation-title {
+                font-size: 1.12rem;
+            }
+            .reservation-meta {
+                gap: 4px 9px;
+                font-size: 0.78rem;
+            }
+            .reservation-card .status,
+            .workspace-row .status {
                 justify-self: start;
+            }
+            .detail-panel {
+                scroll-margin-top: 78px;
+            }
+            .detail-header {
+                align-items: flex-start;
+            }
+            .detail-title {
+                font-size: clamp(1.42rem, 9vw, 1.82rem);
+            }
+            .detail-subtitle {
+                margin-bottom: 10px;
+                font-size: 0.9rem;
+            }
+            .detail-actions {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .detail-actions .action.primary {
+                grid-column: 1 / -1;
+            }
+            .detail-close {
+                min-width: 78px;
+            }
+            .section {
+                padding: 12px 0;
+            }
+            .field {
+                padding: 9px;
+            }
+            .workspace-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 8px;
+            }
+            .workspace-card {
+                padding: 11px;
+            }
+            .workspace-card strong {
+                font-size: 1.25rem;
+            }
+            .workspace-head {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto;
+                align-items: start;
+            }
+            .workspace-copy {
+                font-size: 0.82rem;
+            }
+            .workspace-row {
+                grid-template-columns: 1fr;
+                text-align: left;
             }
         }
     </style>
@@ -1685,6 +1831,13 @@ function renderAdminReservationsPage() {
             '</div></div>';
         }
 
+        function scrollReservationDetailIntoView(detail) {
+            if (!window.matchMedia || !window.matchMedia('(max-width: 620px)').matches) return;
+            window.setTimeout(function () {
+                detail.scrollIntoView({ block: 'start', behavior: 'smooth' });
+            }, 0);
+        }
+
         function renderDetail(payload) {
             var r = payload.reservation;
             var detail = document.getElementById('reservationDetail');
@@ -1761,6 +1914,7 @@ function renderAdminReservationsPage() {
                 openManualPanel('edit', state.currentReservation);
             });
             document.getElementById('closeReservationDetail').addEventListener('click', closeReservationDetail);
+            scrollReservationDetailIntoView(detail);
         }
 
         function closeReservationDetail() {
