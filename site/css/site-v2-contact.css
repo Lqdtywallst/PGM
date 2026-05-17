@@ -267,14 +267,29 @@
 }
 
 .contact-trust-list li {
+    min-width: 0;
+}
+
+.contact-trust-list a {
     display: grid;
+    align-content: start;
     gap: 0.3rem;
     min-width: 0;
+    min-height: 100%;
     padding: 0.82rem 0.88rem;
     border: 1px solid rgba(241, 226, 189, 0.12);
     border-radius: 14px;
     background: rgba(255, 255, 255, 0.055);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+    text-decoration: none;
+    transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
+}
+
+.contact-trust-list a:hover,
+.contact-trust-list a:focus-visible {
+    border-color: rgba(241, 226, 189, 0.36);
+    background: rgba(255, 255, 255, 0.09);
+    transform: translateY(-1px);
 }
 
 .contact-trust-list strong {
