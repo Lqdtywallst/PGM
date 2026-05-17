@@ -1060,9 +1060,13 @@ function renderAdminReservationsPage() {
                 '. Stripe: ' + (data.services && data.services.stripeMode ? data.services.stripeMode : 'unknown') + '.';
 
             var checks = Array.isArray(data.checks) ? data.checks : [];
+            var crmData = data.storage && data.storage.crmData ? data.storage.crmData : {};
             var metricCards = [
                 '<div class="ops-metric"><span>Environment</span><strong>' + escapeHtml(data.label || 'CRM') + '</strong></div>',
                 '<div class="ops-metric"><span>Reservations</span><strong>' + escapeHtml(data.storage && data.storage.reservationCount != null ? data.storage.reservationCount : 'Unknown') + '</strong></div>',
+                '<div class="ops-metric"><span>Customers</span><strong>' + escapeHtml(crmData.customerCount != null ? crmData.customerCount : 'Unknown') + '</strong></div>',
+                '<div class="ops-metric"><span>AI-ready</span><strong>' + escapeHtml(crmData.aiReadyReservationCount != null ? crmData.aiReadyReservationCount : 'Unknown') + '</strong></div>',
+                '<div class="ops-metric"><span>Data score</span><strong>' + escapeHtml(crmData.averageDataQualityScore != null ? crmData.averageDataQualityScore + '%' : 'Unknown') + '</strong></div>',
                 '<div class="ops-metric"><span>Database</span><strong>' + escapeHtml(data.storage && data.storage.databaseConfigured ? 'Postgres' : 'Local fallback') + '</strong></div>',
                 '<div class="ops-metric"><span>Updated</span><strong>' + escapeHtml(data.storage && data.storage.latestUpdatedAt ? formatDate(data.storage.latestUpdatedAt) : 'No records yet') + '</strong></div>'
             ];

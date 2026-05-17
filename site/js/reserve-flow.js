@@ -13,6 +13,26 @@
         function normalizeValue(value) {
             return String(value || '').trim();
         }
+        function readUtmParam(params, key) {
+            return normalizeValue(params.get(key)).slice(0, 180);
+        }
+        function buildClientContext() {
+            const params = new URLSearchParams(window.location.search || '');
+            const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
+            const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+
+            return {
+                pagePath: normalizeValue(window.location.pathname).slice(0, 180),
+                landingUrl: normalizeValue(window.location.href).slice(0, 500),
+                referrer: normalizeValue(document.referrer).slice(0, 500),
+                utmSource: readUtmParam(params, 'utm_source'),
+                utmMedium: readUtmParam(params, 'utm_medium'),
+                utmCampaign: readUtmParam(params, 'utm_campaign'),
+                viewport: `${viewportWidth}x${viewportHeight}`,
+                language: normalizeValue(navigator.language).slice(0, 40),
+                timezone: normalizeValue(Intl.DateTimeFormat().resolvedOptions().timeZone).slice(0, 80)
+            };
+        }
         function getNavigationType() {
             return window.performance?.getEntriesByType?.('navigation')?.[0]?.type || '';
         }
@@ -1411,6 +1431,7 @@
                     const reservationData = {
                         amount: totalCents,
                         currency: (window.STRIPE_CONFIG && window.STRIPE_CONFIG.currency) || (isAED ? 'aed' : 'eur'),
+                        clientContext: buildClientContext(),
                         customerData: {
                             name: formData.fullName,
                             email: formData.email,

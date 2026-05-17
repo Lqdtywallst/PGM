@@ -60,6 +60,19 @@ The CRM does not hard-delete reservations. Use:
 Every create, edit, note update, review mark, handover confirmation,
 cancellation and archive writes an entry to `reservationData.admin.activity`.
 
+## CRM Data And AI Readiness
+
+The reservation table is still the source of truth, but PostgreSQL also keeps a
+derived CRM data layer for future reporting and AI assistance:
+
+- `crm_customers` normalizes customer identity from email, phone or Stripe customer ID.
+- `crm_reservation_intelligence` separates lead stage, payment status, handover status and reservation status.
+- `crm_interaction_events` starts a deterministic event timeline from reservation state changes.
+
+The readiness panel now shows customer count, AI-ready reservations and average
+data quality score. See `docs/admin/CRM-DATA-AI-ROADMAP.md` before adding AI
+features or training workflows.
+
 ## Required Environment
 
 Set these variables in Railway before using the desk:

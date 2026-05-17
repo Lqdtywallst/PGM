@@ -1,9 +1,13 @@
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const {
+    buildCrmInteractionSeed,
+    buildCrmReservationIntelligence
+} = require('../crm/crm-intelligence');
 
 const runtimeReservationDir = path.resolve(__dirname, '..', '..', 'output', 'runtime-reservations');
-const RESERVATION_STORAGE_SCHEMA_VERSION = 1;
+const RESERVATION_STORAGE_SCHEMA_VERSION = 2;
 
 const CREATE_RESERVATIONS_TABLE_SQL = `
 CREATE TABLE IF NOT EXISTS reservations (
@@ -43,6 +47,81 @@ CREATE INDEX IF NOT EXISTS reservations_schedule_idx ON reservations (start_date
 
 ALTER TABLE reservations
     ADD COLUMN IF NOT EXISTS schema_version INTEGER NOT NULL DEFAULT 1;
+
+CREATE TABLE IF NOT EXISTS crm_customers (
+    id TEXT PRIMARY KEY,
+    display_name TEXT,
+    primary_email TEXT,
+    primary_phone TEXT,
+    stripe_customer_id TEXT,
+    city TEXT,
+    country TEXT,
+    identity_key TEXT,
+    consent_data JSONB NOT NULL DEFAULT '{}'::jsonb,
+    data_quality JSONB NOT NULL DEFAULT '{}'::jsonb,
+    first_source TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS crm_customers_primary_email_idx
+    ON crm_customers (primary_email)
+    WHERE primary_email IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS crm_customers_primary_phone_idx
+    ON crm_customers (primary_phone)
+    WHERE primary_phone IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS crm_customers_stripe_customer_idx
+    ON crm_customers (stripe_customer_id)
+    WHERE stripe_customer_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS crm_customers_updated_at_idx ON crm_customers (updated_at DESC);
+
+CREATE TABLE IF NOT EXISTS crm_reservation_intelligence (
+    reservation_id TEXT PRIMARY KEY REFERENCES reservations(reservation_id) ON DELETE CASCADE,
+    customer_id TEXT NOT NULL,
+    lead_stage TEXT NOT NULL,
+    payment_status TEXT NOT NULL,
+    handover_status TEXT NOT NULL,
+    reservation_status TEXT NOT NULL,
+    source TEXT NOT NULL,
+    preferred_vehicle TEXT,
+    pickup_area TEXT,
+    dropoff_area TEXT,
+    rental_start DATE,
+    rental_end DATE,
+    total_amount NUMERIC,
+    attribution JSONB NOT NULL DEFAULT '{}'::jsonb,
+    data_quality JSONB NOT NULL DEFAULT '{}'::jsonb,
+    ai_features JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS crm_reservation_intelligence_customer_idx
+    ON crm_reservation_intelligence (customer_id);
+CREATE INDEX IF NOT EXISTS crm_reservation_intelligence_stage_idx
+    ON crm_reservation_intelligence (lead_stage, payment_status, handover_status);
+CREATE INDEX IF NOT EXISTS crm_reservation_intelligence_quality_idx
+    ON crm_reservation_intelligence (((data_quality ->> 'score')::int));
+
+CREATE TABLE IF NOT EXISTS crm_interaction_events (
+    id TEXT PRIMARY KEY,
+    reservation_id TEXT,
+    customer_id TEXT,
+    event_type TEXT NOT NULL,
+    channel TEXT NOT NULL DEFAULT 'system',
+    direction TEXT NOT NULL DEFAULT 'internal',
+    summary TEXT NOT NULL,
+    actor TEXT,
+    outcome TEXT,
+    metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+    occurred_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS crm_interaction_events_reservation_idx
+    ON crm_interaction_events (reservation_id, occurred_at DESC);
+CREATE INDEX IF NOT EXISTS crm_interaction_events_customer_idx
+    ON crm_interaction_events (customer_id, occurred_at DESC);
 `;
 
 let pgPool = null;
@@ -317,6 +396,26 @@ function saveLocalReservationRecord(record) {
     };
 }
 
+function buildLocalCrmDataDiagnostics(records = []) {
+    const intelligenceRows = records.map(buildCrmReservationIntelligence);
+    const customerIds = new Set(intelligenceRows.map((item) => item.customer.customerId).filter(Boolean));
+    const scores = intelligenceRows
+        .map((item) => item.dataQuality?.score)
+        .filter((score) => Number.isFinite(score));
+    const averageScore = scores.length
+        ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length)
+        : null;
+
+    return {
+        schemaVersion: RESERVATION_STORAGE_SCHEMA_VERSION,
+        customerCount: customerIds.size,
+        reservationIntelligenceCount: intelligenceRows.length,
+        interactionEventCount: intelligenceRows.length,
+        aiReadyReservationCount: intelligenceRows.filter((item) => item.dataQuality?.aiReadyForOps).length,
+        averageDataQualityScore: averageScore
+    };
+}
+
 function deleteLocalReservationRecord(recordKey) {
     const filePath = getReservationRecordPath(recordKey);
     if (fs.existsSync(filePath)) {
@@ -389,6 +488,188 @@ async function listPostgresReservationRecords({ limit = 1000 } = {}) {
     );
 
     return result.rows.map(rowToReservationRecord).filter(Boolean);
+}
+
+async function resolveCrmCustomerId(pool, customer = {}) {
+    const result = await pool.query(
+        `SELECT id
+         FROM crm_customers
+         WHERE ($1::text IS NOT NULL AND primary_email = $1)
+            OR ($2::text IS NOT NULL AND primary_phone = $2)
+            OR ($3::text IS NOT NULL AND stripe_customer_id = $3)
+         ORDER BY updated_at DESC
+         LIMIT 1`,
+        [
+            customer.email || null,
+            customer.phone || null,
+            customer.stripeCustomerId || null
+        ]
+    );
+
+    return result.rows[0]?.id || customer.customerId;
+}
+
+async function syncPostgresCrmData(pool, record = {}) {
+    const intelligence = buildCrmReservationIntelligence(record);
+    if (!intelligence.reservationId || !intelligence.customer?.customerId) {
+        return;
+    }
+
+    const customerId = await resolveCrmCustomerId(pool, intelligence.customer);
+    const customer = {
+        ...intelligence.customer,
+        customerId
+    };
+    const event = {
+        ...buildCrmInteractionSeed(record),
+        customerId
+    };
+    const updatedAt = record.updatedAt || new Date().toISOString();
+
+    await pool.query(
+        `INSERT INTO crm_customers (
+            id,
+            display_name,
+            primary_email,
+            primary_phone,
+            stripe_customer_id,
+            city,
+            country,
+            identity_key,
+            consent_data,
+            data_quality,
+            first_source,
+            created_at,
+            updated_at
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10::jsonb, $11, $12, $13)
+        ON CONFLICT (id) DO UPDATE SET
+            display_name = COALESCE(EXCLUDED.display_name, crm_customers.display_name),
+            primary_email = COALESCE(EXCLUDED.primary_email, crm_customers.primary_email),
+            primary_phone = COALESCE(EXCLUDED.primary_phone, crm_customers.primary_phone),
+            stripe_customer_id = COALESCE(EXCLUDED.stripe_customer_id, crm_customers.stripe_customer_id),
+            city = COALESCE(EXCLUDED.city, crm_customers.city),
+            country = COALESCE(EXCLUDED.country, crm_customers.country),
+            identity_key = COALESCE(EXCLUDED.identity_key, crm_customers.identity_key),
+            consent_data = crm_customers.consent_data || EXCLUDED.consent_data,
+            data_quality = EXCLUDED.data_quality,
+            first_source = COALESCE(crm_customers.first_source, EXCLUDED.first_source),
+            updated_at = EXCLUDED.updated_at`,
+        [
+            customer.customerId,
+            customer.name || null,
+            customer.email || null,
+            customer.phone || null,
+            customer.stripeCustomerId || null,
+            customer.city || null,
+            customer.country || null,
+            customer.identityKey || null,
+            JSON.stringify(customer.consent || {}),
+            JSON.stringify(intelligence.dataQuality || {}),
+            intelligence.source || record.source || null,
+            record.createdAt || updatedAt,
+            updatedAt
+        ]
+    );
+
+    await pool.query(
+        `INSERT INTO crm_reservation_intelligence (
+            reservation_id,
+            customer_id,
+            lead_stage,
+            payment_status,
+            handover_status,
+            reservation_status,
+            source,
+            preferred_vehicle,
+            pickup_area,
+            dropoff_area,
+            rental_start,
+            rental_end,
+            total_amount,
+            attribution,
+            data_quality,
+            ai_features,
+            created_at,
+            updated_at
+        )
+        VALUES (
+            $1, $2, $3, $4, $5, $6, $7, $8,
+            $9, $10, $11, $12, $13, $14::jsonb, $15::jsonb, $16::jsonb, $17, $18
+        )
+        ON CONFLICT (reservation_id) DO UPDATE SET
+            customer_id = EXCLUDED.customer_id,
+            lead_stage = EXCLUDED.lead_stage,
+            payment_status = EXCLUDED.payment_status,
+            handover_status = EXCLUDED.handover_status,
+            reservation_status = EXCLUDED.reservation_status,
+            source = EXCLUDED.source,
+            preferred_vehicle = COALESCE(EXCLUDED.preferred_vehicle, crm_reservation_intelligence.preferred_vehicle),
+            pickup_area = COALESCE(EXCLUDED.pickup_area, crm_reservation_intelligence.pickup_area),
+            dropoff_area = COALESCE(EXCLUDED.dropoff_area, crm_reservation_intelligence.dropoff_area),
+            rental_start = COALESCE(EXCLUDED.rental_start, crm_reservation_intelligence.rental_start),
+            rental_end = COALESCE(EXCLUDED.rental_end, crm_reservation_intelligence.rental_end),
+            total_amount = COALESCE(EXCLUDED.total_amount, crm_reservation_intelligence.total_amount),
+            attribution = crm_reservation_intelligence.attribution || EXCLUDED.attribution,
+            data_quality = EXCLUDED.data_quality,
+            ai_features = EXCLUDED.ai_features,
+            updated_at = EXCLUDED.updated_at`,
+        [
+            intelligence.reservationId,
+            customer.customerId,
+            intelligence.leadStage,
+            intelligence.paymentStatus,
+            intelligence.handoverStatus,
+            intelligence.reservationStatus,
+            intelligence.source,
+            intelligence.preferredVehicle || null,
+            intelligence.pickupArea || null,
+            intelligence.dropoffArea || null,
+            dateOrNull(intelligence.rentalStart),
+            dateOrNull(intelligence.rentalEnd),
+            numberOrNull(intelligence.totalAmount),
+            JSON.stringify(intelligence.attribution || {}),
+            JSON.stringify(intelligence.dataQuality || {}),
+            JSON.stringify(intelligence.aiFeatures || {}),
+            record.createdAt || updatedAt,
+            updatedAt
+        ]
+    );
+
+    await pool.query(
+        `INSERT INTO crm_interaction_events (
+            id,
+            reservation_id,
+            customer_id,
+            event_type,
+            channel,
+            direction,
+            summary,
+            actor,
+            outcome,
+            metadata,
+            occurred_at
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11)
+        ON CONFLICT (id) DO UPDATE SET
+            customer_id = EXCLUDED.customer_id,
+            summary = EXCLUDED.summary,
+            outcome = EXCLUDED.outcome,
+            metadata = crm_interaction_events.metadata || EXCLUDED.metadata`,
+        [
+            event.id,
+            event.reservationId || null,
+            event.customerId || null,
+            event.eventType,
+            event.channel,
+            event.direction,
+            event.summary,
+            event.actor,
+            event.outcome,
+            JSON.stringify(event.metadata || {}),
+            event.occurredAt || updatedAt
+        ]
+    );
 }
 
 async function savePostgresReservationRecord(record) {
@@ -491,7 +772,17 @@ async function savePostgresReservationRecord(record) {
         values
     );
 
-    return rowToReservationRecord(result.rows[0]);
+    const savedRecord = rowToReservationRecord(result.rows[0]);
+    try {
+        await syncPostgresCrmData(pool, savedRecord);
+    } catch (error) {
+        console.warn('[CRM DATA] Reservation saved but CRM intelligence sync failed:', {
+            reservationId: savedRecord.reservationId,
+            message: error.message
+        });
+    }
+
+    return savedRecord;
 }
 
 async function readReservationRecord(recordKey) {
@@ -600,7 +891,8 @@ async function getReservationStoreDiagnostics() {
                 ...diagnostics,
                 storagePath: runtimeReservationDir,
                 reservationCount: records.length,
-                latestUpdatedAt: records[0]?.updatedAt || records[0]?.createdAt || null
+                latestUpdatedAt: records[0]?.updatedAt || records[0]?.createdAt || null,
+                crmData: buildLocalCrmDataDiagnostics(records)
             };
         } catch (error) {
             return {
@@ -618,7 +910,16 @@ async function getReservationStoreDiagnostics() {
             `SELECT COUNT(*)::int AS reservation_count, MAX(updated_at) AS latest_updated_at
              FROM reservations`
         );
+        const crmResult = await pool.query(
+            `SELECT
+                (SELECT COUNT(*)::int FROM crm_customers) AS customer_count,
+                (SELECT COUNT(*)::int FROM crm_reservation_intelligence) AS reservation_intelligence_count,
+                (SELECT COUNT(*)::int FROM crm_interaction_events) AS interaction_event_count,
+                (SELECT COUNT(*)::int FROM crm_reservation_intelligence WHERE data_quality ->> 'aiReadyForOps' = 'true') AS ai_ready_reservation_count,
+                (SELECT ROUND(AVG((data_quality ->> 'score')::numeric))::int FROM crm_reservation_intelligence WHERE data_quality ? 'score') AS average_data_quality_score`
+        );
         const row = result.rows[0] || {};
+        const crmRow = crmResult.rows[0] || {};
 
         return {
             ...diagnostics,
@@ -626,7 +927,15 @@ async function getReservationStoreDiagnostics() {
             reservationCount: row.reservation_count || 0,
             latestUpdatedAt: row.latest_updated_at instanceof Date
                 ? row.latest_updated_at.toISOString()
-                : row.latest_updated_at || null
+                : row.latest_updated_at || null,
+            crmData: {
+                schemaVersion: RESERVATION_STORAGE_SCHEMA_VERSION,
+                customerCount: crmRow.customer_count || 0,
+                reservationIntelligenceCount: crmRow.reservation_intelligence_count || 0,
+                interactionEventCount: crmRow.interaction_event_count || 0,
+                aiReadyReservationCount: crmRow.ai_ready_reservation_count || 0,
+                averageDataQualityScore: crmRow.average_data_quality_score ?? null
+            }
         };
     } catch (error) {
         return {

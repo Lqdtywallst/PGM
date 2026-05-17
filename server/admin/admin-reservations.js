@@ -199,6 +199,15 @@ function buildAdminOperationsStatus(options = {}) {
             : 'Storage diagnostics are healthy.'
     ));
 
+    checks.push(buildStatusCheck(
+        'crm_data_layer',
+        'CRM data layer',
+        diagnostics.crmData ? 'pass' : (isRealEnvironment ? 'fail' : 'warn'),
+        diagnostics.crmData
+            ? `CRM intelligence schema v${diagnostics.crmData.schemaVersion || 'unknown'} is available.`
+            : 'CRM intelligence tables and data-quality diagnostics are not available.'
+    ));
+
     const failCount = checks.filter((check) => check.status === 'fail').length;
     const warnCount = checks.filter((check) => check.status === 'warn').length;
 
@@ -223,7 +232,8 @@ function buildAdminOperationsStatus(options = {}) {
             schemaVersion: diagnostics.schemaVersion || null,
             schemaReady: diagnostics.schemaReady ?? null,
             reservationCount: diagnostics.reservationCount ?? null,
-            latestUpdatedAt: diagnostics.latestUpdatedAt || null
+            latestUpdatedAt: diagnostics.latestUpdatedAt || null,
+            crmData: diagnostics.crmData || null
         }
     };
 }

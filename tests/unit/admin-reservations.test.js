@@ -311,7 +311,15 @@ test('admin operations status separates staging and production safety checks', (
             ok: true,
             mode: 'postgres',
             reservationCount: 12,
-            latestUpdatedAt: now
+            latestUpdatedAt: now,
+            crmData: {
+                schemaVersion: 2,
+                customerCount: 9,
+                reservationIntelligenceCount: 12,
+                interactionEventCount: 18,
+                aiReadyReservationCount: 10,
+                averageDataQualityScore: 84
+            }
         }
     });
 
@@ -319,6 +327,7 @@ test('admin operations status separates staging and production safety checks', (
     assert.equal(stagingStatus.overallStatus, 'ok');
     assert.equal(stagingStatus.services.stripeMode, 'test');
     assert.equal(stagingStatus.storage.databaseConfigured, true);
+    assert.equal(stagingStatus.storage.crmData.aiReadyReservationCount, 10);
 
     const brokenProduction = buildAdminOperationsStatus({
         env: {

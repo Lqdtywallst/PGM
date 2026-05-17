@@ -237,12 +237,35 @@ function buildSafeReservationLookupSummary(record = {}) {
     };
 }
 
-function sanitizeReservationRequestForStorage(data = {}) {
+function cleanContextValue(value, maxLength = 500) {
+    const clean = String(value ?? '').trim();
+    if (!clean) return null;
+    return clean.slice(0, maxLength);
+}
+
+function sanitizeReservationRequestForStorage(data = {}, req = {}) {
+    const clientContext = data.clientContext || {};
+    const headers = req.headers || {};
+
     return {
         hasNestedCustomerData: !!data.customerData,
         hasNestedReservationData: !!data.reservationData,
         amount: data.amount || null,
         currency: data.currency || data.reservationData?.currency || null,
+        attribution: {
+            pagePath: cleanContextValue(clientContext.pagePath || clientContext.page_path, 180),
+            landingUrl: cleanContextValue(clientContext.landingUrl || clientContext.landing_url, 500),
+            referrer: cleanContextValue(clientContext.referrer || headers.referer, 500),
+            origin: cleanContextValue(headers.origin, 180),
+            utmSource: cleanContextValue(clientContext.utmSource || clientContext.utm_source, 120),
+            utmMedium: cleanContextValue(clientContext.utmMedium || clientContext.utm_medium, 120),
+            utmCampaign: cleanContextValue(clientContext.utmCampaign || clientContext.utm_campaign, 180)
+        },
+        device: {
+            viewport: cleanContextValue(clientContext.viewport, 60),
+            language: cleanContextValue(clientContext.language, 40),
+            timezone: cleanContextValue(clientContext.timezone, 80)
+        },
         submittedAt: new Date().toISOString()
     };
 }
@@ -759,7 +782,7 @@ router.post('/', createReservationRateLimit({
                             queuedAt: new Date().toISOString()
                         }
                     },
-                    rawRequest: sanitizeReservationRequestForStorage(data)
+                    rawRequest: sanitizeReservationRequestForStorage(data, req)
                 }, 'reservation received', { critical: true });
             };
 
