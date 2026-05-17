@@ -1819,7 +1819,9 @@ function initSiteV2() {
             ".vehicle-pdp-gallery-top__stage img",
             ".vehicle-pdp-gallery-top__thumb--media img",
             ".vehicle-pdp-gallery-panel__item img",
-            ".vehicle-pdp-gallery-card__media img"
+            ".vehicle-pdp-gallery-card__media img",
+            ".vehicle-landing-reserve__stage img",
+            ".vehicle-landing-reserve__thumbs img"
         ].join(",")));
 
         if (galleryImages.length < 2) {
@@ -1857,7 +1859,7 @@ function initSiteV2() {
                 alt: normalizeBookingValue(image.getAttribute("alt")) || "Vehicle media",
                 caption: getCaptionForImage(image)
             };
-            const trigger = image.closest(".vehicle-pdp-gallery-top__stage, .vehicle-pdp-gallery-top__thumb--media, .vehicle-pdp-gallery-panel__item, .vehicle-pdp-gallery-card__media");
+            const trigger = image.closest(".vehicle-pdp-gallery-top__stage, .vehicle-pdp-gallery-top__thumb--media, .vehicle-pdp-gallery-panel__item, .vehicle-pdp-gallery-card__media, .vehicle-landing-reserve__stage, .vehicle-landing-reserve__thumbs figure");
 
             seenSources.add(absoluteSource);
             items.push(item);

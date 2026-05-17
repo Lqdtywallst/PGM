@@ -1779,7 +1779,7 @@ select {
     width: 100%;
     height: auto;
     object-fit: contain;
-    filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.18));
+    filter: none;
 }
 
 .lab-nav__card-media--brand {
@@ -1890,9 +1890,7 @@ select {
 .lab-nav__card--type .lab-nav__card-media--type img {
     transform: scale(1.36);
     transform-origin: center;
-    filter:
-        drop-shadow(0 12px 14px rgba(0, 0, 0, 0.32))
-        drop-shadow(0 3px 5px rgba(0, 0, 0, 0.2));
+    filter: none;
 }
 
 .lab-nav__card--type .lab-nav__card-copy {
@@ -3066,7 +3064,7 @@ select {
 
 .fleet-category__media::before,
 .fleet-category__media::after {
-    content: "";
+    content: none;
     position: absolute;
     pointer-events: none;
 }
@@ -3109,18 +3107,14 @@ select {
     object-fit: contain;
     object-position: center bottom;
     justify-self: center;
-    filter:
-        drop-shadow(0 18px 20px rgba(0, 0, 0, 0.24))
-        drop-shadow(0 5px 10px rgba(0, 0, 0, 0.18));
+    filter: none;
     transform: translateY(var(--fleet-image-shift-y, 0));
     transition: transform 260ms ease, filter 260ms ease;
 }
 
 .fleet-category:hover .fleet-category__image {
     transform: translateY(calc(var(--fleet-image-shift-y, 0) - 2px));
-    filter:
-        drop-shadow(0 20px 22px rgba(0, 0, 0, 0.28))
-        drop-shadow(0 6px 12px rgba(0, 0, 0, 0.18));
+    filter: none;
 }
 
 .fleet-category__copy {
@@ -6259,7 +6253,7 @@ a.brand-marquee__item:focus-visible img {
     }
 
     .fleet-showcase .fleet-visual-card__body {
-        gap: 0.58rem;
+        gap: 0.5rem;
         padding: 0.82rem var(--fleet-card-content-pad-x) 0.72rem;
     }
 
@@ -6271,10 +6265,21 @@ a.brand-marquee__item:focus-visible img {
         display: none;
     }
 
-    .fleet-showcase .fleet-visual-card__description,
     .fleet-showcase .fleet-visual-card__sales-line,
     .fleet-showcase .fleet-visual-card__spec-list {
         display: none;
+    }
+
+    .fleet-showcase .fleet-visual-card__description {
+        display: -webkit-box;
+        min-height: 2.55rem;
+        margin: 0.12rem 0 0;
+        overflow: hidden;
+        color: rgba(73, 62, 51, 0.82);
+        font-size: 0.84rem;
+        line-height: 1.34;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
     }
 
     .fleet-showcase .fleet-visual-card h3 {
@@ -6288,8 +6293,8 @@ a.brand-marquee__item:focus-visible img {
     }
 
     .fleet-showcase .fleet-visual-card__price-box {
-        margin-top: 0.05rem;
-        padding: 0.7rem 0.76rem;
+        margin-top: 0;
+        padding: 0.62rem 0.76rem;
         border-radius: 0.82rem;
     }
 
