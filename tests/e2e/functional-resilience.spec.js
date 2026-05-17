@@ -6,6 +6,7 @@ const {
 const {
     createConsoleTracker,
     expectNoConsoleErrors,
+    mockFleetAvailability,
     settlePage
 } = require('./support/site-helpers');
 
@@ -55,6 +56,7 @@ test('reserve preserves guest data after validation errors and lets the user rec
 
 test('fleet survives browser back from reserve without losing the active schedule', async ({ page }) => {
     const consoleErrors = createConsoleTracker(page);
+    await mockFleetAvailability(page);
 
     await page.goto('/fleet.html', { waitUntil: 'domcontentloaded' });
     await settlePage(page);

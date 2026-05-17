@@ -3,6 +3,7 @@ const { reservationGuest } = require('../../test-data/users.json');
 const {
     createConsoleTracker,
     expectNoConsoleErrors,
+    mockFleetAvailability,
     settlePage
 } = require('./support/site-helpers');
 
@@ -94,6 +95,7 @@ test.describe('Mobile friction points', () => {
 
     test('mobile filter sheet can narrow the fleet and still hand the correct schedule into reserve', async ({ page }) => {
         const consoleErrors = createConsoleTracker(page);
+        await mockFleetAvailability(page);
 
         await page.goto('/fleet.html', { waitUntil: 'domcontentloaded' });
         await settlePage(page);
@@ -182,6 +184,7 @@ test.describe('Mobile friction points', () => {
 
     test('mobile filter sheet has obvious exits back to fleet results', async ({ page }) => {
         const consoleErrors = createConsoleTracker(page);
+        await mockFleetAvailability(page);
 
         await page.goto('/fleet.html', { waitUntil: 'domcontentloaded' });
         await settlePage(page);
@@ -209,6 +212,7 @@ test.describe('Mobile friction points', () => {
 
     test('mobile vehicle pages expose a prominent return to fleet', async ({ page }) => {
         const consoleErrors = createConsoleTracker(page);
+        await mockFleetAvailability(page);
 
         await page.goto('/lamborghini-huracan-evo-spyder-rental-dubai.html', { waitUntil: 'domcontentloaded' });
         await settlePage(page);
@@ -242,6 +246,7 @@ test.describe('Mobile friction points', () => {
 
     test('short mobile filter sheet keeps filled date controls readable', async ({ page }) => {
         const consoleErrors = createConsoleTracker(page);
+        await mockFleetAvailability(page);
 
         await page.setViewportSize({ width: 400, height: 608 });
         await page.goto('/fleet.html', { waitUntil: 'domcontentloaded' });
@@ -357,6 +362,7 @@ test.describe('Mobile friction points', () => {
 
     test('fleet mobile cards avoid embedded contact buttons and keep the global dock visible', async ({ page }) => {
         const consoleErrors = createConsoleTracker(page);
+        await mockFleetAvailability(page);
 
         await page.setViewportSize({ width: 390, height: 844 });
         await page.goto('/fleet.html', { waitUntil: 'domcontentloaded' });

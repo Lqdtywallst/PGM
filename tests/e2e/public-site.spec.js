@@ -153,7 +153,7 @@ test.describe('Public site quality gate', () => {
         await expect(page.locator('#home-pickup-date')).toBeVisible();
         await expect(page.locator('#home-return-date')).toBeVisible();
 
-        await page.getByRole('button', { name: 'Cars Brands' }).click();
+        await page.getByRole('button', { name: /Cars?\s+Brands/i }).click();
         await expect(page.getByRole('link', { name: /Lamborghini/i }).first()).toBeVisible();
 
         await expect(page.getByRole('button', { name: /See available cars/i })).toBeVisible();

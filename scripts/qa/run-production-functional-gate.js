@@ -60,6 +60,13 @@ const steps = [
         ])
     },
     {
+        label: 'Every fleet car card routes media, title, keyboard and reserve actions correctly',
+        ...playwright([
+            'tests/e2e/fleet-card-actions-routing.spec.js',
+            '--project=desktop-chromium'
+        ])
+    },
+    {
         label: 'Services to reserve funnels',
         ...playwright([
             'tests/e2e/services-to-reserve-funnels.spec.js',
@@ -89,6 +96,13 @@ const steps = [
             'tests/e2e/reservation-lookup.spec.js',
             '--project=desktop-chromium',
             '--project=mobile-chromium'
+        ])
+    },
+    {
+        label: 'CRM admin can manage reservations manually without the visual editor',
+        ...playwright([
+            'tests/e2e/admin-reservations-crm.spec.js',
+            '--project=desktop-chromium'
         ])
     }
 ];
@@ -141,7 +155,7 @@ if (listOnly) {
 }
 
 console.log('Running production functional rental gate...');
-console.log('This gate is intentionally business-focused: discovery, availability, exact car handoff, reserve, recovery, contact, and lookup.');
+console.log('This gate is intentionally business-focused: discovery, availability, exact car handoff, reserve, recovery, contact, lookup, and CRM operations.');
 
 for (const [index, step] of steps.entries()) {
     const startedAt = Date.now();

@@ -23,6 +23,7 @@ No se sube a produccion si falla cualquiera de estas categorias:
 - Reservation lookup filtra informacion sensible, muestra resultados obsoletos o mezcla reservas.
 - Mobile impide completar una accion critica por overlays, drawers, filtros o CTAs mal apilados.
 - Hay console errors/request failures en flujos basicos de cliente.
+- El CRM no permite revisar, editar, crear, archivar o cancelar reservas sin volver a introducir el editor visual.
 
 ## Fallos tipicos de alquiler/reserva que el auditor debe buscar
 
@@ -99,10 +100,12 @@ Un run valido debe cubrir:
 - Home availability con CRM mocked/controlado.
 - Home category cards a Fleet con filtro real y resultados no vacios.
 - Home featured cars a landings exactas.
+- Cada card de Fleet: media, titulo, teclado y CTA de reserva por los seis coches reales.
 - Fleet comparacion, filtros y reserve handoff.
 - Services deep links y funnels a reserve.
 - Reserve validaciones negativas, persistencia, recuperacion y doble submit.
 - Reservation lookup seguro.
+- CRM/admin: login, ausencia de editor visual, filtros/notas/review, creacion manual, edicion y archivado.
 - Functional agent en Home, Fleet, Reserve, Lookup y Contact para desktop/mobile.
 
 Si aparece un bug nuevo, se convierte en test o en memoria de auditoria. No se acepta como "ya lo miramos manualmente".

@@ -2,6 +2,7 @@ const { expect, test } = require('@playwright/test');
 const {
     createConsoleTracker,
     expectNoConsoleErrors,
+    mockFleetAvailability,
     settlePage
 } = require('./support/site-helpers');
 
@@ -68,6 +69,7 @@ test.describe('Fleet card action routing', () => {
     for (const fleetCard of fleetCards) {
         test(`${fleetCard.fullCar} card actions keep the customer on the intended flow`, async ({ page }) => {
             const consoleErrors = createConsoleTracker(page);
+            await mockFleetAvailability(page);
 
             await openFleet(page);
             const card = page.locator(`.js-fleet-card[data-id="${fleetCard.id}"]`);

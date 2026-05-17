@@ -6,6 +6,7 @@ const {
 const {
     createConsoleTracker,
     expectNoConsoleErrors,
+    mockFleetAvailability,
     settlePage
 } = require('./support/site-helpers');
 
@@ -246,6 +247,7 @@ test.describe('Adversarial functional audit', () => {
     test('mobile rapid filter mutation carries only the latest brand into reserve', async ({ page }, testInfo) => {
         test.skip(testInfo.project.name !== 'mobile-chromium', 'Mobile adversarial filter check.');
         const consoleErrors = createConsoleTracker(page);
+        await mockFleetAvailability(page);
 
         await page.goto('/fleet.html', { waitUntil: 'domcontentloaded' });
         await settlePage(page);

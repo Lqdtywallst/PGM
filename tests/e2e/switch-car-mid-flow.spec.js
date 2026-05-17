@@ -2,6 +2,7 @@ const { test, expect } = require('@playwright/test');
 const {
     createConsoleTracker,
     expectNoConsoleErrors,
+    mockFleetAvailability,
     settlePage
 } = require('./support/site-helpers');
 
@@ -15,6 +16,7 @@ test.describe('Switch car mid-flow', () => {
 
     test('guest can switch from mercedes to lamborghini without carrying stale car or pricing state', async ({ page }) => {
         const consoleErrors = createConsoleTracker(page);
+        await mockFleetAvailability(page);
 
         await page.goto('/fleet.html', { waitUntil: 'domcontentloaded' });
         await settlePage(page);

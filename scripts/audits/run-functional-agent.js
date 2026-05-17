@@ -2105,7 +2105,7 @@ function createHomeMegaMenuAction() {
         kind: 'menu',
         async run(page) {
             const recorder = createStepRecorder();
-            const brandsButton = page.getByRole('button', { name: /cars brands/i }).first();
+            const brandsButton = page.getByRole('button', { name: /cars?\s+brands/i }).first();
             await brandsButton.click();
             await expect(brandsButton).toHaveAttribute('aria-expanded', 'true');
             const panelId = await brandsButton.getAttribute('aria-controls');
@@ -2149,7 +2149,7 @@ function createHomeCarsTypesFilterAction() {
                 await page.goto(`${origin}/`, { waitUntil: 'domcontentloaded' });
                 await settlePage(page, 250);
 
-                const typesButton = page.getByRole('button', { name: /cars types/i }).first();
+                const typesButton = page.getByRole('button', { name: /cars?\s+types/i }).first();
                 await typesButton.click();
                 await expect(typesButton).toHaveAttribute('aria-expanded', 'true');
                 const panelId = await typesButton.getAttribute('aria-controls');

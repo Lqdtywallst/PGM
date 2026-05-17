@@ -3,6 +3,7 @@ const { reservationGuest } = require('../../test-data/users.json');
 const {
     createConsoleTracker,
     expectNoConsoleErrors,
+    mockFleetAvailability,
     primeHomeAnimations,
     settlePage
 } = require('./support/site-helpers');
@@ -16,7 +17,7 @@ async function openBrandLandingFromMegaMenu(page, landingPathname) {
     await primeHomeAnimations(page);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await settlePage(page);
-    const brandsButton = page.getByRole('button', { name: /Cars Brands/i }).first();
+    const brandsButton = page.getByRole('button', { name: /Cars?\s+Brands/i }).first();
     await brandsButton.click();
     await expect(brandsButton).toHaveAttribute('aria-expanded', 'true');
     const panelId = await brandsButton.getAttribute('aria-controls');
@@ -202,12 +203,13 @@ test('guest opens each Cars Types card into Fleet with a real non-empty type fil
 
     await primeHomeAnimations(page);
     const consoleErrors = createConsoleTracker(page);
+    await mockFleetAvailability(page);
 
     for (const journey of carTypeFleetJourneys) {
         await page.goto('/', { waitUntil: 'domcontentloaded' });
         await settlePage(page);
 
-        const typesButton = page.getByRole('button', { name: /Cars Types/i }).first();
+        const typesButton = page.getByRole('button', { name: /Cars?\s+Types/i }).first();
         await typesButton.click();
         await expect(typesButton).toHaveAttribute('aria-expanded', 'true');
 
@@ -234,6 +236,7 @@ for (const journey of directBrandAvailabilityJourneys) {
         test.skip(testInfo.project.name !== 'desktop-chromium', 'Mega menu journey is desktop-first');
 
         const consoleErrors = createConsoleTracker(page);
+        await mockFleetAvailability(page);
 
         await openBrandLandingFromMegaMenu(page, journey.landingPathname);
         await expect(page).toHaveURL(journey.landingUrl);
@@ -276,6 +279,7 @@ test('guest compares Lamborghini models from the SEO landing and starts reserve 
 
 test('guest compares Ferrari and Mercedes in fleet before opening reserve', async ({ page }) => {
     const consoleErrors = createConsoleTracker(page);
+    await mockFleetAvailability(page);
 
     await page.goto('/fleet.html', { waitUntil: 'domcontentloaded' });
     await settlePage(page);
@@ -309,6 +313,7 @@ test('guest compares Ferrari and Mercedes in fleet before opening reserve', asyn
 
 test('guest starts on a Mercedes brand page and carries the schedule through the vehicle detail page', async ({ page }) => {
     const consoleErrors = createConsoleTracker(page);
+    await mockFleetAvailability(page);
 
     await page.goto('/mercedes-rental-dubai.html', { waitUntil: 'domcontentloaded' });
     await settlePage(page);

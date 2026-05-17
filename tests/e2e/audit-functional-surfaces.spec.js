@@ -3,6 +3,7 @@ const { contactLead } = require('../../test-data/users.json');
 const {
     createConsoleTracker,
     expectNoConsoleErrors,
+    mockFleetAvailability,
     primeHomeAnimations,
     settlePage
 } = require('./support/site-helpers');
@@ -18,6 +19,7 @@ test.describe('Functional surfaces intelligent audit', () => {
     test('home booking panel hands schedule into fleet cleanly', async ({ page }) => {
         await primeHomeAnimations(page);
         const consoleErrors = createConsoleTracker(page);
+        await mockFleetAvailability(page);
 
         await page.goto('/', { waitUntil: 'domcontentloaded' });
         await settlePage(page);
@@ -38,6 +40,7 @@ test.describe('Functional surfaces intelligent audit', () => {
 
     test('fleet filters keep reserve CTAs aligned with the active schedule and reset cleanly', async ({ page }) => {
         const consoleErrors = createConsoleTracker(page);
+        await mockFleetAvailability(page);
 
         await page.goto('/fleet.html', { waitUntil: 'domcontentloaded' });
         await settlePage(page);

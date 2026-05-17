@@ -41,7 +41,12 @@ async function expectHeaderRoute(page, locator, href, label) {
 
 async function openDesktopMega(page, label) {
     const header = page.locator('header.lab-header');
-    const trigger = header.getByRole('button', { name: label, exact: true });
+    const triggerName = label === 'Cars Brands'
+        ? /Cars?\s+Brands/i
+        : label === 'Cars Types'
+            ? /Cars?\s+Types/i
+            : label;
+    const trigger = header.getByRole('button', { name: triggerName, exact: typeof triggerName === 'string' });
 
     await trigger.click();
 
