@@ -6,7 +6,9 @@ identifiable people and stock-source dependency.
 
 After generation, the assets were color-graded against the approved fleet
 photography so their contrast, cream/neutral backgrounds, shadow detail and
-warm gold accents feel consistent with the existing site images.
+warm gold accents feel consistent with the existing site images. A later pass
+increased brightness, color and opacity so the generated assets do not read as
+misty or translucent in the live UI.
 
 ## Generated Prompts
 
