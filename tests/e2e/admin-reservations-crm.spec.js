@@ -158,6 +158,13 @@ test.describe('Private admin reservations CRM', () => {
         await expect(page.locator('#operationsPanel')).toContainText('Test CRM');
         await expect(page.locator('#operationsPanel')).toContainText('local-json');
         await expect(page.locator('#operationsPanel')).toContainText('AI-ready');
+        await expect(page.locator('#operationsDetailsPanel')).toBeHidden();
+        await page.click('#operationsDetailsToggle');
+        await expect(page.locator('#operationsDetailsToggle')).toHaveText('Hide details');
+        await expect(page.locator('#operationsDetailsPanel')).toBeVisible();
+        await page.click('#operationsDetailsClose');
+        await expect(page.locator('#operationsDetailsToggle')).toHaveText('Show details');
+        await expect(page.locator('#operationsDetailsPanel')).toBeHidden();
         await expect(page.locator('#storageMode')).toContainText('local-json');
         await expect(page.locator('#resultCount')).toContainText('reservation');
 

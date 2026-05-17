@@ -492,31 +492,67 @@ function renderAdminReservationsPage() {
             color: #fff8e7;
             font-size: 0.76rem;
         }
-        .ops-details {
-            justify-self: end;
-        }
-        .ops-details summary {
+        .ops-details-toggle {
             min-height: 32px;
+            justify-self: end;
             padding: 0 12px;
             border: 1px solid rgba(247, 223, 149, 0.26);
             border-radius: 999px;
+            background: rgba(255, 255, 255, 0.055);
             color: var(--gold-soft);
             cursor: pointer;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
+            font-size: 0.68rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .ops-details-toggle:hover,
+        .ops-details-toggle[aria-expanded="true"] {
+            border-color: rgba(247, 223, 149, 0.54);
+            background: rgba(247, 223, 149, 0.12);
+        }
+        .ops-details-panel {
+            grid-column: 1 / -1;
+            justify-self: stretch;
+        }
+        .ops-details-panel[hidden] {
+            display: none;
+        }
+        .ops-details-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 8px;
+            padding-top: 6px;
+        }
+        .ops-details-head span {
+            color: var(--gold-soft);
             font-size: 0.68rem;
             font-weight: 900;
             letter-spacing: 0.1em;
-            list-style: none;
             text-transform: uppercase;
         }
-        .ops-details summary::-webkit-details-marker {
-            display: none;
+        .ops-details-close {
+            min-height: 30px;
+            padding: 0 10px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.055);
+            color: #fff8e7;
+            cursor: pointer;
+            font-size: 0.62rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
-        .ops-details[open] {
-            grid-column: 1 / -1;
-            justify-self: stretch;
-            padding-top: 6px;
+        .ops-details-close:hover {
+            border-color: rgba(247, 223, 149, 0.4);
+            color: var(--gold-soft);
         }
         .ops-grid {
             display: grid;
@@ -973,10 +1009,17 @@ function renderAdminReservationsPage() {
                 display: block;
             }
             .ops-panel {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr) auto;
+            }
+            .ops-status-main {
+                grid-column: 1 / -1;
             }
             .ops-strip {
+                grid-column: 1;
                 justify-content: flex-start;
+            }
+            .ops-details-toggle {
+                grid-column: 2;
             }
             .ops-grid {
                 grid-template-columns: 1fr;
@@ -1009,6 +1052,7 @@ function renderAdminReservationsPage() {
                 border-radius: 20px;
             }
             .search-row,
+            .ops-panel,
             .reservation-card,
             .detail-actions,
             .field-grid,
@@ -1018,6 +1062,14 @@ function renderAdminReservationsPage() {
             }
             .form-field.is-wide {
                 grid-column: span 1;
+            }
+            .ops-status-main,
+            .ops-strip,
+            .ops-details-toggle {
+                grid-column: auto;
+            }
+            .ops-details-toggle {
+                justify-self: start;
             }
         }
     </style>
@@ -1060,12 +1112,16 @@ function renderAdminReservationsPage() {
             <div class="ops-strip" id="operationsMetrics">
                 <span class="ops-chip"><span>Status</span><strong>Checking...</strong></span>
             </div>
-            <details class="ops-details" id="operationsDetails">
-                <summary>Details</summary>
+            <button class="ops-details-toggle" id="operationsDetailsToggle" type="button" aria-expanded="false" aria-controls="operationsDetailsPanel">Show details</button>
+            <div class="ops-details-panel" id="operationsDetailsPanel" hidden>
+                <div class="ops-details-head">
+                    <span>Readiness details</span>
+                    <button class="ops-details-close" id="operationsDetailsClose" type="button">Hide</button>
+                </div>
                 <div class="ops-grid" id="operationsGrid">
                     <div class="ops-metric"><span>Status</span><strong>Checking...</strong></div>
                 </div>
-            </details>
+            </div>
         </section>
 
         <section class="manual-panel" id="manualPanel" hidden>
@@ -1331,6 +1387,14 @@ function renderAdminReservationsPage() {
                 document.getElementById('operationsGrid').innerHTML =
                     '<div class="ops-check is-fail"><span>Status</span><strong>Unavailable</strong></div>';
             }
+        }
+
+        function setOperationsDetailsOpen(isOpen) {
+            var panel = document.getElementById('operationsDetailsPanel');
+            var toggle = document.getElementById('operationsDetailsToggle');
+            panel.hidden = !isOpen;
+            toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            toggle.textContent = isOpen ? 'Hide details' : 'Show details';
         }
 
         async function api(path, options) {
@@ -1825,6 +1889,12 @@ function renderAdminReservationsPage() {
         }
         document.getElementById('queueFilterSelect').addEventListener('change', function (event) {
             applyQuickFilter(event.target.value || '');
+        });
+        document.getElementById('operationsDetailsToggle').addEventListener('click', function () {
+            setOperationsDetailsOpen(this.getAttribute('aria-expanded') !== 'true');
+        });
+        document.getElementById('operationsDetailsClose').addEventListener('click', function () {
+            setOperationsDetailsOpen(false);
         });
 
         loadOperationsStatus();
