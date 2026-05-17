@@ -154,9 +154,10 @@ test.describe('Private admin reservations CRM', () => {
             expect(removedEditorResponse.status(), removedEditorPath).toBe(404);
         }
 
-        await expect(page.locator('#operationsPanel')).toContainText('CRM readiness');
+        await expect(page.locator('#operationsPanel')).toContainText('System status');
         await expect(page.locator('#operationsPanel')).toContainText('Test CRM');
-        await expect(page.locator('#operationsPanel')).toContainText('Local fallback');
+        await expect(page.locator('#operationsPanel')).toContainText('local-json');
+        await expect(page.locator('#operationsPanel')).toContainText('AI-ready');
         await expect(page.locator('#storageMode')).toContainText('local-json');
         await expect(page.locator('#resultCount')).toContainText('reservation');
 

@@ -416,33 +416,111 @@ function renderAdminReservationsPage() {
         .ops-panel {
             grid-column: 1 / -1;
             display: grid;
-            grid-template-columns: minmax(220px, 0.7fr) minmax(0, 1.3fr);
-            gap: 14px;
-            padding: 16px;
+            grid-template-columns: auto minmax(0, 1fr) auto;
+            gap: 10px 14px;
+            align-items: center;
+            padding: 10px 14px;
             border: 1px solid var(--line);
-            border-radius: 22px;
+            border-radius: 16px;
             background: rgba(13, 13, 15, 0.92);
             color: #fff8e7;
-            box-shadow: var(--shadow);
+            box-shadow: 0 16px 38px rgba(0, 0, 0, 0.18);
         }
         .ops-panel.is-ok { border-color: rgba(31, 143, 84, 0.34); }
         .ops-panel.is-review { border-color: rgba(180, 120, 37, 0.48); }
         .ops-panel.is-bad { border-color: rgba(182, 64, 53, 0.62); }
+        .ops-status-main {
+            display: flex;
+            min-width: 0;
+            align-items: center;
+            gap: 10px;
+        }
+        .ops-dot {
+            width: 10px;
+            height: 10px;
+            flex: 0 0 auto;
+            border-radius: 999px;
+            background: #f1c174;
+            box-shadow: 0 0 0 4px rgba(241, 193, 116, 0.12);
+        }
+        .ops-panel.is-ok .ops-dot {
+            background: #8ee0ad;
+            box-shadow: 0 0 0 4px rgba(142, 224, 173, 0.12);
+        }
+        .ops-panel.is-bad .ops-dot {
+            background: #ff9a92;
+            box-shadow: 0 0 0 4px rgba(255, 154, 146, 0.12);
+        }
         .ops-title {
             margin: 0;
-            font-family: Georgia, "Times New Roman", serif;
-            font-size: 1.35rem;
+            color: var(--gold-soft);
+            font-family: Arial, sans-serif;
+            font-size: 0.64rem;
+            font-weight: 900;
+            letter-spacing: 0.12em;
             line-height: 1;
+            text-transform: uppercase;
         }
         .ops-copy {
-            margin: 7px 0 0;
+            margin: 4px 0 0;
             color: rgba(255, 248, 231, 0.68);
-            line-height: 1.42;
-            font-size: 0.86rem;
+            line-height: 1.25;
+            font-size: 0.78rem;
+        }
+        .ops-strip {
+            display: flex;
+            min-width: 0;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+        .ops-chip {
+            display: inline-flex;
+            min-height: 28px;
+            align-items: center;
+            gap: 6px;
+            padding: 0 10px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.055);
+            color: rgba(255, 248, 231, 0.78);
+            font-size: 0.72rem;
+            white-space: nowrap;
+        }
+        .ops-chip strong {
+            color: #fff8e7;
+            font-size: 0.76rem;
+        }
+        .ops-details {
+            justify-self: end;
+        }
+        .ops-details summary {
+            min-height: 32px;
+            padding: 0 12px;
+            border: 1px solid rgba(247, 223, 149, 0.26);
+            border-radius: 999px;
+            color: var(--gold-soft);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.68rem;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            list-style: none;
+            text-transform: uppercase;
+        }
+        .ops-details summary::-webkit-details-marker {
+            display: none;
+        }
+        .ops-details[open] {
+            grid-column: 1 / -1;
+            justify-self: stretch;
+            padding-top: 6px;
         }
         .ops-grid {
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-columns: repeat(5, minmax(0, 1fr));
             gap: 8px;
         }
         .ops-metric,
@@ -781,7 +859,12 @@ function renderAdminReservationsPage() {
             .hero {
                 display: block;
             }
-            .ops-panel,
+            .ops-panel {
+                grid-template-columns: 1fr;
+            }
+            .ops-strip {
+                justify-content: flex-start;
+            }
             .ops-grid {
                 grid-template-columns: 1fr;
             }
@@ -853,13 +936,22 @@ function renderAdminReservationsPage() {
         </section>
 
         <section class="ops-panel is-review" id="operationsPanel" aria-live="polite">
-            <div>
-                <h2 class="ops-title">CRM readiness</h2>
+            <div class="ops-status-main">
+                <span class="ops-dot" aria-hidden="true"></span>
+                <div>
+                <h2 class="ops-title">System status</h2>
                 <p class="ops-copy" id="operationsSummary">Checking reservation storage, Stripe mode and admin setup...</p>
+                </div>
             </div>
-            <div class="ops-grid" id="operationsGrid">
-                <div class="ops-metric"><span>Status</span><strong>Checking...</strong></div>
+            <div class="ops-strip" id="operationsMetrics">
+                <span class="ops-chip"><span>Status</span><strong>Checking...</strong></span>
             </div>
+            <details class="ops-details" id="operationsDetails">
+                <summary>Details</summary>
+                <div class="ops-grid" id="operationsGrid">
+                    <div class="ops-metric"><span>Status</span><strong>Checking...</strong></div>
+                </div>
+            </details>
         </section>
 
         <section class="manual-panel" id="manualPanel" hidden>
@@ -1051,24 +1143,24 @@ function renderAdminReservationsPage() {
         function renderOperationsStatus(data) {
             var panel = document.getElementById('operationsPanel');
             var summary = document.getElementById('operationsSummary');
+            var metrics = document.getElementById('operationsMetrics');
             var grid = document.getElementById('operationsGrid');
             var overall = data.overallStatus || 'review';
             panel.classList.remove('is-ok', 'is-review', 'is-bad');
             panel.classList.add('is-' + overall);
-            summary.textContent = data.label + ' - ' + statusWord(overall) + '. Storage: ' +
-                (data.storage && data.storage.mode ? data.storage.mode : 'unknown') +
-                '. Stripe: ' + (data.services && data.services.stripeMode ? data.services.stripeMode : 'unknown') + '.';
+            var storageMode = data.storage && data.storage.mode ? data.storage.mode : 'unknown';
+            var stripeMode = data.services && data.services.stripeMode ? data.services.stripeMode : 'unknown';
+            summary.textContent = data.label + ' - ' + statusWord(overall) + ' · ' +
+                storageMode + ' · Stripe ' + stripeMode;
 
             var checks = Array.isArray(data.checks) ? data.checks : [];
             var crmData = data.storage && data.storage.crmData ? data.storage.crmData : {};
-            var metricCards = [
-                '<div class="ops-metric"><span>Environment</span><strong>' + escapeHtml(data.label || 'CRM') + '</strong></div>',
-                '<div class="ops-metric"><span>Reservations</span><strong>' + escapeHtml(data.storage && data.storage.reservationCount != null ? data.storage.reservationCount : 'Unknown') + '</strong></div>',
-                '<div class="ops-metric"><span>Customers</span><strong>' + escapeHtml(crmData.customerCount != null ? crmData.customerCount : 'Unknown') + '</strong></div>',
-                '<div class="ops-metric"><span>AI-ready</span><strong>' + escapeHtml(crmData.aiReadyReservationCount != null ? crmData.aiReadyReservationCount : 'Unknown') + '</strong></div>',
-                '<div class="ops-metric"><span>Data score</span><strong>' + escapeHtml(crmData.averageDataQualityScore != null ? crmData.averageDataQualityScore + '%' : 'Unknown') + '</strong></div>',
-                '<div class="ops-metric"><span>Database</span><strong>' + escapeHtml(data.storage && data.storage.databaseConfigured ? 'Postgres' : 'Local fallback') + '</strong></div>',
-                '<div class="ops-metric"><span>Updated</span><strong>' + escapeHtml(data.storage && data.storage.latestUpdatedAt ? formatDate(data.storage.latestUpdatedAt) : 'No records yet') + '</strong></div>'
+            var metricChips = [
+                '<span class="ops-chip"><span>Reservations</span><strong>' + escapeHtml(data.storage && data.storage.reservationCount != null ? data.storage.reservationCount : 'Unknown') + '</strong></span>',
+                '<span class="ops-chip"><span>Customers</span><strong>' + escapeHtml(crmData.customerCount != null ? crmData.customerCount : 'Unknown') + '</strong></span>',
+                '<span class="ops-chip"><span>AI-ready</span><strong>' + escapeHtml(crmData.aiReadyReservationCount != null ? crmData.aiReadyReservationCount : 'Unknown') + '</strong></span>',
+                '<span class="ops-chip"><span>Data</span><strong>' + escapeHtml(crmData.averageDataQualityScore != null ? crmData.averageDataQualityScore + '%' : 'Unknown') + '</strong></span>',
+                '<span class="ops-chip"><span>DB</span><strong>' + escapeHtml(data.storage && data.storage.databaseConfigured ? 'Postgres' : 'Local') + '</strong></span>'
             ];
             var checkCards = checks.map(function (check) {
                 return '<div class="ops-check is-' + escapeHtml(check.status || 'warn') + '">' +
@@ -1077,7 +1169,8 @@ function renderAdminReservationsPage() {
                 '</div>';
             });
 
-            grid.innerHTML = metricCards.concat(checkCards).join('');
+            metrics.innerHTML = metricChips.join('');
+            grid.innerHTML = checkCards.join('');
         }
 
         async function loadOperationsStatus() {
@@ -1087,6 +1180,8 @@ function renderAdminReservationsPage() {
                 renderOperationsStatus(data);
             } catch (error) {
                 document.getElementById('operationsSummary').textContent = 'CRM readiness could not be checked.';
+                document.getElementById('operationsMetrics').innerHTML =
+                    '<span class="ops-chip"><span>Status</span><strong>Unavailable</strong></span>';
                 document.getElementById('operationsGrid').innerHTML =
                     '<div class="ops-check is-fail"><span>Status</span><strong>Unavailable</strong></div>';
             }
