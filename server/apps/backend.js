@@ -918,13 +918,23 @@ app.post('/api/contact', async (req, res) => {
 });
 
 
+function wantsJsonRootStatus(req) {
+    const accept = String(req.headers.accept || '').toLowerCase();
+    return req.query.format === 'json' || (accept.includes('application/json') && !accept.includes('text/html'));
+}
+
 // Endpoints informativos
 app.get('/', (req, res) => {
+    if (!wantsJsonRootStatus(req)) {
+        return res.redirect('/crm');
+    }
+
     res.json({
         status: 'ok',
         message: 'Dynasty Prestige - API Server',
         version: '1.0.0',
         endpoints: {
+            crm: '/crm',
             health: '/health',
             test: '/api/test',
             availability: '/api/availability',
