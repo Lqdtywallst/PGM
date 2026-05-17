@@ -749,12 +749,12 @@
     background: rgba(255, 250, 244, 0.76);
     color: #5f4930;
     font-family: var(--lab-font-sans);
-    font-size: 0.58rem;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    line-height: 1.2;
+    font-size: 0.68rem;
+    font-weight: 750;
+    letter-spacing: 0.01em;
+    line-height: 1.28;
     text-align: center;
-    text-transform: uppercase;
+    text-transform: none;
 }
 
 .fleet-card__availability[hidden] {
