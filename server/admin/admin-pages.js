@@ -564,9 +564,9 @@ function renderAdminReservationsPage() {
         }
         .search-row {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) auto;
+            grid-template-columns: minmax(0, 1fr) minmax(210px, 260px) auto;
             gap: 10px;
-            margin-bottom: 12px;
+            align-items: end;
         }
         input,
         select,
@@ -599,7 +599,6 @@ function renderAdminReservationsPage() {
             box-shadow: 0 0 0 4px rgba(220, 180, 88, 0.16);
         }
         .button,
-        .filter,
         .action {
             min-height: 40px;
             border: 1px solid var(--line);
@@ -630,39 +629,29 @@ function renderAdminReservationsPage() {
             opacity: 0.45;
             pointer-events: none;
         }
-        .filters {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 7px;
-            padding-top: 2px;
+        .queue-field {
+            min-width: 0;
         }
-        .filters-label {
-            flex: 0 0 100%;
-            margin: 0 0 2px;
+        .queue-field label {
+            display: block;
+            margin: 0 0 6px;
             color: var(--muted);
             font-size: 0.62rem;
             font-weight: 900;
             letter-spacing: 0.12em;
             text-transform: uppercase;
         }
-        .filter {
-            min-height: 34px;
-            border-radius: 999px;
-            padding: 0 12px;
+        .queue-field select {
+            min-height: 40px;
+            border-radius: 13px;
             background: rgba(255, 250, 242, 0.82);
             color: rgba(31, 29, 27, 0.78);
-            font-size: 0.63rem;
-            letter-spacing: 0.075em;
+            font: 900 0.72rem Arial, sans-serif;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.66);
         }
-        .filter.is-active {
-            border-color: rgba(220, 180, 88, 0.9);
-            background: linear-gradient(135deg, rgba(250, 226, 149, 0.94), rgba(210, 161, 67, 0.9));
-            color: #171513;
-            box-shadow: 0 8px 18px rgba(142, 103, 38, 0.14);
-        }
-        .filter:hover {
+        .queue-field select:hover {
             border-color: rgba(220, 180, 88, 0.58);
             color: var(--ink);
         }
@@ -1185,24 +1174,26 @@ function renderAdminReservationsPage() {
         <section>
             <div class="toolbar">
                 <div class="search-row">
-                    <input id="searchInput" type="search" placeholder="Search by client, email, phone, vehicle or reservation ID">
+                    <input id="searchInput" type="search" placeholder="Search client, phone, vehicle or ID">
+                    <div class="queue-field">
+                        <label for="queueFilterSelect">Work queue</label>
+                        <select id="queueFilterSelect">
+                            <option value="">All work</option>
+                            <option value="new_leads">New leads</option>
+                            <option value="new_today">New today</option>
+                            <option value="pending_review">Needs review</option>
+                            <option value="pending_payment">Awaiting payment</option>
+                            <option value="payment_issues">Payment issues</option>
+                            <option value="confirmed_to_schedule">Plan handover</option>
+                            <option value="email_issue">Email follow-up</option>
+                            <option value="pickup_today">Pickup today</option>
+                            <option value="next_7_days">Next 7 days</option>
+                            <option value="handover_done">Completed</option>
+                            <option value="canceled">Canceled</option>
+                            <option value="archived">Archived</option>
+                        </select>
+                    </div>
                     <button class="button primary" id="refreshButton" type="button">Refresh</button>
-                </div>
-                <div class="filters" id="filters">
-                    <p class="filters-label">Work queues</p>
-                    <button class="filter is-active" type="button" data-filter="">All work</button>
-                    <button class="filter" type="button" data-filter="new_leads">New leads</button>
-                    <button class="filter" type="button" data-filter="new_today">New today</button>
-                    <button class="filter" type="button" data-filter="pending_review">Needs review</button>
-                    <button class="filter" type="button" data-filter="pending_payment">Awaiting payment</button>
-                    <button class="filter" type="button" data-filter="payment_issues">Payment issues</button>
-                    <button class="filter" type="button" data-filter="confirmed_to_schedule">Plan handover</button>
-                    <button class="filter" type="button" data-filter="email_issue">Email follow-up</button>
-                    <button class="filter" type="button" data-filter="pickup_today">Pickup today</button>
-                    <button class="filter" type="button" data-filter="next_7_days">Next 7 days</button>
-                    <button class="filter" type="button" data-filter="handover_done">Completed</button>
-                    <button class="filter" type="button" data-filter="canceled">Canceled</button>
-                    <button class="filter" type="button" data-filter="archived">Archived</button>
                 </div>
             </div>
             <div class="list-panel">
@@ -1222,6 +1213,21 @@ function renderAdminReservationsPage() {
     <script>
         var state = { quick: '', q: '', selectedId: '', manualMode: 'create', currentReservation: null, lastListData: null };
         var searchTimer = null;
+        var quickFilterLabels = {
+            '': 'All work',
+            new_leads: 'New leads',
+            new_today: 'New today',
+            pending_review: 'Needs review',
+            pending_payment: 'Awaiting payment',
+            payment_issues: 'Payment issues',
+            confirmed_to_schedule: 'Plan handover',
+            email_issue: 'Email follow-up',
+            pickup_today: 'Pickup today',
+            next_7_days: 'Next 7 days',
+            handover_done: 'Completed',
+            canceled: 'Canceled',
+            archived: 'Archived'
+        };
 
         function escapeHtml(value) {
             return String(value == null ? '' : value)
@@ -1235,6 +1241,10 @@ function renderAdminReservationsPage() {
         function display(value, fallback) {
             var clean = value == null ? '' : String(value).trim();
             return clean || (fallback || 'Not set');
+        }
+
+        function queueLabel(value) {
+            return quickFilterLabels[value || ''] || display(String(value || '').replace(/_/g, ' '));
         }
 
         function numberFromMoney(value) {
@@ -1477,7 +1487,7 @@ function renderAdminReservationsPage() {
                     '</div>' +
                     '<div class="section"><h2>Current value</h2><div class="field-grid">' +
                         field('Visible active value', formatDashboardMoney(totalValue)) +
-                        field('Current queue', state.quick ? display(state.quick.replace(/_/g, ' ')) : 'All reservations') +
+                        field('Current queue', queueLabel(state.quick)) +
                     '</div></div>' +
                     '<div class="section"><h2>Priority work</h2>' +
                         (
@@ -1807,16 +1817,14 @@ function renderAdminReservationsPage() {
         function applyQuickFilter(value) {
             state.quick = value || '';
             state.selectedId = '';
-            document.querySelectorAll('[data-filter]').forEach(function (item) {
-                var isActive = (item.getAttribute('data-filter') || '') === state.quick;
-                item.classList.toggle('is-active', isActive);
-            });
+            var queueSelect = document.getElementById('queueFilterSelect');
+            if (queueSelect && queueSelect.value !== state.quick) {
+                queueSelect.value = state.quick;
+            }
             loadReservations();
         }
-        document.querySelectorAll('[data-filter]').forEach(function (button) {
-            button.addEventListener('click', function () {
-                applyQuickFilter(button.getAttribute('data-filter') || '');
-            });
+        document.getElementById('queueFilterSelect').addEventListener('change', function (event) {
+            applyQuickFilter(event.target.value || '');
         });
 
         loadOperationsStatus();

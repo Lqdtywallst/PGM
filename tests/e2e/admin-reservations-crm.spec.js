@@ -237,7 +237,7 @@ test.describe('Private admin reservations CRM', () => {
         await expect(page.locator('#reservationDetail')).toContainText('Archived at');
         await expect(page.locator('#reservationDetail')).toContainText('Archive after E2E coverage.');
 
-        await page.click('[data-filter="archived"]');
+        await page.selectOption('#queueFilterSelect', 'archived');
         await expect(page.locator('.reservation-card', { hasText: 'Manual CRM E2E Client' })).toContainText('Archived');
     });
 });
