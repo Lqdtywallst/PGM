@@ -633,11 +633,38 @@ function renderAdminReservationsPage() {
         .filters {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            align-items: center;
+            gap: 7px;
+            padding-top: 2px;
+        }
+        .filters-label {
+            flex: 0 0 100%;
+            margin: 0 0 2px;
+            color: var(--muted);
+            font-size: 0.62rem;
+            font-weight: 900;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+        .filter {
+            min-height: 34px;
+            border-radius: 999px;
+            padding: 0 12px;
+            background: rgba(255, 250, 242, 0.82);
+            color: rgba(31, 29, 27, 0.78);
+            font-size: 0.63rem;
+            letter-spacing: 0.075em;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.66);
         }
         .filter.is-active {
-            background: var(--black);
-            color: #fff8e7;
+            border-color: rgba(220, 180, 88, 0.9);
+            background: linear-gradient(135deg, rgba(250, 226, 149, 0.94), rgba(210, 161, 67, 0.9));
+            color: #171513;
+            box-shadow: 0 8px 18px rgba(142, 103, 38, 0.14);
+        }
+        .filter:hover {
+            border-color: rgba(220, 180, 88, 0.58);
+            color: var(--ink);
         }
         .manual-panel {
             grid-column: 1 / -1;
@@ -1162,17 +1189,18 @@ function renderAdminReservationsPage() {
                     <button class="button primary" id="refreshButton" type="button">Refresh</button>
                 </div>
                 <div class="filters" id="filters">
-                    <button class="filter is-active" type="button" data-filter="">All</button>
+                    <p class="filters-label">Work queues</p>
+                    <button class="filter is-active" type="button" data-filter="">All work</button>
                     <button class="filter" type="button" data-filter="new_leads">New leads</button>
                     <button class="filter" type="button" data-filter="new_today">New today</button>
-                    <button class="filter" type="button" data-filter="pending_review">Pending review</button>
-                    <button class="filter" type="button" data-filter="pending_payment">Payment pending</button>
+                    <button class="filter" type="button" data-filter="pending_review">Needs review</button>
+                    <button class="filter" type="button" data-filter="pending_payment">Awaiting payment</button>
                     <button class="filter" type="button" data-filter="payment_issues">Payment issues</button>
-                    <button class="filter" type="button" data-filter="confirmed_to_schedule">Handover open</button>
-                    <button class="filter" type="button" data-filter="email_issue">Email issues</button>
+                    <button class="filter" type="button" data-filter="confirmed_to_schedule">Plan handover</button>
+                    <button class="filter" type="button" data-filter="email_issue">Email follow-up</button>
                     <button class="filter" type="button" data-filter="pickup_today">Pickup today</button>
                     <button class="filter" type="button" data-filter="next_7_days">Next 7 days</button>
-                    <button class="filter" type="button" data-filter="handover_done">Handover done</button>
+                    <button class="filter" type="button" data-filter="handover_done">Completed</button>
                     <button class="filter" type="button" data-filter="canceled">Canceled</button>
                     <button class="filter" type="button" data-filter="archived">Archived</button>
                 </div>
