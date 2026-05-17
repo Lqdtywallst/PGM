@@ -3372,6 +3372,8 @@
 
 .services-page .services-hero--cards-only .services-lane-orb__copy {
     display: block;
+    font-size: clamp(0.88rem, 0.96vw, 0.98rem);
+    line-height: 1.48;
 }
 
 .services-page .services-hero--cards-only .services-lane-orb__action {
@@ -3460,8 +3462,8 @@
     }
 
     .services-page .services-hero--cards-only .services-lane-orb__copy {
-        font-size: 0.78rem;
-        line-height: 1.38;
+        font-size: 0.92rem;
+        line-height: 1.44;
     }
 
     .services-page .services-hero--cards-only .services-lane-orb__action {
