@@ -19,6 +19,7 @@ const reservationId = `e2e_admin_${crypto.randomBytes(5).toString('hex')}`;
 
 let backendProcess = null;
 let adminBaseUrl = '';
+let manualReservationId = '';
 
 function addDaysIso(days) {
     const date = new Date();
@@ -122,6 +123,9 @@ test.describe('Private admin reservations CRM', () => {
         }
 
         await deleteReservationRecord(reservationId).catch(() => {});
+        if (manualReservationId) {
+            await deleteReservationRecord(manualReservationId).catch(() => {});
+        }
     });
 
     test.beforeEach(({}, testInfo) => {
@@ -171,5 +175,58 @@ test.describe('Private admin reservations CRM', () => {
 
         await page.click('[data-action="mark_contacted"]');
         await expect(page.locator('#reservationDetail')).toContainText('Reviewed at');
+
+        await page.click('#manualNewButton');
+        await expect(page.locator('#manualPanel')).toBeVisible();
+        await page.fill('#manualCustomerName', 'Manual CRM E2E Client');
+        await page.fill('#manualCustomerPhone', '+971 55 777 3333');
+        await page.fill('#manualCustomerEmail', 'manual-crm-e2e@example.com');
+        await page.fill('#manualCustomerId', 'MANUAL-E2E-ID');
+        await page.fill('#manualVehicle', 'Bentley Bentayga Azure');
+        await page.selectOption('#manualStatus', 'received');
+        await page.fill('#manualStartDate', addDaysIso(5));
+        await page.fill('#manualEndDate', addDaysIso(7));
+        await page.fill('#manualPickupTime', '09:30');
+        await page.fill('#manualDropoffTime', '18:30');
+        await page.fill('#manualPickupLocation', 'Atlantis The Royal');
+        await page.fill('#manualDropoffLocation', 'Dubai Hills office');
+        await page.fill('#manualTotalAmount', '9800');
+        await page.fill('#manualUpfrontAmount', '4900');
+        await page.fill('#manualRemainingAmount', '4900');
+        await page.fill('#manualNotes', 'Manual booking from E2E test.');
+        await page.click('#manualSubmitButton');
+
+        await expect(page.locator('#manualPanel')).toBeHidden();
+        await expect(page.locator('.detail-title')).toContainText('Bentley Bentayga Azure');
+        await expect(page.locator('#reservationDetail')).toContainText('Manual CRM E2E Client');
+        await expect(page.locator('#reservationDetail')).toContainText('9,800 AED');
+        await expect(page.locator('#reservationDetail')).toContainText('Manual booking created in CRM');
+
+        const manualListResponse = await page.request.get(`${adminBaseUrl}/api/admin/reservations?q=Manual%20CRM%20E2E%20Client`);
+        const manualList = await manualListResponse.json();
+        manualReservationId = manualList.items[0]?.reservationId || '';
+        expect(manualReservationId).toMatch(/^manual_/);
+
+        await page.click('#editReservationButton');
+        await expect(page.locator('#manualPanel')).toBeVisible();
+        await page.fill('#manualVehicle', 'Rolls-Royce Cullinan');
+        await page.fill('#manualTotalAmount', '12000');
+        await page.fill('#manualNotes', 'Edited from the CRM E2E test.');
+        await page.click('#manualSubmitButton');
+
+        await expect(page.locator('.detail-title')).toContainText('Rolls-Royce Cullinan');
+        await expect(page.locator('#reservationDetail')).toContainText('12,000 AED');
+        await expect(page.locator('#reservationDetail')).toContainText('Updated vehicle, total amount, admin notes');
+
+        await page.fill('#adminNotes', 'Archive after E2E coverage.');
+        page.once('dialog', async (dialog) => {
+            await dialog.accept();
+        });
+        await page.click('[data-action="archive"]');
+        await expect(page.locator('#reservationDetail')).toContainText('Archived at');
+        await expect(page.locator('#reservationDetail')).toContainText('Archive after E2E coverage.');
+
+        await page.click('[data-filter="archived"]');
+        await expect(page.locator('.reservation-card', { hasText: 'Manual CRM E2E Client' })).toContainText('Archived');
     });
 });

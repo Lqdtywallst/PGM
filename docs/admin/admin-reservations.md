@@ -7,9 +7,9 @@ Private mini-CRM for Dynasty Prestige reservations. It is served by the Railway/
 - `/admin/login.html`: private admin login.
 - `/crm`: short protected CRM link for partners; redirects to reservations after login.
 - `/admin/reservations.html`: reservations desk after login.
-- `/api/admin/reservations`: reservation list with quick filters and search.
+- `/api/admin/reservations`: reservation list with quick filters and search. `POST` creates a manual CRM booking.
 - `/api/admin/reservations/storage`: active storage diagnostics for the authenticated admin.
-- `/api/admin/reservations/:id`: reservation detail.
+- `/api/admin/reservations/:id`: reservation detail. `PUT` edits safe reservation fields and `PATCH` runs workflow actions such as notes, reviewed, handover, cancel and archive.
 - `/api/admin/reservations.csv`: filtered CSV export.
 
 ## Client Classification Matrix
@@ -29,8 +29,36 @@ The CRM separates reservations into three operational layers:
 | Agenda | `Next 7 days` | Active records with `startDate` from today through the next 7 days | Prepare upcoming handovers. |
 | Completion | `Handover done` | Records with `admin.handoverConfirmedAt` | Already operationally completed. |
 | Closed | `Canceled` | `admin_canceled` or records with `admin.canceledAt` | Closed by the team; excluded from active agenda filters. |
+| Closed | `Archived` | Records with `admin.archivedAt` | Hidden from active work queues without deleting operational history. |
 
 Legacy API aliases still work for old links: `to_contact`, `confirmed`, `today`, `needs_contact` and `failed_payment`.
+
+## Manual Reservations
+
+The CRM can create bookings received outside checkout, such as WhatsApp, phone
+or partner handoffs. Use `New manual booking` and fill at least:
+
+- Client name.
+- WhatsApp/phone.
+- Vehicle.
+
+Dates, locations, payment amounts, ID/passport and admin notes are optional but
+recommended before handover. Manual reservations are stored with
+`source: manual_crm` and start as `received` unless another status is selected.
+
+Existing reservations can be edited from the detail panel with `Edit booking`.
+Editable fields are limited to client data, vehicle, dates, times, locations,
+amounts, currency, status and private notes. Stripe IDs and storage internals
+are not edited from the CRM.
+
+The CRM does not hard-delete reservations. Use:
+
+- `Cancel` when the client or team cancels the booking.
+- `Archive` for duplicates, old tests or records no longer needed in active
+  queues.
+
+Every create, edit, note update, review mark, handover confirmation,
+cancellation and archive writes an entry to `reservationData.admin.activity`.
 
 ## Required Environment
 

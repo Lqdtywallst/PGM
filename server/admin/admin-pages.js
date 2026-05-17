@@ -491,6 +491,7 @@ function renderAdminReservationsPage() {
             margin-bottom: 12px;
         }
         input,
+        select,
         textarea {
             width: 100%;
             border: 1px solid var(--line);
@@ -504,12 +505,17 @@ function renderAdminReservationsPage() {
             min-height: 42px;
             padding: 0 14px;
         }
+        select {
+            min-height: 42px;
+            padding: 0 12px;
+        }
         textarea {
             min-height: 92px;
             padding: 12px;
             resize: vertical;
         }
         input:focus,
+        select:focus,
         textarea:focus {
             border-color: rgba(220, 180, 88, 0.78);
             box-shadow: 0 0 0 4px rgba(220, 180, 88, 0.16);
@@ -554,6 +560,64 @@ function renderAdminReservationsPage() {
         .filter.is-active {
             background: var(--black);
             color: #fff8e7;
+        }
+        .manual-panel {
+            grid-column: 1 / -1;
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.88);
+            box-shadow: var(--shadow);
+            padding: 16px;
+        }
+        .manual-panel[hidden] {
+            display: none;
+        }
+        .panel-heading {
+            display: flex;
+            justify-content: space-between;
+            gap: 14px;
+            align-items: flex-start;
+            margin-bottom: 14px;
+        }
+        .panel-heading h2 {
+            margin: 0;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 1.4rem;
+            line-height: 1;
+        }
+        .panel-heading p {
+            max-width: 680px;
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.45;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+        }
+        .form-field {
+            min-width: 0;
+        }
+        .form-field.is-wide {
+            grid-column: span 2;
+        }
+        .form-field label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--muted);
+            font-size: 0.62rem;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 14px;
         }
         .list-panel {
             overflow: hidden;
@@ -618,6 +682,26 @@ function renderAdminReservationsPage() {
         .status.failed { background: rgba(182, 64, 53, 0.12); color: var(--red); }
         .status.email { background: rgba(180, 120, 37, 0.16); color: var(--amber); }
         .status.canceled { background: rgba(117, 107, 97, 0.16); color: var(--muted); }
+        .activity-list {
+            display: grid;
+            gap: 8px;
+        }
+        .activity-item {
+            padding: 10px;
+            border: 1px solid var(--line);
+            border-radius: 13px;
+            background: rgba(255, 255, 255, 0.7);
+        }
+        .activity-item strong {
+            display: block;
+            font-size: 0.88rem;
+        }
+        .activity-item span {
+            display: block;
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 0.76rem;
+        }
         .detail-panel {
             position: sticky;
             top: 72px;
@@ -701,6 +785,9 @@ function renderAdminReservationsPage() {
             .ops-grid {
                 grid-template-columns: 1fr;
             }
+            .form-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
             .detail-panel {
                 position: static;
                 max-height: none;
@@ -722,11 +809,18 @@ function renderAdminReservationsPage() {
                 border-radius: 20px;
                 padding: 18px;
             }
+            .manual-panel {
+                border-radius: 20px;
+            }
             .search-row,
             .reservation-card,
             .detail-actions,
-            .field-grid {
+            .field-grid,
+            .form-grid {
                 grid-template-columns: 1fr;
+            }
+            .form-field.is-wide {
+                grid-column: span 1;
             }
         }
     </style>
@@ -753,6 +847,7 @@ function renderAdminReservationsPage() {
                 <p>Track leads, payment issues, confirmed handovers and pending review work with quick contact actions and private admin notes.</p>
             </div>
             <div class="hero-actions">
+                <button class="button primary" id="manualNewButton" type="button">New manual booking</button>
                 <button class="button primary" id="exportCsvButton" type="button">Export CSV</button>
             </div>
         </section>
@@ -765,6 +860,109 @@ function renderAdminReservationsPage() {
             <div class="ops-grid" id="operationsGrid">
                 <div class="ops-metric"><span>Status</span><strong>Checking...</strong></div>
             </div>
+        </section>
+
+        <section class="manual-panel" id="manualPanel" hidden>
+            <div class="panel-heading">
+                <div>
+                    <h2 id="manualPanelTitle">New manual booking</h2>
+                    <p id="manualPanelCopy">Create reservations received by WhatsApp, phone or partner handoff without using public checkout.</p>
+                </div>
+                <button class="action" id="manualCloseButton" type="button">Close</button>
+            </div>
+            <form id="manualReservationForm">
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="manualCustomerName">Client name</label>
+                        <input id="manualCustomerName" name="customerName" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="manualCustomerPhone">WhatsApp / phone</label>
+                        <input id="manualCustomerPhone" name="customerPhone" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="manualCustomerEmail">Email</label>
+                        <input id="manualCustomerEmail" name="customerEmail" type="email">
+                    </div>
+                    <div class="form-field">
+                        <label for="manualCustomerId">ID / passport</label>
+                        <input id="manualCustomerId" name="customerIdDocument">
+                    </div>
+                    <div class="form-field is-wide">
+                        <label for="manualVehicle">Vehicle</label>
+                        <input id="manualVehicle" name="vehicle" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="manualStatus">Status</label>
+                        <select id="manualStatus" name="status">
+                            <option value="received">Received</option>
+                            <option value="lead_received">Lead received</option>
+                            <option value="checkout_started">Checkout started</option>
+                            <option value="payment_intent_created">Payment started</option>
+                            <option value="payment_requires_action">Payment requires action</option>
+                            <option value="customer_processing_failed">Customer processing failed</option>
+                            <option value="payment_intent_failed">Payment intent failed</option>
+                            <option value="payment_failed">Payment failed</option>
+                            <option value="payment_canceled">Payment canceled</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="payment_succeeded">Payment succeeded</option>
+                            <option value="reservation_confirmed">Reservation confirmed</option>
+                            <option value="confirmed_email_failed">Email issue</option>
+                            <option value="failed">Failed</option>
+                            <option value="error">Error</option>
+                            <option value="admin_canceled">Canceled by admin</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label for="manualCurrency">Currency</label>
+                        <input id="manualCurrency" name="currency" value="AED">
+                    </div>
+                    <div class="form-field">
+                        <label for="manualStartDate">Start date</label>
+                        <input id="manualStartDate" name="startDate" type="date">
+                    </div>
+                    <div class="form-field">
+                        <label for="manualEndDate">End date</label>
+                        <input id="manualEndDate" name="endDate" type="date">
+                    </div>
+                    <div class="form-field">
+                        <label for="manualPickupTime">Pickup time</label>
+                        <input id="manualPickupTime" name="pickupTime" type="time">
+                    </div>
+                    <div class="form-field">
+                        <label for="manualDropoffTime">Dropoff time</label>
+                        <input id="manualDropoffTime" name="dropoffTime" type="time">
+                    </div>
+                    <div class="form-field is-wide">
+                        <label for="manualPickupLocation">Pickup location</label>
+                        <input id="manualPickupLocation" name="pickupLocation">
+                    </div>
+                    <div class="form-field is-wide">
+                        <label for="manualDropoffLocation">Dropoff location</label>
+                        <input id="manualDropoffLocation" name="dropoffLocation">
+                    </div>
+                    <div class="form-field">
+                        <label for="manualTotalAmount">Total</label>
+                        <input id="manualTotalAmount" name="totalAmount" inputmode="decimal">
+                    </div>
+                    <div class="form-field">
+                        <label for="manualUpfrontAmount">Upfront</label>
+                        <input id="manualUpfrontAmount" name="upfrontAmount" inputmode="decimal">
+                    </div>
+                    <div class="form-field">
+                        <label for="manualRemainingAmount">Remaining</label>
+                        <input id="manualRemainingAmount" name="remainingAmount" inputmode="decimal">
+                    </div>
+                    <div class="form-field is-wide">
+                        <label for="manualNotes">Admin notes</label>
+                        <textarea id="manualNotes" name="notes"></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button class="action" id="manualCancelButton" type="button">Cancel</button>
+                    <button class="action primary" id="manualSubmitButton" type="submit">Save booking</button>
+                </div>
+            </form>
         </section>
 
         <section>
@@ -786,6 +984,7 @@ function renderAdminReservationsPage() {
                     <button class="filter" type="button" data-filter="next_7_days">Next 7 days</button>
                     <button class="filter" type="button" data-filter="handover_done">Handover done</button>
                     <button class="filter" type="button" data-filter="canceled">Canceled</button>
+                    <button class="filter" type="button" data-filter="archived">Archived</button>
                 </div>
             </div>
             <div class="list-panel">
@@ -803,7 +1002,7 @@ function renderAdminReservationsPage() {
     </main>
 
     <script>
-        var state = { quick: '', q: '', selectedId: '' };
+        var state = { quick: '', q: '', selectedId: '', manualMode: 'create', currentReservation: null };
         var searchTimer = null;
 
         function escapeHtml(value) {
@@ -828,6 +1027,7 @@ function renderAdminReservationsPage() {
         }
 
         function statusClass(item) {
+            if (item.flags && item.flags.archived) return 'canceled';
             if (item.flags && item.flags.canceled) return 'canceled';
             if (item.flags && item.flags.emailIssue) return 'email';
             if (item.flags && item.flags.paymentIssue) return 'failed';
@@ -908,11 +1108,11 @@ function renderAdminReservationsPage() {
         function renderCard(item) {
             var activeClass = item.id === state.selectedId ? ' is-active' : '';
             var dateText = display(item.schedule.startDate) + ' to ' + display(item.schedule.endDate);
-            var contactFlag = item.flags.handoverDone
-                ? 'Handover done'
-                : item.flags.toContact
-                    ? 'Pending review'
-                    : (item.admin.contacted ? 'Contacted' : 'No contact mark');
+            var contactFlag = item.admin.contacted ? 'Contacted' : 'No contact mark';
+            if (item.flags.toContact) contactFlag = 'Pending review';
+            if (item.flags.handoverDone) contactFlag = 'Handover done';
+            if (item.flags.canceled) contactFlag = 'Canceled';
+            if (item.flags.archived) contactFlag = 'Archived';
             return '<button class="reservation-card' + activeClass + '" type="button" data-reservation-id="' + escapeHtml(item.id) + '">' +
                 '<div>' +
                     '<h2 class="reservation-title">' + escapeHtml(display(item.vehicle.name, 'Vehicle not set')) + '</h2>' +
@@ -973,9 +1173,100 @@ function renderAdminReservationsPage() {
             return '<a class="action' + (primary ? ' primary' : '') + '" href="' + escapeHtml(href) + '" target="_blank" rel="noopener">' + escapeHtml(label) + '</a>';
         }
 
+        function setFormValue(id, value) {
+            var input = document.getElementById(id);
+            if (input) input.value = value == null ? '' : value;
+        }
+
+        function rawReservationValue(reservation, key, fallback) {
+            var data = reservation && reservation.reservationData ? reservation.reservationData : {};
+            return data[key] == null || data[key] === '' ? (fallback || '') : data[key];
+        }
+
+        function openManualPanel(mode, reservation) {
+            var panel = document.getElementById('manualPanel');
+            var title = document.getElementById('manualPanelTitle');
+            var copy = document.getElementById('manualPanelCopy');
+            state.manualMode = mode || 'create';
+            state.currentReservation = reservation || state.currentReservation;
+            document.getElementById('manualReservationForm').reset();
+            setFormValue('manualCurrency', 'AED');
+            setFormValue('manualStatus', 'received');
+
+            if (state.manualMode === 'edit' && reservation) {
+                title.textContent = 'Edit booking';
+                copy.textContent = 'Update client, vehicle, schedule, payment and internal notes without deleting the reservation.';
+                setFormValue('manualCustomerName', reservation.customer.name);
+                setFormValue('manualCustomerPhone', reservation.customer.phone);
+                setFormValue('manualCustomerEmail', reservation.customer.email);
+                setFormValue('manualCustomerId', reservation.customer.idDocument);
+                setFormValue('manualVehicle', reservation.vehicle.name);
+                setFormValue('manualStatus', reservation.status || 'received');
+                setFormValue('manualCurrency', reservation.payment.currency || rawReservationValue(reservation, 'currency', 'AED'));
+                setFormValue('manualStartDate', reservation.schedule.startDate);
+                setFormValue('manualEndDate', reservation.schedule.endDate);
+                setFormValue('manualPickupTime', reservation.schedule.pickupTime);
+                setFormValue('manualDropoffTime', reservation.schedule.dropoffTime);
+                setFormValue('manualPickupLocation', reservation.schedule.pickupLocation);
+                setFormValue('manualDropoffLocation', reservation.schedule.dropoffLocation);
+                setFormValue('manualTotalAmount', rawReservationValue(reservation, 'totalAmount', ''));
+                setFormValue('manualUpfrontAmount', rawReservationValue(reservation, 'upfrontAmount', ''));
+                setFormValue('manualRemainingAmount', rawReservationValue(reservation, 'remainingAmount', ''));
+                setFormValue('manualNotes', reservation.admin.notes || '');
+            } else {
+                title.textContent = 'New manual booking';
+                copy.textContent = 'Create reservations received by WhatsApp, phone or partner handoff without using public checkout.';
+            }
+
+            panel.hidden = false;
+            document.getElementById('manualCustomerName').focus();
+        }
+
+        function closeManualPanel() {
+            document.getElementById('manualPanel').hidden = true;
+            state.manualMode = 'create';
+        }
+
+        function manualPayloadFromForm() {
+            return {
+                customerName: document.getElementById('manualCustomerName').value,
+                customerEmail: document.getElementById('manualCustomerEmail').value,
+                customerPhone: document.getElementById('manualCustomerPhone').value,
+                customerIdDocument: document.getElementById('manualCustomerId').value,
+                vehicle: document.getElementById('manualVehicle').value,
+                status: document.getElementById('manualStatus').value,
+                currency: document.getElementById('manualCurrency').value,
+                startDate: document.getElementById('manualStartDate').value,
+                endDate: document.getElementById('manualEndDate').value,
+                pickupTime: document.getElementById('manualPickupTime').value,
+                dropoffTime: document.getElementById('manualDropoffTime').value,
+                pickupLocation: document.getElementById('manualPickupLocation').value,
+                dropoffLocation: document.getElementById('manualDropoffLocation').value,
+                totalAmount: document.getElementById('manualTotalAmount').value,
+                upfrontAmount: document.getElementById('manualUpfrontAmount').value,
+                remainingAmount: document.getElementById('manualRemainingAmount').value,
+                notes: document.getElementById('manualNotes').value
+            };
+        }
+
+        function renderActivity(admin) {
+            var items = admin && Array.isArray(admin.activity) ? admin.activity : [];
+            if (!items.length) return '';
+
+            return '<div class="section"><h2>Activity</h2><div class="activity-list">' +
+                items.map(function (item) {
+                    return '<div class="activity-item">' +
+                        '<strong>' + escapeHtml(display(item.summary || item.action, 'Admin action')) + '</strong>' +
+                        '<span>' + escapeHtml(display(item.by, 'admin')) + ' - ' + escapeHtml(item.at ? formatDate(item.at) : 'Not set') + '</span>' +
+                    '</div>';
+                }).join('') +
+            '</div></div>';
+        }
+
         function renderDetail(payload) {
             var r = payload.reservation;
             var detail = document.getElementById('reservationDetail');
+            state.currentReservation = r;
             detail.innerHTML =
                 '<h2 class="detail-title">' + escapeHtml(display(r.vehicle.name, 'Reservation detail')) + '</h2>' +
                 '<p class="detail-subtitle">' + escapeHtml(display(r.customer.name, 'Guest not set')) + ' · ' + escapeHtml(display(r.reservationId)) + '</p>' +
@@ -985,6 +1276,7 @@ function renderAdminReservationsPage() {
                     externalAction('Call', r.customer.callHref, false) +
                     externalAction('Email', r.customer.emailHref, false) +
                     '<button class="action" type="button" data-action="mark_contacted">Mark reviewed</button>' +
+                    '<button class="action" type="button" id="editReservationButton">Edit booking</button>' +
                 '</div>' +
                 '<div class="section"><h2>Client</h2><div class="field-grid">' +
                     field('Name', r.customer.name) +
@@ -1014,13 +1306,17 @@ function renderAdminReservationsPage() {
                     '<div class="detail-actions">' +
                         '<button class="action primary" type="button" data-action="update_notes">Save notes</button>' +
                         '<button class="action" type="button" data-action="confirm_handover">Confirm handover</button>' +
+                        '<button class="action" type="button" data-action="archive">Archive</button>' +
                         '<button class="action danger" type="button" data-action="cancel">Cancel</button>' +
                     '</div>' +
                     '<div class="field-grid">' +
                         field('Reviewed at', r.admin.contactedAt ? formatDate(r.admin.contactedAt) : '') +
                         field('Handover confirmed', r.admin.handoverConfirmedAt ? formatDate(r.admin.handoverConfirmedAt) : '') +
+                        field('Archived at', r.admin.archivedAt ? formatDate(r.admin.archivedAt) : '') +
+                        field('Archive reason', r.admin.archiveReason || '') +
                     '</div>' +
                 '</div>' +
+                renderActivity(r.admin) +
                 '<div class="section"><h2>Technical</h2><div class="field-grid">' +
                     field('Payment intent', r.technical.paymentIntentId) +
                     field('Source', r.technical.source) +
@@ -1032,6 +1328,9 @@ function renderAdminReservationsPage() {
                 button.addEventListener('click', function () {
                     runAction(button.getAttribute('data-action'));
                 });
+            });
+            document.getElementById('editReservationButton').addEventListener('click', function () {
+                openManualPanel('edit', state.currentReservation);
             });
         }
 
@@ -1058,6 +1357,9 @@ function renderAdminReservationsPage() {
             if (action === 'cancel' && !window.confirm('Cancel this reservation in the admin desk?')) {
                 return;
             }
+            if (action === 'archive' && !window.confirm('Archive this reservation without deleting it?')) {
+                return;
+            }
 
             var notesInput = document.getElementById('adminNotes');
             var payload = {
@@ -1080,6 +1382,40 @@ function renderAdminReservationsPage() {
             }
         }
 
+        async function saveManualReservation(event) {
+            event.preventDefault();
+            var isEdit = state.manualMode === 'edit' && state.selectedId;
+            var submitButton = document.getElementById('manualSubmitButton');
+            var payload = manualPayloadFromForm();
+            submitButton.disabled = true;
+            submitButton.textContent = 'Saving...';
+
+            try {
+                var response = await api(
+                    isEdit
+                        ? '/api/admin/reservations/' + encodeURIComponent(state.selectedId)
+                        : '/api/admin/reservations',
+                    {
+                        method: isEdit ? 'PUT' : 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    }
+                );
+                var data = await response.json().catch(function () { return {}; });
+                if (!response.ok) throw new Error(data.error || 'Manual booking failed');
+
+                closeManualPanel();
+                state.selectedId = data.reservation.id;
+                await loadReservations();
+                renderDetail(data);
+            } catch (error) {
+                window.alert(error.message || 'This manual booking could not be saved.');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Save booking';
+            }
+        }
+
         document.getElementById('refreshButton').addEventListener('click', function () {
             loadOperationsStatus();
             loadReservations();
@@ -1087,6 +1423,12 @@ function renderAdminReservationsPage() {
         document.getElementById('exportCsvButton').addEventListener('click', function () {
             window.location.href = '/api/admin/reservations.csv?' + currentQueryString();
         });
+        document.getElementById('manualNewButton').addEventListener('click', function () {
+            openManualPanel('create', null);
+        });
+        document.getElementById('manualCloseButton').addEventListener('click', closeManualPanel);
+        document.getElementById('manualCancelButton').addEventListener('click', closeManualPanel);
+        document.getElementById('manualReservationForm').addEventListener('submit', saveManualReservation);
         document.getElementById('logoutButton').addEventListener('click', async function () {
             await api('/api/admin/logout', { method: 'POST' }).catch(function () {});
             window.location.href = '/admin/login.html';

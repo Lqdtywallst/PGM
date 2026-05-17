@@ -3,10 +3,13 @@ const test = require('node:test');
 
 const {
     applyAdminReservationAction,
+    applyManualReservationUpdate,
     buildAdminOperationsStatus,
     buildAdminReservationDetail,
     buildAdminReservationSummary,
+    classifyReservation,
     collectReservationFilters,
+    createManualReservationRecord,
     filterAdminReservationSummaries,
     toReservationCsv
 } = require('../../server/admin/admin-reservations');
@@ -146,6 +149,12 @@ test('admin reservation quick filters separate client work queues', () => {
             status: 'admin_canceled',
             startDate: '2026-04-25',
             admin: { canceledAt: now }
+        }),
+        reservation({
+            reservationId: 'res_archived',
+            status: 'received',
+            startDate: '2026-04-26',
+            admin: { archivedAt: now, archiveReason: 'Old test lead' }
         })
     ];
     const idsFor = (quick) => filterAdminReservationSummaries(
@@ -178,6 +187,7 @@ test('admin reservation quick filters separate client work queues', () => {
     ]);
     assert.deepEqual(idsFor('handover_done'), ['res_handover_done']);
     assert.deepEqual(idsFor('canceled'), ['res_canceled']);
+    assert.deepEqual(idsFor('archived'), ['res_archived']);
 });
 
 test('admin actions persist private workflow state without deleting reservation data', () => {
@@ -198,6 +208,68 @@ test('admin actions persist private workflow state without deleting reservation 
     const canceled = applyAdminReservationAction(contacted, 'cancel', { reason: 'Client request' }, 'owner', { now });
     assert.equal(canceled.status, 'admin_canceled');
     assert.equal(canceled.reservationData.admin.cancelReason, 'Client request');
+    assert.equal(canceled.reservationData.admin.activity.length, 2);
+});
+
+test('manual CRM reservations can be created, edited and archived without hard delete', () => {
+    const created = createManualReservationRecord({
+        customerName: 'Manual VIP',
+        customerPhone: '+971 55 100 2000',
+        customerEmail: 'manual@example.com',
+        customerIdDocument: 'VIP-ID',
+        vehicle: 'Ferrari 296 GTS',
+        startDate: '2026-05-10',
+        endDate: '2026-05-12',
+        pickupTime: '11:30',
+        dropoffTime: '17:00',
+        pickupLocation: 'Palm Jumeirah',
+        totalAmount: '8800',
+        upfrontAmount: '4400',
+        remainingAmount: '4400',
+        notes: 'Booked by WhatsApp'
+    }, 'owner', { now });
+
+    assert.match(created.reservationId, /^manual_20260425120000_/);
+    assert.equal(created.status, 'received');
+    assert.equal(created.source, 'manual_crm');
+    assert.equal(created.customerData.name, 'Manual VIP');
+    assert.equal(created.reservationData.car, 'Ferrari 296 GTS');
+    assert.equal(created.reservationData.totalAmount, 8800);
+    assert.equal(created.reservationData.admin.notes, 'Booked by WhatsApp');
+    assert.equal(created.reservationData.admin.activity[0].action, 'create_manual');
+
+    const updated = applyManualReservationUpdate(created, {
+        vehicle: 'Lamborghini Huracan EVO Spyder',
+        status: 'confirmed',
+        totalAmount: '9200',
+        notes: 'Client sent documents'
+    }, 'owner', { now: '2026-04-25T13:00:00.000Z' });
+
+    assert.equal(updated.status, 'confirmed');
+    assert.equal(updated.reservationData.car, 'Lamborghini Huracan EVO Spyder');
+    assert.equal(updated.reservationData.totalAmount, 9200);
+    assert.equal(updated.reservationData.admin.notes, 'Client sent documents');
+    assert.equal(updated.reservationData.admin.activity.at(-1).action, 'update_reservation');
+
+    const archived = applyAdminReservationAction(
+        updated,
+        'archive',
+        { reason: 'Duplicate manual test' },
+        'owner',
+        { now: '2026-04-25T14:00:00.000Z' }
+    );
+
+    assert.equal(archived.reservationData.admin.archivedAt, '2026-04-25T14:00:00.000Z');
+    assert.equal(archived.reservationData.admin.archiveReason, 'Duplicate manual test');
+    assert.equal(classifyReservation(archived, { now }).active, false);
+    assert.equal(classifyReservation(archived, { now }).archived, true);
+});
+
+test('manual CRM reservations validate core operational fields', () => {
+    assert.throws(
+        () => createManualReservationRecord({ customerName: 'Missing phone', vehicle: 'G63' }, 'owner', { now }),
+        /customerPhone/
+    );
 });
 
 test('admin detail hides internal admin object from public reservation data block', () => {

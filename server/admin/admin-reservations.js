@@ -1,3 +1,4 @@
+const crypto = require('node:crypto');
 const express = require('express');
 const {
     getMobileNotificationDiagnostics
@@ -16,6 +17,7 @@ const QUICK_FILTERS = Object.freeze({
     next_7_days: 'Next 7 days',
     handover_done: 'Handover done',
     canceled: 'Canceled',
+    archived: 'Archived',
     confirmed: 'Confirmed',
     today: 'Today',
     needs_contact: 'Pending review',
@@ -75,6 +77,14 @@ const EMAIL_ISSUE_STATUSES = new Set([
     'error',
     'bounced',
     'rejected'
+]);
+
+const MANUAL_RESERVATION_STATUSES = new Set([
+    ...Object.keys(STATUS_LABELS),
+    'payment_intent_failed',
+    'reservation_confirmed',
+    'failed',
+    'error'
 ]);
 
 function normalizeAppEnvironment(env = process.env) {
@@ -287,6 +297,66 @@ function formatMoney(value, currency = 'AED') {
     return `${Math.round(numeric).toLocaleString('en-US')} ${asCleanString(currency || 'AED').toUpperCase()}`;
 }
 
+function numberOrNull(value) {
+    if (value === undefined || value === null || value === '') return null;
+    const numeric = typeof value === 'number'
+        ? value
+        : Number.parseFloat(String(value).replace(/[^0-9.-]+/g, ''));
+
+    return Number.isFinite(numeric) ? numeric : null;
+}
+
+function getObjectPayload(payload = {}) {
+    return payload && typeof payload === 'object' ? payload : {};
+}
+
+function firstPresentValue(source = {}, keys = []) {
+    const input = getObjectPayload(source);
+    for (const key of keys) {
+        if (Object.prototype.hasOwnProperty.call(input, key)) {
+            return input[key];
+        }
+    }
+
+    return undefined;
+}
+
+function setCleanTextIfPresent(target, key, source, aliases = [key]) {
+    const value = firstPresentValue(source, aliases);
+    if (value !== undefined) {
+        target[key] = asCleanString(value);
+        return true;
+    }
+
+    return false;
+}
+
+function setDateIfPresent(target, key, source, aliases = [key]) {
+    const value = firstPresentValue(source, aliases);
+    if (value !== undefined) {
+        target[key] = toIsoDate(value) || asCleanString(value);
+        return true;
+    }
+
+    return false;
+}
+
+function setNumberIfPresent(target, key, source, aliases = [key]) {
+    const value = firstPresentValue(source, aliases);
+    if (value !== undefined) {
+        target[key] = numberOrNull(value);
+        return true;
+    }
+
+    return false;
+}
+
+function buildValidationError(message) {
+    const error = new Error(message);
+    error.statusCode = 400;
+    return error;
+}
+
 function getAdminData(record = {}) {
     const admin = record.reservationData?.admin;
     return admin && typeof admin === 'object' ? admin : {};
@@ -413,6 +483,335 @@ function getReservationFacts(record = {}) {
     };
 }
 
+function getManualReservationInput(payload = {}) {
+    const input = getObjectPayload(payload);
+    return getObjectPayload(input.reservation || input);
+}
+
+function normalizeManualCurrency(value) {
+    const currency = asCleanString(value || 'AED').toUpperCase();
+    return currency || 'AED';
+}
+
+function normalizeManualStatus(value, fallback = 'received') {
+    const status = normalizeStatus(value || fallback);
+    if (!MANUAL_RESERVATION_STATUSES.has(status)) {
+        throw buildValidationError(`Unsupported reservation status: ${status}`);
+    }
+
+    return status;
+}
+
+function buildManualReservationPatch(payload = {}) {
+    const input = getManualReservationInput(payload);
+    const customerData = {};
+    const reservationData = {};
+    const payment = {};
+    const updatedFields = [];
+
+    if (setCleanTextIfPresent(customerData, 'name', input, ['customerName', 'name', 'fullName'])) {
+        updatedFields.push('client name');
+    }
+    if (setCleanTextIfPresent(customerData, 'email', input, ['customerEmail', 'email'])) {
+        updatedFields.push('email');
+    }
+    if (setCleanTextIfPresent(customerData, 'phone', input, ['customerPhone', 'phone', 'whatsapp'])) {
+        updatedFields.push('phone');
+    }
+    if (setCleanTextIfPresent(customerData, 'passport', input, ['customerIdDocument', 'passport', 'dni', 'idDocument', 'idNumber'])) {
+        updatedFields.push('ID/passport');
+    }
+    if (setCleanTextIfPresent(reservationData, 'car', input, ['vehicle', 'car', 'vehicleName'])) {
+        updatedFields.push('vehicle');
+    }
+    if (setDateIfPresent(reservationData, 'startDate', input, ['startDate', 'pickupDate'])) {
+        updatedFields.push('start date');
+    }
+    if (setDateIfPresent(reservationData, 'endDate', input, ['endDate', 'dropoffDate'])) {
+        updatedFields.push('end date');
+    }
+    if (setCleanTextIfPresent(reservationData, 'pickupTime', input)) {
+        updatedFields.push('pickup time');
+    }
+    if (setCleanTextIfPresent(reservationData, 'dropoffTime', input)) {
+        updatedFields.push('dropoff time');
+    }
+    if (setCleanTextIfPresent(reservationData, 'pickupLocation', input)) {
+        updatedFields.push('pickup location');
+    }
+    if (setCleanTextIfPresent(reservationData, 'dropoffLocation', input, ['dropoffLocation', 'returnLocation'])) {
+        updatedFields.push('dropoff location');
+    }
+    if (setNumberIfPresent(reservationData, 'totalAmount', input)) {
+        updatedFields.push('total amount');
+    }
+    if (setNumberIfPresent(reservationData, 'upfrontAmount', input)) {
+        updatedFields.push('upfront amount');
+    }
+    if (setNumberIfPresent(reservationData, 'remainingAmount', input)) {
+        updatedFields.push('remaining amount');
+    }
+
+    const currencyValue = firstPresentValue(input, ['currency']);
+    if (currencyValue !== undefined) {
+        const currency = normalizeManualCurrency(currencyValue);
+        reservationData.currency = currency;
+        payment.currency = currency.toLowerCase();
+        updatedFields.push('currency');
+    }
+
+    const statusValue = firstPresentValue(input, ['status']);
+    const status = statusValue === undefined || !asCleanString(statusValue) ? null : normalizeManualStatus(statusValue);
+    if (status) {
+        updatedFields.push('status');
+    }
+
+    const notesValue = firstPresentValue(input, ['notes', 'adminNotes']);
+    const hasNotes = notesValue !== undefined;
+    if (hasNotes) {
+        updatedFields.push('admin notes');
+    }
+
+    return {
+        customerData,
+        reservationData,
+        payment,
+        status,
+        notes: hasNotes ? asCleanString(notesValue) : null,
+        hasNotes,
+        updatedFields: [...new Set(updatedFields)]
+    };
+}
+
+function hasOwnValue(source, key) {
+    return Object.prototype.hasOwnProperty.call(source || {}, key);
+}
+
+function textValueChanged(nextValue, currentValue) {
+    return asCleanString(nextValue) !== asCleanString(currentValue);
+}
+
+function numberValueChanged(nextValue, currentValue) {
+    return numberOrNull(nextValue) !== numberOrNull(currentValue);
+}
+
+function collectManualChangedFields(record = {}, patch = {}) {
+    const customerData = record.customerData || {};
+    const reservationData = record.reservationData || {};
+    const admin = getAdminData(record);
+    const changedFields = [];
+
+    if (hasOwnValue(patch.customerData, 'name') && textValueChanged(patch.customerData.name, firstValue([
+        customerData.name,
+        customerData.fullName,
+        reservationData.customerName
+    ]))) {
+        changedFields.push('client name');
+    }
+    if (hasOwnValue(patch.customerData, 'email') && textValueChanged(patch.customerData.email, firstValue([
+        customerData.email,
+        reservationData.customerEmail
+    ]))) {
+        changedFields.push('email');
+    }
+    if (hasOwnValue(patch.customerData, 'phone') && textValueChanged(patch.customerData.phone, firstValue([
+        customerData.phone,
+        customerData.whatsapp,
+        reservationData.customerPhone
+    ]))) {
+        changedFields.push('phone');
+    }
+    if (hasOwnValue(patch.customerData, 'passport') && textValueChanged(patch.customerData.passport, firstValue([
+        customerData.passport,
+        customerData.dni,
+        customerData.idNumber
+    ]))) {
+        changedFields.push('ID/passport');
+    }
+    if (hasOwnValue(patch.reservationData, 'car') && textValueChanged(patch.reservationData.car, firstValue([
+        reservationData.car,
+        reservationData.vehicle
+    ]))) {
+        changedFields.push('vehicle');
+    }
+    if (hasOwnValue(patch.reservationData, 'startDate') && textValueChanged(
+        patch.reservationData.startDate,
+        toIsoDate(reservationData.startDate) || reservationData.startDate
+    )) {
+        changedFields.push('start date');
+    }
+    if (hasOwnValue(patch.reservationData, 'endDate') && textValueChanged(
+        patch.reservationData.endDate,
+        toIsoDate(reservationData.endDate) || reservationData.endDate
+    )) {
+        changedFields.push('end date');
+    }
+    if (hasOwnValue(patch.reservationData, 'pickupTime') && textValueChanged(patch.reservationData.pickupTime, reservationData.pickupTime)) {
+        changedFields.push('pickup time');
+    }
+    if (hasOwnValue(patch.reservationData, 'dropoffTime') && textValueChanged(patch.reservationData.dropoffTime, reservationData.dropoffTime)) {
+        changedFields.push('dropoff time');
+    }
+    if (hasOwnValue(patch.reservationData, 'pickupLocation') && textValueChanged(patch.reservationData.pickupLocation, reservationData.pickupLocation)) {
+        changedFields.push('pickup location');
+    }
+    if (hasOwnValue(patch.reservationData, 'dropoffLocation') && textValueChanged(patch.reservationData.dropoffLocation, reservationData.dropoffLocation)) {
+        changedFields.push('dropoff location');
+    }
+    if (hasOwnValue(patch.reservationData, 'totalAmount') && numberValueChanged(patch.reservationData.totalAmount, reservationData.totalAmount)) {
+        changedFields.push('total amount');
+    }
+    if (hasOwnValue(patch.reservationData, 'upfrontAmount') && numberValueChanged(patch.reservationData.upfrontAmount, reservationData.upfrontAmount)) {
+        changedFields.push('upfront amount');
+    }
+    if (hasOwnValue(patch.reservationData, 'remainingAmount') && numberValueChanged(patch.reservationData.remainingAmount, reservationData.remainingAmount)) {
+        changedFields.push('remaining amount');
+    }
+    if (hasOwnValue(patch.reservationData, 'currency') && textValueChanged(patch.reservationData.currency, reservationData.currency)) {
+        changedFields.push('currency');
+    }
+    if (patch.status && patch.status !== normalizeStatus(record.status)) {
+        changedFields.push('status');
+    }
+    if (patch.hasNotes && textValueChanged(patch.notes, admin.notes)) {
+        changedFields.push('admin notes');
+    }
+
+    return changedFields;
+}
+
+function generateManualReservationId(options = {}) {
+    const baseDate = options.now ? new Date(options.now) : new Date();
+    const date = Number.isNaN(baseDate.getTime()) ? new Date() : baseDate;
+    const timestamp = date.toISOString().replace(/[-:.TZ]/g, '').slice(0, 14);
+    return `manual_${timestamp}_${crypto.randomBytes(4).toString('hex')}`;
+}
+
+function appendAdminActivity(admin = {}, entry = {}) {
+    const activity = Array.isArray(admin.activity) ? admin.activity.filter(Boolean) : [];
+    const nextEntry = {
+        action: asCleanString(entry.action),
+        at: asCleanString(entry.at),
+        by: asCleanString(entry.by || 'admin'),
+        summary: asCleanString(entry.summary)
+    };
+
+    if (!nextEntry.action || !nextEntry.at) {
+        return {
+            ...admin,
+            activity: activity.slice(-50)
+        };
+    }
+
+    return {
+        ...admin,
+        activity: [...activity, nextEntry].slice(-50)
+    };
+}
+
+function createManualReservationRecord(payload = {}, actor = 'admin', options = {}) {
+    const input = getManualReservationInput(payload);
+    const patch = buildManualReservationPatch(input);
+    const timestamp = (options.now ? new Date(options.now) : new Date()).toISOString();
+    const reservationId = asCleanString(input.reservationId) || generateManualReservationId({ now: timestamp });
+    const currency = patch.reservationData.currency || 'AED';
+    const missingFields = [];
+
+    if (!patch.customerData.name) missingFields.push('customerName');
+    if (!patch.customerData.phone) missingFields.push('customerPhone');
+    if (!patch.reservationData.car) missingFields.push('vehicle');
+
+    if (missingFields.length) {
+        throw buildValidationError(`Manual reservation requires: ${missingFields.join(', ')}`);
+    }
+
+    const admin = appendAdminActivity({
+        notes: patch.hasNotes ? patch.notes : '',
+        lastAction: 'create_manual',
+        lastActionAt: timestamp,
+        lastActionBy: actor || 'admin'
+    }, {
+        action: 'create_manual',
+        at: timestamp,
+        by: actor || 'admin',
+        summary: 'Manual booking created in CRM'
+    });
+
+    return {
+        reservationId,
+        status: patch.status || 'received',
+        source: 'manual_crm',
+        customerData: patch.customerData,
+        reservationData: {
+            ...patch.reservationData,
+            reservationId,
+            currency,
+            admin
+        },
+        payment: {
+            currency: currency.toLowerCase(),
+            ...patch.payment
+        },
+        rawRequest: {
+            type: 'manual_crm',
+            createdAt: timestamp,
+            createdBy: actor || 'admin'
+        },
+        createdAt: timestamp,
+        updatedAt: timestamp
+    };
+}
+
+function applyManualReservationUpdate(record = {}, payload = {}, actor = 'admin', options = {}) {
+    const patch = buildManualReservationPatch(payload);
+    const facts = getReservationFacts(record);
+    const timestamp = (options.now ? new Date(options.now) : new Date()).toISOString();
+    const reservationId = facts.reservationId || record.reservationId || record.reservationData?.reservationId;
+    const changedFields = collectManualChangedFields(record, patch);
+    const adminBase = {
+        ...getAdminData(record),
+        lastAction: 'update_reservation',
+        lastActionAt: timestamp,
+        lastActionBy: actor || 'admin'
+    };
+    const admin = appendAdminActivity({
+        ...adminBase,
+        notes: patch.hasNotes ? patch.notes : adminBase.notes
+    }, {
+        action: 'update_reservation',
+        at: timestamp,
+        by: actor || 'admin',
+        summary: changedFields.length
+            ? `Updated ${changedFields.join(', ')}`
+            : 'Reservation saved from CRM'
+    });
+    const { storage, ...recordWithoutStorage } = record;
+
+    return {
+        ...recordWithoutStorage,
+        status: patch.status || record.status || 'received',
+        customerData: {
+            ...(record.customerData || {}),
+            ...patch.customerData
+        },
+        reservationData: {
+            ...(record.reservationData || {}),
+            ...patch.reservationData,
+            reservationId,
+            admin
+        },
+        payment: {
+            ...(record.payment || {}),
+            ...patch.payment
+        },
+        rawRequest: record.rawRequest || {
+            type: 'crm_update',
+            updatedAt: timestamp,
+            updatedBy: actor || 'admin'
+        }
+    };
+}
+
 function classifyReservation(record = {}, options = {}) {
     const facts = getReservationFacts(record);
     const admin = getAdminData(record);
@@ -421,19 +820,22 @@ function classifyReservation(record = {}, options = {}) {
     const status = facts.status;
     const adminCanceled = status === 'admin_canceled' || Boolean(admin.canceledAt);
     const paymentCanceled = status === 'payment_canceled';
+    const archived = Boolean(admin.archivedAt);
     const isCanceled = adminCanceled;
     const startsToday = facts.startDate === today;
     const createdToday = toIsoDate(facts.createdAt) === today;
     const lead = LEAD_STATUSES.has(status);
     const checkoutPending = CHECKOUT_PENDING_STATUSES.has(status);
-    const paymentIssue = FAILED_PAYMENT_STATUSES.has(status);
-    const failedPayment = paymentIssue;
-    const pendingPayment = PENDING_PAYMENT_STATUSES.has(status);
-    const confirmed = CONFIRMED_STATUSES.has(status);
+    const paymentIssueStatus = FAILED_PAYMENT_STATUSES.has(status);
+    const confirmedStatus = CONFIRMED_STATUSES.has(status);
     const emailStatus = normalizeStatus(facts.emailStatus);
-    const emailIssue = status === 'confirmed_email_failed' || EMAIL_ISSUE_STATUSES.has(emailStatus);
-    const handoverDone = Boolean(admin.handoverConfirmedAt);
-    const active = !isCanceled;
+    const active = !isCanceled && !archived;
+    const paymentIssue = active && paymentIssueStatus;
+    const failedPayment = paymentIssue;
+    const pendingPayment = active && PENDING_PAYMENT_STATUSES.has(status);
+    const confirmed = active && confirmedStatus;
+    const emailIssue = active && (status === 'confirmed_email_failed' || EMAIL_ISSUE_STATUSES.has(emailStatus));
+    const handoverDone = active && Boolean(admin.handoverConfirmedAt);
     const newLead = active && lead && !admin.contactedAt;
     const confirmedToSchedule = active && confirmed && !handoverDone;
     const toContact = active && !admin.contactedAt && (lead || checkoutPending || paymentIssue || confirmed);
@@ -466,7 +868,8 @@ function classifyReservation(record = {}, options = {}) {
         handoverDone,
         active,
         adminCanceled,
-        canceled: isCanceled
+        canceled: isCanceled,
+        archived
     };
 }
 
@@ -534,10 +937,14 @@ function buildAdminReservationSummary(record = {}, options = {}) {
             handoverStatus: admin.handoverStatus || null,
             canceledAt: admin.canceledAt || null,
             cancelReason: admin.cancelReason || null,
+            archivedAt: admin.archivedAt || null,
+            archivedBy: admin.archivedBy || null,
+            archiveReason: admin.archiveReason || null,
             notes: admin.notes || '',
             lastAction: admin.lastAction || null,
             lastActionAt: admin.lastActionAt || null,
-            lastActionBy: admin.lastActionBy || null
+            lastActionBy: admin.lastActionBy || null,
+            activity: Array.isArray(admin.activity) ? admin.activity.slice(-12).reverse() : []
         },
         flags: classifyReservation(record, options)
     };
@@ -614,6 +1021,8 @@ function summaryMatchesQuickFilter(summary, quickFilter) {
             return summary.flags.handoverDone;
         case 'canceled':
             return summary.flags.canceled;
+        case 'archived':
+            return summary.flags.archived;
         case 'failed_payment':
             return summary.flags.failedPayment;
         default:
@@ -656,13 +1065,14 @@ function filterAdminReservationSummaries(records = [], filters = {}, options = {
 function applyAdminReservationAction(record = {}, action, payload = {}, actor = 'admin', options = {}) {
     const normalizedAction = asCleanString(action).toLowerCase();
     const timestamp = (options.now ? new Date(options.now) : new Date()).toISOString();
-    const admin = {
+    let admin = {
         ...getAdminData(record),
         lastAction: normalizedAction,
         lastActionAt: timestamp,
         lastActionBy: actor || 'admin'
     };
     let status = record.status || 'received';
+    let activitySummary = '';
 
     if (Object.prototype.hasOwnProperty.call(payload, 'notes')) {
         admin.notes = asCleanString(payload.notes);
@@ -672,20 +1082,36 @@ function applyAdminReservationAction(record = {}, action, payload = {}, actor = 
         admin.contactedAt = timestamp;
         admin.contactedBy = actor || 'admin';
         admin.contactMethod = asCleanString(payload.method) || 'manual';
+        activitySummary = 'Reservation marked reviewed';
     } else if (normalizedAction === 'confirm_handover') {
         admin.handoverConfirmedAt = timestamp;
         admin.handoverStatus = 'confirmed';
+        activitySummary = 'Handover confirmed';
     } else if (normalizedAction === 'cancel') {
         status = 'admin_canceled';
         admin.canceledAt = timestamp;
         admin.cancelReason = asCleanString(payload.reason) || asCleanString(payload.notes) || 'Admin canceled';
+        activitySummary = `Reservation canceled: ${admin.cancelReason}`;
+    } else if (normalizedAction === 'archive') {
+        admin.archivedAt = timestamp;
+        admin.archivedBy = actor || 'admin';
+        admin.archiveReason = asCleanString(payload.reason) || asCleanString(payload.notes) || 'Archived in CRM';
+        activitySummary = `Reservation archived: ${admin.archiveReason}`;
     } else if (normalizedAction === 'update_notes') {
         admin.notes = asCleanString(payload.notes);
+        activitySummary = 'Admin notes updated';
     } else {
         const error = new Error(`Unsupported admin reservation action: ${normalizedAction || 'empty'}`);
         error.statusCode = 400;
         throw error;
     }
+
+    admin = appendAdminActivity(admin, {
+        action: normalizedAction,
+        at: timestamp,
+        by: actor || 'admin',
+        summary: activitySummary
+    });
 
     const { storage, ...recordWithoutStorage } = record;
     return {
@@ -725,6 +1151,7 @@ function toReservationCsv(items = []) {
         ['remaining', 'Remaining'],
         ['contactedAt', 'Reviewed at'],
         ['handoverConfirmedAt', 'Handover confirmed at'],
+        ['archivedAt', 'Archived at'],
         ['updatedAt', 'Updated at']
     ];
 
@@ -745,6 +1172,7 @@ function toReservationCsv(items = []) {
         remaining: item.payment.remaining,
         contactedAt: item.admin.contactedAt,
         handoverConfirmedAt: item.admin.handoverConfirmedAt,
+        archivedAt: item.admin.archivedAt,
         updatedAt: item.updatedAt
     }));
 
@@ -782,6 +1210,22 @@ function createAdminReservationsRouter(dependencies = {}) {
             quickFilters: QUICK_FILTERS,
             storage: store.getReservationStoreMode ? store.getReservationStoreMode() : null
         });
+    }));
+
+    router.post('/reservations', asyncRoute(async (req, res) => {
+        try {
+            const record = createManualReservationRecord(
+                req.body || {},
+                req.adminSession?.user || 'admin'
+            );
+            const savedRecord = await store.saveReservationRecord(record);
+
+            return res.status(201).json({ reservation: buildAdminReservationDetail(savedRecord) });
+        } catch (error) {
+            return res.status(error.statusCode || 500).json({
+                error: error.statusCode ? error.message : 'Manual reservation could not be created'
+            });
+        }
     }));
 
     router.get('/reservations/storage', asyncRoute(async (req, res) => {
@@ -831,6 +1275,28 @@ function createAdminReservationsRouter(dependencies = {}) {
         return res.json({ reservation: buildAdminReservationDetail(record) });
     }));
 
+    router.put('/reservations/:id', asyncRoute(async (req, res) => {
+        const record = await store.readReservationRecord(req.params.id);
+        if (!record) {
+            return res.status(404).json({ error: 'Reservation not found' });
+        }
+
+        try {
+            const nextRecord = applyManualReservationUpdate(
+                record,
+                req.body || {},
+                req.adminSession?.user || 'admin'
+            );
+            const savedRecord = await store.saveReservationRecord(nextRecord);
+
+            return res.json({ reservation: buildAdminReservationDetail(savedRecord) });
+        } catch (error) {
+            return res.status(error.statusCode || 500).json({
+                error: error.statusCode ? error.message : 'Reservation could not be updated'
+            });
+        }
+    }));
+
     router.patch('/reservations/:id', asyncRoute(async (req, res) => {
         const record = await store.readReservationRecord(req.params.id);
         if (!record) {
@@ -863,15 +1329,19 @@ module.exports = {
     EMAIL_ISSUE_STATUSES,
     FAILED_PAYMENT_STATUSES,
     LEAD_STATUSES,
+    MANUAL_RESERVATION_STATUSES,
     PENDING_PAYMENT_STATUSES,
     QUICK_FILTERS,
     applyAdminReservationAction,
+    applyManualReservationUpdate,
     buildAdminReservationDetail,
     buildAdminReservationSummary,
     buildAdminOperationsStatus,
     classifyReservation,
     collectReservationFilters,
     createAdminReservationsRouter,
+    createManualReservationRecord,
     filterAdminReservationSummaries,
+    generateManualReservationId,
     toReservationCsv
 };

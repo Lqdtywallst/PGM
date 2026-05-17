@@ -113,9 +113,12 @@ dates, pickup location, amount and the `/crm` link. A separate
 
 1. Open `/crm`.
 2. Log in with the environment-specific credentials.
-3. Use `Needs contact` for new reservations that need follow-up.
+3. Use `Pending review` for new reservations that need follow-up.
 4. Open a reservation and use WhatsApp, call or email actions.
 5. Save private notes after each client contact.
 6. Mark reviewed when the client or booking has been checked by the team.
 7. Confirm handover only when the car handover is actually confirmed.
-8. Export CSV when operations needs a backup or handoff sheet.
+8. Use `New manual booking` for WhatsApp, phone or partner reservations that did not pass through checkout.
+9. Use `Edit booking` for safe client, schedule, vehicle and price corrections.
+10. Use `Cancel` or `Archive` to close records; do not hard-delete operational reservations.
+11. Export CSV when operations needs a backup or handoff sheet.
