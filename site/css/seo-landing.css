@@ -1617,6 +1617,10 @@ body.vehicle-page--mother-base {
     outline: none;
 }
 
+.vehicle-page--landing-pilot .vehicle-return-link {
+    display: none;
+}
+
 .vehicle-page--mother-base h1 {
     margin: 0;
     color: #121212;
@@ -3251,6 +3255,10 @@ body.vehicle-page--premium-pilot {
         border-radius: 14px;
     }
 
+    .vehicle-page--landing-pilot .vehicle-return-link {
+        display: flex;
+    }
+
     .vehicle-pdp-hero-shell {
         gap: 0.62rem;
     }
@@ -4009,6 +4017,12 @@ body.vehicle-page--premium-pilot {
 @media (max-width: 640px) {
     .vehicle-page--landing-pilot {
         background: linear-gradient(180deg, var(--dp-color-warm-white) 0%, var(--dp-color-sand-strong) 100%);
+    }
+
+    .vehicle-page--landing-pilot .vehicle-return-link {
+        display: flex;
+        width: min(100%, var(--dp-frame-width));
+        margin: 0 auto 0.72rem;
     }
 
     .vehicle-landing-reserve {

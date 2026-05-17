@@ -780,6 +780,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
 
                         const schedule = getCurrentSchedule();
+                        reserveLink.setAttribute("href", buildReserveHref(card));
                         storeBookingIntent({
                             car: title,
                             price: card.dataset.price,

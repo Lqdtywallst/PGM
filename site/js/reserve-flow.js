@@ -222,6 +222,7 @@
         let elements = null;
         let cardElement = null;
         let paymentIntentClientSecret = null;
+        let currentReservationId = null;
 
         // Get URL parameters (if coming from index.html)
         const carName = urlParams.get('car');
@@ -1516,6 +1517,7 @@
                     }
 
                     paymentIntentClientSecret = data.clientSecret;
+                    currentReservationId = normalizeValue(data.reservationId) || currentReservationId;
                     console.log('[PAYMENT] Client secret received:', paymentIntentClientSecret ? paymentIntentClientSecret.substring(0, 20) + '...' : 'not received');
                     showMessage('Reservation created. Please complete payment...', 'success');
                 } else {
@@ -1596,6 +1598,7 @@
                         const confirmData = {
                             paymentIntentId: paymentIntent.id,
                             reservationData: {
+                                reservationId: currentReservationId,
                                 car: selectedCar,
                                 pricePerDay: pricePerDay,
                                 days: Number(pricing.billingDays.toFixed(2)),
@@ -1634,6 +1637,7 @@
                         
                         const confirmResult = await confirmResponse.json();
                         console.log('[PAYMENT] Confirmation response:', confirmResult);
+                        currentReservationId = normalizeValue(confirmResult.reservationId) || currentReservationId;
                         
                         if (confirmResult.emailSent) {
                             console.log('[PAYMENT] Confirmation email sent');
@@ -1654,7 +1658,13 @@
                         scroll: false
                     });
                     setTimeout(() => {
-                        alert(`Payment received.\n\nVehicle: ${selectedCar}\nDuration: ${pricing.durationLabel}\nTotal reservation: ${formatAmount(total)}\nPaid now: ${formatAmount(upfrontAmount)}\nRemaining balance: ${formatAmount(remainingAmount)}\n\nYou will receive a confirmation email and the team will coordinate the handover details.`);
+                        const bookingReferenceLine = currentReservationId
+                            ? `Booking reference: ${currentReservationId}\n`
+                            : '';
+                        const lookupLine = currentReservationId
+                            ? '\nUse this reference with your booking email in Find Booking.'
+                            : '';
+                        alert(`Payment received.\n\n${bookingReferenceLine}Vehicle: ${selectedCar}\nDuration: ${pricing.durationLabel}\nTotal reservation: ${formatAmount(total)}\nPaid now: ${formatAmount(upfrontAmount)}\nRemaining balance: ${formatAmount(remainingAmount)}\n${lookupLine}\n\nYou will receive a confirmation email and the team will coordinate the handover details.`);
                         window.location.href = '/index.html';
                     }, 1500);
                 } else if (paymentIntent.status === 'processing') {

@@ -361,7 +361,10 @@ test('guest completes a reservation with mocked checkout and success redirect', 
         await route.fulfill({
             status: 200,
             contentType: 'application/json',
-            body: JSON.stringify({ clientSecret: 'pi_mock_customer_checkout_secret' })
+            body: JSON.stringify({
+                reservationId: 'res_mock_customer_checkout',
+                clientSecret: 'pi_mock_customer_checkout_secret'
+            })
         });
     });
 
@@ -370,7 +373,11 @@ test('guest completes a reservation with mocked checkout and success redirect', 
         await route.fulfill({
             status: 200,
             contentType: 'application/json',
-            body: JSON.stringify({ ok: true, emailSent: true })
+            body: JSON.stringify({
+                ok: true,
+                emailSent: true,
+                reservationId: 'res_mock_customer_checkout'
+            })
         });
     });
 
@@ -396,6 +403,7 @@ test('guest completes a reservation with mocked checkout and success redirect', 
 
     const successDialog = await successDialogPromise;
     expect(successDialog.message()).toContain('Payment received');
+    expect(successDialog.message()).toContain('Booking reference: res_mock_customer_checkout');
     expect(successDialog.message()).toContain('Mercedes G63 AMG');
     await successDialog.accept();
 

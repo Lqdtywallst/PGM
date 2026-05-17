@@ -2156,8 +2156,12 @@
     }
 
     .fleet-card__booking {
-        gap: 0.82rem;
-        padding: 0.92rem;
+        gap: 0.58rem;
+        padding: 0.92rem 0.92rem 0.85rem;
+    }
+
+    .fleet-card__availability {
+        display: none;
     }
 
     .fleet-card__price-row {
@@ -3167,4 +3171,56 @@ body.fleet-page .fleet-sidebar__module[aria-labelledby="fleet-sidebar-types"] .f
     padding-right: 2.25rem;
     text-align: center;
     text-align-last: center;
+}
+
+/* Final mobile filter contract: the sheet behaves like a focused task surface, not a squeezed sidebar. */
+@media (max-width: 560px) {
+    .fleet-sidebar {
+        top: 0;
+        right: 0;
+        bottom: auto;
+        left: 0;
+        height: 94svh;
+        max-height: 94svh;
+        padding: 0.4rem 0.92rem calc(0.4rem + env(safe-area-inset-bottom));
+        border-radius: 0 0 18px 18px;
+    }
+
+    .fleet-sidebar__scroll {
+        max-height: calc(94svh - 5.9rem);
+    }
+
+    .fleet-sidebar__field-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.38rem;
+    }
+
+    .fleet-sidebar__field-shell,
+    .fleet-sidebar__field-display {
+        min-height: 44px;
+    }
+
+    .fleet-sidebar__field-shell--date .fleet-sidebar__field-display,
+    .fleet-sidebar__field-shell--time .fleet-sidebar__field-display {
+        padding-inline: 0.42rem;
+        font-size: 0.76rem;
+        letter-spacing: 0.045em;
+    }
+
+    .fleet-sidebar__module[aria-labelledby="fleet-sidebar-brands"] {
+        order: 1;
+    }
+
+    .fleet-sidebar__module[aria-labelledby="fleet-sidebar-types"] {
+        order: 2;
+    }
+
+    .fleet-sidebar__module[aria-labelledby="fleet-sidebar-period"] {
+        order: 3;
+    }
+
+    .fleet-sidebar__module[aria-labelledby="fleet-sidebar-price"] {
+        order: 4;
+        display: none;
+    }
 }

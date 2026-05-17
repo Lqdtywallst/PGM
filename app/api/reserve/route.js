@@ -397,6 +397,7 @@ const emailTransporter = createEmailTransporter();
 // Function to send notification email BEFORE payment
 async function sendReservationNotificationEmail(reservationData, customerData) {
     const companyEmail = 'prestigegoalmotion@gmail.com';
+    const reservationId = displayEmailValue(reservationData.reservationId);
     
     // Company notification email (reservation pending payment)
     const notificationEmailHtml = `
@@ -422,6 +423,7 @@ async function sendReservationNotificationEmail(reservationData, customerData) {
                 <div class="content">
                     <div class="status">PAYMENT PENDING</div>
                     <h2>Reservation Details</h2>
+                    <div class="info-row"><span class="label">Reservation ID:</span> ${reservationId}</div>
                     <div class="info-row"><span class="label">Vehicle:</span> ${displayEmailValue(reservationData.car, 'Vehicle to be confirmed')}</div>
                     <div class="info-row"><span class="label">Start date:</span> ${displayEmailValue(reservationData.startDate)}${reservationData.pickupTime ? ` at ${reservationData.pickupTime}` : ''}</div>
                     <div class="info-row"><span class="label">End date:</span> ${displayEmailValue(reservationData.endDate)}${reservationData.dropoffTime ? ` at ${reservationData.dropoffTime}` : ''}</div>
@@ -450,7 +452,7 @@ async function sendReservationNotificationEmail(reservationData, customerData) {
         await emailTransporter.sendMail({
             from: EMAIL_CONFIG.from,
             to: companyEmail,
-            subject: `New Pending Reservation: ${reservationData.car || 'Vehicle'} - ${customerData.name || customerData.fullName || 'Customer'}`,
+            subject: `New Pending Reservation ${reservationId}: ${reservationData.car || 'Vehicle'} - ${customerData.name || customerData.fullName || 'Customer'}`,
             html: notificationEmailHtml,
         });
         
@@ -464,6 +466,7 @@ async function sendReservationNotificationEmail(reservationData, customerData) {
 // Function to send confirmation email
 async function sendReservationEmail(reservationData, customerData, paymentIntentId) {
     const companyEmail = 'prestigegoalmotion@gmail.com';
+    const reservationId = displayEmailValue(reservationData.reservationId);
     
     // Company email
     const companyEmailHtml = `
@@ -487,6 +490,7 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
                 </div>
                 <div class="content">
                     <h2>Reservation Details</h2>
+                    <div class="info-row"><span class="label">Reservation ID:</span> ${reservationId}</div>
                     <div class="info-row"><span class="label">Vehicle:</span> ${displayEmailValue(reservationData.car, 'Vehicle to be confirmed')}</div>
                     <div class="info-row"><span class="label">Start date:</span> ${displayEmailValue(reservationData.startDate)}${reservationData.pickupTime ? ` at ${reservationData.pickupTime}` : ''}</div>
                     <div class="info-row"><span class="label">End date:</span> ${displayEmailValue(reservationData.endDate)}${reservationData.dropoffTime ? ` at ${reservationData.dropoffTime}` : ''}</div>
@@ -533,8 +537,9 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
                 </div>
                 <div class="content">
                     <p>Dear ${customerData.name || customerData.fullName || 'Customer'},</p>
-                    <p>Your reservation is confirmed. Here are the key details for your booking:</p>
+                    <p>Your reservation is confirmed. Keep this booking reference with the email used at checkout so you can use Find Booking later.</p>
                     <h2>Reservation Details</h2>
+                    <div class="info-row"><span class="label">Booking reference:</span> ${reservationId}</div>
                     <div class="info-row"><span class="label">Vehicle:</span> ${displayEmailValue(reservationData.car, 'Vehicle to be confirmed')}</div>
                     <div class="info-row"><span class="label">Start date:</span> ${displayEmailValue(reservationData.startDate)}${reservationData.pickupTime ? ` at ${reservationData.pickupTime}` : ''}</div>
                     <div class="info-row"><span class="label">End date:</span> ${displayEmailValue(reservationData.endDate)}${reservationData.dropoffTime ? ` at ${reservationData.dropoffTime}` : ''}</div>
@@ -566,7 +571,7 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
         const companyEmailResult = await emailTransporter.sendMail({
             from: EMAIL_CONFIG.from,
             to: companyEmail,
-            subject: `New Reservation: ${reservationData.car || 'Vehicle'} - ${customerData.name || customerData.fullName || 'Customer'}`,
+            subject: `New Reservation ${reservationId}: ${reservationData.car || 'Vehicle'} - ${customerData.name || customerData.fullName || 'Customer'}`,
             html: companyEmailHtml,
         });
         console.log('[EMAIL]  Company email sent:', {
@@ -581,7 +586,7 @@ async function sendReservationEmail(reservationData, customerData, paymentIntent
             const customerEmailResult = await emailTransporter.sendMail({
                 from: EMAIL_CONFIG.from,
                 to: customerData.email,
-                subject: `Reservation confirmed - Dynasty Prestige`,
+                subject: `Reservation confirmed ${reservationId} - Dynasty Prestige`,
                 html: customerEmailHtml,
                 replyTo: companyEmail,
             });

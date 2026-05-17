@@ -838,7 +838,7 @@ function initSiteV2() {
             return;
         }
 
-        heroVideo.preload = mobileViewport.matches ? "metadata" : "auto";
+        heroVideo.preload = "metadata";
 
         if (heroVideo.getAttribute("src") !== selectedSource) {
             heroVideo.setAttribute("src", selectedSource);
