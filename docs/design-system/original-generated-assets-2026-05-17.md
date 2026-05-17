@@ -4,6 +4,10 @@ Purpose: replace non-fleet public imagery with original Dynasty Prestige visual
 assets that avoid third-party logos, recognizable model badges, license plates,
 identifiable people and stock-source dependency.
 
+After generation, the assets were color-graded against the approved fleet
+photography so their contrast, cream/neutral backgrounds, shadow detail and
+warm gold accents feel consistent with the existing site images.
+
 ## Generated Prompts
 
 ### Home Hero / Location Fallback
