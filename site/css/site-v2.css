@@ -1881,12 +1881,18 @@ select {
 }
 
 .lab-nav__card--type .lab-nav__card-media--type {
-    width: 2.22rem;
-    min-width: 2.22rem;
+    width: 3.9rem;
+    min-width: 3.9rem;
+    height: 1.8rem;
+    overflow: visible;
 }
 
 .lab-nav__card--type .lab-nav__card-media--type img {
-    filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.2));
+    transform: scale(1.36);
+    transform-origin: center;
+    filter:
+        drop-shadow(0 12px 14px rgba(0, 0, 0, 0.32))
+        drop-shadow(0 3px 5px rgba(0, 0, 0, 0.2));
 }
 
 .lab-nav__card--type .lab-nav__card-copy {
@@ -3052,7 +3058,7 @@ select {
     padding: 0.05rem 0 0.22rem;
     border-radius: 0;
     background: none;
-    overflow: hidden;
+    overflow: visible;
     transition:
         background 260ms ease,
         transform 260ms ease;
@@ -3097,9 +3103,9 @@ select {
 .fleet-category__image {
     position: relative;
     z-index: 2;
-    width: var(--fleet-image-width);
+    width: min(var(--fleet-image-width), 118%);
     height: clamp(8.15rem, 8.9vw, 9.9rem);
-    max-width: 19rem;
+    max-width: 20.5rem;
     object-fit: contain;
     object-position: center bottom;
     justify-self: center;
