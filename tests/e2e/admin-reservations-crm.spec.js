@@ -177,12 +177,17 @@ test.describe('Private admin reservations CRM', () => {
 
         await expect(page.locator('.detail-title')).toContainText('Lamborghini Huracan EVO Spyder');
         await expect(page.locator('#closeReservationDetail')).toBeVisible();
+        if ((page.viewportSize()?.width || 0) <= 620) {
+            await expect(page.locator('#reservationDetailBackdrop')).toBeVisible();
+            await expect(page.locator('#reservationDetail')).toHaveCSS('position', 'fixed');
+        }
         await expect(page.locator('#reservationDetail')).toContainText('crm-test-client@example.com');
         await expect(page.locator('#reservationDetail')).toContainText('6,400 AED');
         await page.click('#closeReservationDetail');
         await expect(page.locator('#reservationDetail')).toContainText('Operations overview');
         await expect(page.locator('#reservationDetail')).toContainText('Today at a glance');
         await expect(page.locator('#closeReservationDetail')).toHaveCount(0);
+        await expect(page.locator('#reservationDetailBackdrop')).toBeHidden();
         await card.click();
         await expect(page.locator('.detail-title')).toContainText('Lamborghini Huracan EVO Spyder');
 
@@ -192,6 +197,8 @@ test.describe('Private admin reservations CRM', () => {
 
         await page.click('[data-action="mark_contacted"]');
         await expect(page.locator('#reservationDetail')).toContainText('Reviewed at');
+        await page.click('#closeReservationDetail');
+        await expect(page.locator('#reservationDetailBackdrop')).toBeHidden();
 
         await page.click('#manualNewButton');
         await expect(page.locator('#manualPanel')).toBeVisible();

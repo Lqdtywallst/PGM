@@ -840,6 +840,9 @@ function renderAdminReservationsPage() {
             overflow: auto;
             padding: 18px;
         }
+        .detail-backdrop {
+            display: none;
+        }
         .workspace-overview {
             display: grid;
             gap: 16px;
@@ -996,6 +999,30 @@ function renderAdminReservationsPage() {
             overflow-wrap: anywhere;
             font-size: 0.88rem;
         }
+        .technical-details {
+            margin-top: 4px;
+        }
+        .technical-details summary {
+            min-height: 38px;
+            padding: 0 12px;
+            border: 1px solid var(--line);
+            border-radius: 13px;
+            background: rgba(255, 255, 255, 0.72);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.68rem;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            list-style: none;
+            text-transform: uppercase;
+        }
+        .technical-details summary::-webkit-details-marker {
+            display: none;
+        }
+        .technical-details .field-grid {
+            margin-top: 10px;
+        }
         .empty {
             padding: 22px;
             color: var(--muted);
@@ -1077,6 +1104,9 @@ function renderAdminReservationsPage() {
             .layout {
                 gap: 12px;
                 padding: 12px;
+            }
+            .reservations-workspace {
+                order: 5;
             }
             .hero,
             .toolbar,
@@ -1168,7 +1198,39 @@ function renderAdminReservationsPage() {
                 justify-self: start;
             }
             .detail-panel {
+                order: 4;
                 scroll-margin-top: 78px;
+            }
+            .detail-panel.has-detail {
+                position: fixed;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 30;
+                width: min(92vw, 390px);
+                height: 100dvh;
+                max-height: none;
+                overflow-x: hidden;
+                overflow-y: auto;
+                background: #fffaf2;
+                border-radius: 22px 0 0 22px;
+                border-top: 0;
+                border-right: 0;
+                border-bottom: 0;
+                box-shadow: -18px 0 44px rgba(0, 0, 0, 0.24);
+                overscroll-behavior: contain;
+                -webkit-overflow-scrolling: touch;
+            }
+            .detail-backdrop:not([hidden]) {
+                position: fixed;
+                inset: 0;
+                z-index: 20;
+                display: block;
+                background: rgba(13, 13, 15, 0.46);
+                backdrop-filter: blur(2px);
+            }
+            body.has-mobile-detail {
+                overflow: hidden;
             }
             .detail-header {
                 align-items: flex-start;
@@ -1373,7 +1435,7 @@ function renderAdminReservationsPage() {
             </form>
         </section>
 
-        <section>
+        <section class="reservations-workspace">
             <div class="toolbar">
                 <div class="search-row">
                     <input id="searchInput" type="search" placeholder="Search client, phone, vehicle or ID">
@@ -1407,6 +1469,7 @@ function renderAdminReservationsPage() {
             </div>
         </section>
 
+        <div class="detail-backdrop" id="reservationDetailBackdrop" hidden></div>
         <aside class="detail-panel" id="reservationDetail" aria-live="polite">
             <div class="detail-empty">Loading operations overview...</div>
         </aside>
@@ -1627,6 +1690,36 @@ function renderAdminReservationsPage() {
             return '<div class="field"><span>' + escapeHtml(label) + '</span><strong>' + escapeHtml(display(value)) + '</strong></div>';
         }
 
+        function hasDisplayValue(value) {
+            return value != null && String(value).trim() !== '';
+        }
+
+        function optionalField(label, value) {
+            return hasDisplayValue(value) ? field(label, value) : '';
+        }
+
+        function fieldSection(title, fieldsHtml, emptyText) {
+            var content = String(fieldsHtml || '').trim();
+            if (!content && !emptyText) return '';
+            return '<div class="section"><h2>' + escapeHtml(title) + '</h2>' +
+                (content ? '<div class="field-grid">' + content + '</div>' : '<div class="empty">' + escapeHtml(emptyText) + '</div>') +
+            '</div>';
+        }
+
+        function paymentStatusLabel(value) {
+            var status = String(value || '').trim();
+            if (!status) return '';
+            var labels = {
+                requires_payment_method: 'Payment not completed',
+                requires_action: 'Payment requires action',
+                processing: 'Payment processing',
+                succeeded: 'Payment received',
+                canceled: 'Payment canceled',
+                failed: 'Payment failed'
+            };
+            return labels[status] || status.replace(/_/g, ' ');
+        }
+
         function overviewCount(items, predicate) {
             return items.filter(predicate).length;
         }
@@ -1676,6 +1769,7 @@ function renderAdminReservationsPage() {
                 .slice(0, 5);
 
             detail.classList.remove('has-detail');
+            setReservationDetailDrawer(false);
             state.currentReservation = null;
             detail.innerHTML =
                 '<div class="workspace-overview">' +
@@ -1751,12 +1845,20 @@ function renderAdminReservationsPage() {
             return data[key] == null || data[key] === '' ? (fallback || '') : data[key];
         }
 
+        function isMobileCrmViewport() {
+            return Boolean(window.matchMedia && window.matchMedia('(max-width: 620px)').matches);
+        }
+
         function openManualPanel(mode, reservation) {
             var panel = document.getElementById('manualPanel');
             var title = document.getElementById('manualPanelTitle');
             var copy = document.getElementById('manualPanelCopy');
             state.manualMode = mode || 'create';
             state.currentReservation = reservation || state.currentReservation;
+            if (isMobileCrmViewport()) {
+                document.getElementById('reservationDetail').classList.remove('has-detail');
+                setReservationDetailDrawer(false);
+            }
             document.getElementById('manualReservationForm').reset();
             setFormValue('manualCurrency', 'AED');
             setFormValue('manualStatus', 'received');
@@ -1831,18 +1933,48 @@ function renderAdminReservationsPage() {
             '</div></div>';
         }
 
-        function scrollReservationDetailIntoView(detail) {
-            if (!window.matchMedia || !window.matchMedia('(max-width: 620px)').matches) return;
-            window.setTimeout(function () {
-                detail.scrollIntoView({ block: 'start', behavior: 'smooth' });
-            }, 0);
+        function setReservationDetailDrawer(isOpen) {
+            var backdrop = document.getElementById('reservationDetailBackdrop');
+            if (backdrop) backdrop.hidden = !isOpen;
+            document.body.classList.toggle('has-mobile-detail', Boolean(isOpen));
         }
 
         function renderDetail(payload) {
             var r = payload.reservation;
             var detail = document.getElementById('reservationDetail');
+            var clientFields =
+                field('Name', r.customer.name) +
+                optionalField('Email', r.customer.email) +
+                optionalField('Phone', r.customer.phone) +
+                optionalField('ID / Passport', r.customer.idDocument);
+            var reservationFields =
+                field('Reservation ID', r.reservationId) +
+                field('Vehicle', r.vehicle.name) +
+                field('Date range', display(r.schedule.startDate) + ' to ' + display(r.schedule.endDate)) +
+                optionalField('Pickup time', r.schedule.pickupTime) +
+                optionalField('Dropoff time', r.schedule.dropoffTime) +
+                optionalField('Pickup', r.schedule.pickupLocation) +
+                optionalField('Dropoff', r.schedule.dropoffLocation);
+            var paymentFields =
+                optionalField('Total', r.payment.total) +
+                optionalField('Upfront', r.payment.upfront) +
+                optionalField('Remaining', r.payment.remaining) +
+                optionalField('Stripe status', paymentStatusLabel(r.payment.stripeStatus)) +
+                optionalField('Payment issue', r.payment.error) +
+                optionalField('Email status', r.email.status || r.email.sentAt);
+            var workflowFields =
+                optionalField('Reviewed at', r.admin.contactedAt ? formatDate(r.admin.contactedAt) : '') +
+                optionalField('Handover confirmed', r.admin.handoverConfirmedAt ? formatDate(r.admin.handoverConfirmedAt) : '') +
+                optionalField('Archived at', r.admin.archivedAt ? formatDate(r.admin.archivedAt) : '') +
+                optionalField('Archive reason', r.admin.archiveReason || '');
+            var technicalFields =
+                optionalField('Payment intent', r.technical.paymentIntentId) +
+                optionalField('Source', r.technical.source) +
+                optionalField('Storage', r.technical.storage) +
+                optionalField('Updated', r.updatedAt ? formatDate(r.updatedAt) : '');
             state.currentReservation = r;
             detail.classList.add('has-detail');
+            setReservationDetailDrawer(true);
             detail.innerHTML =
                 '<div class="detail-header">' +
                     '<div>' +
@@ -1859,29 +1991,9 @@ function renderAdminReservationsPage() {
                     '<button class="action" type="button" data-action="mark_contacted">Mark reviewed</button>' +
                     '<button class="action" type="button" id="editReservationButton">Edit booking</button>' +
                 '</div>' +
-                '<div class="section"><h2>Client</h2><div class="field-grid">' +
-                    field('Name', r.customer.name) +
-                    field('Email', r.customer.email) +
-                    field('Phone', r.customer.phone) +
-                    field('ID / Passport', r.customer.idDocument) +
-                '</div></div>' +
-                '<div class="section"><h2>Reservation</h2><div class="field-grid">' +
-                    field('Reservation ID', r.reservationId) +
-                    field('Vehicle', r.vehicle.name) +
-                    field('Date range', display(r.schedule.startDate) + ' to ' + display(r.schedule.endDate)) +
-                    field('Pickup time', r.schedule.pickupTime) +
-                    field('Dropoff time', r.schedule.dropoffTime) +
-                    field('Pickup', r.schedule.pickupLocation) +
-                    field('Dropoff', r.schedule.dropoffLocation) +
-                '</div></div>' +
-                '<div class="section"><h2>Payment</h2><div class="field-grid">' +
-                    field('Total', r.payment.total) +
-                    field('Upfront', r.payment.upfront) +
-                    field('Remaining', r.payment.remaining) +
-                    field('Stripe status', r.payment.stripeStatus) +
-                    field('Payment issue', r.payment.error) +
-                    field('Email status', r.email.status || r.email.sentAt) +
-                '</div></div>' +
+                fieldSection('Client', clientFields) +
+                fieldSection('Reservation', reservationFields) +
+                fieldSection('Payment', paymentFields, 'No payment details stored yet.') +
                 '<div class="section"><h2>Admin notes</h2>' +
                     '<textarea id="adminNotes" placeholder="Internal notes for the team">' + escapeHtml(r.admin.notes || '') + '</textarea>' +
                     '<div class="detail-actions">' +
@@ -1890,20 +2002,10 @@ function renderAdminReservationsPage() {
                         '<button class="action" type="button" data-action="archive">Archive</button>' +
                         '<button class="action danger" type="button" data-action="cancel">Cancel</button>' +
                     '</div>' +
-                    '<div class="field-grid">' +
-                        field('Reviewed at', r.admin.contactedAt ? formatDate(r.admin.contactedAt) : '') +
-                        field('Handover confirmed', r.admin.handoverConfirmedAt ? formatDate(r.admin.handoverConfirmedAt) : '') +
-                        field('Archived at', r.admin.archivedAt ? formatDate(r.admin.archivedAt) : '') +
-                        field('Archive reason', r.admin.archiveReason || '') +
-                    '</div>' +
+                    (workflowFields ? '<div class="field-grid">' + workflowFields + '</div>' : '') +
                 '</div>' +
                 renderActivity(r.admin) +
-                '<div class="section"><h2>Technical</h2><div class="field-grid">' +
-                    field('Payment intent', r.technical.paymentIntentId) +
-                    field('Source', r.technical.source) +
-                    field('Storage', r.technical.storage) +
-                    field('Updated', r.updatedAt ? formatDate(r.updatedAt) : '') +
-                '</div></div>';
+                (technicalFields ? '<div class="section"><details class="technical-details"><summary>Technical details</summary><div class="field-grid">' + technicalFields + '</div></details></div>' : '');
 
             detail.querySelectorAll('[data-action]').forEach(function (button) {
                 button.addEventListener('click', function () {
@@ -1914,12 +2016,12 @@ function renderAdminReservationsPage() {
                 openManualPanel('edit', state.currentReservation);
             });
             document.getElementById('closeReservationDetail').addEventListener('click', closeReservationDetail);
-            scrollReservationDetailIntoView(detail);
         }
 
         function closeReservationDetail() {
             state.selectedId = '';
             state.currentReservation = null;
+            setReservationDetailDrawer(false);
             document.querySelectorAll('[data-reservation-id]').forEach(function (button) {
                 button.classList.remove('is-active');
             });
@@ -1931,7 +2033,10 @@ function renderAdminReservationsPage() {
             document.querySelectorAll('[data-reservation-id]').forEach(function (button) {
                 button.classList.toggle('is-active', button.getAttribute('data-reservation-id') === id);
             });
-            document.getElementById('reservationDetail').innerHTML = '<div class="detail-empty">Loading reservation...</div>';
+            var detail = document.getElementById('reservationDetail');
+            detail.classList.add('has-detail');
+            setReservationDetailDrawer(true);
+            detail.innerHTML = '<div class="detail-empty">Loading reservation...</div>';
             await loadReservations();
 
             try {
@@ -2050,6 +2155,7 @@ function renderAdminReservationsPage() {
         document.getElementById('operationsDetailsClose').addEventListener('click', function () {
             setOperationsDetailsOpen(false);
         });
+        document.getElementById('reservationDetailBackdrop').addEventListener('click', closeReservationDetail);
 
         loadOperationsStatus();
         loadReservations();
