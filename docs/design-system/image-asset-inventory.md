@@ -115,8 +115,10 @@ Status labels:
 | `site/images/fleet/ferrari-296-gts/06-exterior-motion.jpg` | 1024x599 | `vehicle-gallery` | Ferrari PDP | Temporary | High saturation/sports energy; OK as support, not as global hero/card. |
 | `site/images/fleet/ferrari-296-gts/07-hero-dubai.jpeg` | 1024x683 | `vehicle-pdp-hero` | Ferrari PDP and remaining Ferrari-specific references | Temporary | No longer used as Home fallback. Good Ferrari/Dubai mood but too model-specific for utility or brand-wide pages. |
 | `site/images/fleet/ferrari-296-gts/08-front-profile.jpg` | 1572x1882 | `vehicle-gallery` | Ferrari PDP | Temporary | Portrait crop; not card/hero safe. |
+| `site/images/fleet/ferrari-296-gts/11-driver-view.jpg` | 1600x900 | `vehicle-gallery` thumbnail | Ferrari PDP driver view | Reusable now | Pexels photo `11175230` by Ryan Collis, cropped/resized from source. Shows more red body and driver cabin than the prior tight crop. License: `https://www.pexels.com/license/`. |
+| `site/images/fleet/ferrari-296-gts/12-seat-detail.jpg` | 1600x900 | `vehicle-gallery` thumbnail | Ferrari PDP seat detail | Reusable now | Unsplash photo `EeSoGZYwkLo` by Mubashir Shoukat, cropped/resized from source. Red Ferrari cockpit/seat detail with a wider, less zoomed composition. License: `https://unsplash.com/license`. |
 
-Recommendation: use `07-hero-dubai.jpeg` for Ferrari PDP hero only until a stronger Ferrari-specific exterior exists. Use `01-exterior-front.jpg` for Ferrari fleet/brand temporarily, but it should be replaced with a Dubai-context exterior.
+Recommendation: use `07-hero-dubai.jpeg` for Ferrari PDP hero only until a stronger Ferrari-specific exterior exists. Use `01-exterior-front.jpg` for Ferrari fleet/brand temporarily, but it should be replaced with a Dubai-context exterior. Keep `11-driver-view.jpg` and `12-seat-detail.jpg` as the current PDP support thumbnails.
 
 ### Lamborghini Huracan
 
