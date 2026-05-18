@@ -3909,7 +3909,7 @@ body.vehicle-page--premium-pilot {
         grid-template-areas:
             "stage booking"
             "thumbs specs";
-        grid-template-rows: auto minmax(7.75rem, 8rem);
+        grid-template-rows: clamp(30rem, 36.7vw, 33.05rem) minmax(7.75rem, 8rem);
         gap: clamp(1rem, 1.2vw, 1.4rem);
         justify-content: stretch;
         align-items: stretch;
@@ -3945,6 +3945,7 @@ body.vehicle-page--premium-pilot {
     .vehicle-landing-reserve .vehicle-booking {
         grid-area: booking;
         height: 100%;
+        min-height: 0;
         align-self: stretch;
     }
 
