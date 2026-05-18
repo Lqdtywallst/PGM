@@ -526,12 +526,13 @@ async function run() {
         hasLegacyHeroOverlayControls || hasInlineHeroBookingControls,
         'home page exposes the date-first hero controls'
     );
-    const homeOriginalHeroStillRule = /\.home-page\s+\.hero-lab__still\s*\{(?=[^}]*home-hero-original\.jpg)[^}]*\}/m;
+    const homeHeroStillBlock = (homeSiteCss.match(/\.home-page\s+\.hero-lab__still\s*\{[^}]*\}/m) || [''])[0];
     assert(
-        !indexPage.includes('data-src-mobile="./media/hero-sports-road.mp4"') &&
-        !indexPage.includes('data-src-desktop="./media/home-hero-city-streets.mp4"') &&
-        homeOriginalHeroStillRule.test(homeSiteCss),
-        'home hero uses the original generated still instead of unverified video media'
+        !indexPage.includes('poster="./images/home-hero-video-poster.jpg"') &&
+        indexPage.includes('data-src-desktop="./media/home-hero-city-streets.mp4"') &&
+        homeHeroStillBlock.includes('linear-gradient(180deg') &&
+        !homeHeroStillBlock.includes('url('),
+        'home hero stays dark until the hero video is ready'
     );
     assert(
         indexPage.includes('./fleet.html') &&

@@ -126,13 +126,11 @@
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(circle at 70% 24%, rgba(var(--dp-color-gold-rgb), 0.1), rgba(var(--dp-color-gold-rgb), 0) 30%),
-        linear-gradient(90deg, rgba(5, 6, 7, 0.72), rgba(5, 6, 7, 0.34) 48%, rgba(5, 6, 7, 0.82)),
-        url("../images/home-hero-original.jpg") center / cover no-repeat,
+        radial-gradient(circle at 58% 24%, rgba(var(--dp-color-gold-rgb), 0.08), rgba(var(--dp-color-gold-rgb), 0) 30%),
         linear-gradient(180deg, rgba(6, 7, 8, 0.98) 0%, rgba(14, 14, 12, 0.96) 48%, rgba(5, 6, 7, 0.98) 100%);
     opacity: 1;
     transform: none;
-    transition: opacity 900ms ease;
+    transition: opacity 1200ms ease;
 }
 
 .home-page .hero-lab.is-video-ready .hero-lab__still {
@@ -7610,7 +7608,7 @@ body.lab-mobile-nav-open {
     }
 
     .home-page .hero-lab__still {
-        opacity: 0;
+        opacity: 1;
     }
 
     .hero-lab__body {

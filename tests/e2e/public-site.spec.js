@@ -187,9 +187,9 @@ test.describe('Public site quality gate', () => {
             };
         });
 
-        expect(heroVideoState.poster).toContain('home-hero-video-poster.jpg');
-        expect(heroVideoState.sourceSrc).toContain('hero-dubai-sunset.mp4');
-        expect(heroVideoState.currentSrc).toContain('hero-dubai-sunset.mp4');
+        expect(heroVideoState.poster).toBe('');
+        expect(heroVideoState.sourceSrc).toContain('home-hero-city-streets.mp4');
+        expect(heroVideoState.currentSrc).toContain('home-hero-city-streets.mp4');
         expect(heroVideoState.readyState > 0 || heroVideoState.currentTime > 0).toBeTruthy();
 
         await expectNoConsoleErrors(consoleErrors, 'home desktop hero video');
