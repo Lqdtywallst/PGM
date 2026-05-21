@@ -44,6 +44,10 @@ function initSiteV2() {
     const homeReturnDateInput = document.getElementById("home-return-date");
     const homePickupTimeInput = document.getElementById("home-pickup-time");
     const homeReturnTimeInput = document.getElementById("home-return-time");
+    const overlayPickupDateInput = document.getElementById("hero-lab-pickup-date");
+    const overlayReturnDateInput = document.getElementById("hero-lab-return-date");
+    const overlayPickupTimeInput = document.getElementById("hero-lab-pickup-time");
+    const overlayReturnTimeInput = document.getElementById("hero-lab-return-time");
 
     let introTimers = [];
     let introStarted = false;
@@ -142,6 +146,73 @@ function initSiteV2() {
         return `${year}-${month}-${day}`;
     }
 
+    function isValidDateInputValue(value) {
+        const normalized = normalizeBookingValue(value);
+
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
+            return false;
+        }
+
+        const [year, month, day] = normalized.split("-").map(Number);
+        const parsed = new Date(year, month - 1, day);
+        return parsed.getFullYear() === year &&
+            parsed.getMonth() === month - 1 &&
+            parsed.getDate() === day;
+    }
+
+    function addDaysToDateInputValue(value, offsetDays = 0) {
+        if (!isValidDateInputValue(value)) {
+            return getDubaiDateString(offsetDays);
+        }
+
+        const [year, month, day] = value.split("-").map(Number);
+        const date = new Date(year, month - 1, day);
+        date.setDate(date.getDate() + offsetDays);
+        const nextYear = date.getFullYear();
+        const nextMonth = String(date.getMonth() + 1).padStart(2, "0");
+        const nextDay = String(date.getDate()).padStart(2, "0");
+        return `${nextYear}-${nextMonth}-${nextDay}`;
+    }
+
+    function clampBookingDateValue(value, fallbackValue, minDateValue) {
+        const normalized = normalizeBookingValue(value);
+        const fallback = isValidDateInputValue(fallbackValue) ? fallbackValue : getDubaiDateString(0);
+        const minimum = isValidDateInputValue(minDateValue) ? minDateValue : getDubaiDateString(0);
+
+        if (!isValidDateInputValue(normalized)) {
+            return fallback < minimum ? minimum : fallback;
+        }
+
+        return normalized < minimum ? minimum : normalized;
+    }
+
+    function resolveDefaultBookingDates(intent = {}) {
+        const today = getDubaiDateString(0);
+        const startDate = clampBookingDateValue(intent.startDate, today, today);
+        const rawEndDate = normalizeBookingValue(intent.endDate);
+        const defaultEndDate = addDaysToDateInputValue(startDate, 1);
+        const endDate = isValidDateInputValue(rawEndDate) && rawEndDate >= startDate
+            ? rawEndDate
+            : defaultEndDate;
+
+        return { today, startDate, endDate };
+    }
+
+    function syncBookingDateInputs(startInput, endInput) {
+        if (!(startInput instanceof HTMLInputElement) || !(endInput instanceof HTMLInputElement)) {
+            return;
+        }
+
+        const today = getDubaiDateString(0);
+        startInput.min = today;
+        startInput.value = clampBookingDateValue(startInput.value, today, today);
+        endInput.min = startInput.value || today;
+
+        if (!endInput.value || endInput.value < endInput.min) {
+            endInput.value = addDaysToDateInputValue(startInput.value || today, 1);
+        }
+    }
+
     function buildTimeOptions(select, selectedValue) {
         if (!(select instanceof HTMLSelectElement)) {
             return;
@@ -236,6 +307,28 @@ function initSiteV2() {
             }
 
             return "";
+        }
+
+        function getFallbackPreviousPath(currentPath) {
+            const [pathname] = stripHashAndTrailingSlash(currentPath).split("?");
+
+            if (!pathname || pathsEqual(pathname, "/")) {
+                return "";
+            }
+
+            if (document.body.classList.contains("vehicle-page")) {
+                return "/fleet.html";
+            }
+
+            if (document.body.classList.contains("fleet-page") || pathsEqual(pathname, "/fleet.html")) {
+                return "/";
+            }
+
+            if (pathname.includes("/app/reserve/page.html")) {
+                return "/fleet.html";
+            }
+
+            return "/";
         }
 
         function bindInternalNavigationCapture(currentPath) {
@@ -370,13 +463,11 @@ function initSiteV2() {
         const referrerPath = normalizeInternalPath(document.referrer);
         const storedMemory = readNavigationMemory();
         const pendingPreviousPath = getPendingInternalPreviousPath(storedMemory, currentPath);
-        const hasInternalHistoryTarget = Boolean(
-            (referrerPath && !pathsEqual(referrerPath, currentPath)) ||
-            pendingPreviousPath
-        );
+        const fallbackPreviousPath = getFallbackPreviousPath(currentPath);
         const previousPath = [
             referrerPath,
-            pendingPreviousPath
+            pendingPreviousPath,
+            fallbackPreviousPath
         ].find((candidate) => candidate && !pathsEqual(candidate, currentPath));
 
         bindInternalNavigationCapture(currentPath);
@@ -392,7 +483,7 @@ function initSiteV2() {
             return;
         }
 
-        if (!previousPath || !hasInternalHistoryTarget || document.querySelector(".lab-floating-back")) {
+        if (!previousPath || document.querySelector(".lab-floating-back")) {
             return;
         }
 
@@ -415,14 +506,11 @@ function initSiteV2() {
                 Boolean(liveReferrerPath && pathsEqual(liveReferrerPath, previousPath))
             );
 
-            event.preventDefault();
-
             if (!canUseHistoryBack) {
-                backButton.classList.remove("is-visible");
-                backButton.setAttribute("aria-hidden", "true");
                 return;
             }
 
+            event.preventDefault();
             window.history.back();
             window.setTimeout(() => {
                 if (!document.hidden) {
@@ -1333,28 +1421,24 @@ function initSiteV2() {
         }
 
         const storedIntent = getStoredBookingIntent();
-        const today = getDubaiDateString(0);
-        const tomorrow = getDubaiDateString(1);
-        const pickupDate = normalizeBookingValue(storedIntent?.startDate) || today;
-        const returnDate = normalizeBookingValue(storedIntent?.endDate) || tomorrow;
+        const { today, startDate, endDate } = resolveDefaultBookingDates(storedIntent);
         const pickupTime = normalizeBookingValue(storedIntent?.pickupTime) || "12:00";
         const dropoffTime = normalizeBookingValue(storedIntent?.dropoffTime) || "12:00";
 
         homePickupDateInput.min = today;
-        homeReturnDateInput.min = today;
-        homePickupDateInput.value = pickupDate;
-        homeReturnDateInput.value = returnDate >= pickupDate ? returnDate : pickupDate;
+        homePickupDateInput.value = startDate;
         homeReturnDateInput.min = homePickupDateInput.value;
+        homeReturnDateInput.value = endDate;
 
         buildTimeOptions(homePickupTimeInput, pickupTime);
         buildTimeOptions(homeReturnTimeInput, dropoffTime);
 
         homePickupDateInput.addEventListener("change", () => {
-            if (homeReturnDateInput.value < homePickupDateInput.value) {
-                homeReturnDateInput.value = homePickupDateInput.value;
-            }
+            syncBookingDateInputs(homePickupDateInput, homeReturnDateInput);
+        });
 
-            homeReturnDateInput.min = homePickupDateInput.value;
+        homeReturnDateInput.addEventListener("change", () => {
+            syncBookingDateInputs(homePickupDateInput, homeReturnDateInput);
         });
 
         homeBookingForm.addEventListener("submit", (event) => {
@@ -1380,6 +1464,33 @@ function initSiteV2() {
             });
 
             window.location.href = `./fleet.html${queryString ? `?${queryString}` : ""}`;
+        });
+    }
+
+    function initHeroOverlayBookingDefaults() {
+        if (!overlay || !overlayPickupDateInput || !overlayReturnDateInput || !overlayPickupTimeInput || !overlayReturnTimeInput) {
+            return;
+        }
+
+        const storedIntent = getStoredBookingIntent();
+        const { today, startDate, endDate } = resolveDefaultBookingDates(storedIntent);
+        const pickupTime = normalizeBookingValue(storedIntent?.pickupTime) || "12:00";
+        const dropoffTime = normalizeBookingValue(storedIntent?.dropoffTime) || "12:00";
+
+        overlayPickupDateInput.min = today;
+        overlayPickupDateInput.value = startDate;
+        overlayReturnDateInput.min = overlayPickupDateInput.value;
+        overlayReturnDateInput.value = endDate;
+
+        buildTimeOptions(overlayPickupTimeInput, pickupTime);
+        buildTimeOptions(overlayReturnTimeInput, dropoffTime);
+
+        overlayPickupDateInput.addEventListener("change", () => {
+            syncBookingDateInputs(overlayPickupDateInput, overlayReturnDateInput);
+        });
+
+        overlayReturnDateInput.addEventListener("change", () => {
+            syncBookingDateInputs(overlayPickupDateInput, overlayReturnDateInput);
         });
     }
 
@@ -2170,6 +2281,7 @@ function initSiteV2() {
     initMobileHeaderDrawer();
     initMobileActionBar();
     initHomeBookingBar();
+    initHeroOverlayBookingDefaults();
     initLocationsMap();
     initGoogleReviews();
 
@@ -2200,10 +2312,10 @@ function initSiteV2() {
             const bookingIntent = storeBookingIntent({
                 car: storedIntent?.car,
                 price: storedIntent?.price,
-                startDate: document.getElementById("hero-lab-pickup-date")?.value,
-                endDate: document.getElementById("hero-lab-return-date")?.value,
-                pickupTime: overlay.querySelector('[aria-label="Pickup time"]')?.value,
-                dropoffTime: overlay.querySelector('[aria-label="Return time"]')?.value
+                startDate: overlayPickupDateInput?.value,
+                endDate: overlayReturnDateInput?.value,
+                pickupTime: overlayPickupTimeInput?.value,
+                dropoffTime: overlayReturnTimeInput?.value
             });
             const queryString = buildBookingQuery(bookingIntent).toString();
 

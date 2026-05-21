@@ -915,17 +915,17 @@ textarea {
 }
 
 .lab-floating-back.is-visible {
-    opacity: 0.58;
+    opacity: 0.92;
     pointer-events: auto;
     transform: translate3d(0, 0, 0) scale(1);
 }
 
 .lab-floating-back.is-visible.is-over-important-content {
-    opacity: 0.34;
+    opacity: 0.78;
     border-color: rgba(241, 226, 189, 0.18);
     background:
-        linear-gradient(180deg, rgba(23, 24, 27, 0.36), rgba(7, 8, 10, 0.28));
-    color: rgba(248, 238, 214, 0.82);
+        linear-gradient(180deg, rgba(23, 24, 27, 0.62), rgba(7, 8, 10, 0.52));
+    color: rgba(248, 238, 214, 0.92);
     box-shadow:
         0 10px 24px rgba(0, 0, 0, 0.12),
         inset 0 1px 0 rgba(255, 255, 255, 0.04);

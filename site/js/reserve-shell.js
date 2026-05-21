@@ -194,6 +194,20 @@
             return stripHashAndTrailingSlash(left) === stripHashAndTrailingSlash(right);
         }
 
+        function getFallbackPreviousPath(currentPath) {
+            const [pathname] = stripHashAndTrailingSlash(currentPath).split("?");
+
+            if (!pathname || pathsEqual(pathname, "/")) {
+                return "";
+            }
+
+            if (pathname.includes("/app/reserve/page.html")) {
+                return "/fleet.html";
+            }
+
+            return "/";
+        }
+
         function readNavigationMemory() {
             try {
                 const rawMemory = window.sessionStorage.getItem(navigationMemoryKey);
@@ -306,7 +320,8 @@
         const previousPath = [
             referrerPath,
             storedCurrentPath && !pathsEqual(storedCurrentPath, currentPath) ? storedCurrentPath : "",
-            storedPreviousPath
+            storedPreviousPath,
+            getFallbackPreviousPath(currentPath)
         ].find((candidate) => candidate && !pathsEqual(candidate, currentPath));
 
         writeNavigationMemory({

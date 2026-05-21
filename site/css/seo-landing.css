@@ -3536,6 +3536,12 @@ body.vehicle-page--premium-pilot {
     display: none;
 }
 
+@media (max-width: 860px) {
+    .vehicle-page--landing-pilot .lab-floating-back {
+        display: inline-grid;
+    }
+}
+
 .vehicle-page--landing-pilot .vehicle-landing-breadcrumb a,
 .vehicle-page--landing-pilot .vehicle-landing-breadcrumb span[aria-current="page"] {
     color: inherit;
