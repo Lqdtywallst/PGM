@@ -2209,10 +2209,19 @@
     }
 
     .fleet-card__availability {
-        display: none;
+        order: 2;
+        display: inline-flex;
+        width: 100%;
+        min-height: 34px;
+        padding: 0.34rem 0.58rem;
+        border-radius: 12px;
+        font-size: 0.62rem;
+        font-weight: 800;
+        line-height: 1.2;
     }
 
     .fleet-card__price-row {
+        order: 1;
         align-items: center;
         flex-direction: row;
         gap: 0.58rem;
@@ -2236,11 +2245,13 @@
 
     .fleet-card__primary,
     .fleet-card__secondary {
+        order: 3;
         min-height: 48px;
         border-radius: 12px;
     }
 
     .fleet-card__contact-row {
+        order: 4;
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
