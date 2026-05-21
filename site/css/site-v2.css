@@ -6729,7 +6729,7 @@ a.brand-marquee__item:focus-visible img {
 .lab-mobile-drawer {
     position: fixed;
     inset: 0;
-    z-index: 110;
+    z-index: 1000;
     width: 100%;
     overflow: hidden;
     opacity: 0;
@@ -6839,6 +6839,7 @@ a.brand-marquee__item:focus-visible img {
 .lab-mobile-drawer__close,
 .hero-lab-overlay__close {
     position: relative;
+    z-index: 2;
     display: inline-grid;
     place-items: center;
     flex: 0 0 auto;
