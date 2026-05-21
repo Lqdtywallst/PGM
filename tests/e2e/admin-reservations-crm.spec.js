@@ -168,6 +168,13 @@ test.describe('Private admin reservations CRM', () => {
         await expect(page.locator('#resultCount')).toContainText('reservation');
         await expect(page.locator('.calendar-panel')).toContainText('Reservations by day and car');
         await expect(page.locator('#calendarSummary')).toContainText('scheduled reservation');
+        await expect(page.locator('#calendarSnapshot')).toContainText('Bookings');
+        await expect(page.locator('#calendarSnapshot')).toContainText('Busy days');
+        await expect(page.locator('#calendarToggleButton')).toHaveText(/Open calendar/);
+        await expect(page.locator('#calendarBody')).toBeHidden();
+        await page.click('#calendarToggleButton');
+        await expect(page.locator('#calendarToggleButton')).toHaveText(/Hide calendar/);
+        await expect(page.locator('#calendarBody')).toBeVisible();
         await expect(page.locator('#reservationCalendarGrid')).toContainText('Lamborghini Huracan EVO Spyder');
 
         const calendarReservation = page.locator(`[data-calendar-reservation-id="${reservationId}"]`).first();

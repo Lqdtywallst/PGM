@@ -589,18 +589,21 @@ function renderAdminReservationsPage() {
         .calendar-panel {
             grid-column: 1 / -1;
             overflow: hidden;
-            border: 1px solid var(--line);
-            border-radius: 22px;
-            background: rgba(255, 255, 255, 0.78);
+            scroll-margin-top: 88px;
+            border: 1px solid rgba(122, 92, 37, 0.16);
+            border-radius: 24px;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 250, 242, 0.82)),
+                radial-gradient(circle at top right, rgba(220, 180, 88, 0.16), transparent 36%);
             box-shadow: var(--shadow);
         }
         .calendar-head {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 16px;
-            padding: 16px 18px 12px;
-            border-bottom: 1px solid var(--line);
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: start;
+            gap: 18px;
+            padding: 18px;
+            border-bottom: 1px solid rgba(122, 92, 37, 0.12);
         }
         .calendar-kicker {
             margin: 0 0 6px;
@@ -622,6 +625,81 @@ function renderAdminReservationsPage() {
             font-size: 0.86rem;
             line-height: 1.42;
         }
+        .calendar-toggle {
+            min-width: 170px;
+            min-height: 44px;
+            border-color: rgba(122, 92, 37, 0.2);
+            background: #111317;
+            color: #fff7e4;
+            box-shadow: 0 14px 28px rgba(17, 19, 23, 0.16);
+        }
+        .calendar-toggle__icon {
+            position: relative;
+            width: 12px;
+            height: 12px;
+        }
+        .calendar-toggle__icon::before,
+        .calendar-toggle__icon::after {
+            content: "";
+            position: absolute;
+            inset: 50% auto auto 50%;
+            width: 12px;
+            height: 2px;
+            border-radius: 999px;
+            background: currentColor;
+            transform: translate(-50%, -50%);
+            transition: transform 160ms ease;
+        }
+        .calendar-toggle__icon::after {
+            transform: translate(-50%, -50%) rotate(90deg);
+        }
+        .calendar-panel.is-open .calendar-toggle__icon::after {
+            transform: translate(-50%, -50%) rotate(0deg);
+        }
+        .calendar-snapshot {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+            padding: 0 18px 16px;
+        }
+        .calendar-metric {
+            min-width: 0;
+            padding: 12px;
+            border: 1px solid rgba(122, 92, 37, 0.12);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.72);
+        }
+        .calendar-metric span {
+            display: block;
+            color: var(--muted);
+            font-size: 0.58rem;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .calendar-metric strong {
+            display: block;
+            margin-top: 5px;
+            overflow: hidden;
+            color: var(--ink);
+            font-size: 0.92rem;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .calendar-body {
+            border-top: 1px solid rgba(122, 92, 37, 0.12);
+            background: rgba(255, 255, 255, 0.44);
+        }
+        .calendar-body[hidden] {
+            display: none;
+        }
+        .calendar-toolbar {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: center;
+            padding: 14px 18px 0;
+        }
         .calendar-actions {
             display: grid;
             grid-template-columns: auto minmax(150px, 190px) auto auto;
@@ -634,6 +712,49 @@ function renderAdminReservationsPage() {
             border-radius: 13px;
             font-size: 0.82rem;
             font-weight: 800;
+        }
+        .calendar-legend {
+            display: inline-flex;
+            justify-content: flex-end;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .calendar-legend span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 30px;
+            padding: 0 10px;
+            border: 1px solid rgba(122, 92, 37, 0.12);
+            border-radius: 999px;
+            background: rgba(255, 250, 242, 0.72);
+            color: var(--muted);
+            font-size: 0.64rem;
+            font-weight: 900;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .calendar-legend i,
+        .calendar-reservation__status-dot {
+            width: 8px;
+            height: 8px;
+            flex: 0 0 auto;
+            border-radius: 999px;
+            background: var(--gold);
+        }
+        .calendar-legend i.confirmed,
+        .calendar-reservation.confirmed .calendar-reservation__status-dot {
+            background: var(--green);
+        }
+        .calendar-legend i.pending,
+        .calendar-reservation.pending .calendar-reservation__status-dot {
+            background: var(--amber);
+        }
+        .calendar-legend i.issue,
+        .calendar-reservation.failed .calendar-reservation__status-dot,
+        .calendar-reservation.email .calendar-reservation__status-dot {
+            background: var(--red);
         }
         .calendar-vehicle-strip {
             display: flex;
@@ -704,6 +825,12 @@ function renderAdminReservationsPage() {
             gap: 8px;
             margin-bottom: 8px;
         }
+        .calendar-day__date {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-width: 0;
+        }
         .calendar-day__number {
             width: 26px;
             height: 26px;
@@ -713,6 +840,13 @@ function renderAdminReservationsPage() {
             color: var(--ink);
             font-size: 0.82rem;
             font-weight: 900;
+        }
+        .calendar-day__weekday {
+            color: var(--muted);
+            font-size: 0.56rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
         .calendar-day.is-today .calendar-day__number {
             background: linear-gradient(135deg, var(--gold-soft), var(--gold));
@@ -738,6 +872,12 @@ function renderAdminReservationsPage() {
             color: var(--ink);
             cursor: pointer;
             text-align: left;
+        }
+        .calendar-reservation__top {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            min-width: 0;
         }
         .calendar-reservation:hover,
         .calendar-reservation:focus-visible {
@@ -1236,6 +1376,18 @@ function renderAdminReservationsPage() {
                 display: grid;
                 grid-template-columns: 1fr;
             }
+            .calendar-toggle {
+                justify-self: start;
+            }
+            .calendar-snapshot {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .calendar-toolbar {
+                grid-template-columns: 1fr;
+            }
+            .calendar-legend {
+                justify-content: flex-start;
+            }
             .calendar-actions {
                 grid-template-columns: auto minmax(140px, 1fr) auto auto;
             }
@@ -1308,10 +1460,31 @@ function renderAdminReservationsPage() {
                 padding: 14px;
             }
             .calendar-head,
+            .calendar-snapshot,
+            .calendar-toolbar,
             .calendar-vehicle-strip,
             .calendar-scroll {
                 padding-left: 14px;
                 padding-right: 14px;
+            }
+            .calendar-head {
+                gap: 12px;
+            }
+            .calendar-toggle {
+                width: 100%;
+            }
+            .calendar-snapshot {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 8px;
+                padding-bottom: 14px;
+            }
+            .calendar-metric {
+                padding: 10px;
+                border-radius: 14px;
+            }
+            .calendar-toolbar {
+                gap: 10px;
+                padding-top: 12px;
             }
             .calendar-actions {
                 grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1321,10 +1494,38 @@ function renderAdminReservationsPage() {
             }
             .calendar-weekdays,
             .calendar-grid {
-                min-width: 680px;
+                min-width: 820px;
             }
             .calendar-day {
                 min-height: 118px;
+            }
+            .calendar-day__head {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+            .calendar-day__count {
+                font-size: 0.56rem;
+            }
+            .calendar-reservation {
+                padding: 7px;
+            }
+            .calendar-reservation__top {
+                align-items: flex-start;
+            }
+            .calendar-reservation__vehicle,
+            .calendar-reservation__meta {
+                white-space: normal;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+            }
+            .calendar-reservation__vehicle {
+                -webkit-line-clamp: 2;
+                font-size: 0.7rem;
+                line-height: 1.12;
+            }
+            .calendar-reservation__meta {
+                -webkit-line-clamp: 1;
             }
             h1 {
                 font-size: clamp(1.55rem, 10vw, 1.95rem);
@@ -1544,33 +1745,52 @@ function renderAdminReservationsPage() {
             </div>
         </section>
 
-        <section class="calendar-panel" aria-labelledby="calendarTitle">
+        <section class="calendar-panel is-collapsed" id="calendarPanel" aria-labelledby="calendarTitle">
             <div class="calendar-head">
                 <div>
                     <p class="calendar-kicker">Fleet calendar</p>
                     <h2 class="calendar-title" id="calendarTitle">Reservations by day and car.</h2>
                     <p class="calendar-summary" id="calendarSummary">Loading scheduled bookings...</p>
                 </div>
-                <div class="calendar-actions" aria-label="Calendar controls">
-                    <button class="action" id="calendarPreviousButton" type="button">Prev</button>
-                    <input id="calendarMonthInput" type="month" aria-label="Calendar month">
-                    <button class="action" id="calendarNextButton" type="button">Next</button>
-                    <button class="action primary" id="calendarTodayButton" type="button">Today</button>
-                </div>
+                <button class="action calendar-toggle" id="calendarToggleButton" type="button" aria-expanded="false" aria-controls="calendarBody">
+                    <span id="calendarToggleLabel">Open calendar</span>
+                    <span class="calendar-toggle__icon" aria-hidden="true"></span>
+                </button>
             </div>
-            <div class="calendar-vehicle-strip" id="calendarVehicleSummary" aria-live="polite"></div>
-            <div class="calendar-scroll">
-                <div class="calendar-weekdays" aria-hidden="true">
-                    <span>Mon</span>
-                    <span>Tue</span>
-                    <span>Wed</span>
-                    <span>Thu</span>
-                    <span>Fri</span>
-                    <span>Sat</span>
-                    <span>Sun</span>
+            <div class="calendar-snapshot" id="calendarSnapshot" aria-live="polite">
+                <span class="calendar-metric"><span>Month</span><strong>Loading...</strong></span>
+                <span class="calendar-metric"><span>Bookings</span><strong>Checking</strong></span>
+                <span class="calendar-metric"><span>Cars</span><strong>Checking</strong></span>
+                <span class="calendar-metric"><span>Busy days</span><strong>Checking</strong></span>
+            </div>
+            <div class="calendar-body" id="calendarBody" hidden>
+                <div class="calendar-toolbar">
+                    <div class="calendar-actions" aria-label="Calendar controls">
+                        <button class="action" id="calendarPreviousButton" type="button">Previous</button>
+                        <input id="calendarMonthInput" type="month" aria-label="Calendar month">
+                        <button class="action" id="calendarNextButton" type="button">Next</button>
+                        <button class="action primary" id="calendarTodayButton" type="button">Today</button>
+                    </div>
+                    <div class="calendar-legend" aria-label="Reservation status legend">
+                        <span><i class="confirmed" aria-hidden="true"></i>Confirmed</span>
+                        <span><i class="pending" aria-hidden="true"></i>Pending</span>
+                        <span><i class="issue" aria-hidden="true"></i>Needs action</span>
+                    </div>
                 </div>
-                <div class="calendar-grid" id="reservationCalendarGrid">
-                    <div class="empty">Loading calendar...</div>
+                <div class="calendar-vehicle-strip" id="calendarVehicleSummary" aria-live="polite"></div>
+                <div class="calendar-scroll">
+                    <div class="calendar-weekdays" aria-hidden="true">
+                        <span>Mon</span>
+                        <span>Tue</span>
+                        <span>Wed</span>
+                        <span>Thu</span>
+                        <span>Fri</span>
+                        <span>Sat</span>
+                        <span>Sun</span>
+                    </div>
+                    <div class="calendar-grid" id="reservationCalendarGrid">
+                        <div class="empty">Loading calendar...</div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1726,7 +1946,9 @@ function renderAdminReservationsPage() {
             manualMode: 'create',
             currentReservation: null,
             lastListData: null,
-            calendarMonth: ''
+            calendarMonth: '',
+            calendarOpen: false,
+            calendarLoaded: false
         };
         var searchTimer = null;
         var quickFilterLabels = {
@@ -1880,6 +2102,26 @@ function renderAdminReservationsPage() {
             return currentMonthValue(date);
         }
 
+        function setCalendarOpen(open) {
+            state.calendarOpen = Boolean(open);
+            var panel = document.getElementById('calendarPanel');
+            var body = document.getElementById('calendarBody');
+            var button = document.getElementById('calendarToggleButton');
+            var label = document.getElementById('calendarToggleLabel');
+            if (!panel || !body || !button || !label) return;
+            panel.classList.toggle('is-open', state.calendarOpen);
+            panel.classList.toggle('is-collapsed', !state.calendarOpen);
+            body.hidden = !state.calendarOpen;
+            button.setAttribute('aria-expanded', state.calendarOpen ? 'true' : 'false');
+            label.textContent = state.calendarOpen ? 'Hide calendar' : 'Open calendar';
+        }
+
+        function calendarWeekdayLabel(dateIso) {
+            var date = new Date(String(dateIso || '') + 'T00:00:00');
+            if (Number.isNaN(date.getTime())) return '';
+            return new Intl.DateTimeFormat('en-GB', { weekday: 'short' }).format(date);
+        }
+
         function calendarReservationClass(item) {
             var classes = ['calendar-reservation'];
             if (item.statusClass) classes.push(item.statusClass);
@@ -1897,12 +2139,16 @@ function renderAdminReservationsPage() {
             if (item.continuesBefore && !item.isEnd) pieces.push('Continues');
             if (item.isEnd && item.isMultiDay) pieces.push('Return');
             if (item.isStart && item.isMultiDay) pieces.push('Pickup');
-            return pieces.join(' · ');
+            return pieces.join(' - ');
         }
 
         function renderCalendarReservation(item) {
-            return '<button class="' + escapeHtml(calendarReservationClass(item)) + '" type="button" data-calendar-reservation-id="' + escapeHtml(item.id) + '">' +
-                '<span class="calendar-reservation__vehicle">' + escapeHtml(display(item.vehicle, 'Vehicle not set')) + '</span>' +
+            var label = 'Open reservation ' + display(item.vehicle, 'Vehicle not set') + ' for ' + display(item.customer, 'guest');
+            return '<button class="' + escapeHtml(calendarReservationClass(item)) + '" type="button" data-calendar-reservation-id="' + escapeHtml(item.id) + '" aria-label="' + escapeHtml(label) + '">' +
+                '<span class="calendar-reservation__top">' +
+                    '<span class="calendar-reservation__status-dot" aria-hidden="true"></span>' +
+                    '<span class="calendar-reservation__vehicle">' + escapeHtml(display(item.vehicle, 'Vehicle not set')) + '</span>' +
+                '</span>' +
                 '<span class="calendar-reservation__meta">' + escapeHtml(calendarReservationMeta(item) || display(item.statusLabel, 'Reservation')) + '</span>' +
             '</button>';
         }
@@ -1917,7 +2163,10 @@ function renderAdminReservationsPage() {
                 : '';
             return '<div class="' + classes.join(' ') + '" data-calendar-day="' + escapeHtml(day.date) + '">' +
                 '<div class="calendar-day__head">' +
-                    '<span class="calendar-day__number">' + escapeHtml(day.dayNumber) + '</span>' +
+                    '<span class="calendar-day__date">' +
+                        '<span class="calendar-day__number">' + escapeHtml(day.dayNumber) + '</span>' +
+                        '<span class="calendar-day__weekday">' + escapeHtml(calendarWeekdayLabel(day.date)) + '</span>' +
+                    '</span>' +
                     (countLabel ? '<span class="calendar-day__count">' + escapeHtml(countLabel) + '</span>' : '') +
                 '</div>' +
                 '<div class="calendar-day__items">' +
@@ -1934,6 +2183,22 @@ function renderAdminReservationsPage() {
             });
         }
 
+        function renderCalendarSnapshot(data) {
+            var snapshot = document.getElementById('calendarSnapshot');
+            if (!snapshot) return;
+            var totals = data && data.totals ? data.totals : {};
+            var reservations = totals.reservations != null ? totals.reservations : 0;
+            var vehicles = totals.vehicles != null ? totals.vehicles : 0;
+            var busyDays = totals.daysWithReservations != null ? totals.daysWithReservations : 0;
+            var label = data ? display(data.label, data.month || state.calendarMonth || 'Calendar') : 'Calendar';
+            snapshot.innerHTML = [
+                '<span class="calendar-metric"><span>Month</span><strong>' + escapeHtml(label) + '</strong></span>',
+                '<span class="calendar-metric"><span>Bookings</span><strong>' + escapeHtml(reservations) + '</strong></span>',
+                '<span class="calendar-metric"><span>Cars</span><strong>' + escapeHtml(vehicles) + '</strong></span>',
+                '<span class="calendar-metric"><span>Busy days</span><strong>' + escapeHtml(busyDays) + '</strong></span>'
+            ].join('');
+        }
+
         function renderReservationCalendar(data) {
             var summary = document.getElementById('calendarSummary');
             var vehicles = document.getElementById('calendarVehicleSummary');
@@ -1941,11 +2206,16 @@ function renderAdminReservationsPage() {
             var monthInput = document.getElementById('calendarMonthInput');
             state.calendarMonth = data.month || state.calendarMonth || currentMonthValue();
             monthInput.value = state.calendarMonth;
-            summary.textContent = display(data.label, state.calendarMonth) + ' · ' +
-                escapeHtml(data.totals && data.totals.reservations != null ? data.totals.reservations : 0) +
-                ' scheduled reservation' + ((data.totals && data.totals.reservations === 1) ? '' : 's') +
-                ' across ' + escapeHtml(data.totals && data.totals.vehicles != null ? data.totals.vehicles : 0) + ' car' +
-                ((data.totals && data.totals.vehicles === 1) ? '' : 's') + '.';
+            var totalReservations = data.totals && data.totals.reservations != null ? data.totals.reservations : 0;
+            var totalVehicles = data.totals && data.totals.vehicles != null ? data.totals.vehicles : 0;
+            var totalBusyDays = data.totals && data.totals.daysWithReservations != null ? data.totals.daysWithReservations : 0;
+            summary.textContent = display(data.label, state.calendarMonth) + ' - ' +
+                totalReservations +
+                ' scheduled reservation' + (totalReservations === 1 ? '' : 's') +
+                ' across ' + totalVehicles + ' car' +
+                (totalVehicles === 1 ? '' : 's') +
+                ' on ' + totalBusyDays + ' active day' + (totalBusyDays === 1 ? '' : 's') + '.';
+            renderCalendarSnapshot(data);
             var vehicleItems = Array.isArray(data.vehicles) ? data.vehicles : [];
             vehicles.innerHTML = vehicleItems.length
                 ? vehicleItems.slice(0, 8).map(function (vehicle) {
@@ -1970,9 +2240,11 @@ function renderAdminReservationsPage() {
                 var data = await response.json();
                 if (!response.ok) throw new Error(data.error || 'Calendar failed');
                 renderReservationCalendar(data);
+                state.calendarLoaded = true;
             } catch (error) {
                 grid.innerHTML = '<div class="empty">Calendar could not be loaded.</div>';
                 document.getElementById('calendarSummary').textContent = 'Calendar data could not be checked.';
+                renderCalendarSnapshot(null);
             }
         }
 
@@ -2513,6 +2785,9 @@ function renderAdminReservationsPage() {
         document.getElementById('queueFilterSelect').addEventListener('change', function (event) {
             applyQuickFilter(event.target.value || '');
         });
+        document.getElementById('calendarToggleButton').addEventListener('click', function () {
+            setCalendarOpen(this.getAttribute('aria-expanded') !== 'true');
+        });
         document.getElementById('calendarPreviousButton').addEventListener('click', function () {
             state.calendarMonth = addCalendarMonths(state.calendarMonth || currentMonthValue(), -1);
             loadReservationCalendar();
@@ -2537,6 +2812,7 @@ function renderAdminReservationsPage() {
         });
         document.getElementById('reservationDetailBackdrop').addEventListener('click', closeReservationDetail);
 
+        setCalendarOpen(false);
         loadOperationsStatus();
         loadReservationCalendar();
         loadReservations();
