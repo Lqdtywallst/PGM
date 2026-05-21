@@ -1098,8 +1098,19 @@ html.js .home-page .hero-lab:not(.is-video-ready) .hero-lab__video {
     }
 
     .home-page .hero-lab .home-booking__field input[type="date"] {
+        display: block;
+        inline-size: 100%;
+        max-inline-size: 100%;
+        min-inline-size: 0;
+        box-sizing: border-box;
         padding: 0 0.66rem;
         font-size: 0.88rem;
+    }
+
+    @supports (-webkit-touch-callout: none) {
+        .home-page .hero-lab .home-booking__field input[type="date"] {
+            width: -webkit-fill-available;
+        }
     }
 
     .home-page .hero-lab .home-booking__field input[type="date"]::-webkit-calendar-picker-indicator {
