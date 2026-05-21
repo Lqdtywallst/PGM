@@ -275,6 +275,60 @@ function addDaysIsoDate(baseDate, days) {
     return date.toISOString().slice(0, 10);
 }
 
+function daysBetweenIsoDates(startDate, endDate) {
+    const start = new Date(`${toIsoDate(startDate)}T00:00:00.000Z`);
+    const end = new Date(`${toIsoDate(endDate)}T00:00:00.000Z`);
+
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+        return 0;
+    }
+
+    return Math.round((end.getTime() - start.getTime()) / 86400000);
+}
+
+function monthFromDate(value, options = {}) {
+    const fallback = toIsoDate(options.now || new Date()).slice(0, 7);
+    const normalized = asCleanString(value || fallback);
+    const match = normalized.match(/^(\d{4})-(\d{2})$/);
+
+    if (!match) {
+        return fallback;
+    }
+
+    const month = Number(match[2]);
+    return month >= 1 && month <= 12 ? `${match[1]}-${match[2]}` : fallback;
+}
+
+function endOfMonthIso(month) {
+    const [year, monthNumber] = month.split('-').map(Number);
+    const date = new Date(Date.UTC(year, monthNumber, 0));
+    return date.toISOString().slice(0, 10);
+}
+
+function monthLabel(month) {
+    const [year, monthNumber] = month.split('-').map(Number);
+    return new Intl.DateTimeFormat('en-GB', {
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'UTC'
+    }).format(new Date(Date.UTC(year, monthNumber - 1, 1)));
+}
+
+function weekStartIso(dateValue) {
+    const date = new Date(`${toIsoDate(dateValue)}T00:00:00.000Z`);
+    const day = date.getUTCDay() || 7;
+    date.setUTCDate(date.getUTCDate() - day + 1);
+    return date.toISOString().slice(0, 10);
+}
+
+function weekEndIso(dateValue) {
+    return addDaysIsoDate(weekStartIso(dateValue), 6);
+}
+
+function isIsoDateWithin(value, startDate, endDate) {
+    return Boolean(value && startDate && endDate && value >= startDate && value <= endDate);
+}
+
 function normalizePhoneForHref(phone) {
     const raw = asCleanString(phone);
     if (!raw) return '';
@@ -1072,6 +1126,142 @@ function filterAdminReservationSummaries(records = [], filters = {}, options = {
     };
 }
 
+function calendarStatusClass(summary = {}) {
+    if (summary.flags?.archived || summary.flags?.canceled) return 'canceled';
+    if (summary.flags?.emailIssue) return 'email';
+    if (summary.flags?.paymentIssue) return 'failed';
+    if (summary.flags?.pendingPayment) return 'pending';
+    if (summary.flags?.confirmed) return 'confirmed';
+    return '';
+}
+
+function calendarReservationEntry(summary = {}, monthStart, monthEnd, includeInactive = false) {
+    const startDate = toIsoDate(summary.schedule?.startDate);
+    const rawEndDate = toIsoDate(summary.schedule?.endDate) || startDate;
+    const endDate = rawEndDate && startDate && rawEndDate < startDate ? startDate : rawEndDate;
+
+    if (!summary.id || !startDate || !endDate) {
+        return null;
+    }
+
+    if (!includeInactive && summary.flags && summary.flags.active === false) {
+        return null;
+    }
+
+    if (endDate < monthStart || startDate > monthEnd) {
+        return null;
+    }
+
+    return {
+        id: summary.id,
+        reservationId: summary.reservationId || summary.id,
+        vehicle: summary.vehicle?.name || 'Vehicle not set',
+        customer: summary.customer?.name || 'Guest not set',
+        status: summary.status,
+        statusLabel: summary.statusLabel,
+        statusClass: calendarStatusClass(summary),
+        startDate,
+        endDate,
+        pickupTime: summary.schedule?.pickupTime || '',
+        dropoffTime: summary.schedule?.dropoffTime || '',
+        pickupLocation: summary.schedule?.pickupLocation || '',
+        dropoffLocation: summary.schedule?.dropoffLocation || '',
+        total: summary.payment?.total || '',
+        flags: summary.flags || {},
+        durationDays: daysBetweenIsoDates(startDate, endDate) + 1
+    };
+}
+
+function buildAdminReservationCalendar(records = [], options = {}) {
+    const month = monthFromDate(options.month || options.query?.month, options);
+    const monthStart = `${month}-01`;
+    const monthEnd = endOfMonthIso(month);
+    const gridStart = weekStartIso(monthStart);
+    const gridEnd = weekEndIso(monthEnd);
+    const today = toIsoDate(options.now || new Date());
+    const includeInactive = options.includeInactive === true || asCleanString(options.query?.includeInactive) === 'true';
+    const summaries = records
+        .map((record) => buildAdminReservationSummary(record, options))
+        .filter((summary) => summary.id);
+    const reservations = summaries
+        .map((summary) => calendarReservationEntry(summary, monthStart, monthEnd, includeInactive))
+        .filter(Boolean)
+        .sort((left, right) => (
+            left.startDate.localeCompare(right.startDate) ||
+            left.vehicle.localeCompare(right.vehicle) ||
+            left.customer.localeCompare(right.customer)
+        ));
+    const vehicleTotals = new Map();
+
+    reservations.forEach((reservation) => {
+        const current = vehicleTotals.get(reservation.vehicle) || {
+            name: reservation.vehicle,
+            reservationCount: 0,
+            bookingDayCount: 0
+        };
+        current.reservationCount += 1;
+        current.bookingDayCount += Math.max(1, Math.min(
+            daysBetweenIsoDates(
+                reservation.startDate < monthStart ? monthStart : reservation.startDate,
+                reservation.endDate > monthEnd ? monthEnd : reservation.endDate
+            ) + 1,
+            370
+        ));
+        vehicleTotals.set(reservation.vehicle, current);
+    });
+
+    const days = [];
+    let cursor = gridStart;
+    while (cursor <= gridEnd) {
+        const dayReservations = reservations
+            .filter((reservation) => isIsoDateWithin(cursor, reservation.startDate, reservation.endDate))
+            .map((reservation) => ({
+                ...reservation,
+                isStart: cursor === reservation.startDate,
+                isEnd: cursor === reservation.endDate,
+                continuesBefore: reservation.startDate < cursor,
+                continuesAfter: reservation.endDate > cursor,
+                isMultiDay: reservation.startDate !== reservation.endDate,
+                dayTime: cursor === reservation.startDate
+                    ? reservation.pickupTime
+                    : cursor === reservation.endDate
+                        ? reservation.dropoffTime
+                        : ''
+            }));
+
+        days.push({
+            date: cursor,
+            dayNumber: Number(cursor.slice(8, 10)),
+            isToday: cursor === today,
+            isCurrentMonth: cursor >= monthStart && cursor <= monthEnd,
+            reservations: dayReservations
+        });
+        cursor = addDaysIsoDate(cursor, 1);
+    }
+
+    return {
+        month,
+        label: monthLabel(month),
+        today,
+        range: {
+            monthStart,
+            monthEnd,
+            gridStart,
+            gridEnd
+        },
+        totals: {
+            reservations: reservations.length,
+            vehicles: vehicleTotals.size,
+            daysWithReservations: days.filter((day) => day.isCurrentMonth && day.reservations.length > 0).length
+        },
+        vehicles: Array.from(vehicleTotals.values()).sort((left, right) => (
+            right.reservationCount - left.reservationCount ||
+            left.name.localeCompare(right.name)
+        )),
+        days
+    };
+}
+
 function applyAdminReservationAction(record = {}, action, payload = {}, actor = 'admin', options = {}) {
     const normalizedAction = asCleanString(action).toLowerCase();
     const timestamp = (options.now ? new Date(options.now) : new Date()).toISOString();
@@ -1266,6 +1456,16 @@ function createAdminReservationsRouter(dependencies = {}) {
         return res.status(status.overallStatus === 'bad' ? 503 : 200).json(status);
     }));
 
+    router.get('/reservations/calendar', asyncRoute(async (req, res) => {
+        const records = await store.listReservationRecords({ limit: 5000 });
+        const calendar = buildAdminReservationCalendar(records, {
+            month: req.query.month,
+            query: req.query
+        });
+
+        return res.json(calendar);
+    }));
+
     router.get('/reservations.csv', asyncRoute(async (req, res) => {
         const filters = collectReservationFilters({ ...req.query, limit: 5000 });
         const records = await store.listReservationRecords({ limit: 5000 });
@@ -1344,6 +1544,7 @@ module.exports = {
     QUICK_FILTERS,
     applyAdminReservationAction,
     applyManualReservationUpdate,
+    buildAdminReservationCalendar,
     buildAdminReservationDetail,
     buildAdminReservationSummary,
     buildAdminOperationsStatus,

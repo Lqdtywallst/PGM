@@ -5,6 +5,7 @@ const {
     applyAdminReservationAction,
     applyManualReservationUpdate,
     buildAdminOperationsStatus,
+    buildAdminReservationCalendar,
     buildAdminReservationDetail,
     buildAdminReservationSummary,
     classifyReservation,
@@ -188,6 +189,60 @@ test('admin reservation quick filters separate client work queues', () => {
     assert.deepEqual(idsFor('handover_done'), ['res_handover_done']);
     assert.deepEqual(idsFor('canceled'), ['res_canceled']);
     assert.deepEqual(idsFor('archived'), ['res_archived']);
+});
+
+test('admin reservation calendar groups active vehicle bookings by day', () => {
+    const records = [
+        reservation({
+            reservationId: 'res_calendar_lambo',
+            status: 'confirmed',
+            car: 'Lamborghini Huracan EVO Spyder',
+            startDate: '2026-05-10',
+            endDate: '2026-05-12'
+        }),
+        reservation({
+            reservationId: 'res_calendar_ferrari',
+            status: 'payment_succeeded',
+            car: 'Ferrari 296 GTS',
+            startDate: '2026-05-12',
+            endDate: '2026-05-13'
+        }),
+        reservation({
+            reservationId: 'res_calendar_previous_month',
+            status: 'confirmed',
+            car: 'Mercedes G63 AMG',
+            startDate: '2026-04-30',
+            endDate: '2026-05-02'
+        }),
+        reservation({
+            reservationId: 'res_calendar_canceled',
+            status: 'admin_canceled',
+            car: 'Rolls-Royce Cullinan',
+            startDate: '2026-05-11',
+            endDate: '2026-05-12',
+            admin: { canceledAt: now }
+        })
+    ];
+    const calendar = buildAdminReservationCalendar(records, {
+        month: '2026-05',
+        now: '2026-05-12T08:00:00.000Z'
+    });
+    const may12 = calendar.days.find((day) => day.date === '2026-05-12');
+    const may1 = calendar.days.find((day) => day.date === '2026-05-01');
+
+    assert.equal(calendar.month, '2026-05');
+    assert.equal(calendar.label, 'May 2026');
+    assert.equal(calendar.totals.reservations, 3);
+    assert.equal(calendar.totals.vehicles, 3);
+    assert.equal(may12.isToday, true);
+    assert.deepEqual(
+        may12.reservations.map((item) => item.reservationId).sort(),
+        ['res_calendar_ferrari', 'res_calendar_lambo']
+    );
+    assert.equal(may12.reservations.find((item) => item.reservationId === 'res_calendar_lambo').isEnd, true);
+    assert.equal(may12.reservations.find((item) => item.reservationId === 'res_calendar_ferrari').isStart, true);
+    assert.deepEqual(may1.reservations.map((item) => item.reservationId), ['res_calendar_previous_month']);
+    assert.equal(calendar.days.some((day) => day.reservations.some((item) => item.reservationId === 'res_calendar_canceled')), false);
 });
 
 test('admin actions persist private workflow state without deleting reservation data', () => {

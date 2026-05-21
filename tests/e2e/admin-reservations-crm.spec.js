@@ -166,6 +166,16 @@ test.describe('Private admin reservations CRM', () => {
         await expect(page.locator('#operationsDetailsPanel')).toBeHidden();
         await expect(page.locator('#storageMode')).toContainText('local-json');
         await expect(page.locator('#resultCount')).toContainText('reservation');
+        await expect(page.locator('.calendar-panel')).toContainText('Reservations by day and car');
+        await expect(page.locator('#calendarSummary')).toContainText('scheduled reservation');
+        await expect(page.locator('#reservationCalendarGrid')).toContainText('Lamborghini Huracan EVO Spyder');
+
+        const calendarReservation = page.locator(`[data-calendar-reservation-id="${reservationId}"]`).first();
+        await calendarReservation.scrollIntoViewIfNeeded();
+        await calendarReservation.click();
+        await expect(page.locator('.detail-title')).toContainText('Lamborghini Huracan EVO Spyder');
+        await page.click('#closeReservationDetail');
+        await expect(page.locator('#reservationDetail')).toContainText('Operations overview');
 
         const card = page.locator('.reservation-card', { hasText: reservationId });
         await expect(card).toContainText('Lamborghini Huracan EVO Spyder');
