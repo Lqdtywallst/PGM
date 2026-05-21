@@ -11,6 +11,7 @@ async function readTypeMetrics(page, selectors) {
                 x: Math.round(rect.x),
                 y: Math.round(rect.y),
                 width: Math.round(rect.width),
+                centerX: Math.round(rect.x + rect.width / 2),
                 fontSize: Number.parseFloat(styles.fontSize),
                 lineHeight: Number.parseFloat(styles.lineHeight),
                 fontWeight: Number.parseInt(styles.fontWeight, 10),
@@ -37,6 +38,9 @@ test.describe('Mobile section type level', () => {
             title: '.about-proof-strip--entry .about-proof-strip__head h1',
             lead: '.about-proof-strip--entry .about-proof-strip__head p'
         });
+        const viewportCenter = page.viewportSize().width / 2;
+
+        expect(Math.abs(about.kicker.centerX - viewportCenter)).toBeLessThanOrEqual(1);
 
         const targets = [
             {
@@ -61,7 +65,7 @@ test.describe('Mobile section type level', () => {
             await page.goto(target.route, { waitUntil: 'networkidle' });
             const metrics = await readTypeMetrics(page, target.selectors);
 
-            expect(metrics.kicker.x).toBeCloseTo(about.kicker.x, 0);
+            expect(Math.abs(metrics.kicker.centerX - viewportCenter)).toBeLessThanOrEqual(1);
             expect(metrics.kicker.y).toBeCloseTo(about.kicker.y, 0);
             expect(metrics.kicker.fontSize).toBeCloseTo(about.kicker.fontSize, 1);
             expect(metrics.kicker.fontWeight).toBe(about.kicker.fontWeight);

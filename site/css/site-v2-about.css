@@ -190,15 +190,18 @@
 }
 
 .about-kicker {
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.7rem;
     width: fit-content;
+    margin-inline: auto;
     color: #e5c86f;
     font-family: var(--lab-font-sans);
     font-size: 0.72rem;
     font-weight: 800;
     letter-spacing: 0.12em;
+    text-align: center;
     text-transform: uppercase;
 }
 

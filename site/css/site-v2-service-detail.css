@@ -146,14 +146,18 @@
 }
 
 .service-detail-kicker {
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.9rem;
+    width: fit-content;
+    margin-inline: auto;
     color: var(--service-detail-kicker);
     font-family: var(--lab-font-sans);
     font-size: 0.74rem;
     font-weight: 600;
     letter-spacing: 0.18em;
+    text-align: center;
     text-transform: uppercase;
 }
 

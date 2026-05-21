@@ -2162,14 +2162,18 @@ select {
 }
 
 .hero-lab__eyebrow {
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.9rem;
+    width: fit-content;
+    margin-inline: auto;
     color: var(--lab-champagne);
     font-family: var(--lab-font-sans);
     font-size: 0.74rem;
     font-weight: 600;
     letter-spacing: 0.22em;
+    text-align: center;
     text-transform: uppercase;
 }
 

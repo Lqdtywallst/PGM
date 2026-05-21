@@ -42,15 +42,19 @@
 }
 
 .dp-kicker {
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.65em;
+    width: fit-content;
+    margin-inline: auto;
     color: var(--dp-kicker-color, var(--dp-color-gold));
     font-family: var(--dp-font-sans);
     font-size: var(--dp-type-kicker);
     font-weight: 800;
     letter-spacing: 0.16em;
     line-height: 1.1;
+    text-align: center;
     text-transform: uppercase;
 }
 

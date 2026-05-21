@@ -96,12 +96,16 @@
 }
 
 .services-kicker {
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.65rem;
+    width: fit-content;
+    margin-inline: auto;
     color: #e3d3a9;
     font-size: 0.8rem;
     font-weight: 700;
+    text-align: center;
     text-transform: uppercase;
 }
 

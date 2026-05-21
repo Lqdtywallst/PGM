@@ -976,6 +976,14 @@ body.vehicle-page {
     text-transform: uppercase;
 }
 
+.section-kicker {
+    display: flex;
+    justify-content: center;
+    width: fit-content;
+    margin-inline: auto;
+    text-align: center;
+}
+
 .vehicle-booking__kicker::before,
 .section-kicker::before {
     content: "";

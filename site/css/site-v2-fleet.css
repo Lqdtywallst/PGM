@@ -276,14 +276,18 @@
 }
 
 .fleet-browser__hero-kicker {
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.8rem;
+    width: fit-content;
+    margin-inline: auto;
     color: rgba(241, 226, 189, 0.92);
     font-family: var(--lab-font-sans);
     font-size: 0.6rem;
     font-weight: 700;
     letter-spacing: 0.2em;
+    text-align: center;
     text-transform: uppercase;
 }
 
@@ -1634,8 +1638,12 @@
     }
 
     .fleet-browser__hero-copy {
+        justify-items: center;
         gap: 0.48rem;
+        width: 100%;
+        max-width: 100%;
         padding: calc(var(--lab-header-offset) + 0.5rem) 0 1.3rem;
+        text-align: center;
     }
 
     .fleet-browser__hero-kicker::before,
