@@ -3439,11 +3439,11 @@
     }
 
     .services-page .services-flow--lead .services-section__head {
-        justify-items: start;
+        justify-items: center;
         max-width: 100%;
-        margin-inline: 0;
+        margin-inline: auto;
         gap: 0.72rem;
-        text-align: left;
+        text-align: center;
     }
 
     .services-page .services-flow--lead .services-kicker {
@@ -3457,6 +3457,7 @@
 
     .services-page .services-flow--lead .services-section__head h1 {
         max-width: 100%;
+        margin-inline: auto;
         font-size: clamp(1.78rem, 7vw, 2.25rem);
         font-weight: 600;
         letter-spacing: 0;
@@ -3466,7 +3467,7 @@
 
     .services-page .services-flow--lead .services-section__head p {
         max-width: 42rem;
-        margin-inline: 0;
+        margin-inline: auto;
         font-size: 0.92rem;
         font-weight: 500;
         line-height: 1.5;
