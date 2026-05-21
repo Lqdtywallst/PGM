@@ -187,9 +187,10 @@ function initSiteV2() {
     }
 
     function resolveDefaultBookingDates(intent = {}) {
+        const safeIntent = intent && typeof intent === "object" ? intent : {};
         const today = getDubaiDateString(0);
-        const startDate = clampBookingDateValue(intent.startDate, today, today);
-        const rawEndDate = normalizeBookingValue(intent.endDate);
+        const startDate = clampBookingDateValue(safeIntent.startDate, today, today);
+        const rawEndDate = normalizeBookingValue(safeIntent.endDate);
         const defaultEndDate = addDaysToDateInputValue(startDate, 1);
         const endDate = isValidDateInputValue(rawEndDate) && rawEndDate >= startDate
             ? rawEndDate

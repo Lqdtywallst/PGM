@@ -14,6 +14,47 @@ function getDubaiDateString(offsetDays = 0) {
 test.describe('Mobile date and back controls regression', () => {
     test.use({ viewport: { width: 390, height: 844 } });
 
+    test('home date inputs render defaults on a clean mobile visit', async ({ page }) => {
+        const today = getDubaiDateString(0);
+        const tomorrow = getDubaiDateString(1);
+
+        await page.goto('/', { waitUntil: 'networkidle' });
+
+        const visibleControls = [
+            ['#home-pickup-date', today],
+            ['#home-return-date', tomorrow]
+        ];
+
+        for (const [selector, expectedValue] of visibleControls) {
+            const control = page.locator(selector);
+            await expect(control).toBeVisible();
+            await expect(control).toHaveValue(expectedValue);
+
+            const controlState = await control.evaluate((element) => {
+                const rect = element.getBoundingClientRect();
+                const styles = window.getComputedStyle(element);
+                return {
+                    width: rect.width,
+                    height: rect.height,
+                    color: styles.color,
+                    textFill: styles.webkitTextFillColor,
+                    opacity: Number(styles.opacity)
+                };
+            });
+
+            expect(controlState.width).toBeGreaterThan(40);
+            expect(controlState.height).toBeGreaterThan(32);
+            expect(controlState.opacity).toBeGreaterThan(0.8);
+            expect(controlState.color).not.toBe('rgba(0, 0, 0, 0)');
+            expect(controlState.textFill).not.toBe('rgba(0, 0, 0, 0)');
+        }
+
+        await expect(page.locator('#hero-lab-pickup-date')).toHaveValue(today);
+        await expect(page.locator('#hero-lab-return-date')).toHaveValue(tomorrow);
+        await expect(page.locator('#home-pickup-time')).toHaveValue('12:00');
+        await expect(page.locator('#home-return-time')).toHaveValue('12:00');
+    });
+
     test('home date inputs clamp stale stored dates on every date surface', async ({ page }) => {
         const today = getDubaiDateString(0);
         const tomorrow = getDubaiDateString(1);
