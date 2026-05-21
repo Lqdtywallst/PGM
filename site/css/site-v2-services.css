@@ -3426,6 +3426,48 @@
 }
 
 @media (max-width: 640px) {
+    .services-page .services-flow--lead {
+        padding-top: calc(var(--lab-header-offset) + 0.85rem);
+    }
+
+    .services-page .services-flow--lead .services-flow__shell {
+        width: min(100% - 3rem, 62rem);
+    }
+
+    .services-page .services-flow--lead .services-section__head {
+        justify-items: start;
+        max-width: 100%;
+        margin-inline: 0;
+        gap: 0.72rem;
+        text-align: left;
+    }
+
+    .services-page .services-flow--lead .services-kicker {
+        gap: 0.7rem;
+        color: #7a5c25;
+        font-family: var(--lab-font-sans);
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+    }
+
+    .services-page .services-flow--lead .services-section__head h1 {
+        max-width: 100%;
+        font-size: clamp(1.78rem, 7vw, 2.25rem);
+        font-weight: 600;
+        letter-spacing: 0;
+        line-height: 1;
+        text-wrap: balance;
+    }
+
+    .services-page .services-flow--lead .services-section__head p {
+        max-width: 42rem;
+        margin-inline: 0;
+        font-size: 0.92rem;
+        font-weight: 500;
+        line-height: 1.5;
+    }
+
     .services-page .services-hero--cards-only {
         padding: 2rem 0 2.8rem;
     }
