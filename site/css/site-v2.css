@@ -1065,7 +1065,7 @@ html.js .home-page .hero-lab:not(.is-video-ready) .hero-lab__video {
     }
 }
 
-@media (min-width: 340px) and (max-width: 430px) {
+@media (min-width: 340px) and (max-width: 480px) {
     .home-page .hero-lab .home-booking__shell {
         gap: 0.78rem;
         padding: 0.78rem;
