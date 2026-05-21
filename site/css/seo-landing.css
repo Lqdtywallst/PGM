@@ -4375,6 +4375,10 @@ body.vehicle-page :is(h1, h2, h3, h4, h5, h6) {
     font-family: var(--lab-font-display);
 }
 
+body.vehicle-page .site-v2-footer__column h3 {
+    color: rgba(250, 246, 239, 0.96);
+}
+
 .vehicle-page--brand-mother {
     --brand-landing-css-version: "20260513-brand-mother-audit3";
 }
