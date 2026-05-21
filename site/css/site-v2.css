@@ -7720,3 +7720,158 @@ body.lab-mobile-nav-open {
 }
 
 
+/* Shared compact mobile footer. */
+@media (max-width: 860px) {
+    .lab-floating-contact {
+        display: none;
+    }
+
+    .site-v2-footer {
+        padding-top: 0;
+        padding-bottom: 0.85rem;
+    }
+
+    .site-v2-footer__shell {
+        box-sizing: border-box;
+        width: min(342px, calc(100vw - 48px));
+        margin-inline: auto;
+        gap: 1rem;
+        padding: 1.05rem 1rem 1rem;
+        border: 1px solid rgba(214, 188, 134, 0.18);
+        border-radius: 22px;
+        background:
+            radial-gradient(circle at 50% 0%, rgba(214, 188, 134, 0.1), rgba(214, 188, 134, 0) 30%),
+            linear-gradient(180deg, #10100f 0%, #080808 100%);
+        box-shadow: 0 22px 48px rgba(8, 7, 6, 0.32);
+    }
+
+    .site-v2-footer--over-video .site-v2-footer__shell {
+        border-color: rgba(214, 188, 134, 0.2);
+        background:
+            radial-gradient(circle at 50% 0%, rgba(214, 188, 134, 0.11), rgba(214, 188, 134, 0) 30%),
+            linear-gradient(180deg, rgba(16, 16, 15, 0.98) 0%, rgba(8, 8, 8, 0.99) 100%);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+
+    .site-v2-footer__top {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 0.9rem;
+        text-align: center;
+    }
+
+    .site-v2-footer__crest {
+        width: 4.55rem;
+        height: 4.55rem;
+        border-radius: 16px;
+        border-color: rgba(214, 188, 134, 0.26);
+        background:
+            radial-gradient(circle at 50% 18%, rgba(214, 188, 134, 0.11), rgba(255, 255, 255, 0.03) 54%),
+            rgba(255, 255, 255, 0.025);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+    }
+
+    .site-v2-footer__brand {
+        justify-items: center;
+        gap: 0.62rem;
+        padding-bottom: 0.2rem;
+        text-align: center;
+    }
+
+    .site-v2-footer__brand p {
+        max-width: 18.5rem;
+        font-size: 0.82rem;
+        line-height: 1.42;
+        color: rgba(239, 233, 222, 0.74);
+    }
+
+    .site-v2-footer__column {
+        justify-items: center;
+        gap: 0.48rem;
+        text-align: center;
+    }
+
+    .site-v2-footer__column--guides {
+        display: none;
+    }
+
+    .site-v2-footer__column h3 {
+        font-size: 1.05rem;
+        color: rgba(250, 246, 239, 0.96);
+    }
+
+    .site-v2-footer__column a,
+    .site-v2-footer__column p {
+        font-size: 0.82rem;
+        line-height: 1.36;
+        color: rgba(229, 222, 211, 0.72);
+    }
+
+    .site-v2-footer__column--links {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 1.1rem;
+        width: min(100%, 16.5rem);
+    }
+
+    .site-v2-footer__column--links h3 {
+        grid-column: 1 / -1;
+    }
+
+    .site-v2-footer__column--links a,
+    .site-v2-footer__column--contact a,
+    .site-v2-footer__column--contact p {
+        justify-self: center;
+        text-align: center;
+    }
+
+    .site-v2-footer__column--contact {
+        width: min(100%, 18.5rem);
+    }
+
+    .site-v2-footer__middle {
+        display: none;
+    }
+
+    .site-v2-footer__bottom {
+        display: grid;
+        width: 100%;
+        justify-content: center;
+        justify-items: center;
+        gap: 0.7rem;
+        padding-top: 0.9rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.075);
+        text-align: center;
+    }
+
+    .site-v2-footer__legal {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        justify-self: center;
+        gap: 0.75rem;
+    }
+
+    .site-v2-footer__bottom p {
+        width: 100%;
+        justify-self: center;
+        font-size: 0.76rem;
+        text-align: center;
+        color: rgba(223, 216, 206, 0.52);
+    }
+
+    .site-v2-footer__socials {
+        width: 100%;
+        justify-self: center;
+        justify-content: center;
+    }
+
+    .site-v2-footer__socials a {
+        min-width: 2.5rem;
+        min-height: 2.5rem;
+        border-color: rgba(214, 188, 134, 0.18);
+        background: rgba(255, 255, 255, 0.035);
+        font-size: 0.72rem;
+    }
+}

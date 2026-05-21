@@ -3,7 +3,7 @@
     color: #171615;
 }
 
-.locations-page .lab-shell {
+.locations-page .lab-shell:not(.site-v2-footer__shell) {
     width: var(--lab-frame-width);
 }
 
@@ -1408,7 +1408,7 @@
 }
 
 @media (max-width: 760px) {
-    .locations-page .lab-shell {
+    .locations-page .lab-shell:not(.site-v2-footer__shell) {
         width: min(100% - 2rem, 98rem);
     }
 

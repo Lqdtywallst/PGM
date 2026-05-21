@@ -1,0 +1,115 @@
+{
+  "brand": {
+    "crestSrc": "/images/dp-crest-cropped.png",
+    "text": "Luxury cars, chauffeur options and hotel, villa or airport handovers across Dubai."
+  },
+  "columns": [
+    {
+      "title": "Useful links",
+      "variant": "links",
+      "links": [
+        {
+          "label": "Home",
+          "href": "/index.html"
+        },
+        {
+          "label": "Fleet",
+          "href": "/fleet.html"
+        },
+        {
+          "label": "Services",
+          "href": "/services.html"
+        },
+        {
+          "label": "Locations",
+          "href": "/locations.html"
+        },
+        {
+          "label": "About us",
+          "href": "/about.html"
+        },
+        {
+          "label": "Contact us",
+          "href": "/contact.html"
+        }
+      ]
+    },
+    {
+      "title": "Dubai guides",
+      "variant": "guides",
+      "links": [
+        {
+          "label": "Dubai city guide",
+          "href": "/luxury-car-rental-dubai.html"
+        },
+        {
+          "label": "Palm Jumeirah",
+          "href": "/palm-jumeirah-luxury-car-rental.html"
+        },
+        {
+          "label": "Dubai Marina",
+          "href": "/dubai-marina-luxury-car-rental.html"
+        },
+        {
+          "label": "Dubai Airport",
+          "href": "/dubai-airport-luxury-car-rental.html"
+        },
+        {
+          "label": "Monthly rental",
+          "href": "/monthly-luxury-car-rental-dubai.html"
+        }
+      ]
+    },
+    {
+      "title": "Contact us",
+      "variant": "contact",
+      "links": [
+        {
+          "label": "+971 58 612 2568",
+          "href": "tel:+971586122568"
+        },
+        {
+          "label": "WhatsApp the team",
+          "href": "https://wa.me/971586122568"
+        },
+        {
+          "label": "prestigegoalmotion@gmail.com",
+          "href": "mailto:prestigegoalmotion@gmail.com"
+        }
+      ],
+      "body": "Palm Jumeirah based, with hotel, villa and airport handovers across Dubai."
+    }
+  ],
+  "service": {
+    "label": "24/7",
+    "text": "Reservation support"
+  },
+  "legal": [
+    {
+      "label": "Booking T&C",
+      "href": "/terms-and-conditions.html"
+    },
+    {
+      "label": "Privacy & contact",
+      "href": "/contact.html"
+    }
+  ],
+  "copyright": "© 2026 Dynasty Prestige. All rights reserved.",
+  "socials": [
+    {
+      "label": "Call",
+      "href": "tel:+971586122568",
+      "ariaLabel": "Call Dynasty Prestige"
+    },
+    {
+      "label": "WA",
+      "href": "https://wa.me/971586122568",
+      "ariaLabel": "Open WhatsApp"
+    },
+    {
+      "label": "Mail",
+      "href": "mailto:prestigegoalmotion@gmail.com",
+      "ariaLabel": "Send email"
+    }
+  ]
+}
