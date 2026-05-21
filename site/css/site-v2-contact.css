@@ -56,6 +56,7 @@
 
 .contact-page-main {
     position: relative;
+    background: #050506;
 }
 
 .contact-hero {
@@ -669,10 +670,26 @@
     }
 
     .contact-hero {
-        padding: 1rem 0 1.25rem;
+        padding: 1rem 0 4.4rem;
         background:
             radial-gradient(circle at 14% 8%, rgba(209, 184, 122, 0.2), rgba(209, 184, 122, 0) 16rem),
-            linear-gradient(180deg, #090a0d 0%, #111217 38%, #f7f3ea 38%, #f7f3ea 100%);
+            linear-gradient(
+                180deg,
+                #090a0d 0%,
+                #111217 38%,
+                #f7f3ea 38.1%,
+                #f7f3ea calc(100% - 6.2rem),
+                #ede6d8 calc(100% - 4.25rem),
+                #7f7668 calc(100% - 1.9rem),
+                #050506 100%
+            );
+    }
+
+    .contact-page .site-v2-footer {
+        position: relative;
+        z-index: 1;
+        padding-top: 1.05rem;
+        background: #050506;
     }
 
     .contact-hero__shell.hero-grid,
