@@ -463,18 +463,19 @@ function initSiteV2() {
         const referrerPath = normalizeInternalPath(document.referrer);
         const storedMemory = readNavigationMemory();
         const pendingPreviousPath = getPendingInternalPreviousPath(storedMemory, currentPath);
-        const fallbackPreviousPath = getFallbackPreviousPath(currentPath);
-        const previousPath = [
+        const historyPreviousPath = [
             referrerPath,
-            pendingPreviousPath,
-            fallbackPreviousPath
+            pendingPreviousPath
         ].find((candidate) => candidate && !pathsEqual(candidate, currentPath));
+        const fallbackPreviousPath = getFallbackPreviousPath(currentPath);
+        const previousPath = historyPreviousPath ||
+            (fallbackPreviousPath && !pathsEqual(fallbackPreviousPath, currentPath) ? fallbackPreviousPath : "");
 
         bindInternalNavigationCapture(currentPath);
 
         writeNavigationMemory({
             current: currentPath,
-            previous: previousPath || "",
+            previous: historyPreviousPath || "",
             pending: null,
             updatedAt: Date.now()
         });
@@ -502,6 +503,7 @@ function initSiteV2() {
         backButton.addEventListener("click", (event) => {
             const liveReferrerPath = normalizeInternalPath(document.referrer);
             const canUseHistoryBack = window.history.length > 1 && (
+                Boolean(historyPreviousPath && pathsEqual(historyPreviousPath, previousPath)) ||
                 Boolean(pendingPreviousPath && pathsEqual(pendingPreviousPath, previousPath)) ||
                 Boolean(liveReferrerPath && pathsEqual(liveReferrerPath, previousPath))
             );

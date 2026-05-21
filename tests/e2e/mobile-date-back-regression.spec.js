@@ -63,4 +63,31 @@ test.describe('Mobile date and back controls regression', () => {
             await directPage.close();
         });
     });
+
+    test('back arrow prefers the real browser history page over the fallback', async ({ page }) => {
+        await page.goto('/locations.html', { waitUntil: 'domcontentloaded' });
+        await page.evaluate(() => {
+            window.location.href = '/lamborghini-huracan-evo-spyder-rental-dubai.html';
+        });
+        await page.waitForURL(/\/lamborghini-huracan-evo-spyder-rental-dubai\.html$/);
+
+        const vehicleBackButton = page.locator('.lab-floating-back');
+        await expect(vehicleBackButton).toBeVisible();
+        await expect(vehicleBackButton).toHaveAttribute('href', '/locations.html');
+
+        await vehicleBackButton.click();
+        await page.waitForURL(/\/locations\.html$/);
+
+        await page.evaluate(() => {
+            window.location.href = '/app/reserve/page.html';
+        });
+        await page.waitForURL(/\/app\/reserve\/page\.html$/);
+
+        const reserveBackButton = page.locator('.lab-floating-back');
+        await expect(reserveBackButton).toBeVisible();
+        await expect(reserveBackButton).toHaveAttribute('href', '/locations.html');
+
+        await reserveBackButton.click();
+        await page.waitForURL(/\/locations\.html$/);
+    });
 });

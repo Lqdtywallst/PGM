@@ -317,16 +317,18 @@
         const storedMemory = readNavigationMemory();
         const storedCurrentPath = normalizeInternalPath(storedMemory.current);
         const storedPreviousPath = normalizeInternalPath(storedMemory.previous);
-        const previousPath = [
+        const historyPreviousPath = [
             referrerPath,
             storedCurrentPath && !pathsEqual(storedCurrentPath, currentPath) ? storedCurrentPath : "",
-            storedPreviousPath,
-            getFallbackPreviousPath(currentPath)
+            storedPreviousPath
         ].find((candidate) => candidate && !pathsEqual(candidate, currentPath));
+        const fallbackPreviousPath = getFallbackPreviousPath(currentPath);
+        const previousPath = historyPreviousPath ||
+            (fallbackPreviousPath && !pathsEqual(fallbackPreviousPath, currentPath) ? fallbackPreviousPath : "");
 
         writeNavigationMemory({
             current: currentPath,
-            previous: previousPath || "",
+            previous: historyPreviousPath || "",
             updatedAt: Date.now()
         });
 
@@ -352,8 +354,12 @@
 
         backButton.addEventListener("click", (event) => {
             const liveReferrerPath = normalizeInternalPath(document.referrer);
+            const canUseHistoryBack = window.history.length > 1 && (
+                Boolean(historyPreviousPath && pathsEqual(historyPreviousPath, previousPath)) ||
+                Boolean(liveReferrerPath && pathsEqual(liveReferrerPath, previousPath))
+            );
 
-            if (!liveReferrerPath || !pathsEqual(liveReferrerPath, previousPath) || window.history.length <= 1) {
+            if (!canUseHistoryBack) {
                 return;
             }
 

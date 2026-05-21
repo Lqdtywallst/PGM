@@ -6371,19 +6371,64 @@ a.brand-marquee__item:focus-visible img {
         height: 3rem;
     }
 
-    .guest-reviews__body,
     .guest-reviews__body {
         grid-template-columns: 1fr;
+        gap: 0.9rem;
+    }
+
+    .guest-reviews {
+        padding: 0.65rem 0 3.7rem;
+    }
+
+    .guest-reviews__shell {
+        gap: 1.15rem;
     }
 
     .guest-reviews__intro h2 {
-        max-width: 22rem;
-        font-size: clamp(2.15rem, 11vw, 2.85rem);
+        max-width: 21rem;
+        font-size: 2.15rem;
+        line-height: 1.02;
+        letter-spacing: 0;
     }
 
     .guest-reviews__summary {
         max-width: none;
-        padding: 0.1rem 0;
+        gap: 0.62rem;
+        padding: 1.05rem 0.92rem 1rem;
+        border-radius: 1.15rem;
+        background: rgba(255, 251, 245, 0.74);
+        box-shadow: 0 14px 28px rgba(33, 24, 16, 0.12);
+    }
+
+    .guest-reviews__brand {
+        font-size: 1.38rem;
+        line-height: 1.1;
+    }
+
+    .guest-reviews__rating {
+        padding: 0.82rem 0.88rem;
+        border-radius: 0.9rem;
+    }
+
+    .guest-reviews__rating .guest-reviews__score {
+        font-size: 2.05rem;
+        letter-spacing: 0;
+    }
+
+    .guest-reviews__rating .guest-reviews__stars {
+        font-size: 1.1rem;
+        letter-spacing: 0.12em;
+    }
+
+    .guest-reviews__count,
+    .guest-reviews__powered {
+        max-width: 18.5rem;
+        font-size: 0.88rem;
+        line-height: 1.4;
+    }
+
+    .guest-reviews__actions {
+        gap: 0.45rem;
     }
 
     .guest-reviews .review-card {
@@ -6393,6 +6438,19 @@ a.brand-marquee__item:focus-visible img {
 
     .guest-reviews__google-button {
         width: 100%;
+        max-width: 19rem;
+        min-height: 46px;
+        padding: 0 1.1rem;
+        border: 1px solid rgba(207, 173, 101, 0.42);
+        background: linear-gradient(135deg, #181512, #2a241d);
+        color: #fffaf0;
+        font-size: 0.7rem;
+        letter-spacing: 0.06em;
+        box-shadow: 0 12px 24px rgba(33, 24, 16, 0.18);
+    }
+
+    .guest-reviews__google-link {
+        font-size: 0.86rem;
     }
 }
 
