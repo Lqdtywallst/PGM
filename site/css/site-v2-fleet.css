@@ -2359,41 +2359,22 @@
         margin: 0 0 0.72rem;
     }
 
+    .fleet-results__mobile-hint::after {
+        display: none;
+    }
+
     .fleet-results__list {
-        display: flex;
-        grid-template-columns: none;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
         gap: 1rem;
         width: 100%;
-        padding: 0.1rem 2.35rem 0.85rem 0.05rem;
-        overflow-x: auto;
-        overscroll-behavior-x: contain;
-        scroll-padding-inline: 0.05rem;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-color: rgba(214, 181, 94, 0.55) rgba(70, 52, 34, 0.08);
-        scrollbar-width: thin;
-        mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 2.9rem), transparent 100%);
-    }
-
-    .fleet-results__list::-webkit-scrollbar {
-        display: block;
-        height: 4px;
-    }
-
-    .fleet-results__list::-webkit-scrollbar-track {
-        background: rgba(70, 52, 34, 0.08);
-        border-radius: 999px;
-    }
-
-    .fleet-results__list::-webkit-scrollbar-thumb {
-        background: rgba(214, 181, 94, 0.58);
-        border-radius: 999px;
+        padding: 0;
+        overflow: visible;
     }
 
     .fleet-results__list .fleet-card {
-        flex: 0 0 clamp(16.5rem, 76vw, 21rem);
-        scroll-snap-align: start;
-        scroll-snap-stop: always;
+        width: 100%;
+        min-width: 0;
     }
 }
 
