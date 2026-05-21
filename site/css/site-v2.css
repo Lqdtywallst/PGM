@@ -7632,6 +7632,10 @@ body.lab-mobile-nav-open {
         justify-content: flex-start;
     }
 
+    .home-page .lab-brand__crest {
+        display: none;
+    }
+
     .lab-brand__crest {
         width: 50px;
         border-radius: 8px;
