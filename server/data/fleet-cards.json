@@ -252,7 +252,7 @@
     "types": [
       "luxury"
     ],
-    "pricePerDay": 2200,
+    "pricePerDay": 3790,
     "href": "./black-mercedes-s680-maybach-rental-dubai.html",
     "image": {
       "src": "./images/fleet/black-mercedes-s680-maybach/01.jpg",
@@ -277,7 +277,7 @@
       ]
     },
     "booking": {
-      "priceNote": "Executive-led saloon",
+      "priceNote": "+ VAT per day",
       "primaryLabel": "View Mercedes S680 Maybach"
     },
     "contact": {
@@ -292,7 +292,7 @@
     "types": [
       "sports"
     ],
-    "pricePerDay": 2600,
+    "pricePerDay": 5490,
     "href": "./blue-porsche-gt3-rs-rental-dubai.html",
     "image": {
       "src": "./images/fleet/blue-porsche-gt3-rs/01.jpg",
@@ -317,7 +317,7 @@
       ]
     },
     "booking": {
-      "priceNote": "Driver-first pick",
+      "priceNote": "+ VAT per day",
       "primaryLabel": "View Porsche GT3 RS"
     },
     "contact": {
@@ -333,7 +333,7 @@
       "suv",
       "luxury"
     ],
-    "pricePerDay": 1650,
+    "pricePerDay": 1990,
     "href": "./bronze-mercedes-g63-rental-dubai.html",
     "image": {
       "src": "./images/fleet/bronze-mercedes-g63/01.jpg",
@@ -358,7 +358,7 @@
       ]
     },
     "booking": {
-      "priceNote": "G-Class daily fit",
+      "priceNote": "+ VAT per day",
       "primaryLabel": "View Bronze Mercedes G63"
     },
     "contact": {
@@ -374,7 +374,7 @@
       "convertible",
       "sports"
     ],
-    "pricePerDay": 3000,
+    "pricePerDay": 4490,
     "href": "./ferrari-f8-spider-rental-dubai.html",
     "image": {
       "src": "./images/fleet/ferrari-f8-spider/01.jpg",
@@ -399,7 +399,7 @@
       ]
     },
     "booking": {
-      "priceNote": "Open-top supercar",
+      "priceNote": "+ VAT per day",
       "primaryLabel": "View Ferrari F8 Spider"
     },
     "contact": {
@@ -415,7 +415,7 @@
       "convertible",
       "luxury"
     ],
-    "pricePerDay": 2200,
+    "pricePerDay": 1690,
     "href": "./mercedes-benz-sl63-amg-rental-dubai.html",
     "image": {
       "src": "./images/fleet/mercedes-benz-sl63-amg/01.jpg",
@@ -440,7 +440,7 @@
       ]
     },
     "booking": {
-      "priceNote": "AMG roadster fit",
+      "priceNote": "+ VAT per day",
       "primaryLabel": "View Mercedes SL63 AMG"
     },
     "contact": {

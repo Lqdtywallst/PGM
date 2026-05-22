@@ -662,7 +662,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (!availability || availability.available === null) {
-            statusNode.textContent = "Availability not checked yet.";
+            statusNode.textContent = "Team will confirm availability.";
             return;
         }
 
