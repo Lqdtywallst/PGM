@@ -89,7 +89,7 @@
     "types": [
       "sports"
     ],
-    "pricePerDay": 2100,
+    "pricePerDay": 2300,
     "href": "./porsche-992-gt3-rental-dubai.html",
     "image": {
       "src": "./images/fleet/porsche-992-gt3/02-exterior-side.jpg",
@@ -130,11 +130,11 @@
       "suv",
       "luxury"
     ],
-    "pricePerDay": 3500,
+    "pricePerDay": 3600,
     "href": "./lamborghini-urus-rental-dubai.html",
     "image": {
       "src": "./images/fleet/lamborghini-urus/01-exterior-front.png",
-      "alt": "Lamborghini Urus Sport in Dubai",
+      "alt": "Lamborghini Urus SE in Dubai",
       "loading": "lazy"
     },
     "utility": {
@@ -145,7 +145,7 @@
       "accent": "Lamborghini with luggage logic"
     },
     "copy": {
-      "title": "Urus Sport",
+      "title": "Urus SE",
       "description": "Lamborghini presence with SUV room for luggage, guests and full-day plans.",
       "salesLine": "Best for airport arrivals, villas and flexible schedules.",
       "specs": [
@@ -156,10 +156,10 @@
     },
     "booking": {
       "priceNote": "Airport-to-villa fit",
-      "primaryLabel": "View Lamborghini Urus"
+      "primaryLabel": "View Lamborghini Urus SE"
     },
     "contact": {
-      "whatsappText": "Hi, I'm interested in the Lamborghini Urus Sport in Dubai."
+      "whatsappText": "Hi, I'm interested in the Lamborghini Urus SE in Dubai."
     }
   },
   {

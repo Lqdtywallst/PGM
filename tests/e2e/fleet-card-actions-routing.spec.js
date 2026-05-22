@@ -26,14 +26,14 @@ const fleetCards = [
         detailPath: '/porsche-992-gt3-rental-dubai.html',
         reserveCar: '992 GT3',
         fullCar: 'Porsche 992 GT3',
-        price: '2100'
+        price: '2300'
     },
     {
         id: 'lamborghini-urus-sport',
         detailPath: '/lamborghini-urus-rental-dubai.html',
-        reserveCar: 'Urus Sport',
-        fullCar: 'Lamborghini Urus Sport',
-        price: '3500'
+        reserveCar: 'Urus SE',
+        fullCar: 'Lamborghini Urus SE',
+        price: '3600'
     },
     {
         id: 'mercedes-g63-amg',

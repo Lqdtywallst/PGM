@@ -119,7 +119,7 @@ const directBrandAvailabilityJourneys = [
         landingHeading: 'Porsche 992 GT3',
         reservationIntent: {
             selectedCar: 'Porsche 992 GT3',
-            selectedRate: '2,100',
+            selectedRate: '2,300',
             startDate: '2026-08-09',
             endDate: '2026-08-11',
             pickupTime: '10:30',
@@ -146,7 +146,7 @@ const carTypeFleetJourneys = [
     {
         label: 'Luxury Cars',
         type: 'luxury',
-        titles: ['Urus Sport', 'G63 AMG', 'Cullinan Black Badge']
+        titles: ['Urus SE', 'G63 AMG', 'Cullinan Black Badge']
     },
     {
         label: 'Convertible Cars',
@@ -161,7 +161,7 @@ const carTypeFleetJourneys = [
     {
         label: 'SUV Cars',
         type: 'suv',
-        titles: ['Urus Sport', 'G63 AMG', 'Cullinan Black Badge']
+        titles: ['Urus SE', 'G63 AMG', 'Cullinan Black Badge']
     }
 ];
 
@@ -263,7 +263,7 @@ test('guest compares Lamborghini models from the SEO landing and starts reserve 
     const modelCards = page.locator('.model-card');
     await expect(modelCards).toHaveCount(2);
     await expect(modelCards.filter({ hasText: 'Lamborghini Huracan EVO Spyder' })).toBeVisible();
-    await expect(modelCards.filter({ hasText: 'Lamborghini Urus Sport' })).toBeVisible();
+    await expect(modelCards.filter({ hasText: 'Lamborghini Urus SE' })).toBeVisible();
 
     await modelCards
         .filter({ hasText: 'Lamborghini Huracan EVO Spyder' })
