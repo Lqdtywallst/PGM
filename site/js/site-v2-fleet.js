@@ -1260,6 +1260,7 @@ document.addEventListener("DOMContentLoaded", () => {
             Object.assign(state, defaultState);
             render();
             updateFilterChips();
+            setFilterSheetState(false);
         });
     });
 
