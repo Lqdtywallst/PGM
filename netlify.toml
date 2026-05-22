@@ -231,14 +231,44 @@
   force = true
 
 [[redirects]]
+  from = "/ferrari-f8-spider-rental-dubai.html"
+  to = "/pages/vehicles/ferrari-f8-spider-rental-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/mercedes-g63-amg-rental-dubai.html"
   to = "/pages/vehicles/mercedes-g63-amg-rental-dubai.html"
   status = 200
   force = true
 
 [[redirects]]
+  from = "/black-mercedes-s680-maybach-rental-dubai.html"
+  to = "/pages/vehicles/black-mercedes-s680-maybach-rental-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/bronze-mercedes-g63-rental-dubai.html"
+  to = "/pages/vehicles/bronze-mercedes-g63-rental-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/mercedes-benz-sl63-amg-rental-dubai.html"
+  to = "/pages/vehicles/mercedes-benz-sl63-amg-rental-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/porsche-992-gt3-rental-dubai.html"
   to = "/pages/vehicles/porsche-992-gt3-rental-dubai.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/blue-porsche-gt3-rs-rental-dubai.html"
+  to = "/pages/vehicles/blue-porsche-gt3-rs-rental-dubai.html"
   status = 200
   force = true
 
