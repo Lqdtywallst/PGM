@@ -35,7 +35,7 @@ async function installSuccessfulCheckoutMocks(page) {
                         paymentIntent: {
                             id: 'pi_mock_customer_checkout',
                             status: 'succeeded',
-                            amount: 165000
+                            amount: 199000
                         }
                     };
                 }

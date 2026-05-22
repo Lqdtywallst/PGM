@@ -76,7 +76,7 @@ async function installStripeMock(page) {
                         paymentIntent: {
                             id: 'pi_mock_mobile_reload',
                             status: 'succeeded',
-                            amount: 165000
+                            amount: 199000
                         }
                     };
                 }
@@ -422,7 +422,7 @@ test.describe('Mobile friction points', () => {
         await installStripeMock(page);
 
         await page.goto(
-            '/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1650&startDate=2026-12-30&endDate=2027-01-02&pickupTime=10:00&dropoffTime=18:00',
+            '/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1990&startDate=2026-12-30&endDate=2027-01-02&pickupTime=10:00&dropoffTime=18:00',
             { waitUntil: 'domcontentloaded' }
         );
         await settlePage(page);

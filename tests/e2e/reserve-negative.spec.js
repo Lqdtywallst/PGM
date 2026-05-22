@@ -8,7 +8,7 @@ const {
 
 async function openReserve(page) {
     await page.goto(
-        '/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1650&startDate=2026-07-10&endDate=2026-07-12&pickupTime=10:00&dropoffTime=18:00',
+        '/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1990&startDate=2026-07-10&endDate=2026-07-12&pickupTime=10:00&dropoffTime=18:00',
         { waitUntil: 'domcontentloaded' }
     );
     await settlePage(page);

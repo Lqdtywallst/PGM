@@ -40,7 +40,7 @@ const fleetCards = [
         detailPath: '/mercedes-g63-amg-rental-dubai.html',
         reserveCar: 'G63 AMG',
         fullCar: 'Mercedes G63 AMG',
-        price: '1650'
+        price: '1990'
     },
     {
         id: 'rolls-royce-cullinan-black-badge',

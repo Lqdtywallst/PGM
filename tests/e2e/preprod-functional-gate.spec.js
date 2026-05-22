@@ -74,7 +74,7 @@ async function seedBlockingReservation({ reservationId, email, schedule }) {
             email,
             phone: '+971 58 612 2568',
             car: 'Mercedes G63 AMG',
-            pricePerDay: 1650,
+            pricePerDay: 1990,
             days: 2,
             startDate: schedule.startDate,
             endDate: schedule.endDate,
@@ -83,8 +83,8 @@ async function seedBlockingReservation({ reservationId, email, schedule }) {
             durationHours: 56,
             pickupLocation: 'Preproduction QA seeded reservation',
             totalAmount: 3300,
-            upfrontAmount: 1650,
-            remainingAmount: 1650,
+            upfrontAmount: 1990,
+            remainingAmount: 1990,
             currency: 'aed'
         })
     });

@@ -32,7 +32,7 @@ test.describe('Switch car mid-flow', () => {
 
         await expect(page).toHaveURL(/\/app\/reserve\/page\.html\?/i);
         await expect(page.locator('#selectedCar')).toContainText('G63 AMG');
-        await expect(page.locator('#summaryPricePerDay')).toContainText('1,650');
+        await expect(page.locator('#summaryPricePerDay')).toContainText('1,990');
 
         await page.goBack({ waitUntil: 'domcontentloaded' });
         await settlePage(page);

@@ -39,7 +39,7 @@ async function installStripeMock(page, paymentResult) {
 
 async function openPaymentStep(page) {
     await page.goto(
-        '/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1650&startDate=2027-01-04&endDate=2027-01-06&pickupTime=10:00&dropoffTime=18:00',
+        '/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1990&startDate=2027-01-04&endDate=2027-01-06&pickupTime=10:00&dropoffTime=18:00',
         { waitUntil: 'domcontentloaded' }
     );
     await settlePage(page);
@@ -72,7 +72,7 @@ test.describe('Adversarial functional audit', () => {
             paymentIntent: {
                 id: 'pi_mock_double_submit',
                 status: 'succeeded',
-                amount: 165000
+                amount: 199000
             }
         });
 
@@ -137,7 +137,7 @@ test.describe('Adversarial functional audit', () => {
             paymentIntent: {
                 id: 'pi_mock_retry_success',
                 status: 'succeeded',
-                amount: 165000
+                amount: 199000
             }
         });
 

@@ -18,7 +18,7 @@ const fleetCards = [
     {
         id: 'mercedes-g63-amg',
         brand: 'Mercedes',
-        pricePerDay: 1650,
+        pricePerDay: 1990,
         copy: { title: 'G63 AMG' }
     }
 ];

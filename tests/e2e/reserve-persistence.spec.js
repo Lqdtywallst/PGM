@@ -31,7 +31,7 @@ async function installStripeMock(page) {
                         paymentIntent: {
                             id: 'pi_mock_persistence',
                             status: 'succeeded',
-                            amount: 165000
+                            amount: 199000
                         }
                     };
                 }
@@ -44,7 +44,7 @@ test('reserve keeps URL schedule but clears typed delivery details after reload'
     const consoleErrors = createConsoleTracker(page);
 
     await page.goto(
-        '/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1650&startDate=2026-09-14&endDate=2026-09-16&pickupTime=11:00&dropoffTime=17:00',
+        '/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1990&startDate=2026-09-14&endDate=2026-09-16&pickupTime=11:00&dropoffTime=17:00',
         { waitUntil: 'domcontentloaded' }
     );
     await settlePage(page);
@@ -70,7 +70,7 @@ test('reserve clears guest details and returns to the schedule step after reload
     const consoleErrors = createConsoleTracker(page);
 
     await page.goto(
-        '/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1650&startDate=2026-09-14&endDate=2026-09-16&pickupTime=11:00&dropoffTime=17:00',
+        '/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1990&startDate=2026-09-14&endDate=2026-09-16&pickupTime=11:00&dropoffTime=17:00',
         { waitUntil: 'domcontentloaded' }
     );
     await settlePage(page);
@@ -103,7 +103,7 @@ test('reserve browser back moves between steps without losing in-page details', 
     await installStripeMock(page);
 
     await page.goto(
-        '/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1650&startDate=2026-09-14&endDate=2026-09-16&pickupTime=11:00&dropoffTime=17:00',
+        '/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1990&startDate=2026-09-14&endDate=2026-09-16&pickupTime=11:00&dropoffTime=17:00',
         { waitUntil: 'domcontentloaded' }
     );
     await settlePage(page);
@@ -146,7 +146,7 @@ test('reserve lets guests clear remembered details without losing the selected s
     const consoleErrors = createConsoleTracker(page);
 
     await page.goto(
-        '/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1650&startDate=2026-09-14&endDate=2026-09-16&pickupTime=11:00&dropoffTime=17:00',
+        '/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1990&startDate=2026-09-14&endDate=2026-09-16&pickupTime=11:00&dropoffTime=17:00',
         { waitUntil: 'domcontentloaded' }
     );
     await settlePage(page);

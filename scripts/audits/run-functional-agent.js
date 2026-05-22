@@ -684,7 +684,7 @@ async function installCommonMocks(page, { enableStripeMock = false } = {}) {
                             paymentIntent: {
                                 id: 'pi_mock_customer_checkout',
                                 status: 'succeeded',
-                                amount: 165000,
+                                amount: 199000,
                                 client_secret: clientSecret
                             }
                         };
@@ -2834,7 +2834,7 @@ function createReserveCheckoutAction() {
         enableStripeMock: true,
         async run(page) {
             const recorder = createStepRecorder();
-            await page.goto(`${new URL(page.url()).origin}/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1650&startDate=2026-08-20&endDate=2026-08-22&pickupTime=10:00&dropoffTime=18:00`, {
+            await page.goto(`${new URL(page.url()).origin}/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1990&startDate=2026-08-20&endDate=2026-08-22&pickupTime=10:00&dropoffTime=18:00`, {
                 waitUntil: 'domcontentloaded'
             });
             await settlePage(page, 350);
@@ -2873,7 +2873,7 @@ function createReserveStep1ValidationAction() {
         kind: 'validation',
         async run(page) {
             const recorder = createStepRecorder();
-            await page.goto(`${new URL(page.url()).origin}/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1650&startDate=2026-08-20&endDate=2026-08-22&pickupTime=10:00&dropoffTime=18:00`, {
+            await page.goto(`${new URL(page.url()).origin}/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1990&startDate=2026-08-20&endDate=2026-08-22&pickupTime=10:00&dropoffTime=18:00`, {
                 waitUntil: 'domcontentloaded'
             });
             await settlePage(page, 350);
@@ -2901,7 +2901,7 @@ function createReserveStep2ValidationAction() {
         kind: 'validation',
         async run(page) {
             const recorder = createStepRecorder();
-            await page.goto(`${new URL(page.url()).origin}/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1650&startDate=2026-08-20&endDate=2026-08-22&pickupTime=10:00&dropoffTime=18:00`, {
+            await page.goto(`${new URL(page.url()).origin}/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1990&startDate=2026-08-20&endDate=2026-08-22&pickupTime=10:00&dropoffTime=18:00`, {
                 waitUntil: 'domcontentloaded'
             });
             await settlePage(page, 350);

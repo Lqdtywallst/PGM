@@ -87,7 +87,7 @@ async function installStripeMock(page) {
                         paymentIntent: {
                             id: 'pi_mock_customer_checkout',
                             status: 'succeeded',
-                            amount: 165000,
+                            amount: 199000,
                             client_secret: clientSecret
                         }
                     };
@@ -301,7 +301,7 @@ test('guest compares Ferrari and Mercedes in fleet before opening reserve', asyn
 
     await expectReservationPrefill(page, {
         selectedCar: 'G63 AMG',
-        selectedRate: '1,650',
+        selectedRate: '1,990',
         startDate: '2026-05-20',
         endDate: '2026-05-22',
         pickupTime: '10:00',
@@ -334,7 +334,7 @@ test('guest starts on a Mercedes brand page and carries the schedule through the
 
     await expectReservationPrefill(page, {
         selectedCar: 'Mercedes G63 AMG',
-        selectedRate: '1,650',
+        selectedRate: '1,990',
         startDate: '2026-06-03',
         endDate: '2026-06-05',
         pickupTime: '11:00',
@@ -386,7 +386,7 @@ test('guest completes a reservation with mocked checkout and success redirect', 
         });
     });
 
-    await page.goto('/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1650&startDate=2026-07-10&endDate=2026-07-12&pickupTime=10:00&dropoffTime=18:00', {
+    await page.goto('/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1990&startDate=2026-07-10&endDate=2026-07-12&pickupTime=10:00&dropoffTime=18:00', {
         waitUntil: 'domcontentloaded'
     });
     await settlePage(page);

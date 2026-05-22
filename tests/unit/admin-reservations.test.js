@@ -40,8 +40,8 @@ function reservation(overrides = {}) {
             dropoffTime: '18:00',
             pickupLocation: 'Dubai Marina',
             totalAmount: 3300,
-            upfrontAmount: 1650,
-            remainingAmount: 1650,
+            upfrontAmount: 1990,
+            remainingAmount: 1990,
             currency: 'AED',
             admin: overrides.admin || undefined
         },

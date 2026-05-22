@@ -12,7 +12,7 @@ const fleetCards = [
     {
         id: 'mercedes-g63-amg',
         brand: 'Mercedes',
-        pricePerDay: 1650,
+        pricePerDay: 1990,
         href: './mercedes-g63-amg-rental-dubai.html',
         copy: { title: 'G63 AMG' }
     },
@@ -81,7 +81,7 @@ test('pricing report undercuts fresh market prices within guardrails', () => {
     const mercedes = report.recommendations.find((entry) => entry.vehicleId === 'mercedes-g63-amg');
 
     assert.equal(mercedes.canApply, true);
-    assert.equal(mercedes.recommendedPrice, 1700);
+    assert.equal(mercedes.recommendedPrice, 1850);
     assert.equal(report.summary.changedCount, 1);
 });
 
@@ -97,7 +97,7 @@ test('pricing report keeps current prices when there is no demand or competitor 
         now: new Date('2026-04-25T00:00:00.000Z')
     });
 
-    assert.equal(report.recommendations[0].recommendedPrice, 1650);
+    assert.equal(report.recommendations[0].recommendedPrice, 1990);
     assert.equal(report.summary.changedCount, 0);
 });
 

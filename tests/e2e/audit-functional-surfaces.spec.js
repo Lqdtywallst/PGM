@@ -69,7 +69,7 @@ test.describe('Functional surfaces intelligent audit', () => {
         const consoleErrors = createConsoleTracker(page);
 
         await page.goto(
-            '/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1650&startDate=2026-11-14&endDate=2026-11-16&pickupTime=10:00&dropoffTime=18:00',
+            '/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1990&startDate=2026-11-14&endDate=2026-11-16&pickupTime=10:00&dropoffTime=18:00',
             { waitUntil: 'domcontentloaded' }
         );
         await settlePage(page);

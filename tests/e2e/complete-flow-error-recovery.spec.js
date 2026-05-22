@@ -4,7 +4,7 @@ const { settlePage } = require('./support/site-helpers');
 
 async function goToPaymentStep(page) {
     await page.goto(
-        '/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1650&startDate=2026-12-26&endDate=2026-12-28&pickupTime=10:00&dropoffTime=18:00',
+        '/app/reserve/page.html?car=Mercedes%20G63%20AMG&price=1990&startDate=2026-12-26&endDate=2026-12-28&pickupTime=10:00&dropoffTime=18:00',
         { waitUntil: 'domcontentloaded' }
     );
     await settlePage(page);
@@ -65,7 +65,7 @@ test.describe('Complete-flow error recovery', () => {
             paymentIntent: {
                 id: 'pi_mock_confirm_failure',
                 status: 'succeeded',
-                amount: 165000
+                amount: 199000
             }
         });
 
@@ -122,7 +122,7 @@ test.describe('Complete-flow error recovery', () => {
             paymentIntent: {
                 id: 'pi_mock_failure',
                 status: 'requires_payment_method',
-                amount: 165000
+                amount: 199000
             }
         });
 

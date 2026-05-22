@@ -109,7 +109,7 @@ async function seedBlockingReservationViaApi() {
         email: 'fleet-filter-e2e@example.com',
         phone: '+971 58 612 2568',
         car: 'Mercedes G63 AMG',
-        pricePerDay: 1650,
+        pricePerDay: 1990,
         days: 2,
         startDate: '2026-11-10',
         endDate: '2026-11-12',
@@ -118,8 +118,8 @@ async function seedBlockingReservationViaApi() {
         durationHours: 56,
         pickupLocation: 'E2E reservation seed',
         totalAmount: 3300,
-        upfrontAmount: 1650,
-        remainingAmount: 1650,
+        upfrontAmount: 1990,
+        remainingAmount: 1990,
         currency: 'aed'
     });
 
