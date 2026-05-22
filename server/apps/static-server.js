@@ -30,7 +30,7 @@ const CONTENT_SECURITY_POLICY = [
     "font-src 'self' data: https://cdnjs.cloudflare.com",
     "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com",
     "script-src 'self' 'unsafe-inline' https://js.stripe.com https://www.googletagmanager.com",
-    "connect-src 'self' http://127.0.0.1:3000 http://localhost:3000 https://api.stripe.com https://pgm-production.up.railway.app https://pgm-staging.up.railway.app https://prestigegoalmotion.com https://www.prestigegoalmotion.com https://staging.prestigegoalmotion.com https://preprod.prestigegoalmotion.com https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com",
+    "connect-src 'self' http://127.0.0.1:3000 http://localhost:3000 https://api.stripe.com https://pgm-production.up.railway.app https://pgm-preproduccion.up.railway.app https://pgm-staging.up.railway.app https://prestigegoalmotion.com https://www.prestigegoalmotion.com https://staging.prestigegoalmotion.com https://preprod.prestigegoalmotion.com https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com",
     "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://www.openstreetmap.org https://www.google.com",
     "media-src 'self' https:",
     "manifest-src 'self'",

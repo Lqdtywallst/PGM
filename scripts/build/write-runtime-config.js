@@ -5,6 +5,8 @@ const path = require('node:path');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 const outputPath = path.join(repoRoot, 'site', 'runtime-config.js');
+const stagingBackendUrl = 'https://pgm-preproduccion.up.railway.app';
+const productionBackendUrl = 'https://pgm-production.up.railway.app';
 
 function readPublicEnv(...names) {
     for (const name of names) {
@@ -36,13 +38,53 @@ function normalizeEnvironment(value) {
     return '';
 }
 
+function resolveRuntimeEnvironment() {
+    const vercelEnvironment = normalizeEnvironment(readPublicEnv('VERCEL_ENV'));
+
+    if (vercelEnvironment) {
+        return vercelEnvironment;
+    }
+
+    return normalizeEnvironment(readPublicEnv('PGM_APP_ENV', 'APP_ENV'));
+}
+
+function backendHostname(url) {
+    try {
+        return new URL(String(url || '')).hostname.toLowerCase();
+    } catch (error) {
+        return '';
+    }
+}
+
+function normalizeBackendUrlForEnvironment(url, appEnv) {
+    const normalizedUrl = String(url || '').trim().replace(/\/+$/, '');
+
+    if (appEnv === 'staging') {
+        const hostname = backendHostname(normalizedUrl);
+
+        if (!normalizedUrl || hostname === 'pgm-production.up.railway.app' || hostname === 'pgm-staging.up.railway.app') {
+            return stagingBackendUrl;
+        }
+    }
+
+    if (appEnv === 'production' && !normalizedUrl) {
+        return productionBackendUrl;
+    }
+
+    return normalizedUrl;
+}
+
 function isSafePublishableKey(value) {
     return /^pk_(test|live)_[A-Za-z0-9_]+$/.test(String(value || '').trim());
 }
 
 function buildRuntimeConfig() {
-    const appEnv = normalizeEnvironment(readPublicEnv('PGM_APP_ENV', 'APP_ENV'));
-    const backendUrl = readPublicEnv('PGM_PUBLIC_BACKEND_URL', 'PUBLIC_BACKEND_URL');
+    const vercelEnv = readPublicEnv('VERCEL_ENV');
+    const appEnv = resolveRuntimeEnvironment();
+    const backendUrl = normalizeBackendUrlForEnvironment(
+        readPublicEnv('PGM_PUBLIC_BACKEND_URL', 'PUBLIC_BACKEND_URL'),
+        appEnv
+    );
     const publishableKey = readPublicEnv('PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY', 'PUBLIC_STRIPE_PUBLISHABLE_KEY', 'STRIPE_PUBLISHABLE_KEY');
     const runtimeConfig = {};
 
@@ -50,8 +92,12 @@ function buildRuntimeConfig() {
         runtimeConfig.appEnv = appEnv;
     }
 
+    if (vercelEnv) {
+        runtimeConfig.vercelEnv = vercelEnv;
+    }
+
     if (backendUrl) {
-        runtimeConfig.backendUrl = backendUrl.replace(/\/+$/, '');
+        runtimeConfig.backendUrl = backendUrl;
     }
 
     if (publishableKey) {
@@ -59,7 +105,9 @@ function buildRuntimeConfig() {
             throw new Error('Refusing to write Stripe key. Use a public pk_test_/pk_live_ publishable key only.');
         }
 
-        runtimeConfig.publishableKey = publishableKey;
+        if (!(appEnv === 'staging' && publishableKey.startsWith('pk_live_'))) {
+            runtimeConfig.publishableKey = publishableKey;
+        }
     }
 
     return runtimeConfig;

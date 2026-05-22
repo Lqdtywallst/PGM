@@ -21,7 +21,7 @@ const DEV_CONFIG_DUBAI = {
 // Railway staging backend and Stripe test publishable key are confirmed.
 const STAGING_CONFIG_DUBAI = {
     publishableKey: 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-    backendUrl: 'https://pgm-staging.up.railway.app',
+    backendUrl: 'https://pgm-preproduccion.up.railway.app',
     currency: 'aed',
     country: 'AE'
 };
@@ -41,8 +41,10 @@ const PROD_CONFIG_DUBAI = {
 // ============================================
 // Local file/localhost uses development by default.
 // Vercel preview URLs and staging/preprod hostnames use staging by default.
-// Public custom domains use production.
-// Any mode can be forced with window.__APP_ENV__ or APP_ENV/NODE_ENV.
+// Public production domains use production.
+// Vercel writes runtimeConfig.vercelEnv during build so production deployments
+// and preview deployments stay separated even when both use *.vercel.app URLs.
+// Unknown non-local hostnames default to staging so they cannot accidentally use production.
 function normalizeEnvironment(value) {
     if (typeof value !== 'string') {
         return '';
@@ -73,43 +75,98 @@ function isLocalHostname(hostname) {
         normalizedHostname.endsWith('.local');
 }
 
+function isVercelProductionHostname(hostname) {
+    return normalizeHostname(hostname) === 'prestigegoalmotion1-wia1.vercel.app';
+}
+
 function isProductionHostname(hostname) {
     const normalizedHostname = normalizeHostname(hostname);
     return normalizedHostname === 'prestigegoalmotion.com' ||
         normalizedHostname === 'www.prestigegoalmotion.com' ||
         normalizedHostname === 'dynastyprestigecarrental.com' ||
-        normalizedHostname === 'www.dynastyprestigecarrental.com';
+        normalizedHostname === 'www.dynastyprestigecarrental.com' ||
+        isVercelProductionHostname(normalizedHostname);
 }
 
 function isStagingHostname(hostname) {
     const normalizedHostname = normalizeHostname(hostname);
-    return normalizedHostname.endsWith('.vercel.app') ||
-        normalizedHostname.includes('staging') ||
+    return normalizedHostname.includes('staging') ||
         normalizedHostname.includes('preprod') ||
         normalizedHostname.includes('preview');
 }
 
+function isVercelHostname(hostname) {
+    return normalizeHostname(hostname).endsWith('.vercel.app');
+}
+
+function backendHostname(url) {
+    try {
+        return new URL(String(url || '')).hostname.toLowerCase();
+    } catch (error) {
+        return '';
+    }
+}
+
+function isProductionBackendUrl(url) {
+    return backendHostname(url) === 'pgm-production.up.railway.app';
+}
+
+function isLegacyStagingBackendUrl(url) {
+    return backendHostname(url) === 'pgm-staging.up.railway.app';
+}
+
+function isLivePublishableKey(value) {
+    return /^pk_live_/i.test(String(value || '').trim());
+}
+
+function normalizeBackendUrlForEnvironment(url, environment) {
+    const normalizedUrl = String(url || '').trim();
+
+    if (!normalizedUrl) {
+        return '';
+    }
+
+    if (environment === 'staging' && (
+        isProductionBackendUrl(normalizedUrl) ||
+        isLegacyStagingBackendUrl(normalizedUrl)
+    )) {
+        return STAGING_CONFIG_DUBAI.backendUrl;
+    }
+
+    return normalizedUrl;
+}
+
 function detectEnvironment() {
     if (typeof window !== 'undefined') {
-        const browserOverride = normalizeEnvironment(window.__APP_ENV__);
-        if (browserOverride) {
-            return browserOverride;
-        }
-
         if (window.location) {
             if (window.location.protocol === 'file:' || isLocalHostname(window.location.hostname)) {
                 return 'development';
-            }
-
-            if (isStagingHostname(window.location.hostname)) {
-                return 'staging';
             }
 
             if (isProductionHostname(window.location.hostname)) {
                 return 'production';
             }
 
+            if (isStagingHostname(window.location.hostname)) {
+                return 'staging';
+            }
+
+            const runtimeConfig = getRuntimeConfig();
+            const vercelRuntimeEnvironment = normalizeEnvironment(runtimeConfig.vercelEnv);
+            if (vercelRuntimeEnvironment) {
+                return vercelRuntimeEnvironment;
+            }
+
+            if (isVercelHostname(window.location.hostname)) {
+                return 'staging';
+            }
+
             return 'staging';
+        }
+
+        const browserOverride = normalizeEnvironment(window.__APP_ENV__);
+        if (browserOverride) {
+            return browserOverride;
         }
     }
 
@@ -154,7 +211,11 @@ function getPublishableKey() {
     const runtimeConfig = getRuntimeConfig();
     const runtimePublishableKey = runtimeConfig.publishableKey || runtimeConfig.stripePublishableKey;
     if (runtimePublishableKey) {
-        return String(runtimePublishableKey).trim();
+        const normalizedKey = String(runtimePublishableKey).trim();
+
+        if (!(ENVIRONMENT === 'staging' && isLivePublishableKey(normalizedKey))) {
+            return normalizedKey;
+        }
     }
 
     const config = getStripeConfig();
@@ -163,13 +224,13 @@ function getPublishableKey() {
 
 function getConfiguredBackendUrl() {
     if (typeof window !== 'undefined' && typeof window.BACKEND_URL === 'string' && window.BACKEND_URL.trim()) {
-        return window.BACKEND_URL.trim();
+        return normalizeBackendUrlForEnvironment(window.BACKEND_URL, ENVIRONMENT);
     }
 
     const runtimeConfig = getRuntimeConfig();
     const runtimeBackendUrl = runtimeConfig.backendUrl || runtimeConfig.apiBaseUrl;
     if (runtimeBackendUrl) {
-        return String(runtimeBackendUrl).trim();
+        return normalizeBackendUrlForEnvironment(runtimeBackendUrl, ENVIRONMENT);
     }
 
     const config = getStripeConfig();

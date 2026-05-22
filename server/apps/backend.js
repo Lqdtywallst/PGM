@@ -226,6 +226,7 @@ const exactAllowedOrigins = new Set([
     'https://staging.prestigegoalmotion.com',
     'https://preprod.prestigegoalmotion.com',
     'https://pgm-production.up.railway.app',
+    'https://pgm-preproduccion.up.railway.app',
     'https://pgm-staging.up.railway.app',
     ...String(process.env.ALLOWED_ORIGINS || '')
         .split(',')
