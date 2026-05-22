@@ -12,6 +12,7 @@ docs/audit/INVENTARIO-RELACIONAL-*.csv
 docs/audit/INVENTARIO-RELACIONAL-*.json
 docs/audit/INVENTARIO-RELACIONAL-RESUMEN-*.md
 *.log
+*.pdf
 .env
 .env.local
 .env.*.local

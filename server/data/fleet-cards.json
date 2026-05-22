@@ -243,5 +243,208 @@
     "contact": {
       "whatsappText": "Hi, I'm interested in the Rolls-Royce Cullinan Black Badge in Dubai."
     }
+  },
+  {
+    "id": "black-mercedes-s680-maybach",
+    "variant": "executive-led",
+    "brandKey": "mercedes",
+    "brand": "Mercedes",
+    "types": [
+      "luxury"
+    ],
+    "pricePerDay": 2200,
+    "href": "./black-mercedes-s680-maybach-rental-dubai.html",
+    "image": {
+      "src": "./images/fleet/black-mercedes-s680-maybach/01.jpg",
+      "alt": "Black Mercedes S680 Maybach in Dubai",
+      "loading": "lazy"
+    },
+    "utility": {
+      "badge": "Executive flagship",
+      "trust": "Chauffeur optional"
+    },
+    "heading": {
+      "accent": "Black Maybach arrival saloon"
+    },
+    "copy": {
+      "title": "S680 Maybach",
+      "description": "A black Maybach S680 for executive arrivals, hotel transfers and calm high-status movement in Dubai.",
+      "salesLine": "Best for VIP hotel arrivals and discreet executive travel.",
+      "specs": [
+        "Luxury saloon",
+        "Up to 4",
+        "Executive calm"
+      ]
+    },
+    "booking": {
+      "priceNote": "Executive-led saloon",
+      "primaryLabel": "View Mercedes S680 Maybach"
+    },
+    "contact": {
+      "whatsappText": "Hi, I'm interested in the Black Mercedes S680 Maybach in Dubai."
+    }
+  },
+  {
+    "id": "blue-porsche-gt3-rs",
+    "variant": "driver-led",
+    "brandKey": "porsche",
+    "brand": "Porsche",
+    "types": [
+      "sports"
+    ],
+    "pricePerDay": 2600,
+    "href": "./blue-porsche-gt3-rs-rental-dubai.html",
+    "image": {
+      "src": "./images/fleet/blue-porsche-gt3-rs/01.jpg",
+      "alt": "Blue Porsche GT3 RS in Dubai",
+      "loading": "lazy"
+    },
+    "utility": {
+      "badge": "Track-bred focus",
+      "trust": "Precision handover"
+    },
+    "heading": {
+      "accent": "Blue RS driver car"
+    },
+    "copy": {
+      "title": "GT3 RS",
+      "description": "A blue Porsche GT3 RS for guests who want the booking to feel sharp, focused and unmistakably driver-led.",
+      "salesLine": "Best for enthusiasts and precise city-to-highway movement.",
+      "specs": [
+        "Sports",
+        "2 seats",
+        "RS focus"
+      ]
+    },
+    "booking": {
+      "priceNote": "Driver-first pick",
+      "primaryLabel": "View Porsche GT3 RS"
+    },
+    "contact": {
+      "whatsappText": "Hi, I'm interested in the Blue Porsche GT3 RS in Dubai."
+    }
+  },
+  {
+    "id": "bronze-mercedes-g63",
+    "variant": "premium-utility-led",
+    "brandKey": "mercedes",
+    "brand": "Mercedes",
+    "types": [
+      "suv",
+      "luxury"
+    ],
+    "pricePerDay": 1650,
+    "href": "./bronze-mercedes-g63-rental-dubai.html",
+    "image": {
+      "src": "./images/fleet/bronze-mercedes-g63/01.jpg",
+      "alt": "Bronze Mercedes G63 in Dubai",
+      "loading": "lazy"
+    },
+    "utility": {
+      "badge": "Bronze G-Class",
+      "trust": "Business-ready handover"
+    },
+    "heading": {
+      "accent": "G-Class with warmer presence"
+    },
+    "copy": {
+      "title": "Bronze G63",
+      "description": "A bronze Mercedes G63 for hotel, villa and business-led days with upright AMG presence and easy access.",
+      "salesLine": "Best for villas, hotels and longer all-day plans.",
+      "specs": [
+        "Luxury SUV",
+        "Up to 5",
+        "All-day ease"
+      ]
+    },
+    "booking": {
+      "priceNote": "G-Class daily fit",
+      "primaryLabel": "View Bronze Mercedes G63"
+    },
+    "contact": {
+      "whatsappText": "Hi, I'm interested in the Bronze Mercedes G63 in Dubai."
+    }
+  },
+  {
+    "id": "ferrari-f8-spider",
+    "variant": "experience-led",
+    "brandKey": "ferrari",
+    "brand": "Ferrari",
+    "types": [
+      "convertible",
+      "sports"
+    ],
+    "pricePerDay": 3000,
+    "href": "./ferrari-f8-spider-rental-dubai.html",
+    "image": {
+      "src": "./images/fleet/ferrari-f8-spider/01.jpg",
+      "alt": "Ferrari F8 Spider in Dubai",
+      "loading": "lazy"
+    },
+    "utility": {
+      "badge": "Open-top theatre",
+      "trust": "Hotel-led arrival"
+    },
+    "heading": {
+      "accent": "Red Ferrari Spider energy"
+    },
+    "copy": {
+      "title": "F8 Spider",
+      "description": "A red Ferrari F8 Spider for open-top Dubai routes, resort arrivals and high-visibility dinner movement.",
+      "salesLine": "Best when the arrival should feel emotional and unmistakably Ferrari.",
+      "specs": [
+        "Convertible",
+        "2 seats",
+        "High-visibility"
+      ]
+    },
+    "booking": {
+      "priceNote": "Open-top supercar",
+      "primaryLabel": "View Ferrari F8 Spider"
+    },
+    "contact": {
+      "whatsappText": "Hi, I'm interested in the Ferrari F8 Spider in Dubai."
+    }
+  },
+  {
+    "id": "mercedes-benz-sl63-amg",
+    "variant": "experience-led",
+    "brandKey": "mercedes",
+    "brand": "Mercedes",
+    "types": [
+      "convertible",
+      "luxury"
+    ],
+    "pricePerDay": 2200,
+    "href": "./mercedes-benz-sl63-amg-rental-dubai.html",
+    "image": {
+      "src": "./images/fleet/mercedes-benz-sl63-amg/01.jpg",
+      "alt": "Mercedes-Benz SL63 AMG in Dubai",
+      "loading": "lazy"
+    },
+    "utility": {
+      "badge": "AMG roadster",
+      "trust": "Hotel-ready handover"
+    },
+    "heading": {
+      "accent": "Open-top AMG grand tourer"
+    },
+    "copy": {
+      "title": "SL63 AMG",
+      "description": "A Mercedes-Benz SL63 AMG for open-top hotel arrivals, coastal routes and polished two-person Dubai plans.",
+      "salesLine": "Best for refined open-top movement without full supercar noise.",
+      "specs": [
+        "Convertible",
+        "2 seats",
+        "Grand touring"
+      ]
+    },
+    "booking": {
+      "priceNote": "AMG roadster fit",
+      "primaryLabel": "View Mercedes SL63 AMG"
+    },
+    "contact": {
+      "whatsappText": "Hi, I'm interested in the Mercedes-Benz SL63 AMG in Dubai."
+    }
   }
 ]

@@ -129,7 +129,27 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://prestigegoalmotion.com/ferrari-f8-spider-rental-dubai.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://prestigegoalmotion.com/mercedes-g63-amg-rental-dubai.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.78</priority>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/black-mercedes-s680-maybach-rental-dubai.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.78</priority>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/bronze-mercedes-g63-rental-dubai.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.78</priority>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/mercedes-benz-sl63-amg-rental-dubai.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.78</priority>
   </url>
@@ -140,6 +160,11 @@
   </url>
   <url>
     <loc>https://prestigegoalmotion.com/porsche-992-gt3-rental-dubai.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.77</priority>
+  </url>
+  <url>
+    <loc>https://prestigegoalmotion.com/blue-porsche-gt3-rs-rental-dubai.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.77</priority>
   </url>
