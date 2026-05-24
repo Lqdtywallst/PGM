@@ -1172,6 +1172,86 @@ function calendarReservationEntry(summary = {}, monthStart, monthEnd, includeIna
     };
 }
 
+function buildCalendarTimelineDays(monthStart, monthEnd, today) {
+    const days = [];
+    let cursor = monthStart;
+    while (cursor <= monthEnd) {
+        const date = new Date(`${cursor}T00:00:00`);
+        const weekday = Number.isNaN(date.getTime())
+            ? ''
+            : new Intl.DateTimeFormat('en-GB', { weekday: 'short' }).format(date);
+        days.push({
+            date: cursor,
+            dayNumber: Number(cursor.slice(8, 10)),
+            weekday,
+            isToday: cursor === today,
+            isWeekend: ['Sat', 'Sun'].includes(weekday)
+        });
+        cursor = addDaysIsoDate(cursor, 1);
+    }
+    return days;
+}
+
+function buildVehicleTimelineRows(reservations = [], monthStart, monthEnd) {
+    const vehicles = new Map();
+
+    reservations.forEach((reservation) => {
+        const clippedStartDate = reservation.startDate < monthStart ? monthStart : reservation.startDate;
+        const clippedEndDate = reservation.endDate > monthEnd ? monthEnd : reservation.endDate;
+        const offsetDays = Math.max(0, daysBetweenIsoDates(monthStart, clippedStartDate));
+        const spanDays = Math.max(1, daysBetweenIsoDates(clippedStartDate, clippedEndDate) + 1);
+        const row = vehicles.get(reservation.vehicle) || {
+            name: reservation.vehicle,
+            reservationCount: 0,
+            bookingDayCount: 0,
+            laneCount: 1,
+            reservations: []
+        };
+
+        row.reservationCount += 1;
+        row.bookingDayCount += spanDays;
+        row.reservations.push({
+            ...reservation,
+            clippedStartDate,
+            clippedEndDate,
+            offsetDays,
+            spanDays,
+            startsBeforeMonth: reservation.startDate < monthStart,
+            endsAfterMonth: reservation.endDate > monthEnd
+        });
+        vehicles.set(reservation.vehicle, row);
+    });
+
+    return Array.from(vehicles.values())
+        .map((row) => {
+            const laneEnds = [];
+            row.reservations = row.reservations
+                .sort((left, right) => (
+                    left.offsetDays - right.offsetDays ||
+                    right.spanDays - left.spanDays ||
+                    left.customer.localeCompare(right.customer)
+                ))
+                .map((reservation) => {
+                    let lane = laneEnds.findIndex((lastEnd) => reservation.offsetDays > lastEnd);
+                    if (lane === -1) {
+                        lane = laneEnds.length;
+                    }
+                    laneEnds[lane] = reservation.offsetDays + reservation.spanDays - 1;
+                    return {
+                        ...reservation,
+                        lane
+                    };
+                });
+            row.laneCount = Math.max(1, laneEnds.length);
+            return row;
+        })
+        .sort((left, right) => (
+            right.bookingDayCount - left.bookingDayCount ||
+            right.reservationCount - left.reservationCount ||
+            left.name.localeCompare(right.name)
+        ));
+}
+
 function buildAdminReservationCalendar(records = [], options = {}) {
     const month = monthFromDate(options.month || options.query?.month, options);
     const monthStart = `${month}-01`;
@@ -1210,6 +1290,8 @@ function buildAdminReservationCalendar(records = [], options = {}) {
         vehicleTotals.set(reservation.vehicle, current);
     });
 
+    const timelineDays = buildCalendarTimelineDays(monthStart, monthEnd, today);
+    const timelineVehicles = buildVehicleTimelineRows(reservations, monthStart, monthEnd);
     const days = [];
     let cursor = gridStart;
     while (cursor <= gridEnd) {
@@ -1258,6 +1340,11 @@ function buildAdminReservationCalendar(records = [], options = {}) {
             right.reservationCount - left.reservationCount ||
             left.name.localeCompare(right.name)
         )),
+        timeline: {
+            dayCount: timelineDays.length,
+            days: timelineDays,
+            vehicles: timelineVehicles
+        },
         days
     };
 }
