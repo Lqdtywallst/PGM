@@ -1349,40 +1349,10 @@ router.post('/confirm', createReservationRateLimit({
 
 // GET /api/reserve/:paymentIntentId - Get reservation status
 router.get('/:paymentIntentId', async (req, res) => {
-    try {
-        const { paymentIntentId } = req.params;
-        const savedRecord = await readReservationRecord(paymentIntentId);
-
-        if (!stripe) {
-            if (savedRecord) {
-                return res.json({
-                    paymentIntentId,
-                    status: savedRecord.status,
-                    reservation: summarizeSavedReservationRecord(savedRecord)
-                });
-            }
-
-            return res.status(503).json({
-                error: 'Secure payment is temporarily unavailable'
-            });
-        }
-
-        const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-
-        return res.json({
-            paymentIntentId: paymentIntent.id,
-            status: paymentIntent.status,
-            amount: paymentIntent.amount,
-            currency: paymentIntent.currency,
-            metadata: paymentIntent.metadata,
-            reservation: summarizeSavedReservationRecord(savedRecord),
-        });
-    } catch (error) {
-        console.error('Error retrieving reservation:', error);
-        return res.status(500).json({ 
-            error: 'Error retrieving reservation: ' + error.message 
-        });
-    }
+    res.set('Cache-Control', 'no-store');
+    return res.status(404).json({
+        error: 'Reservation status is available through the secure reservation lookup.'
+    });
 });
 
 module.exports = router;

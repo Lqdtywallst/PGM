@@ -214,7 +214,7 @@ function serializeAdminCookie(value, options = {}) {
     const pieces = [
         `${ADMIN_COOKIE_NAME}=${encodeURIComponent(value || '')}`,
         'HttpOnly',
-        'SameSite=Lax',
+        'SameSite=Strict',
         'Path=/',
         `Max-Age=${maxAge}`
     ];

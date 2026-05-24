@@ -222,7 +222,7 @@ function renderAdminLoginPage() {
                 var response = await fetch('/api/admin/login', {
                     method: 'POST',
                     credentials: 'same-origin',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'X-Admin-Request': 'XMLHttpRequest' },
                     body: JSON.stringify({
                         username: document.getElementById('username').value,
                         password: document.getElementById('password').value
@@ -2080,7 +2080,16 @@ function renderAdminReservationsPage() {
         }
 
         async function api(path, options) {
-            var response = await fetch(path, Object.assign({ credentials: 'same-origin' }, options || {}));
+            var requestOptions = Object.assign({ credentials: 'same-origin' }, options || {});
+            var method = String(requestOptions.method || 'GET').toUpperCase();
+            if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+                requestOptions.headers = Object.assign(
+                    {},
+                    requestOptions.headers || {},
+                    { 'X-Admin-Request': 'XMLHttpRequest' }
+                );
+            }
+            var response = await fetch(path, requestOptions);
             if (response.status === 401) {
                 window.location.href = '/admin/login.html';
                 return Promise.reject(new Error('Admin session required'));

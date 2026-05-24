@@ -116,8 +116,9 @@
     "@stripe/stripe-js": "^2.4.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "nodemailer": "^6.9.7",
+    "express": "^4.22.2",
+    "helmet": "^8.2.0",
+    "nodemailer": "^8.0.7",
     "pg": "^8.13.1",
     "stripe": "^14.25.0",
     "three": "^0.183.2"

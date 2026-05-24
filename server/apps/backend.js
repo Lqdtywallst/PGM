@@ -4,6 +4,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const path = require('path');
 const {
     EMAIL_CONFIG,
@@ -79,6 +80,8 @@ const stripe = stripeConfigured
 
 const app = express();
 const siteRoot = path.resolve(__dirname, '..', '..', 'site');
+app.disable('x-powered-by');
+app.set('trust proxy', 1);
 
 function serveSiteAsset(relativePath) {
     return (req, res) => {
@@ -130,6 +133,15 @@ function maskEmail(email) {
     if (!localPart || !domain) return '[redacted-email]';
     const visibleLocal = localPart.slice(0, 2);
     return `${visibleLocal}${'*'.repeat(Math.max(localPart.length - 2, 1))}@${domain}`;
+}
+
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
 
 function parseNumericValue(value) {
@@ -220,19 +232,71 @@ async function persistBackendReservation(record, contextLabel, options = {}) {
     }
 }
 
-const exactAllowedOrigins = new Set([
-    'https://prestigegoalmotion.com',
-    'https://www.prestigegoalmotion.com',
-    'https://staging.prestigegoalmotion.com',
-    'https://preprod.prestigegoalmotion.com',
-    'https://pgm-production.up.railway.app',
-    'https://pgm-preproduccion.up.railway.app',
-    'https://pgm-staging.up.railway.app',
-    ...String(process.env.ALLOWED_ORIGINS || '')
+function normalizeAppEnvironment(env = process.env) {
+    const raw = String(env.APP_ENV || env.PGM_APP_ENV || env.NODE_ENV || '').trim().toLowerCase();
+
+    if (['production', 'prod'].includes(raw)) return 'production';
+    if (['staging', 'stage', 'preview', 'preprod', 'preproduction'].includes(raw)) return 'staging';
+    if (['test'].includes(raw)) return 'test';
+    if (['development', 'dev', 'local'].includes(raw)) return 'development';
+
+    return raw || 'development';
+}
+
+function originsFromList(value) {
+    return String(value || '')
         .split(',')
-        .map((value) => value.trim())
-        .filter(Boolean)
-]);
+        .map((origin) => origin.trim().replace(/\/+$/, ''))
+        .filter(Boolean);
+}
+
+function originFromUrl(value) {
+    try {
+        const url = new URL(String(value || '').trim());
+        return `${url.protocol}//${url.host}`;
+    } catch (error) {
+        return '';
+    }
+}
+
+function buildAllowedOrigins(env = process.env) {
+    const appEnv = normalizeAppEnvironment(env);
+    const origins = new Set();
+    const ownBackendOrigins = originsFromList([
+        originFromUrl(env.PGM_PUBLIC_BACKEND_URL || env.PUBLIC_BACKEND_URL),
+        env.RAILWAY_PUBLIC_DOMAIN ? `https://${String(env.RAILWAY_PUBLIC_DOMAIN).replace(/^https?:\/\//, '').replace(/\/+$/, '')}` : '',
+        env.RAILWAY_STATIC_URL ? originFromUrl(env.RAILWAY_STATIC_URL) : ''
+    ].filter(Boolean).join(','));
+
+    [
+        'https://dynastyprestigecarrental.com',
+        'https://www.dynastyprestigecarrental.com',
+        'https://web-production-3d323.up.railway.app',
+        ...ownBackendOrigins
+    ].forEach((origin) => origins.add(origin));
+
+    if (appEnv !== 'production') {
+        [
+            'https://staging.dynastyprestigecarrental.com',
+            'https://preprod.dynastyprestigecarrental.com',
+            'https://pgm-preproduccion.up.railway.app',
+            'https://pgm-staging.up.railway.app',
+            'http://localhost:8080',
+            'http://localhost:8081',
+            'http://127.0.0.1:8080',
+            'http://127.0.0.1:8081'
+        ].forEach((origin) => origins.add(origin));
+
+        originsFromList(env.ALLOWED_ORIGINS).forEach((origin) => origins.add(origin));
+    } else if (env.ALLOW_EXTRA_PRODUCTION_ORIGINS === 'true') {
+        originsFromList(env.ALLOWED_ORIGINS).forEach((origin) => origins.add(origin));
+    }
+
+    return origins;
+}
+
+const appEnvironment = normalizeAppEnvironment();
+const exactAllowedOrigins = buildAllowedOrigins();
 
 function isAllowedOrigin(origin) {
     if (!origin) {
@@ -243,19 +307,104 @@ function isAllowedOrigin(origin) {
         const url = new URL(origin);
         const hostname = url.hostname.toLowerCase();
 
-        if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]') {
+        if (
+            appEnvironment !== 'production' &&
+            (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]')
+        ) {
             return true;
         }
 
-        if (hostname.endsWith('.vercel.app')) {
+        if (
+            appEnvironment !== 'production' &&
+            process.env.ALLOW_VERCEL_PREVIEW_ORIGINS !== 'false' &&
+            hostname.endsWith('.vercel.app')
+        ) {
             return true;
         }
 
-        return exactAllowedOrigins.has(origin);
+        return exactAllowedOrigins.has(`${url.protocol}//${url.host}`);
     } catch (error) {
         console.warn('[CORS] Invalid origin header received:', origin);
         return false;
     }
+}
+
+function rejectDisallowedBrowserOrigin(req, res, next) {
+    const origin = req.headers.origin;
+
+    if (origin && !isAllowedOrigin(origin)) {
+        console.warn('[SECURITY] Blocked disallowed origin:', {
+            origin,
+            method: req.method,
+            path: req.path
+        });
+        return res.status(403).json({ error: 'Origin not allowed' });
+    }
+
+    return next();
+}
+
+const securityRateBuckets = new Map();
+
+function getRequestIp(req = {}) {
+    const forwardedFor = String(req.headers?.['x-forwarded-for'] || '').split(',')[0].trim();
+    return forwardedFor ||
+        req.headers?.['cf-connecting-ip'] ||
+        req.ip ||
+        req.socket?.remoteAddress ||
+        'unknown';
+}
+
+function cleanRateKeyPart(value, maxLength = 120) {
+    return String(value || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9@._:-]+/g, '_')
+        .slice(0, maxLength);
+}
+
+function createSecurityRateLimit({ group, windowMs, max, keyParts = () => [] }) {
+    return (req, res, next) => {
+        const now = Date.now();
+        const ip = getRequestIp(req);
+        const parts = [group, cleanRateKeyPart(ip), ...keyParts(req).map((part) => cleanRateKeyPart(part))];
+        const key = parts.filter(Boolean).join(':');
+
+        for (const [bucketKey, bucket] of securityRateBuckets.entries()) {
+            if (bucket.resetAt <= now) {
+                securityRateBuckets.delete(bucketKey);
+            }
+        }
+
+        const bucket = securityRateBuckets.get(key) || {
+            count: 0,
+            resetAt: now + windowMs
+        };
+
+        bucket.count += 1;
+        securityRateBuckets.set(key, bucket);
+
+        if (bucket.count > max) {
+            res.setHeader('Retry-After', String(Math.ceil((bucket.resetAt - now) / 1000)));
+            return res.status(429).json({
+                error: 'Too many attempts. Please wait a moment and try again.'
+            });
+        }
+
+        return next();
+    };
+}
+
+function requireAdminBrowserRequest(req, res, next) {
+    if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+        return next();
+    }
+
+    if (req.get('X-Admin-Request') !== 'XMLHttpRequest') {
+        return res.status(403).json({ error: 'Admin request verification failed' });
+    }
+
+    return next();
 }
 
 function setAdminNoIndexHeaders(res) {
@@ -344,6 +493,31 @@ async function handleStripeWebhook(req, res) {
 }
 
 // Middleware
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            baseUri: ["'self'"],
+            objectSrc: ["'none'"],
+            frameAncestors: ["'none'"],
+            formAction: ["'self'"],
+            imgSrc: ["'self'", 'data:'],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            scriptSrc: ["'self'", "'unsafe-inline'"],
+            connectSrc: ["'self'"],
+            upgradeInsecureRequests: appEnvironment === 'production' ? [] : null
+        }
+    },
+    crossOriginEmbedderPolicy: false,
+    frameguard: { action: 'deny' },
+    hsts: appEnvironment === 'production'
+        ? { maxAge: 63072000, includeSubDomains: true, preload: true }
+        : false,
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
+}));
+
+app.use(rejectDisallowedBrowserOrigin);
+
 app.use(cors({
     origin(origin, callback) {
         if (isAllowedOrigin(origin)) {
@@ -351,18 +525,18 @@ app.use(cors({
         }
 
         console.warn('[CORS] Blocked origin:', origin);
-        return callback(new Error('Origin not allowed by CORS'));
+        return callback(null, false);
     },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Admin-Request'],
     credentials: false
 }));
 
 // Stripe webhook must receive the raw body before the global JSON parser.
 app.post('/api/webhook', express.raw({ type: 'application/json' }), handleStripeWebhook);
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '32kb' }));
+app.use(express.urlencoded({ extended: false, limit: '16kb' }));
 
 // Logging de requests (solo en desarrollo)
 if (process.env.NODE_ENV === 'development') {
@@ -385,7 +559,12 @@ app.get('/admin/login.html', (req, res) => {
     return res.type('html').send(renderAdminLoginPage());
 });
 
-app.post('/api/admin/login', (req, res) => {
+app.post('/api/admin/login', createSecurityRateLimit({
+    group: 'admin_login',
+    windowMs: 15 * 60 * 1000,
+    max: 8,
+    keyParts: (req) => [req.body?.username]
+}), requireAdminBrowserRequest, (req, res) => {
     setAdminNoIndexHeaders(res);
 
     const credentialResult = verifyAdminCredentials(req.body || {});
@@ -407,7 +586,7 @@ app.post('/api/admin/login', (req, res) => {
     });
 });
 
-app.post('/api/admin/logout', (req, res) => {
+app.post('/api/admin/logout', requireAdminBrowserRequest, (req, res) => {
     setAdminNoIndexHeaders(res);
     clearAdminSessionCookie(res);
     res.json({ ok: true });
@@ -448,7 +627,7 @@ app.get('/admin/reservations.html', requireAdminSession({ redirectToLogin: true 
     res.type('html').send(renderAdminReservationsPage());
 });
 
-app.use('/api/admin', requireAdminSession(), createAdminReservationsRouter());
+app.use('/api/admin', requireAdminBrowserRequest, requireAdminSession(), createAdminReservationsRouter());
 
 app.get('/api/availability', async (req, res) => {
     res.setHeader('Cache-Control', 'no-store');
@@ -496,8 +675,17 @@ app.get('/api/reviews/google', async (req, res) => {
 });
 
 // Compatibility endpoint for creating a Stripe payment intent.
-app.post('/api/create-payment-intent', async (req, res) => {
+app.post('/api/create-payment-intent', createSecurityRateLimit({
+    group: 'legacy_payment_intent',
+    windowMs: 10 * 60 * 1000,
+    max: 10,
+    keyParts: (req) => [req.body?.customerData?.email]
+}), async (req, res) => {
     try {
+        return res.status(410).json({
+            error: 'This legacy payment endpoint is disabled. Use the secure reservation checkout.'
+        });
+
         if (!stripe) {
             return res.status(503).json({ error: 'Stripe is not configured on this server' });
         }
@@ -688,8 +876,17 @@ app.post('/api/create-payment-intent', async (req, res) => {
 });
 
 // Compatibility endpoint for confirming a Stripe payment intent.
-app.post('/api/confirm-payment-intent', async (req, res) => {
+app.post('/api/confirm-payment-intent', createSecurityRateLimit({
+    group: 'legacy_confirm_payment_intent',
+    windowMs: 10 * 60 * 1000,
+    max: 20,
+    keyParts: (req) => [req.body?.paymentIntentId]
+}), async (req, res) => {
     try {
+        return res.status(410).json({
+            error: 'This legacy payment status endpoint is disabled. Use reservation lookup.'
+        });
+
         if (!stripe) {
             return res.status(503).json({ error: 'Stripe is not configured on this server' });
         }
@@ -714,9 +911,8 @@ app.post('/api/confirm-payment-intent', async (req, res) => {
 
 // Endpoint deshabilitado (emails desactivados)
 app.post('/api/send-confirmation-email', (req, res) => {
-    res.json({ 
-        success: true, 
-        message: 'Endpoint disabled - emails are not sent' 
+    res.status(410).json({
+        error: 'This legacy email endpoint is disabled.'
     });
 });
 
@@ -746,6 +942,11 @@ async function sendContactEmail(contactData) {
     };
 
     const subjectLabel = subjectLabels[contactData.subject] || contactData.subject;
+    const safeName = escapeHtml(contactData.name);
+    const safeEmail = escapeHtml(contactData.email);
+    const safePhone = escapeHtml(contactData.phone);
+    const safeSubjectLabel = escapeHtml(subjectLabel);
+    const safeMessage = escapeHtml(contactData.message).replace(/\n/g, '<br>');
 
     const emailHtml = `
         <!DOCTYPE html>
@@ -770,14 +971,14 @@ async function sendContactEmail(contactData) {
                 </div>
                 <div class="content">
                     <h2>Contact Information</h2>
-                    <div class="info-row"><span class="label">Name:</span> ${contactData.name}</div>
-                    <div class="info-row"><span class="label">Email:</span> <a href="mailto:${contactData.email}">${contactData.email}</a></div>
-                    ${contactData.phone ? `<div class="info-row"><span class="label">Phone:</span> <a href="tel:${contactData.phone}">${contactData.phone}</a></div>` : ''}
-                    <div class="info-row"><span class="label">Subject:</span> ${subjectLabel}</div>
+                    <div class="info-row"><span class="label">Name:</span> ${safeName}</div>
+                    <div class="info-row"><span class="label">Email:</span> <a href="mailto:${safeEmail}">${safeEmail}</a></div>
+                    ${contactData.phone ? `<div class="info-row"><span class="label">Phone:</span> <a href="tel:${safePhone}">${safePhone}</a></div>` : ''}
+                    <div class="info-row"><span class="label">Subject:</span> ${safeSubjectLabel}</div>
                     <h2 style="margin-top: 30px;">Message</h2>
-                    <div class="message-box">${contactData.message.replace(/\n/g, '<br>')}</div>
+                    <div class="message-box">${safeMessage}</div>
                     <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-left: 3px solid #2196f3;">
-                        <p style="margin: 0;"><strong>Reply to:</strong> <a href="mailto:${contactData.email}">${contactData.email}</a></p>
+                        <p style="margin: 0;"><strong>Reply to:</strong> <a href="mailto:${safeEmail}">${safeEmail}</a></p>
                     </div>
                 </div>
                 <div class="footer">
@@ -855,7 +1056,12 @@ async function saveContactLead(contactData, emailStatus = {}) {
 }
 
 // Contact form endpoint
-app.post('/api/contact', async (req, res) => {
+app.post('/api/contact', createSecurityRateLimit({
+    group: 'contact',
+    windowMs: 10 * 60 * 1000,
+    max: 12,
+    keyParts: (req) => [req.body?.email]
+}), async (req, res) => {
     try {
         const { name, email, phone, subject, message } = req.body;
 
@@ -940,8 +1146,6 @@ app.get('/', (req, res) => {
             test: '/api/test',
             availability: '/api/availability',
             reserve: '/api/reserve',
-            createPaymentIntent: '/api/create-payment-intent',
-            confirmPayment: '/api/confirm-payment-intent',
             contact: '/api/contact',
             webhook: '/api/webhook',
             googleReviews: '/api/reviews/google'
@@ -955,6 +1159,15 @@ app.get('/health', (req, res) => {
 });
 
 app.get('/api/test', (req, res) => {
+    if (appEnvironment === 'production') {
+        return res.json({
+            status: 'ok',
+            message: 'Server running correctly',
+            timestamp: new Date().toISOString(),
+            server: 'Dynasty Prestige API'
+        });
+    }
+
     res.json({ 
         status: 'ok', 
         message: 'Server running correctly',
