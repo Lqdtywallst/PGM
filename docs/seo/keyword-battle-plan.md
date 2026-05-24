@@ -52,7 +52,7 @@ Esto nos dice que la batalla no se gana solo con una home bonita. Hay que tener 
 - Guía ciudad: title, description y H1 convertidos en landing de `Luxury Car Rental Dubai`.
 - Supercar: H1 reforzado para `Supercar rental Dubai`.
 - Airport, Palm Jumeirah, Dubai Marina y Abu Dhabi: titles y H1 orientados a búsquedas por zona.
-- Urus, Cullinan, G63 y Ferrari 296: H1 orientados a búsquedas exactas por modelo.
+- Todos los modelos principales: H1 orientados a búsquedas exactas por modelo (`rental in Dubai`) y descriptions más claras en las fichas con más intención.
 
 ## Siguiente tanda recomendada
 
@@ -61,4 +61,3 @@ Esto nos dice que la batalla no se gana solo con una home bonita. Hay que tener 
 3. Mejorar snippets con precios, depósito, entrega y soporte si el negocio confirma esas condiciones.
 4. Pedir reindexación en Search Console de las páginas prioritarias.
 5. Medir en Search Console: impresiones, CTR, posición media y consultas reales.
-
