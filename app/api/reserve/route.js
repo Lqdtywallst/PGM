@@ -34,6 +34,13 @@ const stripe = process.env.STRIPE_SECRET_KEY ? require('stripe')(process.env.STR
 
 const router = express.Router();
 const reservationRateBuckets = new Map();
+const CONFIRMATION_TERMINAL_STATUSES = new Set([
+    'confirmed',
+    'confirmed_email_failed',
+    'payment_succeeded',
+    'payment_amount_mismatch',
+    'payment_availability_conflict'
+]);
 
 // Map country names to 2-character ISO codes
 const countryNameToCode = {
@@ -211,6 +218,51 @@ function displayEmailValue(value, fallback = 'To be confirmed') {
     return normalized || fallback;
 }
 
+function publicReservationError(message = 'Reservation request could not be processed. Please try again or WhatsApp the team.') {
+    return { error: message };
+}
+
+function normalizeReservationStatus(status) {
+    return String(status || '').trim().toLowerCase();
+}
+
+function buildIdempotentConfirmationResponse(record = {}, paymentIntent = {}) {
+    const status = normalizeReservationStatus(record.status);
+    if (!status || !CONFIRMATION_TERMINAL_STATUSES.has(status)) {
+        return null;
+    }
+
+    const reservationId = record.reservationId || record.reservationData?.reservationId || paymentIntent.metadata?.reservationId || null;
+    const paymentIntentId = record.paymentIntentId || record.payment?.paymentIntentId || paymentIntent.id || null;
+
+    if (['payment_amount_mismatch', 'payment_availability_conflict'].includes(status)) {
+        return {
+            statusCode: 409,
+            body: {
+                success: false,
+                idempotent: true,
+                reservationId,
+                paymentIntentId,
+                status,
+                error: 'Payment received but this reservation needs manual review. WhatsApp the team with your reservation reference.'
+            }
+        };
+    }
+
+    return {
+        statusCode: 200,
+        body: {
+            success: true,
+            idempotent: true,
+            reservationId,
+            paymentIntentId,
+            status,
+            emailSent: record.email?.confirmation?.status === 'sent',
+            message: 'Reservation confirmation has already been processed.'
+        }
+    };
+}
+
 function buildSafeReservationLookupSummary(record = {}) {
     const reservationData = record.reservationData || {};
     const paymentData = record.payment || {};
@@ -286,10 +338,13 @@ function buildPaymentPersistence(paymentIntent = null, currency = 'aed') {
 }
 
 function getRequestIp(req = {}) {
-    const forwardedFor = String(req.headers?.['x-forwarded-for'] || '').split(',')[0].trim();
-    return forwardedFor ||
-        req.headers?.['cf-connecting-ip'] ||
-        req.ip ||
+    const expressIp = String(req.ip || '').trim();
+    const cloudflareIp = String(req.headers?.['cf-connecting-ip'] || '').trim();
+    const realIp = String(req.headers?.['x-real-ip'] || '').trim();
+
+    return expressIp ||
+        cloudflareIp ||
+        realIp ||
         req.socket?.remoteAddress ||
         'unknown';
 }
@@ -904,9 +959,7 @@ router.post('/', createReservationRateLimit({
                         errorCode: error.code || null
                     }
                 }, 'stripe customer failure');
-                return res.status(500).json({ 
-                    error: 'Error processing customer data: ' + error.message 
-                });
+                return res.status(500).json(publicReservationError('Customer details could not be processed securely. Please try again or WhatsApp the team.'));
             }
 
             // Create the Stripe payment intent.
@@ -991,9 +1044,7 @@ router.post('/', createReservationRateLimit({
                         declineCode: error.decline_code || null
                     }
                 }, 'payment intent failure');
-                return res.status(500).json({ 
-                    error: 'Error creating payment intent: ' + error.message 
-                });
+                return res.status(500).json(publicReservationError('Secure payment could not be started. Please try again or WhatsApp the team.'));
             }
         } else {
             console.log('[API]  Amount not received, payment intent will not be created');
@@ -1042,9 +1093,7 @@ router.post('/', createReservationRateLimit({
     } catch (error) {
         console.error('[API]  GENERAL ERROR:', error);
         console.error('[API] Trace:', error.stack);
-        return res.status(500).json({ 
-            error: 'Error processing reservation: ' + error.message 
-        });
+        return res.status(500).json(publicReservationError());
     }
 });
 
@@ -1134,6 +1183,15 @@ router.post('/confirm', createReservationRateLimit({
             currency: paymentIntent.currency
         });
         const existingReservation = await readReservationRecord(paymentIntentId);
+        const idempotentResponse = buildIdempotentConfirmationResponse(existingReservation, paymentIntent);
+        if (idempotentResponse) {
+            console.log('[API CONFIRM] Existing terminal reservation returned idempotently:', {
+                reservationId: idempotentResponse.body.reservationId,
+                paymentIntentId: idempotentResponse.body.paymentIntentId,
+                status: idempotentResponse.body.status
+            });
+            return res.status(idempotentResponse.statusCode).json(idempotentResponse.body);
+        }
 
         if (paymentIntent.status === 'succeeded') {
             console.log('[API CONFIRM]  Payment successful, sending emails...');
@@ -1294,9 +1352,13 @@ router.post('/confirm', createReservationRateLimit({
                 console.log('[API CONFIRM]  Email send result:', emailResult);
             } catch (emailErr) {
                 emailError = emailErr.message || emailErr.toString();
-                console.error('[API CONFIRM]  Error sending emails:', emailError);
+                console.error('[API CONFIRM]  Error sending emails:', emailErr);
                 // Do not fail confirmation if email fails; payment already succeeded
             }
+
+            const publicEmailError = emailResult?.success
+                ? null
+                : (emailResult || emailError ? 'confirmation_email_failed' : null);
 
             await persistReservationUpdate({
                 reservationId,
@@ -1318,7 +1380,7 @@ router.post('/confirm', createReservationRateLimit({
                 paymentIntentId: paymentIntent.id,
                 status: paymentIntent.status,
                 emailSent: emailResult?.success || false,
-                emailError: emailError,
+                emailError: publicEmailError,
                 message: emailResult?.success ? 'Reservation confirmed and emails sent' : (emailError ? 'Reservation confirmed but email failed' : 'Reservation confirmed')
             });
         } else {
@@ -1341,9 +1403,7 @@ router.post('/confirm', createReservationRateLimit({
     } catch (error) {
         console.error('[API CONFIRM]  ERROR:', error);
         console.error('[API CONFIRM] Trace:', error.stack);
-        return res.status(500).json({ 
-            error: 'Error confirming reservation: ' + error.message 
-        });
+        return res.status(500).json(publicReservationError('Reservation confirmation could not be completed. Please WhatsApp the team with your payment reference.'));
     }
 });
 

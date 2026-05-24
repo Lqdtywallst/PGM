@@ -30,12 +30,6 @@ const {
     loadFleetCards
 } = require('../reservations/availability-core');
 const {
-    assertCheckoutVehicleAvailable,
-    buildCheckoutIdempotencyKey,
-    verifyCheckoutAmount,
-    withCheckoutVehicleLock
-} = require('../reservations/checkout-guard');
-const {
     clearAdminSessionCookie,
     createAdminSessionToken,
     getAdminConfig,
@@ -142,6 +136,10 @@ function escapeHtml(value) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
+}
+
+function publicServerError(message = 'Request could not be processed. Please try again or WhatsApp the team.') {
+    return { error: message };
 }
 
 function parseNumericValue(value) {
@@ -344,13 +342,102 @@ function rejectDisallowedBrowserOrigin(req, res, next) {
     return next();
 }
 
+const ALLOWED_HTTP_METHODS = new Set(['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'OPTIONS']);
+const JSON_API_PREFIXES = [
+    '/api/admin',
+    '/api/contact',
+    '/api/reserve',
+    '/api/create-payment-intent',
+    '/api/confirm-payment-intent'
+];
+const JSON_API_EXEMPT_PATHS = new Set([
+    '/api/admin/logout'
+]);
+const SENSITIVE_NO_STORE_PREFIXES = [
+    '/api/admin',
+    '/api/contact',
+    '/api/reserve',
+    '/api/create-payment-intent',
+    '/api/confirm-payment-intent'
+];
+
+function restrictHttpMethods(req, res, next) {
+    if (ALLOWED_HTTP_METHODS.has(req.method)) {
+        return next();
+    }
+
+    res.setHeader('Allow', Array.from(ALLOWED_HTTP_METHODS).join(', '));
+    return res.status(405).json({ error: 'HTTP method not allowed.' });
+}
+
+function isHttpsRequest(req = {}) {
+    if (req.secure) return true;
+    const proto = String(req.headers?.['x-forwarded-proto'] || '').split(',')[0].trim().toLowerCase();
+    return proto === 'https';
+}
+
+function enforceProductionHttps(req, res, next) {
+    if (appEnvironment !== 'production' || isHttpsRequest(req)) {
+        return next();
+    }
+
+    if (req.path === '/health') {
+        return next();
+    }
+
+    if (req.method === 'GET' || req.method === 'HEAD') {
+        const host = req.get('host');
+        if (host) {
+            return res.redirect(308, `https://${host}${req.originalUrl || req.url || '/'}`);
+        }
+    }
+
+    return res.status(403).json({ error: 'HTTPS is required.' });
+}
+
+function preventSensitiveApiCaching(req, res, next) {
+    if (SENSITIVE_NO_STORE_PREFIXES.some((prefix) => req.path === prefix || req.path.startsWith(`${prefix}/`))) {
+        res.setHeader('Cache-Control', 'no-store');
+        res.setHeader('Pragma', 'no-cache');
+    }
+
+    return next();
+}
+
+function requiresJsonContentType(req = {}) {
+    if (!['POST', 'PUT', 'PATCH'].includes(req.method)) {
+        return false;
+    }
+
+    if (JSON_API_EXEMPT_PATHS.has(req.path)) {
+        return false;
+    }
+
+    return JSON_API_PREFIXES.some((prefix) => req.path === prefix || req.path.startsWith(`${prefix}/`));
+}
+
+function requireJsonContentType(req, res, next) {
+    if (!requiresJsonContentType(req)) {
+        return next();
+    }
+
+    if (!req.is('application/json')) {
+        return res.status(415).json({ error: 'Content-Type must be application/json.' });
+    }
+
+    return next();
+}
+
 const securityRateBuckets = new Map();
 
 function getRequestIp(req = {}) {
-    const forwardedFor = String(req.headers?.['x-forwarded-for'] || '').split(',')[0].trim();
-    return forwardedFor ||
-        req.headers?.['cf-connecting-ip'] ||
-        req.ip ||
+    const expressIp = String(req.ip || '').trim();
+    const cloudflareIp = String(req.headers?.['cf-connecting-ip'] || '').trim();
+    const realIp = String(req.headers?.['x-real-ip'] || '').trim();
+
+    return expressIp ||
+        cloudflareIp ||
+        realIp ||
         req.socket?.remoteAddress ||
         'unknown';
 }
@@ -405,6 +492,40 @@ function requireAdminBrowserRequest(req, res, next) {
     }
 
     return next();
+}
+
+function getAdminAllowedIps(env = process.env) {
+    return originsFromList(env.ADMIN_ALLOWED_IPS)
+        .map((ip) => ip.replace(/^\[|\]$/g, ''))
+        .filter(Boolean);
+}
+
+function normalizeClientIp(value) {
+    return String(value || '')
+        .trim()
+        .replace(/^::ffff:/, '')
+        .replace(/^\[|\]$/g, '');
+}
+
+function requireAdminAllowedIp(req, res, next) {
+    const allowedIps = getAdminAllowedIps();
+    if (!allowedIps.length) {
+        return next();
+    }
+
+    const requestIp = normalizeClientIp(getRequestIp(req));
+    if (allowedIps.includes(requestIp)) {
+        return next();
+    }
+
+    console.warn('[SECURITY] Blocked admin request from non-allowlisted IP:', {
+        ip: requestIp || 'unknown',
+        method: req.method,
+        path: req.path
+    });
+
+    setAdminNoIndexHeaders(res);
+    return res.status(403).json({ error: 'Admin access is restricted from this network.' });
 }
 
 function setAdminNoIndexHeaders(res) {
@@ -516,6 +637,9 @@ app.use(helmet({
     referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
 }));
 
+app.use(restrictHttpMethods);
+app.use(enforceProductionHttps);
+app.use(preventSensitiveApiCaching);
 app.use(rejectDisallowedBrowserOrigin);
 
 app.use(cors({
@@ -535,6 +659,7 @@ app.use(cors({
 // Stripe webhook must receive the raw body before the global JSON parser.
 app.post('/api/webhook', express.raw({ type: 'application/json' }), handleStripeWebhook);
 
+app.use(requireJsonContentType);
 app.use(express.json({ limit: '32kb' }));
 app.use(express.urlencoded({ extended: false, limit: '16kb' }));
 
@@ -547,7 +672,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Rutas
-app.get('/admin/login.html', (req, res) => {
+app.get('/admin/login.html', requireAdminAllowedIp, (req, res) => {
     setAdminNoIndexHeaders(res);
     const adminConfig = getAdminConfig();
     const session = adminConfig.configured ? getAdminSessionFromRequest(req) : null;
@@ -559,7 +684,7 @@ app.get('/admin/login.html', (req, res) => {
     return res.type('html').send(renderAdminLoginPage());
 });
 
-app.post('/api/admin/login', createSecurityRateLimit({
+app.post('/api/admin/login', requireAdminAllowedIp, createSecurityRateLimit({
     group: 'admin_login',
     windowMs: 15 * 60 * 1000,
     max: 8,
@@ -586,13 +711,13 @@ app.post('/api/admin/login', createSecurityRateLimit({
     });
 });
 
-app.post('/api/admin/logout', requireAdminBrowserRequest, (req, res) => {
+app.post('/api/admin/logout', requireAdminAllowedIp, requireAdminBrowserRequest, (req, res) => {
     setAdminNoIndexHeaders(res);
     clearAdminSessionCookie(res);
     res.json({ ok: true });
 });
 
-app.get('/api/admin/session', (req, res) => {
+app.get('/api/admin/session', requireAdminAllowedIp, (req, res) => {
     setAdminNoIndexHeaders(res);
     const adminConfig = getAdminConfig();
 
@@ -612,22 +737,22 @@ app.get('/api/admin/session', (req, res) => {
     });
 });
 
-app.get(['/admin', '/admin/', '/crm', '/crm/'], requireAdminSession({ redirectToLogin: true }), (req, res) => {
+app.get(['/admin', '/admin/', '/crm', '/crm/'], requireAdminAllowedIp, requireAdminSession({ redirectToLogin: true }), (req, res) => {
     setAdminNoIndexHeaders(res);
     res.redirect('/admin/reservations.html');
 });
 
-app.get('/admin/reservations', requireAdminSession({ redirectToLogin: true }), (req, res) => {
+app.get('/admin/reservations', requireAdminAllowedIp, requireAdminSession({ redirectToLogin: true }), (req, res) => {
     setAdminNoIndexHeaders(res);
     res.redirect('/admin/reservations.html');
 });
 
-app.get('/admin/reservations.html', requireAdminSession({ redirectToLogin: true }), (req, res) => {
+app.get('/admin/reservations.html', requireAdminAllowedIp, requireAdminSession({ redirectToLogin: true }), (req, res) => {
     setAdminNoIndexHeaders(res);
     res.type('html').send(renderAdminReservationsPage());
 });
 
-app.use('/api/admin', requireAdminBrowserRequest, requireAdminSession(), createAdminReservationsRouter());
+app.use('/api/admin', requireAdminAllowedIp, requireAdminBrowserRequest, requireAdminSession(), createAdminReservationsRouter());
 
 app.get('/api/availability', async (req, res) => {
     res.setHeader('Cache-Control', 'no-store');
@@ -680,199 +805,10 @@ app.post('/api/create-payment-intent', createSecurityRateLimit({
     windowMs: 10 * 60 * 1000,
     max: 10,
     keyParts: (req) => [req.body?.customerData?.email]
-}), async (req, res) => {
-    try {
-        return res.status(410).json({
-            error: 'This legacy payment endpoint is disabled. Use the secure reservation checkout.'
-        });
-
-        if (!stripe) {
-            return res.status(503).json({ error: 'Stripe is not configured on this server' });
-        }
-
-        const { amount, currency, paymentMethodId, customerData, reservationData } = req.body;
-
-        if (!amount || amount <= 0) {
-            return res.status(400).json({ error: 'Amount is required and must be greater than 0' });
-        }
-
-        if (!customerData?.email) {
-            return res.status(400).json({ error: 'Customer data is required' });
-        }
-
-        if (!reservationData?.car) {
-            return res.status(400).json({ error: 'Reservation data is required' });
-        }
-
-        const reservationId = reservationData.reservationId || buildReservationId();
-        reservationData.reservationId = reservationId;
-        let verifiedCheckout;
-        try {
-            verifiedCheckout = verifyCheckoutAmount({
-                reservationData,
-                amount,
-                currency
-            });
-            Object.assign(reservationData, verifiedCheckout.reservationData, { reservationId });
-        } catch (checkoutError) {
-            return res.status(checkoutError.statusCode || 409).json({
-                error: checkoutError.message
-            });
-        }
-
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(customerData.email)) {
-            return res.status(400).json({ error: 'The provided email is not valid' });
-        }
-
-        let checkoutReservation;
-        try {
-            checkoutReservation = await withCheckoutVehicleLock(reservationData, async () => {
-                const reservations = await listReservationRecords({ limit: 5000 });
-                assertCheckoutVehicleAvailable({
-                    reservations,
-                    reservationData,
-                    reservationId
-                });
-
-                return persistBackendReservation({
-                    reservationId,
-                    status: 'checkout_started',
-                    source: 'legacy_payment_intent_endpoint',
-                    customerData,
-                    reservationData,
-                    payment: {
-                        amount: verifiedCheckout.amountMinor,
-                        currency: verifiedCheckout.currency
-                    }
-                }, 'legacy checkout started', { critical: true });
-            });
-        } catch (checkoutError) {
-            return res.status(checkoutError.statusCode || 500).json({
-                error: checkoutError.message
-            });
-        }
-        queueReservationMobileNotification(checkoutReservation, 'reservation_received');
-
-        // Create or retrieve customer
-        let customer;
-        try {
-            const existingCustomers = await stripe.customers.list({
-                email: customerData.email,
-                limit: 1
-            });
-
-            if (existingCustomers.data.length > 0) {
-                customer = existingCustomers.data[0];
-                if (customerData.name || customerData.phone || customerData.address) {
-                    await stripe.customers.update(customer.id, {
-                        name: customerData.name || customer.name,
-                        phone: customerData.phone || customer.phone,
-                        address: {
-                            line1: customerData.address || customer.address?.line1,
-                            city: customerData.city || customer.address?.city,
-                            country: customerData.country || customer.address?.country || 'ES',
-                        },
-                        metadata: { dni: customerData.dni || customer.metadata?.dni || '' }
-                    });
-                }
-            } else {
-                customer = await stripe.customers.create({
-                    email: customerData.email,
-                    name: customerData.name,
-                    phone: customerData.phone,
-                    address: {
-                        line1: customerData.address,
-                        city: customerData.city,
-                        country: customerData.country || 'ES',
-                    },
-                    metadata: { dni: customerData.dni || '' }
-                });
-            }
-        } catch (customerError) {
-            console.error('Error processing customer:', customerError);
-            await persistBackendReservation({
-                reservationId,
-                status: 'customer_processing_failed',
-                customerData,
-                reservationData,
-                payment: {
-                    error: customerError.message
-                }
-            }, 'legacy stripe customer failure');
-            return res.status(500).json({ error: 'Error processing customer data' });
-        }
-
-        // Create the Stripe payment intent.
-        const paymentIntentParams = {
-            amount: verifiedCheckout.amountMinor,
-            currency: verifiedCheckout.currency,
-            customer: customer.id,
-            confirmation_method: 'manual',
-            confirm: false,
-            description: `Reservation: ${reservationData.car} - ${reservationData.days} days`,
-            metadata: {
-                reservationId,
-                car: reservationData.car,
-                days: reservationData.days.toString(),
-                startDate: reservationData.startDate,
-                endDate: reservationData.endDate,
-                pricePerDay: reservationData.pricePerDay.toString(),
-                customerName: customerData.name,
-                customerEmail: customerData.email,
-            },
-            payment_method_types: ['card'],
-            payment_method_options: {
-                link: { persistent_token: null }
-            }
-        };
-
-        if (paymentMethodId) {
-            paymentIntentParams.payment_method = paymentMethodId;
-        }
-
-        const paymentIntent = await stripe.paymentIntents.create(paymentIntentParams, {
-            idempotencyKey: buildCheckoutIdempotencyKey(reservationId)
-        });
-
-        await persistBackendReservation({
-            reservationId,
-            paymentIntentId: paymentIntent.id,
-            stripeCustomerId: customer.id,
-            status: 'payment_intent_created',
-            source: 'legacy_payment_intent_endpoint',
-            customerData,
-            reservationData,
-            payment: {
-                paymentIntentId: paymentIntent.id,
-                stripeStatus: paymentIntent.status,
-                amount: paymentIntent.amount,
-                currency: paymentIntent.currency
-            }
-        }, 'legacy payment intent created', { critical: true });
-
-        res.json({
-            reservationId,
-            clientSecret: paymentIntent.client_secret,
-            paymentIntentId: paymentIntent.id,
-            customerId: customer.id,
-        });
-
-    } catch (error) {
-        console.error('Error creating PaymentIntent:', error);
-        
-        if (error.type === 'StripeCardError') {
-            return res.status(400).json({ error: 'Card error: ' + error.message });
-        } else if (error.type === 'StripeRateLimitError') {
-            return res.status(429).json({ error: 'Too many requests. Please try again later.' });
-        } else if (error.type === 'StripeInvalidRequestError') {
-            return res.status(400).json({ error: 'Invalid request: ' + error.message });
-        } else if (error.type === 'StripeAPIError') {
-            return res.status(500).json({ error: 'Stripe server error' });
-        }
-        
-        res.status(500).json({ error: error.message || 'Error processing payment' });
-    }
+}), (req, res) => {
+    return res.status(410).json({
+        error: 'This legacy payment endpoint is disabled. Use the secure reservation checkout.'
+    });
 });
 
 // Compatibility endpoint for confirming a Stripe payment intent.
@@ -881,32 +817,10 @@ app.post('/api/confirm-payment-intent', createSecurityRateLimit({
     windowMs: 10 * 60 * 1000,
     max: 20,
     keyParts: (req) => [req.body?.paymentIntentId]
-}), async (req, res) => {
-    try {
-        return res.status(410).json({
-            error: 'This legacy payment status endpoint is disabled. Use reservation lookup.'
-        });
-
-        if (!stripe) {
-            return res.status(503).json({ error: 'Stripe is not configured on this server' });
-        }
-
-        const { paymentIntentId } = req.body;
-
-        if (!paymentIntentId) {
-            return res.status(400).json({ error: 'paymentIntentId is required' });
-        }
-
-        const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-        
-        res.json({
-            status: paymentIntent.status,
-            paymentIntent: paymentIntent
-        });
-    } catch (error) {
-        console.error('Error confirming PaymentIntent:', error);
-        res.status(500).json({ error: error.message || 'Error confirming payment' });
-    }
+}), (req, res) => {
+    return res.status(410).json({
+        error: 'This legacy payment status endpoint is disabled. Use reservation lookup.'
+    });
 });
 
 // Endpoint deshabilitado (emails desactivados)
@@ -1120,7 +1034,7 @@ app.post('/api/contact', createSecurityRateLimit({
         }
     } catch (error) {
         console.error('Error processing form:', error);
-        res.status(500).json({ error: error.message || 'Error processing the form' });
+        res.status(500).json(publicServerError('Contact request could not be processed. Please try again or WhatsApp the team.'));
     }
 });
 
