@@ -16,7 +16,7 @@ const siteRoot = path.join(projectRoot, 'site');
 const reportPath = path.join(projectRoot, 'docs/audit/MATRIZ-SEO-FINAL-2026-04-18.md');
 const seoPort = Number(process.env.SEO_STATIC_PORT || (8600 + Math.floor(Math.random() * 200)));
 const seoBaseUrl = `http://127.0.0.1:${seoPort}`;
-const publicOrigin = 'https://prestigegoalmotion.com';
+const publicOrigin = 'https://www.dynastyprestigecarrental.com';
 
 const locationGuidePaths = new Set([
     '/luxury-car-rental-dubai.html',
@@ -150,7 +150,7 @@ function resolveLocalReference(fromFile, reference) {
     const html = readFile(fromFile);
     const baseHref = extractTagValue(html, /<base[^>]+href=["']([^"']+)["'][^>]*>/i);
     const basePath = baseHref.startsWith('/') ? baseHref : publicPathForFile(siteRoot, fromFile);
-    const resolvedPath = new URL(cleanReference, `https://prestigegoalmotion.com${basePath}`).pathname;
+    const resolvedPath = new URL(cleanReference, `https://www.dynastyprestigecarrental.com${basePath}`).pathname;
     return siteFileForPath(siteRoot, resolvedPath);
 }
 

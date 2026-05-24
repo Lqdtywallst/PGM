@@ -4,8 +4,7 @@
     const runtimeConfig = {
     "appEnv": "production",
     "vercelEnv": "production",
-    "backendUrl": "https://web-production-3d323.up.railway.app",
-    "publishableKey": "pk_live_51RsMXQ3DSCa2l71zZiMkmlBXXpLu1HF0Sy4N4xSsB1TvUWu6wJLlKR5z7HrCa0AIlWQjfZo4tL8d1qcxtgExNHS300EPCAtXti"
+    "backendUrl": "https://web-production-3d323.up.railway.app"
 };
 
     window.PGM_RUNTIME_CONFIG = Object.assign({}, window.PGM_RUNTIME_CONFIG || {}, runtimeConfig);

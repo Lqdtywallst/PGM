@@ -9,7 +9,7 @@
     "qa:manual": "node scripts/qa/run-manual-rental-qa-env.js",
     "qa:manual:db": "node scripts/qa/run-manual-rental-qa-env.js --require-db",
     "qa:test:manual": "node scripts/qa/run-manual-rental-qa-test.js",
-    "build:site": "npm run build:footer && npm run build:fleet && node scripts/build/write-runtime-config.js",
+    "build:site": "npm run build:footer && npm run build:fleet && node scripts/build/write-runtime-config.js && node scripts/build/sync-public-seo-origin.js",
     "build:footer": "node server/renderers/render-global-footer.js",
     "build:fleet": "node server/renderers/render-fleet-cards.js",
     "audit:quick": "npm run test:visual && npm run audit:navigation:quick && node scripts/audits/run-visual-smoke-audit.js --route / --route /fleet.html --route /contact.html --viewport mobile-modern --viewport laptop --output-dir artifacts/visual-audit-quick",

@@ -19,7 +19,7 @@ const repoRoot = path.resolve(__dirname, '..', '..');
 const siteRoot = path.join(repoRoot, 'site');
 const artifactsRoot = path.join(repoRoot, 'artifacts', 'view-connectivity-agent');
 const DEFAULT_VIEWPORT = 'desktop-wide';
-const SITE_ORIGIN = 'https://prestigegoalmotion.com';
+const SITE_ORIGIN = 'https://www.dynastyprestigecarrental.com';
 const MODERN_VISUAL_INTENTS = new Set([
     'modern_dark_system',
     'modern_light_system'

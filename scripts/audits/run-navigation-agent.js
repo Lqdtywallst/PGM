@@ -38,7 +38,7 @@ const {
 const repoRoot = path.resolve(__dirname, '..', '..');
 const siteRoot = path.join(repoRoot, 'site');
 const artifactsRoot = path.join(repoRoot, 'artifacts', 'navigation-agent');
-const SITE_ORIGIN = 'https://prestigegoalmotion.com';
+const SITE_ORIGIN = 'https://www.dynastyprestigecarrental.com';
 const ALL_VIEWPORTS = Object.freeze(getViewportCoverageMatrix('all'));
 const DEFAULT_VIEWPORTS = Object.freeze(['mobile-modern', 'laptop']);
 const FULL_NAVIGATION_VIEWPORTS = Object.freeze([
