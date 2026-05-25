@@ -52,7 +52,7 @@ Esto nos dice que la batalla no se gana solo con una home bonita. Hay que tener 
 - Guía ciudad: title, description y H1 convertidos en landing de `Luxury Car Rental Dubai`.
 - Supercar: H1 reforzado para `Supercar rental Dubai`.
 - Airport, Palm Jumeirah, Dubai Marina y Abu Dhabi: titles y H1 orientados a búsquedas por zona.
-- Todos los modelos principales: H1 orientados a búsquedas exactas por modelo (`rental in Dubai`) y descriptions más claras en las fichas con más intención.
+- Todos los modelos principales: H1 visuales limpios con nombre de coche, sin punto final; la keyword `rental in Dubai` se mueve a `title`, description, intro y enlaces internos para no romper la estética premium.
 - Flota completa: la página `fleet.html` pasa a reforzar `Luxury Car Rental Dubai Fleet` y todas las fichas de coche quedan conectadas mediante bloques de comparación o enlaces de flota.
 
 ## Siguiente tanda recomendada

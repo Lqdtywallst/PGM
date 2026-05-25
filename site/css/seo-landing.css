@@ -3647,12 +3647,14 @@ body.vehicle-page--premium-pilot {
 
 .vehicle-landing-reserve .vehicle-booking h1 {
     margin: 0.36rem 0 0;
-    max-width: 11.5ch;
+    max-width: 13.5ch;
     color: var(--dp-color-text);
     font-family: var(--dp-font-display);
     font-size: clamp(2.32rem, 3.7vw, 3.45rem);
     line-height: 0.92;
     letter-spacing: -0.05em;
+    text-align: center;
+    margin-inline: auto;
 }
 
 .vehicle-landing-reserve .vehicle-booking__intro {
@@ -3660,6 +3662,7 @@ body.vehicle-page--premium-pilot {
     color: var(--dp-color-text-soft);
     font-size: 0.88rem;
     line-height: 1.42;
+    text-align: center;
 }
 
 .vehicle-landing-reserve .vehicle-booking__trust {
