@@ -180,6 +180,42 @@ function previewImageOverride(card) {
     };
 }
 
+function seoIntentForVehicle(card) {
+    const seo = card.seo || {};
+    const name = vehicleName(card);
+    const primaryKeyword = seo.primaryKeyword || `${name} rental Dubai`;
+
+    return {
+        heading: seo.heading || `${name} rental in Dubai for the right arrival`,
+        body: seo.body || `${primaryKeyword} bookings work best when the car, handover and guest schedule all fit the same Dubai plan.`,
+        signals: Array.isArray(seo.signals) && seo.signals.length
+            ? seo.signals.slice(0, 3)
+            : [
+                {
+                    label: 'Model intent',
+                    text: `${primaryKeyword} requests should match the real model, route and handover style.`
+                },
+                {
+                    label: 'Dubai routes',
+                    text: 'Hotels, villas, residences and airport handovers are coordinated around the booking.'
+                },
+                {
+                    label: 'Booking fit',
+                    text: 'Best when the car choice matches luggage, guests, route and arrival tone.'
+                }
+            ]
+    };
+}
+
+function renderSeoIntentSignal(signal) {
+    return [
+        '                    <article class="vehicle-pdp-seo-intent-card">',
+        `                        <span>${escapeHtml(signal.label)}</span>`,
+        `                        <p>${escapeHtml(signal.text)}</p>`,
+        '                    </article>'
+    ].join('\n');
+}
+
 function renderRelatedVisualItem(item) {
     return [
         `                <a class="vehicle-pdp-related-card" href="${escapeHtml(item.href)}">`,
@@ -201,6 +237,8 @@ function renderVehicleMotherContent(card, cards = [], options = {}) {
     const titleId = `${card.id}-cinema-title`;
     const images = firstUsefulImages(card);
     const posterImage = previewImageOverride(card) || previewImageForVehicle(images, card.image, options.excludePreviewImageSources);
+    const seoIntent = seoIntentForVehicle(card);
+    const seoTitleId = `${card.id}-seo-intent-title`;
     const related = relatedCars(card, cards);
 
     return [
@@ -222,6 +260,17 @@ function renderVehicleMotherContent(card, cards = [], options = {}) {
         `                    <p>${escapeHtml(card.copy.description)} ${escapeHtml(card.copy.salesLine)}</p>`,
         `                    <a class="vehicle-pdp-section-link vehicle-pdp-cinema__link" href="#vehicle-booking">Reserve ${escapeHtml(card.copy.title)}</a>`,
         '                </div>',
+        '            </div>',
+        '        </section>',
+        '',
+        `        <section class="vehicle-section vehicle-pdp-seo-intent" aria-labelledby="${escapeHtml(seoTitleId)}">`,
+        '            <div class="vehicle-section__heading vehicle-section__heading--compact">',
+        '                <span class="section-kicker">Dubai fit</span>',
+        `                <h2 id="${escapeHtml(seoTitleId)}">${escapeHtml(seoIntent.heading)}</h2>`,
+        `                <p>${escapeHtml(seoIntent.body)}</p>`,
+        '            </div>',
+        '            <div class="vehicle-pdp-seo-intent__grid">',
+        seoIntent.signals.map(renderSeoIntentSignal).join('\n'),
         '            </div>',
         '        </section>',
         '',
@@ -380,6 +429,7 @@ module.exports = {
     removeFaqStructuredData,
     renderVehicleMotherContent,
     replaceVehicleMotherContent,
+    seoIntentForVehicle,
     syncVehiclePagesFromData,
     vehicleName
 };

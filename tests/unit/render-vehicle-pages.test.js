@@ -9,6 +9,7 @@ const {
     removeFaqStructuredData,
     renderVehicleMotherContent,
     replaceVehicleMotherContent,
+    seoIntentForVehicle,
     vehicleName
 } = require('../../server/renderers/render-vehicle-pages');
 
@@ -26,6 +27,8 @@ test('vehicle mother content renders reusable sections from fleet card data', ()
     assert.match(markup, /vehicle-pdp-video-card/);
     assert.match(markup, /Featured detail/);
     assert.match(markup, /blue-porsche-gt3-rs\/05\.jpg/);
+    assert.match(markup, /vehicle-pdp-seo-intent/);
+    assert.match(markup, /Porsche GT3 RS rental in Dubai for focused enthusiasts/);
     assert.doesNotMatch(markup, /Photo preview/);
     assert.match(markup, /vehicle-pdp-related-card/);
     assert.match(markup, /Porsche 992 GT3/);
@@ -104,6 +107,18 @@ test('vehicle mother content respects explicit preview image overrides', () => {
 
     assert.match(markup, /ferrari-296-gts\/10-cabin-detail\.jpg/);
     assert.doesNotMatch(markup, /ferrari-296-gts\/05-detail-wheel\.jpg/);
+});
+
+test('all vehicle cards define a natural SEO intent matrix', () => {
+    fleetCards.forEach((card) => {
+        const seoIntent = seoIntentForVehicle(card);
+
+        assert.ok(card.seo?.primaryKeyword, `${card.id} needs a primary keyword`);
+        assert.equal(Array.isArray(card.seo?.supportingKeywords), true, `${card.id} needs supporting keywords`);
+        assert.equal(card.seo.supportingKeywords.length >= 3, true, `${card.id} needs at least three supporting keywords`);
+        assert.equal(seoIntent.signals.length, 3, `${card.id} should render three intent signals`);
+        assert.match(seoIntent.heading, /rental in Dubai/i, `${card.id} heading should carry rental in Dubai naturally`);
+    });
 });
 
 test('vehicle renderer extracts existing reserve gallery image sources', () => {

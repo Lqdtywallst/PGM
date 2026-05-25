@@ -35,6 +35,8 @@ test('all vehicle pages keep the generated mother content markers', () => {
         assert.match(html, /<!-- VEHICLE_MOTHER_CONTENT_END -->/, `${card.id} needs generated content end marker`);
         assert.match(html, /vehicle-pdp-cinema/, `${card.id} needs generated cinematic block`);
         assert.match(html, /vehicle-pdp-video-card/, `${card.id} needs generated video-ready block`);
+        assert.match(html, /vehicle-pdp-seo-intent/, `${card.id} needs generated SEO intent block`);
+        assert.match(html, new RegExp(card.seo.primaryKeyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'), `${card.id} needs its primary keyword in the generated body`);
         assert.match(html, /vehicle-pdp-related-card/, `${card.id} needs generated related cars`);
         assert.doesNotMatch(html, /vehicle-pdp-quick-spec/, `${card.id} must not render quick-spec blocks in the lean vehicle mother body`);
         assert.doesNotMatch(html, /vehicle-pdp-experience/, `${card.id} must not render use-case blocks in the lean vehicle mother body`);

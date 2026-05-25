@@ -5031,6 +5031,7 @@ body.vehicle-page .site-v2-footer__column h3 {
 .vehicle-page--mother-base .vehicle-pdp-experience,
 .vehicle-page--mother-base .vehicle-pdp-detail-split,
 .vehicle-page--mother-base .vehicle-pdp-gallery-strip,
+.vehicle-page--mother-base .vehicle-pdp-seo-intent,
 .vehicle-page--mother-base .vehicle-pdp-related-visual {
     width: var(--dp-frame-width);
     max-width: var(--dp-frame-max);
@@ -5046,6 +5047,7 @@ body.vehicle-page .site-v2-footer__column h3 {
 .vehicle-page--mother-base .vehicle-pdp-experience,
 .vehicle-page--mother-base .vehicle-pdp-detail-split,
 .vehicle-page--mother-base .vehicle-pdp-gallery-strip,
+.vehicle-page--mother-base .vehicle-pdp-seo-intent,
 .vehicle-page--mother-base .vehicle-pdp-related-visual {
     margin-top: clamp(2.2rem, 5vw, 4.8rem);
 }
@@ -5103,6 +5105,7 @@ body.vehicle-page .site-v2-footer__column h3 {
 .vehicle-pdp-video-card,
 .vehicle-pdp-cinema__copy,
 .vehicle-pdp-experience-card,
+.vehicle-pdp-seo-intent-card,
 .vehicle-pdp-detail-split,
 .vehicle-pdp-gallery-strip__item,
 .vehicle-pdp-related-card {
@@ -5227,6 +5230,7 @@ body.vehicle-page .site-v2-footer__column h3 {
 .vehicle-pdp-cinema__copy h2,
 .vehicle-pdp-detail-split__content h2,
 .vehicle-pdp-gallery-strip .vehicle-section__heading h2,
+.vehicle-pdp-seo-intent .vehicle-section__heading h2,
 .vehicle-pdp-related-visual .vehicle-section__heading h2,
 .vehicle-pdp-experience .vehicle-section__heading h2 {
     margin: 0;
@@ -5311,6 +5315,7 @@ body.vehicle-page .site-v2-footer__column h3 {
 }
 
 .vehicle-pdp-experience__grid,
+.vehicle-pdp-seo-intent__grid,
 .vehicle-pdp-related-visual__grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -5325,6 +5330,32 @@ body.vehicle-page .site-v2-footer__column h3 {
     background:
         radial-gradient(circle at top right, rgba(54, 64, 75, 0.1), transparent 42%),
         linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 243, 236, 0.94));
+}
+
+.vehicle-pdp-seo-intent-card {
+    display: grid;
+    align-content: start;
+    gap: 0.55rem;
+    min-height: 12rem;
+    padding: clamp(1.05rem, 1.9vw, 1.45rem);
+    background:
+        radial-gradient(circle at top right, rgba(213, 176, 91, 0.13), transparent 42%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(246, 243, 236, 0.95));
+}
+
+.vehicle-pdp-seo-intent-card span {
+    color: #7a5f3a;
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.vehicle-pdp-seo-intent-card p {
+    margin: 0;
+    color: #46382b;
+    font-size: 0.97rem;
+    line-height: 1.58;
 }
 
 .vehicle-pdp-experience-card::before {
@@ -5512,6 +5543,7 @@ body.vehicle-page .site-v2-footer__column h3 {
 @media (max-width: 1020px) {
     .vehicle-pdp-quick-specs,
     .vehicle-pdp-experience__grid,
+    .vehicle-pdp-seo-intent__grid,
     .vehicle-pdp-related-visual__grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -5537,6 +5569,7 @@ body.vehicle-page .site-v2-footer__column h3 {
     .vehicle-page--mother-base .vehicle-pdp-experience,
     .vehicle-page--mother-base .vehicle-pdp-detail-split,
     .vehicle-page--mother-base .vehicle-pdp-gallery-strip,
+    .vehicle-page--mother-base .vehicle-pdp-seo-intent,
     .vehicle-page--mother-base .vehicle-pdp-related-visual {
         width: var(--dp-frame-width);
         max-width: var(--dp-frame-max);
@@ -5544,6 +5577,7 @@ body.vehicle-page .site-v2-footer__column h3 {
 
     .vehicle-pdp-quick-specs,
     .vehicle-pdp-experience__grid,
+    .vehicle-pdp-seo-intent__grid,
     .vehicle-pdp-related-visual__grid,
     .vehicle-pdp-gallery-strip__grid {
         grid-template-columns: 1fr;
@@ -5562,6 +5596,7 @@ body.vehicle-page .site-v2-footer__column h3 {
     .vehicle-pdp-video-card,
     .vehicle-pdp-cinema__copy,
     .vehicle-pdp-experience-card,
+    .vehicle-pdp-seo-intent-card,
     .vehicle-pdp-detail-split,
     .vehicle-pdp-gallery-strip__item,
     .vehicle-pdp-related-card {
@@ -5579,6 +5614,7 @@ body.vehicle-page .site-v2-footer__column h3 {
     .vehicle-pdp-cinema__copy h2,
     .vehicle-pdp-detail-split__content h2,
     .vehicle-pdp-gallery-strip .vehicle-section__heading h2,
+    .vehicle-pdp-seo-intent .vehicle-section__heading h2,
     .vehicle-pdp-related-visual .vehicle-section__heading h2,
     .vehicle-pdp-experience .vehicle-section__heading h2 {
         font-size: clamp(1.8rem, 9vw, 2.55rem);
