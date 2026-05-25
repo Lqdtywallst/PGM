@@ -13,6 +13,10 @@ function writeUtf8(filePath, value) {
     fs.writeFileSync(filePath, value, 'utf8');
 }
 
+function normalizeNewlines(value) {
+    return String(value).replace(/\r\n?|\n/g, '\n');
+}
+
 function slugify(value) {
     return String(value ?? '')
         .toLowerCase()
@@ -184,8 +188,8 @@ function escapeRegExp(value) {
 
 function syncServicesHtmlFromData() {
     const data = normalizeServicesContent(JSON.parse(readUtf8(dataPath)));
-    const html = readUtf8(pagePath);
-    const newline = html.includes('\r\n') ? '\r\n' : '\n';
+    const html = normalizeNewlines(readUtf8(pagePath));
+    const newline = '\n';
     const laneMarkup = data.lanes.map(renderLane).join(`${newline}${newline}`);
     const additionalMarkup = data.additionalRoutes.map(renderDirectoryItem).join(`${newline}${newline}`);
     const guideMarkup = data.guideRoutes.map(renderDirectoryItem).join(`${newline}${newline}`);
@@ -198,7 +202,7 @@ function syncServicesHtmlFromData() {
         indent: '                        ',
         label: 'service lanes',
         pattern: /(<nav class="services-hero__selector" aria-label="Primary service lanes">)([\s\S]*?)(\s*<\/nav>)/
-    }, laneMarkup.replace(/\n/g, newline), newline);
+    }, normalizeNewlines(laneMarkup), newline);
 
     nextHtml = replaceMarkerBlock(nextHtml, {
         start: '<!-- SERVICES_ADDITIONAL_ROUTES_START -->',
@@ -206,7 +210,7 @@ function syncServicesHtmlFromData() {
         indent: '                            ',
         label: 'additional service routes',
         pattern: /(id="services-directory-services">Additional service routes<\/h3>\s*<div class="services-directory__list">)([\s\S]*?)(\s*<\/div>\s*<\/section>)/
-    }, additionalMarkup.replace(/\n/g, newline), newline);
+    }, normalizeNewlines(additionalMarkup), newline);
 
     nextHtml = replaceMarkerBlock(nextHtml, {
         start: '<!-- SERVICES_GUIDE_ROUTES_START -->',
@@ -214,7 +218,7 @@ function syncServicesHtmlFromData() {
         indent: '                            ',
         label: 'location-led guide routes',
         pattern: /(id="services-directory-guides">Location-led guides<\/h3>\s*<div class="services-directory__list">)([\s\S]*?)(\s*<\/div>\s*<\/section>)/
-    }, guideMarkup.replace(/\n/g, newline), newline);
+    }, normalizeNewlines(guideMarkup), newline);
 
     if (nextHtml !== html) {
         writeUtf8(pagePath, nextHtml);
@@ -225,6 +229,15 @@ function syncServicesHtmlFromData() {
         dataPath,
         changed: nextHtml !== html
     };
+}
+
+if (require.main === module) {
+    const result = syncServicesHtmlFromData();
+    console.log(JSON.stringify({
+        changed: result.changed,
+        pagePath: result.pagePath,
+        dataPath: result.dataPath
+    }, null, 2));
 }
 
 module.exports = {

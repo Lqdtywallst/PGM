@@ -43,7 +43,7 @@
     },
     {
       "itemType": "mega",
-      "label": "Cars Brands",
+      "label": "Car Brands",
       "href": "",
       "visible": true,
       "panelVariant": "brands",
@@ -93,7 +93,7 @@
     },
     {
       "itemType": "mega",
-      "label": "Cars Types",
+      "label": "Car Types",
       "href": "",
       "visible": true,
       "panelVariant": "types",

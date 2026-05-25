@@ -38,7 +38,12 @@
     },
     "contact": {
       "whatsappText": "Hi, I'm interested in the Lamborghini Huracan EVO Spyder in Dubai."
-    }
+    },
+    "relatedIds": [
+      "ferrari-f8-spider",
+      "ferrari-296-gts",
+      "mercedes-benz-sl63-amg"
+    ]
   },
   {
     "id": "ferrari-296-gts",
@@ -79,7 +84,12 @@
     },
     "contact": {
       "whatsappText": "Hi, I'm interested in the Ferrari 296 GTS in Dubai."
-    }
+    },
+    "relatedIds": [
+      "ferrari-f8-spider",
+      "lamborghini-huracan-evo-spyder",
+      "mercedes-benz-sl63-amg"
+    ]
   },
   {
     "id": "porsche-992-gt3",
@@ -119,7 +129,12 @@
     },
     "contact": {
       "whatsappText": "Hi, I'm interested in the Porsche 992 GT3 in Dubai."
-    }
+    },
+    "relatedIds": [
+      "blue-porsche-gt3-rs",
+      "ferrari-296-gts",
+      "lamborghini-huracan-evo-spyder"
+    ]
   },
   {
     "id": "lamborghini-urus-sport",
@@ -160,7 +175,12 @@
     },
     "contact": {
       "whatsappText": "Hi, I'm interested in the Lamborghini Urus SE in Dubai."
-    }
+    },
+    "relatedIds": [
+      "mercedes-g63-amg",
+      "bronze-mercedes-g63",
+      "rolls-royce-cullinan-black-badge"
+    ]
   },
   {
     "id": "mercedes-g63-amg",
@@ -201,7 +221,12 @@
     },
     "contact": {
       "whatsappText": "Hi, I'm interested in the Mercedes G63 AMG in Dubai."
-    }
+    },
+    "relatedIds": [
+      "bronze-mercedes-g63",
+      "lamborghini-urus-sport",
+      "rolls-royce-cullinan-black-badge"
+    ]
   },
   {
     "id": "rolls-royce-cullinan-black-badge",
@@ -242,7 +267,12 @@
     },
     "contact": {
       "whatsappText": "Hi, I'm interested in the Rolls-Royce Cullinan Black Badge in Dubai."
-    }
+    },
+    "relatedIds": [
+      "black-mercedes-s680-maybach",
+      "mercedes-g63-amg",
+      "lamborghini-urus-sport"
+    ]
   },
   {
     "id": "black-mercedes-s680-maybach",
@@ -282,7 +312,12 @@
     },
     "contact": {
       "whatsappText": "Hi, I'm interested in the Black Mercedes S680 Maybach in Dubai."
-    }
+    },
+    "relatedIds": [
+      "rolls-royce-cullinan-black-badge",
+      "mercedes-g63-amg",
+      "bronze-mercedes-g63"
+    ]
   },
   {
     "id": "blue-porsche-gt3-rs",
@@ -322,7 +357,12 @@
     },
     "contact": {
       "whatsappText": "Hi, I'm interested in the Blue Porsche GT3 RS in Dubai."
-    }
+    },
+    "relatedIds": [
+      "porsche-992-gt3",
+      "ferrari-f8-spider",
+      "lamborghini-huracan-evo-spyder"
+    ]
   },
   {
     "id": "bronze-mercedes-g63",
@@ -363,7 +403,12 @@
     },
     "contact": {
       "whatsappText": "Hi, I'm interested in the Bronze Mercedes G63 in Dubai."
-    }
+    },
+    "relatedIds": [
+      "mercedes-g63-amg",
+      "lamborghini-urus-sport",
+      "rolls-royce-cullinan-black-badge"
+    ]
   },
   {
     "id": "ferrari-f8-spider",
@@ -404,7 +449,12 @@
     },
     "contact": {
       "whatsappText": "Hi, I'm interested in the Ferrari F8 Spider in Dubai."
-    }
+    },
+    "relatedIds": [
+      "ferrari-296-gts",
+      "lamborghini-huracan-evo-spyder",
+      "mercedes-benz-sl63-amg"
+    ]
   },
   {
     "id": "mercedes-benz-sl63-amg",
@@ -445,6 +495,11 @@
     },
     "contact": {
       "whatsappText": "Hi, I'm interested in the Mercedes-Benz SL63 AMG in Dubai."
-    }
+    },
+    "relatedIds": [
+      "ferrari-296-gts",
+      "ferrari-f8-spider",
+      "lamborghini-huracan-evo-spyder"
+    ]
   }
 ]
