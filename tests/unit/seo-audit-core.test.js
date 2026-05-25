@@ -22,7 +22,7 @@ function countMap(entries) {
     return new Map(entries);
 }
 
-function baseHtml({ route = '/example.html', canonical = `https://prestigegoalmotion.com${route}` } = {}) {
+function baseHtml({ route = '/example.html', canonical = `https://www.dynastyprestigecarrental.com${route}` } = {}) {
     return `<!doctype html>
 <html lang="en">
 <head>
@@ -35,11 +35,11 @@ function baseHtml({ route = '/example.html', canonical = `https://prestigegoalmo
     <meta property="og:url" content="${canonical}">
     <meta property="og:title" content="Luxury Booking Example | Dynasty Prestige">
     <meta property="og:description" content="Securely review premium Dynasty Prestige booking details, handover timing and support steps in Dubai.">
-    <meta property="og:image" content="https://prestigegoalmotion.com/logo.png">
+    <meta property="og:image" content="https://www.dynastyprestigecarrental.com/logo.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Luxury Booking Example | Dynasty Prestige">
     <meta name="twitter:description" content="Securely review premium Dynasty Prestige booking details, handover timing and support steps in Dubai.">
-    <meta name="twitter:image" content="https://prestigegoalmotion.com/logo.png">
+    <meta name="twitter:image" content="https://www.dynastyprestigecarrental.com/logo.png">
 </head>
 <body>
     <h1>Luxury booking example</h1>
@@ -71,7 +71,7 @@ test('page assessment marks canonical mismatches as hard indexability failures',
     const filePath = path.join(siteRoot, 'example.html');
     const html = baseHtml({
         route: '/example.html',
-        canonical: 'https://prestigegoalmotion.com/wrong.html'
+        canonical: 'https://www.dynastyprestigecarrental.com/wrong.html'
     });
     fs.writeFileSync(filePath, html, 'utf8');
 

@@ -844,7 +844,15 @@ const DESIGN_SYSTEM_CONTRACT = Object.freeze({
     }),
   }),
   pages: Object.freeze({
+    '/contact.html': Object.freeze({
+      viewConnectivity: Object.freeze({
+        visualIntents: Object.freeze(['modern_dark_system']),
+      }),
+    }),
     '/reservation-lookup.html': Object.freeze({
+      viewConnectivity: Object.freeze({
+        visualIntents: Object.freeze(['modern_dark_system']),
+      }),
       firstViewport: Object.freeze({
         tiers: Object.freeze({
           laptop: Object.freeze({
@@ -866,6 +874,9 @@ const DESIGN_SYSTEM_CONTRACT = Object.freeze({
       }),
     }),
     '/about.html': Object.freeze({
+      viewConnectivity: Object.freeze({
+        visualIntents: Object.freeze(['modern_light_system']),
+      }),
       firstViewport: Object.freeze({
         tiers: Object.freeze({
           mobile: Object.freeze({
@@ -879,6 +890,9 @@ const DESIGN_SYSTEM_CONTRACT = Object.freeze({
       }),
     }),
     '/services.html': Object.freeze({
+      viewConnectivity: Object.freeze({
+        visualIntents: Object.freeze(['modern_light_system']),
+      }),
       firstViewport: Object.freeze({
         tiers: Object.freeze({
           laptop: Object.freeze({
@@ -978,6 +992,9 @@ const DESIGN_SYSTEM_CONTRACT = Object.freeze({
       }),
     }),
     '/locations.html': Object.freeze({
+      viewConnectivity: Object.freeze({
+        visualIntents: Object.freeze(['modern_light_system']),
+      }),
       firstViewport: Object.freeze({
         tiers: Object.freeze({
           laptop: Object.freeze({

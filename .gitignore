@@ -41,6 +41,10 @@ site/rework-*.png
 .env
 .env.local
 .env.*.local
+.env.locked
+.env.vault
+.secrets-local/
+*.env.dpapi
 
 # Dependencias de Node.js
 node_modules/

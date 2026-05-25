@@ -60,9 +60,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     priceMinInput.min = String(catalogMin);
     priceMinInput.max = String(catalogMax);
+    priceMinInput.step = "1";
     priceMinInput.value = String(defaultState.priceMin);
     priceMaxInput.min = String(catalogMin);
     priceMaxInput.max = String(catalogMax);
+    priceMaxInput.step = "1";
     priceMaxInput.value = String(defaultState.priceMax);
 
     function normalizeValue(value) {
@@ -1258,6 +1260,7 @@ document.addEventListener("DOMContentLoaded", () => {
             Object.assign(state, defaultState);
             render();
             updateFilterChips();
+            setFilterSheetState(false);
         });
     });
 

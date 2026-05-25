@@ -6,7 +6,10 @@ const path = require('node:path');
 const repoRoot = path.resolve(__dirname, '..', '..');
 const outputPath = path.join(repoRoot, 'site', 'runtime-config.js');
 const stagingBackendUrl = 'https://pgm-preproduccion.up.railway.app';
-const productionBackendUrl = 'https://pgm-production.up.railway.app';
+const productionBackendUrl = 'https://web-production-3d323.up.railway.app';
+const staleProductionBackendHostnames = new Set([
+    'pgm-production.up.railway.app'
+]);
 
 function readPublicEnv(...names) {
     for (const name of names) {
@@ -67,8 +70,12 @@ function normalizeBackendUrlForEnvironment(url, appEnv) {
         }
     }
 
-    if (appEnv === 'production' && !normalizedUrl) {
-        return productionBackendUrl;
+    if (appEnv === 'production') {
+        const hostname = backendHostname(normalizedUrl);
+
+        if (!normalizedUrl || staleProductionBackendHostnames.has(hostname)) {
+            return productionBackendUrl;
+        }
     }
 
     return normalizedUrl;

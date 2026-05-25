@@ -367,6 +367,15 @@ function syncGlobalHeaderHtml() {
     };
 }
 
+if (require.main === module) {
+    const result = syncGlobalHeaderHtml();
+    console.log(JSON.stringify({
+        syncedHeaderFiles: result.touchedFiles.length,
+        htmlFileCount: result.htmlFileCount,
+        dataPath: result.dataPath
+    }, null, 2));
+}
+
 module.exports = {
     normalizeHeaderConfig,
     syncGlobalHeaderHtml

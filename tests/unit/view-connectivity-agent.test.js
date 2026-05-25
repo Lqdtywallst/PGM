@@ -77,11 +77,25 @@ test('inferVisualIntentFromSource detects legacy orbitron shells and modern serv
 
 test('determineRouteFormatStatus approves expected intents and flags legacy shells', () => {
     const approved = determineRouteFormatStatus({
+        route: '/app/reserve/page.html',
+        cohort: 'reserve',
+        visualIntent: 'modern_light_system',
+        templateFamily: 'reserve_flow',
+        headingFontFamily: 'manrope'
+    });
+    const approvedDarkContact = determineRouteFormatStatus({
         route: '/contact.html',
         cohort: 'contact',
-        visualIntent: 'modern_light_system',
+        visualIntent: 'modern_dark_system',
         templateFamily: 'contact_form',
         headingFontFamily: 'manrope'
+    });
+    const approvedLightHubOverride = determineRouteFormatStatus({
+        route: '/services.html',
+        cohort: 'hub_marketing',
+        visualIntent: 'modern_light_system',
+        templateFamily: 'services_premium',
+        headingFontFamily: 'cormorant garamond'
     });
     const legacy = determineRouteFormatStatus({
         route: '/lamborghini-rental-dubai.html',
@@ -91,7 +105,7 @@ test('determineRouteFormatStatus approves expected intents and flags legacy shel
         headingFontFamily: 'orbitron'
     });
     const review = determineRouteFormatStatus({
-        route: '/about.html',
+        route: '/custom-hub.html',
         cohort: 'hub_marketing',
         visualIntent: 'modern_light_system',
         templateFamily: 'about_hero',
@@ -106,6 +120,8 @@ test('determineRouteFormatStatus approves expected intents and flags legacy shel
     });
 
     assert.equal(approved.status, 'approved');
+    assert.equal(approvedDarkContact.status, 'approved');
+    assert.equal(approvedLightHubOverride.status, 'approved');
     assert.equal(legacy.status, 'legacy');
     assert.equal(review.status, 'review');
     assert.equal(darkLightCohort.status, 'legacy');

@@ -198,17 +198,21 @@ function buildFooterMarkup(config, currentPublicPath = '/', options = {}) {
 }
 
 function replaceFirstFooter(html, footerMarkupFactory) {
-    const pattern = /[ \t]*<footer class="([^"]*\bsite-v2-footer\b[^"]*)"(?: id="([^"]+)")?>[\s\S]*?<\/footer>/;
+    const pattern = /[ \t]*<footer class="([^"]*(?:\bsite-v2-footer\b|\bpage-foot\b)[^"]*)"(?: id="([^"]+)")?>[\s\S]*?<\/footer>/;
     const match = html.match(pattern);
 
     if (!match) {
         return { found: false, html };
     }
 
+    const className = /\bsite-v2-footer\b/.test(match[1])
+        ? match[1]
+        : 'site-v2-footer';
+
     return {
         found: true,
         html: html.replace(pattern, footerMarkupFactory({
-            className: match[1],
+            className,
             id: match[2] || 'contact'
         }))
     };

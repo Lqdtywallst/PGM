@@ -13,6 +13,10 @@ function writeUtf8(filePath, value) {
     fs.writeFileSync(filePath, value, 'utf8');
 }
 
+function normalizeNewlines(value) {
+    return String(value).replace(/\r\n?|\n/g, '\n');
+}
+
 function requireText(value, label) {
     if (!String(value ?? '').trim()) {
         throw new Error(label);
@@ -171,7 +175,10 @@ function replaceMarkerBlock(html, config, markup, newline) {
 
     if (html.includes(config.start) && html.includes(config.end)) {
         return html.replace(
-            new RegExp(`${escapeRegExp(config.start)}[\\s\\S]*?${escapeRegExp(config.end)}`, 'm'),
+            new RegExp(
+                `^[\\t ]*${escapeRegExp(config.start)}[\\s\\S]*?^[\\t ]*${escapeRegExp(config.end)}`,
+                'm'
+            ),
             block
         );
     }
@@ -185,8 +192,8 @@ function replaceMarkerBlock(html, config, markup, newline) {
 
 function syncLocationsHtmlFromData() {
     const data = normalizeLocationsContent(JSON.parse(readUtf8(dataPath)));
-    const html = readUtf8(pagePath);
-    const newline = html.includes('\r\n') ? '\r\n' : '\n';
+    const html = normalizeNewlines(readUtf8(pagePath));
+    const newline = '\n';
 
     let nextHtml = html;
 
@@ -196,7 +203,7 @@ function syncLocationsHtmlFromData() {
         indent: '                        ',
         label: 'hero zones',
         pattern: /(<nav class="locations-hero__zone-list" aria-label="Priority location guides">)([\s\S]*?)(\s*<\/nav>)/
-    }, data.heroZones.map(renderHeroZone).join(`${newline}${newline}`).replace(/\n/g, newline), newline);
+    }, normalizeNewlines(data.heroZones.map(renderHeroZone).join(`${newline}${newline}`)), newline);
 
     nextHtml = replaceMarkerBlock(nextHtml, {
         start: '<!-- LOCATIONS_GUIDE_CARDS_START -->',
@@ -204,7 +211,7 @@ function syncLocationsHtmlFromData() {
         indent: '                    ',
         label: 'guide cards',
         pattern: /(<article class="locations-guide-feature">[\s\S]*?<\/article>)([\s\S]*?)(\s*<\/div>\s*<\/div>\s*<\/section>)/
-    }, data.guideCards.map(renderGuideCard).join(`${newline}${newline}`).replace(/\n/g, newline), newline);
+    }, normalizeNewlines(data.guideCards.map(renderGuideCard).join(`${newline}${newline}`)), newline);
 
     nextHtml = replaceMarkerBlock(nextHtml, {
         start: '<!-- LOCATIONS_ZONE_CARDS_START -->',
@@ -212,7 +219,7 @@ function syncLocationsHtmlFromData() {
         indent: '                    ',
         label: 'zone cards',
         pattern: /(<div class="locations-zone-grid">)([\s\S]*?)(\s*<\/div>\s*<\/div>\s*<\/section>)/
-    }, data.zoneCards.map(renderZoneCard).join(`${newline}${newline}`).replace(/\n/g, newline), newline);
+    }, normalizeNewlines(data.zoneCards.map(renderZoneCard).join(`${newline}${newline}`)), newline);
 
     nextHtml = replaceMarkerBlock(nextHtml, {
         start: '<!-- LOCATIONS_PROCESS_STEPS_START -->',
@@ -220,7 +227,7 @@ function syncLocationsHtmlFromData() {
         indent: '                    ',
         label: 'process steps',
         pattern: /(<ol class="locations-process__list">)([\s\S]*?)(\s*<\/ol>\s*<\/div>\s*<\/section>)/
-    }, data.processSteps.map(renderProcessStep).join(`${newline}${newline}`).replace(/\n/g, newline), newline);
+    }, normalizeNewlines(data.processSteps.map(renderProcessStep).join(`${newline}${newline}`)), newline);
 
     if (nextHtml !== html) {
         writeUtf8(pagePath, nextHtml);
@@ -231,6 +238,15 @@ function syncLocationsHtmlFromData() {
         dataPath,
         changed: nextHtml !== html
     };
+}
+
+if (require.main === module) {
+    const result = syncLocationsHtmlFromData();
+    console.log(JSON.stringify({
+        changed: result.changed,
+        pagePath: result.pagePath,
+        dataPath: result.dataPath
+    }, null, 2));
 }
 
 module.exports = {

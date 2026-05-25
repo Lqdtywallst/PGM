@@ -31,7 +31,7 @@ const STAGING_CONFIG_DUBAI = {
 // ============================================
 const PROD_CONFIG_DUBAI = {
     publishableKey: 'pk_live_51RsMXQ3DSCa2l71zZiMkmlBXXpLu1HF0Sy4N4xSsB1TvUWu6wJLlKR5z7HrCa0AIlWQjfZo4tL8d1qcxtgExNHS300EPCAtXti',
-    backendUrl: 'https://pgm-production.up.railway.app',
+    backendUrl: 'https://web-production-3d323.up.railway.app',
     currency: 'aed',
     country: 'AE'
 };
@@ -108,7 +108,10 @@ function backendHostname(url) {
 }
 
 function isProductionBackendUrl(url) {
-    return backendHostname(url) === 'pgm-production.up.railway.app';
+    return [
+        'web-production-3d323.up.railway.app',
+        'pgm-production.up.railway.app'
+    ].includes(backendHostname(url));
 }
 
 function isLegacyStagingBackendUrl(url) {
@@ -131,6 +134,10 @@ function normalizeBackendUrlForEnvironment(url, environment) {
         isLegacyStagingBackendUrl(normalizedUrl)
     )) {
         return STAGING_CONFIG_DUBAI.backendUrl;
+    }
+
+    if (environment === 'production' && backendHostname(normalizedUrl) === 'pgm-production.up.railway.app') {
+        return PROD_CONFIG_DUBAI.backendUrl;
     }
 
     return normalizedUrl;

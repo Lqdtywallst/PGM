@@ -9,7 +9,7 @@ const {
     siteFileForPath
 } = require('../shared/site-audit-utils');
 
-const DEFAULT_PUBLIC_ORIGIN = 'https://prestigegoalmotion.com';
+const DEFAULT_PUBLIC_ORIGIN = 'https://www.dynastyprestigecarrental.com';
 const BROKEN_ENCODING_PATTERN = /(?:Ã‚|Ãƒ.|Ã¢â‚¬â€|Ã¢â‚¬â€œ|Ã¢â‚¬|ï¿½)/;
 const PLACEHOLDER_PATTERN = /\b(?:TODO|Lorem ipsum|coming soon|placeholder|N\/A)\b/i;
 const GENERIC_CTA_PATTERN = /^(?:click here|learn more|read more|more|details|submit|view|open)$/i;

@@ -143,6 +143,12 @@ function escapeRegExp(value) {
     return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+function hasHref(html, target) {
+    const normalizedTarget = String(target || '').replace(/^\.\//, '').replace(/^\//, '');
+    const pattern = new RegExp(`href=["'](?:\\./|/)${escapeRegExp(normalizedTarget)}(?:["'?#])`, 'i');
+    return pattern.test(html);
+}
+
 function hasMetaTagContent(html, attributeName, attributeValue) {
     const escapedAttribute = escapeRegExp(attributeValue);
     const patterns = [
@@ -167,8 +173,8 @@ function createStaticMarkupAssertions(pathname, html) {
     assert(title.length > 10, `${pathname} has a non-empty <title>`);
     assert(description.length > 20, `${pathname} has a non-empty meta description`);
     assert(
-        canonical.startsWith('https://prestigegoalmotion.com'),
-        `${pathname} has a canonical URL on prestigegoalmotion.com`
+        canonical.startsWith('https://www.dynastyprestigecarrental.com'),
+        `${pathname} has a canonical URL on dynastyprestigecarrental.com`
     );
 }
 
@@ -207,10 +213,10 @@ function createServiceClusterAssertions(pathname, html) {
         new RegExp(`"url"\\s*:\\s*"${escapeRegExp(canonical)}"`).test(html),
         `${pathname} aligns Service JSON-LD with the canonical URL`
     );
-    assert(html.includes('href="./app/reserve/page.html"'), `${pathname} links to the reservation flow`);
-    assert(html.includes('href="./services.html"'), `${pathname} links back to the services hub`);
+    assert(hasHref(html, './app/reserve/page.html'), `${pathname} links to the reservation flow`);
+    assert(hasHref(html, './services.html'), `${pathname} links back to the services hub`);
     assert(
-        serviceLocationGuidePaths.some((link) => html.includes(`href="${link}"`) || html.includes(`href='${link}'`)),
+        serviceLocationGuidePaths.some((link) => hasHref(html, link)),
         `${pathname} links to at least one relevant location guide`
     );
 }
@@ -278,7 +284,7 @@ function resolveLocalReference(fromFile, reference) {
     const html = fs.readFileSync(fromFile, 'utf8');
     const baseHref = extractTagValue(html, /<base[^>]+href=["']([^"']+)["'][^>]*>/i);
     const basePath = baseHref.startsWith('/') ? baseHref : resolvePublicPathForFile(siteRoot, fromFile);
-    const resolvedPath = new URL(cleanReference, `https://prestigegoalmotion.com${basePath}`).pathname;
+    const resolvedPath = new URL(cleanReference, `https://www.dynastyprestigecarrental.com${basePath}`).pathname;
     return siteFileForPath(resolvedPath);
 }
 
@@ -358,9 +364,13 @@ async function run() {
         'package.json exposes the advisory copy audit script'
     );
 
+    const servesSiteDirectory = vercelConfig.outputDirectory === 'site';
     const hasSiteRewrite = Array.isArray(vercelConfig.rewrites) &&
         vercelConfig.rewrites.some((rule) => String(rule.destination || '').startsWith('/site/'));
-    assert(hasSiteRewrite, 'vercel.json rewrites public requests into /site');
+    assert(
+        servesSiteDirectory || hasSiteRewrite,
+        'vercel.json serves public requests from the site directory'
+    );
 
     const configModule = loadConfigModuleForWindow();
     assert(
@@ -375,7 +385,7 @@ async function run() {
     const productionBrowserConfig = loadConfigModuleForWindow({
         location: {
             protocol: 'https:',
-            hostname: 'prestigegoalmotion.com'
+            hostname: 'www.dynastyprestigecarrental.com'
         }
     });
     assert(
@@ -410,7 +420,7 @@ async function run() {
     const stagingDomainConfig = loadConfigModuleForWindow({
         location: {
             protocol: 'https:',
-            hostname: 'staging.prestigegoalmotion.com'
+            hostname: 'staging.dynastyprestigecarrental.com'
         }
     });
     assert(
@@ -427,7 +437,7 @@ async function run() {
         },
         location: {
             protocol: 'https:',
-            hostname: 'staging.prestigegoalmotion.com'
+            hostname: 'staging.dynastyprestigecarrental.com'
         }
     });
     assert(
@@ -438,9 +448,9 @@ async function run() {
 
     const cspHeader = JSON.stringify(vercelConfig.headers || []);
     assert(
-        cspHeader.includes('https://pgm-staging.up.railway.app') &&
-        cspHeader.includes('https://staging.prestigegoalmotion.com') &&
-        cspHeader.includes('https://preprod.prestigegoalmotion.com'),
+        cspHeader.includes('https://pgm-preproduccion.up.railway.app') &&
+        cspHeader.includes('https://staging.dynastyprestigecarrental.com') &&
+        cspHeader.includes('https://preprod.dynastyprestigecarrental.com'),
         'Vercel CSP allows the staging backend and staging domains'
     );
 
@@ -535,27 +545,27 @@ async function run() {
         'home hero stays dark until the hero video is ready'
     );
     assert(
-        indexPage.includes('./fleet.html') &&
-        indexPage.includes('./locations.html') &&
-        indexPage.includes('./services.html') &&
-        indexPage.includes('./about.html') &&
-        indexPage.includes('./contact.html'),
+        hasHref(indexPage, './fleet.html') &&
+        hasHref(indexPage, './locations.html') &&
+        hasHref(indexPage, './services.html') &&
+        hasHref(indexPage, './about.html') &&
+        hasHref(indexPage, './contact.html'),
         'home page links to the core production pages'
     );
     assert(
-        indexPage.includes('./luxury-car-rental-dubai.html') &&
-        indexPage.includes('./locations.html') &&
-        indexPage.includes('./palm-jumeirah-luxury-car-rental.html') &&
-        indexPage.includes('./dubai-marina-luxury-car-rental.html') &&
-        indexPage.includes('./dubai-airport-luxury-car-rental.html') &&
-        indexPage.includes('./monthly-luxury-car-rental-dubai.html'),
+        hasHref(indexPage, './luxury-car-rental-dubai.html') &&
+        hasHref(indexPage, './locations.html') &&
+        hasHref(indexPage, './palm-jumeirah-luxury-car-rental.html') &&
+        hasHref(indexPage, './dubai-marina-luxury-car-rental.html') &&
+        hasHref(indexPage, './dubai-airport-luxury-car-rental.html') &&
+        hasHref(indexPage, './monthly-luxury-car-rental-dubai.html'),
         'home page links into the locations hub, priority guides and service-guide layer'
     );
     assert(
         indexPage.includes('data-google-reviews') &&
         readFile('site/js/site-v2.js').includes('/api/reviews/google') &&
         indexPage.includes('Read Google reviews') &&
-        indexPage.includes('Google reviews load here from the official Dynasty Prestige Google Business profile') &&
+        indexPage.includes('Official Google review data loads here when available.') &&
         !indexPage.includes('Handover feedback') &&
         !indexPage.includes('WhatsApp support') &&
         !indexPage.includes('Dubai delivery</strong>') &&
@@ -569,44 +579,44 @@ async function run() {
 
     const fleetPage = readPublicPage('/fleet.html');
     assert(
-        fleetPage.includes('./luxury-car-rental-dubai.html') &&
-        fleetPage.includes('./dubai-airport-luxury-car-rental.html') &&
-        fleetPage.includes('./palm-jumeirah-luxury-car-rental.html') &&
-        fleetPage.includes('./dubai-marina-luxury-car-rental.html'),
+        hasHref(fleetPage, './luxury-car-rental-dubai.html') &&
+        hasHref(fleetPage, './dubai-airport-luxury-car-rental.html') &&
+        hasHref(fleetPage, './palm-jumeirah-luxury-car-rental.html') &&
+        hasHref(fleetPage, './dubai-marina-luxury-car-rental.html'),
         'fleet page links into the core local SEO guide pages'
     );
     assert(
-        fleetPage.includes('./chauffeur-service-dubai.html') &&
-        fleetPage.includes('./airport-concierge-dubai.html') &&
-        fleetPage.includes('./hotel-villa-airport-delivery-dubai.html') &&
-        fleetPage.includes('./monthly-luxury-car-rental-dubai.html'),
+        hasHref(fleetPage, './chauffeur-service-dubai.html') &&
+        hasHref(fleetPage, './airport-concierge-dubai.html') &&
+        hasHref(fleetPage, './hotel-villa-airport-delivery-dubai.html') &&
+        hasHref(fleetPage, './monthly-luxury-car-rental-dubai.html'),
         'fleet page links contextually into the core service detail pages'
     );
 
     const locationsPage = readPublicPage('/locations.html');
     assert(
-        locationsPage.includes('./luxury-car-rental-dubai.html') &&
-        locationsPage.includes('./abu-dhabi-luxury-car-rental.html') &&
-        locationsPage.includes('./dubai-airport-luxury-car-rental.html') &&
-        locationsPage.includes('./palm-jumeirah-luxury-car-rental.html') &&
-        locationsPage.includes('./dubai-marina-luxury-car-rental.html'),
+        hasHref(locationsPage, './luxury-car-rental-dubai.html') &&
+        hasHref(locationsPage, './abu-dhabi-luxury-car-rental.html') &&
+        hasHref(locationsPage, './dubai-airport-luxury-car-rental.html') &&
+        hasHref(locationsPage, './palm-jumeirah-luxury-car-rental.html') &&
+        hasHref(locationsPage, './dubai-marina-luxury-car-rental.html'),
         'locations page links prominently to the five local SEO guides'
     );
     assert(
-        locationsPage.includes('./app/reserve/page.html'),
+        hasHref(locationsPage, './app/reserve/page.html'),
         'locations page links into the reservation flow'
     );
     assert(
-        locationsPage.includes('./airport-concierge-dubai.html') &&
-        locationsPage.includes('./hotel-villa-airport-delivery-dubai.html') &&
-        locationsPage.includes('./chauffeur-service-dubai.html') &&
-        locationsPage.includes('./business-car-rental-dubai.html'),
+        hasHref(locationsPage, './airport-concierge-dubai.html') &&
+        hasHref(locationsPage, './hotel-villa-airport-delivery-dubai.html') &&
+        hasHref(locationsPage, './chauffeur-service-dubai.html') &&
+        hasHref(locationsPage, './business-car-rental-dubai.html'),
         'locations page links contextually into the service detail pages'
     );
     assert(
-        locationsPage.includes('./fleet.html') &&
-        locationsPage.includes('./contact.html') &&
-        locationsPage.includes('Palm Jumeirah, Dubai UAE') &&
+        hasHref(locationsPage, './fleet.html') &&
+        hasHref(locationsPage, './contact.html') &&
+        locationsPage.includes('Palm Jumeirah, Dubai, UAE') &&
         locationsPage.includes('Service-area model') &&
         locationsPage.includes('locations-faq-list') &&
         locationsPage.includes('FAQPage'),
@@ -639,16 +649,16 @@ async function run() {
 
     const servicesPage = readPublicPage('/services.html');
     assert(
-        servicesPage.includes('./airport-concierge-dubai.html') &&
-        servicesPage.includes('./chauffeur-service-dubai.html') &&
-        servicesPage.includes('./hotel-villa-airport-delivery-dubai.html') &&
-        servicesPage.includes('./monthly-luxury-car-rental-dubai.html'),
+        hasHref(servicesPage, './airport-concierge-dubai.html') &&
+        hasHref(servicesPage, './chauffeur-service-dubai.html') &&
+        hasHref(servicesPage, './hotel-villa-airport-delivery-dubai.html') &&
+        hasHref(servicesPage, './monthly-luxury-car-rental-dubai.html'),
         'services page links into the detailed service landing pages'
     );
     assert(
-        servicesPage.includes('./locations.html') &&
-        servicesPage.includes('./fleet.html') &&
-        servicesPage.includes('./app/reserve/page.html'),
+        hasHref(servicesPage, './locations.html') &&
+        hasHref(servicesPage, './fleet.html') &&
+        hasHref(servicesPage, './app/reserve/page.html'),
         'services page links to locations, fleet and reservation'
     );
 
@@ -745,9 +755,9 @@ async function run() {
 
     const aboutPage = readPublicPage('/about.html');
     assert(
-        aboutPage.includes('./fleet.html') &&
-        aboutPage.includes('./contact.html') &&
-        aboutPage.includes('./app/reserve/page.html'),
+        hasHref(aboutPage, './fleet.html') &&
+        hasHref(aboutPage, './contact.html') &&
+        hasHref(aboutPage, './app/reserve/page.html'),
         'about page links to fleet, contact and reservation'
     );
 
@@ -850,7 +860,7 @@ async function run() {
 
     const robotsFile = readFile('site/robots.txt');
     assert(
-        robotsFile.includes('Sitemap: https://prestigegoalmotion.com/sitemap.xml'),
+        robotsFile.includes('Sitemap: https://www.dynastyprestigecarrental.com/sitemap.xml'),
         'robots.txt points to the public sitemap'
     );
 

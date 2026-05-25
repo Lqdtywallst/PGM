@@ -26,7 +26,7 @@ const homeBrand = {
     exists: true,
     title: 'Dynasty Prestige',
     subtitle: 'Dubai Luxury Car Rental',
-    logoSrc: 'https://prestigegoalmotion.com/images/dp-crest-cropped.png',
+    logoSrc: 'https://www.dynastyprestigecarrental.com/images/dp-crest-cropped.png',
     titleFontFamily: 'Manrope, sans-serif',
     titleFontSizePx: 14,
     titleLetterSpacingPx: 1.8,
@@ -96,7 +96,7 @@ const homeHeaderCta = {
 
 test('normalizeAssetPath compares public logo assets without host noise', () => {
     assert.equal(
-        normalizeAssetPath('https://prestigegoalmotion.com/images/dp-crest-cropped.png?v=1'),
+        normalizeAssetPath('https://www.dynastyprestigecarrental.com/images/dp-crest-cropped.png?v=1'),
         '/images/dp-crest-cropped.png'
     );
 });

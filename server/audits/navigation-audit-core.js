@@ -38,7 +38,7 @@ function normalizeRoute(route = '/') {
     let pathname = String(route || '/').trim();
 
     try {
-        pathname = new URL(pathname, 'https://prestigegoalmotion.com').pathname;
+        pathname = new URL(pathname, 'https://www.dynastyprestigecarrental.com').pathname;
     } catch (error) {
         pathname = pathname.split(/[?#]/)[0] || '/';
     }

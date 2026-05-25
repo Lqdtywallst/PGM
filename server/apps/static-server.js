@@ -30,7 +30,7 @@ const CONTENT_SECURITY_POLICY = [
     "font-src 'self' data: https://cdnjs.cloudflare.com",
     "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com",
     "script-src 'self' 'unsafe-inline' https://js.stripe.com https://www.googletagmanager.com",
-    "connect-src 'self' http://127.0.0.1:3000 http://localhost:3000 https://api.stripe.com https://pgm-production.up.railway.app https://pgm-preproduccion.up.railway.app https://pgm-staging.up.railway.app https://prestigegoalmotion.com https://www.prestigegoalmotion.com https://staging.prestigegoalmotion.com https://preprod.prestigegoalmotion.com https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com",
+    "connect-src 'self' http://127.0.0.1:3000 http://localhost:3000 https://api.stripe.com https://web-production-3d323.up.railway.app https://pgm-preproduccion.up.railway.app https://pgm-staging.up.railway.app https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com",
     "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://www.openstreetmap.org https://www.google.com",
     "media-src 'self' https:",
     "manifest-src 'self'",
@@ -59,6 +59,7 @@ const COMPRESSIBLE_TYPES = new Set([
     'text/css',
     'text/html'
 ]);
+const ALLOWED_STATIC_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 
 function buildCacheHeaders(filePath) {
     const normalizedPath = String(filePath || '').toLowerCase();
@@ -85,6 +86,8 @@ function buildCacheHeaders(filePath) {
 function buildSecurityHeaders() {
     const headers = {
         'Content-Security-Policy': CONTENT_SECURITY_POLICY,
+        'Cross-Origin-Opener-Policy': 'same-origin',
+        'Cross-Origin-Resource-Policy': 'same-origin',
         'Referrer-Policy': 'strict-origin-when-cross-origin',
         'Permissions-Policy': 'camera=(), geolocation=(), microphone=()',
         'X-Content-Type-Options': 'nosniff'
@@ -92,6 +95,10 @@ function buildSecurityHeaders() {
 
     if (FRAME_ANCESTORS === "'none'") {
         headers['X-Frame-Options'] = 'DENY';
+    }
+
+    if (normalizeRuntimeEnvironment(process.env.APP_ENV || process.env.PGM_APP_ENV) === 'production') {
+        headers['Strict-Transport-Security'] = 'max-age=63072000; includeSubDomains; preload';
     }
 
     return headers;
@@ -219,6 +226,25 @@ function sanitizeRequestPath(rawUrl) {
 }
 
 const server = http.createServer((req, res) => {
+    if (!ALLOWED_STATIC_METHODS.has(req.method)) {
+        res.writeHead(405, {
+            Allow: 'GET, HEAD, OPTIONS',
+            ...buildSecurityHeaders()
+        });
+        res.end();
+        return;
+    }
+
+    if (req.method === 'OPTIONS') {
+        res.writeHead(204, {
+            Allow: 'GET, HEAD, OPTIONS',
+            'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
+            ...buildSecurityHeaders()
+        });
+        res.end();
+        return;
+    }
+
     let filePath = sanitizeRequestPath(req.url);
 
     console.log(`${req.method} ${req.url} -> ${filePath}`);
@@ -241,6 +267,10 @@ const server = http.createServer((req, res) => {
             ...buildCacheHeaders(filePath),
             ...buildSecurityHeaders()
         });
+        if (req.method === 'HEAD') {
+            res.end();
+            return;
+        }
         res.end(renderDynamicRuntimeConfig(), 'utf-8');
         return;
     }
@@ -263,16 +293,11 @@ const server = http.createServer((req, res) => {
             if (error.code === 'ENOENT') {
                 console.error(`File not found: ${fullPath}`);
                 res.writeHead(404, { 'Content-Type': 'text/html', ...buildSecurityHeaders() });
-                res.end(`
-                    <h1>404 - File not found</h1>
-                    <p>Requested path: ${filePath}</p>
-                    <p>Full path: ${fullPath}</p>
-                    <p>Base directory: ${siteRoot}</p>
-                `, 'utf-8');
+                res.end('<h1>404 - File not found</h1>', 'utf-8');
             } else {
                 console.error(`Error reading file: ${error.code}`);
                 res.writeHead(500, buildSecurityHeaders());
-                res.end(`Server error: ${error.code}`, 'utf-8');
+                res.end('Server error', 'utf-8');
             }
         } else {
             console.log(`File served: ${filePath}`);
@@ -280,11 +305,17 @@ const server = http.createServer((req, res) => {
             const baseHeaders = {
                 'Content-Type': contentType,
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
                 'Access-Control-Allow-Headers': 'Content-Type',
                 ...buildCacheHeaders(filePath),
                 ...buildSecurityHeaders()
             };
+
+            if (req.method === 'HEAD') {
+                res.writeHead(200, baseHeaders);
+                res.end();
+                return;
+            }
 
             if (!compression) {
                 res.writeHead(200, baseHeaders);

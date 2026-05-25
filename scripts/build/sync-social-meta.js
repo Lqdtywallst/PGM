@@ -5,7 +5,7 @@ const { siteFileForPublicPath } = require('../../server/shared/public-page-map')
 
 const projectRoot = path.resolve(__dirname, '..', '..');
 const siteRoot = path.join(projectRoot, 'site');
-const publicOrigin = 'https://prestigegoalmotion.com';
+const publicOrigin = 'https://www.dynastyprestigecarrental.com';
 const defaultImage = `${publicOrigin}/logo-dp-transparent.png`;
 
 const managedMetaKeys = [

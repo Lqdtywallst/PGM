@@ -151,8 +151,8 @@ async function run() {
         );
         const expectedCanonical =
             pathname === '/'
-                ? 'https://prestigegoalmotion.com/'
-                : `https://prestigegoalmotion.com${pathname}`;
+                ? 'https://www.dynastyprestigecarrental.com/'
+                : `https://www.dynastyprestigecarrental.com${pathname}`;
         const h1Count = countMatches(html, /<h1\b/gi);
 
         assert(canonical === expectedCanonical, `${pathname} canonical matches the public URL exactly`);

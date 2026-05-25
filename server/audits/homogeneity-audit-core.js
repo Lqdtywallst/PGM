@@ -55,7 +55,7 @@ function normalizeAssetPath(value = '') {
     }
 
     try {
-        const parsed = new URL(rawValue, 'https://prestigegoalmotion.com');
+        const parsed = new URL(rawValue, 'https://www.dynastyprestigecarrental.com');
         return parsed.pathname.replace(/\/+/g, '/').toLowerCase();
     } catch (error) {
         return rawValue.split(/[?#]/)[0].replace(/\/+/g, '/').toLowerCase();

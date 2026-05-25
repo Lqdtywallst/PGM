@@ -19,7 +19,7 @@ const repoRoot = path.resolve(__dirname, '..', '..');
 const siteRoot = path.join(repoRoot, 'site');
 const artifactsRoot = path.join(repoRoot, 'artifacts', 'view-connectivity-agent');
 const DEFAULT_VIEWPORT = 'desktop-wide';
-const SITE_ORIGIN = 'https://prestigegoalmotion.com';
+const SITE_ORIGIN = 'https://www.dynastyprestigecarrental.com';
 const MODERN_VISUAL_INTENTS = new Set([
     'modern_dark_system',
     'modern_light_system'
@@ -225,13 +225,19 @@ function inferVisualIntentFromSource(html) {
     return 'unknown';
 }
 
-function getExpectedVisualIntents(cohort) {
+function getExpectedVisualIntents(cohort, route = '') {
+    const pageExpected = DESIGN_SYSTEM_CONTRACT.pages?.[normalizeRoute(route)]?.viewConnectivity?.visualIntents;
+
+    if (Array.isArray(pageExpected) && pageExpected.length > 0) {
+        return pageExpected;
+    }
+
     const expected = DESIGN_SYSTEM_CONTRACT.cohorts?.[cohort]?.visualIntents;
     return Array.isArray(expected) ? expected : [];
 }
 
 function determineRouteFormatStatus({ route, cohort, visualIntent = '', templateFamily = '', headingFontFamily = '', sourceVisualIntent = '' }) {
-    const expectedVisualIntents = getExpectedVisualIntents(cohort);
+    const expectedVisualIntents = getExpectedVisualIntents(cohort, route);
     const effectiveIntent = visualIntent || sourceVisualIntent || 'unknown';
     const usesLegacyTemplate = templateFamily === 'legacy_brand_catalog' || /orbitron/i.test(String(headingFontFamily || ''));
     const lightCohortForcedDark =

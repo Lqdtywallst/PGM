@@ -1689,32 +1689,10 @@
                         window.location.href = '/index.html';
                     }, 1500);
                 } else if (paymentIntent.status === 'processing') {
-                    console.log('[PAYMENT] Payment is processing. Checking status...');
-                    showMessage('Payment is processing. Please wait...', 'success');
-                    // Check the payment status after a few seconds
-                    setTimeout(async () => {
-                        try {
-                            const BACKEND_URL = getConfiguredBackendUrl();
-                            const checkResponse = await fetch(`${BACKEND_URL}/api/reserve/${paymentIntent.id}`);
-                            const checkData = await checkResponse.json();
-                            console.log('[PAYMENT] Status checked:', checkData.status);
-                            
-                            if (checkData.status === 'succeeded') {
-                                showMessage('Payment received. Finalising your reservation...', 'success');
-                                // Call the same success logic
-                                location.reload(); // Reload to process the successful payment
-                            } else {
-                                showMessage('Payment is still processing. Please check your email for confirmation.', 'success');
-                                payButton.disabled = false;
-                                payButton.textContent = restorePayButtonLabel();
-                            }
-                        } catch (checkError) {
-                            console.warn('[PAYMENT] Error checking status:', checkError);
-                            showMessage('Payment is processing. You will receive a confirmation email shortly.', 'success');
-                            payButton.disabled = false;
-                            payButton.textContent = restorePayButtonLabel();
-                        }
-                    }, 3000);
+                    console.log('[PAYMENT] Payment is processing.');
+                    showMessage('Payment is processing. You will receive a confirmation email shortly.', 'success');
+                    payButton.disabled = false;
+                    payButton.textContent = restorePayButtonLabel();
                 } else if (paymentIntent.status === 'requires_action') {
                     console.log('[PAYMENT] Additional authentication required');
                     showMessage('Please complete the authentication in the popup window...', 'success');

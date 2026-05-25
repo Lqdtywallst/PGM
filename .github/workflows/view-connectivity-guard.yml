@@ -54,8 +54,10 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Run full audit suite
-        run: npm run audit
+      - name: Run view connectivity guard
+        run: |
+          npm run test:visual
+          npm run audit:connectivity:views:strict
 
       - name: Upload audit artifacts
         if: always()
