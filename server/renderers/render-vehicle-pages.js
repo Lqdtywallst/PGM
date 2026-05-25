@@ -167,6 +167,19 @@ function previewImageForVehicle(images, fallback, excludedSources = []) {
     return candidates.find((image) => !excluded.has(normalizeImageSource(image.src))) || candidates[0] || fallback;
 }
 
+function previewImageOverride(card) {
+    const override = card.motherPreviewImage;
+
+    if (!override?.src) {
+        return null;
+    }
+
+    return {
+        src: override.src,
+        alt: override.alt || `${vehicleName(card)} detail in Dubai`
+    };
+}
+
 function renderRelatedVisualItem(item) {
     return [
         `                <a class="vehicle-pdp-related-card" href="${escapeHtml(item.href)}">`,
@@ -187,7 +200,7 @@ function renderVehicleMotherContent(card, cards = [], options = {}) {
     const name = vehicleName(card);
     const titleId = `${card.id}-cinema-title`;
     const images = firstUsefulImages(card);
-    const posterImage = previewImageForVehicle(images, card.image, options.excludePreviewImageSources);
+    const posterImage = previewImageOverride(card) || previewImageForVehicle(images, card.image, options.excludePreviewImageSources);
     const related = relatedCars(card, cards);
 
     return [

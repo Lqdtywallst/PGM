@@ -61,6 +61,10 @@
       "alt": "Ferrari 296 GTS front stance",
       "loading": "lazy"
     },
+    "motherPreviewImage": {
+      "src": "./images/fleet/ferrari-296-gts/10-cabin-detail.jpg",
+      "alt": "Ferrari 296 GTS red cabin detail in Dubai"
+    },
     "utility": {
       "badge": "Italian polish",
       "trust": "Hotel-led arrival"

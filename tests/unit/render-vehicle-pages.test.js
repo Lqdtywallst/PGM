@@ -98,6 +98,14 @@ test('vehicle preview image respects existing page gallery exclusions', () => {
     assert.equal(preview.src.endsWith('/06.jpg'), true);
 });
 
+test('vehicle mother content respects explicit preview image overrides', () => {
+    const card = fleetCards.find((item) => item.id === 'ferrari-296-gts');
+    const markup = renderVehicleMotherContent(card, fleetCards);
+
+    assert.match(markup, /ferrari-296-gts\/10-cabin-detail\.jpg/);
+    assert.doesNotMatch(markup, /ferrari-296-gts\/05-detail-wheel\.jpg/);
+});
+
 test('vehicle renderer extracts existing reserve gallery image sources', () => {
     const html = [
         '<main>',
