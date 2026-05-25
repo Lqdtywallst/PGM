@@ -763,6 +763,7 @@ function renderAdminReservationsPage() {
             padding: 12px 18px 0;
         }
         .calendar-vehicle-chip {
+            appearance: none;
             display: inline-flex;
             align-items: center;
             gap: 7px;
@@ -772,11 +773,30 @@ function renderAdminReservationsPage() {
             border-radius: 999px;
             background: rgba(255, 250, 242, 0.78);
             color: var(--muted);
+            font: inherit;
             font-size: 0.72rem;
+            font-weight: 800;
+            text-align: left;
             white-space: nowrap;
+        }
+        .calendar-vehicle-chip[data-calendar-vehicle-filter] {
+            cursor: pointer;
+        }
+        .calendar-vehicle-chip[data-calendar-vehicle-filter]:hover,
+        .calendar-vehicle-chip[data-calendar-vehicle-filter]:focus-visible,
+        .calendar-vehicle-chip.is-active {
+            border-color: rgba(122, 92, 37, 0.38);
+            background: rgba(17, 19, 23, 0.92);
+            color: #fff8e7;
+            outline: none;
         }
         .calendar-vehicle-chip strong {
             color: var(--ink);
+        }
+        .calendar-vehicle-chip[data-calendar-vehicle-filter]:hover strong,
+        .calendar-vehicle-chip[data-calendar-vehicle-filter]:focus-visible strong,
+        .calendar-vehicle-chip.is-active strong {
+            color: var(--gold-soft);
         }
         .calendar-scroll {
             overflow-x: auto;
@@ -792,7 +812,7 @@ function renderAdminReservationsPage() {
             border: 1px solid rgba(122, 92, 37, 0.12);
             border-radius: 18px;
             background: rgba(255, 255, 255, 0.66);
-            overflow: hidden;
+            overflow: visible;
         }
         .calendar-timeline__header,
         .calendar-timeline__row {
@@ -810,11 +830,13 @@ function renderAdminReservationsPage() {
         .calendar-timeline__vehicle {
             position: sticky;
             left: 0;
-            z-index: 3;
-            border-right: 1px solid rgba(122, 92, 37, 0.13);
+            z-index: 6;
+            border-right: 1px solid rgba(82, 61, 37, 0.24);
             background: rgba(255, 250, 242, 0.98);
+            box-shadow: 12px 0 22px rgba(52, 38, 21, 0.11);
         }
         .calendar-timeline__corner {
+            z-index: 8;
             padding: 12px;
             color: var(--muted);
             font-size: 0.62rem;
@@ -2027,6 +2049,7 @@ function renderAdminReservationsPage() {
             lastListData: null,
             lastCalendarData: null,
             calendarMonth: '',
+            calendarVehicleFilter: '',
             calendarOpen: false,
             calendarLoaded: false
         };
@@ -2326,19 +2349,64 @@ function renderAdminReservationsPage() {
             }).join('') + '</div>';
         }
 
+        function getVisibleCalendarData(data) {
+            var selectedVehicle = state.calendarVehicleFilter || '';
+            if (!selectedVehicle) return data;
+
+            var timeline = data && data.timeline ? data.timeline : {};
+            var visibleTimeline = {
+                dayCount: timeline.dayCount,
+                days: Array.isArray(timeline.days) ? timeline.days : [],
+                vehicles: Array.isArray(timeline.vehicles)
+                    ? timeline.vehicles.filter(function (vehicle) {
+                        return vehicle.name === selectedVehicle;
+                    })
+                    : []
+            };
+            var visibleDays = Array.isArray(data.days)
+                ? data.days.map(function (day) {
+                    var reservations = Array.isArray(day.reservations)
+                        ? day.reservations.filter(function (reservation) {
+                            return reservation.vehicle === selectedVehicle;
+                        })
+                        : [];
+                    return {
+                        ...day,
+                        reservations: reservations
+                    };
+                })
+                : [];
+
+            return {
+                ...data,
+                timeline: visibleTimeline,
+                days: visibleDays
+            };
+        }
+
         function renderCalendarBody(data) {
             if (!Array.isArray(data.days) || !data.days.length) {
                 return '<div class="empty">No calendar days available.</div>';
             }
+            var visibleData = getVisibleCalendarData(data);
             return isMobileCrmViewport()
-                ? renderCalendarAgenda(data)
-                : renderCalendarTimeline(data);
+                ? renderCalendarAgenda(visibleData)
+                : renderCalendarTimeline(visibleData);
         }
 
         function bindCalendarReservations() {
             document.querySelectorAll('[data-calendar-reservation-id]').forEach(function (button) {
                 button.addEventListener('click', function () {
                     openReservation(button.getAttribute('data-calendar-reservation-id'));
+                });
+            });
+        }
+
+        function bindCalendarVehicleFilters() {
+            document.querySelectorAll('[data-calendar-vehicle-filter]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    state.calendarVehicleFilter = button.getAttribute('data-calendar-vehicle-filter') || '';
+                    renderReservationCalendar(state.lastCalendarData);
                 });
             });
         }
@@ -2378,14 +2446,23 @@ function renderAdminReservationsPage() {
                 ' on ' + totalBusyDays + ' active day' + (totalBusyDays === 1 ? '' : 's') + '.';
             renderCalendarSnapshot(data);
             var vehicleItems = Array.isArray(data.vehicles) ? data.vehicles : [];
+            var vehicleNames = vehicleItems.map(function (vehicle) { return vehicle.name; });
+            if (state.calendarVehicleFilter && !vehicleNames.includes(state.calendarVehicleFilter)) {
+                state.calendarVehicleFilter = '';
+            }
             vehicles.innerHTML = vehicleItems.length
-                ? vehicleItems.slice(0, 8).map(function (vehicle) {
-                    return '<span class="calendar-vehicle-chip"><strong>' + escapeHtml(vehicle.reservationCount) + '</strong>' +
-                        escapeHtml(vehicle.name) + '</span>';
+                ? '<button class="calendar-vehicle-chip' + (!state.calendarVehicleFilter ? ' is-active' : '') + '" type="button" data-calendar-vehicle-filter="">' +
+                    '<strong>' + escapeHtml(totalVehicles) + '</strong>All cars</button>' +
+                    vehicleItems.slice(0, 8).map(function (vehicle) {
+                    var isActive = state.calendarVehicleFilter === vehicle.name;
+                    return '<button class="calendar-vehicle-chip' + (isActive ? ' is-active' : '') + '" type="button" data-calendar-vehicle-filter="' + escapeHtml(vehicle.name) + '">' +
+                        '<strong>' + escapeHtml(vehicle.reservationCount) + '</strong>' +
+                        escapeHtml(vehicle.name) + '</button>';
                 }).join('')
                 : '<span class="calendar-vehicle-chip"><strong>0</strong>No cars scheduled this month</span>';
             grid.innerHTML = renderCalendarBody(data);
             bindCalendarReservations();
+            bindCalendarVehicleFilters();
         }
 
         async function loadReservationCalendar() {
