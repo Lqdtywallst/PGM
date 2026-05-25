@@ -902,19 +902,25 @@ function renderAdminReservationsPage() {
             align-self: center;
             z-index: 2;
             padding: 5px 9px;
-            border: 1px solid rgba(122, 92, 37, 0.14);
+            border: 1px solid rgba(66, 50, 31, 0.34);
             border-left: 5px solid var(--gold);
             border-radius: 999px;
-            background: #fff;
+            background: linear-gradient(180deg, #ffffff 0%, #fffaf1 100%);
             color: var(--ink);
             cursor: pointer;
             text-align: left;
-            box-shadow: 0 8px 18px rgba(17, 19, 23, 0.07);
+            box-shadow:
+                0 10px 24px rgba(52, 38, 21, 0.13),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.86);
+            transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
         }
         .calendar-timeline__booking:hover,
         .calendar-timeline__booking:focus-visible {
-            border-color: rgba(220, 180, 88, 0.7);
-            box-shadow: 0 0 0 3px rgba(220, 180, 88, 0.14);
+            border-color: rgba(157, 112, 35, 0.9);
+            box-shadow:
+                0 0 0 4px rgba(220, 180, 88, 0.2),
+                0 14px 28px rgba(52, 38, 21, 0.16);
+            transform: translateY(-1px);
             outline: none;
         }
         .calendar-timeline__booking.confirmed { border-left-color: var(--green); }
@@ -979,13 +985,24 @@ function renderAdminReservationsPage() {
         .calendar-agenda__booking {
             width: 100%;
             padding: 9px;
-            border: 1px solid rgba(122, 92, 37, 0.14);
+            border: 1px solid rgba(66, 50, 31, 0.3);
             border-left: 4px solid var(--gold);
             border-radius: 12px;
-            background: #fff;
+            background: linear-gradient(180deg, #ffffff 0%, #fffaf1 100%);
             color: var(--ink);
             cursor: pointer;
             text-align: left;
+            box-shadow: 0 8px 18px rgba(52, 38, 21, 0.1);
+            transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+        }
+        .calendar-agenda__booking:hover,
+        .calendar-agenda__booking:focus-visible {
+            border-color: rgba(157, 112, 35, 0.86);
+            box-shadow:
+                0 0 0 4px rgba(220, 180, 88, 0.18),
+                0 12px 24px rgba(52, 38, 21, 0.14);
+            transform: translateY(-1px);
+            outline: none;
         }
         .calendar-agenda__booking.confirmed { border-left-color: var(--green); }
         .calendar-agenda__booking.pending { border-left-color: var(--amber); }
