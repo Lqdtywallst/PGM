@@ -43,7 +43,7 @@
     },
     {
       "itemType": "mega",
-      "label": "Cars Brands",
+      "label": "Car Brands",
       "href": "",
       "visible": true,
       "panelVariant": "brands",
@@ -54,7 +54,7 @@
           "description": "Huracan and Urus selection.",
           "href": "/lamborghini-rental-dubai.html",
           "imageSrc": "/images/brands/lamborghini-mark.png",
-          "imageAlt": "",
+          "imageAlt": "Lamborghini brand mark",
           "visible": true
         },
         {
@@ -62,7 +62,7 @@
           "description": "Convertible-led flagship moments.",
           "href": "/ferrari-rental-dubai.html",
           "imageSrc": "/images/brands/ferrari-mark.png",
-          "imageAlt": "",
+          "imageAlt": "Ferrari brand mark",
           "visible": true
         },
         {
@@ -70,7 +70,7 @@
           "description": "G-Class and executive balance.",
           "href": "/mercedes-rental-dubai.html",
           "imageSrc": "/images/brands/mercedes-mark.png",
-          "imageAlt": "",
+          "imageAlt": "Mercedes-Benz brand mark",
           "visible": true
         },
         {
@@ -78,7 +78,7 @@
           "description": "Focused driver-first delivery.",
           "href": "/porsche-rental-dubai.html",
           "imageSrc": "/images/brands/porsche-mark.png",
-          "imageAlt": "",
+          "imageAlt": "Porsche brand mark",
           "visible": true
         },
         {
@@ -86,14 +86,14 @@
           "description": "Arrival-first quiet authority.",
           "href": "/rolls-royce-rental-dubai.html",
           "imageSrc": "/images/brands/rolls-royce-mark.png",
-          "imageAlt": "",
+          "imageAlt": "Rolls-Royce brand mark",
           "visible": true
         }
       ]
     },
     {
       "itemType": "mega",
-      "label": "Cars Types",
+      "label": "Car Types",
       "href": "",
       "visible": true,
       "panelVariant": "types",
@@ -104,7 +104,7 @@
           "description": "Comfort-first arrivals and city stays.",
           "href": "/fleet.html?type=luxury",
           "imageSrc": "/images/categories/mock-fastpng/luxury-stage.png",
-          "imageAlt": "",
+          "imageAlt": "Luxury car category preview",
           "visible": true
         },
         {
@@ -112,7 +112,7 @@
           "description": "Open-top Dubai movement with presence.",
           "href": "/fleet.html?type=convertible",
           "imageSrc": "/images/categories/mock-fastpng/convertible-stage.png",
-          "imageAlt": "",
+          "imageAlt": "Convertible car category preview",
           "visible": true
         },
         {
@@ -120,7 +120,7 @@
           "description": "Sharper performance-led picks.",
           "href": "/fleet.html?type=sports",
           "imageSrc": "/images/categories/mock-fastpng/sports-stage.png",
-          "imageAlt": "",
+          "imageAlt": "Sports car category preview",
           "visible": true
         },
         {
@@ -128,7 +128,7 @@
           "description": "Room, height and hotel-ready comfort.",
           "href": "/fleet.html?type=suv",
           "imageSrc": "/images/categories/mock-fastpng/suv-stage.png",
-          "imageAlt": "",
+          "imageAlt": "SUV car category preview",
           "visible": true
         }
       ]

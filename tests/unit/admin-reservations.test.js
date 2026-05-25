@@ -243,6 +243,56 @@ test('admin reservation calendar groups active vehicle bookings by day', () => {
     assert.equal(may12.reservations.find((item) => item.reservationId === 'res_calendar_ferrari').isStart, true);
     assert.deepEqual(may1.reservations.map((item) => item.reservationId), ['res_calendar_previous_month']);
     assert.equal(calendar.days.some((day) => day.reservations.some((item) => item.reservationId === 'res_calendar_canceled')), false);
+    assert.equal(calendar.timeline.dayCount, 31);
+    assert.equal(calendar.timeline.days[0].date, '2026-05-01');
+    assert.equal(calendar.timeline.days.at(-1).date, '2026-05-31');
+    const lamboRow = calendar.timeline.vehicles.find((vehicle) => vehicle.name === 'Lamborghini Huracan EVO Spyder');
+    const lamboBooking = lamboRow.reservations.find((item) => item.reservationId === 'res_calendar_lambo');
+    assert.equal(lamboBooking.offsetDays, 9);
+    assert.equal(lamboBooking.spanDays, 3);
+    assert.equal(lamboBooking.lane, 0);
+    const previousMonthBooking = calendar.timeline.vehicles
+        .find((vehicle) => vehicle.name === 'Mercedes G63 AMG')
+        .reservations[0];
+    assert.equal(previousMonthBooking.startsBeforeMonth, true);
+    assert.equal(previousMonthBooking.offsetDays, 0);
+    assert.equal(previousMonthBooking.spanDays, 2);
+});
+
+test('admin reservation calendar stacks overlapping bookings in separate vehicle lanes', () => {
+    const calendar = buildAdminReservationCalendar([
+        reservation({
+            reservationId: 'res_overlap_one',
+            status: 'confirmed',
+            car: 'Porsche 992 GT3',
+            startDate: '2026-05-10',
+            endDate: '2026-05-12'
+        }),
+        reservation({
+            reservationId: 'res_overlap_two',
+            status: 'payment_succeeded',
+            car: 'Porsche 992 GT3',
+            startDate: '2026-05-12',
+            endDate: '2026-05-14'
+        }),
+        reservation({
+            reservationId: 'res_overlap_three',
+            status: 'confirmed',
+            car: 'Porsche 992 GT3',
+            startDate: '2026-05-15',
+            endDate: '2026-05-16'
+        })
+    ], {
+        month: '2026-05',
+        now: '2026-05-12T08:00:00.000Z'
+    });
+    const porscheRow = calendar.timeline.vehicles.find((vehicle) => vehicle.name === 'Porsche 992 GT3');
+    const lanes = Object.fromEntries(porscheRow.reservations.map((item) => [item.reservationId, item.lane]));
+
+    assert.equal(porscheRow.laneCount, 2);
+    assert.equal(lanes.res_overlap_one, 0);
+    assert.equal(lanes.res_overlap_two, 1);
+    assert.equal(lanes.res_overlap_three, 0);
 });
 
 test('admin actions persist private workflow state without deleting reservation data', () => {

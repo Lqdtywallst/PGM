@@ -82,3 +82,16 @@ test('footer replacement preserves the page footer class variant', () => {
     assert.match(replacement.html, /class="site-v2-footer site-v2-footer--over-video"/);
     assert.doesNotMatch(replacement.html, /Old footer/);
 });
+
+test('footer replacement upgrades legacy vehicle page-foot footer', () => {
+    const original = [
+        '<main>Vehicle page</main>',
+        '<footer class="page-foot"><p>Old vehicle footer</p></footer>'
+    ].join('\n');
+    const replacement = replaceFirstFooter(original, (options) => buildFooterMarkup(normalizeFooterConfig(baseFooterConfig()), '/', options));
+
+    assert.equal(replacement.found, true);
+    assert.match(replacement.html, /class="site-v2-footer" id="contact"/);
+    assert.doesNotMatch(replacement.html, /page-foot/);
+    assert.doesNotMatch(replacement.html, /Old vehicle footer/);
+});
