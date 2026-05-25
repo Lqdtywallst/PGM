@@ -2776,6 +2776,7 @@ function renderAdminReservationsPage() {
                         '<button class="action" type="button" data-action="confirm_handover">Confirm handover</button>' +
                         '<button class="action" type="button" data-action="archive">Archive</button>' +
                         '<button class="action danger" type="button" data-action="cancel">Cancel</button>' +
+                        '<button class="action danger" type="button" data-delete-reservation>Delete</button>' +
                     '</div>' +
                     (workflowFields ? '<div class="field-grid">' + workflowFields + '</div>' : '') +
                 '</div>' +
@@ -2790,6 +2791,10 @@ function renderAdminReservationsPage() {
             document.getElementById('editReservationButton').addEventListener('click', function () {
                 openManualPanel('edit', state.currentReservation);
             });
+            var deleteButton = detail.querySelector('[data-delete-reservation]');
+            if (deleteButton) {
+                deleteButton.addEventListener('click', deleteSelectedReservation);
+            }
             document.getElementById('closeReservationDetail').addEventListener('click', closeReservationDetail);
         }
 
@@ -2852,6 +2857,30 @@ function renderAdminReservationsPage() {
                 await loadReservationCalendar();
             } catch (error) {
                 window.alert('This reservation could not be updated.');
+            }
+        }
+
+        async function deleteSelectedReservation() {
+            if (!state.selectedId) return;
+            var reservationLabel = state.currentReservation && state.currentReservation.reservationId
+                ? state.currentReservation.reservationId
+                : state.selectedId;
+            if (!window.confirm('Delete reservation ' + reservationLabel + ' permanently? This cannot be undone.')) {
+                return;
+            }
+
+            try {
+                var response = await api('/api/admin/reservations/' + encodeURIComponent(state.selectedId), {
+                    method: 'DELETE'
+                });
+                if (!response.ok) throw new Error('Delete failed');
+                state.selectedId = '';
+                state.currentReservation = null;
+                closeReservationDetail();
+                await loadReservations();
+                await loadReservationCalendar();
+            } catch (error) {
+                window.alert('This reservation could not be deleted.');
             }
         }
 

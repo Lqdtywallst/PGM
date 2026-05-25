@@ -1617,6 +1617,28 @@ function createAdminReservationsRouter(dependencies = {}) {
         }
     }));
 
+    router.delete('/reservations/:id', asyncRoute(async (req, res) => {
+        const record = await store.readReservationRecord(req.params.id);
+        if (!record) {
+            return res.status(404).json({ error: 'Reservation not found' });
+        }
+
+        if (!store.deleteReservationRecord) {
+            return res.status(501).json({ error: 'Reservation delete is not available for this store' });
+        }
+
+        const summary = buildAdminReservationSummary(record);
+        await store.deleteReservationRecord(req.params.id);
+
+        return res.json({
+            ok: true,
+            deleted: {
+                id: summary.id,
+                reservationId: summary.reservationId
+            }
+        });
+    }));
+
     return router;
 }
 

@@ -268,6 +268,20 @@ test.describe('Private admin reservations CRM', () => {
         await expect(page.locator('#reservationDetail')).toContainText('Archive after E2E coverage.');
 
         await page.selectOption('#queueFilterSelect', 'archived');
-        await expect(page.locator('.reservation-card', { hasText: manualClientName })).toContainText('Archived');
+        const archivedManualCard = page.locator('.reservation-card', { hasText: manualClientName });
+        await expect(archivedManualCard).toContainText('Archived');
+        await archivedManualCard.click();
+        await expect(page.locator('.detail-title')).toContainText('Rolls-Royce Cullinan');
+
+        page.once('dialog', async (dialog) => {
+            expect(dialog.message()).toContain('Delete reservation');
+            await dialog.accept();
+        });
+        await page.click('[data-delete-reservation]');
+        await expect(page.locator('#reservationDetail')).toContainText('Operations overview');
+        await expect(page.locator('.reservation-card', { hasText: manualClientName })).toHaveCount(0);
+        const deletedManualResponse = await page.request.get(`${adminBaseUrl}/api/admin/reservations/${encodeURIComponent(manualReservationId)}`);
+        expect(deletedManualResponse.status()).toBe(404);
+        manualReservationId = '';
     });
 });
