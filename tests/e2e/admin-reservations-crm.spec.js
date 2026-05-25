@@ -176,6 +176,19 @@ test.describe('Private admin reservations CRM', () => {
         await expect(page.locator('#calendarToggleButton')).toHaveText(/Hide calendar/);
         await expect(page.locator('#calendarBody')).toBeVisible();
         await expect(page.locator('#reservationCalendarGrid')).toContainText('Lamborghini Huracan EVO Spyder');
+        await expect(page.locator('[data-calendar-view="timeline"]')).toHaveClass(/is-active/);
+        await expect(page.locator('[data-calendar-vehicle-filter="Lamborghini Huracan EVO Spyder"]')).toBeVisible();
+        await page.click('[data-calendar-view="month"]');
+        await expect(page.locator('[data-calendar-view="month"]')).toHaveClass(/is-active/);
+        await expect(page.locator('.calendar-month')).toBeVisible();
+        await expect(page.locator('.calendar-month__booking').first()).toContainText('Lamborghini Huracan EVO Spyder');
+        await page.click('[data-calendar-vehicle-filter="Lamborghini Huracan EVO Spyder"]');
+        await expect(page.locator('.calendar-vehicle-chip.is-active')).toContainText('Lamborghini Huracan EVO Spyder');
+        await expect(page.locator('#reservationCalendarGrid')).toContainText('Lamborghini Huracan EVO Spyder');
+        await page.click('[data-calendar-vehicle-filter=""]');
+        await page.click('[data-calendar-view="timeline"]');
+        await expect(page.locator('[data-calendar-view="timeline"]')).toHaveClass(/is-active/);
+        await expect(page.locator('#reservationCalendarGrid')).toContainText('Lamborghini Huracan EVO Spyder');
 
         const calendarReservation = page.locator(`[data-calendar-reservation-id="${reservationId}"]`).first();
         await calendarReservation.scrollIntoViewIfNeeded();
