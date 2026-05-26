@@ -1370,6 +1370,94 @@
             return false;
         }
 
+        function collectReservationFormData() {
+            return {
+                fullName: document.getElementById('fullName').value,
+                passport: document.getElementById('passport').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                city: document.getElementById('city').value,
+                country: document.getElementById('country').value,
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value,
+                pickupTime: document.getElementById('pickupTime').value,
+                dropoffTime: document.getElementById('dropoffTime').value,
+                pickupLocation: document.getElementById('pickupLocation').value,
+            };
+        }
+
+        function buildReservationRequestPayload(formData, pricing) {
+            const total = pricing.total;
+            const upfrontAmount = pricing.upfrontAmount;
+            const remainingAmount = pricing.remainingAmount;
+
+            return {
+                amount: Math.round(upfrontAmount * 100),
+                currency: (window.STRIPE_CONFIG && window.STRIPE_CONFIG.currency) || (isAED ? 'aed' : 'eur'),
+                clientContext: buildClientContext(),
+                ...(qaCheckoutContext || {}),
+                customerData: {
+                    name: formData.fullName,
+                    email: formData.email,
+                    phone: formData.phone,
+                    dni: formData.passport,
+                    address: formData.address,
+                    city: formData.city,
+                    country: formData.country,
+                },
+                reservationData: {
+                    car: selectedCar,
+                    pricePerDay: pricePerDay,
+                    days: Number(pricing.billingDays.toFixed(2)),
+                    startDate: formData.startDate.split('T')[0],
+                    endDate: formData.endDate.split('T')[0],
+                    pickupTime: formData.pickupTime,
+                    dropoffTime: formData.dropoffTime,
+                    durationHours: Number(pricing.durationHours.toFixed(2)),
+                    durationLabel: pricing.durationLabel,
+                    totalAmount: Number(total.toFixed(2)),
+                    total: formatAmount(total),
+                    upfrontAmount: Number(upfrontAmount.toFixed(2)),
+                    upfrontDisplay: formatAmount(upfrontAmount),
+                    remainingAmount: Number(remainingAmount.toFixed(2)),
+                    remainingDisplay: formatAmount(remainingAmount),
+                    pickupLocation: formData.pickupLocation,
+                    ...(qaCheckoutContext || {}),
+                }
+            };
+        }
+
+        async function redirectToHostedCheckout(BACKEND_URL, reservationPayload, payButton) {
+            console.warn('[PAYMENT] Stripe Elements unavailable. Trying hosted Stripe checkout fallback.');
+            showMessage('Opening Stripe secure checkout...', 'success');
+            payButton.textContent = 'Opening Stripe checkout...';
+            updateMobileReserveUi();
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/reserve/checkout-session`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(reservationPayload)
+                });
+                const data = await response.json().catch(() => ({}));
+
+                if (!response.ok || !data.checkoutUrl) {
+                    throw new Error(data.error || 'Hosted Stripe checkout could not be started.');
+                }
+
+                window.location.href = data.checkoutUrl;
+            } catch (error) {
+                console.error('[PAYMENT] Hosted checkout fallback failed:', error);
+                showMessage('We could not open Stripe checkout. ' + error.message, 'error');
+                payButton.disabled = false;
+                payButton.textContent = restorePayButtonLabel();
+                updateMobileReserveUi();
+            }
+        }
+
         async function submitReservation() {
             console.log('[PAYMENT] ========== STARTING PAYMENT PROCESS ==========');
             const payButton = document.getElementById('payButton');
@@ -1402,32 +1490,7 @@
             }
             console.log('[PAYMENT] Server connection verified, proceeding with payment...');
 
-            const stripeReady = await ensureStripeReady();
-            if (!stripeReady) {
-                showMessage('Secure payment could not be initialized. Please reload the page or contact the team on WhatsApp.', 'error');
-                payButton.disabled = false;
-                payButton.textContent = restorePayButtonLabel();
-                updateMobileReserveUi();
-                return;
-            }
-
-            await initializeStripeElements();
-
-            // Collect form data
-            const formData = {
-                fullName: document.getElementById('fullName').value,
-                passport: document.getElementById('passport').value,
-                email: document.getElementById('email').value,
-                phone: document.getElementById('phone').value,
-                address: document.getElementById('address').value,
-                city: document.getElementById('city').value,
-                country: document.getElementById('country').value,
-                startDate: document.getElementById('startDate').value,
-                endDate: document.getElementById('endDate').value,
-                pickupTime: document.getElementById('pickupTime').value,
-                dropoffTime: document.getElementById('dropoffTime').value,
-                pickupLocation: document.getElementById('pickupLocation').value,
-            };
+            const formData = collectReservationFormData();
 
             console.log('[PAYMENT] Collected form data:', {
                 fullName: formData.fullName,
@@ -1461,6 +1524,7 @@
             const upfrontAmount = pricing.upfrontAmount;
             const remainingAmount = pricing.remainingAmount;
             const totalCents = Math.round(upfrontAmount * 100);
+            const reservationPayload = buildReservationRequestPayload(formData, pricing);
 
             emitAnalyticsEvent('reserve_submit', {
                 car: selectedCar,
@@ -1477,6 +1541,18 @@
                 remainingAmount: remainingAmount,
                 totalCents: totalCents
             });
+
+            const stripeReady = await ensureStripeReady();
+            if (!stripeReady) {
+                await redirectToHostedCheckout(BACKEND_URL, reservationPayload, payButton);
+                return;
+            }
+
+            await initializeStripeElements();
+            if (!stripe || !cardElement) {
+                await redirectToHostedCheckout(BACKEND_URL, reservationPayload, payButton);
+                return;
+            }
 
             try {
                 // Get reservation service URL

@@ -337,6 +337,67 @@ function sanitizeReservationRequestForStorage(data = {}, req = {}) {
     };
 }
 
+function isAllowedPublicOrigin(origin) {
+    try {
+        const { hostname, protocol } = new URL(String(origin || ''));
+        return protocol === 'https:' && [
+            'dynastyprestigecarrental.com',
+            'www.dynastyprestigecarrental.com',
+            'prestigegoalmotion.com',
+            'www.prestigegoalmotion.com'
+        ].includes(hostname.toLowerCase());
+    } catch (error) {
+        return false;
+    }
+}
+
+function resolvePublicOrigin(data = {}, req = {}) {
+    if (isAllowedPublicOrigin(req.headers?.origin)) {
+        return req.headers.origin;
+    }
+
+    const landingUrl = data.clientContext?.landingUrl || data.clientContext?.landing_url;
+    try {
+        const parsed = new URL(String(landingUrl || ''));
+        if (isAllowedPublicOrigin(parsed.origin)) {
+            return parsed.origin;
+        }
+    } catch (error) {
+        // Fall back to the canonical public domain below.
+    }
+
+    return 'https://www.dynastyprestigecarrental.com';
+}
+
+function stripeMetadataValue(value) {
+    return String(value ?? '').slice(0, 500);
+}
+
+function buildCheckoutMetadata({ reservationId, reservationData = {}, customerData = {} } = {}) {
+    return {
+        reservationId: stripeMetadataValue(reservationId),
+        car: stripeMetadataValue(reservationData.car),
+        days: stripeMetadataValue(reservationData.days),
+        startDate: stripeMetadataValue(reservationData.startDate),
+        endDate: stripeMetadataValue(reservationData.endDate),
+        pickupTime: stripeMetadataValue(reservationData.pickupTime),
+        dropoffTime: stripeMetadataValue(reservationData.dropoffTime),
+        durationHours: stripeMetadataValue(reservationData.durationHours),
+        durationLabel: stripeMetadataValue(reservationData.durationLabel),
+        pricePerDay: stripeMetadataValue(reservationData.pricePerDay),
+        totalAmount: stripeMetadataValue(reservationData.totalAmount),
+        totalDisplay: stripeMetadataValue(reservationData.total),
+        upfrontAmount: stripeMetadataValue(reservationData.upfrontAmount),
+        upfrontDisplay: stripeMetadataValue(reservationData.upfrontDisplay),
+        remainingAmount: stripeMetadataValue(reservationData.remainingAmount),
+        remainingDisplay: stripeMetadataValue(reservationData.remainingDisplay),
+        customerName: stripeMetadataValue(customerData.name),
+        customerEmail: stripeMetadataValue(customerData.email),
+        customerPhone: stripeMetadataValue(customerData.phone),
+        pickupLocation: stripeMetadataValue(reservationData.pickupLocation)
+    };
+}
+
 function buildPaymentPersistence(paymentIntent = null, currency = 'aed') {
     if (!paymentIntent) {
         return {
@@ -482,6 +543,48 @@ function enrichReservationPricing(reservationData, currency = 'aed') {
     reservationData.remainingDisplay = reservationData.remainingDisplay || formatMoneyDisplay(reservationData.remainingAmount, normalizedCurrency);
 
     return reservationData;
+}
+
+function normalizeWebsiteReservationPayload(data = {}) {
+    const customerData = data.customerData || {
+        name: data.fullName,
+        email: data.email,
+        phone: data.phone,
+        dni: data.passport || data.dni,
+        address: data.address,
+        city: data.city,
+        country: normalizeCountryCode(data.country),
+    };
+    const reservationCurrency = (data.currency || data.reservationData?.currency || 'aed').toLowerCase();
+    const reservationData = data.reservationData || {
+        car: data.car || 'Mercedes GLE 53 AMG',
+        pricePerDay: data.pricePerDay || 500,
+        days: data.days,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        pickupTime: data.pickupTime,
+        dropoffTime: data.dropoffTime,
+        durationHours: data.durationHours,
+        durationLabel: data.durationLabel,
+        totalAmount: data.totalAmount,
+        total: data.total,
+        upfrontAmount: data.upfrontAmount,
+        upfrontDisplay: data.upfrontDisplay,
+        remainingAmount: data.remainingAmount,
+        remainingDisplay: data.remainingDisplay,
+        pickupLocation: data.pickupLocation,
+        currency: reservationCurrency.toUpperCase(),
+    };
+    const reservationId = data.reservationId || reservationData.reservationId || buildReservationId();
+
+    reservationData.reservationId = reservationId;
+
+    return {
+        customerData,
+        reservationCurrency,
+        reservationData,
+        reservationId
+    };
 }
 
 // Email configuration
@@ -1111,6 +1214,156 @@ router.post('/', createReservationRateLimit({
         console.error('[API]  GENERAL ERROR:', error);
         console.error('[API] Trace:', error.stack);
         return res.status(500).json(publicReservationError());
+    }
+});
+
+// POST /api/reserve/checkout-session - Stripe-hosted fallback checkout
+router.post('/checkout-session', createReservationRateLimit({
+    group: 'checkout_session',
+    windowMs: 10 * 60 * 1000,
+    max: 20
+}), async (req, res) => {
+    console.log('[API CHECKOUT SESSION] ========== HOSTED CHECKOUT ==========');
+    res.set('Cache-Control', 'no-store');
+
+    try {
+        const data = req.body || {};
+
+        if (!data.amount) {
+            return res.status(400).json({ error: 'Amount is required.' });
+        }
+
+        if (!stripe) {
+            return res.status(503).json({
+                error: 'Secure payment is temporarily unavailable'
+            });
+        }
+
+        const {
+            customerData,
+            reservationCurrency,
+            reservationData,
+            reservationId
+        } = normalizeWebsiteReservationPayload(data);
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(customerData.email || '')) {
+            return res.status(400).json({
+                error: 'Invalid email format'
+            });
+        }
+
+        let verifiedCheckout;
+        try {
+            verifiedCheckout = verifyCheckoutAmount({
+                reservationData,
+                amount: data.amount,
+                currency: reservationCurrency
+            });
+            Object.assign(reservationData, verifiedCheckout.reservationData, { reservationId });
+            delete reservationData.qaCheckoutToken;
+            delete reservationData.qaToken;
+        } catch (checkoutError) {
+            console.warn('[API CHECKOUT SESSION] Checkout pricing blocked:', checkoutError.message);
+            return res.status(checkoutError.statusCode || 409).json({
+                error: checkoutError.message
+            });
+        }
+
+        try {
+            const persistHostedReservation = async () => {
+                const reservations = await listReservationRecords({ limit: 5000 });
+                assertCheckoutVehicleAvailable({
+                    reservations,
+                    reservationData,
+                    reservationId
+                });
+
+                return persistReservationUpdate({
+                    reservationId,
+                    status: 'hosted_checkout_started',
+                    source: 'website_hosted_checkout',
+                    customerData,
+                    reservationData,
+                    payment: {
+                        amount: verifiedCheckout.amountMinor,
+                        currency: verifiedCheckout.currency
+                    },
+                    email: {
+                        pendingNotification: {
+                            status: 'queued',
+                            queuedAt: new Date().toISOString()
+                        }
+                    },
+                    rawRequest: sanitizeReservationRequestForStorage(data, req)
+                }, 'hosted checkout started', { critical: true });
+            };
+
+            await withCheckoutVehicleLock(reservationData, persistHostedReservation);
+        } catch (checkoutError) {
+            console.warn('[API CHECKOUT SESSION] Reservation blocked:', checkoutError.message);
+            return res.status(checkoutError.statusCode || 500).json({
+                error: checkoutError.message
+            });
+        }
+
+        const publicOrigin = resolvePublicOrigin(data, req);
+        const successUrl = `${publicOrigin}/index.html?checkout=success&reservationId=${encodeURIComponent(reservationId)}`;
+        const cancelUrl = `${publicOrigin}/app/reserve/page.html?checkout=cancelled&reservationId=${encodeURIComponent(reservationId)}`;
+        const metadata = buildCheckoutMetadata({ reservationId, reservationData, customerData });
+
+        const session = await stripe.checkout.sessions.create({
+            mode: 'payment',
+            payment_method_types: ['card'],
+            customer_email: customerData.email,
+            client_reference_id: reservationId,
+            success_url: successUrl,
+            cancel_url: cancelUrl,
+            line_items: [
+                {
+                    price_data: {
+                        currency: verifiedCheckout.currency,
+                        unit_amount: verifiedCheckout.amountMinor,
+                        product_data: {
+                            name: `${reservationData.car} reservation deposit`,
+                            description: `${reservationData.durationLabel || 'Rental'} upfront payment`
+                        }
+                    },
+                    quantity: 1
+                }
+            ],
+            payment_intent_data: {
+                description: `Reservation: ${reservationData.car} - 50% upfront`,
+                metadata
+            },
+            metadata
+        }, {
+            idempotencyKey: `${buildCheckoutIdempotencyKey(reservationId)}-hosted`
+        });
+
+        await persistReservationUpdate({
+            reservationId,
+            status: 'hosted_checkout_created',
+            source: 'website_hosted_checkout',
+            customerData,
+            reservationData,
+            payment: {
+                amount: verifiedCheckout.amountMinor,
+                currency: verifiedCheckout.currency,
+                checkoutSessionId: session.id,
+                checkoutUrlCreated: true
+            }
+        }, 'hosted checkout session created');
+
+        return res.json({
+            success: true,
+            reservationId,
+            checkoutSessionId: session.id,
+            checkoutUrl: session.url
+        });
+    } catch (error) {
+        console.error('[API CHECKOUT SESSION] Error:', error);
+        return res.status(500).json(publicReservationError('Hosted checkout could not be started. Please try again or WhatsApp the team.'));
     }
 });
 
