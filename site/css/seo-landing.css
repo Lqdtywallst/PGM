@@ -5281,6 +5281,40 @@ body.vehicle-page .site-v2-footer__column h3 {
     margin-bottom: clamp(1rem, 2.5vw, 1.65rem);
 }
 
+.vehicle-pdp-seo-intent .vehicle-section__heading--compact {
+    display: grid;
+    justify-items: center;
+    gap: clamp(0.72rem, 1.25vw, 0.95rem);
+    max-width: min(100%, 58rem);
+    margin-right: auto;
+    margin-bottom: clamp(1.65rem, 3.2vw, 2.45rem);
+    margin-left: auto;
+    text-align: center;
+}
+
+.vehicle-pdp-seo-intent .section-kicker {
+    justify-content: center;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.vehicle-pdp-seo-intent .vehicle-section__heading h2 {
+    max-width: 21.5ch;
+    margin: 0 auto;
+    font-size: clamp(2.05rem, 3vw, 3.18rem);
+    letter-spacing: -0.028em;
+    line-height: 1.05;
+    text-wrap: balance;
+}
+
+.vehicle-pdp-seo-intent .vehicle-section__heading p {
+    max-width: 54rem;
+    margin: 0 auto;
+    font-size: clamp(1rem, 1.15vw, 1.13rem);
+    line-height: 1.72;
+    text-wrap: pretty;
+}
+
 .vehicle-section__heading--with-link {
     display: flex;
     align-items: end;
@@ -5618,6 +5652,25 @@ body.vehicle-page .site-v2-footer__column h3 {
     .vehicle-pdp-related-visual .vehicle-section__heading h2,
     .vehicle-pdp-experience .vehicle-section__heading h2 {
         font-size: clamp(1.8rem, 9vw, 2.55rem);
+    }
+
+    .vehicle-pdp-seo-intent .vehicle-section__heading--compact {
+        gap: 0.78rem;
+        margin-bottom: 1.35rem;
+        text-align: center;
+    }
+
+    .vehicle-pdp-seo-intent .vehicle-section__heading h2 {
+        max-width: 13.25ch;
+        font-size: clamp(1.84rem, 8.2vw, 2.38rem);
+        letter-spacing: -0.024em;
+        line-height: 1.06;
+    }
+
+    .vehicle-pdp-seo-intent .vehicle-section__heading p {
+        max-width: 32rem;
+        font-size: 0.96rem;
+        line-height: 1.58;
     }
 
     .vehicle-section__heading--with-link {
