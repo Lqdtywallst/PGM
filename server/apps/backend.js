@@ -51,10 +51,16 @@ const {
     buildGoogleReviewsUnavailablePayload
 } = require('../integrations/google-reviews');
 
-const stripeConfigured = Boolean(
-    process.env.STRIPE_SECRET_KEY &&
-    !process.env.STRIPE_SECRET_KEY.includes('tu_clave')
-);
+function getStripeSecretMode(env = process.env) {
+    const secretKey = String(env.STRIPE_SECRET_KEY || '').trim();
+    if (!secretKey || secretKey.includes('tu_clave')) return 'missing';
+    if (secretKey.startsWith('sk_live_')) return 'live';
+    if (secretKey.startsWith('sk_test_')) return 'test';
+    return 'unknown';
+}
+
+const stripeSecretMode = getStripeSecretMode();
+const stripeConfigured = stripeSecretMode !== 'missing';
 
 // Verify Stripe configuration
 if (!stripeConfigured) {
@@ -1091,6 +1097,7 @@ app.get('/api/test', (req, res) => {
         server: 'Dynasty Prestige API',
         services: {
             stripeConfigured,
+            stripeMode: stripeSecretMode,
             emailConfigured: isEmailConfigured(),
             contactMode: EMAIL_CONFIG.logOnlyInDevelopment && !isEmailConfigured() ? 'development-log-only' : 'email',
             reservationStorage: getReservationStoreMode(),

@@ -185,7 +185,15 @@ async function checkBackend() {
     addCheck('backend', 'Service diagnostics', testApi.response.ok ? 'pass' : 'fail', `HTTP ${testApi.response.status}`);
 
     const services = testApi.body?.services || {};
-    addCheck('backend', 'Stripe test backend configured', services.stripeConfigured ? 'pass' : 'fail', services.stripeConfigured ? 'Stripe is configured' : 'STRIPE_SECRET_KEY missing/invalid on backend.');
+    const stripeMode = String(services.stripeMode || (services.stripeConfigured ? 'unknown' : 'missing')).trim().toLowerCase();
+    addCheck(
+        'backend',
+        'Stripe backend is test mode',
+        stripeMode === 'test' ? 'pass' : 'fail',
+        stripeMode === 'test'
+            ? 'STRIPE_SECRET_KEY is sk_test_.'
+            : `Expected sk_test_ on staging backend, detected ${stripeMode}.`
+    );
     addCheck('backend', 'Postgres reservation storage', services.databaseConfigured && services.reservationStorage === 'postgres' ? 'pass' : 'fail', `storage=${services.reservationStorage || 'unknown'}`);
     addCheck('backend', 'Mobile reservation notifications', services.mobileNotifications?.configured ? 'pass' : 'fail', services.mobileNotifications?.configured ? `channels=${(services.mobileNotifications.channels || []).join(', ')}` : 'Telegram/webhook is not configured on backend.');
     addCheck('backend', 'Email delivery', services.emailConfigured ? 'pass' : 'warn', services.contactMode || 'unknown');

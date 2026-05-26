@@ -466,6 +466,12 @@ async function run() {
         stagingReadinessCheck.includes('Stripe publishable key is usable test key'),
         'staging readiness rejects placeholder Stripe publishable keys'
     );
+    assert(
+        stagingReadinessCheck.includes('Stripe backend is test mode') &&
+        stagingReadinessCheck.includes("stripeMode === 'test'") &&
+        readFile('server/apps/backend.js').includes('stripeMode: stripeSecretMode'),
+        'staging readiness requires the backend Stripe secret to be test mode'
+    );
 
     const cspHeader = JSON.stringify(vercelConfig.headers || []);
     assert(
