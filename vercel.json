@@ -227,7 +227,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline' https://js.stripe.com https://www.googletagmanager.com; connect-src 'self' https://api.stripe.com https://web-production-3d323.up.railway.app https://pgm-preproduccion.up.railway.app https://pgm-staging.up.railway.app https://dynastyprestigecarrental.com https://www.dynastyprestigecarrental.com https://staging.dynastyprestigecarrental.com https://preprod.dynastyprestigecarrental.com https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com; frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://www.openstreetmap.org https://www.google.com; media-src 'self' https:; manifest-src 'self'; worker-src 'self' blob:"
+          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self' https://checkout.stripe.com; img-src 'self' data: https: https://*.stripe.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline' https://js.stripe.com https://*.js.stripe.com https://checkout.stripe.com https://www.googletagmanager.com; connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://web-production-3d323.up.railway.app https://pgm-preproduccion.up.railway.app https://pgm-staging.up.railway.app https://dynastyprestigecarrental.com https://www.dynastyprestigecarrental.com https://staging.dynastyprestigecarrental.com https://preprod.dynastyprestigecarrental.com https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com; frame-src 'self' https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com https://checkout.stripe.com https://www.openstreetmap.org https://www.google.com; media-src 'self' https:; manifest-src 'self'; worker-src 'self' blob:"
         },
         {
           "key": "Referrer-Policy",
@@ -239,7 +239,7 @@
         },
         {
           "key": "Cross-Origin-Opener-Policy",
-          "value": "same-origin"
+          "value": "unsafe-none"
         },
         {
           "key": "Cross-Origin-Resource-Policy",

@@ -453,6 +453,18 @@ async function run() {
         cspHeader.includes('https://preprod.dynastyprestigecarrental.com'),
         'Vercel CSP allows the staging backend and staging domains'
     );
+    assert(
+        cspHeader.includes('https://js.stripe.com') &&
+        cspHeader.includes('https://*.js.stripe.com') &&
+        cspHeader.includes('https://checkout.stripe.com') &&
+        cspHeader.includes('https://*.stripe.com') &&
+        cspHeader.includes('https://hooks.stripe.com'),
+        'Vercel CSP keeps Stripe Elements and hosted Checkout allowed'
+    );
+    assert(
+        cspHeader.includes('"Cross-Origin-Opener-Policy","value":"unsafe-none"'),
+        'Vercel public pages avoid cross-origin isolation for Stripe checkout'
+    );
 
     const reserveRoute = readFile('app/api/reserve/route.js');
     assert(

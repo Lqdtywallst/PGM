@@ -25,13 +25,13 @@ const CONTENT_SECURITY_POLICY = [
     "base-uri 'self'",
     "object-src 'none'",
     `frame-ancestors ${FRAME_ANCESTORS}`,
-    "form-action 'self'",
-    "img-src 'self' data: https:",
+    "form-action 'self' https://checkout.stripe.com",
+    "img-src 'self' data: https: https://*.stripe.com",
     "font-src 'self' data: https://cdnjs.cloudflare.com",
     "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com",
-    "script-src 'self' 'unsafe-inline' https://js.stripe.com https://www.googletagmanager.com",
-    "connect-src 'self' http://127.0.0.1:3000 http://localhost:3000 https://api.stripe.com https://web-production-3d323.up.railway.app https://pgm-preproduccion.up.railway.app https://pgm-staging.up.railway.app https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com",
-    "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://www.openstreetmap.org https://www.google.com",
+    "script-src 'self' 'unsafe-inline' https://js.stripe.com https://*.js.stripe.com https://checkout.stripe.com https://www.googletagmanager.com",
+    "connect-src 'self' http://127.0.0.1:3000 http://localhost:3000 https://api.stripe.com https://checkout.stripe.com https://web-production-3d323.up.railway.app https://pgm-preproduccion.up.railway.app https://pgm-staging.up.railway.app https://dynastyprestigecarrental.com https://www.dynastyprestigecarrental.com https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com",
+    "frame-src 'self' https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com https://checkout.stripe.com https://www.openstreetmap.org https://www.google.com",
     "media-src 'self' https:",
     "manifest-src 'self'",
     "worker-src 'self' blob:"
@@ -86,7 +86,7 @@ function buildCacheHeaders(filePath) {
 function buildSecurityHeaders() {
     const headers = {
         'Content-Security-Policy': CONTENT_SECURITY_POLICY,
-        'Cross-Origin-Opener-Policy': 'same-origin',
+        'Cross-Origin-Opener-Policy': 'unsafe-none',
         'Cross-Origin-Resource-Policy': 'same-origin',
         'Referrer-Policy': 'strict-origin-when-cross-origin',
         'Permissions-Policy': 'camera=(), geolocation=(), microphone=()',

@@ -621,14 +621,16 @@ app.use(helmet({
             baseUri: ["'self'"],
             objectSrc: ["'none'"],
             frameAncestors: ["'none'"],
-            formAction: ["'self'"],
-            imgSrc: ["'self'", 'data:'],
+            formAction: ["'self'", 'https://checkout.stripe.com'],
+            imgSrc: ["'self'", 'data:', 'https:', 'https://*.stripe.com'],
             styleSrc: ["'self'", "'unsafe-inline'"],
-            scriptSrc: ["'self'", "'unsafe-inline'"],
-            connectSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'", 'https://js.stripe.com', 'https://*.js.stripe.com', 'https://checkout.stripe.com'],
+            connectSrc: ["'self'", 'https://api.stripe.com', 'https://checkout.stripe.com'],
+            frameSrc: ["'self'", 'https://js.stripe.com', 'https://*.js.stripe.com', 'https://hooks.stripe.com', 'https://checkout.stripe.com'],
             upgradeInsecureRequests: appEnvironment === 'production' ? [] : null
         }
     },
+    crossOriginOpenerPolicy: { policy: 'unsafe-none' },
     crossOriginEmbedderPolicy: false,
     frameguard: { action: 'deny' },
     hsts: appEnvironment === 'production'
