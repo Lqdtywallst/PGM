@@ -43,7 +43,7 @@ Set these in the frontend hosting provider. They are browser-visible by design.
 ```bash
 APP_ENV=staging
 PGM_PUBLIC_BACKEND_URL=https://your-railway-staging.up.railway.app
-PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+PGM_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY=pk_test_...
 ```
 
 For Vercel:
@@ -99,7 +99,7 @@ $env:APP_ENV="staging"
 $env:NODE_ENV="production"
 $env:DATABASE_URL="<staging PostgreSQL URL>"
 $env:STRIPE_SECRET_KEY="sk_test_..."
-$env:PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_..."
+$env:PGM_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY="pk_test_..."
 $env:STRIPE_WEBHOOK_SECRET="whsec_..."
 $env:ADMIN_USER="<staging admin user>"
 $env:ADMIN_PASSWORD_HASH="<generated hash>"

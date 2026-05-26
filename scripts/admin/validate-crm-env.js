@@ -49,6 +49,27 @@ function stripePublicMode(value) {
     return key ? 'unknown' : 'missing';
 }
 
+function getStripePublishableKeyForTarget(env, target) {
+    if (target === 'production') {
+        return clean(
+            env.PGM_PUBLIC_STRIPE_LIVE_PUBLISHABLE_KEY ||
+            env.PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY ||
+            env.PUBLIC_STRIPE_PUBLISHABLE_KEY ||
+            env.STRIPE_PUBLISHABLE_KEY
+        );
+    }
+
+    return clean(
+        env.PGM_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY ||
+        env.PGM_PUBLIC_STRIPE_STAGING_PUBLISHABLE_KEY ||
+        env.PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY ||
+        env.STRIPE_TEST_PUBLISHABLE_KEY ||
+        env.PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY ||
+        env.PUBLIC_STRIPE_PUBLISHABLE_KEY ||
+        env.STRIPE_PUBLISHABLE_KEY
+    );
+}
+
 function parsePasswordHash(value) {
     const [scheme, iterationsRaw, salt, digest] = clean(value).split('$');
     const iterations = Number.parseInt(iterationsRaw, 10);
@@ -111,6 +132,7 @@ function validateCrmEnvironment(env = process.env, options = {}) {
         clean(env.SMTP_HOST) ||
         (clean(env.EMAIL_USER) && clean(env.EMAIL_PASSWORD))
     );
+    const stripePublishableKey = getStripePublishableKeyForTarget(env, target);
 
     addCheck(
         checks,
@@ -154,8 +176,8 @@ function validateCrmEnvironment(env = process.env, options = {}) {
         checks,
         'stripe_public',
         'Stripe publishable mode',
-        stripePublicMode(env.PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY) === expectedMode ? 'pass' : 'fail',
-        `expected ${expectedMode}, got ${stripePublicMode(env.PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY)}`
+        stripePublicMode(stripePublishableKey) === expectedMode ? 'pass' : 'fail',
+        `expected ${expectedMode}, got ${stripePublicMode(stripePublishableKey)}`
     );
 
     addCheck(

@@ -463,8 +463,15 @@ async function run() {
     assert(
         stagingReadinessCheck.includes('isUsableTestPublishableKey') &&
         stagingReadinessCheck.includes('!isPlaceholderPublishableKey') &&
-        stagingReadinessCheck.includes('Stripe publishable key is usable test key'),
+        stagingReadinessCheck.includes('Stripe publishable key is usable test key') &&
+        stagingReadinessCheck.includes('PGM_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY'),
         'staging readiness rejects placeholder Stripe publishable keys'
+    );
+    assert(
+        runtimeConfigBuilder.includes('PGM_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY') &&
+        runtimeConfigBuilder.includes('PGM_PUBLIC_STRIPE_LIVE_PUBLISHABLE_KEY') &&
+        readFile('server/apps/static-server.js').includes('PGM_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY'),
+        'runtime config separates staging test and production live Stripe publishable keys'
     );
     assert(
         stagingReadinessCheck.includes('Stripe backend is test mode') &&

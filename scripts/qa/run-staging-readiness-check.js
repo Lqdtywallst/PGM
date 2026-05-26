@@ -42,6 +42,17 @@ function isUsableTestPublishableKey(value) {
     return text.startsWith('pk_test_') && !isPlaceholderPublishableKey(text);
 }
 
+function getLocalTestPublishableKey() {
+    return process.env.PGM_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY ||
+        process.env.PGM_PUBLIC_STRIPE_STAGING_PUBLISHABLE_KEY ||
+        process.env.PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY ||
+        process.env.STRIPE_TEST_PUBLISHABLE_KEY ||
+        process.env.PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY ||
+        process.env.PUBLIC_STRIPE_PUBLISHABLE_KEY ||
+        process.env.STRIPE_PUBLISHABLE_KEY ||
+        '';
+}
+
 async function fetchText(url) {
     const response = await fetch(url, {
         headers: { Accept: 'text/html,application/javascript,application/json;q=0.9,*/*;q=0.8' }
@@ -101,7 +112,7 @@ function evaluateFrontendConfig(runtimeJs, configJs) {
 function addLocalEnvSnapshot() {
     const appEnv = process.env.APP_ENV || process.env.PGM_APP_ENV || '';
     const backendPublicUrl = process.env.PGM_PUBLIC_BACKEND_URL || '';
-    const publishableKey = process.env.PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY || '';
+    const publishableKey = getLocalTestPublishableKey();
     const stripeSecret = process.env.STRIPE_SECRET_KEY || '';
     const databaseUrl = process.env.DATABASE_URL || '';
     const telegramConfigured = Boolean(
@@ -126,9 +137,9 @@ function addLocalEnvSnapshot() {
     }
 
     if (publishableKey) {
-        addCheck('local-env', 'PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY', isUsableTestPublishableKey(publishableKey) ? 'pass' : 'fail', maskKey(publishableKey));
+        addCheck('local-env', 'PGM_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY', isUsableTestPublishableKey(publishableKey) ? 'pass' : 'fail', maskKey(publishableKey));
     } else {
-        addCheck('local-env', 'PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY', 'warn', 'Not set locally. Frontend host must set pk_test_ for staging.');
+        addCheck('local-env', 'PGM_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY', 'warn', 'Not set locally. Frontend host must set pk_test_ for staging.');
     }
 
     if (stripeSecret) {

@@ -25,7 +25,8 @@ test('staging CRM environment accepts test Stripe keys and staging database', ()
         ...baseEnv,
         APP_ENV: 'staging',
         STRIPE_SECRET_KEY: 'sk_test_123',
-        PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY: 'pk_test_123'
+        PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY: 'pk_live_123',
+        PGM_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY: 'pk_test_123'
     }, { target: 'staging' });
 
     assert.equal(report.ok, true);

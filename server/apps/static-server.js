@@ -134,14 +134,42 @@ function normalizeRuntimeEnvironment(value) {
     return '';
 }
 
+function resolvePublishableKeyForEnvironment(appEnv) {
+    if (appEnv === 'staging') {
+        return readPublicEnv(
+            'PGM_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY',
+            'PGM_PUBLIC_STRIPE_STAGING_PUBLISHABLE_KEY',
+            'PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY',
+            'STRIPE_TEST_PUBLISHABLE_KEY',
+            'PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY',
+            'PUBLIC_STRIPE_PUBLISHABLE_KEY',
+            'STRIPE_PUBLISHABLE_KEY'
+        );
+    }
+
+    if (appEnv === 'production') {
+        return readPublicEnv(
+            'PGM_PUBLIC_STRIPE_LIVE_PUBLISHABLE_KEY',
+            'PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY',
+            'PUBLIC_STRIPE_PUBLISHABLE_KEY',
+            'STRIPE_PUBLISHABLE_KEY'
+        );
+    }
+
+    return readPublicEnv(
+        'PGM_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY',
+        'PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY',
+        'PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY',
+        'PUBLIC_STRIPE_PUBLISHABLE_KEY',
+        'STRIPE_TEST_PUBLISHABLE_KEY',
+        'STRIPE_PUBLISHABLE_KEY'
+    );
+}
+
 function buildDynamicRuntimeConfig() {
     const appEnv = normalizeRuntimeEnvironment(readPublicEnv('PGM_APP_ENV', 'APP_ENV'));
     const backendUrl = readPublicEnv('PGM_PUBLIC_BACKEND_URL', 'PUBLIC_BACKEND_URL');
-    const publishableKey = readPublicEnv(
-        'PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY',
-        'PUBLIC_STRIPE_PUBLISHABLE_KEY',
-        'STRIPE_PUBLISHABLE_KEY'
-    );
+    const publishableKey = resolvePublishableKeyForEnvironment(appEnv);
     const runtimeConfig = {};
 
     if (appEnv) {
@@ -152,7 +180,10 @@ function buildDynamicRuntimeConfig() {
         runtimeConfig.backendUrl = backendUrl.replace(/\/+$/, '');
     }
 
-    if (/^pk_(test|live)_[A-Za-z0-9_]+$/.test(publishableKey)) {
+    if (
+        /^pk_(test|live)_[A-Za-z0-9_]+$/.test(publishableKey) &&
+        !(appEnv === 'staging' && publishableKey.startsWith('pk_live_'))
+    ) {
         runtimeConfig.publishableKey = publishableKey;
     }
 

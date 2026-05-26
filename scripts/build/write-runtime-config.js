@@ -123,6 +123,38 @@ function isSafePublishableKey(value) {
     return /^pk_(test|live)_[A-Za-z0-9_]+$/.test(String(value || '').trim());
 }
 
+function resolvePublishableKeyForEnvironment(appEnv) {
+    if (appEnv === 'staging') {
+        return readPublicEnv(
+            'PGM_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY',
+            'PGM_PUBLIC_STRIPE_STAGING_PUBLISHABLE_KEY',
+            'PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY',
+            'STRIPE_TEST_PUBLISHABLE_KEY',
+            'PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY',
+            'PUBLIC_STRIPE_PUBLISHABLE_KEY',
+            'STRIPE_PUBLISHABLE_KEY'
+        );
+    }
+
+    if (appEnv === 'production') {
+        return readPublicEnv(
+            'PGM_PUBLIC_STRIPE_LIVE_PUBLISHABLE_KEY',
+            'PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY',
+            'PUBLIC_STRIPE_PUBLISHABLE_KEY',
+            'STRIPE_PUBLISHABLE_KEY'
+        );
+    }
+
+    return readPublicEnv(
+        'PGM_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY',
+        'PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY',
+        'PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY',
+        'PUBLIC_STRIPE_PUBLISHABLE_KEY',
+        'STRIPE_TEST_PUBLISHABLE_KEY',
+        'STRIPE_PUBLISHABLE_KEY'
+    );
+}
+
 function buildRuntimeConfig() {
     const vercelEnv = readPublicEnv('VERCEL_ENV');
     const appEnv = resolveRuntimeEnvironment();
@@ -130,7 +162,7 @@ function buildRuntimeConfig() {
         readPublicEnv('PGM_PUBLIC_BACKEND_URL', 'PUBLIC_BACKEND_URL'),
         appEnv
     );
-    const publishableKey = readPublicEnv('PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY', 'PUBLIC_STRIPE_PUBLISHABLE_KEY', 'STRIPE_PUBLISHABLE_KEY');
+    const publishableKey = resolvePublishableKeyForEnvironment(appEnv);
     const runtimeConfig = {};
 
     if (appEnv) {

@@ -112,7 +112,11 @@ const frontendUrl = `http://localhost:${frontendPort}`;
 const backendUrl = `http://localhost:${backendPort}`;
 const hasDatabase = Boolean(process.env.DATABASE_URL);
 const hasStripeSecret = /^sk_test_/.test(String(process.env.STRIPE_SECRET_KEY || ''));
-const publicStripeKey = process.env.PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY ||
+const publicStripeKey = process.env.PGM_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY ||
+    process.env.PGM_PUBLIC_STRIPE_STAGING_PUBLISHABLE_KEY ||
+    process.env.PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY ||
+    process.env.STRIPE_TEST_PUBLISHABLE_KEY ||
+    process.env.PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY ||
     process.env.PUBLIC_STRIPE_PUBLISHABLE_KEY ||
     process.env.STRIPE_PUBLISHABLE_KEY ||
     '';
@@ -148,6 +152,7 @@ const frontendEnv = {
     PGM_RUNTIME_CONFIG_DYNAMIC: 'true',
     PGM_APP_ENV: process.env.PGM_APP_ENV || process.env.APP_ENV || 'development',
     PGM_PUBLIC_BACKEND_URL: backendUrl,
+    PGM_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY: publicStripeKey,
     PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY: publicStripeKey
 };
 
