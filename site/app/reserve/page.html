@@ -549,19 +549,41 @@
                 const reserveRuntimeConfigScript = document.createElement('script');
                 const reserveConfigScript = document.createElement('script');
                 const reserveFlowScript = document.createElement('script');
-                const loadReserveConfig = () => {
-                    reserveConfigScript.src = '/config.js';
-                    document.body.appendChild(reserveConfigScript);
-                };
-                reserveRuntimeConfigScript.src = '/runtime-config.js?v=20260510-preprod1';
-                reserveRuntimeConfigScript.onload = loadReserveConfig;
-                reserveRuntimeConfigScript.onerror = loadReserveConfig;
-                reserveConfigScript.onload = () => {
-                    reserveFlowScript.src = '/js/reserve-flow.js?v=20260526-hosted-checkout1';
+                let reserveConfigRequested = false;
+                let reserveFlowScriptRequested = false;
+                let reserveRuntimeConfigFallbackTimer = null;
+                let reserveConfigFallbackTimer = null;
+                const loadReserveFlowScript = () => {
+                    if (reserveFlowScriptRequested) {
+                        return;
+                    }
+                    reserveFlowScriptRequested = true;
+                    if (reserveConfigFallbackTimer) {
+                        window.clearTimeout(reserveConfigFallbackTimer);
+                    }
+                    reserveFlowScript.src = '/js/reserve-flow.js?v=20260526-runtime-loader1';
                     reserveFlowScript.defer = true;
                     document.body.appendChild(reserveFlowScript);
                 };
+                const loadReserveConfig = () => {
+                    if (reserveConfigRequested) {
+                        return;
+                    }
+                    reserveConfigRequested = true;
+                    if (reserveRuntimeConfigFallbackTimer) {
+                        window.clearTimeout(reserveRuntimeConfigFallbackTimer);
+                    }
+                    reserveConfigScript.src = '/config.js?v=20260526-runtime-loader1';
+                    reserveConfigScript.onload = loadReserveFlowScript;
+                    reserveConfigScript.onerror = loadReserveFlowScript;
+                    document.body.appendChild(reserveConfigScript);
+                    reserveConfigFallbackTimer = window.setTimeout(loadReserveFlowScript, 2500);
+                };
+                reserveRuntimeConfigScript.src = '/runtime-config.js?v=20260526-runtime-loader1';
+                reserveRuntimeConfigScript.onload = loadReserveConfig;
+                reserveRuntimeConfigScript.onerror = loadReserveConfig;
                 document.body.appendChild(reserveRuntimeConfigScript);
+                reserveRuntimeConfigFallbackTimer = window.setTimeout(loadReserveConfig, 2500);
             };
 
             const wakeReserveEnhancements = () => {

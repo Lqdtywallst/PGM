@@ -531,6 +531,12 @@ async function run() {
         reserveFlowScript.includes('https://js.stripe.com/v3/') && reservePage.includes('config.js'),
         'reserve page loads Stripe.js and runtime config'
     );
+    assert(
+        reservePage.includes('window.setTimeout(loadReserveConfig, 2500)') &&
+        reservePage.includes('window.setTimeout(loadReserveFlowScript, 2500)') &&
+        reservePage.includes('/js/reserve-flow.js?v=20260526-runtime-loader1'),
+        'reserve page falls back if runtime config or config.js hangs'
+    );
 
     const indexPage = readFile('site/index.html');
     const homeSiteCss = readFile('site/css/site-v2.css');
