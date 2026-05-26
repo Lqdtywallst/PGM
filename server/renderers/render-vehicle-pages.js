@@ -283,7 +283,7 @@ function renderVehicleMotherContent(card, cards = [], options = {}) {
         '',
         '                <div class="vehicle-pdp-cinema__copy">',
         '                    <span class="section-kicker">Premium use</span>',
-        `                    <h2 id="${escapeHtml(titleId)}">${escapeHtml(card.copy.title)} for a clean Dubai handover.</h2>`,
+        `                    <h2 id="${escapeHtml(titleId)}">${escapeHtml(card.copy.title)} for a clean Dubai handover</h2>`,
         `                    <p>${escapeHtml(card.copy.description)} ${escapeHtml(card.copy.salesLine)}</p>`,
         `                    <a class="vehicle-pdp-section-link vehicle-pdp-cinema__link" href="#vehicle-booking">Reserve ${escapeHtml(card.copy.title)}</a>`,
         '                </div>',

@@ -5219,12 +5219,20 @@ body.vehicle-page .site-v2-footer__column h3 {
 .vehicle-pdp-cinema__copy {
     display: flex;
     flex-direction: column;
+    align-items: center;
     justify-content: center;
-    gap: 1rem;
+    gap: clamp(0.9rem, 1.45vw, 1.18rem);
     padding: clamp(1.2rem, 3vw, 2rem);
+    text-align: center;
     background:
         radial-gradient(circle at top right, rgba(213, 176, 91, 0.2), transparent 42%),
         linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 241, 233, 0.98));
+}
+
+.vehicle-pdp-cinema__copy .section-kicker {
+    justify-content: center;
+    margin-right: auto;
+    margin-left: auto;
 }
 
 .vehicle-pdp-cinema__copy h2,
@@ -5247,6 +5255,25 @@ body.vehicle-page .site-v2-footer__column h3 {
     color: #46382b;
     font-size: clamp(1rem, 1.35vw, 1.12rem);
     line-height: 1.65;
+}
+
+.vehicle-pdp-cinema__copy h2 {
+    max-width: 13.8ch;
+    margin: 0 auto;
+    line-height: 1.02;
+    letter-spacing: -0.048em;
+    text-wrap: balance;
+}
+
+.vehicle-pdp-cinema__copy p {
+    max-width: 36rem;
+    margin: 0 auto;
+    text-wrap: pretty;
+}
+
+.vehicle-pdp-cinema__link {
+    align-self: center;
+    width: min(100%, 34rem);
 }
 
 .vehicle-pdp-note-list {
@@ -5652,6 +5679,18 @@ body.vehicle-page .site-v2-footer__column h3 {
     .vehicle-pdp-related-visual .vehicle-section__heading h2,
     .vehicle-pdp-experience .vehicle-section__heading h2 {
         font-size: clamp(1.8rem, 9vw, 2.55rem);
+    }
+
+    .vehicle-pdp-cinema__copy h2 {
+        max-width: 12.5ch;
+        font-size: clamp(2rem, 10vw, 2.55rem);
+        line-height: 1.03;
+        letter-spacing: -0.04em;
+    }
+
+    .vehicle-pdp-cinema__copy p {
+        max-width: 31rem;
+        line-height: 1.58;
     }
 
     .vehicle-pdp-seo-intent .vehicle-section__heading--compact {
