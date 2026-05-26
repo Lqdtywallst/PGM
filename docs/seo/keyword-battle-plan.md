@@ -20,12 +20,12 @@ Esto nos dice que la batalla no se gana solo con una home bonita. Hay que tener 
 | rent luxury car Dubai | `/luxury-car-rental-dubai.html` | Comparar y reservar | Convertir esta guía en landing principal de ciudad. |
 | supercar rental Dubai | `/supercar-rental-dubai.html` | Elegir supercar | Enfatizar Lamborghini, Ferrari, Porsche y G63. |
 | Lamborghini rental Dubai | `/lamborghini-rental-dubai.html` | Marca con intención alta | Seguir reforzando modelos Huracan y Urus. |
-| Lamborghini Urus rental Dubai | `/lamborghini-urus-rental-dubai.html` | Modelo con intención alta | H1 exacto, FAQs y comparativa con Cullinan/G63. |
+| Lamborghini Urus rental Dubai | `/lamborghini-urus-rental-dubai.html` | Modelo con intención alta | Title/meta, intro útil y comparativa natural con Cullinan/G63, sin forzar el H1 visual. |
 | Rolls-Royce rental Dubai | `/rolls-royce-rental-dubai.html` | Marca VIP | Reforzar Cullinan, chófer opcional y hoteles/villas. |
-| Rolls-Royce Cullinan rental Dubai | `/rolls-royce-cullinan-black-badge-rental-dubai.html` | Modelo VIP | H1 exacto y señales de precio/entrega. |
-| Mercedes G63 rental Dubai | `/mercedes-g63-amg-rental-dubai.html` | Modelo SUV popular | H1 exacto, aeropuerto/villa/luggage angle. |
+| Rolls-Royce Cullinan rental Dubai | `/rolls-royce-cullinan-black-badge-rental-dubai.html` | Modelo VIP | Snippet, intro y señales visibles de precio/entrega. |
+| Mercedes G63 rental Dubai | `/mercedes-g63-amg-rental-dubai.html` | Modelo SUV popular | Snippet, intro y uso real para aeropuerto, villa y equipaje. |
 | Ferrari rental Dubai | `/ferrari-rental-dubai.html` | Marca supercar | Conectar 296 GTS y F8 Spider. |
-| Ferrari 296 GTS rental Dubai | `/ferrari-296-gts-rental-dubai.html` | Modelo concreto | H1 exacto y contenido de uso real. |
+| Ferrari 296 GTS rental Dubai | `/ferrari-296-gts-rental-dubai.html` | Modelo concreto | Mantener título visual limpio y reforzar la intención en title, meta, intro y enlaces internos. |
 
 ## Prioridad media
 
@@ -57,10 +57,11 @@ Esto nos dice que la batalla no se gana solo con una home bonita. Hay que tener 
 
 ## Siguiente tanda recomendada
 
-1. Seguir el roadmap Google-first en [google-first-seo-roadmap.md](google-first-seo-roadmap.md).
-2. Añadir comparativas internas: Urus vs Cullinan, G63 vs Urus, Ferrari vs Lamborghini.
-3. Mejorar snippets con precios, depósito, entrega y soporte si el negocio confirma esas condiciones.
-4. Pedir reindexación en Search Console de las páginas prioritarias.
-5. Medir en Search Console: impresiones, CTR, posición media y consultas reales.
+1. Seguir el roadmap operativo en [google-first-seo-roadmap.md](google-first-seo-roadmap.md).
+2. Publicar la base SEO validada cuando el paquete esté limpio.
+3. Pedir indexación en Search Console de las páginas prioritarias.
+4. Medir consultas reales, URL objetivo, impresiones, CTR y posición media.
+5. Añadir comparativas internas solo donde ayuden al cliente: Urus vs Cullinan, G63 vs Urus, Ferrari vs Lamborghini.
+6. Mejorar snippets con precios, depósito, entrega y soporte si el negocio confirma esas condiciones.
 
 Nota 2026-05-26: no usamos `FAQPage` como táctica para landings de coche. Google ya no muestra FAQ rich results, así que la prioridad pasa a contenido útil, autoridad local, datos estructurados honestos e imágenes estables.

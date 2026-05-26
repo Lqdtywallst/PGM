@@ -43,8 +43,8 @@ El informe separa las búsquedas por intención:
 - `modelo`: Ferrari 296, Ferrari F8, Urus, G63, Cullinan, Maybach, GT3, etc.
 - `marca`: Ferrari rental Dubai, Lamborghini rental Dubai, Mercedes rental Dubai.
 - `servicio`: chauffeur, airport, monthly, business, wedding/event.
-- `ubicacion`: Dubai Marina, Palm Jumeirah, Abu Dhabi, airport.
-- `generica comercial`: luxury car rental Dubai, exotic car rental Dubai y similares.
+- `ubicación`: Dubai Marina, Palm Jumeirah, Abu Dhabi, airport.
+- `genérica comercial`: luxury car rental Dubai, exotic car rental Dubai y similares.
 
 ## Cómo decidir qué tocar
 
