@@ -59,6 +59,65 @@ test('checkout rejects a client-tampered amount before Stripe receives it', () =
     );
 });
 
+test('QA checkout accepts AED 1 per day only with the private token and four billable days', () => {
+    const pricing = verifyCheckoutAmount({
+        reservationData: {
+            ...baseReservation,
+            endDate: '2026-06-19',
+            checkoutMode: 'qa_price_test',
+            qaCheckout: true,
+            qaCheckoutToken: 'secret-token'
+        },
+        amount: 200,
+        currency: 'aed',
+        fleetCards,
+        qaCheckoutToken: 'secret-token'
+    });
+
+    assert.equal(pricing.amountMinor, 200);
+    assert.equal(pricing.reservationData.pricePerDay, 1);
+    assert.equal(pricing.reservationData.catalogPricePerDay, 3400);
+    assert.equal(pricing.reservationData.totalAmount, 4);
+    assert.equal(pricing.reservationData.upfrontAmount, 2);
+    assert.equal(pricing.reservationData.qaCheckout, true);
+    assert.equal(pricing.reservationData.checkoutMode, 'qa_price_test');
+    assert.equal(pricing.reservationData.qaCheckoutToken, undefined);
+});
+
+test('QA checkout rejects missing token and too-short rental windows', () => {
+    assert.throws(
+        () => verifyCheckoutAmount({
+            reservationData: {
+                ...baseReservation,
+                endDate: '2026-06-19',
+                checkoutMode: 'qa_price_test',
+                qaCheckout: true
+            },
+            amount: 200,
+            currency: 'aed',
+            fleetCards,
+            qaCheckoutToken: 'secret-token'
+        }),
+        /not authorized/i
+    );
+
+    assert.throws(
+        () => verifyCheckoutAmount({
+            reservationData: {
+                ...baseReservation,
+                checkoutMode: 'qa_price_test',
+                qaCheckout: true,
+                qaCheckoutToken: 'secret-token'
+            },
+            amount: 50,
+            currency: 'aed',
+            fleetCards,
+            qaCheckoutToken: 'secret-token'
+        }),
+        /at least 4 billable days/i
+    );
+});
+
 test('checkout accepts only the server-calculated minor-unit amount', () => {
     const pricing = verifyCheckoutAmount({
         reservationData: baseReservation,

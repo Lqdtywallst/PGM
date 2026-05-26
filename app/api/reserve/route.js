@@ -295,6 +295,21 @@ function cleanContextValue(value, maxLength = 500) {
     return clean.slice(0, maxLength);
 }
 
+function cleanContextUrl(value, maxLength = 500) {
+    const clean = cleanContextValue(value, maxLength);
+    if (!clean) return null;
+
+    try {
+        const parsed = new URL(clean);
+        ['qaCheckoutToken', 'qaToken'].forEach((param) => parsed.searchParams.delete(param));
+        return parsed.toString().slice(0, maxLength);
+    } catch (error) {
+        return clean
+            .replace(/([?&](?:qaCheckoutToken|qaToken)=)[^&#]*/gi, '$1[redacted]')
+            .slice(0, maxLength);
+    }
+}
+
 function sanitizeReservationRequestForStorage(data = {}, req = {}) {
     const clientContext = data.clientContext || {};
     const headers = req.headers || {};
@@ -306,8 +321,8 @@ function sanitizeReservationRequestForStorage(data = {}, req = {}) {
         currency: data.currency || data.reservationData?.currency || null,
         attribution: {
             pagePath: cleanContextValue(clientContext.pagePath || clientContext.page_path, 180),
-            landingUrl: cleanContextValue(clientContext.landingUrl || clientContext.landing_url, 500),
-            referrer: cleanContextValue(clientContext.referrer || headers.referer, 500),
+            landingUrl: cleanContextUrl(clientContext.landingUrl || clientContext.landing_url, 500),
+            referrer: cleanContextUrl(clientContext.referrer || headers.referer, 500),
             origin: cleanContextValue(headers.origin, 180),
             utmSource: cleanContextValue(clientContext.utmSource || clientContext.utm_source, 120),
             utmMedium: cleanContextValue(clientContext.utmMedium || clientContext.utm_medium, 120),
@@ -767,6 +782,8 @@ router.post('/', createReservationRateLimit({
                     currency: reservationCurrency
                 });
                 Object.assign(reservationData, verifiedCheckout.reservationData, { reservationId });
+                delete reservationData.qaCheckoutToken;
+                delete reservationData.qaToken;
             } catch (checkoutError) {
                 console.warn('[API] Checkout pricing blocked:', checkoutError.message);
                 return res.status(checkoutError.statusCode || 409).json({

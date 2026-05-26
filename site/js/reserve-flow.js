@@ -8,10 +8,60 @@
         const isAED = true;
         const CURRENCY_SYMBOL = 'AED';
         const CURRENCY_ZERO = 'AED 0.00';
+        const QA_CHECKOUT_MODE = 'qa_price_test';
+        const QA_CHECKOUT_PRICE_PER_DAY = 1;
+        const QA_CHECKOUT_MIN_BILLING_DAYS = 4;
         const SUPPORT_WHATSAPP_MESSAGE = 'Hi, I would like help booking a luxury car in Dubai.';
         const SUPPORT_WHATSAPP_URL = `https://wa.me/971586122568?text=${encodeURIComponent(SUPPORT_WHATSAPP_MESSAGE)}`;
         function normalizeValue(value) {
             return String(value || '').trim();
+        }
+        function isTruthyUrlFlag(value) {
+            return ['1', 'true', 'yes'].includes(normalizeValue(value).toLowerCase());
+        }
+        function isQaCheckoutRequestedFromUrl() {
+            return normalizeValue(urlParams.get('checkoutMode')).toLowerCase() === QA_CHECKOUT_MODE ||
+                isTruthyUrlFlag(urlParams.get('qaCheckout'));
+        }
+        function getQaCheckoutContext() {
+            const token = normalizeValue(urlParams.get('qaCheckoutToken') || urlParams.get('qaToken'));
+
+            if (!isQaCheckoutRequestedFromUrl() || !token) {
+                return null;
+            }
+
+            return {
+                checkoutMode: QA_CHECKOUT_MODE,
+                qaCheckout: true,
+                qaCheckoutToken: token
+            };
+        }
+        function buildSafeCurrentUrl() {
+            try {
+                const url = new URL(window.location.href);
+                ['qaCheckoutToken', 'qaToken'].forEach((param) => url.searchParams.delete(param));
+                return url.toString();
+            } catch (error) {
+                return window.location.href.replace(/([?&](?:qaCheckoutToken|qaToken)=)[^&#]*/gi, '$1[redacted]');
+            }
+        }
+        function redactQaCheckoutToken(payload) {
+            if (!payload || typeof payload !== 'object') return payload;
+            const clone = { ...payload };
+
+            if (clone.qaCheckoutToken) {
+                clone.qaCheckoutToken = '[redacted]';
+            }
+
+            if (clone.qaToken) {
+                clone.qaToken = '[redacted]';
+            }
+
+            if (clone.reservationData && typeof clone.reservationData === 'object') {
+                clone.reservationData = redactQaCheckoutToken(clone.reservationData);
+            }
+
+            return clone;
         }
         function readUtmParam(params, key) {
             return normalizeValue(params.get(key)).slice(0, 180);
@@ -23,7 +73,7 @@
 
             return {
                 pagePath: normalizeValue(window.location.pathname).slice(0, 180),
-                landingUrl: normalizeValue(window.location.href).slice(0, 500),
+                landingUrl: normalizeValue(buildSafeCurrentUrl()).slice(0, 500),
                 referrer: normalizeValue(document.referrer).slice(0, 500),
                 utmSource: readUtmParam(params, 'utm_source'),
                 utmMedium: readUtmParam(params, 'utm_medium'),
@@ -252,6 +302,7 @@
         const pickupTimeParam = urlParams.get('pickupTime');
         const dropoffTimeParam = urlParams.get('dropoffTime');
         const pickupLocationParam = urlParams.get('pickupLocation');
+        const qaCheckoutContext = getQaCheckoutContext();
 
         function getStoredBookingIntent() {
             try {
@@ -445,6 +496,7 @@
         
         if (carName) selectedCar = decodeURIComponent(carName);
         if (price) pricePerDay = parseFloat(price);
+        if (qaCheckoutContext) pricePerDay = QA_CHECKOUT_PRICE_PER_DAY;
         
         console.log('[RESERVE PAGE] Selected vehicle:', selectedCar, 'Price:', pricePerDay);
         
@@ -1396,6 +1448,15 @@
                 updateMobileReserveUi();
                 return;
             }
+
+            if (qaCheckoutContext && pricing.billingDays < QA_CHECKOUT_MIN_BILLING_DAYS) {
+                showMessage(`QA checkout needs at least ${QA_CHECKOUT_MIN_BILLING_DAYS} full billable days so Stripe can accept the AED minimum charge.`, 'error');
+                payButton.disabled = false;
+                payButton.textContent = restorePayButtonLabel();
+                updateMobileReserveUi();
+                return;
+            }
+
             const total = pricing.total;
             const upfrontAmount = pricing.upfrontAmount;
             const remainingAmount = pricing.remainingAmount;
@@ -1432,6 +1493,7 @@
                         amount: totalCents,
                         currency: (window.STRIPE_CONFIG && window.STRIPE_CONFIG.currency) || (isAED ? 'aed' : 'eur'),
                         clientContext: buildClientContext(),
+                        ...(qaCheckoutContext || {}),
                         customerData: {
                             name: formData.fullName,
                             email: formData.email,
@@ -1458,13 +1520,14 @@
                             remainingAmount: Number(remainingAmount.toFixed(2)),
                             remainingDisplay: formatAmount(remainingAmount),
                             pickupLocation: formData.pickupLocation,
+                            ...(qaCheckoutContext || {}),
                         }
                     };
 
                     console.log('[PAYMENT] Sending data to the server:', {
                         url: `${BACKEND_URL}/api/reserve`,
                         method: 'POST',
-                        data: reservationData
+                        data: redactQaCheckoutToken(reservationData)
                     });
 
                     let response;

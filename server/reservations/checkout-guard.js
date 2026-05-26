@@ -9,6 +9,9 @@ const {
 const CHECKOUT_CURRENCY = 'aed';
 const HOURS_PER_DAY = 24;
 const UPFRONT_PAYMENT_RATIO = 0.5;
+const QA_CHECKOUT_MODE = 'qa_price_test';
+const QA_CHECKOUT_PRICE_PER_DAY = 1;
+const QA_CHECKOUT_MIN_BILLING_DAYS = 4;
 const checkoutVehicleLocks = new Map();
 
 function checkoutError(message, statusCode = 400) {
@@ -38,6 +41,53 @@ function normalizeCheckoutCurrency(currency) {
 
 function formatMoneyDisplay(amount, currency = CHECKOUT_CURRENCY) {
     return `${normalizeCheckoutCurrency(currency).toUpperCase()} ${roundMoney(amount).toFixed(2)}`;
+}
+
+function normalizeToken(value) {
+    return String(value || '').trim();
+}
+
+function tokenMatches(submittedToken, expectedToken) {
+    const submitted = normalizeToken(submittedToken);
+    const expected = normalizeToken(expectedToken);
+
+    if (!submitted || !expected || submitted.length !== expected.length) {
+        return false;
+    }
+
+    return submitted === expected;
+}
+
+function isQaCheckoutRequested(reservationData = {}) {
+    const rawMode = String(reservationData.checkoutMode || reservationData.qaCheckoutMode || '').trim().toLowerCase();
+    const rawFlag = String(reservationData.qaCheckout || '').trim().toLowerCase();
+
+    return rawMode === QA_CHECKOUT_MODE || ['1', 'true', 'yes'].includes(rawFlag);
+}
+
+function resolveQaCheckoutOverride(reservationData = {}, options = {}) {
+    if (!isQaCheckoutRequested(reservationData)) {
+        return null;
+    }
+
+    const expectedToken = normalizeToken(options.qaCheckoutToken || process.env.QA_CHECKOUT_TOKEN);
+    if (!expectedToken) {
+        throw checkoutError('QA checkout pricing is not enabled.', 403);
+    }
+
+    if (!tokenMatches(reservationData.qaCheckoutToken || reservationData.qaToken, expectedToken)) {
+        throw checkoutError('QA checkout pricing is not authorized.', 403);
+    }
+
+    if (Number(options.billingDays) < QA_CHECKOUT_MIN_BILLING_DAYS) {
+        throw checkoutError(`QA checkout requires at least ${QA_CHECKOUT_MIN_BILLING_DAYS} billable days so Stripe can accept the AED minimum charge.`, 400);
+    }
+
+    return {
+        mode: QA_CHECKOUT_MODE,
+        pricePerDay: QA_CHECKOUT_PRICE_PER_DAY,
+        minBillingDays: QA_CHECKOUT_MIN_BILLING_DAYS
+    };
 }
 
 function formatDurationLabel(totalHours) {
@@ -106,11 +156,22 @@ function calculateServerPricing(reservationData = {}, options = {}) {
 
     const durationHours = (schedule.endMs - schedule.startMs) / (1000 * 60 * 60);
     const billingDays = durationHours / HOURS_PER_DAY;
-    const pricePerDay = Number(fleetCard.pricePerDay);
+    const qaCheckoutOverride = resolveQaCheckoutOverride(reservationData, {
+        billingDays,
+        currency,
+        qaCheckoutToken: options.qaCheckoutToken
+    });
+    const catalogPricePerDay = Number(fleetCard.pricePerDay);
+    const pricePerDay = qaCheckoutOverride ? qaCheckoutOverride.pricePerDay : catalogPricePerDay;
     const totalAmount = roundMoney(billingDays * pricePerDay);
     const upfrontAmount = roundMoney(totalAmount * UPFRONT_PAYMENT_RATIO);
     const remainingAmount = roundMoney(Math.max(totalAmount - upfrontAmount, 0));
     const canonicalVehicleName = `${fleetCard.brand} ${fleetCard.copy?.title || vehicle.title}`.trim();
+    const sanitizedReservationData = {
+        ...reservationData,
+        qaCheckoutToken: undefined,
+        qaToken: undefined
+    };
 
     return {
         amountMinor: moneyToMinorUnits(upfrontAmount),
@@ -118,7 +179,7 @@ function calculateServerPricing(reservationData = {}, options = {}) {
         fleetCard,
         vehicle,
         reservationData: {
-            ...reservationData,
+            ...sanitizedReservationData,
             reservationId: reservationData.reservationId,
             car: canonicalVehicleName,
             vehicleId: fleetCard.id,
@@ -130,24 +191,32 @@ function calculateServerPricing(reservationData = {}, options = {}) {
             days: roundMoney(billingDays),
             durationLabel: formatDurationLabel(durationHours),
             pricePerDay,
+            catalogPricePerDay,
             totalAmount,
             total: formatMoneyDisplay(totalAmount, currency),
             upfrontAmount,
             upfrontDisplay: formatMoneyDisplay(upfrontAmount, currency),
             remainingAmount,
             remainingDisplay: formatMoneyDisplay(remainingAmount, currency),
-            currency: currency.toUpperCase()
+            currency: currency.toUpperCase(),
+            ...(qaCheckoutOverride
+                ? {
+                    checkoutMode: QA_CHECKOUT_MODE,
+                    qaCheckout: true,
+                    pricingNote: `QA checkout override: AED ${QA_CHECKOUT_PRICE_PER_DAY.toFixed(2)} per day.`
+                }
+                : {})
         }
     };
 }
 
-function verifyCheckoutAmount({ reservationData = {}, amount, currency, fleetCards } = {}) {
+function verifyCheckoutAmount({ reservationData = {}, amount, currency, fleetCards, qaCheckoutToken } = {}) {
     const requestedAmount = Math.round(parseMoneyValue(amount) || 0);
     if (!requestedAmount || requestedAmount <= 0) {
         throw checkoutError('Amount is required and must be greater than 0.', 400);
     }
 
-    const pricing = calculateServerPricing(reservationData, { currency, fleetCards });
+    const pricing = calculateServerPricing(reservationData, { currency, fleetCards, qaCheckoutToken });
     if (requestedAmount !== pricing.amountMinor) {
         throw checkoutError('Reservation amount does not match the selected vehicle and rental window.', 409);
     }
@@ -235,6 +304,7 @@ module.exports = {
     parseMoneyValue,
     recordMatchesReservationId,
     resolveFleetCardForReservation,
+    resolveQaCheckoutOverride,
     verifyCheckoutAmount,
     withCheckoutVehicleLock
 };
