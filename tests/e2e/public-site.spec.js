@@ -1,5 +1,10 @@
 const { test, expect } = require('@playwright/test');
 const axeSource = require.resolve('axe-core/axe.min.js');
+const fleetCards = require('../../server/data/fleet-cards.json');
+
+const sportsFleetCount = fleetCards.filter((card) => (
+    Array.isArray(card.types) && card.types.includes('sports')
+)).length;
 
 const criticalPages = [
     { path: '/', name: 'home', expectsVisibleH1: true },
@@ -71,14 +76,13 @@ async function mockFleetAvailability(page, overrides = {}) {
                     pickupTime: requestUrl.searchParams.get('pickupTime'),
                     dropoffTime: requestUrl.searchParams.get('dropoffTime')
                 },
-                vehicles: [
-                    { id: 'lamborghini-huracan-evo-spyder', available: true },
-                    { id: 'ferrari-296-gts', available: true },
-                    { id: 'porsche-992-gt3', available: true },
-                    { id: 'lamborghini-urus-sport', available: true },
-                    { id: 'mercedes-g63-amg', available: true },
-                    { id: 'rolls-royce-cullinan-black-badge', available: true }
-                ].map((vehicle) => ({ ...vehicle, ...overrides[vehicle.id] }))
+                vehicles: fleetCards.map((card) => ({
+                    id: card.id,
+                    brand: card.brand,
+                    title: card.copy.title,
+                    available: true,
+                    ...overrides[card.id]
+                }))
             })
         });
     });
@@ -124,6 +128,10 @@ test.describe('Public site quality gate', () => {
     for (const pageEntry of criticalPages) {
         test(`${pageEntry.name} renders cleanly`, async ({ page }, testInfo) => {
             const consoleErrors = createConsoleTracker(page);
+
+            if (pageEntry.path === '/fleet.html') {
+                await mockFleetAvailability(page);
+            }
 
             await page.goto(pageEntry.path, { waitUntil: 'domcontentloaded' });
             if (pageEntry.expectsVisibleH1) {
@@ -309,10 +317,10 @@ test.describe('Public site quality gate', () => {
         await expect(page).toHaveURL(/endDate=2026-11-17/i);
         await expect(page).toHaveURL(/pickupTime=11%3A00/i);
         await expect(page).toHaveURL(/dropoffTime=19%3A00/i);
-        await expect(page.locator('.js-fleet-results-count')).toContainText('3 models visible');
+        await expect(page.locator('.js-fleet-results-count')).toContainText(`${sportsFleetCount} models visible`);
 
         const visibleCards = page.locator('.js-fleet-card:not([hidden])');
-        await expect(visibleCards).toHaveCount(3);
+        await expect(visibleCards).toHaveCount(sportsFleetCount);
         expect(await visibleCards.evaluateAll((cards) => cards.every((card) => (
             String(card.dataset.type || '').split(/\s+/).includes('sports')
         )))).toBe(true);

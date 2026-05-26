@@ -192,6 +192,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             return candidates.some((candidate) => {
                 const normalizedCandidate = normalizeVehicleName(candidate);
+                if (!normalizedCandidate) {
+                    return false;
+                }
+
                 const compactCandidate = normalizedCandidate.replace(/\s+/g, "");
                 const candidateSlug = vehicleSlug(candidate);
 
