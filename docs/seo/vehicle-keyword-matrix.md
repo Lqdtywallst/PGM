@@ -1,6 +1,6 @@
 # Matriz SEO por coche
 
-Fecha: 2026-05-25
+Fecha: 2026-05-26
 
 ## Criterio
 
@@ -24,4 +24,8 @@ Las keywords de modelo se refuerzan en lugares donde no rompen el diseño: `titl
 
 ## Regla de copy
 
-No repetimos la keyword principal en cada línea. La usamos una vez en el bloque inferior y dejamos que el resto del texto aporte contexto: zonas de Dubái, tipo de entrega, perfil de cliente y motivo real de reserva.
+No repetimos la keyword principal en cada línea. La usamos en el bloque inferior, pero evitamos convertir los H2 visuales en frases SEO rígidas. El título de sección queda editorial y la keyword vive en el párrafo, tarjetas, metadatos, datos estructurados y enlaces internos.
+
+## Datos estructurados
+
+No usamos `FAQPage` para las landings de coche porque Google ya no muestra FAQ rich results y no debe ser la base de esta estrategia. El schema fuerte es semántico y verificable: `AutoRental`/`LocalBusiness` para la entidad de alquiler, `Product` + `Car` + `Offer` para el coche y su tarifa diaria indicativa, `Service` para el alquiler en Dubái y `BreadcrumbList` para jerarquía.

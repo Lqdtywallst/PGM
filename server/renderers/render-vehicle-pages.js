@@ -10,6 +10,9 @@ const imageRoot = path.join(siteRoot, 'images', 'fleet');
 
 const startMarker = '<!-- VEHICLE_MOTHER_CONTENT_START -->';
 const endMarker = '<!-- VEHICLE_MOTHER_CONTENT_END -->';
+const publicOrigin = 'https://www.dynastyprestigecarrental.com';
+const businessSchemaId = `${publicOrigin}/#organization`;
+const websiteSchemaId = `${publicOrigin}/#website`;
 
 const displayNameOverrides = {
     'black-mercedes-s680-maybach': 'Black Mercedes S680 Maybach',
@@ -39,6 +42,22 @@ function toVehiclePagePath(card) {
     return path.join(vehiclePagesRoot, fileName);
 }
 
+function toPublicVehiclePath(card) {
+    return `/${String(card.href || '').replace(/^\.\//, '')}`;
+}
+
+function toPublicUrl(publicPath) {
+    const pathname = String(publicPath || '').startsWith('/')
+        ? String(publicPath || '')
+        : `/${String(publicPath || '')}`;
+
+    return `${publicOrigin}${pathname}`;
+}
+
+function toAbsolutePublicImageUrl(src) {
+    return toPublicUrl(String(src || '').replace(/^\.\//, ''));
+}
+
 function vehicleName(card) {
     if (displayNameOverrides[card.id]) {
         return displayNameOverrides[card.id];
@@ -49,6 +68,10 @@ function vehicleName(card) {
 
 function formatAed(value) {
     return `${Number(value).toLocaleString('en-US')} AED`;
+}
+
+function plainText(value) {
+    return String(value || '').replace(/\s+/g, ' ').trim();
 }
 
 function sentenceCase(value) {
@@ -350,6 +373,200 @@ function indentJson(value, indent = '    ') {
         .join('\n');
 }
 
+function fleetPriceRange(cards = []) {
+    const prices = cards
+        .map((card) => Number(card.pricePerDay))
+        .filter((price) => Number.isFinite(price) && price > 0);
+
+    if (!prices.length) {
+        return 'AED per day';
+    }
+
+    const min = Math.min(...prices);
+    const max = Math.max(...prices);
+
+    return min === max
+        ? `AED ${min.toLocaleString('en-US')} per day`
+        : `AED ${min.toLocaleString('en-US')}-${max.toLocaleString('en-US')} per day`;
+}
+
+function vehicleStructuredDataForCard(card, cards = []) {
+    const name = vehicleName(card);
+    const canonicalUrl = toPublicUrl(toPublicVehiclePath(card));
+    const productId = `${canonicalUrl}#rental-offer`;
+    const offerId = `${canonicalUrl}#day-rate`;
+    const serviceId = `${canonicalUrl}#service`;
+    const seoIntent = seoIntentForVehicle(card);
+    const description = plainText(`${seoIntent.body} Indicative day rate starts from ${formatAed(card.pricePerDay)}.`);
+
+    return {
+        '@context': 'https://schema.org',
+        '@graph': [
+            {
+                '@type': ['AutoRental', 'LocalBusiness', 'Organization'],
+                '@id': businessSchemaId,
+                name: 'Dynasty Prestige',
+                url: `${publicOrigin}/`,
+                logo: `${publicOrigin}/logo-dp-transparent.png`,
+                image: `${publicOrigin}/logo-dp-transparent.png`,
+                telephone: '+971586122568',
+                email: 'prestigegoalmotion@gmail.com',
+                description: 'Luxury car rental and concierge handover coordination across Dubai hotels, villas, airports and residences.',
+                priceRange: fleetPriceRange(cards),
+                areaServed: [
+                    { '@type': 'City', name: 'Dubai' },
+                    { '@type': 'Airport', name: 'Dubai International Airport' },
+                    { '@type': 'Airport', name: 'Al Maktoum International Airport' },
+                    { '@type': 'Place', name: 'Palm Jumeirah' },
+                    { '@type': 'Place', name: 'Dubai Marina' }
+                ],
+                contactPoint: {
+                    '@type': 'ContactPoint',
+                    contactType: 'customer service',
+                    telephone: '+971586122568',
+                    email: 'prestigegoalmotion@gmail.com',
+                    availableLanguage: ['English', 'Spanish']
+                }
+            },
+            {
+                '@type': 'WebSite',
+                '@id': websiteSchemaId,
+                url: `${publicOrigin}/`,
+                name: 'Dynasty Prestige',
+                publisher: {
+                    '@id': businessSchemaId
+                }
+            },
+            {
+                '@type': 'WebPage',
+                '@id': `${canonicalUrl}#webpage`,
+                url: canonicalUrl,
+                name: `${name} Rental Dubai | Dynasty Prestige`,
+                description,
+                isPartOf: {
+                    '@id': websiteSchemaId
+                },
+                breadcrumb: {
+                    '@id': `${canonicalUrl}#breadcrumb`
+                },
+                mainEntity: {
+                    '@id': productId
+                },
+                inLanguage: 'en-AE'
+            },
+            {
+                '@type': 'BreadcrumbList',
+                '@id': `${canonicalUrl}#breadcrumb`,
+                itemListElement: [
+                    {
+                        '@type': 'ListItem',
+                        position: 1,
+                        name: 'Home',
+                        item: `${publicOrigin}/`
+                    },
+                    {
+                        '@type': 'ListItem',
+                        position: 2,
+                        name: 'Fleet',
+                        item: `${publicOrigin}/fleet.html`
+                    },
+                    {
+                        '@type': 'ListItem',
+                        position: 3,
+                        name,
+                        item: canonicalUrl
+                    }
+                ]
+            },
+            {
+                '@type': ['Product', 'Car'],
+                '@id': productId,
+                name: `${name} rental in Dubai`,
+                model: name,
+                brand: {
+                    '@type': 'Brand',
+                    name: card.brand
+                },
+                category: 'Luxury car rental',
+                description,
+                image: toAbsolutePublicImageUrl(card.image?.src),
+                url: canonicalUrl,
+                mainEntityOfPage: {
+                    '@id': `${canonicalUrl}#webpage`
+                },
+                offers: {
+                    '@type': 'Offer',
+                    '@id': offerId,
+                    name: `${name} indicative day rental rate`,
+                    priceCurrency: 'AED',
+                    price: String(card.pricePerDay),
+                    availability: 'https://schema.org/LimitedAvailability',
+                    url: canonicalUrl,
+                    seller: {
+                        '@id': businessSchemaId
+                    },
+                    areaServed: {
+                        '@type': 'City',
+                        name: 'Dubai'
+                    },
+                    priceSpecification: {
+                        '@type': 'UnitPriceSpecification',
+                        priceCurrency: 'AED',
+                        price: String(card.pricePerDay),
+                        unitText: 'DAY'
+                    }
+                }
+            },
+            {
+                '@type': 'Service',
+                '@id': serviceId,
+                name: `${name} rental in Dubai`,
+                serviceType: 'Luxury car rental',
+                provider: {
+                    '@id': businessSchemaId
+                },
+                areaServed: {
+                    '@type': 'City',
+                    name: 'Dubai'
+                },
+                url: canonicalUrl,
+                description: plainText(`${name} handovers can be coordinated for Dubai hotels, villas, residences and airport-led arrivals. ${card.copy.salesLine}`),
+                offers: {
+                    '@id': offerId
+                }
+            }
+        ]
+    };
+}
+
+function renderVehicleStructuredDataScript(card, cards = []) {
+    return [
+        '    <script type="application/ld+json">',
+        indentJson(JSON.stringify(vehicleStructuredDataForCard(card, cards), null, 2), '    '),
+        '    </script>'
+    ].join('\n');
+}
+
+function replaceVehicleStructuredData(html, card, cards = []) {
+    const normalizedHtml = normalizeNewlines(html);
+    const headEndIndex = normalizedHtml.indexOf('</head>');
+
+    if (headEndIndex === -1) {
+        throw new Error('Could not locate </head> in vehicle page.');
+    }
+
+    const headHtml = normalizedHtml.slice(0, headEndIndex);
+    const script = renderVehicleStructuredDataScript(card, cards);
+    const jsonLdPattern = /\s*<script\s+type=["']application\/ld\+json["']>[\s\S]*?<\/script>/i;
+    const match = headHtml.match(jsonLdPattern);
+
+    if (match) {
+        return `${headHtml.replace(jsonLdPattern, `\n${script}`)}${normalizedHtml.slice(headEndIndex)}`;
+    }
+
+    return `${normalizedHtml.slice(0, headEndIndex)}${script}\n${normalizedHtml.slice(headEndIndex)}`;
+}
+
 function removeFaqStructuredData(html) {
     return normalizeNewlines(html).replace(
         /(<script\s+type=["']application\/ld\+json["']>\s*)([\s\S]*?)(\s*<\/script>)/g,
@@ -390,10 +607,12 @@ function syncVehiclePagesFromData() {
         }
 
         const html = readUtf8(pagePath);
+        const htmlWithoutStaleFaqSchema = removeFaqStructuredData(html);
         const contentMarkup = renderVehicleMotherContent(card, cards, {
-            excludePreviewImageSources: extractLandingReserveImageSources(html)
+            excludePreviewImageSources: extractLandingReserveImageSources(htmlWithoutStaleFaqSchema)
         });
-        const nextHtml = removeFaqStructuredData(replaceVehicleMotherContent(html, contentMarkup));
+        const htmlWithMotherContent = replaceVehicleMotherContent(htmlWithoutStaleFaqSchema, contentMarkup);
+        const nextHtml = replaceVehicleStructuredData(htmlWithMotherContent, card, cards);
 
         if (nextHtml !== normalizeNewlines(html)) {
             writeUtf8(pagePath, nextHtml);
@@ -424,12 +643,15 @@ if (require.main === module) {
 module.exports = {
     compactBestFit,
     extractLandingReserveImageSources,
+    fleetPriceRange,
     listVehicleImages,
     previewImageForVehicle,
     removeFaqStructuredData,
     renderVehicleMotherContent,
+    replaceVehicleStructuredData,
     replaceVehicleMotherContent,
     seoIntentForVehicle,
     syncVehiclePagesFromData,
+    vehicleStructuredDataForCard,
     vehicleName
 };

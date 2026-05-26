@@ -37,13 +37,20 @@ test('all vehicle pages keep the generated mother content markers', () => {
         assert.match(html, /vehicle-pdp-video-card/, `${card.id} needs generated video-ready block`);
         assert.match(html, /vehicle-pdp-seo-intent/, `${card.id} needs generated SEO intent block`);
         assert.match(html, new RegExp(card.seo.primaryKeyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'), `${card.id} needs its primary keyword in the generated body`);
+        assert.doesNotMatch(html, /vehicle-pdp-faq/, `${card.id} must not render FAQ blocks as an SEO shortcut`);
+        assert.doesNotMatch(html, /"@type":\s*"FAQPage"/, `${card.id} must not ship deprecated FAQPage schema`);
+        assert.match(html, /"AutoRental"/, `${card.id} needs AutoRental business schema`);
+        assert.match(html, /"LocalBusiness"/, `${card.id} needs LocalBusiness business schema`);
+        assert.match(html, /"Product"/, `${card.id} needs rental offer Product schema`);
+        assert.match(html, /"Car"/, `${card.id} needs car-specific Product schema`);
+        assert.match(html, /"availability":\s*"https:\/\/schema\.org\/LimitedAvailability"/, `${card.id} should not claim always-in-stock rental availability`);
+        assert.match(html, /"unitText":\s*"DAY"/, `${card.id} needs day-rate price specification`);
         assert.match(html, /vehicle-pdp-related-card/, `${card.id} needs generated related cars`);
         assert.doesNotMatch(html, /vehicle-pdp-quick-spec/, `${card.id} must not render quick-spec blocks in the lean vehicle mother body`);
         assert.doesNotMatch(html, /vehicle-pdp-experience/, `${card.id} must not render use-case blocks in the lean vehicle mother body`);
         assert.doesNotMatch(html, /vehicle-pdp-detail-split/, `${card.id} must not render detail split blocks in the lean vehicle mother body`);
         assert.doesNotMatch(html, /vehicle-pdp-gallery-strip/, `${card.id} must not render gallery strip blocks in the lean vehicle mother body`);
-        assert.doesNotMatch(html, /class="faq-list"/, `${card.id} must not render visible FAQ in the vehicle mother body`);
-        assert.doesNotMatch(html, /"@type":\s*"FAQPage"/, `${card.id} must not keep FAQPage schema without visible FAQ`);
+        assert.doesNotMatch(html, /class="faq-list"/, `${card.id} must not use the legacy FAQ list shell`);
     });
 });
 

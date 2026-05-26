@@ -31,101 +31,173 @@
     <meta property="og:locale" content="en_AE">
     <meta property="og:site_name" content="Dynasty Prestige">
     <link rel="stylesheet" href="css/site-v2.css?v=20260521-mobile-drawer-close1">
-    <link rel="stylesheet" href="css/seo-landing.css?v=20260525-faq-minus1">
+    <link rel="stylesheet" href="css/seo-landing.css?v=20260526-semantic-schema1">
     <link rel="stylesheet" href="/css/admin-style-overrides.css?v=20260516-nav-opacity-fix2">
     <script src="js/site-v2.js?v=20260521-home-dates1" defer></script>
     <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
     {
-      "@type": "Organization",
-      "@id": "https://www.dynastyprestigecarrental.com/#organization",
-      "name": "Dynasty Prestige",
-      "url": "https://www.dynastyprestigecarrental.com/",
-      "logo": "https://www.dynastyprestigecarrental.com/logo-dp-transparent.png",
-      "telephone": "+971586122568",
-      "email": "prestigegoalmotion@gmail.com"
-    },
-    {
-      "@type": "WebSite",
-      "@id": "https://www.dynastyprestigecarrental.com/#website",
-      "url": "https://www.dynastyprestigecarrental.com/",
-      "name": "Dynasty Prestige"
-    },
-    {
-      "@type": "WebPage",
-      "@id": "https://www.dynastyprestigecarrental.com/lamborghini-urus-rental-dubai.html#webpage",
-      "url": "https://www.dynastyprestigecarrental.com/lamborghini-urus-rental-dubai.html",
-      "name": "Lamborghini Urus SE Rental Dubai | Dynasty Prestige",
-      "description": "Lamborghini Urus SE rental in Dubai with airport, villa and hotel delivery.",
-      "isPartOf": {
-        "@id": "https://www.dynastyprestigecarrental.com/#website"
-      },
-      "breadcrumb": {
-        "@id": "https://www.dynastyprestigecarrental.com/lamborghini-urus-rental-dubai.html#breadcrumb"
-      },
-      "inLanguage": "en-AE"
-    },
-    {
-      "@type": "BreadcrumbList",
-      "@id": "https://www.dynastyprestigecarrental.com/lamborghini-urus-rental-dubai.html#breadcrumb",
-      "itemListElement": [
+      "@context": "https://schema.org",
+      "@graph": [
         {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Home",
-          "item": "https://www.dynastyprestigecarrental.com/"
+          "@type": [
+            "AutoRental",
+            "LocalBusiness",
+            "Organization"
+          ],
+          "@id": "https://www.dynastyprestigecarrental.com/#organization",
+          "name": "Dynasty Prestige",
+          "url": "https://www.dynastyprestigecarrental.com/",
+          "logo": "https://www.dynastyprestigecarrental.com/logo-dp-transparent.png",
+          "image": "https://www.dynastyprestigecarrental.com/logo-dp-transparent.png",
+          "telephone": "+971586122568",
+          "email": "prestigegoalmotion@gmail.com",
+          "description": "Luxury car rental and concierge handover coordination across Dubai hotels, villas, airports and residences.",
+          "priceRange": "AED 1,690-5,490 per day",
+          "areaServed": [
+            {
+              "@type": "City",
+              "name": "Dubai"
+            },
+            {
+              "@type": "Airport",
+              "name": "Dubai International Airport"
+            },
+            {
+              "@type": "Airport",
+              "name": "Al Maktoum International Airport"
+            },
+            {
+              "@type": "Place",
+              "name": "Palm Jumeirah"
+            },
+            {
+              "@type": "Place",
+              "name": "Dubai Marina"
+            }
+          ],
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "customer service",
+            "telephone": "+971586122568",
+            "email": "prestigegoalmotion@gmail.com",
+            "availableLanguage": [
+              "English",
+              "Spanish"
+            ]
+          }
         },
         {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Fleet",
-          "item": "https://www.dynastyprestigecarrental.com/fleet.html"
+          "@type": "WebSite",
+          "@id": "https://www.dynastyprestigecarrental.com/#website",
+          "url": "https://www.dynastyprestigecarrental.com/",
+          "name": "Dynasty Prestige",
+          "publisher": {
+            "@id": "https://www.dynastyprestigecarrental.com/#organization"
+          }
         },
         {
-          "@type": "ListItem",
-          "position": 3,
-          "name": "Lamborghini Urus SE",
-          "item": "https://www.dynastyprestigecarrental.com/lamborghini-urus-rental-dubai.html"
+          "@type": "WebPage",
+          "@id": "https://www.dynastyprestigecarrental.com/lamborghini-urus-rental-dubai.html#webpage",
+          "url": "https://www.dynastyprestigecarrental.com/lamborghini-urus-rental-dubai.html",
+          "name": "Lamborghini Urus SE Rental Dubai | Dynasty Prestige",
+          "description": "The Urus is the Lamborghini rental in Dubai that still makes sense for luggage, guests, airport arrivals and full-day villa schedules. Indicative day rate starts from 3,600 AED.",
+          "isPartOf": {
+            "@id": "https://www.dynastyprestigecarrental.com/#website"
+          },
+          "breadcrumb": {
+            "@id": "https://www.dynastyprestigecarrental.com/lamborghini-urus-rental-dubai.html#breadcrumb"
+          },
+          "mainEntity": {
+            "@id": "https://www.dynastyprestigecarrental.com/lamborghini-urus-rental-dubai.html#rental-offer"
+          },
+          "inLanguage": "en-AE"
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://www.dynastyprestigecarrental.com/lamborghini-urus-rental-dubai.html#breadcrumb",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://www.dynastyprestigecarrental.com/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Fleet",
+              "item": "https://www.dynastyprestigecarrental.com/fleet.html"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Lamborghini Urus SE",
+              "item": "https://www.dynastyprestigecarrental.com/lamborghini-urus-rental-dubai.html"
+            }
+          ]
+        },
+        {
+          "@type": [
+            "Product",
+            "Car"
+          ],
+          "@id": "https://www.dynastyprestigecarrental.com/lamborghini-urus-rental-dubai.html#rental-offer",
+          "name": "Lamborghini Urus SE rental in Dubai",
+          "model": "Lamborghini Urus SE",
+          "brand": {
+            "@type": "Brand",
+            "name": "Lamborghini"
+          },
+          "category": "Luxury car rental",
+          "description": "The Urus is the Lamborghini rental in Dubai that still makes sense for luggage, guests, airport arrivals and full-day villa schedules. Indicative day rate starts from 3,600 AED.",
+          "image": "https://www.dynastyprestigecarrental.com/images/fleet/lamborghini-urus/01-exterior-front.png",
+          "url": "https://www.dynastyprestigecarrental.com/lamborghini-urus-rental-dubai.html",
+          "mainEntityOfPage": {
+            "@id": "https://www.dynastyprestigecarrental.com/lamborghini-urus-rental-dubai.html#webpage"
+          },
+          "offers": {
+            "@type": "Offer",
+            "@id": "https://www.dynastyprestigecarrental.com/lamborghini-urus-rental-dubai.html#day-rate",
+            "name": "Lamborghini Urus SE indicative day rental rate",
+            "priceCurrency": "AED",
+            "price": "3600",
+            "availability": "https://schema.org/LimitedAvailability",
+            "url": "https://www.dynastyprestigecarrental.com/lamborghini-urus-rental-dubai.html",
+            "seller": {
+              "@id": "https://www.dynastyprestigecarrental.com/#organization"
+            },
+            "areaServed": {
+              "@type": "City",
+              "name": "Dubai"
+            },
+            "priceSpecification": {
+              "@type": "UnitPriceSpecification",
+              "priceCurrency": "AED",
+              "price": "3600",
+              "unitText": "DAY"
+            }
+          }
+        },
+        {
+          "@type": "Service",
+          "@id": "https://www.dynastyprestigecarrental.com/lamborghini-urus-rental-dubai.html#service",
+          "name": "Lamborghini Urus SE rental in Dubai",
+          "serviceType": "Luxury car rental",
+          "provider": {
+            "@id": "https://www.dynastyprestigecarrental.com/#organization"
+          },
+          "areaServed": {
+            "@type": "City",
+            "name": "Dubai"
+          },
+          "url": "https://www.dynastyprestigecarrental.com/lamborghini-urus-rental-dubai.html",
+          "description": "Lamborghini Urus SE handovers can be coordinated for Dubai hotels, villas, residences and airport-led arrivals. Best for airport arrivals, villas and flexible schedules.",
+          "offers": {
+            "@id": "https://www.dynastyprestigecarrental.com/lamborghini-urus-rental-dubai.html#day-rate"
+          }
         }
       ]
-    },
-    {
-      "@type": "Product",
-      "@id": "https://www.dynastyprestigecarrental.com/lamborghini-urus-rental-dubai.html#product",
-      "name": "Lamborghini Urus SE",
-      "brand": {
-        "@type": "Brand",
-        "name": "Lamborghini"
-      },
-      "description": "Lamborghini Urus SE rental Dubai from 3,600 AED/day indicative for airport, family and villa-led premium stays.",
-      "image": "https://www.dynastyprestigecarrental.com/images/fleet/lamborghini-urus/01-exterior-front.png",
-      "offers": {
-        "@type": "Offer",
-        "priceCurrency": "AED",
-        "price": "3600",
-        "availability": "https://schema.org/InStock",
-        "url": "https://www.dynastyprestigecarrental.com/app/reserve/page.html?car=Lamborghini%20Urus%20SE&price=3600"
-      }
-    },
-    {
-      "@type": "Service",
-      "@id": "https://www.dynastyprestigecarrental.com/lamborghini-urus-rental-dubai.html#service",
-      "name": "Lamborghini Urus SE rental Dubai",
-      "serviceType": "Luxury car rental",
-      "provider": {
-        "@id": "https://www.dynastyprestigecarrental.com/#organization"
-      },
-      "areaServed": {
-        "@type": "Place",
-        "name": "Dubai"
-      },
-      "url": "https://www.dynastyprestigecarrental.com/lamborghini-urus-rental-dubai.html",
-      "description": "Dubai handovers for the Lamborghini Urus SE across airports, villas, resorts and hotel-led stays."
     }
-  ]
-}
     </script>
 </head>
 <body class="vehicle-page vehicle-page--mother-base vehicle-page--urus vehicle-page--landing-pilot">
@@ -433,7 +505,7 @@
         <section class="vehicle-section vehicle-pdp-seo-intent" aria-labelledby="lamborghini-urus-sport-seo-intent-title">
             <div class="vehicle-section__heading vehicle-section__heading--compact">
                 <span class="section-kicker">Dubai fit</span>
-                <h2 id="lamborghini-urus-sport-seo-intent-title">Lamborghini Urus rental in Dubai for airport-to-villa plans</h2>
+                <h2 id="lamborghini-urus-sport-seo-intent-title">Airport-to-villa plans for the Lamborghini Urus SE</h2>
                 <p>The Urus is the Lamborghini rental in Dubai that still makes sense for luggage, guests, airport arrivals and full-day villa schedules.</p>
             </div>
             <div class="vehicle-pdp-seo-intent__grid">
@@ -566,4 +638,3 @@
     <script src="js/seo-landing.js?v=20260514-availability1"></script>
 </body>
 </html>
-

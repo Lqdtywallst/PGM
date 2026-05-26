@@ -4,12 +4,15 @@ const test = require('node:test');
 const fleetCards = require('../../server/data/fleet-cards.json');
 const {
     extractLandingReserveImageSources,
+    fleetPriceRange,
     listVehicleImages,
     previewImageForVehicle,
     removeFaqStructuredData,
     renderVehicleMotherContent,
+    replaceVehicleStructuredData,
     replaceVehicleMotherContent,
     seoIntentForVehicle,
+    vehicleStructuredDataForCard,
     vehicleName
 } = require('../../server/renderers/render-vehicle-pages');
 
@@ -28,7 +31,9 @@ test('vehicle mother content renders reusable sections from fleet card data', ()
     assert.match(markup, /Featured detail/);
     assert.match(markup, /blue-porsche-gt3-rs\/05\.jpg/);
     assert.match(markup, /vehicle-pdp-seo-intent/);
-    assert.match(markup, /Porsche GT3 RS rental in Dubai for focused enthusiasts/);
+    assert.match(markup, /Focused enthusiast drives for the Porsche GT3 RS/);
+    assert.doesNotMatch(markup, /vehicle-pdp-faq/);
+    assert.doesNotMatch(markup, /FAQPage/);
     assert.doesNotMatch(markup, /Photo preview/);
     assert.match(markup, /vehicle-pdp-related-card/);
     assert.match(markup, /Porsche 992 GT3/);
@@ -116,9 +121,30 @@ test('all vehicle cards define a natural SEO intent matrix', () => {
         assert.ok(card.seo?.primaryKeyword, `${card.id} needs a primary keyword`);
         assert.equal(Array.isArray(card.seo?.supportingKeywords), true, `${card.id} needs supporting keywords`);
         assert.equal(card.seo.supportingKeywords.length >= 3, true, `${card.id} needs at least three supporting keywords`);
-        assert.equal(seoIntent.signals.length, 3, `${card.id} should render three intent signals`);
-        assert.match(seoIntent.heading, /rental in Dubai/i, `${card.id} heading should carry rental in Dubai naturally`);
+    assert.equal(seoIntent.signals.length, 3, `${card.id} should render three intent signals`);
+    assert.doesNotMatch(seoIntent.heading, /rental in Dubai/i, `${card.id} heading should stay editorial, not keyword-stuffed`);
     });
+});
+
+test('vehicle structured data uses rental business semantics without deprecated FAQ schema', () => {
+    const card = fleetCards.find((item) => item.id === 'rolls-royce-cullinan-black-badge');
+    const schema = vehicleStructuredDataForCard(card, fleetCards);
+    const graph = schema['@graph'];
+    const types = graph.flatMap((node) => Array.isArray(node['@type']) ? node['@type'] : [node['@type']]);
+    const product = graph.find((node) => Array.isArray(node['@type']) && node['@type'].includes('Product'));
+    const business = graph.find((node) => Array.isArray(node['@type']) && node['@type'].includes('AutoRental'));
+
+    assert.equal(schema['@context'], 'https://schema.org');
+    ['AutoRental', 'LocalBusiness', 'Organization', 'Product', 'Car', 'Service', 'BreadcrumbList'].forEach((type) => {
+        assert.equal(types.includes(type), true, `schema needs ${type}`);
+    });
+    assert.equal(types.includes('FAQPage'), false);
+    assert.equal(business.priceRange, fleetPriceRange(fleetCards));
+    assert.match(product.name, /rental in Dubai/);
+    assert.equal(product.offers.availability, 'https://schema.org/LimitedAvailability');
+    assert.equal(product.offers.price, String(card.pricePerDay));
+    assert.equal(product.offers.priceSpecification.unitText, 'DAY');
+    assert.equal(product.offers.url, 'https://www.dynastyprestigecarrental.com/rolls-royce-cullinan-black-badge-rental-dubai.html');
 });
 
 test('vehicle renderer extracts existing reserve gallery image sources', () => {
@@ -175,5 +201,21 @@ test('vehicle renderer removes FAQPage structured data when FAQ is not visible',
     const nextHtml = removeFaqStructuredData(html);
 
     assert.match(nextHtml, /"@type": "Product"/);
+    assert.doesNotMatch(nextHtml, /FAQPage/);
+});
+
+test('vehicle renderer replaces head JSON-LD with controlled rental schema', () => {
+    const card = fleetCards.find((item) => item.id === 'ferrari-296-gts');
+    const html = [
+        '<head>',
+        '<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage"}</script>',
+        '</head>'
+    ].join('\n');
+
+    const nextHtml = replaceVehicleStructuredData(removeFaqStructuredData(html), card, fleetCards);
+
+    assert.match(nextHtml, /"@type": \[\s*"AutoRental",\s*"LocalBusiness",\s*"Organization"\s*\]/);
+    assert.match(nextHtml, /"@type": \[\s*"Product",\s*"Car"\s*\]/);
+    assert.match(nextHtml, /"availability": "https:\/\/schema\.org\/LimitedAvailability"/);
     assert.doesNotMatch(nextHtml, /FAQPage/);
 });
