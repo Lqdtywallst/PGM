@@ -41,14 +41,46 @@ function normalizeEnvironment(value) {
     return '';
 }
 
-function resolveRuntimeEnvironment() {
-    const vercelEnvironment = normalizeEnvironment(readPublicEnv('VERCEL_ENV'));
+function inferEnvironmentFromPublicHost(...names) {
+    for (const name of names) {
+        const rawValue = readPublicEnv(name);
+        if (!rawValue) continue;
 
-    if (vercelEnvironment) {
-        return vercelEnvironment;
+        const candidate = rawValue.includes('://') ? rawValue : `https://${rawValue}`;
+
+        try {
+            const hostname = new URL(candidate).hostname.toLowerCase();
+            if (hostname.includes('staging') || hostname.includes('preprod') || hostname.includes('preview')) {
+                return 'staging';
+            }
+        } catch {
+            // Ignore malformed provider hints and keep checking other signals.
+        }
     }
 
-    return normalizeEnvironment(readPublicEnv('PGM_APP_ENV', 'APP_ENV'));
+    return '';
+}
+
+function resolveRuntimeEnvironment() {
+    const explicitEnvironment = normalizeEnvironment(readPublicEnv('PGM_APP_ENV', 'APP_ENV'));
+
+    if (explicitEnvironment) {
+        return explicitEnvironment;
+    }
+
+    const inferredEnvironment = inferEnvironmentFromPublicHost(
+        'PGM_PUBLIC_FRONTEND_URL',
+        'PUBLIC_FRONTEND_URL',
+        'VERCEL_PROJECT_PRODUCTION_URL',
+        'VERCEL_URL',
+        'RAILWAY_PUBLIC_DOMAIN'
+    );
+
+    if (inferredEnvironment) {
+        return inferredEnvironment;
+    }
+
+    return normalizeEnvironment(readPublicEnv('VERCEL_ENV'));
 }
 
 function backendHostname(url) {
@@ -64,8 +96,14 @@ function normalizeBackendUrlForEnvironment(url, appEnv) {
 
     if (appEnv === 'staging') {
         const hostname = backendHostname(normalizedUrl);
+        const productionBackendHostname = backendHostname(productionBackendUrl);
 
-        if (!normalizedUrl || hostname === 'pgm-production.up.railway.app' || hostname === 'pgm-staging.up.railway.app') {
+        if (
+            !normalizedUrl ||
+            hostname === productionBackendHostname ||
+            hostname === 'pgm-production.up.railway.app' ||
+            hostname === 'pgm-staging.up.railway.app'
+        ) {
             return stagingBackendUrl;
         }
     }

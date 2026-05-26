@@ -1,0 +1,55 @@
+name: Preproduction Checkout Gate
+
+on:
+  workflow_dispatch:
+    inputs:
+      frontend_url:
+        description: "Public preproduction frontend URL"
+        required: true
+        default: "https://pgm-staging.vercel.app"
+      backend_url:
+        description: "Preproduction Railway backend URL"
+        required: true
+        default: "https://pgm-preproduccion.up.railway.app"
+      run_functional_checkout:
+        description: "Run the real Stripe test-card checkout flow"
+        required: true
+        type: boolean
+        default: true
+
+jobs:
+  preprod-checkout-gate:
+    name: Verify preproduction before production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PREPROD_FRONTEND_URL: ${{ inputs.frontend_url }}
+      PREPROD_BACKEND_URL: ${{ inputs.backend_url }}
+      STAGING_FRONTEND_URL: ${{ inputs.frontend_url }}
+      STAGING_BACKEND_URL: ${{ inputs.backend_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        if: ${{ inputs.run_functional_checkout }}
+        run: npx playwright install --with-deps chromium
+
+      - name: Static smoke checks
+        run: npm run test:smoke
+
+      - name: Verify staging/preproduction wiring
+        run: npm run audit:staging:readiness
+
+      - name: Run real checkout with Stripe test card
+        if: ${{ inputs.run_functional_checkout }}
+        run: npm run audit:preprod:functional

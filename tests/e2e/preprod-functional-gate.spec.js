@@ -115,11 +115,56 @@ async function waitForBlockedAvailability(schedule) {
 async function assertFrontendRuntimeConfig(page) {
     const runtime = await page.evaluate(() => ({
         env: window.APP_ENVIRONMENT,
-        backendUrl: window.getBackendUrl?.() || window.STRIPE_CONFIG?.backendUrl || ''
+        backendUrl: window.getBackendUrl?.() || window.STRIPE_CONFIG?.backendUrl || '',
+        publishableKey: window.STRIPE_CONFIG?.publishableKey || ''
     }));
 
     expect(runtime.env).toBe('staging');
     expect(String(runtime.backendUrl).replace(/\/+$/, '')).toBe(backendBaseUrl);
+
+    return runtime;
+}
+
+function isPlaceholderPublishableKey(value) {
+    const text = String(value || '').trim();
+    return /^pk_test_x+$/i.test(text) || /^pk_live_x+$/i.test(text);
+}
+
+async function assertFrontendCheckoutConfig(page) {
+    const runtime = await assertFrontendRuntimeConfig(page);
+    expect(runtime.publishableKey, 'Preproduction checkout must use a real Stripe test publishable key.').toMatch(/^pk_test_/);
+    expect(isPlaceholderPublishableKey(runtime.publishableKey), 'Preproduction checkout cannot use the pk_test_xxx placeholder.').toBe(false);
+}
+
+async function completeReserveGuestSteps(page, schedule, email) {
+    await page.locator('#pickupLocation').fill('Preproduction QA hotel handover');
+    await expect(page.locator('#continueToPaymentBtn')).toBeEnabled();
+    await page.locator('#continueToPaymentBtn').click();
+    await expect(page.locator('#step2')).toHaveClass(/active/);
+
+    await page.locator('#fullName').fill('Preprod Checkout QA');
+    await page.locator('#passport').fill('PREPROD-CHECKOUT-QA');
+    await page.locator('#phone').fill('+971 58 612 2568');
+    await page.locator('#email').fill(email);
+    await page.locator('#step2').getByRole('button', { name: /Continue to Payment/i }).click();
+
+    await expect(page.locator('#step3')).toHaveClass(/active/);
+    await expect(page.locator('#payButton')).toContainText('Pay 50% now');
+    await expect(page.locator('#summaryDays')).not.toHaveText('0h');
+    await expect(page.locator('#summaryTotal')).not.toHaveText('AED 0.00');
+    await expect(page.locator('#startDate')).toHaveValue(schedule.startDate);
+    await expect(page.locator('#endDate')).toHaveValue(schedule.endDate);
+}
+
+async function fillStripeTestCard(page) {
+    await expect(page.locator('iframe[src*="js.stripe.com"][src*="elements-inner-card"]')).toHaveCount(1, { timeout: 20000 });
+
+    const stripeFrame = page.frames().find((frame) => frame.url().includes('elements-inner-card'));
+    expect(stripeFrame, 'Stripe card frame should be mounted in preproduction.').toBeTruthy();
+
+    await stripeFrame.locator('input').nth(1).fill('4242424242424242');
+    await stripeFrame.locator('input').nth(2).fill('12 / 34');
+    await stripeFrame.locator('input').nth(3).fill('123');
 }
 
 async function fillFleetSchedule(page, schedule) {
@@ -191,5 +236,49 @@ test.describe('Preproduction functional gate', () => {
         await expect(page.locator('#reservationLookupResult')).toBeVisible();
         await expect(page.locator('#reservationLookupResult')).toContainText('Mercedes G63 AMG');
         await expectNoConsoleErrors(consoleErrors, `preproduction ${testInfo.project.name} flow`);
+    });
+
+    test('Reserve checkout completes with a Stripe test card against staging services', async ({ page }, testInfo) => {
+        test.setTimeout(120000);
+        requirePreprodConfig();
+
+        const schedule = buildSchedules().clear;
+        const runId = crypto.randomBytes(5).toString('hex');
+        const email = `preprod-checkout-${runId}@example.com`;
+        let dialogMessage = '';
+        const apiRequests = [];
+
+        page.on('dialog', async (dialog) => {
+            dialogMessage = dialog.message();
+            await dialog.accept();
+        });
+        page.on('request', (request) => {
+            if (request.url().startsWith(`${backendBaseUrl}/api/reserve`)) {
+                apiRequests.push(request.url());
+            }
+        });
+
+        await assertBackendHealth();
+        await page.goto(`/app/reserve/page.html?car=Ferrari%20296%20GTS&price=3400&startDate=${schedule.startDate}&endDate=${schedule.endDate}&pickupTime=${schedule.pickupTime}&dropoffTime=${schedule.dropoffTime}`, {
+            waitUntil: 'domcontentloaded'
+        });
+        await settlePage(page);
+        await assertFrontendCheckoutConfig(page);
+
+        await expect(page.locator('#selectedCar')).toContainText('Ferrari 296 GTS');
+        await completeReserveGuestSteps(page, schedule, email);
+        await fillStripeTestCard(page);
+
+        await page.locator('#payButton').click();
+        await expect.poll(() => dialogMessage, {
+            message: 'Stripe test card should complete the preproduction reservation.',
+            timeout: 60000
+        }).toContain('Payment received.');
+
+        expect(
+            apiRequests.some((url) => url === `${backendBaseUrl}/api/reserve`) &&
+            apiRequests.some((url) => url === `${backendBaseUrl}/api/reserve/confirm`),
+            'Checkout should create and confirm the reservation through the staging backend.'
+        ).toBe(true);
     });
 });

@@ -32,6 +32,16 @@ function maskKey(value) {
     return `${text.slice(0, 8)}...${text.slice(-4)}`;
 }
 
+function isPlaceholderPublishableKey(value) {
+    const text = String(value || '').trim();
+    return /^pk_test_x+$/i.test(text) || /^pk_live_x+$/i.test(text);
+}
+
+function isUsableTestPublishableKey(value) {
+    const text = String(value || '').trim();
+    return text.startsWith('pk_test_') && !isPlaceholderPublishableKey(text);
+}
+
 async function fetchText(url) {
     const response = await fetch(url, {
         headers: { Accept: 'text/html,application/javascript,application/json;q=0.9,*/*;q=0.8' }
@@ -116,7 +126,7 @@ function addLocalEnvSnapshot() {
     }
 
     if (publishableKey) {
-        addCheck('local-env', 'PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY', publishableKey.startsWith('pk_test_') ? 'pass' : 'fail', maskKey(publishableKey));
+        addCheck('local-env', 'PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY', isUsableTestPublishableKey(publishableKey) ? 'pass' : 'fail', maskKey(publishableKey));
     } else {
         addCheck('local-env', 'PGM_PUBLIC_STRIPE_PUBLISHABLE_KEY', 'warn', 'Not set locally. Frontend host must set pk_test_ for staging.');
     }
@@ -215,7 +225,7 @@ async function checkFrontend() {
 
         addCheck('frontend', 'Frontend environment', stripeConfig.environment === 'staging' ? 'pass' : 'fail', `environment=${stripeConfig.environment || 'unknown'}`);
         addCheck('frontend', 'Frontend points to staging backend', normalizedBackend === backendUrl ? 'pass' : 'fail', `backendUrl=${normalizedBackend || 'missing'}`);
-        addCheck('frontend', 'Stripe publishable key is test', String(stripeConfig.publishableKey || '').startsWith('pk_test_') ? 'pass' : 'fail', maskKey(stripeConfig.publishableKey));
+        addCheck('frontend', 'Stripe publishable key is usable test key', isUsableTestPublishableKey(stripeConfig.publishableKey) ? 'pass' : 'fail', maskKey(stripeConfig.publishableKey));
     } catch (error) {
         addCheck('frontend', 'Frontend config evaluation', 'fail', error.message);
     }

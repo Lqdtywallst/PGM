@@ -446,6 +446,27 @@ async function run() {
         'runtime config can override staging backend and Stripe publishable key'
     );
 
+    const runtimeConfigBuilder = readFile('scripts/build/write-runtime-config.js');
+    assert(
+        runtimeConfigBuilder.indexOf("readPublicEnv('PGM_APP_ENV', 'APP_ENV')") <
+        runtimeConfigBuilder.indexOf("readPublicEnv('VERCEL_ENV')"),
+        'runtime config prefers explicit app env over Vercel deployment target'
+    );
+    assert(
+        runtimeConfigBuilder.includes("'VERCEL_PROJECT_PRODUCTION_URL'") &&
+        runtimeConfigBuilder.includes("hostname.includes('staging')") &&
+        runtimeConfigBuilder.includes('hostname === productionBackendHostname'),
+        'runtime config keeps staging Vercel projects away from production backend'
+    );
+
+    const stagingReadinessCheck = readFile('scripts/qa/run-staging-readiness-check.js');
+    assert(
+        stagingReadinessCheck.includes('isUsableTestPublishableKey') &&
+        stagingReadinessCheck.includes('!isPlaceholderPublishableKey') &&
+        stagingReadinessCheck.includes('Stripe publishable key is usable test key'),
+        'staging readiness rejects placeholder Stripe publishable keys'
+    );
+
     const cspHeader = JSON.stringify(vercelConfig.headers || []);
     assert(
         cspHeader.includes('https://pgm-preproduccion.up.railway.app') &&
