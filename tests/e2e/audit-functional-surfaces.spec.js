@@ -1,5 +1,6 @@
 const { test, expect } = require('@playwright/test');
 const { contactLead } = require('../../test-data/users.json');
+const fleetCards = require('../../server/data/fleet-cards.json');
 const {
     createConsoleTracker,
     expectNoConsoleErrors,
@@ -7,6 +8,9 @@ const {
     primeHomeAnimations,
     settlePage
 } = require('./support/site-helpers');
+
+const fleetTotalCount = fleetCards.length;
+const mercedesFleetCount = fleetCards.filter((card) => card.brand === 'Mercedes').length;
 
 test.describe('Functional surfaces intelligent audit', () => {
     test.beforeEach(({}, testInfo) => {
@@ -50,7 +54,7 @@ test.describe('Functional surfaces intelligent audit', () => {
         await page.locator('#fleet-pickup-time').fill('11:00');
         await page.locator('#fleet-return-time').fill('16:00');
         await page.locator('.js-fleet-brand-select').selectOption('mercedes');
-        await expect(page.locator('.js-fleet-results-count')).toContainText('1 model visible');
+        await expect(page.locator('.js-fleet-results-count')).toContainText(`${mercedesFleetCount} models visible`);
 
         const reserveLink = page.locator('.js-fleet-card:not([hidden]) .fleet-card__reserve').first();
         await expect(reserveLink).toHaveAttribute('href', /startDate=2026-11-10/i);
@@ -61,7 +65,7 @@ test.describe('Functional surfaces intelligent audit', () => {
         await page.getByRole('button', { name: /Reset filters/i }).click();
 
         await expect(page.locator('.js-fleet-brand-select')).toHaveValue('all');
-        await expect(page.locator('.js-fleet-results-count')).toContainText('6 models visible');
+        await expect(page.locator('.js-fleet-results-count')).toContainText(`${fleetTotalCount} models visible`);
         await expectNoConsoleErrors(consoleErrors, 'fleet filter surfaces');
     });
 

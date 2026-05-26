@@ -280,6 +280,16 @@ async function runResponsiveAudit({ browser, pageEntry, viewport, testInfo }) {
     await page.addInitScript(() => {
         window.__siteV2HeroIntroSeen = true;
     });
+    await page.route('**/api/availability?**', async (route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                status: 'ok',
+                vehicles: []
+            })
+        });
+    });
 
     const consoleErrors = createConsoleTracker(page);
     const auditLabel = `${pageEntry.name}-${viewport.name}`;
