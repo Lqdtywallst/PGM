@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { escapeHtml } = require('../shared/html-utils');
+const { renderImageDimensionAttributes } = require('../shared/image-dimensions');
 const { publicPathForSiteFile } = require('../shared/public-page-map');
 
 const projectRoot = path.resolve(__dirname, '..', '..');
@@ -152,6 +153,7 @@ function buildFooterMarkup(config, currentPublicPath = '/', options = {}) {
     const className = String(options.className || 'site-v2-footer').trim();
     const id = String(options.id || 'contact').trim();
     const idAttr = id ? ` id="${escapeHtml(id)}"` : '';
+    const crestDimensions = renderImageDimensionAttributes(siteRoot, config.brand.crestSrc);
 
     return [
         `            <footer class="${escapeHtml(className)}"${idAttr}>`,
@@ -159,7 +161,7 @@ function buildFooterMarkup(config, currentPublicPath = '/', options = {}) {
         '                    <div class="site-v2-footer__top">',
         '                        <div class="site-v2-footer__brand">',
         '                            <span class="site-v2-footer__crest" aria-hidden="true">',
-        `                                <img src="${escapeHtml(config.brand.crestSrc)}" alt="">`,
+        `                                <img src="${escapeHtml(config.brand.crestSrc)}" alt=""${crestDimensions}>`,
         '                            </span>',
         `                            <p>${escapeHtml(config.brand.text)}</p>`,
         '                        </div>',

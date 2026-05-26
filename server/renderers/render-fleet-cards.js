@@ -1,9 +1,11 @@
 const fs = require("fs");
 const path = require("path");
 const { escapeHtml } = require("../shared/html-utils");
+const { renderImageDimensionAttributes } = require("../shared/image-dimensions");
 
 const PHONE_E164 = "971586122568";
 const PHONE_DISPLAY = "+971586122568";
+const siteRoot = path.join(__dirname, "..", "..", "site");
 const cardsPath = path.join(__dirname, "..", "data", "fleet-cards.json");
 const fleetHtmlPath = path.join(__dirname, "..", "..", "site", "pages", "core", "fleet.html");
 const homeHtmlPath = path.join(__dirname, "..", "..", "site", "index.html");
@@ -107,11 +109,12 @@ function renderCard(card, options = {}) {
     const specsHtml = card.copy.specs
         .map((spec) => `                                                <span class="${specClass}">${escapeHtml(spec)}</span>`)
         .join("\n");
+    const imageDimensions = renderImageDimensionAttributes(siteRoot, card.image.src);
 
     return [
         `                            <article class="${articleClass}" data-id="${escapeHtml(card.id)}" data-brand="${escapeHtml(card.brandKey)}" data-type="${escapeHtml(typeAttr)}" data-price="${escapeHtml(card.pricePerDay)}" data-detail-href="${escapeHtml(card.href)}" tabindex="0" aria-label="View ${escapeHtml(card.brand)} ${escapeHtml(card.copy.title)} details"${variantAttr}>`,
         `                                <a class="${mediaClass}" href="${escapeHtml(card.href)}"${homeDataAttrs}>`,
-        `                                    <img src="${escapeHtml(card.image.src)}" alt="${escapeHtml(card.image.alt)}" loading="${escapeHtml(card.image.loading || "lazy")}" decoding="async">`,
+        `                                    <img src="${escapeHtml(card.image.src)}" alt="${escapeHtml(card.image.alt)}"${imageDimensions} loading="${escapeHtml(card.image.loading || "lazy")}" decoding="async">`,
         shadeHtml,
         `                                </a>`,
         `                                <div class="${contentClass}">`,

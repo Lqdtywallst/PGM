@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { escapeHtml } = require('../shared/html-utils');
+const { renderImageDimensionAttributes } = require('../shared/image-dimensions');
 const { publicPathForSiteFile } = require('../shared/public-page-map');
 
 const projectRoot = path.resolve(__dirname, '..', '..');
@@ -237,11 +238,12 @@ function renderUtilityLinks(links) {
 
 function renderMegaCard(card, cardVariant) {
     const imageAlt = card.imageAlt ? escapeHtml(card.imageAlt) : '';
+    const dimensions = renderImageDimensionAttributes(siteRoot, card.imageSrc);
 
     return [
         `                                <a class="lab-nav__card lab-nav__card--${escapeHtml(cardVariant)}" href="${escapeHtml(card.href)}">`,
         `                                    <span class="lab-nav__card-media lab-nav__card-media--${escapeHtml(cardVariant)}">`,
-        `                                        <img src="${escapeHtml(card.imageSrc)}" alt="${imageAlt}">`,
+        `                                        <img src="${escapeHtml(card.imageSrc)}" alt="${imageAlt}"${dimensions} loading="lazy" decoding="async">`,
         '                                    </span>',
         '                                    <span class="lab-nav__card-copy">',
         `                                        <strong>${escapeHtml(card.title)}</strong>`,
@@ -294,6 +296,7 @@ function renderMainNav(navItems, currentPublicPath) {
 function buildHeaderMarkup(config, currentPublicPath) {
     const utilityMarkup = renderUtilityLinks(config.utilityLinks);
     const navMarkup = renderMainNav(config.navItems, currentPublicPath);
+    const crestDimensions = renderImageDimensionAttributes(siteRoot, '/images/dp-crest-cropped.png');
     const reserveMarkup = config.primaryButton.visible
         ? `            <a href="${escapeHtml(config.primaryButton.href)}" class="lab-reserve">${escapeHtml(config.primaryButton.label)}</a>`
         : '';
@@ -303,7 +306,7 @@ function buildHeaderMarkup(config, currentPublicPath) {
         '        <div class="lab-shell lab-header__inner">',
         '            <a href="/index.html" class="lab-brand" aria-label="Dynasty Prestige home">',
         '                <span class="lab-brand__crest" aria-hidden="true">',
-        '                    <img src="/images/dp-crest-cropped.png" alt="">',
+        `                    <img src="/images/dp-crest-cropped.png" alt=""${crestDimensions}>`,
         '                </span>',
         '                <span class="lab-brand__copy">',
         '                    <strong>Dynasty Prestige</strong>',

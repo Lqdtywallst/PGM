@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { escapeHtml } = require('../shared/html-utils');
+const { renderImageDimensionAttributes } = require('../shared/image-dimensions');
 
 const projectRoot = path.resolve(__dirname, '..', '..');
 const siteRoot = path.join(projectRoot, 'site');
@@ -240,10 +241,12 @@ function renderSeoIntentSignal(signal) {
 }
 
 function renderRelatedVisualItem(item) {
+    const dimensions = renderImageDimensionAttributes(siteRoot, item.image.src);
+
     return [
         `                <a class="vehicle-pdp-related-card" href="${escapeHtml(item.href)}">`,
         '                    <span class="vehicle-pdp-related-card__media">',
-        `                        <img src="${escapeHtml(item.image.src)}" alt="${escapeHtml(item.image.alt)}" decoding="async" loading="lazy">`,
+        `                        <img src="${escapeHtml(item.image.src)}" alt="${escapeHtml(item.image.alt)}"${dimensions} decoding="async" loading="lazy">`,
         '                    </span>',
         '                    <span class="vehicle-pdp-related-card__body">',
         `                        <span class="vehicle-pdp-related-card__badge">${escapeHtml(item.badge)}</span>`,
@@ -260,6 +263,7 @@ function renderVehicleMotherContent(card, cards = [], options = {}) {
     const titleId = `${card.id}-cinema-title`;
     const images = firstUsefulImages(card);
     const posterImage = previewImageOverride(card) || previewImageForVehicle(images, card.image, options.excludePreviewImageSources);
+    const posterDimensions = renderImageDimensionAttributes(siteRoot, posterImage.src);
     const seoIntent = seoIntentForVehicle(card);
     const seoTitleId = `${card.id}-seo-intent-title`;
     const related = relatedCars(card, cards);
@@ -269,7 +273,7 @@ function renderVehicleMotherContent(card, cards = [], options = {}) {
         '            <div class="vehicle-pdp-cinema__shell">',
         '                <article class="vehicle-pdp-video-card" aria-label="Premium vehicle photo preview">',
         '                    <figure class="vehicle-pdp-video-card__media">',
-        `                        <img src="${escapeHtml(posterImage.src)}" alt="${escapeHtml(posterImage.alt)}" decoding="async" loading="lazy">`,
+        `                        <img src="${escapeHtml(posterImage.src)}" alt="${escapeHtml(posterImage.alt)}"${posterDimensions} decoding="async" loading="lazy">`,
         '                        <figcaption class="vehicle-pdp-video-card__overlay">',
         '                            <span>Featured detail</span>',
         `                            <strong>${escapeHtml(name)} with the stance, finish and cabin feel guests compare before booking.</strong>`,

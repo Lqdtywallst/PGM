@@ -4,6 +4,7 @@ const { syncGlobalHeaderHtml } = require('./render-global-header');
 const { syncLocationsHtmlFromData } = require('./render-locations-page');
 const { syncServicesHtmlFromData } = require('./render-services-page');
 const { syncVehiclePagesFromData } = require('./render-vehicle-pages');
+const { syncImageDimensions } = require('./sync-image-dimensions');
 
 const defaultTemplateRunners = [
     {
@@ -35,6 +36,11 @@ const defaultTemplateRunners = [
         name: 'locations-page',
         run: syncLocationsHtmlFromData,
         changedCount: (result) => (result.changed ? 1 : 0)
+    },
+    {
+        name: 'image-dimensions',
+        run: syncImageDimensions,
+        changedCount: (result) => result.touchedFiles.length
     }
 ];
 

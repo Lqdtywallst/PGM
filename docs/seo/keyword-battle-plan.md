@@ -57,8 +57,10 @@ Esto nos dice que la batalla no se gana solo con una home bonita. Hay que tener 
 
 ## Siguiente tanda recomendada
 
-1. Crear o reforzar bloques FAQ por página prioritaria.
+1. Seguir el roadmap Google-first en [google-first-seo-roadmap.md](google-first-seo-roadmap.md).
 2. Añadir comparativas internas: Urus vs Cullinan, G63 vs Urus, Ferrari vs Lamborghini.
 3. Mejorar snippets con precios, depósito, entrega y soporte si el negocio confirma esas condiciones.
 4. Pedir reindexación en Search Console de las páginas prioritarias.
 5. Medir en Search Console: impresiones, CTR, posición media y consultas reales.
+
+Nota 2026-05-26: no usamos `FAQPage` como táctica para landings de coche. Google ya no muestra FAQ rich results, así que la prioridad pasa a contenido útil, autoridad local, datos estructurados honestos e imágenes estables.

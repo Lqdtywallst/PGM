@@ -1,7 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 const { escapeHtml } = require('../shared/html-utils');
+const { renderImageDimensionAttributes } = require('../shared/image-dimensions');
 
+const siteRoot = path.join(__dirname, '..', '..', 'site');
 const dataPath = path.join(__dirname, '..', 'data', 'services-editor.json');
 const pagePath = path.join(__dirname, '..', '..', 'site', 'pages', 'core', 'services.html');
 
@@ -120,6 +122,7 @@ function normalizeServicesContent(content = {}) {
 
 function renderLane(lane) {
     const activeClass = lane.isActive ? ' is-active' : '';
+    const imageDimensions = renderImageDimensionAttributes(siteRoot, lane.imageSrc);
 
     return [
         '                        <a',
@@ -138,7 +141,7 @@ function renderLane(lane) {
         `                            data-service-primary-href="${escapeHtml(lane.href)}"`,
         `                            data-service-analytics-service="${escapeHtml(lane.analyticsService)}">`,
         '                            <span class="services-lane-orb__media" aria-hidden="true">',
-        `                                <img src="${escapeHtml(lane.imageSrc)}" alt="${escapeHtml(lane.imageAlt)}" decoding="async" loading="lazy">`,
+        `                                <img src="${escapeHtml(lane.imageSrc)}" alt="${escapeHtml(lane.imageAlt)}"${imageDimensions} decoding="async" loading="lazy">`,
         '                            </span>',
         '                            <span class="services-lane-orb__content">',
         `                                <span class="services-lane-orb__label">${escapeHtml(lane.navLabel)}</span>`,
