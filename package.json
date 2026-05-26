@@ -28,6 +28,7 @@
     "audit:seo": "node scripts/audits/run-seo-agent.js --gate",
     "audit:seo:legacy": "node server/audits/audit-seo.js",
     "agent:seo": "node scripts/audits/run-seo-agent.js",
+    "seo:gsc": "node scripts/seo/analyze-search-console-export.js",
     "audit:copy": "node scripts/audits/run-copy-audit.js",
     "audit:cleanup": "node scripts/audits/run-project-cleanup-audit.js",
     "audit:mobile:pro": "node scripts/audits/run-mobile-pro-audit.js",

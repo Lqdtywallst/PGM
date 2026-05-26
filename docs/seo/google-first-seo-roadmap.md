@@ -76,15 +76,18 @@ Resultado esperado: más prominencia local y más confianza para búsquedas con 
 
 ## Fase 6: Medición y aprendizaje
 
-Estado: pendiente de rutina.
+Estado: primera rutina creada.
 
 - Search Console semanal: consultas, páginas, impresiones, CTR y posición media.
 - Separar consultas por grupo: genéricas, marca, modelo, ubicación y servicio.
 - Detectar canibalización: dos URLs compitiendo por la misma consulta.
 - Pedir reindexación solo en páginas prioritarias tras cambios importantes.
 - Registrar cada cambio SEO con fecha para poder comparar antes/después.
+- Usar `npm run seo:gsc -- --csv "<ruta-csv>"` para generar informe de oportunidades desde Search Console.
 
 Resultado esperado: dejamos de adivinar y empezamos a decidir por datos.
+
+Guía operativa: `docs/seo/search-console-gbp-playbook.md`.
 
 ## Prioridad inmediata
 

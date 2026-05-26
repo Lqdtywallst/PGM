@@ -13,6 +13,7 @@ the repository into a flat toolbox again.
 - `diagnostics/`: manual inspection utilities that are useful during debugging.
 - `pricing/`: pricing agent runner and related operational commands.
 - `qa/`: manual QA harnesses and preproduction/production functional gates.
+- `seo/`: Search Console and organic growth measurement helpers.
 
 ## Rules
 
