@@ -287,6 +287,7 @@
                     endDate: normalizeValue(intent?.endDate),
                     pickupTime: normalizeValue(intent?.pickupTime),
                     dropoffTime: normalizeValue(intent?.dropoffTime),
+                    source: normalizeValue(intent?.source || 'reserve'),
                     savedAt: Date.now()
                 }));
             } catch (error) {

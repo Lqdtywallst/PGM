@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const BOOKING_INTENT_KEY = "dynastyBookingIntent";
+    const BOOKING_INTENT_MAX_AGE_MS = 1000 * 60 * 60 * 2;
+    const ACCEPTED_PREFILL_SOURCES = new Set(["home", "fleet"]);
     const TOAST_HIDE_DELAY = 5200;
     const AVAILABLE_REDIRECT_DELAY = 900;
     const MANUAL_CONFIRM_REDIRECT_DELAY = 1300;
@@ -62,7 +64,25 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             const parsedIntent = JSON.parse(rawIntent);
-            return parsedIntent && typeof parsedIntent === "object" ? parsedIntent : null;
+
+            if (!parsedIntent || typeof parsedIntent !== "object") {
+                return null;
+            }
+
+            const source = normalizeValue(parsedIntent.source).toLowerCase();
+            const savedAt = Number(parsedIntent.savedAt || 0);
+            const age = Date.now() - savedAt;
+            const canPrefillDates = ACCEPTED_PREFILL_SOURCES.has(source) &&
+                savedAt > 0 &&
+                age >= 0 &&
+                age <= BOOKING_INTENT_MAX_AGE_MS;
+
+            if (!canPrefillDates) {
+                window.sessionStorage.removeItem(BOOKING_INTENT_KEY);
+                return null;
+            }
+
+            return parsedIntent;
         } catch (error) {
             return null;
         }
@@ -76,6 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
             endDate: normalizeValue(bookingIntent?.endDate),
             pickupTime: normalizeValue(bookingIntent?.pickupTime),
             dropoffTime: normalizeValue(bookingIntent?.dropoffTime),
+            source: normalizeValue(bookingIntent?.source || "vehicle"),
             savedAt: Date.now()
         };
 

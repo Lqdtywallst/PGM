@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const BOOKING_INTENT_KEY = "dynastyBookingIntent";
+    const BOOKING_INTENT_MAX_AGE_MS = 1000 * 60 * 60 * 2;
+    const ACCEPTED_BOOKING_INTENT_SOURCES = new Set(["home", "fleet"]);
     const DEFAULT_WHATSAPP_URL = "https://wa.me/971586122568?text=Hi%2C%20I%20would%20like%20help%20booking%20a%20luxury%20car%20in%20Dubai.";
     const searchParams = new URLSearchParams(window.location.search);
     const cards = Array.from(browser.querySelectorAll(".js-fleet-card"));
@@ -159,6 +161,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 return null;
             }
 
+            const source = normalizeValue(parsedIntent.source).toLowerCase();
+            const savedAt = Number(parsedIntent.savedAt || 0);
+            const age = Date.now() - savedAt;
+            const canRestore = ACCEPTED_BOOKING_INTENT_SOURCES.has(source) &&
+                savedAt > 0 &&
+                age >= 0 &&
+                age <= BOOKING_INTENT_MAX_AGE_MS;
+
+            if (!canRestore) {
+                window.sessionStorage.removeItem(BOOKING_INTENT_KEY);
+                return null;
+            }
+
             return parsedIntent;
         } catch (error) {
             return null;
@@ -173,6 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
             endDate: normalizeValue(bookingIntent?.endDate),
             pickupTime: normalizeValue(bookingIntent?.pickupTime),
             dropoffTime: normalizeValue(bookingIntent?.dropoffTime),
+            source: normalizeValue(bookingIntent?.source || "fleet"),
             savedAt: Date.now()
         };
 

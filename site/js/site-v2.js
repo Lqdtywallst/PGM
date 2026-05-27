@@ -20,6 +20,8 @@ function initSiteV2() {
     const shouldSkipHeroVideo = prefersReducedMotion.matches;
     const introMemoryKey = "__siteV2HeroIntroSeen";
     const BOOKING_INTENT_KEY = "dynastyBookingIntent";
+    const BOOKING_INTENT_MAX_AGE_MS = 1000 * 60 * 60 * 2;
+    const ACCEPTED_BOOKING_INTENT_SOURCES = new Set(["home", "fleet"]);
     const CONTACT_PHONE_HREF = "tel:+971586122568";
     const DEFAULT_WHATSAPP_MESSAGE = "Hi, I would like help booking a luxury car in Dubai.";
     const DEFAULT_WHATSAPP_URL = `https://wa.me/971586122568?text=${encodeURIComponent(DEFAULT_WHATSAPP_MESSAGE)}`;
@@ -100,6 +102,12 @@ function initSiteV2() {
 
         if (!isSuccess && !isCancelled) {
             return;
+        }
+
+        try {
+            window.sessionStorage.removeItem(BOOKING_INTENT_KEY);
+        } catch (error) {
+            // Ignore storage failures.
         }
 
         const style = document.createElement("style");
@@ -305,7 +313,25 @@ function initSiteV2() {
             }
 
             const parsedIntent = JSON.parse(rawIntent);
-            return parsedIntent && typeof parsedIntent === "object" ? parsedIntent : null;
+
+            if (!parsedIntent || typeof parsedIntent !== "object") {
+                return null;
+            }
+
+            const source = normalizeBookingValue(parsedIntent.source).toLowerCase();
+            const savedAt = Number(parsedIntent.savedAt || 0);
+            const age = Date.now() - savedAt;
+            const canRestore = ACCEPTED_BOOKING_INTENT_SOURCES.has(source) &&
+                savedAt > 0 &&
+                age >= 0 &&
+                age <= BOOKING_INTENT_MAX_AGE_MS;
+
+            if (!canRestore) {
+                window.sessionStorage.removeItem(BOOKING_INTENT_KEY);
+                return null;
+            }
+
+            return parsedIntent;
         } catch (error) {
             return null;
         }
@@ -319,6 +345,7 @@ function initSiteV2() {
             endDate: normalizeBookingValue(bookingIntent?.endDate),
             pickupTime: normalizeBookingValue(bookingIntent?.pickupTime),
             dropoffTime: normalizeBookingValue(bookingIntent?.dropoffTime),
+            source: normalizeBookingValue(bookingIntent?.source || "home"),
             savedAt: Date.now()
         };
 

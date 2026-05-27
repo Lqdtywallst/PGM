@@ -568,7 +568,7 @@ async function run() {
     assert(
         reservePage.includes('window.setTimeout(loadReserveConfig, 2500)') &&
         reservePage.includes('window.setTimeout(loadReserveFlowScript, 2500)') &&
-        reservePage.includes('/js/reserve-flow.js?v=20260526-runtime-loader1'),
+        reservePage.includes('/js/reserve-flow.js?v=20260527-session-storage1'),
         'reserve page falls back if runtime config or config.js hangs'
     );
 
