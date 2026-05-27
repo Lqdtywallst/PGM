@@ -59,26 +59,26 @@ test('checkout rejects a client-tampered amount before Stripe receives it', () =
     );
 });
 
-test('QA checkout accepts AED 1 per day only with the private token and four billable days', () => {
+test('QA checkout accepts AED 1 per day only with the private token and six billable days', () => {
     const pricing = verifyCheckoutAmount({
         reservationData: {
             ...baseReservation,
-            endDate: '2026-06-19',
+            endDate: '2026-06-21',
             checkoutMode: 'qa_price_test',
             qaCheckout: true,
             qaCheckoutToken: 'secret-token'
         },
-        amount: 200,
+        amount: 300,
         currency: 'aed',
         fleetCards,
         qaCheckoutToken: 'secret-token'
     });
 
-    assert.equal(pricing.amountMinor, 200);
+    assert.equal(pricing.amountMinor, 300);
     assert.equal(pricing.reservationData.pricePerDay, 1);
     assert.equal(pricing.reservationData.catalogPricePerDay, 3400);
-    assert.equal(pricing.reservationData.totalAmount, 4);
-    assert.equal(pricing.reservationData.upfrontAmount, 2);
+    assert.equal(pricing.reservationData.totalAmount, 6);
+    assert.equal(pricing.reservationData.upfrontAmount, 3);
     assert.equal(pricing.reservationData.qaCheckout, true);
     assert.equal(pricing.reservationData.checkoutMode, 'qa_price_test');
     assert.equal(pricing.reservationData.qaCheckoutToken, undefined);
@@ -114,7 +114,7 @@ test('QA checkout rejects missing token and too-short rental windows', () => {
             fleetCards,
             qaCheckoutToken: 'secret-token'
         }),
-        /at least 4 billable days/i
+        /at least 6 billable days/i
     );
 });
 

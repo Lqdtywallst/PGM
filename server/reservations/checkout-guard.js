@@ -11,7 +11,7 @@ const HOURS_PER_DAY = 24;
 const UPFRONT_PAYMENT_RATIO = 0.5;
 const QA_CHECKOUT_MODE = 'qa_price_test';
 const QA_CHECKOUT_PRICE_PER_DAY = 1;
-const QA_CHECKOUT_MIN_BILLING_DAYS = 4;
+const QA_CHECKOUT_MIN_BILLING_DAYS = 6;
 const checkoutVehicleLocks = new Map();
 
 function checkoutError(message, statusCode = 400) {

@@ -10,7 +10,7 @@
         const CURRENCY_ZERO = 'AED 0.00';
         const QA_CHECKOUT_MODE = 'qa_price_test';
         const QA_CHECKOUT_PRICE_PER_DAY = 1;
-        const QA_CHECKOUT_MIN_BILLING_DAYS = 4;
+        const QA_CHECKOUT_MIN_BILLING_DAYS = 6;
         const SUPPORT_WHATSAPP_MESSAGE = 'Hi, I would like help booking a luxury car in Dubai.';
         const SUPPORT_WHATSAPP_URL = `https://wa.me/971586122568?text=${encodeURIComponent(SUPPORT_WHATSAPP_MESSAGE)}`;
         function normalizeValue(value) {
