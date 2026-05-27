@@ -227,6 +227,7 @@ function normalizeReservationStatus(status) {
 }
 
 function buildIdempotentConfirmationResponse(record = {}, paymentIntent = {}) {
+    record = record || {};
     const status = normalizeReservationStatus(record.status);
     if (!status || !CONFIRMATION_TERMINAL_STATUSES.has(status)) {
         return null;
@@ -261,6 +262,36 @@ function buildIdempotentConfirmationResponse(record = {}, paymentIntent = {}) {
             message: 'Reservation confirmation has already been processed.'
         }
     };
+}
+
+function isRecoverableHostedCheckoutReview(record = {}, checkoutSessionId) {
+    const status = normalizeReservationStatus(record?.status);
+    return Boolean(
+        checkoutSessionId &&
+        record?.source === 'website_hosted_checkout' &&
+        status === 'payment_amount_mismatch'
+    );
+}
+
+function hostedCheckoutPaymentMatchesRecord(record = {}, paymentIntent = {}, checkoutSession = null) {
+    if (!record || record.source !== 'website_hosted_checkout') {
+        return false;
+    }
+
+    const storedAmount = parseMoneyValue(record.payment?.amount);
+    const paidAmount = parseMoneyValue(paymentIntent.amount);
+    const storedCurrency = String(record.payment?.currency || record.reservationData?.currency || '').trim().toLowerCase();
+    const paidCurrency = String(paymentIntent.currency || '').trim().toLowerCase();
+    const storedSessionId = String(record.payment?.checkoutSessionId || '').trim();
+    const submittedSessionId = String(checkoutSession?.id || '').trim();
+
+    return Boolean(
+        storedAmount &&
+        paidAmount &&
+        storedAmount === paidAmount &&
+        (!storedCurrency || !paidCurrency || storedCurrency === paidCurrency) &&
+        (!storedSessionId || !submittedSessionId || storedSessionId === submittedSessionId)
+    );
 }
 
 function buildSafeReservationLookupSummary(record = {}) {
@@ -1308,7 +1339,7 @@ router.post('/checkout-session', createReservationRateLimit({
         }
 
         const publicOrigin = resolvePublicOrigin(data, req);
-        const successUrl = `${publicOrigin}/index.html?checkout=success&reservationId=${encodeURIComponent(reservationId)}`;
+        const successUrl = `${publicOrigin}/index.html?checkout=success&session_id={CHECKOUT_SESSION_ID}&reservationId=${encodeURIComponent(reservationId)}`;
         const cancelUrl = `${publicOrigin}/app/reserve/page.html?checkout=cancelled&reservationId=${encodeURIComponent(reservationId)}`;
         const metadata = buildCheckoutMetadata({ reservationId, reservationData, customerData });
 
@@ -1423,17 +1454,19 @@ router.post('/confirm', createReservationRateLimit({
     console.log('[API CONFIRM] Timestamp:', new Date().toISOString());
     
     try {
-        const { paymentIntentId, reservationData, customerData } = req.body;
+        const { checkoutSessionId, reservationData, customerData } = req.body;
+        let { paymentIntentId } = req.body;
         console.log('[API CONFIRM] Data received:', {
             paymentIntentId: paymentIntentId,
+            checkoutSessionId: checkoutSessionId || null,
             hasReservationData: !!reservationData,
             hasCustomerData: !!customerData
         });
 
-        if (!paymentIntentId) {
+        if (!paymentIntentId && !checkoutSessionId) {
             console.error('[API CONFIRM]  Payment intent ID required');
             return res.status(400).json({ 
-                error: 'Payment Intent ID is required' 
+                error: 'Payment Intent ID or Checkout Session ID is required'
             });
         }
 
@@ -1443,17 +1476,54 @@ router.post('/confirm', createReservationRateLimit({
             });
         }
 
+        let checkoutSession = null;
+        if (!paymentIntentId && checkoutSessionId) {
+            console.log('[API CONFIRM] Retrieving checkout session from Stripe...');
+            checkoutSession = await stripe.checkout.sessions.retrieve(checkoutSessionId, {
+                expand: ['payment_intent']
+            });
+
+            if (!checkoutSession || checkoutSession.payment_status !== 'paid') {
+                const reservationId = checkoutSession?.client_reference_id || checkoutSession?.metadata?.reservationId || null;
+                return res.status(409).json({
+                    success: false,
+                    reservationId,
+                    checkoutSessionId,
+                    status: checkoutSession?.payment_status || checkoutSession?.status || 'not_paid',
+                    error: 'Checkout payment is not confirmed yet.'
+                });
+            }
+
+            paymentIntentId = typeof checkoutSession.payment_intent === 'string'
+                ? checkoutSession.payment_intent
+                : checkoutSession.payment_intent?.id;
+        }
+
+        if (!paymentIntentId) {
+            return res.status(400).json({
+                error: 'Checkout session does not include a payment intent.'
+            });
+        }
+
         // Check payment status
         console.log('[API CONFIRM] Retrieving payment intent from Stripe...');
-        const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+        const paymentIntent = checkoutSession && typeof checkoutSession.payment_intent === 'object'
+            ? checkoutSession.payment_intent
+            : await stripe.paymentIntents.retrieve(paymentIntentId);
         console.log('[API CONFIRM] Payment intent retrieved:', {
             id: paymentIntent.id,
             status: paymentIntent.status,
             amount: paymentIntent.amount,
             currency: paymentIntent.currency
         });
-        const existingReservation = await readReservationRecord(paymentIntentId);
-        const idempotentResponse = buildIdempotentConfirmationResponse(existingReservation, paymentIntent);
+        const existingReservationByIntent = await readReservationRecord(paymentIntentId);
+        const metadataReservationId = paymentIntent.metadata?.reservationId || checkoutSession?.client_reference_id || checkoutSession?.metadata?.reservationId;
+        const existingReservation = existingReservationByIntent || (
+            metadataReservationId ? await readReservationRecord(metadataReservationId) : null
+        );
+        const idempotentResponse = isRecoverableHostedCheckoutReview(existingReservation, checkoutSessionId)
+            ? null
+            : buildIdempotentConfirmationResponse(existingReservation, paymentIntent);
         if (idempotentResponse) {
             console.log('[API CONFIRM] Existing terminal reservation returned idempotently:', {
                 reservationId: idempotentResponse.body.reservationId,
@@ -1500,13 +1570,22 @@ router.post('/confirm', createReservationRateLimit({
             const reservationId = existingReservation?.reservationId || finalReservationData.reservationId || paymentIntent.metadata.reservationId || buildReservationId();
             finalReservationData.reservationId = reservationId;
 
+            const hostedCheckoutVerified = hostedCheckoutPaymentMatchesRecord(existingReservation, paymentIntent, checkoutSession);
             try {
-                const verifiedCheckout = verifyCheckoutAmount({
-                    reservationData: finalReservationData,
-                    amount: paymentIntent.amount,
-                    currency: paymentIntent.currency || finalReservationData.currency || 'aed'
-                });
-                Object.assign(finalReservationData, verifiedCheckout.reservationData, { reservationId });
+                if (hostedCheckoutVerified) {
+                    finalReservationData = {
+                        ...finalReservationData,
+                        ...(existingReservation?.reservationData || {}),
+                        reservationId
+                    };
+                } else {
+                    const verifiedCheckout = verifyCheckoutAmount({
+                        reservationData: finalReservationData,
+                        amount: paymentIntent.amount,
+                        currency: paymentIntent.currency || finalReservationData.currency || 'aed'
+                    });
+                    Object.assign(finalReservationData, verifiedCheckout.reservationData, { reservationId });
+                }
             } catch (checkoutError) {
                 console.error('[API CONFIRM] Payment amount/catalog mismatch:', checkoutError.message);
                 await persistReservationUpdate({
@@ -1599,7 +1678,10 @@ router.post('/confirm', createReservationRateLimit({
                 status: 'payment_succeeded',
                 customerData: finalCustomerData,
                 reservationData: finalReservationData,
-                payment: buildPaymentPersistence(paymentIntent, paymentIntent.currency || finalReservationData.currency)
+                payment: {
+                    ...buildPaymentPersistence(paymentIntent, paymentIntent.currency || finalReservationData.currency),
+                    checkoutSessionId: checkoutSessionId || existingReservation?.payment?.checkoutSessionId || null
+                }
             }, 'payment confirmed', { critical: true });
             queueReservationMobileNotification(confirmedReservation, 'payment_confirmed');
 

@@ -64,6 +64,238 @@ function initSiteV2() {
         return String(value || "").trim();
     }
 
+    function escapeCheckoutHtml(value) {
+        return String(value || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    function getConfiguredBackendUrl() {
+        if (typeof window.BACKEND_URL === "string" && window.BACKEND_URL.trim()) {
+            return window.BACKEND_URL.trim();
+        }
+
+        if (window.STRIPE_CONFIG && typeof window.STRIPE_CONFIG.backendUrl === "string") {
+            return window.STRIPE_CONFIG.backendUrl.trim();
+        }
+
+        return "";
+    }
+
+    function initCheckoutReturnBanner() {
+        const params = new URLSearchParams(window.location.search || "");
+        const checkoutState = normalizeBookingValue(params.get("checkout")).toLowerCase();
+
+        if (!checkoutState) {
+            return;
+        }
+
+        const reservationId = normalizeBookingValue(params.get("reservationId"));
+        const checkoutSessionId = normalizeBookingValue(params.get("session_id") || params.get("checkoutSessionId"));
+        const isSuccess = checkoutState === "success";
+        const isCancelled = checkoutState === "cancelled" || checkoutState === "canceled";
+
+        if (!isSuccess && !isCancelled) {
+            return;
+        }
+
+        const style = document.createElement("style");
+        style.textContent = `
+            .checkout-return {
+                position: fixed;
+                inset: 18px 18px auto;
+                z-index: 80;
+                display: flex;
+                justify-content: center;
+                pointer-events: none;
+            }
+
+            .checkout-return__card {
+                width: min(680px, calc(100vw - 36px));
+                border: 1px solid rgba(23, 23, 23, 0.12);
+                border-radius: 24px;
+                background: rgba(252, 249, 242, 0.96);
+                box-shadow: 0 24px 80px rgba(20, 18, 15, 0.18);
+                color: #171717;
+                padding: 22px;
+                pointer-events: auto;
+                backdrop-filter: blur(18px);
+            }
+
+            .checkout-return__eyebrow {
+                display: block;
+                margin-bottom: 8px;
+                color: #826844;
+                font-size: 0.72rem;
+                font-weight: 800;
+                letter-spacing: 0.18em;
+                text-transform: uppercase;
+            }
+
+            .checkout-return__card h2 {
+                margin: 0 0 8px;
+                font-family: "Instrument Serif", Georgia, serif;
+                font-size: clamp(2rem, 4vw, 3.2rem);
+                line-height: 0.95;
+            }
+
+            .checkout-return__card p {
+                margin: 0;
+                color: #5f554b;
+                font-size: 1rem;
+                line-height: 1.55;
+            }
+
+            .checkout-return__actions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: 18px;
+            }
+
+            .checkout-return__actions a,
+            .checkout-return__actions button {
+                border: 1px solid rgba(23, 23, 23, 0.16);
+                border-radius: 999px;
+                background: #171717;
+                color: #fff;
+                cursor: pointer;
+                font: inherit;
+                font-size: 0.78rem;
+                font-weight: 800;
+                letter-spacing: 0.12em;
+                padding: 12px 16px;
+                text-decoration: none;
+                text-transform: uppercase;
+            }
+
+            .checkout-return__actions button {
+                background: transparent;
+                color: #171717;
+            }
+
+            @media (max-width: 640px) {
+                .checkout-return {
+                    inset: 10px 10px auto;
+                }
+
+                .checkout-return__card {
+                    width: calc(100vw - 20px);
+                    border-radius: 20px;
+                    padding: 18px;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        const banner = document.createElement("aside");
+        banner.className = "checkout-return";
+        banner.setAttribute("role", "status");
+        banner.setAttribute("aria-live", "polite");
+        document.body.appendChild(banner);
+
+        function render({ eyebrow, title, message, reference, pending = false }) {
+            const referenceLine = reference
+                ? `<p><strong>Booking reference:</strong> ${escapeCheckoutHtml(reference)}</p>`
+                : "";
+            const lookupHref = reference
+                ? `/reservation-lookup.html?reservationId=${encodeURIComponent(reference)}`
+                : "/reservation-lookup.html";
+
+            banner.innerHTML = `
+                <section class="checkout-return__card">
+                    <span class="checkout-return__eyebrow">${escapeCheckoutHtml(eyebrow)}</span>
+                    <h2>${escapeCheckoutHtml(title)}</h2>
+                    <p>${escapeCheckoutHtml(message)}</p>
+                    ${referenceLine}
+                    <div class="checkout-return__actions">
+                        <a href="${escapeCheckoutHtml(lookupHref)}">Find booking</a>
+                        <a href="https://wa.me/971586122568" target="_blank" rel="noopener">WhatsApp team</a>
+                        <button type="button" data-checkout-return-close>${pending ? "Hide" : "Close"}</button>
+                    </div>
+                </section>
+            `;
+
+            banner.querySelector("[data-checkout-return-close]")?.addEventListener("click", () => {
+                banner.remove();
+            });
+        }
+
+        if (isCancelled) {
+            render({
+                eyebrow: "Checkout cancelled",
+                title: "Payment was not completed",
+                message: "No payment has been captured. You can restart the reservation or WhatsApp the team if you need help.",
+                reference: reservationId
+            });
+            return;
+        }
+
+        render({
+            eyebrow: "Payment received",
+            title: "Finalising your reservation",
+            message: "Stripe has returned you to Dynasty Prestige. We are confirming the booking record now.",
+            reference: reservationId,
+            pending: true
+        });
+
+        if (!checkoutSessionId) {
+            render({
+                eyebrow: "Payment received",
+                title: "Booking reference saved",
+                message: "Keep this reference and use Find Booking with your checkout email. If anything looks wrong, WhatsApp the team.",
+                reference: reservationId
+            });
+            return;
+        }
+
+        const backendUrl = getConfiguredBackendUrl();
+        if (!backendUrl) {
+            render({
+                eyebrow: "Payment received",
+                title: "Booking reference saved",
+                message: "The secure reservation service is not configured in this browser. Keep this reference and WhatsApp the team if needed.",
+                reference: reservationId
+            });
+            return;
+        }
+
+        fetch(`${backendUrl}/api/reserve/confirm`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ checkoutSessionId })
+        })
+            .then((response) => response.json().then((data) => ({ response, data })))
+            .then(({ response, data }) => {
+                const confirmedReference = normalizeBookingValue(data.reservationId) || reservationId;
+                if (!response.ok || data.success === false) {
+                    throw new Error(data.error || "Reservation confirmation needs manual review.");
+                }
+
+                render({
+                    eyebrow: "Reservation confirmed",
+                    title: "Your booking is confirmed",
+                    message: data.emailSent
+                        ? "We have sent the confirmation email. The team will coordinate handover details directly with you."
+                        : "Your booking is saved. If the email takes a moment, use Find Booking with this reference and your checkout email.",
+                    reference: confirmedReference
+                });
+            })
+            .catch((error) => {
+                render({
+                    eyebrow: "Payment received",
+                    title: "Booking needs a quick check",
+                    message: `${error.message} Your payment was received, so keep this reference and WhatsApp the team if the lookup is not updated yet.`,
+                    reference: reservationId
+                });
+            });
+    }
+
     function getStoredBookingIntent() {
         try {
             const rawIntent = window.sessionStorage.getItem(BOOKING_INTENT_KEY);
@@ -2280,6 +2512,7 @@ function initSiteV2() {
     initHomeFleetFilterLinks();
     initFloatingBackButton();
     initFloatingContactButtons();
+    initCheckoutReturnBanner();
     setHeaderScrollState();
     initMobileHeaderDrawer();
     initMobileActionBar();

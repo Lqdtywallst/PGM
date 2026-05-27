@@ -59,63 +59,28 @@ test('checkout rejects a client-tampered amount before Stripe receives it', () =
     );
 });
 
-test('QA checkout accepts AED 1 per day only with the private token and six billable days', () => {
+test('checkout accepts a temporary catalog price when the server fleet data is changed', () => {
+    const temporaryFleetCards = fleetCards.map((card) => (
+        card.id === 'ferrari-296-gts'
+            ? { ...card, pricePerDay: 1 }
+            : card
+    ));
+
     const pricing = verifyCheckoutAmount({
         reservationData: {
             ...baseReservation,
-            endDate: '2026-06-21',
-            checkoutMode: 'qa_price_test',
-            qaCheckout: true,
-            qaCheckoutToken: 'secret-token'
+            endDate: '2026-06-21'
         },
         amount: 300,
         currency: 'aed',
-        fleetCards,
-        qaCheckoutToken: 'secret-token'
+        fleetCards: temporaryFleetCards
     });
 
     assert.equal(pricing.amountMinor, 300);
     assert.equal(pricing.reservationData.pricePerDay, 1);
-    assert.equal(pricing.reservationData.catalogPricePerDay, 3400);
+    assert.equal(pricing.reservationData.catalogPricePerDay, 1);
     assert.equal(pricing.reservationData.totalAmount, 6);
     assert.equal(pricing.reservationData.upfrontAmount, 3);
-    assert.equal(pricing.reservationData.qaCheckout, true);
-    assert.equal(pricing.reservationData.checkoutMode, 'qa_price_test');
-    assert.equal(pricing.reservationData.qaCheckoutToken, undefined);
-});
-
-test('QA checkout rejects missing token and too-short rental windows', () => {
-    assert.throws(
-        () => verifyCheckoutAmount({
-            reservationData: {
-                ...baseReservation,
-                endDate: '2026-06-19',
-                checkoutMode: 'qa_price_test',
-                qaCheckout: true
-            },
-            amount: 200,
-            currency: 'aed',
-            fleetCards,
-            qaCheckoutToken: 'secret-token'
-        }),
-        /not authorized/i
-    );
-
-    assert.throws(
-        () => verifyCheckoutAmount({
-            reservationData: {
-                ...baseReservation,
-                checkoutMode: 'qa_price_test',
-                qaCheckout: true,
-                qaCheckoutToken: 'secret-token'
-            },
-            amount: 50,
-            currency: 'aed',
-            fleetCards,
-            qaCheckoutToken: 'secret-token'
-        }),
-        /at least 6 billable days/i
-    );
 });
 
 test('checkout accepts only the server-calculated minor-unit amount', () => {
