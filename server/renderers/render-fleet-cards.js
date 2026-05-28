@@ -15,9 +15,23 @@ const homeFeaturedCardIds = [
     "lamborghini-urus-sport",
     "rolls-royce-cullinan-black-badge"
 ];
+const displayNameOverrides = {
+    "black-mercedes-s680-maybach": "Black Mercedes S680 Maybach",
+    "blue-porsche-gt3-rs": "Blue Porsche GT3 RS",
+    "bronze-mercedes-g63": "Bronze Mercedes G63",
+    "mercedes-benz-sl63-amg": "Mercedes-Benz SL63 AMG"
+};
 
 function formatAed(value) {
     return `${Number(value).toLocaleString("en-US")} AED`;
+}
+
+function vehicleDisplayName(card) {
+    if (displayNameOverrides[card.id]) {
+        return displayNameOverrides[card.id];
+    }
+
+    return `${card.brand} ${card.copy.title}`.replace(/\s+/g, " ").trim();
 }
 
 function buildWhatsAppHref(message) {
@@ -103,8 +117,9 @@ function renderCard(card, options = {}) {
     const priceNoteClass = classNames("fleet-card__price-note", isHome && "fleet-visual-card__price-note");
     const actionsClass = classNames(isHome && "fleet-visual-card__actions");
     const primaryClass = classNames("fleet-card__primary", isHome && "fleet-visual-card__primary");
+    const displayName = vehicleDisplayName(card);
     const homeDataAttrs = isHome
-        ? ` data-home-fleet-car="${escapeHtml(`${card.brand} ${card.copy.title}`)}" data-home-fleet-price="${escapeHtml(card.pricePerDay)}"`
+        ? ` data-home-fleet-car="${escapeHtml(displayName)}" data-home-fleet-price="${escapeHtml(card.pricePerDay)}"`
         : "";
     const specsHtml = card.copy.specs
         .map((spec) => `                                                <span class="${specClass}">${escapeHtml(spec)}</span>`)
@@ -112,7 +127,7 @@ function renderCard(card, options = {}) {
     const imageDimensions = renderImageDimensionAttributes(siteRoot, card.image.src);
 
     return [
-        `                            <article class="${articleClass}" data-id="${escapeHtml(card.id)}" data-brand="${escapeHtml(card.brandKey)}" data-type="${escapeHtml(typeAttr)}" data-price="${escapeHtml(card.pricePerDay)}" data-detail-href="${escapeHtml(card.href)}" tabindex="0" aria-label="View ${escapeHtml(card.brand)} ${escapeHtml(card.copy.title)} details"${variantAttr}>`,
+        `                            <article class="${articleClass}" data-id="${escapeHtml(card.id)}" data-car-name="${escapeHtml(displayName)}" data-brand="${escapeHtml(card.brandKey)}" data-type="${escapeHtml(typeAttr)}" data-price="${escapeHtml(card.pricePerDay)}" data-detail-href="${escapeHtml(card.href)}" tabindex="0" aria-label="View ${escapeHtml(displayName)} details"${variantAttr}>`,
         `                                <a class="${mediaClass}" href="${escapeHtml(card.href)}"${homeDataAttrs}>`,
         `                                    <img src="${escapeHtml(card.image.src)}" alt="${escapeHtml(card.image.alt)}"${imageDimensions} loading="${escapeHtml(card.image.loading || "lazy")}" decoding="async">`,
         shadeHtml,
@@ -309,5 +324,6 @@ module.exports = {
     renderHomeCards,
     replaceFleetCards,
     replaceHomeCards,
+    vehicleDisplayName,
     syncFleetHtmlFromData
 };

@@ -25,6 +25,7 @@ test('fleet cards keep the interactive listing selectors and compact data', () =
 
     assert.match(markup, /class="fleet-card js-fleet-card"/);
     assert.match(markup, /data-id="lamborghini-huracan-evo-spyder"/);
+    assert.match(markup, /data-car-name="Lamborghini Huracan EVO Spyder"/);
     assert.match(markup, /data-type="convertible sports"/);
     assert.match(markup, /data-price="3200"/);
     assert.match(markup, /decoding="async"/);

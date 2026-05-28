@@ -627,7 +627,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function buildReserveHref(card) {
         const schedule = getCurrentSchedule();
-        const title = normalizeValue(card.querySelector(".fleet-card__title a")?.textContent);
+        const title = normalizeValue(card.dataset.carName || card.querySelector(".fleet-card__title a")?.textContent);
         const params = new URLSearchParams({
             car: title,
             price: normalizeValue(card.dataset.price)
@@ -732,7 +732,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function syncCardActions() {
         cards.forEach((card, index) => {
-            const title = normalizeValue(card.querySelector(".fleet-card__title a")?.textContent);
+            const title = normalizeValue(card.dataset.carName || card.querySelector(".fleet-card__title a")?.textContent);
             const reserveLink = card.querySelector(".fleet-card__primary");
             const whatsappLink = card.querySelector(".fleet-card__secondary--wa");
             const image = card.querySelector(".fleet-card__media img");
