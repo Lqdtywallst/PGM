@@ -499,6 +499,15 @@ async function run() {
         cspHeader.includes('"Cross-Origin-Opener-Policy","value":"unsafe-none"'),
         'Vercel public pages avoid cross-origin isolation for Stripe checkout'
     );
+    assert(
+        cspHeader.includes('"source":"/js/(.*)"') &&
+        cspHeader.includes('"source":"/css/(.*)"') &&
+        cspHeader.includes('"source":"/images/(.*)"') &&
+        cspHeader.includes('"source":"/fonts/(.*)"') &&
+        cspHeader.includes('stale-while-revalidate') &&
+        cspHeader.includes('immutable'),
+        'Vercel caches static assets without caching HTML pages'
+    );
 
     const reserveRoute = readFile('app/api/reserve/route.js');
     assert(
@@ -788,8 +797,20 @@ async function run() {
         functionalAgentScript.includes('car-context WhatsApp'),
         'functional agent validates call and WhatsApp number/message contracts'
     );
+    assert(
+        siteV2Script.includes('return mobileSource;') &&
+        siteV2Script.includes('heroVideo.removeAttribute("src")') &&
+        readFile('site/index.html').includes('data-src-mobile=""'),
+        'home mobile hero avoids loading the desktop video payload'
+    );
 
     const fleetScript = readFile('site/js/site-v2-fleet.js');
+    assert(
+        fleetScript.includes('priorityImageCount') &&
+        fleetScript.includes('image.loading = isPriorityImage ? "eager" : "lazy"') &&
+        fleetScript.includes('image.fetchPriority = isPriorityImage ? "high" : "auto"'),
+        'fleet page only prioritizes the first visible vehicle images'
+    );
     const fleetCss = readFile('site/css/site-v2-fleet.css');
     assert(
         fleetScript.includes('fleet-filter-close__icon') &&

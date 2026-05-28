@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const returnDateInput = document.getElementById("fleet-return-date");
     const returnTimeInput = document.getElementById("fleet-return-time");
     const availabilityByVehicleId = new Map();
+    const priorityImageCount = window.matchMedia("(max-width: 860px)").matches ? 2 : 4;
     let availabilityStatus = "idle";
     let availabilityRequestId = 0;
 
@@ -739,8 +740,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const specs = Array.from(card.querySelectorAll(".fleet-card__spec"));
 
             if (image) {
-                image.loading = "eager";
+                const isPriorityImage = index < priorityImageCount;
+                image.loading = isPriorityImage ? "eager" : "lazy";
                 image.decoding = "async";
+                image.fetchPriority = isPriorityImage ? "high" : "auto";
             }
 
             if (specs.length > 3) {

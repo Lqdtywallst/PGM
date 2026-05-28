@@ -13,11 +13,7 @@ function initSiteV2() {
     const mobileViewport = window.matchMedia("(max-width: 860px)");
     const dataSaverConnection = typeof navigator !== "undefined" ? navigator.connection : null;
     const shouldBypassHeroIntro = document.body.classList.contains("home-page") || coarsePointer.matches || mobileViewport.matches;
-    // Solo respetamos reduced motion como hard stop.
-    // saveData resultaba demasiado agresivo para el hero de Home:
-    // algunos navegadores o perfiles lo reportan y el usuario acababa viendo
-    // un poster estatico aunque esperaba un hero en movimiento.
-    const shouldSkipHeroVideo = prefersReducedMotion.matches;
+    const shouldSkipHeroVideo = prefersReducedMotion.matches || dataSaverConnection?.saveData === true;
     const introMemoryKey = "__siteV2HeroIntroSeen";
     const BOOKING_INTENT_KEY = "dynastyBookingIntent";
     const BOOKING_INTENT_MAX_AGE_MS = 1000 * 60 * 60 * 2;
@@ -1145,7 +1141,7 @@ function initSiteV2() {
         const mobileSource = normalizeBookingValue(heroVideo.dataset.srcMobile);
 
         if (mobileViewport.matches) {
-            return mobileSource || desktopSource;
+            return mobileSource;
         }
 
         return desktopSource || mobileSource;
@@ -1185,6 +1181,7 @@ function initSiteV2() {
 
         const selectedSource = getHeroVideoSource();
         if (!selectedSource) {
+            heroVideo.removeAttribute("src");
             return;
         }
 
