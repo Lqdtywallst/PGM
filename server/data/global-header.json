@@ -103,7 +103,7 @@
           "title": "Luxury Cars",
           "description": "Comfort-first arrivals and city stays.",
           "href": "/fleet.html?type=luxury",
-          "imageSrc": "/images/categories/mock-fastpng/luxury-stage.png",
+          "imageSrc": "/images/categories/optimized/luxury-stage.webp",
           "imageAlt": "Luxury car category preview",
           "visible": true
         },
@@ -111,7 +111,7 @@
           "title": "Convertible Cars",
           "description": "Open-top Dubai movement with presence.",
           "href": "/fleet.html?type=convertible",
-          "imageSrc": "/images/categories/mock-fastpng/convertible-stage.png",
+          "imageSrc": "/images/categories/optimized/convertible-stage.webp",
           "imageAlt": "Convertible car category preview",
           "visible": true
         },
@@ -119,7 +119,7 @@
           "title": "Sports Cars",
           "description": "Sharper performance-led picks.",
           "href": "/fleet.html?type=sports",
-          "imageSrc": "/images/categories/mock-fastpng/sports-stage.png",
+          "imageSrc": "/images/categories/optimized/sports-stage.webp",
           "imageAlt": "Sports car category preview",
           "visible": true
         },
@@ -127,7 +127,7 @@
           "title": "SUV Cars",
           "description": "Room, height and hotel-ready comfort.",
           "href": "/fleet.html?type=suv",
-          "imageSrc": "/images/categories/mock-fastpng/suv-stage.png",
+          "imageSrc": "/images/categories/optimized/suv-stage.webp",
           "imageAlt": "SUV car category preview",
           "visible": true
         }

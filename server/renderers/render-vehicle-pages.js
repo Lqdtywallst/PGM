@@ -7,6 +7,7 @@ const projectRoot = path.resolve(__dirname, '..', '..');
 const siteRoot = path.join(projectRoot, 'site');
 const cardsPath = path.join(__dirname, '..', 'data', 'fleet-cards.json');
 const vehiclePagesRoot = path.join(siteRoot, 'pages', 'vehicles');
+const publicImagesRoot = path.join(siteRoot, 'images');
 const imageRoot = path.join(siteRoot, 'images', 'fleet');
 
 const startMarker = '<!-- VEHICLE_MOTHER_CONTENT_START -->';
@@ -35,7 +36,7 @@ function normalizeNewlines(value) {
 }
 
 function toPublicImagePath(filePath) {
-    return `./images/fleet/${path.relative(imageRoot, filePath).replace(/\\/g, '/')}`;
+    return `./images/${path.relative(publicImagesRoot, filePath).replace(/\\/g, '/')}`;
 }
 
 function toVehiclePagePath(card) {
