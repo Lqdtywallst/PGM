@@ -57,7 +57,7 @@
     right: clamp(1rem, 8vw, 10rem);
     width: clamp(15rem, 24vw, 28rem);
     aspect-ratio: 1;
-    background: url("../images/dp-crest-cropped.png") center / contain no-repeat;
+    background: url("../images/dp-crest-optimized.png") center / contain no-repeat;
     filter: grayscale(1) brightness(1.35);
     opacity: 0.055;
 }
