@@ -7,6 +7,7 @@ const fleetCards = require('../../server/data/fleet-cards.json');
 
 const projectRoot = path.resolve(__dirname, '..', '..');
 const vehiclePagesRoot = path.join(projectRoot, 'site', 'pages', 'vehicles');
+const brandPagesRoot = path.join(projectRoot, 'site', 'pages', 'brands');
 
 function readVehiclePage(card) {
     const fileName = String(card.href).replace(/^\.\//, '');
@@ -15,6 +16,15 @@ function readVehiclePage(card) {
     assert.equal(fs.existsSync(pagePath), true, `Missing vehicle page for ${card.id}`);
 
     return fs.readFileSync(pagePath, 'utf8');
+}
+
+function readBrandPages() {
+    return fs.readdirSync(brandPagesRoot)
+        .filter((fileName) => fileName.endsWith('.html'))
+        .map((fileName) => ({
+            fileName,
+            html: fs.readFileSync(path.join(brandPagesRoot, fileName), 'utf8')
+        }));
 }
 
 test('all fleet cards have an individual vehicle page with shared header and footer', () => {
@@ -64,5 +74,23 @@ test('vehicle hero titles stay clean while the kicker keeps Dubai context', () =
         assert.ok(kicker, `${card.id} needs a vehicle hero kicker`);
         assert.doesNotMatch(h1, /\bin Dubai\b/i, `${card.id} H1 should not repeat in Dubai`);
         assert.match(kicker, /rental in Dubai$/i, `${card.id} kicker should keep rental in Dubai context`);
+    });
+});
+
+test('vehicle booking forms use the canonical catalog day rate', () => {
+    fleetCards.forEach((card) => {
+        const html = readVehiclePage(card);
+        const priceInput = html.match(/<input[^>]+name="price"[^>]+value="([^"]+)"[^>]*>/i)?.[1];
+
+        assert.equal(priceInput, String(card.pricePerDay), `${card.id} booking handoff price should match fleet-cards.json`);
+    });
+});
+
+test('brand pages keep rental offer metadata honest and avoid obsolete meta keywords', () => {
+    readBrandPages().forEach(({ fileName, html }) => {
+        assert.doesNotMatch(html, /<meta\s+name=["']keywords["']/i, `${fileName} should not ship obsolete meta keywords`);
+        assert.doesNotMatch(html, /https:\/\/schema\.org\/InStock/i, `${fileName} should not claim always-in-stock rental availability`);
+        assert.match(html, /https:\/\/schema\.org\/LimitedAvailability/i, `${fileName} should describe rental availability as limited by schedule`);
+        assert.doesNotMatch(html, /"price":\s*"5"/, `${fileName} should not expose temporary QA prices in structured data`);
     });
 });

@@ -1,4 +1,5 @@
 const { expect } = require('@playwright/test');
+const fleetCards = require('../../../server/data/fleet-cards.json');
 
 function createConsoleTracker(page) {
     const errors = [];
@@ -18,6 +19,26 @@ function createConsoleTracker(page) {
 
 function normalizeConsoleErrors(errors) {
     return errors.filter((entry) => entry && !/favicon\.ico/i.test(entry));
+}
+
+function fleetCardsForBrand(brandKey) {
+    return fleetCards.filter((card) => card.brandKey === brandKey);
+}
+
+function fleetCardsForType(type) {
+    return fleetCards.filter((card) => Array.isArray(card.types) && card.types.includes(type));
+}
+
+function fleetModelCountLabel(count) {
+    return `${count} ${count === 1 ? 'model' : 'models'} visible`;
+}
+
+function fleetShowCarsLabel(count) {
+    return `Show ${count} ${count === 1 ? 'car' : 'cars'}`;
+}
+
+async function expectFleetResultCount(page, count) {
+    await expect(page.locator('.js-fleet-results-count')).toContainText(fleetModelCountLabel(count));
 }
 
 async function expectNoConsoleErrors(errors, label) {
@@ -52,6 +73,11 @@ async function settlePage(page, delayMs = 300) {
 async function mockFleetAvailability(page, overrides = {}) {
     await page.route('**/api/availability?**', async (route) => {
         const requestUrl = new URL(route.request().url());
+        const vehicles = fleetCards.map((card) => ({
+            id: card.id,
+            available: true,
+            ...overrides[card.id]
+        }));
 
         await route.fulfill({
             status: 200,
@@ -64,14 +90,7 @@ async function mockFleetAvailability(page, overrides = {}) {
                     pickupTime: requestUrl.searchParams.get('pickupTime'),
                     dropoffTime: requestUrl.searchParams.get('dropoffTime')
                 },
-                vehicles: [
-                    { id: 'lamborghini-huracan-evo-spyder', available: true },
-                    { id: 'ferrari-296-gts', available: true },
-                    { id: 'porsche-992-gt3', available: true },
-                    { id: 'lamborghini-urus-sport', available: true },
-                    { id: 'mercedes-g63-amg', available: true },
-                    { id: 'rolls-royce-cullinan-black-badge', available: true }
-                ].map((vehicle) => ({ ...vehicle, ...overrides[vehicle.id] }))
+                vehicles
             })
         });
     });
@@ -79,7 +98,13 @@ async function mockFleetAvailability(page, overrides = {}) {
 
 module.exports = {
     createConsoleTracker,
+    expectFleetResultCount,
     expectNoConsoleErrors,
+    fleetCards,
+    fleetCardsForBrand,
+    fleetCardsForType,
+    fleetModelCountLabel,
+    fleetShowCarsLabel,
     mockFleetAvailability,
     normalizeConsoleErrors,
     primeHomeAnimations,

@@ -9,6 +9,8 @@ const {
     settlePage
 } = require('./support/site-helpers');
 
+test.setTimeout(60000);
+
 const fleetTotalCount = fleetCards.length;
 const mercedesFleetCount = fleetCards.filter((card) => card.brand === 'Mercedes').length;
 

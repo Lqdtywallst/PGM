@@ -5,7 +5,9 @@ const {
 } = require('../../test-data/users.json');
 const {
     createConsoleTracker,
+    expectFleetResultCount,
     expectNoConsoleErrors,
+    fleetCardsForBrand,
     primeHomeAnimations,
     settlePage
 } = require('./support/site-helpers');
@@ -85,8 +87,10 @@ async function fillGuestDetails(page) {
 
 async function goFromFleetToReserve(page) {
     await page.locator('.js-fleet-brand-select').selectOption('mercedes');
-    await expect(page.locator('.js-fleet-results-count')).toContainText('1 model visible');
-    await page.locator('.js-fleet-card:not([hidden]) .fleet-card__reserve').first().click();
+    await expectFleetResultCount(page, fleetCardsForBrand('mercedes').length);
+    const mercedesReserve = page.locator('.js-fleet-card:not([hidden])[data-id="mercedes-g63-amg"] .fleet-card__reserve');
+    await expect(mercedesReserve).toBeVisible();
+    await mercedesReserve.click();
     await expect(page).toHaveURL(/\/app\/reserve\/page\.html\?/i);
 }
 

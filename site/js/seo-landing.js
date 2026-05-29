@@ -279,6 +279,24 @@ document.addEventListener("DOMContentLoaded", () => {
         return targetUrl.toString();
     }
 
+    function syncVehicleReserveLinks(form) {
+        const carInput = form.querySelector('input[name="car"]');
+        const carName = normalizeValue(carInput?.value);
+        const reserveUrl = buildReserveUrl(form);
+        const reserveLinks = Array.from(document.querySelectorAll([
+            '.lab-reserve[href*="app/reserve/page.html"]'
+        ].join(",")));
+
+        reserveLinks.forEach((link) => {
+            link.href = reserveUrl;
+            link.dataset.vehicleReserveHandoff = "true";
+
+            if (carName) {
+                link.setAttribute("aria-label", `Reserve ${carName}`);
+            }
+        });
+    }
+
     function getDubaiDateString(offsetDays = 0) {
         const dubaiNow = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Dubai" }));
         dubaiNow.setDate(dubaiNow.getDate() + offsetDays);
@@ -341,7 +359,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         function persistIntent() {
-            return storeBookingIntent({
+            const bookingIntent = storeBookingIntent({
                 car: carInput?.value,
                 price: priceInput?.value,
                 startDate: startDateInput.value,
@@ -349,6 +367,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 pickupTime: pickupTimeInput.value,
                 dropoffTime: dropoffTimeInput.value
             });
+
+            syncVehicleReserveLinks(form);
+            return bookingIntent;
         }
 
         function syncReturnMin() {

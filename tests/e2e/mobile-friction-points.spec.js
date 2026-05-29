@@ -3,6 +3,9 @@ const { reservationGuest } = require('../../test-data/users.json');
 const {
     createConsoleTracker,
     expectNoConsoleErrors,
+    fleetCards,
+    fleetModelCountLabel,
+    fleetShowCarsLabel,
     mockFleetAvailability,
     settlePage
 } = require('./support/site-helpers');
@@ -96,6 +99,11 @@ test.describe('Mobile friction points', () => {
     test('mobile filter sheet can narrow the fleet and still hand the correct schedule into reserve', async ({ page }) => {
         const consoleErrors = createConsoleTracker(page);
         await mockFleetAvailability(page);
+        const lamborghiniConvertibleCount = fleetCards.filter((card) => (
+            card.brandKey === 'lamborghini' &&
+            Array.isArray(card.types) &&
+            card.types.includes('convertible')
+        )).length;
 
         await page.goto('/fleet.html', { waitUntil: 'domcontentloaded' });
         await settlePage(page);
@@ -111,7 +119,7 @@ test.describe('Mobile friction points', () => {
         await page.locator('.js-fleet-brand-select').selectOption('lamborghini');
         await page.locator('.js-fleet-type-select').selectOption('convertible');
         await expect(page.locator('.fleet-sidebar')).toBeVisible();
-        await expect(page.locator('.fleet-filter-apply')).toContainText(/Show 1 car/i);
+        await expect(page.locator('.fleet-filter-apply')).toContainText(fleetShowCarsLabel(lamborghiniConvertibleCount));
         await expect(page.locator('.fleet-sidebar__field-display')).toContainText([
             '20/12/2026',
             '12:00',
@@ -166,7 +174,7 @@ test.describe('Mobile friction points', () => {
             expect(control.height).toBeGreaterThanOrEqual(44);
         }
 
-        await expect(page.locator('.js-fleet-results-count')).toContainText('1 model visible');
+        await expect(page.locator('.js-fleet-results-count')).toContainText(fleetModelCountLabel(lamborghiniConvertibleCount));
         await page.locator('.fleet-filter-apply').click();
         await expect(page.locator('.fleet-browser')).not.toHaveClass(/fleet-filters-open/);
         await expect(page.locator('.js-fleet-card:not([hidden])').first()).toBeVisible();
@@ -192,7 +200,7 @@ test.describe('Mobile friction points', () => {
         await page.locator('.fleet-mobile-filter-toggle').click();
         await expect(page.locator('.fleet-browser')).toHaveClass(/fleet-filters-open/);
         await expect(page.locator('.fleet-filter-close--top')).toContainText(/Back to cars/i);
-        await expect(page.locator('.fleet-filter-apply')).toContainText(/Show 6 cars/i);
+        await expect(page.locator('.fleet-filter-apply')).toContainText(fleetShowCarsLabel(fleetCards.length));
         await page.locator('.fleet-filter-close--top').click();
         await expect(page.locator('.fleet-browser')).not.toHaveClass(/fleet-filters-open/);
         await expect(page.locator('.fleet-mobile-filter-toggle')).toBeFocused();

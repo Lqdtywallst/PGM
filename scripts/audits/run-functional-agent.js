@@ -7,6 +7,7 @@ const { chromium, expect } = require('@playwright/test');
 const {
     PUBLIC_PAGE_FILE_MAP
 } = require(path.join(__dirname, '..', '..', 'server', 'shared', 'public-page-map.js'));
+const fleetCards = require(path.join(__dirname, '..', '..', 'server', 'data', 'fleet-cards.json'));
 const {
     startStaticServer,
     stopProcess
@@ -65,6 +66,14 @@ const FLEET_CHECKOUT_SCHEDULE = Object.freeze({
 const EXPECTED_CONTACT_PHONE_E164 = '971586122568';
 const EXPECTED_CONTACT_TEL_HREF = 'tel:+971586122568';
 const EXPECTED_GENERIC_WHATSAPP_MESSAGE = 'Hi, I would like help booking a luxury car in Dubai.';
+
+function fleetCardsForType(type) {
+    return fleetCards.filter((card) => Array.isArray(card.types) && card.types.includes(type));
+}
+
+function fleetModelCountLabel(count) {
+    return `${count} ${count === 1 ? 'model' : 'models'} visible`;
+}
 
 function normalizeRoute(route) {
     const pathname = String(route || '/').trim().split(/[?#]/)[0] || '/';
@@ -647,14 +656,10 @@ async function installCommonMocks(page, { enableStripeMock = false } = {}) {
                     pickupTime: requestUrl.searchParams.get('pickupTime'),
                     dropoffTime: requestUrl.searchParams.get('dropoffTime')
                 },
-                vehicles: [
-                    { id: 'lamborghini-huracan-evo-spyder', available: true },
-                    { id: 'ferrari-296-gts', available: true },
-                    { id: 'porsche-992-gt3', available: true },
-                    { id: 'lamborghini-urus-sport', available: true },
-                    { id: 'mercedes-g63-amg', available: true },
-                    { id: 'rolls-royce-cullinan-black-badge', available: true }
-                ]
+                vehicles: fleetCards.map((card) => ({
+                    id: card.id,
+                    available: true
+                }))
             })
         });
     });
@@ -1217,12 +1222,13 @@ async function collectFleetCheckoutCars(page) {
         .map((card, index) => {
             const titleElement = card.querySelector('.fleet-card__title a') || card.querySelector('.fleet-card__title');
             const reserveLink = card.querySelector('.fleet-card__reserve, .fleet-card__primary');
+            const reserveTitle = String(card.dataset.carName || titleElement?.textContent || '').replace(/\s+/g, ' ').trim();
 
             return {
                 index,
                 id: card.dataset.id || `fleet-car-${index + 1}`,
                 brand: card.dataset.brand || '',
-                title: String(titleElement?.textContent || '').replace(/\s+/g, ' ').trim(),
+                title: reserveTitle,
                 price: card.dataset.price || '',
                 reserveHref: reserveLink?.getAttribute('href') || ''
             };
@@ -2131,10 +2137,10 @@ function createHomeMegaMenuAction() {
 
 function createHomeCarsTypesFilterAction() {
     const journeys = [
-        { label: 'Luxury Cars', type: 'luxury', expectedCount: 3 },
-        { label: 'Convertible Cars', type: 'convertible', expectedCount: 2 },
-        { label: 'Sports Cars', type: 'sports', expectedCount: 3 },
-        { label: 'SUV Cars', type: 'suv', expectedCount: 3 }
+        { label: 'Luxury Cars', type: 'luxury', expectedCount: fleetCardsForType('luxury').length },
+        { label: 'Convertible Cars', type: 'convertible', expectedCount: fleetCardsForType('convertible').length },
+        { label: 'Sports Cars', type: 'sports', expectedCount: fleetCardsForType('sports').length },
+        { label: 'SUV Cars', type: 'suv', expectedCount: fleetCardsForType('suv').length }
     ];
 
     return {
@@ -2163,7 +2169,7 @@ function createHomeCarsTypesFilterAction() {
 
                 await expect(page).toHaveURL(new RegExp(`/fleet\\.html\\?type=${journey.type}$`, 'i'));
                 await expect(page.locator('.js-fleet-type-select')).toHaveValue(journey.type);
-                await expect(page.locator('.js-fleet-results-count')).toContainText(`${journey.expectedCount} models visible`);
+                await expect(page.locator('.js-fleet-results-count')).toContainText(fleetModelCountLabel(journey.expectedCount));
                 const visibleCards = await page.locator('.js-fleet-card:not([hidden])').evaluateAll((cards, type) => (
                     cards.map((card) => ({
                         title: card.querySelector('.fleet-card__title')?.textContent?.trim() || '',
@@ -2258,14 +2264,10 @@ function createHomeBookingBarAvailabilityAction() {
                             pickupTime: requestUrl.searchParams.get('pickupTime'),
                             dropoffTime: requestUrl.searchParams.get('dropoffTime')
                         },
-                        vehicles: [
-                            { id: 'lamborghini-huracan-evo-spyder', available: true },
-                            { id: 'ferrari-296-gts', available: true },
-                            { id: 'porsche-992-gt3', available: true },
-                            { id: 'lamborghini-urus-sport', available: true },
-                            { id: 'mercedes-g63-amg', available: false },
-                            { id: 'rolls-royce-cullinan-black-badge', available: true }
-                        ]
+                        vehicles: fleetCards.map((card) => ({
+                            id: card.id,
+                            available: card.id !== 'mercedes-g63-amg'
+                        }))
                     })
                 });
             });
@@ -2310,6 +2312,8 @@ function createHomeBookingBarAvailabilityAction() {
 }
 
 function createHomeCategoryFilterAction() {
+    const sportsCount = fleetCardsForType('sports').length;
+
     return {
         id: 'home-category-filter',
         label: 'Home category card opens fleet with type filter and schedule',
@@ -2326,16 +2330,16 @@ function createHomeCategoryFilterAction() {
             await expect(page).toHaveURL(/type=sports/i);
             await expect(page).toHaveURL(/startDate=2026-08-14/i);
             await expect(page).toHaveURL(/endDate=2026-08-17/i);
-            await expect(page.locator('.js-fleet-results-count')).toContainText('3 models visible');
+            await expect(page.locator('.js-fleet-results-count')).toContainText(fleetModelCountLabel(sportsCount));
             const allVisibleAreSports = await page.locator('.js-fleet-card:not([hidden])').evaluateAll((cards) => (
-                cards.length === 3 && cards.every((card) => String(card.dataset.type || '').split(/\s+/).includes('sports'))
+                cards.every((card) => String(card.dataset.type || '').split(/\s+/).includes('sports'))
             ));
             if (!allVisibleAreSports) {
-                throw new Error('Sports category did not leave exactly the sports fleet cards visible.');
+                throw new Error('Sports category left non-sports fleet cards visible.');
             }
 
             recorder.record('home-category-filters-fleet', 'Home category applies fleet type filter', {
-                expected: 'type=sports and 3 sports cards',
+                expected: `type=sports and ${sportsCount} sports cards`,
                 observed: currentPathFromPageUrl(page.url())
             });
             await expect(page.locator('.js-fleet-card:not([hidden]) .fleet-card__reserve').first()).toHaveAttribute('href', /startDate=2026-08-14/i);

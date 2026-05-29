@@ -2,6 +2,8 @@ const crypto = require('node:crypto');
 const { expect, test } = require('@playwright/test');
 const {
     createConsoleTracker,
+    fleetCards,
+    fleetModelCountLabel,
     expectNoConsoleErrors,
     primeHomeAnimations,
     settlePage
@@ -213,7 +215,7 @@ test.describe('Preproduction functional gate', () => {
         await fillFleetSchedule(page, schedules.overlap);
         const blockedCard = page.locator(`.js-fleet-card[data-id="${blockedVehicleId}"]`);
         await expect(blockedCard).toBeHidden({ timeout: 15000 });
-        await expect(page.locator('.js-fleet-results-count')).toContainText('5 models visible');
+        await expect(page.locator('.js-fleet-results-count')).toContainText(fleetModelCountLabel(fleetCards.length - 1));
 
         expect(
             availabilityRequests.some((url) => String(url).startsWith(`${backendBaseUrl}/api/availability`)),

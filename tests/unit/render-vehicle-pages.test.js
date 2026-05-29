@@ -37,7 +37,8 @@ test('vehicle mother content renders reusable sections from fleet card data', ()
     assert.doesNotMatch(markup, /Photo preview/);
     assert.match(markup, /vehicle-pdp-related-card/);
     assert.match(markup, /Porsche 992 GT3/);
-    assert.match(markup, /Reserve Blue GT3 RS/);
+    assert.doesNotMatch(markup, /Reserve Blue GT3 RS/);
+    assert.doesNotMatch(markup, /vehicle-pdp-cinema__link/);
     assert.doesNotMatch(markup, /vehicle-pdp-video-card__play/);
     assert.doesNotMatch(markup, /<video/);
     assert.doesNotMatch(markup, /vehicle-pdp-quick-spec/);

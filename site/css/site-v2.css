@@ -7888,6 +7888,10 @@ body.lab-mobile-nav-open {
         display: none;
     }
 
+    .fleet-page .lab-floating-contact {
+        display: grid;
+    }
+
     .site-v2-footer {
         padding-top: 0;
         padding-bottom: 0.85rem;

@@ -347,6 +347,51 @@ test.describe('Public site quality gate', () => {
         await expectNoConsoleErrors(consoleErrors, 'home featured vehicle landing handoff');
     });
 
+    test('vehicle page reserve CTAs open checkout with the current car already selected', async ({ page }) => {
+        const consoleErrors = createConsoleTracker(page);
+
+        await page.goto('/ferrari-296-gts-rental-dubai.html', { waitUntil: 'domcontentloaded' });
+        await fillVehicleAvailabilityWindow(page, {
+            startDate: '2026-11-20',
+            endDate: '2026-11-22',
+            pickupTime: '10:00',
+            dropoffTime: '18:00'
+        });
+
+        const headerReserve = page.locator('header.lab-header a.lab-reserve');
+
+        await expect(headerReserve).toHaveAttribute('href', /car=Ferrari\+296\+GTS/i);
+        await expect(headerReserve).toHaveAttribute('href', /startDate=2026-11-20/i);
+        await expect(page.locator('a.vehicle-pdp-section-link').filter({ hasText: /^Reserve\b/i })).toHaveCount(0);
+
+        await headerReserve.click();
+
+        await expect(page).toHaveURL(/\/app\/reserve\/page\.html\?/i);
+        await expect(page.locator('#selectedCar')).toHaveText('Ferrari 296 GTS');
+        await expect(page.locator('#startDate')).toHaveValue('2026-11-20');
+        await expect(page.locator('#endDate')).toHaveValue('2026-11-22');
+        await expectNoConsoleErrors(consoleErrors, 'vehicle reserve CTA direct handoff');
+    });
+
+    test('all vehicle pages wire header reserve to their own car and rate', async ({ page }) => {
+        for (const card of fleetCards) {
+            const pathname = `/${card.href.replace(/^\.\//, '')}`;
+
+            await page.goto(pathname, { waitUntil: 'domcontentloaded' });
+
+            const car = await page.locator('#vehicle-booking input[name="car"]').inputValue();
+            const price = await page.locator('#vehicle-booking input[name="price"]').inputValue();
+            const reserveHref = await page.locator('header.lab-header a.lab-reserve').getAttribute('href');
+            const reserveUrl = new URL(reserveHref, page.url());
+
+            expect(reserveUrl.pathname, `${pathname} reserve path`).toBe('/app/reserve/page.html');
+            expect(reserveUrl.searchParams.get('car'), `${pathname} reserve car`).toBe(car);
+            expect(reserveUrl.searchParams.get('price'), `${pathname} reserve price`).toBe(price);
+            expect(reserveUrl.searchParams.get('startDate'), `${pathname} reserve start date`).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+            expect(reserveUrl.searchParams.get('endDate'), `${pathname} reserve end date`).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+        }
+    });
+
     test('vehicle availability blocks unavailable cars before reserve', async ({ page }) => {
         const consoleErrors = createConsoleTracker(page);
         await mockFleetAvailability(page, {

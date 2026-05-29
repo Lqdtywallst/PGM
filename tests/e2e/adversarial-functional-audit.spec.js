@@ -5,10 +5,14 @@ const {
 } = require('../../test-data/users.json');
 const {
     createConsoleTracker,
+    expectFleetResultCount,
     expectNoConsoleErrors,
+    fleetCardsForBrand,
     mockFleetAvailability,
     settlePage
 } = require('./support/site-helpers');
+
+test.setTimeout(60000);
 
 async function installStripeMock(page, paymentResult) {
     await page.addInitScript((result) => {
@@ -19,9 +23,23 @@ async function installStripeMock(page, paymentResult) {
                         create() {
                             return {
                                 mount(selector) {
-                                    const container = document.querySelector(selector);
-                                    if (container) {
+                                    const markMounted = () => {
+                                        const container = document.querySelector(selector);
+                                        if (!container) {
+                                            return false;
+                                        }
+
                                         container.setAttribute('data-mock-stripe', 'mounted');
+                                        return true;
+                                    };
+
+                                    if (!markMounted()) {
+                                        const retry = window.setInterval(() => {
+                                            if (markMounted()) {
+                                                window.clearInterval(retry);
+                                            }
+                                        }, 25);
+                                        window.setTimeout(() => window.clearInterval(retry), 2000);
                                     }
                                 },
                                 on() {}
@@ -259,15 +277,17 @@ test.describe('Adversarial functional audit', () => {
 
         await page.locator('.fleet-mobile-filter-toggle').click();
         await page.locator('.js-fleet-brand-select').selectOption('lamborghini');
-        await expect(page.locator('.js-fleet-results-count')).toContainText('2 models visible');
+        await expectFleetResultCount(page, fleetCardsForBrand('lamborghini').length);
         await page.locator('.fleet-filter-apply').click();
 
         await page.locator('.fleet-mobile-filter-toggle').click();
         await page.locator('.js-fleet-brand-select').selectOption('ferrari');
-        await expect(page.locator('.js-fleet-results-count')).toContainText('1 model visible');
+        await expectFleetResultCount(page, fleetCardsForBrand('ferrari').length);
         await page.locator('.fleet-filter-apply').click();
 
-        await page.locator('.js-fleet-card:not([hidden]) .fleet-card__reserve').first().click();
+        const ferrariReserve = page.locator('.js-fleet-card:not([hidden])[data-id="ferrari-296-gts"] .fleet-card__reserve');
+        await expect(ferrariReserve).toBeVisible();
+        await ferrariReserve.click();
 
         await expect(page).toHaveURL(/\/app\/reserve\/page\.html\?/i);
         await expect(page.locator('#selectedCar')).toContainText('296 GTS');

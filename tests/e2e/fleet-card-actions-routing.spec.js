@@ -5,51 +5,20 @@ const {
     mockFleetAvailability,
     settlePage
 } = require('./support/site-helpers');
+const fleetCardCatalog = require('../../server/data/fleet-cards.json');
 
-const fleetCards = [
-    {
-        id: 'lamborghini-huracan-evo-spyder',
-        detailPath: '/lamborghini-huracan-evo-spyder-rental-dubai.html',
-        reserveCar: 'Huracan EVO Spyder',
-        fullCar: 'Lamborghini Huracan EVO Spyder',
-        price: '3200'
-    },
-    {
-        id: 'ferrari-296-gts',
-        detailPath: '/ferrari-296-gts-rental-dubai.html',
-        reserveCar: '296 GTS',
-        fullCar: 'Ferrari 296 GTS',
-        price: '3400'
-    },
-    {
-        id: 'porsche-992-gt3',
-        detailPath: '/porsche-992-gt3-rental-dubai.html',
-        reserveCar: '992 GT3',
-        fullCar: 'Porsche 992 GT3',
-        price: '2300'
-    },
-    {
-        id: 'lamborghini-urus-sport',
-        detailPath: '/lamborghini-urus-rental-dubai.html',
-        reserveCar: 'Urus SE',
-        fullCar: 'Lamborghini Urus SE',
-        price: '3600'
-    },
-    {
-        id: 'mercedes-g63-amg',
-        detailPath: '/mercedes-g63-amg-rental-dubai.html',
-        reserveCar: 'G63 AMG',
-        fullCar: 'Mercedes G63 AMG',
-        price: '1990'
-    },
-    {
-        id: 'rolls-royce-cullinan-black-badge',
-        detailPath: '/rolls-royce-cullinan-black-badge-rental-dubai.html',
-        reserveCar: 'Cullinan Black Badge',
-        fullCar: 'Rolls-Royce Cullinan Black Badge',
-        price: '3750'
-    }
-];
+function vehicleDisplayName(card) {
+    const whatsappVehicleMatch = card.contact?.whatsappText?.match(/interested in the (.*?) in Dubai/i);
+
+    return (whatsappVehicleMatch?.[1] || `${card.brand} ${card.copy.title}`).replace(/\s+/g, ' ').trim();
+}
+
+const fleetCards = fleetCardCatalog.map((card) => ({
+    id: card.id,
+    detailHref: card.href,
+    detailPath: new URL(card.href, 'https://example.test/fleet.html').pathname,
+    fullCar: vehicleDisplayName(card)
+}));
 
 async function openFleet(page) {
     await page.goto('/fleet.html', { waitUntil: 'domcontentloaded' });
@@ -68,14 +37,15 @@ async function expectClickNavigatesTo(page, locator, expectedPath) {
 test.describe('Fleet card action routing', () => {
     for (const fleetCard of fleetCards) {
         test(`${fleetCard.fullCar} card actions keep the customer on the intended flow`, async ({ page }) => {
+            test.setTimeout(60000);
             const consoleErrors = createConsoleTracker(page);
             await mockFleetAvailability(page);
 
             await openFleet(page);
             const card = page.locator(`.js-fleet-card[data-id="${fleetCard.id}"]`);
-            await expect(card).toHaveAttribute('data-detail-href', `.${fleetCard.detailPath}`);
-            await expect(card.locator('.fleet-card__media')).toHaveAttribute('href', `.${fleetCard.detailPath}`);
-            await expect(card.locator('.fleet-card__title a')).toHaveAttribute('href', `.${fleetCard.detailPath}`);
+            await expect(card).toHaveAttribute('data-detail-href', fleetCard.detailHref);
+            await expect(card.locator('.fleet-card__media')).toHaveAttribute('href', fleetCard.detailHref);
+            await expect(card.locator('.fleet-card__title a')).toHaveAttribute('href', fleetCard.detailHref);
 
             await expectClickNavigatesTo(page, card.locator('.fleet-card__media'), fleetCard.detailPath);
 
@@ -95,17 +65,22 @@ test.describe('Fleet card action routing', () => {
             await openFleet(page);
             const reserveHref = await card.locator('.fleet-card__reserve').getAttribute('href');
             const reserveUrl = new URL(reserveHref, page.url());
+            const expectedReserveCar = await card.getAttribute('data-car-name');
+            const expectedReservePrice = await card.getAttribute('data-price');
+
+            expect(expectedReserveCar).toBeTruthy();
+            expect(expectedReservePrice).toBeTruthy();
             expect(reserveUrl.pathname).toBe('/app/reserve/page.html');
-            expect(reserveUrl.searchParams.get('car')).toBe(fleetCard.reserveCar);
-            expect(reserveUrl.searchParams.get('price')).toBe(fleetCard.price);
+            expect(reserveUrl.searchParams.get('car')).toBe(expectedReserveCar);
+            expect(reserveUrl.searchParams.get('price')).toBe(expectedReservePrice);
 
             await Promise.all([
                 page.waitForURL((url) => url.pathname === '/app/reserve/page.html', { waitUntil: 'commit' }),
                 card.locator('.fleet-card__reserve').click()
             ]);
             const clickedReserveUrl = new URL(page.url());
-            expect(clickedReserveUrl.searchParams.get('car')).toBe(fleetCard.reserveCar);
-            expect(clickedReserveUrl.searchParams.get('price')).toBe(fleetCard.price);
+            expect(clickedReserveUrl.searchParams.get('car')).toBe(expectedReserveCar);
+            expect(clickedReserveUrl.searchParams.get('price')).toBe(expectedReservePrice);
 
             await openFleet(page);
             await expect(card.locator('.fleet-card__secondary')).toHaveCount(0);

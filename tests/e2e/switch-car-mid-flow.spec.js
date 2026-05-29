@@ -1,7 +1,9 @@
 const { test, expect } = require('@playwright/test');
 const {
     createConsoleTracker,
+    expectFleetResultCount,
     expectNoConsoleErrors,
+    fleetCardsForBrand,
     mockFleetAvailability,
     settlePage
 } = require('./support/site-helpers');
@@ -27,8 +29,10 @@ test.describe('Switch car mid-flow', () => {
         await page.locator('#fleet-return-time').fill('18:00');
 
         await page.locator('.js-fleet-brand-select').selectOption('mercedes');
-        await expect(page.locator('.js-fleet-results-count')).toContainText('1 model visible');
-        await page.locator('.js-fleet-card:not([hidden]) .fleet-card__reserve').first().click();
+        await expectFleetResultCount(page, fleetCardsForBrand('mercedes').length);
+        const mercedesReserve = page.locator('.js-fleet-card:not([hidden])[data-id="mercedes-g63-amg"] .fleet-card__reserve');
+        await expect(mercedesReserve).toBeVisible();
+        await mercedesReserve.click();
 
         await expect(page).toHaveURL(/\/app\/reserve\/page\.html\?/i);
         await expect(page.locator('#selectedCar')).toContainText('G63 AMG');
@@ -43,8 +47,10 @@ test.describe('Switch car mid-flow', () => {
         await expect(page.locator('#fleet-return-time')).toHaveValue('18:00');
 
         await page.locator('.js-fleet-brand-select').selectOption('lamborghini');
-        await expect(page.locator('.js-fleet-results-count')).toContainText('2 models visible');
-        await page.locator('.js-fleet-card:not([hidden]) .fleet-card__reserve').first().click();
+        await expectFleetResultCount(page, fleetCardsForBrand('lamborghini').length);
+        const lamborghiniReserve = page.locator('.js-fleet-card:not([hidden])[data-id="lamborghini-huracan-evo-spyder"] .fleet-card__reserve');
+        await expect(lamborghiniReserve).toBeVisible();
+        await lamborghiniReserve.click();
 
         await expect(page).toHaveURL(/\/app\/reserve\/page\.html\?/i);
         await expect(page.locator('#selectedCar')).toContainText('Huracan EVO Spyder');

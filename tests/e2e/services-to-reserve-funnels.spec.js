@@ -2,7 +2,10 @@ const { test, expect } = require('@playwright/test');
 const { reservationGuest } = require('../../test-data/users.json');
 const {
     createConsoleTracker,
+    expectFleetResultCount,
     expectNoConsoleErrors,
+    fleetCardsForBrand,
+    mockFleetAvailability,
     settlePage
 } = require('./support/site-helpers');
 
@@ -56,6 +59,7 @@ test.describe('Services to reserve funnels', () => {
 
     test('monthly rental service can route through fleet into a concrete vehicle reservation', async ({ page }) => {
         const consoleErrors = createConsoleTracker(page);
+        await mockFleetAvailability(page);
 
         await page.goto('/monthly-luxury-car-rental-dubai.html', { waitUntil: 'domcontentloaded' });
         await settlePage(page);
@@ -68,9 +72,11 @@ test.describe('Services to reserve funnels', () => {
         await page.locator('#fleet-pickup-time').fill('10:00');
         await page.locator('#fleet-return-time').fill('18:00');
         await page.locator('.js-fleet-brand-select').selectOption('rolls-royce');
-        await expect(page.locator('.js-fleet-results-count')).toContainText('1 model visible');
+        await expectFleetResultCount(page, fleetCardsForBrand('rolls-royce').length);
 
-        await page.locator('.js-fleet-card:not([hidden]) .fleet-card__reserve').first().click();
+        const rollsRoyceReserve = page.locator('.js-fleet-card:not([hidden])[data-id="rolls-royce-cullinan-black-badge"] .fleet-card__reserve');
+        await expect(rollsRoyceReserve).toBeVisible();
+        await rollsRoyceReserve.click();
 
         await expect(page).toHaveURL(/\/app\/reserve\/page\.html\?/i);
         await expect(page.locator('#selectedCar')).toContainText('Cullinan Black Badge');

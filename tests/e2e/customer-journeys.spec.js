@@ -1,5 +1,6 @@
 const { test, expect } = require('@playwright/test');
 const { reservationGuest } = require('../../test-data/users.json');
+const fleetCards = require('../../server/data/fleet-cards.json');
 const {
     createConsoleTracker,
     expectNoConsoleErrors,
@@ -97,6 +98,30 @@ async function installStripeMock(page) {
     });
 }
 
+function fleetTitlesForType(type) {
+    return fleetCards
+        .filter((card) => Array.isArray(card.types) && card.types.includes(type))
+        .map((card) => card.copy.title);
+}
+
+function fleetTitlesForBrand(brandKey) {
+    return fleetCards
+        .filter((card) => card.brandKey === brandKey)
+        .map((card) => card.copy.title);
+}
+
+function fleetModelCountLabel(count) {
+    return `${count} ${count === 1 ? 'model' : 'models'} visible`;
+}
+
+function vehicleDisplayName(card) {
+    return `${card.brand} ${card.copy.title}`.replace(/\s+/g, ' ').trim();
+}
+
+function formatAedRate(value) {
+    return Number(value).toLocaleString('en-US');
+}
+
 const directBrandAvailabilityJourneys = [
     {
         brandLabel: 'Ferrari',
@@ -146,22 +171,22 @@ const carTypeFleetJourneys = [
     {
         label: 'Luxury Cars',
         type: 'luxury',
-        titles: ['Urus SE', 'G63 AMG', 'Cullinan Black Badge']
+        titles: fleetTitlesForType('luxury')
     },
     {
         label: 'Convertible Cars',
         type: 'convertible',
-        titles: ['Huracan EVO Spyder', '296 GTS']
+        titles: fleetTitlesForType('convertible')
     },
     {
         label: 'Sports Cars',
         type: 'sports',
-        titles: ['Huracan EVO Spyder', '296 GTS', '992 GT3']
+        titles: fleetTitlesForType('sports')
     },
     {
         label: 'SUV Cars',
         type: 'suv',
-        titles: ['Urus SE', 'G63 AMG', 'Cullinan Black Badge']
+        titles: fleetTitlesForType('suv')
     }
 ];
 
@@ -224,7 +249,7 @@ test('guest opens each Cars Types card into Fleet with a real non-empty type fil
 
         await expect(page).toHaveURL(new RegExp(`/fleet\\.html\\?type=${journey.type}$`, 'i'));
         await expect(page.locator('.js-fleet-type-select')).toHaveValue(journey.type);
-        await expect(page.locator('.js-fleet-results-count')).toContainText(`${journey.titles.length} models visible`);
+        await expect(page.locator('.js-fleet-results-count')).toContainText(fleetModelCountLabel(journey.titles.length));
         expect(await getVisibleFleetTitles(page)).toEqual(journey.titles);
     }
 
@@ -284,26 +309,31 @@ test('guest compares Ferrari and Mercedes in fleet before opening reserve', asyn
     await page.goto('/fleet.html', { waitUntil: 'domcontentloaded' });
     await settlePage(page);
 
-    await page.locator('#fleet-pickup-date').fill('2026-05-20');
-    await page.locator('#fleet-return-date').fill('2026-05-22');
+    await page.locator('#fleet-pickup-date').fill('2026-06-20');
+    await page.locator('#fleet-return-date').fill('2026-06-22');
     await page.locator('#fleet-pickup-time').fill('10:00');
     await page.locator('#fleet-return-time').fill('18:00');
 
+    const ferrariTitles = fleetTitlesForBrand('ferrari');
     await page.locator('.js-fleet-brand-select').selectOption('ferrari');
-    await expect(page.locator('.js-fleet-results-count')).toContainText('1 model visible');
-    await expect(getVisibleFleetTitles(page)).resolves.toEqual(['296 GTS']);
+    await expect(page.locator('.js-fleet-results-count')).toContainText(fleetModelCountLabel(ferrariTitles.length));
+    await expect(getVisibleFleetTitles(page)).resolves.toEqual(ferrariTitles);
 
+    const mercedesTitles = fleetTitlesForBrand('mercedes');
+    const g63Card = fleetCards.find((card) => card.id === 'mercedes-g63-amg');
     await page.locator('.js-fleet-brand-select').selectOption('mercedes');
-    await expect(page.locator('.js-fleet-results-count')).toContainText('1 model visible');
-    await expect(getVisibleFleetTitles(page)).resolves.toEqual(['G63 AMG']);
+    await expect(page.locator('.js-fleet-results-count')).toContainText(fleetModelCountLabel(mercedesTitles.length));
+    await expect(getVisibleFleetTitles(page)).resolves.toEqual(mercedesTitles);
 
-    await page.locator('.js-fleet-card:not([hidden]) .fleet-card__reserve').click();
+    const g63FleetCard = page.locator(`.js-fleet-card:not([hidden])[data-id="${g63Card.id}"]`);
+    await expect(g63FleetCard).toBeVisible();
+    await g63FleetCard.locator('.fleet-card__reserve').click();
 
     await expectReservationPrefill(page, {
-        selectedCar: 'G63 AMG',
-        selectedRate: '1,990',
-        startDate: '2026-05-20',
-        endDate: '2026-05-22',
+        selectedCar: vehicleDisplayName(g63Card),
+        selectedRate: formatAedRate(g63Card.pricePerDay),
+        startDate: '2026-06-20',
+        endDate: '2026-06-22',
         pickupTime: '10:00',
         dropoffTime: '18:00'
     });

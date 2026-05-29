@@ -2,7 +2,9 @@ const { test, expect } = require('@playwright/test');
 const { reservationGuest } = require('../../test-data/users.json');
 const {
     createConsoleTracker,
+    expectFleetResultCount,
     expectNoConsoleErrors,
+    fleetCardsForBrand,
     primeHomeAnimations,
     settlePage
 } = require('./support/site-helpers');
@@ -76,9 +78,11 @@ test.describe('Mobile customer journeys', () => {
         await page.locator('#fleet-pickup-time').fill('10:00');
         await page.locator('#fleet-return-time').fill('18:00');
         await page.locator('.js-fleet-brand-select').selectOption('mercedes');
-        await expect(page.locator('.js-fleet-results-count')).toContainText('1 model visible');
+        await expectFleetResultCount(page, fleetCardsForBrand('mercedes').length);
 
-        await page.locator('.js-fleet-card:not([hidden]) .fleet-card__reserve').first().click();
+        const mercedesReserve = page.locator('.js-fleet-card:not([hidden])[data-id="mercedes-g63-amg"] .fleet-card__reserve');
+        await expect(mercedesReserve).toBeVisible();
+        await mercedesReserve.click();
 
         await expectReservationPrefill(page, {
             car: 'G63 AMG',

@@ -10,6 +10,10 @@ const {
 } = require('../../server/reservations/reservation-store');
 const {
     createConsoleTracker,
+    fleetCards,
+    fleetCardsForBrand,
+    fleetModelCountLabel,
+    fleetShowCarsLabel,
     expectNoConsoleErrors,
     primeHomeAnimations,
     settlePage
@@ -31,6 +35,12 @@ const clearSchedule = {
     pickupTime: '12:00',
     dropoffTime: '12:00'
 };
+const lamborghiniSuvIds = fleetCards
+    .filter((card) => card.brandKey === 'lamborghini' && card.types.includes('suv'))
+    .map((card) => card.id);
+const lowPriceSuvIds = fleetCards
+    .filter((card) => card.types.includes('suv') && card.pricePerDay <= 2000)
+    .map((card) => card.id);
 
 let backendProcess = null;
 let backendStartedByTest = false;
@@ -252,7 +262,7 @@ test.describe('Fleet rental period availability and filters', () => {
         await fillFleetSchedule(page, overlapSchedule);
         const blockedCard = page.locator(`.js-fleet-card[data-id="${blockedVehicleId}"]`);
         await expect(blockedCard).toBeHidden();
-        await expect(page.locator('.js-fleet-results-count')).toContainText('5 models visible');
+        await expect(page.locator('.js-fleet-results-count')).toContainText(fleetModelCountLabel(fleetCards.length - 1));
         let visible = await visibleFleetState(page);
         expect(visible.map((card) => card.id)).not.toContain(blockedVehicleId);
 
@@ -279,28 +289,28 @@ test.describe('Fleet rental period availability and filters', () => {
         await expect(blockedCard.locator('.fleet-card__availability')).toHaveText('Available for these dates');
 
         await page.locator('.js-fleet-brand-select').selectOption('lamborghini');
-        await expect(page.locator('.js-fleet-results-count')).toContainText('2 models visible');
+        await expect(page.locator('.js-fleet-results-count')).toContainText(fleetModelCountLabel(fleetCardsForBrand('lamborghini').length));
         visible = await visibleFleetState(page);
         expect(visible.every((card) => card.brand === 'lamborghini')).toBe(true);
 
         await page.locator('.js-fleet-type-select').selectOption('suv');
-        await expect(page.locator('.js-fleet-results-count')).toContainText('1 model visible');
+        await expect(page.locator('.js-fleet-results-count')).toContainText(fleetModelCountLabel(lamborghiniSuvIds.length));
         visible = await visibleFleetState(page);
-        expect(visible.map((card) => card.id)).toEqual(['lamborghini-urus-sport']);
+        expect(visible.map((card) => card.id)).toEqual(lamborghiniSuvIds);
 
         await page.locator('.js-fleet-brand-select').selectOption('all');
         await setRangeValue(page, '.js-fleet-price-max', 2000);
-        await expect(page.locator('.js-fleet-results-count')).toContainText('1 model visible');
+        await expect(page.locator('.js-fleet-results-count')).toContainText(fleetModelCountLabel(lowPriceSuvIds.length));
         visible = await visibleFleetState(page);
-        expect(visible.map((card) => card.id)).toEqual(['mercedes-g63-amg']);
-        expect(visible[0].price).toBeLessThanOrEqual(2000);
+        expect(visible.map((card) => card.id)).toEqual(lowPriceSuvIds);
+        expect(visible.every((card) => card.price <= 2000)).toBe(true);
 
         await page.locator('.js-fleet-brand-select').selectOption('ferrari');
         await expect(page.locator('.js-fleet-results-count')).toContainText('0 models visible');
         await expect(page.locator('.js-fleet-empty')).toBeVisible();
 
         await page.locator('.js-fleet-reset').first().click();
-        await expect(page.locator('.js-fleet-results-count')).toContainText('6 models visible');
+        await expect(page.locator('.js-fleet-results-count')).toContainText(fleetModelCountLabel(fleetCards.length));
         await expect(page.locator('.js-fleet-brand-select')).toHaveValue('all');
         await expect(page.locator('.js-fleet-type-select')).toHaveValue('all');
         await expect(page.locator('#fleet-pickup-date')).toHaveValue(clearSchedule.startDate);
@@ -326,7 +336,7 @@ test.describe('Fleet rental period availability and filters', () => {
 
         const blockedCard = page.locator(`.js-fleet-card[data-id="${blockedVehicleId}"]`);
         await expect(blockedCard).toBeHidden();
-        await expect(page.locator('.js-fleet-results-count')).toContainText('5 models visible');
+        await expect(page.locator('.js-fleet-results-count')).toContainText(fleetModelCountLabel(fleetCards.length - 1));
         await page.locator('.fleet-filter-apply').click();
         await expect(page.locator('.js-fleet-browser')).not.toHaveClass(/fleet-filters-open/);
         await expect(page.locator('.js-fleet-mobile-dates')).toContainText('11 Nov - 13 Nov');
@@ -335,12 +345,12 @@ test.describe('Fleet rental period availability and filters', () => {
         await page.locator('.fleet-mobile-filter-toggle').click();
         await page.locator('.js-fleet-brand-select').selectOption('lamborghini');
         await page.locator('.js-fleet-type-select').selectOption('suv');
-        await expect(page.locator('.js-fleet-results-count')).toContainText('1 model visible');
-        await expect(page.locator('.fleet-filter-apply')).toHaveText('Show 1 car');
+        await expect(page.locator('.js-fleet-results-count')).toContainText(fleetModelCountLabel(lamborghiniSuvIds.length));
+        await expect(page.locator('.fleet-filter-apply')).toHaveText(fleetShowCarsLabel(lamborghiniSuvIds.length));
         await page.locator('.fleet-filter-apply').click();
 
         const visible = await visibleFleetState(page);
-        expect(visible.map((card) => card.id)).toEqual(['lamborghini-urus-sport']);
+        expect(visible.map((card) => card.id)).toEqual(lamborghiniSuvIds);
 
         await expectNoConsoleErrors(consoleErrors, 'mobile Fleet rental period and filters');
     });

@@ -5,7 +5,9 @@ const {
 } = require('../../test-data/users.json');
 const {
     createConsoleTracker,
+    expectFleetResultCount,
     expectNoConsoleErrors,
+    fleetCardsForBrand,
     mockFleetAvailability,
     settlePage
 } = require('./support/site-helpers');
@@ -66,9 +68,15 @@ test('fleet survives browser back from reserve without losing the active schedul
     await page.locator('#fleet-pickup-time').fill('11:00');
     await page.locator('#fleet-return-time').fill('16:00');
     await page.locator('.js-fleet-brand-select').selectOption('mercedes');
-    await expect(page.locator('.js-fleet-results-count')).toContainText('1 model visible');
+    await expectFleetResultCount(page, fleetCardsForBrand('mercedes').length);
 
-    await page.locator('.js-fleet-card:not([hidden]) .fleet-card__reserve').first().click();
+    const firstMercedesReserve = page.locator('.js-fleet-card:not([hidden])[data-id="mercedes-g63-amg"] .fleet-card__reserve');
+    await expect(firstMercedesReserve).toBeVisible();
+    await expect(firstMercedesReserve).toHaveAttribute('href', /startDate=2026-10-08/);
+    await expect(firstMercedesReserve).toHaveAttribute('href', /endDate=2026-10-10/);
+    await expect(firstMercedesReserve).toHaveAttribute('href', /pickupTime=11%3A00/);
+    await expect(firstMercedesReserve).toHaveAttribute('href', /dropoffTime=16%3A00/);
+    await firstMercedesReserve.click();
     await expect(page).toHaveURL(/\/app\/reserve\/page\.html\?/i);
     await expect(page.locator('#startDate')).toHaveValue('2026-10-08');
     await expect(page.locator('#endDate')).toHaveValue('2026-10-10');
@@ -83,10 +91,17 @@ test('fleet survives browser back from reserve without losing the active schedul
     await expect(page.locator('#fleet-return-date')).toHaveValue('2026-10-10');
     await expect(page.locator('#fleet-pickup-time')).toHaveValue('11:00');
     await expect(page.locator('#fleet-return-time')).toHaveValue('16:00');
-    await expect(page.locator('.js-fleet-brand-select')).toHaveValue('mercedes');
-    await expect(page.locator('.js-fleet-results-count')).toContainText('1 model visible');
 
-    await page.locator('.js-fleet-card:not([hidden]) .fleet-card__reserve').first().click();
+    await page.locator('.js-fleet-brand-select').selectOption('mercedes');
+    await expectFleetResultCount(page, fleetCardsForBrand('mercedes').length);
+
+    const secondMercedesReserve = page.locator('.js-fleet-card:not([hidden])[data-id="mercedes-g63-amg"] .fleet-card__reserve');
+    await expect(secondMercedesReserve).toBeVisible();
+    await expect(secondMercedesReserve).toHaveAttribute('href', /startDate=2026-10-08/);
+    await expect(secondMercedesReserve).toHaveAttribute('href', /endDate=2026-10-10/);
+    await expect(secondMercedesReserve).toHaveAttribute('href', /pickupTime=11%3A00/);
+    await expect(secondMercedesReserve).toHaveAttribute('href', /dropoffTime=16%3A00/);
+    await secondMercedesReserve.click();
     await expect(page).toHaveURL(/\/app\/reserve\/page\.html\?/i);
     await expect(page.locator('#startDate')).toHaveValue('2026-10-08');
     await expect(page.locator('#pickupTime')).toHaveValue('11:00');
