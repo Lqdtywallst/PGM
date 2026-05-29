@@ -348,7 +348,7 @@ function rejectDisallowedBrowserOrigin(req, res, next) {
     return next();
 }
 
-const ALLOWED_HTTP_METHODS = new Set(['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'OPTIONS']);
+const ALLOWED_HTTP_METHODS = new Set(['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']);
 const JSON_API_PREFIXES = [
     '/api/admin',
     '/api/contact',
@@ -659,7 +659,7 @@ app.use(cors({
         console.warn('[CORS] Blocked origin:', origin);
         return callback(null, false);
     },
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Admin-Request'],
     credentials: false
 }));
