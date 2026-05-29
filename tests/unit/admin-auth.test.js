@@ -11,6 +11,7 @@ const {
     verifyAdminSessionToken,
     verifyPasswordHash
 } = require('../../server/admin/admin-auth');
+const { renderAdminLoginPage } = require('../../server/admin/admin-pages');
 
 test('admin password hashes verify with PBKDF2 and reject wrong passwords', () => {
     const passwordHash = hashAdminPassword('safe-password', {
@@ -116,4 +117,11 @@ test('admin cookies default to secure in hosted staging and production', () => {
     assert.equal(getAdminConfig({ APP_ENV: 'production' }).cookieSecure, true);
     assert.equal(getAdminConfig({ APP_ENV: 'development' }).cookieSecure, false);
     assert.equal(getAdminConfig({ APP_ENV: 'staging', ADMIN_COOKIE_SECURE: 'false' }).cookieSecure, false);
+});
+
+test('admin login page sends the browser request verification header', () => {
+    const html = renderAdminLoginPage();
+
+    assert.match(html, /fetch\('\/api\/admin\/login'/);
+    assert.match(html, /'X-Admin-Request': 'XMLHttpRequest'/);
 });
