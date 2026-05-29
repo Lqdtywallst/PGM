@@ -39,6 +39,12 @@ function toPublicImagePath(filePath) {
     return `./images/${path.relative(publicImagesRoot, filePath).replace(/\\/g, '/')}`;
 }
 
+function isInsidePath(parentPath, candidatePath) {
+    const relativePath = path.relative(parentPath, candidatePath);
+
+    return relativePath && !relativePath.startsWith('..') && !path.isAbsolute(relativePath);
+}
+
 function toVehiclePagePath(card) {
     const fileName = String(card.href || '').replace(/^\.\//, '');
     return path.join(vehiclePagesRoot, fileName);
@@ -91,11 +97,24 @@ function captionFromFile(filePath, index) {
     return cleaned ? sentenceCase(cleaned) : `Image ${index + 1}`;
 }
 
-function listVehicleImages(card) {
+function vehicleImageDirectories(card) {
     const imageSrc = String(card.image?.src || '').replace(/^\.\//, '');
-    const imageDir = path.join(siteRoot, path.dirname(imageSrc));
+    const sourceDir = path.join(siteRoot, path.dirname(imageSrc));
+    const canonicalFleetDir = path.join(imageRoot, String(card.id || ''));
+    const dirs = [sourceDir, canonicalFleetDir];
 
-    if (!imageDir.startsWith(imageRoot) || !fs.existsSync(imageDir)) {
+    return dirs.filter((candidate, index) => (
+        candidate
+        && dirs.indexOf(candidate) === index
+        && isInsidePath(imageRoot, candidate)
+        && fs.existsSync(candidate)
+    ));
+}
+
+function listVehicleImages(card) {
+    const imageDir = vehicleImageDirectories(card)[0];
+
+    if (!imageDir) {
         return [];
     }
 
