@@ -222,7 +222,10 @@ function renderAdminLoginPage() {
                 var response = await fetch('/api/admin/login', {
                     method: 'POST',
                     credentials: 'same-origin',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Admin-Request': 'XMLHttpRequest'
+                    },
                     body: JSON.stringify({
                         username: document.getElementById('username').value,
                         password: document.getElementById('password').value
