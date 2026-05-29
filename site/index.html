@@ -70,6 +70,87 @@
     <script src="./runtime-config.js?v=20260510-preprod1"></script>
     <script src="./config.js?v=20260508-staging1"></script>
     <script src="./js/site-v2.js?v=20260528-perf1" defer></script>
+    <!-- HOME_STRUCTURED_DATA_START -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": [
+            "AutoRental",
+            "LocalBusiness",
+            "Organization"
+          ],
+          "@id": "https://www.dynastyprestigecarrental.com/#organization",
+          "name": "Dynasty Prestige",
+          "url": "https://www.dynastyprestigecarrental.com/",
+          "logo": "https://www.dynastyprestigecarrental.com/logo-dp-transparent.png",
+          "image": "https://www.dynastyprestigecarrental.com/logo-dp-transparent.png",
+          "telephone": "+971586122568",
+          "email": "prestigegoalmotion@gmail.com",
+          "description": "Luxury car rental and concierge handover coordination across Dubai hotels, villas, airports and residences.",
+          "priceRange": "AED 1,690-5,490 per day",
+          "areaServed": [
+            {
+              "@type": "City",
+              "name": "Dubai"
+            },
+            {
+              "@type": "Airport",
+              "name": "Dubai International Airport"
+            },
+            {
+              "@type": "Airport",
+              "name": "Al Maktoum International Airport"
+            },
+            {
+              "@type": "Place",
+              "name": "Palm Jumeirah"
+            },
+            {
+              "@type": "Place",
+              "name": "Dubai Marina"
+            }
+          ],
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "customer service",
+            "telephone": "+971586122568",
+            "email": "prestigegoalmotion@gmail.com",
+            "availableLanguage": [
+              "English",
+              "Spanish"
+            ]
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://www.dynastyprestigecarrental.com/#website",
+          "url": "https://www.dynastyprestigecarrental.com/",
+          "name": "Dynasty Prestige",
+          "publisher": {
+            "@id": "https://www.dynastyprestigecarrental.com/#organization"
+          },
+          "inLanguage": "en-AE"
+        },
+        {
+          "@type": "WebPage",
+          "@id": "https://www.dynastyprestigecarrental.com/#webpage",
+          "url": "https://www.dynastyprestigecarrental.com/",
+          "name": "Luxury Car Rental Dubai | Dynasty Prestige",
+          "description": "Rent luxury cars in Dubai with curated supercars and SUVs, hotel, villa, airport and chauffeur handovers.",
+          "isPartOf": {
+            "@id": "https://www.dynastyprestigecarrental.com/#website"
+          },
+          "about": {
+            "@id": "https://www.dynastyprestigecarrental.com/#organization"
+          },
+          "inLanguage": "en-AE"
+        }
+      ]
+    }
+    </script>
+    <!-- HOME_STRUCTURED_DATA_END -->
 </head>
 <body class="home-page">
     <!-- Editorial home experience for Dynasty Prestige: hero, booking overlay and curated fleet routing. -->
@@ -77,7 +158,7 @@
         <div class="lab-shell lab-header__inner">
             <a href="/index.html" class="lab-brand" aria-label="Dynasty Prestige home">
                 <span class="lab-brand__crest" aria-hidden="true">
-                    <img src="/images/dp-crest-cropped.png" alt="" width="552" height="615">
+                    <img src="/images/dp-crest-optimized.png" alt="" width="192" height="214">
                 </span>
                 <span class="lab-brand__copy">
                     <strong>Dynasty Prestige</strong>
@@ -261,14 +342,14 @@
             <div class="hero-lab__overlay" aria-hidden="true"></div>
             <div class="hero-lab__glow" aria-hidden="true"></div>
             <div class="hero-lab__watermark" aria-hidden="true">
-                <img src="./images/dp-crest-cropped.png" alt="" width="552" height="615">
+                <img src="./images/dp-crest-optimized.png" alt="" width="192" height="214">
             </div>
 
             <div class="lab-shell hero-lab__shell">
                 <div class="hero-lab__body">
                     <div class="hero-lab__content-box">
                         <div class="hero-lab__body-copy">
-                            <img class="hero-lab__center-mark" src="./images/dp-crest-cropped.png" alt="" aria-hidden="true" width="552" height="615">
+                            <img class="hero-lab__center-mark" src="./images/dp-crest-optimized.png" alt="" aria-hidden="true" width="192" height="214" fetchpriority="high">
                             <span class="hero-lab__eyebrow">Dubai luxury car rental</span>
                         <h1>Dubai luxury, delivered</h1>
                             <p class="hero-lab__lead">Curated supercars and SUVs, coordinated around Dubai hotels, villas and airports.</p>
@@ -391,7 +472,7 @@
                     <!-- HOME_FLEET_CARDS_START -->
                             <article class="fleet-card fleet-card--home fleet-visual-card fleet-visual-card--lamborghini" data-id="lamborghini-huracan-evo-spyder" data-car-name="Lamborghini Huracan EVO Spyder" data-brand="lamborghini" data-type="convertible sports" data-price="3200" data-detail-href="./lamborghini-huracan-evo-spyder-rental-dubai.html" tabindex="0" aria-label="View Lamborghini Huracan EVO Spyder details" data-variant="experience-led">
                                 <a class="fleet-card__media fleet-visual-card__media" href="./lamborghini-huracan-evo-spyder-rental-dubai.html" data-home-fleet-car="Lamborghini Huracan EVO Spyder" data-home-fleet-price="3200">
-                                    <img src="./images/fleet-card-optimized/lamborghini-huracan-evo-spyder.webp" alt="Lamborghini Huracan EVO Spyder in Dubai" width="1024" height="682" loading="lazy" decoding="async">
+                                    <img src="./images/fleet-card-optimized/lamborghini-huracan-evo-spyder.webp" alt="Lamborghini Huracan EVO Spyder in Dubai" width="1024" height="682" srcset="./images/fleet-card-optimized/responsive/lamborghini-huracan-evo-spyder-640.webp 640w, ./images/fleet-card-optimized/lamborghini-huracan-evo-spyder.webp 1024w" sizes="(max-width: 760px) 78vw, 320px" loading="lazy" decoding="async">
                                     <span class="fleet-visual-card__shade" aria-hidden="true"></span>
                                 </a>
                                 <div class="fleet-card__content fleet-visual-card__body">
@@ -432,7 +513,7 @@
 
                             <article class="fleet-card fleet-card--home fleet-visual-card fleet-visual-card--ferrari" data-id="ferrari-296-gts" data-car-name="Ferrari 296 GTS" data-brand="ferrari" data-type="convertible sports" data-price="3400" data-detail-href="./ferrari-296-gts-rental-dubai.html" tabindex="0" aria-label="View Ferrari 296 GTS details" data-variant="experience-led">
                                 <a class="fleet-card__media fleet-visual-card__media" href="./ferrari-296-gts-rental-dubai.html" data-home-fleet-car="Ferrari 296 GTS" data-home-fleet-price="3400">
-                                    <img src="./images/fleet-card-optimized/ferrari-296-gts.webp" alt="Ferrari 296 GTS front stance" width="1024" height="599" loading="lazy" decoding="async">
+                                    <img src="./images/fleet-card-optimized/ferrari-296-gts.webp" alt="Ferrari 296 GTS front stance" width="1024" height="599" srcset="./images/fleet-card-optimized/responsive/ferrari-296-gts-640.webp 640w, ./images/fleet-card-optimized/ferrari-296-gts.webp 1024w" sizes="(max-width: 760px) 78vw, 320px" loading="lazy" decoding="async">
                                     <span class="fleet-visual-card__shade" aria-hidden="true"></span>
                                 </a>
                                 <div class="fleet-card__content fleet-visual-card__body">
@@ -473,7 +554,7 @@
 
                             <article class="fleet-card fleet-card--home fleet-visual-card fleet-visual-card--lamborghini" data-id="lamborghini-urus-sport" data-car-name="Lamborghini Urus SE" data-brand="lamborghini" data-type="suv luxury" data-price="3600" data-detail-href="./lamborghini-urus-rental-dubai.html" tabindex="0" aria-label="View Lamborghini Urus SE details" data-variant="premium-utility-led">
                                 <a class="fleet-card__media fleet-visual-card__media" href="./lamborghini-urus-rental-dubai.html" data-home-fleet-car="Lamborghini Urus SE" data-home-fleet-price="3600">
-                                    <img src="./images/fleet-card-optimized/lamborghini-urus-sport.webp" alt="Lamborghini Urus SE in Dubai" width="1024" height="682" loading="lazy" decoding="async">
+                                    <img src="./images/fleet-card-optimized/lamborghini-urus-sport.webp" alt="Lamborghini Urus SE in Dubai" width="1024" height="682" srcset="./images/fleet-card-optimized/responsive/lamborghini-urus-sport-640.webp 640w, ./images/fleet-card-optimized/lamborghini-urus-sport.webp 1024w" sizes="(max-width: 760px) 78vw, 320px" loading="lazy" decoding="async">
                                     <span class="fleet-visual-card__shade" aria-hidden="true"></span>
                                 </a>
                                 <div class="fleet-card__content fleet-visual-card__body">
@@ -514,7 +595,7 @@
 
                             <article class="fleet-card fleet-card--home fleet-visual-card fleet-visual-card--rolls" data-id="rolls-royce-cullinan-black-badge" data-car-name="Rolls-Royce Cullinan Black Badge" data-brand="rolls-royce" data-type="suv luxury" data-price="3750" data-detail-href="./rolls-royce-cullinan-black-badge-rental-dubai.html" tabindex="0" aria-label="View Rolls-Royce Cullinan Black Badge details" data-variant="premium-utility-led">
                                 <a class="fleet-card__media fleet-visual-card__media" href="./rolls-royce-cullinan-black-badge-rental-dubai.html" data-home-fleet-car="Rolls-Royce Cullinan Black Badge" data-home-fleet-price="3750">
-                                    <img src="./images/fleet-card-optimized/rolls-royce-cullinan-black-badge.webp" alt="Rolls-Royce Cullinan Black Badge in Dubai" width="1024" height="683" loading="lazy" decoding="async">
+                                    <img src="./images/fleet-card-optimized/rolls-royce-cullinan-black-badge.webp" alt="Rolls-Royce Cullinan Black Badge in Dubai" width="1024" height="683" srcset="./images/fleet-card-optimized/responsive/rolls-royce-cullinan-black-badge-640.webp 640w, ./images/fleet-card-optimized/rolls-royce-cullinan-black-badge.webp 1024w" sizes="(max-width: 760px) 78vw, 320px" loading="lazy" decoding="async">
                                     <span class="fleet-visual-card__shade" aria-hidden="true"></span>
                                 </a>
                                 <div class="fleet-card__content fleet-visual-card__body">
@@ -584,7 +665,7 @@
                                 <span class="guest-reviews__stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
                             </div>
 
-                            <p class="guest-reviews__count" data-google-review-count>Loading official Google review data...</p>
+                            <p class="guest-reviews__count" data-google-review-count data-nosnippet>Loading official Google review data...</p>
 
                             <p class="guest-reviews__powered">
                                 Verified source:
@@ -617,7 +698,7 @@
                         </div>
 
                         <div class="guest-reviews__grid" data-google-reviews-grid>
-                            <article class="review-card review-card--google review-card--status" data-google-reviews-status>
+                            <article class="review-card review-card--google review-card--status" data-google-reviews-status data-nosnippet>
                                 <div class="review-card__topline">
                                     <div class="review-card__header">
                                         <span class="review-card__avatar review-card__avatar--google" aria-hidden="true">G</span>
@@ -641,7 +722,7 @@
                     <div class="site-v2-footer__top">
                         <div class="site-v2-footer__brand">
                             <span class="site-v2-footer__crest" aria-hidden="true">
-                                <img src="/images/dp-crest-cropped.png" alt="" width="552" height="615">
+                                <img src="/images/dp-crest-optimized.png" alt="" width="192" height="214">
                             </span>
                             <p>Luxury cars, chauffeur options and hotel, villa or airport handovers across Dubai.</p>
                         </div>

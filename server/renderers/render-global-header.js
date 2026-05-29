@@ -296,7 +296,7 @@ function renderMainNav(navItems, currentPublicPath) {
 function buildHeaderMarkup(config, currentPublicPath) {
     const utilityMarkup = renderUtilityLinks(config.utilityLinks);
     const navMarkup = renderMainNav(config.navItems, currentPublicPath);
-    const crestDimensions = renderImageDimensionAttributes(siteRoot, '/images/dp-crest-cropped.png');
+    const crestDimensions = renderImageDimensionAttributes(siteRoot, '/images/dp-crest-optimized.png');
     const reserveMarkup = config.primaryButton.visible
         ? `            <a href="${escapeHtml(config.primaryButton.href)}" class="lab-reserve">${escapeHtml(config.primaryButton.label)}</a>`
         : '';
@@ -306,7 +306,7 @@ function buildHeaderMarkup(config, currentPublicPath) {
         '        <div class="lab-shell lab-header__inner">',
         '            <a href="/index.html" class="lab-brand" aria-label="Dynasty Prestige home">',
         '                <span class="lab-brand__crest" aria-hidden="true">',
-        `                    <img src="/images/dp-crest-cropped.png" alt=""${crestDimensions}>`,
+        `                    <img src="/images/dp-crest-optimized.png" alt=""${crestDimensions}>`,
         '                </span>',
         '                <span class="lab-brand__copy">',
         '                    <strong>Dynasty Prestige</strong>',

@@ -1537,7 +1537,7 @@ function initSiteV2() {
                 <div class="lab-mobile-drawer__header">
                     <div class="lab-mobile-drawer__brand">
                         <span class="lab-mobile-drawer__crest" aria-hidden="true">
-                            <img src="/images/dp-crest-cropped.png" width="192" height="192" loading="lazy" decoding="async" alt="">
+                            <img src="/images/dp-crest-optimized.png" width="192" height="214" loading="lazy" decoding="async" alt="">
                         </span>
                         <div class="lab-mobile-drawer__brand-copy">
                             <strong>Dynasty Prestige</strong>
@@ -2387,7 +2387,7 @@ function initSiteV2() {
             }
 
             grid.innerHTML = `
-                <article class="review-card review-card--google review-card--status">
+                <article class="review-card review-card--google review-card--status" data-nosnippet>
                     <div class="review-card__topline">
                         <div class="review-card__header">
                             <span class="review-card__avatar review-card__avatar--google" aria-hidden="true">G</span>
