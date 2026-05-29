@@ -1,7 +1,9 @@
 // Backend para Stripe - Node.js/Express
 // Dynasty Prestige - API Server
 
-require('dotenv').config();
+if (process.env.PGM_SKIP_DOTENV !== 'true') {
+    require('dotenv').config();
+}
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -758,6 +760,11 @@ app.get('/admin/reservations', requireAdminAllowedIp, requireAdminSession({ redi
 app.get('/admin/reservations.html', requireAdminAllowedIp, requireAdminSession({ redirectToLogin: true }), (req, res) => {
     setAdminNoIndexHeaders(res);
     res.type('html').send(renderAdminReservationsPage());
+});
+
+app.get(['/api/admin/content', '/api/admin/visual-editor'], requireAdminAllowedIp, (req, res) => {
+    setAdminNoIndexHeaders(res);
+    res.status(404).json({ error: 'Not found' });
 });
 
 app.use('/api/admin', requireAdminAllowedIp, requireAdminBrowserRequest, requireAdminSession(), createAdminReservationsRouter());

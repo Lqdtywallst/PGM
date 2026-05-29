@@ -1,7 +1,9 @@
 // API route for reservations
 // Handles all reservation-related operations
 
-require('dotenv').config();
+if (process.env.PGM_SKIP_DOTENV !== 'true') {
+    require('dotenv').config();
+}
 const express = require('express');
 const {
     EMAIL_CONFIG,

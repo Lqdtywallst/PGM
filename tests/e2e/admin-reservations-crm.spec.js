@@ -4,6 +4,14 @@ const crypto = require('node:crypto');
 const net = require('node:net');
 const path = require('node:path');
 
+process.env.APP_ENV = 'test';
+process.env.PGM_APP_ENV = 'test';
+process.env.PGM_SKIP_DOTENV = 'true';
+process.env.NODE_ENV = 'test';
+delete process.env.DATABASE_URL;
+delete process.env.STRIPE_SECRET_KEY;
+delete process.env.STRIPE_WEBHOOK_SECRET;
+
 const {
     deleteReservationRecord,
     saveReservationRecord
@@ -111,6 +119,9 @@ test.describe('Private admin reservations CRM', () => {
                 ADMIN_PASSWORD_HASH: hashAdminPassword(adminPassword),
                 ADMIN_SESSION_SECRET: `test-secret-${crypto.randomBytes(32).toString('hex')}`,
                 CONTACT_FORM_LOG_ONLY: 'true',
+                APP_ENV: 'test',
+                PGM_APP_ENV: 'test',
+                PGM_SKIP_DOTENV: 'true',
                 NODE_ENV: 'test',
                 PORT: String(port)
             },
