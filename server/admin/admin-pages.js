@@ -1080,7 +1080,8 @@ function renderAdminReservationsPage() {
             overflow: hidden;
         }
         .calendar-month__weekdays,
-        .calendar-month__grid {
+        .calendar-month__grid,
+        .calendar-month__week {
             display: grid;
             grid-template-columns: repeat(7, minmax(0, 1fr));
         }
@@ -1098,12 +1099,27 @@ function renderAdminReservationsPage() {
         .calendar-month__weekday:last-child {
             border-right: 0;
         }
-        .calendar-month__day {
-            min-height: 138px;
-            padding: 10px;
-            border-right: 1px solid rgba(122, 92, 37, 0.09);
+        .calendar-month__weeks {
+            display: grid;
+        }
+        .calendar-month__week {
+            --month-lane-count: 1;
+            grid-template-rows: 42px repeat(var(--month-lane-count), 38px);
+            min-height: calc(42px + (var(--month-lane-count) * 38px) + 18px);
             border-bottom: 1px solid rgba(122, 92, 37, 0.09);
             background: rgba(255, 255, 255, 0.72);
+            position: relative;
+        }
+        .calendar-month__week:last-child {
+            border-bottom: 0;
+        }
+        .calendar-month__day {
+            min-height: 0;
+            padding: 10px;
+            border-right: 1px solid rgba(122, 92, 37, 0.09);
+            background: rgba(255, 255, 255, 0.72);
+            position: relative;
+            z-index: 1;
         }
         .calendar-month__day:nth-child(7n) {
             border-right: 0;
@@ -1155,15 +1171,21 @@ function renderAdminReservationsPage() {
             scrollbar-width: thin;
         }
         .calendar-month__booking {
+            --booking-accent: var(--gold);
             width: 100%;
             min-width: 0;
-            padding: 7px 8px;
+            min-height: 32px;
+            align-self: start;
+            margin: 0 5px;
+            padding: 6px 8px;
             border: 1px solid rgba(66, 50, 31, 0.3);
-            border-left: 4px solid var(--gold);
+            border-left: 4px solid var(--booking-accent);
             border-radius: 11px;
             background: linear-gradient(180deg, #ffffff 0%, #fffaf1 100%);
             color: var(--ink);
             cursor: pointer;
+            position: relative;
+            z-index: 3;
             text-align: left;
             box-shadow: 0 8px 18px rgba(52, 38, 21, 0.08);
             transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
@@ -1177,10 +1199,48 @@ function renderAdminReservationsPage() {
             transform: translateY(-1px);
             outline: none;
         }
-        .calendar-month__booking.confirmed { border-left-color: var(--green); }
-        .calendar-month__booking.pending { border-left-color: var(--amber); }
+        .calendar-month__booking.confirmed { --booking-accent: var(--green); }
+        .calendar-month__booking.pending { --booking-accent: var(--amber); }
         .calendar-month__booking.failed,
-        .calendar-month__booking.email { border-left-color: var(--red); }
+        .calendar-month__booking.email { --booking-accent: var(--red); }
+        .calendar-month__booking.is-multi-day {
+            background:
+                linear-gradient(90deg, color-mix(in srgb, var(--booking-accent) 18%, transparent), transparent 34px),
+                linear-gradient(180deg, #ffffff 0%, #fffaf1 100%);
+        }
+        .calendar-month__booking.is-segment-start:not(.is-segment-end) {
+            margin-right: -2px;
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+        .calendar-month__booking.is-segment-middle {
+            margin-left: -2px;
+            margin-right: -2px;
+            border-left-width: 1px;
+            border-radius: 5px;
+        }
+        .calendar-month__booking.is-segment-end:not(.is-segment-start) {
+            margin-left: -2px;
+            border-left-width: 1px;
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+        .calendar-month__booking.is-clipped-start::before,
+        .calendar-month__booking.is-clipped-end::after {
+            content: "";
+            position: absolute;
+            top: 9px;
+            bottom: 9px;
+            width: 2px;
+            background: var(--booking-accent);
+            opacity: 0.58;
+        }
+        .calendar-month__booking.is-clipped-start::before {
+            left: 2px;
+        }
+        .calendar-month__booking.is-clipped-end::after {
+            right: 2px;
+        }
         .calendar-month__vehicle,
         .calendar-month__meta {
             display: block;
@@ -2460,7 +2520,13 @@ function renderAdminReservationsPage() {
         }
 
         async function api(path, options) {
-            var response = await fetch(path, Object.assign({ credentials: 'same-origin' }, options || {}));
+            var requestOptions = Object.assign({}, options || {});
+            var headers = new Headers(requestOptions.headers || {});
+            headers.set('X-Admin-Request', 'XMLHttpRequest');
+            requestOptions.headers = headers;
+            requestOptions.credentials = 'same-origin';
+
+            var response = await fetch(path, requestOptions);
             if (response.status === 401) {
                 window.location.href = '/admin/login.html';
                 return Promise.reject(new Error('Admin session required'));
@@ -2515,6 +2581,29 @@ function renderAdminReservationsPage() {
             if (item.continuesBefore && !item.isEnd) pieces.push('Continues');
             if (item.isEnd && item.isMultiDay) pieces.push('Return');
             if (item.isStart && item.isMultiDay) pieces.push('Pickup');
+            return pieces.join(' - ');
+        }
+
+        function calendarMonthReservationMeta(item) {
+            var pieces = [];
+            var timePieces = [];
+            if (item.customer) pieces.push(item.customer);
+
+            if (item.pickupTime && !item.segmentStartsBefore) {
+                timePieces.push('Pickup ' + item.pickupTime);
+            }
+            if (item.dropoffTime && !item.segmentEndsAfter) {
+                timePieces.push('Return ' + item.dropoffTime);
+            }
+
+            if (timePieces.length) {
+                pieces.push(timePieces.join(' - '));
+            } else if (item.segmentStartsBefore || item.segmentEndsAfter || item.continuesBefore || item.continuesAfter) {
+                pieces.push('Continues');
+            } else if (item.dayTime) {
+                pieces.push(item.dayTime);
+            }
+
             return pieces.join(' - ');
         }
 
@@ -2599,15 +2688,88 @@ function renderAdminReservationsPage() {
             '</div>';
         }
 
+        function buildMonthWeekPlan(weekDays) {
+            var weekStart = weekDays[0] ? weekDays[0].date : '';
+            var weekEnd = weekDays[weekDays.length - 1] ? weekDays[weekDays.length - 1].date : '';
+            var reservationsById = {};
+
+            weekDays.forEach(function (day) {
+                (Array.isArray(day.reservations) ? day.reservations : []).forEach(function (reservation) {
+                    if (!reservation || !reservation.id) return;
+                    reservationsById[reservation.id] = reservation;
+                });
+            });
+
+            var segments = Object.keys(reservationsById).map(function (id) {
+                var reservation = reservationsById[id];
+                var segmentStartDate = reservation.startDate > weekStart ? reservation.startDate : weekStart;
+                var segmentEndDate = reservation.endDate < weekEnd ? reservation.endDate : weekEnd;
+                var startIndex = weekDays.findIndex(function (day) { return day.date === segmentStartDate; });
+                var endIndex = weekDays.findIndex(function (day) { return day.date === segmentEndDate; });
+
+                if (startIndex < 0 || endIndex < startIndex) return null;
+
+                return {
+                    ...reservation,
+                    segmentStartDate,
+                    segmentEndDate,
+                    segmentColumn: startIndex + 1,
+                    segmentSpan: endIndex - startIndex + 1,
+                    segmentStartsBefore: reservation.startDate < segmentStartDate,
+                    segmentEndsAfter: reservation.endDate > segmentEndDate,
+                    isSegmentStart: reservation.startDate === segmentStartDate,
+                    isSegmentEnd: reservation.endDate === segmentEndDate
+                };
+            }).filter(Boolean).sort(function (left, right) {
+                return left.segmentColumn - right.segmentColumn ||
+                    right.segmentSpan - left.segmentSpan ||
+                    display(left.vehicle, '').localeCompare(display(right.vehicle, '')) ||
+                    display(left.customer, '').localeCompare(display(right.customer, ''));
+            });
+
+            var laneEnds = [];
+            segments = segments.map(function (segment) {
+                var lane = laneEnds.findIndex(function (lastColumn) {
+                    return segment.segmentColumn > lastColumn;
+                });
+                if (lane === -1) {
+                    lane = laneEnds.length;
+                }
+                laneEnds[lane] = segment.segmentColumn + segment.segmentSpan - 1;
+                return {
+                    ...segment,
+                    monthLane: lane
+                };
+            });
+
+            return {
+                laneCount: Math.max(1, laneEnds.length),
+                segments
+            };
+        }
+
         function renderMonthBooking(item) {
+            var classes = calendarStatusClasses('calendar-month__booking', item).split(' ');
+            var span = Math.max(1, Number(item.segmentSpan || 1));
+            var column = Math.max(1, Number(item.segmentColumn || 1));
+            var row = Math.max(2, Number(item.monthLane || 0) + 2);
+            var isMultiDay = item.isMultiDay || span > 1;
             var label = 'Open reservation ' + display(item.vehicle, 'Vehicle not set') + ' for ' + display(item.customer, 'guest');
-            return '<button class="' + escapeHtml(calendarStatusClasses('calendar-month__booking', item)) + '" type="button" data-calendar-reservation-id="' + escapeHtml(item.id) + '" aria-label="' + escapeHtml(label) + '">' +
+
+            classes.push(isMultiDay ? 'is-multi-day' : 'is-single-day');
+            if (item.isSegmentStart) classes.push('is-segment-start');
+            if (item.isSegmentEnd) classes.push('is-segment-end');
+            if (isMultiDay && !item.isSegmentStart && !item.isSegmentEnd) classes.push('is-segment-middle');
+            if (item.segmentStartsBefore) classes.push('is-clipped-start');
+            if (item.segmentEndsAfter) classes.push('is-clipped-end');
+
+            return '<button class="' + escapeHtml(classes.join(' ')) + '" type="button" data-calendar-reservation-id="' + escapeHtml(item.id) + '" aria-label="' + escapeHtml(label) + '" style="grid-column:' + escapeHtml(column) + ' / span ' + escapeHtml(span) + ';grid-row:' + escapeHtml(row) + '">' +
                 '<span class="calendar-month__vehicle">' + escapeHtml(display(item.vehicle, 'Vehicle not set')) + '</span>' +
-                '<span class="calendar-month__meta">' + escapeHtml(calendarReservationMeta(item) || display(item.statusLabel, 'Reservation')) + '</span>' +
+                '<span class="calendar-month__meta">' + escapeHtml(calendarMonthReservationMeta(item) || display(item.statusLabel, 'Reservation')) + '</span>' +
             '</button>';
         }
 
-        function renderMonthDay(day) {
+        function renderMonthDay(day, index, laneCount) {
             var reservations = Array.isArray(day.reservations) ? day.reservations : [];
             var classes = ['calendar-month__day'];
             if (!day.isCurrentMonth) classes.push('is-muted');
@@ -2616,13 +2778,23 @@ function renderAdminReservationsPage() {
             var countLabel = reservations.length
                 ? reservations.length + ' booking' + (reservations.length === 1 ? '' : 's')
                 : '';
-            return '<section class="' + escapeHtml(classes.join(' ')) + '">' +
+            return '<section class="' + escapeHtml(classes.join(' ')) + '" style="grid-column:' + escapeHtml(index + 1) + ';grid-row:1 / span ' + escapeHtml(laneCount + 1) + '">' +
                 '<div class="calendar-month__day-head">' +
                     '<span class="calendar-month__date">' + escapeHtml(day.dayNumber || String(day.date || '').slice(-2)) + '</span>' +
                     '<span class="calendar-month__count">' + escapeHtml(countLabel) + '</span>' +
                 '</div>' +
-                '<div class="calendar-month__items">' + reservations.map(renderMonthBooking).join('') + '</div>' +
             '</section>';
+        }
+
+        function renderMonthWeek(weekDays) {
+            var plan = buildMonthWeekPlan(weekDays);
+            var laneCount = plan.laneCount;
+            return '<div class="calendar-month__week" style="--month-lane-count:' + escapeHtml(laneCount) + '">' +
+                weekDays.map(function (day, index) {
+                    return renderMonthDay(day, index, laneCount);
+                }).join('') +
+                plan.segments.map(renderMonthBooking).join('') +
+            '</div>';
         }
 
         function renderCalendarMonth(data) {
@@ -2631,11 +2803,15 @@ function renderAdminReservationsPage() {
                 return '<div class="empty">No calendar days available.</div>';
             }
             var weekdayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            var weeks = [];
+            for (var index = 0; index < days.length; index += 7) {
+                weeks.push(days.slice(index, index + 7));
+            }
             return '<div class="calendar-month">' +
                 '<div class="calendar-month__weekdays">' + weekdayLabels.map(function (label) {
                     return '<span class="calendar-month__weekday">' + escapeHtml(label) + '</span>';
                 }).join('') + '</div>' +
-                '<div class="calendar-month__grid">' + days.map(renderMonthDay).join('') + '</div>' +
+                '<div class="calendar-month__weeks">' + weeks.map(renderMonthWeek).join('') + '</div>' +
             '</div>';
         }
 

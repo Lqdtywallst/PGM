@@ -11,7 +11,10 @@ const {
     verifyAdminSessionToken,
     verifyPasswordHash
 } = require('../../server/admin/admin-auth');
-const { renderAdminLoginPage } = require('../../server/admin/admin-pages');
+const {
+    renderAdminLoginPage,
+    renderAdminReservationsPage
+} = require('../../server/admin/admin-pages');
 
 test('admin password hashes verify with PBKDF2 and reject wrong passwords', () => {
     const passwordHash = hashAdminPassword('safe-password', {
@@ -124,4 +127,11 @@ test('admin login page sends the browser request verification header', () => {
 
     assert.match(html, /fetch\('\/api\/admin\/login'/);
     assert.match(html, /'X-Admin-Request': 'XMLHttpRequest'/);
+});
+
+test('admin reservations page sends the browser request verification header for CRM API calls', () => {
+    const html = renderAdminReservationsPage();
+
+    assert.match(html, /function api\(path, options\)/);
+    assert.match(html, /headers\.set\('X-Admin-Request', 'XMLHttpRequest'\)/);
 });
